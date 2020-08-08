@@ -660,7 +660,7 @@ class InteractionInstance(python_utils.OBJECT):
         except KeyError:
             raise utils.ValidationError('Invalid interaction id: %s' % self.id)
 
-        self.validate_customization_args()
+        self._validate_customization_args()
 
         if not isinstance(self.answer_groups, list):
             raise utils.ValidationError(
@@ -695,7 +695,7 @@ class InteractionInstance(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
-    def validate_customization_args(self):
+    def _validate_customization_args(self):
         """Validates the customization arguments keys and values using
         customization_args_util.validate_customization_args_and_values().
         """
