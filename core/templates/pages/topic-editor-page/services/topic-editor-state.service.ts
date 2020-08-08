@@ -62,6 +62,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
     var _topicIsInitialized = false;
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
+    var _topicWithNameExists = false;
+    var _topicWithUrlFragmentExists = false;
     var _canonicalStorySummaries = [];
     var _skillIdToRubricsObject = {};
     var _skillQuestionCountDict = {};
@@ -69,6 +71,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
       current: [],
       others: []
     };
+    var _classroomUrlFragment = 'staging';
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -117,6 +120,9 @@ angular.module('oppia').factory('TopicEditorStateService', [
       }
       return null;
     };
+    var _updateClassroomUrlFragment = function(classroomUrlFragment) {
+      _classroomUrlFragment = classroomUrlFragment;
+    };
     var _updateTopic = function(newBackendTopicDict, skillIdToDescriptionDict) {
       _setTopic(
         TopicObjectFactory.create(
@@ -154,6 +160,15 @@ angular.module('oppia').factory('TopicEditorStateService', [
         });
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
+
+    var _setTopicWithNameExists = function(topicWithNameExists) {
+      _topicWithNameExists = topicWithNameExists;
+    };
+
+    var _setTopicWithUrlFragmentExists = function(topicWithUrlFragmentExists) {
+      _topicWithUrlFragmentExists = topicWithUrlFragmentExists;
+    };
+
     return {
       /**
        * Loads, or reloads, the topic stored by this service given a
@@ -177,6 +192,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
               newBackendTopicObject.groupedSkillSummaries);
             _updateSkillIdToRubricsObject(
               newBackendTopicObject.skillIdToRubricsDict);
+            _updateClassroomUrlFragment(
+              newBackendTopicObject.classroomUrlFragment);
             EditableTopicBackendApiService.fetchStories(topicId).then(
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
@@ -206,6 +223,21 @@ angular.module('oppia').factory('TopicEditorStateService', [
       getSkillQuestionCountDict: function() {
         return _skillQuestionCountDict;
       },
+
+      /**
+       * Returns whether the topic name already exists on the server.
+       */
+      getTopicWithNameExists: function() {
+        return _topicWithNameExists;
+      },
+
+      /**
+       * Returns whether the topic URL fragment already exists on the server.
+       */
+      getTopicWithUrlFragmentExists: function() {
+        return _topicWithUrlFragmentExists;
+      },
+
       /**
        * Loads, or reloads, the subtopic page stored by this service given a
        * specified topic ID and subtopic ID.
@@ -429,6 +461,62 @@ angular.module('oppia').factory('TopicEditorStateService', [
        */
       isSavingTopic: function() {
         return _topicIsBeingSaved;
+      },
+
+      /**
+       * Returns the classroom name for the topic.
+       */
+      getClassroomUrlFragment: function() {
+        return _classroomUrlFragment;
+      },
+
+      /**
+       * Attempts to set the boolean variable _topicWithNameExists based
+       * on the value returned by doesTopicWithNameExistAsync and
+       * executes the success callback provided. No arguments are passed to the
+       * success callback. Execution of the success callback indicates that the
+       * async backend call was successful and that _topicWithNameExists
+       * has been successfully updated.
+       */
+      updateExistenceOfTopicName: function(topicName, successCallback) {
+        EditableTopicBackendApiService.doesTopicWithNameExistAsync(
+          topicName).then(
+          function(topicNameExists) {
+            _setTopicWithNameExists(topicNameExists);
+            if (successCallback) {
+              successCallback();
+            }
+          }, function(error) {
+            AlertsService.addWarning(
+              error ||
+              'There was an error when checking if the topic name ' +
+              'exists for another topic.');
+          });
+      },
+
+      /**
+       * Attempts to set the boolean variable _topicWithUrlFragmentExists based
+       * on the value returned by doesTopicWithUrlFragmentExistAsync and
+       * executes the success callback provided. No arguments are passed to the
+       * success callback. Execution of the success callback indicates that the
+       * async backend call was successful and that _topicWithUrlFragmentExists
+       * has been successfully updated.
+       */
+      updateExistenceOfTopicUrlFragment: function(
+          topicUrlFragment, successCallback) {
+        EditableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
+          topicUrlFragment).then(
+          function(topicUrlFragmentExists) {
+            _setTopicWithUrlFragmentExists(topicUrlFragmentExists);
+            if (successCallback) {
+              successCallback();
+            }
+          }, function(error) {
+            AlertsService.addWarning(
+              error ||
+              'There was an error when checking if the topic url fragment ' +
+              'exists for another topic.');
+          });
       }
     };
   }

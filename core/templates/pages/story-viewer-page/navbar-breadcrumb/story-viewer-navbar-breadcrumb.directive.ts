@@ -26,18 +26,22 @@ angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-viewer-page/navbar-breadcrumb/' +
         'story-viewer-navbar-breadcrumb.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$rootScope', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
-        function($rootScope, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
+      controller: [
+        '$rootScope', 'UrlService', 'TOPIC_VIEWER_STORY_URL_TEMPLATE',
+        function(
+            $rootScope, UrlService, TOPIC_VIEWER_STORY_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getTopicUrl = function() {
             return UrlInterpolationService.interpolateUrl(
-              TOPIC_VIEWER_URL_TEMPLATE, {
-                topic_name: ctrl.topicName
+              TOPIC_VIEWER_STORY_URL_TEMPLATE, {
+                topic_url_fragment: (
+                  UrlService.getTopicUrlFragmentFromLearnerUrl()),
+                classroom_url_fragment: (
+                  UrlService.getClassroomUrlFragmentFromLearnerUrl())
               });
           };
 

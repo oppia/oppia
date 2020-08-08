@@ -2022,6 +2022,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;qu'
             'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20207'
             '261338imzlvnf23a_height_4d123_width_23d122_vertical_2d123.svg&a'
+            'mp;quot;}"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;qu'
+            'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20207'
+            '261338imzlvnf23a_height_4d123_width_23d122_vertical_2d123.svg&a'
             'mp;quot;}"></oppia-noninteractive-math>')
 
         filename1 = (
@@ -2038,9 +2043,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             (filename3, '(x - a_1)(x - a_2)')]
 
         self.assertEqual(
-            html_validation_service.
-            extract_svg_filename_latex_mapping_in_math_rte_components(
-                html_string), expected_output)
+            sorted(
+                html_validation_service.
+                extract_svg_filename_latex_mapping_in_math_rte_components(
+                    html_string)), sorted(expected_output))
 
     def test_check_for_math_component_in_html(self):
         """Test that the check_for_math_component_in_html method checks for
