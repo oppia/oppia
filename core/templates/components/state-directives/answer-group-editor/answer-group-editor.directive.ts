@@ -44,6 +44,8 @@ require(
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -82,6 +84,7 @@ angular.module('oppia').directive('answerGroupEditor', [
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
 
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
@@ -291,18 +294,25 @@ angular.module('oppia').directive('answerGroupEditor', [
                 ctrl.saveRules();
               }
             });
-            $scope.$on('onInteractionIdChanged', function() {
-              if (ctrl.isRuleEditorOpen()) {
-                ctrl.saveRules();
-              }
-              $scope.$broadcast('updateAnswerGroupInteractionId');
-              ctrl.answerChoices = ctrl.getAnswerChoices();
-            });
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                () => {
+                  if (ctrl.isRuleEditorOpen()) {
+                    ctrl.saveRules();
+                  }
+                  $scope.$broadcast('updateAnswerGroupInteractionId');
+                  ctrl.answerChoices = ctrl.getAnswerChoices();
+                }
+              )
+            );
             ctrl.rules = ctrl.getRules();
             ctrl.rulesMemento = null;
             ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
             ctrl.editAnswerGroupForm = {};
             ctrl.answerChoices = ctrl.getAnswerChoices();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

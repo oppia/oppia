@@ -554,34 +554,38 @@ angular.module('oppia').directive('stateResponses', [
               return UrlInterpolationService.getStaticImageUrl(imagePath);
             };
 
-            $scope.$on('onInteractionIdChanged', function(
-                evt, newInteractionId) {
-              $rootScope.$broadcast('externalSave');
-              ResponsesService.onInteractionIdChanged(
-                newInteractionId, function(newAnswerGroups, newDefaultOutcome) {
-                  $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
-                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
-                  $scope.refreshWarnings()();
-                  $scope.answerGroups = ResponsesService.getAnswerGroups();
-                  $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                (newInteractionId) => {
+                  $rootScope.$broadcast('externalSave');
+                  ResponsesService.onInteractionIdChanged(newInteractionId,
+                    function(newAnswerGroups, newDefaultOutcome) {
+                      $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                      $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                      $scope.refreshWarnings()();
+                      $scope.answerGroups = ResponsesService.getAnswerGroups();
+                      $scope.defaultOutcome =
+                        ResponsesService.getDefaultOutcome();
 
-                  // Reinitialize training data if the interaction ID is
-                  // changed.
-                  _initializeTrainingData();
+                      // Reinitialize training data if the interaction ID is
+                      // changed.
+                      _initializeTrainingData();
 
-                  $scope.activeAnswerGroupIndex = (
-                    ResponsesService.getActiveAnswerGroupIndex());
-                });
+                      $scope.activeAnswerGroupIndex = (
+                        ResponsesService.getActiveAnswerGroupIndex());
+                    });
 
-              // Prompt the user to create a new response if it is not a linear
-              // or non-terminal interaction and if an actual interaction is
-              // specified (versus one being deleted).
-              if (newInteractionId &&
-                  !INTERACTION_SPECS[newInteractionId].is_linear &&
-                  !INTERACTION_SPECS[newInteractionId].is_terminal) {
-                $scope.openAddAnswerGroupModal();
-              }
-            });
+                  // Prompt the user to create a new response if it is not a
+                  // linear or non-terminal interaction and if an actual
+                  // interaction is specified (versus one being deleted).
+                  if (newInteractionId &&
+                      !INTERACTION_SPECS[newInteractionId].is_linear &&
+                      !INTERACTION_SPECS[newInteractionId].is_terminal) {
+                    $scope.openAddAnswerGroupModal();
+                  }
+                }
+              )
+            );
 
             ctrl.directiveSubscriptions.add(
               ResponsesService.onAnswerGroupsChanged.subscribe(
@@ -636,7 +640,6 @@ angular.module('oppia').directive('stateResponses', [
             }
             StateEditorService.updateStateResponsesInitialised();
           };
-
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();
           };
