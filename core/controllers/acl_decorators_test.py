@@ -2284,12 +2284,12 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
         @acl_decorators.can_access_subtopic_viewer_page
-        def get(self, unused_topic_name, subtopic_id):
-            self.render_json({'subtopic_id': subtopic_id})
+        def get(self, unused_topic_url_fragment, subtopic_url_fragment):
+            self.render_json({'subtopic_url_fragment': subtopic_url_fragment})
 
     class MockPageHandler(base.BaseHandler):
         @acl_decorators.can_access_subtopic_viewer_page
-        def get(self, unused_topic_name, unused_subtopic_id):
+        def get(self, unused_topic_url_fragment, unused_subtopic_url_fragment):
             self.render_template('subtopic-viewer-page.mainpage.html')
 
     def setUp(self):
@@ -2303,10 +2303,10 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         self.set_banned_users([self.banned_user])
         subtopic_data_url = (
             '/mock_subtopic_data/<classroom_url_fragment>/'
-            '<topic_url_fragment>/<subtopic_id>')
+            '<topic_url_fragment>/<subtopic_url_fragment>')
         subtopic_page_url = (
             '/mock_subtopic_page/<classroom_url_fragment>/'
-            '<topic_url_fragment>/revision/<subtopic_id>')
+            '<topic_url_fragment>/revision/<subtopic_url_fragment>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
                 webapp2.Route(subtopic_data_url, self.MockDataHandler),
@@ -2345,37 +2345,37 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def test_cannot_access_non_existent_subtopic(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_subtopic_data/staging/topic/revision/non-existent-frag',
+                '/mock_subtopic_data/staging/topic-frag/non-existent-frag',
                 expected_status_int=404)
 
     def test_cannot_access_subtopic_when_topic_is_not_published(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_subtopic_data/staging/topic/revision/sub-one-frag',
+                '/mock_subtopic_data/staging/topic-frag/sub-one-frag',
                 expected_status_int=404)
 
     def test_can_access_subtopic_when_topic_is_published(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_subtopic_data/staging/topic/revision/sub-one-frag',
+                '/mock_subtopic_data/staging/topic-frag/sub-one-frag',
                 expected_status_int=200)
 
     def test_can_access_subtopic_when_all_url_fragments_are_valid(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_html_response(
-                '/mock_subtopic_page/staging/topic/revision/sub-one-frag',
+                '/mock_subtopic_page/staging/topic-frag/revision/sub-one-frag',
                 expected_status_int=200)
 
     def test_fall_back_to_revision_page_if_subtopic_url_frag_is_invalid(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic/revision/000',
+                '/mock_subtopic_page/staging/topic-frag/revision/000',
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic/revision',
+                'http://localhost/learn/staging/topic-frag/revision',
                 response.headers['location'])
 
     def test_redirect_to_classroom_if_abbreviated_topic_is_invalid(self):
@@ -2392,10 +2392,11 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/math/topic/revision/sub-one-frag',
+                '/mock_subtopic_page/math/topic-frag/revision/sub-one-frag',
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic/revision/sub-one-frag',
+                'http://localhost/learn/staging/topic-frag/revision'
+                '/sub-one-frag',
                 response.headers['location'])
 
 
