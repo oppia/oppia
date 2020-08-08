@@ -956,7 +956,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
     def create_exploration_with_states_schema_version(
             self, states_schema_version, exp_id, user_id, states_dict):
         """Saves a new default exploration with the given states dictionary in
-        the given state schema version. All passed state dictionaries in 
+        the given state schema version. All passed state dictionaries in
         'states_dict' must have the states schema version indicated by
         'states_schema_version'.
 
@@ -1233,7 +1233,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         mock_conversion = classmethod(
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
-        swap_conversion =  self.swap(
+        swap_conversion = self.swap(
             exp_domain.Exploration,
             '_convert_v41_dict_to_v42_dict',
             mock_conversion)
