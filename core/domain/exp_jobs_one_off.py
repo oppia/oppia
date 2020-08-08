@@ -273,65 +273,52 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         current_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
-        current_exp_schema_version = (
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
 
-        exploration_dict = item.to_dict()
-        states_schema_version = exploration_dict['states_schema_version']
+        states_schema_version = item.states_schema_version
         versioned_exploration_states = {
             'states_schema_version': states_schema_version,
-            'states': exploration_dict['states']
+            'states': item.states
         }
-        # Upgrading older explorations to current version - 1 before running the
-        # audit job.
-        while states_schema_version < current_state_schema_version - 1:
-            exp_domain.Exploration.update_states_from_model(
-                versioned_exploration_states, states_schema_version,
-                item.id)
-            states_schema_version += 1
-
-        exploration_dict['states'] = versioned_exploration_states['states']
-        exploration_dict['states_schema_version'] = states_schema_version
-
-        try:
-            conversion_fn = getattr(
-                exp_domain.Exploration,
-                '_convert_v%i_dict_to_v%i_dict' % (
-                    current_exp_schema_version - 1,
-                    current_exp_schema_version)
-            )
-            converted_dict = conversion_fn(exploration_dict)
-
+        while states_schema_version < current_state_schema_version:
+            try:
+                exp_domain.Exploration.update_states_from_model(
+                    versioned_exploration_states, states_schema_version,
+                    item.id)
+                states_schema_version += 1
+            except Exception as e:
+                error_message = (
+                    'Exploration %s failed migration to states v%s: %s' %
+                    (item.id, states_schema_version + 1, e))
+                logging.error(error_message)
+                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+                break
+            
             # TODO(iamprayush): Revert these changes (special-casing the
             # SUCCESS output for math interactions) after the migration job
             # for math interactions has been successfully run.
-            extracted_variables_output = []
-            for state_name, state_dict in converted_dict['states'].items():
-                if state_dict['interaction']['id'] in (
-                        'AlgebraicExpressionInput', 'MathEquationInput'):
-                    rule_inputs = []
-                    for group in state_dict['interaction']['answer_groups']:
-                        for rule_spec in group['rule_specs']:
-                            rule_inputs.append(rule_spec['inputs']['x'])
-                    customization_args = state_dict['interaction'][
-                        'customization_args']['customOskLetters']['value']
-                    extracted_variables_output.append(
-                        'State Name: %s, Rule Inputs: %s, Variables: %s' %
-                        (state_name, ', '.join(rule_inputs), ', '.join(
-                            customization_args)))
+            if states_schema_version == current_state_schema_version:
+                extracted_variables_output = []
+                for state_name, state_dict in versioned_exploration_states[
+                        'states'].items():
+                    if state_dict['interaction']['id'] in (
+                            'AlgebraicExpressionInput', 'MathEquationInput'):
+                        rule_inputs = []
+                        for group in state_dict['interaction']['answer_groups']:
+                            for rule_spec in group['rule_specs']:
+                                rule_inputs.append(rule_spec['inputs']['x'])
+                        customization_args = state_dict['interaction'][
+                            'customization_args']['customOskLetters']['value']
+                        extracted_variables_output.append(
+                            'State Name: %s, Rule Inputs: %s, Variables: %s' %
+                            (state_name, ', '.join(rule_inputs), ', '.join(
+                                customization_args)))
 
-            if len(extracted_variables_output):
-                output_values = 'Exp ID: %s: %s' % (
-                    item.id, extracted_variables_output)
-                yield ('SUCCESS_WITH_OUTPUT', output_values.encode('utf-8'))
-            else:
-                yield ('SUCCESS', None)
-        except Exception as e:
-            error_message = (
-                'Exploration %s failed migration to v%s: %s' %
-                (item.id, current_exp_schema_version, e))
-            logging.error(error_message)
-            yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+                if len(extracted_variables_output):
+                    output_values = 'Exp ID: %s: %s' % (
+                        item.id, extracted_variables_output)
+                    yield ('SUCCESS_WITH_OUTPUT', output_values.encode('utf-8'))
+                else:
+                    yield ('SUCCESS', None)
 
     @staticmethod
     def reduce(key, values):

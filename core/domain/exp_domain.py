@@ -3992,7 +3992,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v39.
+                with schema version v40.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
@@ -4013,11 +4013,11 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v39.
+                with schema version v41.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v41.
+            following schema version v42.
         """
         exploration_dict['schema_version'] = 42
 
