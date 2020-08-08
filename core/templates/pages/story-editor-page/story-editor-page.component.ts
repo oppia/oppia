@@ -120,6 +120,10 @@ angular.module('oppia').component('storyEditorPage', {
 
       var _validateStory = function() {
         ctrl.validationIssues = ctrl.story.validate();
+        if (StoryEditorStateService.getStoryWithUrlFragmentExists()) {
+          ctrl.validationIssues.push(
+            'Story URL fragment already exists.');
+        }
         _validateExplorations();
         var nodes = ctrl.story.getStoryContents().getNodes();
         var storyPrepublishValidationIssues = (

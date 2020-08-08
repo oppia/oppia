@@ -99,6 +99,7 @@ angular.module('oppia').directive('storyEditor', [
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
             $scope.editableUrlFragment = $scope.story.getUrlFragment();
+            $scope.initialStoryUrlFragment = $scope.story.getUrlFragment();
             $scope.editableNotes = $scope.story.getNotes();
             $scope.editableDescription = $scope.story.getDescription();
             $scope.editableDescriptionIsEmpty = (
@@ -242,17 +243,22 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.updateStoryUrlFragment = function(newUrlFragment) {
-            if (newUrlFragment === $scope.story.getUrlFragment()) {
+            if (newUrlFragment === $scope.initialStoryUrlFragment) {
               $scope.storyUrlFragmentExists = false;
               return;
             }
-            StoryEditorStateService.changeStoryWithUrlFragmentExists(
-              newUrlFragment, function() {
-                $scope.storyUrlFragmentExists = (
-                  StoryEditorStateService.getStoryWithUrlFragmentExists());
-                StoryUpdateService.setStoryUrlFragment(
-                  $scope.story, newUrlFragment);
-              });
+            if (newUrlFragment) {
+              StoryEditorStateService.updateExistenceOfStoryUrlFragment(
+                newUrlFragment, function() {
+                  $scope.storyUrlFragmentExists = (
+                    StoryEditorStateService.getStoryWithUrlFragmentExists());
+                  StoryUpdateService.setStoryUrlFragment(
+                    $scope.story, newUrlFragment);
+                });
+            } else {
+              StoryUpdateService.setStoryUrlFragment(
+                $scope.story, newUrlFragment);
+            }
           };
 
           $scope.updateStoryThumbnailFilename = function(

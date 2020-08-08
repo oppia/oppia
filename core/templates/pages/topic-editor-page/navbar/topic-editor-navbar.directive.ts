@@ -75,16 +75,28 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 'with the changes', 2000);
               return;
             }
+            var topicUrlFragment = $scope.topic.getUrlFragment();
+            var classroomUrlFragment = (
+              TopicEditorStateService.getClassroomUrlFragment());
             $window.open(
               UrlInterpolationService.interpolateUrl(
                 TOPIC_VIEWER_URL_TEMPLATE, {
-                  topic_name: $scope.topic.getName()
+                  topic_url_fragment: topicUrlFragment,
+                  classroom_url_fragment: classroomUrlFragment
                 }
               ), 'blank');
           };
 
           var _validateTopic = function() {
             $scope.validationIssues = $scope.topic.validate();
+            if (TopicEditorStateService.getTopicWithNameExists()) {
+              $scope.validationIssues.push(
+                'A topic with this name already exists.');
+            }
+            if (TopicEditorStateService.getTopicWithUrlFragmentExists()) {
+              $scope.validationIssues.push(
+                'Topic URL fragment already exists.');
+            }
             var prepublishTopicValidationIssues = (
               $scope.topic.prepublishValidate());
             var subtopicPrepublishValidationIssues = (
