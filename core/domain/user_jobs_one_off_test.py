@@ -200,10 +200,10 @@ class PopulateUserAuthModelOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off PopulateUserAuthModel migration job."""
 
     USER_A_EMAIL = 'a@example.com'
-    USER_A_ID = 'user_a_id'
+    USER_A_ID = 'uid_voxecidnxaqdvhmoilhxxgeixffkauxc'
     USER_A_GAE_ID = 'user_a_gae_id'
     USER_B_EMAIL = 'b@example.com'
-    USER_B_ID = 'user_b_id'
+    USER_B_ID = 'uid_mjmohemylmjjdqredntquhfvcyuindem'
     USER_B_GAE_ID = 'user_b_gae_id'
 
     def _run_one_off_job(self):
@@ -309,6 +309,20 @@ class PopulateUserAuthModelOneOffJobTests(test_utils.GenericTestBase):
         user_auth_model = user_models.UserAuthModel.get_by_auth_id(
             feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
         self.assertEqual(user_auth_model.id, self.USER_B_ID)
+
+    def test_mark_user_for_deletion_for_migrated_old_users_is_correct(self):
+        self._run_one_off_job()
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        self.assertEqual(user_auth_model.id, self.USER_A_ID)
+        self.assertFalse(user_auth_model.deleted)
+        user_services.mark_user_for_deletion(self.USER_A_ID)
+
+        self._run_one_off_job()
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        self.assertEqual(user_auth_model.id, self.USER_A_ID)
+        self.assertTrue(user_auth_model.deleted)
 
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):

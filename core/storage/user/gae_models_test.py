@@ -37,7 +37,7 @@ import utils
 class UserSettingsModelTest(test_utils.GenericTestBase):
     """Tests for UserSettingsModel class."""
 
-    NONEXISTENT_USER_ID = 'auth_method_x'
+    NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_id'
     USER_1_GAE_ID = 'gae_id'
     USER_1_EMAIL = 'user@example.com'
@@ -2276,7 +2276,7 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
 class UserAuthModelTests(test_utils.GenericTestBase):
     """Tests for UserAuthModel."""
 
-    NONEXISTENT_AUTH_METHOD_NAME = 'id_x'
+    NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
     NONEXISTENT_USER_ID = 'id_x'
     NONREGISTERED_GAE_ID = 'gae_id_x'
     USER_ID = 'user_id'
