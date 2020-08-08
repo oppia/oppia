@@ -44,6 +44,7 @@ angular.module('oppia').factory('StoryEditorStateService', [
 
     var _storyInitializedEventEmitter = new EventEmitter();
     var _storyReinitializedEventEmitter = new EventEmitter();
+    var _viewStoryNodeEditorEventEmitter = new EventEmitter();
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
@@ -233,6 +234,10 @@ angular.module('oppia').factory('StoryEditorStateService', [
 
       get onStoryReinitialized() {
         return _storyReinitializedEventEmitter;
+      },
+
+      get onViewStoryNodeEditor() {
+        return _viewStoryNodeEditorEventEmitter;
       }
     };
   }

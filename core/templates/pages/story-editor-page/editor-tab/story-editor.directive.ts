@@ -54,15 +54,13 @@ angular.module('oppia').directive('storyEditor', [
       controller: [
         '$scope', '$window', 'StoryEditorStateService', 'StoryUpdateService',
         'UndoRedoService', 'StoryEditorNavigationService',
-        'WindowDimensionsService',
-        'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
+        'WindowDimensionsService', '$uibModal',
         'AlertsService', 'MAX_CHARS_IN_STORY_TITLE',
         'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
             $scope, $window, StoryEditorStateService, StoryUpdateService,
             UndoRedoService, StoryEditorNavigationService,
-            WindowDimensionsService,
-            EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
+            WindowDimensionsService, $uibModal,
             AlertsService, MAX_CHARS_IN_STORY_TITLE,
             MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
@@ -296,9 +294,11 @@ angular.module('oppia').directive('storyEditor', [
                 startupFocusEnabled: false
               }
             };
-            $scope.$on(EVENT_VIEW_STORY_NODE_EDITOR, function(evt, nodeId) {
-              $scope.setNodeToEdit(nodeId);
-            });
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onViewStoryNodeEditor.subscribe(
+                (nodeId) => $scope.setNodeToEdit(nodeId)
+              )
+            );
 
             $scope.$on('storyGraphUpdated', function(evt, storyContents) {
               _initEditor();
