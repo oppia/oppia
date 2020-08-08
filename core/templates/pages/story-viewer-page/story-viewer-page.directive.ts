@@ -108,7 +108,14 @@ angular.module('oppia').directive('storyViewerPage', [
           ctrl.getExplorationUrl = function(node) {
             var result = '/explore/' + node.getExplorationId();
             result = UrlService.addField(
-              result, 'story_id', UrlService.getStoryIdFromViewerUrl());
+              result, 'topic_url_fragment',
+              UrlService.getTopicUrlFragmentFromLearnerUrl());
+            result = UrlService.addField(
+              result, 'classroom_url_fragment',
+              UrlService.getClassroomUrlFragmentFromLearnerUrl());
+            result = UrlService.addField(
+              result, 'story_url_fragment',
+              UrlService.getStoryUrlFragmentFromLearnerUrl());
             result = UrlService.addField(
               result, 'node_id', node.getId());
             return result;
@@ -117,11 +124,20 @@ angular.module('oppia').directive('storyViewerPage', [
           ctrl.$onInit = function() {
             ctrl.storyIsLoaded = false;
             LoaderService.showLoadingScreen('Loading');
-            ctrl.storyId = UrlService.getStoryIdFromViewerUrl();
-            StoryViewerBackendApiService.fetchStoryData(ctrl.storyId).then(
+            var abbreviatedTopicName = (
+              UrlService.getTopicUrlFragmentFromLearnerUrl());
+            var classroomUrlFragment = (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl());
+            var storyUrlFragment = (
+              UrlService.getStoryUrlFragmentFromLearnerUrl());
+            StoryViewerBackendApiService.fetchStoryData(
+              abbreviatedTopicName,
+              classroomUrlFragment,
+              storyUrlFragment).then(
               function(storyDataDict) {
                 ctrl.storyIsLoaded = true;
                 ctrl.storyPlaythroughObject = storyDataDict;
+                ctrl.storyId = storyDataDict.id;
                 PageTitleService.setPageTitle(
                   storyDataDict.title + ' - Oppia');
                 ctrl.storyTitle = storyDataDict.title;

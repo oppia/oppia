@@ -23,13 +23,19 @@ require('domain/utilities/url-interpolation.service.ts');
 angular.module('oppia').component('storyViewerNavbarBreadcrumb', {
   template: require('./story-viewer-navbar-breadcrumb.component.html'),
   controller: [
-    '$rootScope', 'UrlInterpolationService', 'TOPIC_VIEWER_URL_TEMPLATE',
-    function($rootScope, UrlInterpolationService, TOPIC_VIEWER_URL_TEMPLATE) {
+    '$rootScope', 'UrlInterpolationService', 'UrlService',
+    'TOPIC_VIEWER_STORY_URL_TEMPLATE',
+    function(
+        $rootScope, UrlInterpolationService, UrlService,
+        TOPIC_VIEWER_STORY_URL_TEMPLATE) {
       var ctrl = this;
       ctrl.getTopicUrl = function() {
         return UrlInterpolationService.interpolateUrl(
-          TOPIC_VIEWER_URL_TEMPLATE, {
-            topic_name: ctrl.topicName
+          TOPIC_VIEWER_STORY_URL_TEMPLATE, {
+            topic_url_fragment: (
+              UrlService.getTopicUrlFragmentFromLearnerUrl()),
+            classroom_url_fragment: (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl())
           });
       };
 
