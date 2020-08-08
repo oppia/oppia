@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
@@ -52,6 +52,8 @@ export class ClassroomBackendApiService {
     private http: HttpClient,
     private classroomDataObjectFactory: ClassroomDataObjectFactory
   ) {}
+
+  private _initializeTranslationEventEmitter = new EventEmitter();
 
   _fetchClassroomData(classroomUrlFragment: string,
       successCallback: (value: ClassroomData) => void,
@@ -106,6 +108,10 @@ export class ClassroomBackendApiService {
     return new Promise((resolve, reject) => {
       this._fetchClassroomPageIsShownStatus(resolve, reject);
     });
+  }
+
+  get onInitializeTranslation() {
+    return this._initializeTranslationEventEmitter;
   }
 }
 

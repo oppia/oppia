@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { Subscription } from 'rxjs';
 // ^^^ This block is to be removed.
 
 require('pages/classroom-page/classroom-page.component.ts');
@@ -37,6 +38,9 @@ describe('Classroom page', () => {
 
   var loadingMessage = null;
   var subscriptions = [];
+  var testSubscriptions = null;
+
+  const translationInitializedSpy = jasmine.createSpy('topicInitialized');
   var classroomData = {};
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -76,6 +80,17 @@ describe('Classroom page', () => {
       set: () => {}
     });
   }));
+
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      ClassroomBackendApiService.onInitializeTranslation.subscribe(
+        translationInitializedSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
 
   afterEach(function() {
     for (let subscription of subscriptions) {
@@ -118,9 +133,8 @@ describe('Classroom page', () => {
       expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
         'Math Classroom | Oppia');
 
+      expect(translationInitializedSpy).toHaveBeenCalled();
       expect(ctrl.classroomData.getName()).toEqual('Math');
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'initializeTranslation');
     });
   });
 
