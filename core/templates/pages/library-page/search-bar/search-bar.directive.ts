@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Subscription } from 'rxjs';
+
 /**
  * @fileoverview Directive for the Search Bar.
  */
 
 require('filters/string-utility-filters/truncate.filter.ts');
 
+require('domain/classroom/classroom-backend-api.service.ts');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/construct-translation-ids.service.ts');
@@ -40,15 +43,20 @@ angular.module('oppia').directive('searchBar', [
       controllerAs: '$ctrl',
       controller: [
         '$location', '$rootScope', '$scope', '$timeout', '$translate',
-        '$window', 'ConstructTranslationIdsService', 'DebouncerService',
+        '$window', 'ClassroomBackendApiService',
+        'ConstructTranslationIdsService', 'DebouncerService',
         'HtmlEscaperService', 'LanguageUtilService', 'NavigationService',
         'SearchService', 'UrlService', 'SEARCH_DROPDOWN_CATEGORIES',
         function(
             $location, $rootScope, $scope, $timeout, $translate,
-            $window, ConstructTranslationIdsService, DebouncerService,
+            $window, ClassroomBackendApiService,
+            ConstructTranslationIdsService, DebouncerService,
             HtmlEscaperService, LanguageUtilService, NavigationService,
             SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
           var ctrl = this;
+
+          ctrl.directiveSubscriptions = new Subscription();
+
           ctrl.isSearchInProgress = function() {
             return SearchService.isSearchInProgress();
           };
@@ -278,7 +286,14 @@ angular.module('oppia').directive('searchBar', [
               }
             );
             $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
-            $rootScope.$on('initializeTranslation', refreshSearchBarLabels);
+            ctrl.directiveSubscriptions.add(
+              ClassroomBackendApiService.onInitializeTranslation.subscribe(
+                () => refreshSearchBarLabels()
+              )
+            );
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

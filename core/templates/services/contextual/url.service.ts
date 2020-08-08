@@ -100,29 +100,54 @@ export class UrlService {
   }
 
   /**
-   * This function is used to find the topic name
+   * This function is used to find the topic URL fragment
    * from the learner's url.
-   * @return {string} the topic name.
+   * @return {string} the topic URL fragment.
    * @throws Will throw an error if the url is invalid.
    */
-  getTopicNameFromLearnerUrl(): string {
+  getTopicUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
-    if (pathname.match(/\/(story|topic|subtopic|practice_session)/g)) {
-      return decodeURIComponent(pathname.split('/')[2]);
+    if (pathname.startsWith('/learn')) {
+      return decodeURIComponent(pathname.split('/')[3]);
     }
     throw new Error('Invalid URL for topic');
   }
 
+  getStoryUrlFragmentFromLearnerUrl(): string {
+    let pathname = this.getPathname();
+    if (
+      pathname.startsWith('/learn') &&
+      pathname.match(/\/story\/|\/review-test\//g)) {
+      return decodeURIComponent(pathname.split('/')[5]);
+    }
+    throw new Error('Invalid URL for story');
+  }
+
+  getSubtopicUrlFragmentFromLearnerUrl(): string {
+    let pathname = this.getPathname();
+    if (pathname.startsWith('/learn') && pathname.includes('/revision')) {
+      return decodeURIComponent(pathname.split('/')[5]);
+    }
+    throw new Error('Invalid URL for subtopic');
+  }
+
+  getClassroomUrlFragmentFromLearnerUrl(): string {
+    let pathname = this.getPathname();
+    if (pathname.startsWith('/learn')) {
+      return decodeURIComponent(pathname.split('/')[2]);
+    }
+    throw new Error('Invalid URL for classroom');
+  }
 
   /**
-   * This function is used to find the subtopic name from the learner's url.
+   * This function is used to find the subtopic name from the learner's URL.
    * @return {string} the subtopic name.
    * @throws Will throw an error if the url for practice session is invalid.
    */
   getSelectedSubtopicsFromUrl(): string {
     let pathname = this.getPathname();
     let queryStrings = this.getCurrentQueryString().split('=');
-    if (pathname.match(/\/practice_session/g) && queryStrings.length === 2) {
+    if (pathname.match(/\/practice/g) && queryStrings.length === 2) {
       return decodeURIComponent(queryStrings[1]);
     }
     throw new Error('Invalid URL for practice session');
@@ -130,15 +155,16 @@ export class UrlService {
 
 
   /**
-   * This function is used to find the classroom name from the learner's url.
-   * @return {string} the classroom name.
-   * @throws Will throw an error if the url is invalid.
+   * This function is used to find the classroom URL fragment from the learner's
+   * URL.
+   * @return {string} the classroom URL fragment.
+   * @throws Will throw an error if the URL is invalid.
    */
-  getClassroomNameFromUrl(): string {
+  getClassroomUrlFragmentFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
-    if (argumentsArray.length === 2) {
-      return decodeURIComponent(pathname.split('/')[1]);
+    if (pathname.startsWith('/learn') && argumentsArray.length === 3) {
+      return decodeURIComponent(pathname.split('/')[2]);
     }
     throw new Error('Invalid URL for classroom');
   }
@@ -151,8 +177,8 @@ export class UrlService {
   getSubtopicIdFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
-    if (pathname.match(/\/subtopic/g) && argumentsArray.length === 4) {
-      return decodeURIComponent(argumentsArray[3]);
+    if (pathname.match(/\/revision/g) && argumentsArray.length === 6) {
+      return decodeURIComponent(argumentsArray[5]);
     }
     throw new Error('Invalid URL for subtopic');
   }
@@ -164,8 +190,10 @@ export class UrlService {
    */
   getStoryIdFromUrl(): string {
     let pathname = this.getPathname();
-    if (pathname.match(/\/(story_editor|review_test)\/(\w|-){12}/g)) {
-      return pathname.split('/')[2];
+    var matchedPath = pathname.match(
+      /\/(story_editor|review-test)\/(\w|-){12}/g);
+    if (matchedPath) {
+      return matchedPath[0].split('/')[2];
     }
     throw new Error('Invalid story id url');
   }
@@ -178,7 +206,7 @@ export class UrlService {
   getStoryIdFromViewerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/story\/(\w|-){12}/g)) {
-      return pathname.split('/')[2];
+      return pathname.split('/')[5];
     }
     throw new Error('Invalid story id url');
   }
