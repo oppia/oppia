@@ -268,6 +268,19 @@ export class DragAndDropSortInputValidationService {
                   `${ranges[k].answerGroupIndex}.`)
               });
             }
+          } else if (rule.type ===
+            'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
+            earlierRule.type === 'IsEqualToOrdering') {
+            if (checkRedundancy(rule, earlierRule)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'will never be matched because it is made redundant by ' +
+                  `rule ${ranges[k].ruleIndex} from answer group ` +
+                  `${ranges[k].answerGroupIndex}.`)
+              });
+            }
           }
         }
         ranges.push(range);

@@ -33,7 +33,7 @@ import { VisualizationInfoObjectFactory } from
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
-fdescribe('State Interaction Stats Service', () => {
+describe('State Interaction Stats Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -72,34 +72,52 @@ fdescribe('State Interaction Stats Service', () => {
       interaction: {
         answer_groups: [
           {
-            ruleInputs: {
+            rule_input_translations_mapping: {},
+            rule_inputs: {
               Equals: [{x: 'hola!'}]
             },
             outcome: {
               dest: 'Me Llamo',
-              feedback: {},
-              param_changes: []
-            }
+              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            training_data: null,
+            tagged_skill_misconception_id: null,
           },
           {
-            ruleInputs: {
+            rule_input_translations_mapping: {},
+            rule_inputs: {
               Contains: [{x: 'hola'}]
             },
             outcome: {
               dest: 'Me Llamo',
-              feedback: {},
-              param_changes: []
-            }
+              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            training_data: null,
+            tagged_skill_misconception_id: null,
           },
           {
-            ruleInputs: {
+            rule_input_translations_mapping: {},
+            rule_inputs: {
               FuzzyEquals: [{x: 'hola'}]
             },
             outcome: {
-              dest: 'Hola',
-              feedback: {},
-              param_changes: []
-            }
+              dest: 'Me Llamo',
+              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            training_data: null,
+            tagged_skill_misconception_id: null,
           }
         ],
         confirmed_unclassified_answers: [],
@@ -114,11 +132,11 @@ fdescribe('State Interaction Stats Service', () => {
         },
         default_outcome: {
           dest: 'Hola',
-          feedback: {
-            content_id: 'default_outcome',
-            html: ''
-          },
-          param_changes: []
+          feedback: {content_id: 'default_outcome', html: ''},
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
         },
         hints: [],
         id: 'TextInput'
@@ -140,7 +158,7 @@ fdescribe('State Interaction Stats Service', () => {
     ).toBeTrue();
   });
 
-  fdescribe('when gathering stats from the backend', () => {
+  describe('when gathering stats from the backend', () => {
     it('should provide cached results after first call', fakeAsync(() => {
       this.statsCaptured = [];
       const captureStats = (stats: StateInteractionStats) => {
@@ -253,7 +271,7 @@ fdescribe('State Interaction Stats Service', () => {
       expect(this.onFailure).not.toHaveBeenCalled();
     }));
 
-    fit(
+    it(
       'should determine whether TextInput answers are addressed explicitly',
       fakeAsync(() => {
         this.onSuccess = jasmine.createSpy('success');
@@ -273,16 +291,16 @@ fdescribe('State Interaction Stats Service', () => {
         });
         flushMicrotasks();
 
-        // expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
-        //   visualizationsInfo: [this.joC({
-        //     data: [
-        //       this.joC({answer: 'Ni Hao', isAddressed: false}),
-        //       this.joC({answer: 'Aloha', isAddressed: false}),
-        //       this.joC({answer: 'Hola', isAddressed: true})
-        //     ]
-        //   })]
-        // }));
-        expect(this.onFailure).toHaveBeenCalledWith({});
+        expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
+          visualizationsInfo: [this.joC({
+            data: [
+              this.joC({answer: 'Ni Hao', isAddressed: false}),
+              this.joC({answer: 'Aloha', isAddressed: false}),
+              this.joC({answer: 'Hola', isAddressed: true})
+            ]
+          })]
+        }));
+        expect(this.onFailure).not.toHaveBeenCalled();
       }));
 
     it('should return content of MultipleChoiceInput answers', fakeAsync(() => {
