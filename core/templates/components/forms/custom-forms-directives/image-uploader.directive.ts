@@ -54,25 +54,25 @@ angular.module('oppia').directive('imageUploader', [
           }
 
           var imageTypeMapping = {
-            'jpeg': {
-              'format': 'image/jpeg',
-              'condition': [/jp(e?)g$/, /\.jp(e?)g$/],
+            jpeg: {
+              format: 'image/jpeg',
+              condition: [/jp(e?)g$/, /\.jp(e?)g$/],
             },
-            'jpg': {
-              'format': 'image/jpg',
-              'condition': [/jp(e?)g$/, /\.jp(e?)g$/],
+            jpg: {
+              format: 'image/jpg',
+              condition: [/jp(e?)g$/, /\.jp(e?)g$/],
             },
-            'gif': {
-              'format': 'image/gif',
-              'condition': [/gif$/, /\.gif$/],
+            gif: {
+              format: 'image/gif',
+              condition: [/gif$/, /\.gif$/],
             },
-            'png': {
-              'format': 'image/png',
-              'condition': [/png$/, /\.png$/],
+            png: {
+              format: 'image/png',
+              condition: [/png$/, /\.png$/],
             },
-            'svg': {
-              'format': 'image/svg\\+xml',
-              'condition': [/svg\+xml$/, /\.svg$/],
+            svg: {
+              format: 'image/svg\\+xml',
+              condition: [/svg\+xml$/, /\.svg$/],
             }
           };
 
@@ -82,7 +82,8 @@ angular.module('oppia').directive('imageUploader', [
 
           for (var i = 0; i < scope.allowedImageType.length; i++) {
             var fileType = scope.allowedImageType[i];
-            check1 = check1 && !file.type.match(imageTypeMapping[fileType].format)
+            check1 = (
+              check1 && !file.type.match(imageTypeMapping[fileType].format));
             check2 = (
               check2 ||
               (file.type.match(imageTypeMapping[fileType].condition[0]) &&

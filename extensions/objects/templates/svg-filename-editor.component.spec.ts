@@ -457,6 +457,9 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.isFileUploaded()).toBe(true);
     svgFilenameCtrl.uploadSvgFile();
     expect(svgFilenameCtrl.canvas.getObjects()[0].get('type')).toBe('group');
+    svgFilenameCtrl.canvas.setActiveObject(
+      svgFilenameCtrl.canvas.getObjects()[0]);
+    expect(svgFilenameCtrl.displayFontStyles).toBe(false);
     svgFilenameCtrl.uploadSvgFile();
     expect(svgFilenameCtrl.isDrawModeSvgUpload()).toBe(true);
     var file = new File([fileContent], 'circle.svg', {type: 'image/svg'});

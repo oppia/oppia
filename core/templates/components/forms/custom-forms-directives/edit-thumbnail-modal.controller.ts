@@ -46,7 +46,6 @@ angular.module('oppia').controller('EditThumbnailModalController', [
       attrs: []
     };
     $scope.allowedImageFormats = ALLOWED_IMAGE_FORMATS;
-    
 
     $scope.allowedBgColors = allowedBgColors;
     $scope.aspectRatio = aspectRatio;
