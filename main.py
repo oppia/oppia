@@ -27,8 +27,8 @@ from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
-from core.controllers import community_dashboard
 from core.controllers import concept_card_viewer
+from core.controllers import contributor_dashboard
 from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
 from core.controllers import editor
@@ -215,31 +215,33 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
-        r'/adminmathsvghandler', admin.ExplorationsLatexSvgHandler),
+        r'/explorationslatexsvghandler', admin.ExplorationsLatexSvgHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcommunityreviewerhandler', admin.AddCommunityReviewerHandler),
+        r'/addcontributionreviewerhandler',
+        admin.AddContributionReviewerHandler),
     get_redirect_route(
-        r'/removecommunityreviewerhandler',
-        admin.RemoveCommunityReviewerHandler),
+        r'/removecontributionreviewerhandler',
+        admin.RemoveContributionReviewerHandler),
     get_redirect_route(
-        r'/getcommunityreviewershandler', admin.CommunityReviewersListHandler),
+        r'/getcontributionreviewershandler',
+        admin.ContributionReviewersListHandler),
     get_redirect_route(
-        r'/communityreviewerrightsdatahandler',
-        admin.CommunityReviewerRightsDataHandler),
+        r'/contributionreviewerrightsdatahandler',
+        admin.ContributionReviewerRightsDataHandler),
     get_redirect_route(
-        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
-        community_dashboard.CommunityDashboardPage),
+        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
+        contributor_dashboard.ContributorDashboardPage),
 
     get_redirect_route(
         '/notifications_dashboard',
         creator_dashboard.OldNotificationsDashboardRedirectPage),
     get_redirect_route(
-        '/community_dashboard',
-        creator_dashboard.OldCommunityDashboardRedirectPage),
+        '/contributor_dashboard',
+        creator_dashboard.OldContributorDashboardRedirectPage),
     get_redirect_route(
         feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
@@ -264,17 +266,17 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_COLLECTION_URL,
         creator_dashboard.NewCollectionHandler),
     get_redirect_route(
-        r'%s/<opportunity_type>' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
-        community_dashboard.ContributionOpportunitiesHandler),
+        r'%s/<opportunity_type>' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+        contributor_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
         r'/gettranslatabletexthandler',
-        community_dashboard.TranslatableTextHandler),
+        contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(
-        r'/usercommunityrightsdatahandler',
-        community_dashboard.UserCommunityRightsDataHandler),
+        r'/usercontributionrightsdatahandler',
+        contributor_dashboard.UserContributionRightsDataHandler),
     get_redirect_route(
         r'/retrivefeaturedtranslationlanguages',
-        community_dashboard.FeaturedTranslationLanguagesHandler),
+        contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
@@ -302,6 +304,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
+    get_redirect_route(
+        r'%s/<story_url_fragment>' % feconf.STORY_URL_FRAGMENT_HANDLER,
+        story_editor.StoryUrlFragmentHandler),
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
