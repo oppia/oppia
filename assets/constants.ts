@@ -5345,7 +5345,7 @@ export = {
 
   // Number of custom letters allowed in the on-screen keyboard for math
   // interactions.
-  "ALLOWED_CUSTOM_LETTERS_LIMIT": 10,
+  "MAX_CUSTOM_LETTERS_FOR_OSK": 10,
 
   // Functions allowed in math interactions.
   "MATH_FUNCTION_NAMES": [

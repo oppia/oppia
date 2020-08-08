@@ -26,11 +26,11 @@ angular.module('oppia').component('customOskLettersEditor', {
   },
   template: require('./custom-osk-letters-editor.component.html'),
   controller: [
-    '$scope', '$window', 'ALLOWED_CUSTOM_LETTERS_LIMIT',
+    '$scope', '$window', 'MAX_CUSTOM_LETTERS_FOR_OSK',
     'CUSTOM_LETTERS_GREEK_TAB', 'CUSTOM_LETTERS_LATIN_TAB',
     'GREEK_LETTER_NAMES_TO_SYMBOLS',
     function(
-        $scope, $window, ALLOWED_CUSTOM_LETTERS_LIMIT,
+        $scope, $window, MAX_CUSTOM_LETTERS_FOR_OSK,
         CUSTOM_LETTERS_GREEK_TAB, CUSTOM_LETTERS_LATIN_TAB,
         GREEK_LETTER_NAMES_TO_SYMBOLS) {
       const ctrl = this;
@@ -63,7 +63,7 @@ angular.module('oppia').component('customOskLettersEditor', {
       };
 
       ctrl.getRemainingLettersCount = function() {
-        return Math.max(ALLOWED_CUSTOM_LETTERS_LIMIT - ctrl.value.length, 0);
+        return Math.max(MAX_CUSTOM_LETTERS_FOR_OSK - ctrl.value.length, 0);
       };
 
       ctrl.keyDownCallBack = function(e) {
@@ -76,7 +76,7 @@ angular.module('oppia').component('customOskLettersEditor', {
           ctrl.latinLowerCase.join('').indexOf(
             keyPressed.toLowerCase()) !== -1 &&
           ctrl.value.indexOf(keyPressed) === -1) {
-          $('button#custom-letter-' + keyPressed).click();
+          ctrl.updateLettersList(keyPressed);
         }
         $scope.$apply();
       };
