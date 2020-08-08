@@ -55,7 +55,8 @@ describe('Story object factory', () => {
         }],
         next_node_id: 'node_3'
       },
-      language_code: 'en'
+      language_code: 'en',
+      url_fragment: 'story-title'
     };
     _sampleStory = storyObjectFactory.createFromBackendDict(
       // This throws "Argument of type '{ id: string; ... }'
@@ -78,6 +79,7 @@ describe('Story object factory', () => {
     expect(story.getStoryContents()).toEqual(null);
     expect(story.getNotes()).toEqual('Story notes loading');
     expect(story.getCorrespondingTopicId()).toEqual(null);
+    expect(story.getUrlFragment()).toEqual(null);
   });
 
   it('should correctly validate a valid story', () => {
@@ -92,10 +94,32 @@ describe('Story object factory', () => {
     expect(_sampleStory.prepublishValidate()).toEqual([]);
   });
 
-  it('should correctly validate a story', () => {
+  it('should correctly validate a story with empty title', () => {
     _sampleStory.setTitle('');
     expect(_sampleStory.validate()).toEqual([
       'Story title should not be empty'
+    ]);
+  });
+
+  it('should fail validation for empty url fragment', () => {
+    _sampleStory.setUrlFragment('');
+    expect(_sampleStory.validate()).toEqual([
+      'Url Fragment should not be empty.'
+    ]);
+  });
+
+  it('should fail validation for invalid url fragment', () => {
+    _sampleStory.setUrlFragment(' aBc inv4lid-');
+    expect(_sampleStory.validate()).toEqual([
+      'Url Fragment contains invalid characters. ' +
+      'Only lowercase words separated by hyphens are allowed.'
+    ]);
+  });
+
+  it('should fail validation for lengthy url fragment', () => {
+    _sampleStory.setUrlFragment('abcde-abcde-abcde-abcde-abcde-abcde-abcde');
+    expect(_sampleStory.validate()).toEqual([
+      'Url Fragment should not be greater than 30 characters'
     ]);
   });
 
@@ -126,7 +150,8 @@ describe('Story object factory', () => {
       },
       language_code: 'en',
       thumbnail_filename: 'img.png',
-      thumbnail_bg_color: '#a33f40'
+      thumbnail_bg_color: '#a33f40',
+      url_fragment: 'story'
     });
 
     expect(_sampleStory).not.toBe(secondStory);
