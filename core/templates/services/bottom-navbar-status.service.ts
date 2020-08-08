@@ -38,7 +38,7 @@ export class BottomNavbarStatusService {
   isBottomNavbarEnabled(): boolean {
     return (
       this.bottomNavbarIsEnabled &&
-          this.windowDimensionsService.isWindowNarrow());
+          this.windowDimensionsService.getWidth() < 1000);
   }
 }
 

@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for settingsTab.
  */
 
-import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
@@ -41,16 +40,6 @@ import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-class MockRouterService {
-  private refreshSettingsTabEmitter: EventEmitter<void>;
-  get onRefreshSettingsTab() {
-    return this.refreshSettingsTabEmitter;
-  }
-  set Emitter(val) {
-    this.refreshSettingsTabEmitter = val;
-  }
-}
-
 describe('Settings Tab Component', function() {
   var ctrl = null;
   var $httpBackend = null;
@@ -74,7 +63,6 @@ describe('Settings Tab Component', function() {
   var userEmailPreferencesService = null;
   var userExplorationPermissionsService = null;
   var windowRef = null;
-  var routerService = null;
 
   var explorationId = 'exp1';
   var userPermissions = {
@@ -92,7 +80,6 @@ describe('Settings Tab Component', function() {
     userExplorationPermissionsService = (
       TestBed.get(UserExplorationPermissionsService));
     windowRef = TestBed.get(WindowRef);
-    routerService = new MockRouterService();
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -148,22 +135,16 @@ describe('Settings Tab Component', function() {
 
     explorationCategoryService.init('Astrology');
 
-    routerService.Emitter = new EventEmitter();
     $scope = $rootScope.$new();
     ctrl = $componentController('settingsTab', {
       $scope: $scope,
       AlertsService: alertsService,
       UserExplorationPermissionsService: userExplorationPermissionsService,
-      RouterService: routerService,
       WindowRef: windowRef
     });
     ctrl.$onInit();
     $scope.$apply();
   }));
-
-  afterEach(() => {
-    ctrl.$onDestroy();
-  });
 
   it('should evaluate controller properties after its initialization',
     function() {
@@ -501,11 +482,4 @@ describe('Settings Tab Component', function() {
 
     expect(explorationRightsService.setViewability).toHaveBeenCalledWith(true);
   });
-
-  it('should refresh settings tab when refreshSettingsTab event occurs',
-    function() {
-      spyOn(ctrl, 'refreshSettingsTab').and.callThrough();
-      routerService.onRefreshSettingsTab.emit();
-      expect(ctrl.refreshSettingsTab).toHaveBeenCalled();
-    });
 });

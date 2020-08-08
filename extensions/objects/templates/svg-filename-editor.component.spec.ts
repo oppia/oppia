@@ -49,26 +49,69 @@ describe('SvgFilenameEditor', function() {
   var $scope = null;
   var samplesvg = (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
-    '1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494 367' +
+    '1999/xlink" version="1.1" width="494" height="368" viewBox="0 0 494 368' +
     '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
-    '0" width="100%" height="100%" fill="rgba(10,245,49,0.607)"/><g transfor' +
-    'm="matrix(1 0 0 1 273.5 177.5)"><rect style="stroke: rgb(0,0,0); stroke' +
-    '-width: 9; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoff' +
-    'set: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0);' +
-    ' fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" x=' +
-    '"-30" y="-35" rx="0" ry="0" width="60" height="70"/></g><g transform="m' +
-    'atrix(1 0 0 1 169.5 182.5)"><circle style="stroke: rgb(0,0,0); stroke-w' +
-    'idth: 9; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffse' +
-    't: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); f' +
-    'ill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" cx="' +
-    '0" cy="0" r="30"/></g><g transform="matrix(1 0 0 2.15 100.49 123.68)" s' +
-    'tyle=""><text font-family="helvetica" font-size="18" font-style="nor' +
-    'mal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-' +
-    'dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-lin' +
-    'ejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzer' +
-    'o; opacity: 1; white-space: pre;"><tspan x="-43.99" y="-17.94" style="w' +
-    'hite-space: pre; ">Enter </tspan><tspan x="-43.99" y="29.25">Text</tspa' +
-    'n></text></g></svg>');
+    '0" width="100%" height="100%" fill="rgba(109,106,234,0.937)"/><g transf' +
+    'orm="matrix(1 0 0 1 324 91)"><rect style="stroke: rgb(0,0,0); stroke-wi' +
+    'dth: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset' +
+    ': 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fi' +
+    'll-opacity: 0; fill-rule: nonzero; opacity: 1; vector-effect: non-scali' +
+    'ng-stroke" x="-30" y="-35" rx="0" ry="0" width="60" height="70"/></g><g' +
+    ' transform="matrix(1 0 0 1 321 209)"><circle style="stroke: rgb(0,0,0);' +
+    ' stroke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-' +
+    'dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(' +
+    '0,0,0); fill-opacity: 0; fill-rule: nonzero; opacity: 1; vector-effect:' +
+    ' non-scaling-stroke" cx="0" cy="0" r="30"/></g><g transform="matrix(1 0' +
+    ' 0 1 560 82)" style=""><text font-family="helvetica" font-size="18" fon' +
+    't-style="normal" font-weight="normal" style="stroke: none; stroke-width' +
+    ': 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0' +
+    '; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-' +
+    'rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-100" y="-17.94' +
+    '" style="stroke: rgb(0,0,0); stroke-width: 2; fill: rgb(255,0,0); ">▇' +
+    '</tspan><tspan x="-86.16" y="-17.94" style="white-space: pre; "> - Data' +
+    ' name 1 - 10</tspan><tspan x="-100" y="5.65" style="stroke: rgb(0,0,0);' +
+    ' stroke-width: 2; fill: rgb(0,255,0); ">▇</tspan><tspan x="-86.16" y=' +
+    '"5.65" style="white-space: pre; "> - Data name 2 - 10</tspan><tspan x="' +
+    '-100" y="29.25" style="stroke: rgb(0,0,0); stroke-width: 2; fill: rgb(1' +
+    '90,65,65); ">▇</tspan><tspan x="-86.16" y="29.25" style="white-space:' +
+    ' pre; "> - Data name - 10</tspan></text></g><g transform="matrix(1 0 0 ' +
+    '1 113 222)"><g style=""><g transform="matrix(0.5 0.87 -0.87 0.5 0 0)"><' +
+    'g style=""><g transform="matrix(1 0 0 1 0 0)" id="group0"><path d="M 15' +
+    '.000000000000004 -25.980762113533157 A 30 30 0 0 1 15.000000000000004 2' +
+    '5.980762113533157" style="stroke: rgb(255,0,0); stroke-width: 1; stroke' +
+    '-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-li' +
+    'nejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: non' +
+    'zero; opacity: 1; vector-effect: non-scaling-stroke" id="group0"/></g><' +
+    'g transform="matrix(1 0 0 1 7.5 0)" id="group0"><polygon style="stroke:' +
+    ' rgb(255,0,0); stroke-width: 1; stroke-dasharray: none; stroke-linecap:' +
+    ' butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit:' +
+    ' 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1; vector-effect: ' +
+    'non-scaling-stroke" points="-7.5,0 7.5,25.98 7.5,-25.98 -7.5,0 " id="gr' +
+    'oup0"/></g></g></g><g transform="matrix(-1 0 0 -1 0 0)"><g style=""><g ' +
+    'transform="matrix(1 0 0 1 0 0)" id="group0"><path d="M 15.0000000000000' +
+    '04 -25.980762113533157 A 30 30 0 0 1 15.000000000000004 25.980762113533' +
+    '157" style="stroke: rgb(0,255,0); stroke-width: 1; stroke-dasharray: no' +
+    'ne; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter;' +
+    ' stroke-miterlimit: 4; fill: rgb(0,255,0); fill-rule: nonzero; opacity:' +
+    ' 1; vector-effect: non-scaling-stroke" id="group0"/></g><g transform="m' +
+    'atrix(1 0 0 1 7.5 0)" id="group0"><polygon style="stroke: rgb(0,255,0);' +
+    ' stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-' +
+    'dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(' +
+    '0,255,0); fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-st' +
+    'roke" points="-7.5,0 7.5,25.98 7.5,-25.98 -7.5,0 " id="group0"/></g></g' +
+    '></g><g transform="matrix(0.5 -0.87 0.87 0.5 0 0)"><g style=""><g trans' +
+    'form="matrix(1 0 0 1 0 0)" id="group0"><path d="M 14.999999999999996 -2' +
+    '5.98076211353316 A 30 30 0 0 1 14.999999999999996 25.98076211353316" st' +
+    'yle="stroke: rgb(190,65,65); stroke-width: 1; stroke-dasharray: none; s' +
+    'troke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stro' +
+    'ke-miterlimit: 4; fill: rgb(190,65,65); fill-rule: nonzero; opacity: 1;' +
+    ' vector-effect: non-scaling-stroke" id="group0"/></g><g transform="matr' +
+    'ix(1 0 0 1 7.5 0)" id="group0"><polygon style="stroke: rgb(190,65,65); ' +
+    'stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-d' +
+    'ashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(1' +
+    '90,65,65); fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-s' +
+    'troke" points="-7.5,0 7.5,25.98 7.5,-25.98 -7.5,0 " id="group0"/></g></' +
+    'g></g></g></g></svg>');
   var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockAssetsBackendApiService = {
@@ -370,6 +413,15 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('path');
   });
 
+  it('should create a pie chart', function() {
+    svgFilenameCtrl.createPieChart();
+    expect(svgFilenameCtrl.isPieChartEnabled()).toBe(true);
+    expect(svgFilenameCtrl.isDrawModePieChart()).toBe(true);
+    svgFilenameCtrl.onAddItem();
+    svgFilenameCtrl.createPieChart();
+    expect(svgFilenameCtrl.isDrawModePieChart()).toBe(false);
+  });
+
   it('should trigger object selection and scaling events', function() {
     svgFilenameCtrl.createRect();
     svgFilenameCtrl.createText();
@@ -453,6 +505,12 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.savedSVGDiagram = 'saved';
     svgFilenameCtrl.savedSVGDiagram = samplesvg;
     svgFilenameCtrl.continueDiagramEditing();
+    var mocktoSVG = function(arg) {
+      return '<path></path>';
+    };
+    var customToSVG = svgFilenameCtrl.createCustomToSVG(
+      mocktoSVG, 'path', 'group1');
+    expect(customToSVG()).toBe('<path id="group1"/>');
     expect(svgFilenameCtrl.diagramStatus).toBe('editing');
   });
 });

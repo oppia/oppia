@@ -64,12 +64,18 @@ def install_hook():
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_commit_file = os.path.join(hooks_dir, 'pre-commit')
     chmod_cmd = ['chmod', '+x', pre_commit_file]
-    if os.path.islink(pre_commit_file):
+    file_is_symlink = os.path.islink(pre_commit_file)
+    file_exists = os.path.exists(pre_commit_file)
+    if file_is_symlink and file_exists:
         python_utils.PRINT('Symlink already exists')
     else:
         # This is needed, because otherwise some systems symlink/copy the .pyc
         # file instead of the .py file.
         this_file = __file__.replace('pyc', 'py')
+        # If its a broken symlink, delete it.
+        if file_is_symlink and not file_exists:
+            os.unlink(pre_commit_file)
+            python_utils.PRINT('Removing broken symlink')
         try:
             os.symlink(os.path.abspath(this_file), pre_commit_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
