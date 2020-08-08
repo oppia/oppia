@@ -203,7 +203,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             self.get_json(
                 '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                    'non-existent-story-url-fragment'),
+                    'public-story-title-two'),
                 expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self):

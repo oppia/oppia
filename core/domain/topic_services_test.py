@@ -1368,6 +1368,92 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, changelist, 'Update url fragment')
 
+    def test_does_not_create_topic_url_fragment_if_it_already_exists(self):
+        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_2 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic 1',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag-one')
+        with self.assertRaisesRegexp(
+            Exception,
+            'Topic with URL Fragment \'topic-frag-one\' already exists'):
+            self.save_new_topic(
+                topic_id_2, self.user_id, name='topic 2',
+                description='Description', canonical_story_ids=[],
+                additional_story_ids=[], uncategorized_skill_ids=[],
+                subtopics=[], next_subtopic_id=1,
+                url_fragment='topic-frag-one')
+
+    def test_does_not_update_topic_if_url_fragment_already_exists(self):
+        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_2 = topic_services.get_new_topic_id()
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'topic-frag-one',
+            'old_value': 'topic-frag-two',
+        })]
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic name 1',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag-one')
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic name 2',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag-two')
+        with self.assertRaisesRegexp(
+            Exception,
+            'Topic with URL Fragment \'topic-frag-one\' already exists'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id_2, changelist, 'Update url fragment')
+
+    def test_does_not_update_topic_if_name_already_exists(self):
+        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_2 = topic_services.get_new_topic_id()
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_NAME,
+            'new_value': 'topic 1',
+            'old_value': 'topic 2',
+        })]
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic 1',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag-one')
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic 2',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag-two')
+        with self.assertRaisesRegexp(
+            Exception,
+            'Topic with name \'topic 1\' already exists'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id_2, changelist, 'Update name')
+
+    def test_does_not_create_topic_if_name_is_non_string(self):
+        topic_id = topic_services.get_new_topic_id()
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_NAME,
+            'new_value': 123,
+            'old_value': 'topic name',
+        })]
+        self.save_new_topic(
+            topic_id, self.user_id, name='topic name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag')
+        with self.assertRaisesRegexp(
+            Exception, 'Name should be a string.'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, changelist, 'Update topic name')
+
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.language_code, 'en')

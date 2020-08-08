@@ -463,10 +463,6 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic.validate(strict=topic_rights.topic_is_published)
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
-    if not topic.are_subtopic_url_fragments_unique():
-        raise Exception(
-            'Subtopic url fragments are not unique across '
-            'subtopics in the topic')
 
     # Topic model cannot be None as topic is passed as parameter here and that
     # is only possible if a topic model with that topic id exists. Also this is
