@@ -2945,15 +2945,17 @@ class Exploration(python_utils.OBJECT):
                         'voiceovers_mapping'][new_content_id] = {}
 
         return states_dict
-    
+
     @classmethod
     def _convert_states_v36_dict_to_v37_dict(cls, states_dict):
         """Converts from version 36 to 37. Version 37 changes all rules with
         type CaseSensitiveEquals to Equals.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
         Returns:
             dict. The converted states_dict.
         """
@@ -4003,14 +4005,16 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states_schema_version'] = 36
 
         return exploration_dict
-    
+
     @classmethod
     def _convert_v41_dict_to_v42_dict(cls, exploration_dict):
         """Converts a v41 exploration dict into a v42 exploration dict.
         Adds translation support to customization args.
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v39.
+
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v41.
@@ -4287,7 +4291,7 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v41_dict_to_v42_dict(
                 exploration_dict)
             exploration_schema_version = 42
-        
+
         if exploration_schema_version == 42:
             exploration_dict = cls._convert_v42_dict_to_v43_dict(
                 exploration_dict)

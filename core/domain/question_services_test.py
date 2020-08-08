@@ -1858,7 +1858,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'showChoicesInShuffledOrder': {'value': True}
             })
-    
+
     def test_migrate_question_state_from_v36_to_latest(self):
         # Test restructuring of written_translations.
         question_state_dict = {

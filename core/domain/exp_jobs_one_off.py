@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import copy
 import itertools
 import logging
 import re
@@ -275,7 +274,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
 
         current_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         current_exp_schema_version = (
-                exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
+            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
 
         exploration_dict = item.to_dict()
         states_schema_version = exploration_dict['states_schema_version']
