@@ -15,12 +15,9 @@ module.exports = function(config) {
       // Since jquery, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.5.1/jquery.min.js',
-      // We need a module with ngAudio and ngJoyRide as a dependency.
-      // So we are using exploration-editor-page.module.ts
       // The module needs to be loaded directly after jquery because
       // it imports angular js.
-      'core/templates/pages/exploration-editor-page/' +
-      'exploration-editor-page.module.ts',
+      'core/templates/karma.module.ts',
       'third_party/static/angularjs-1.7.9/angular-mocks.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
       generatedJs,
