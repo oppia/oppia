@@ -424,7 +424,7 @@ def get_state_training_jobs_mapping(exp_id, exp_version, state_name):
             state_training_jobs_mapping_model.algorithm_ids_to_job_ids)
 
 
-def migrate_exploration_training_jobs(state_training_jobs_mapping):
+def migrate_state_training_jobs(state_training_jobs_mapping):
     """Migrate exploration training jobs to latest version of algorithm_id
     and algorithm_version.
 
@@ -445,14 +445,14 @@ def migrate_exploration_training_jobs(state_training_jobs_mapping):
             algorithms are no longer supported.
 
     Once all three types of algorithm IDs are filtered, the function performs
-    specific tasks tailored to each of them. Its called lazy migration because
-    it happens only when there is a query to retrieve trained model for given
-    <exploration, version, state> and algorithm_id.
+    specific tasks tailored to each of them. We call this a lazy migration
+    because it happens only when there is a query to retrieve a trained model
+    for given <exploration, version, state> and algorithm_id.
 
     Args:
         state_training_jobs_mapping: StateTrainingJobsMapping. Domain
             object containing exploration to training job id mapping. This
-            mapping is used to figure out jobs that needs to be re-submitted /
+            mapping is used to figure out jobs that need to be re-submitted,
             added or removed.
     """
     exp_id = state_training_jobs_mapping.exp_id
@@ -473,39 +473,30 @@ def migrate_exploration_training_jobs(state_training_jobs_mapping):
     }
     possible_algorithm_ids = [algorithm_id]
 
-    algorithm_ids_to_add = [
-        algorithm_id for algorithm_id in possible_algorithm_ids
-        if not (
-            state_training_jobs_mapping.algorithm_ids_to_job_ids.
-            contains_algorithm_id(algorithm_id))]
+    algorithm_ids_to_add = set(possible_algorithm_ids).difference(
+        set(state_training_jobs_mapping.get_all_algorithm_ids()))
 
-    algorithm_ids_to_remove = [
-        algorithm_id for algorithm_id in (
-            state_training_jobs_mapping.algorithm_ids_to_job_ids.
-            get_all_algorithm_ids())
-        if algorithm_id not in possible_algorithm_ids]
+    algorithm_ids_to_remove = set(
+        state_training_jobs_mapping.get_all_algorithm_ids()).difference(
+            set(possible_algorithm_ids))
 
-    algorithm_ids_to_upgrade = [
-        algorithm_id for algorithm_id in possible_algorithm_ids
-        if (state_training_jobs_mapping.algorithm_ids_to_job_ids.
-            contains_algorithm_id(algorithm_id))]
+    algorithm_ids_to_upgrade = set(possible_algorithm_ids).intersection(
+        set(state_training_jobs_mapping.get_all_algorithm_ids()))
 
     if len(algorithm_ids_to_add) > 0:
-        job_dicts_list = []
+        job_dicts = []
 
         for algorithm_id in algorithm_ids_to_add:
             next_scheduled_check_time = datetime.datetime.utcnow()
             training_data = exploration.states[state_name].get_training_data()
 
-            dummy_classifier_training_job = (
-                classifier_domain.ClassifierTrainingJob(
-                    'job_id_dummy', algorithm_id, interaction_id, exp_id,
-                    exp_version, next_scheduled_check_time, state_name,
-                    feconf.TRAINING_JOB_STATUS_NEW, training_data,
-                    algorithm_version))
-            dummy_classifier_training_job.validate()
+            classifier_domain.ClassifierTrainingJob(
+                'job_id_dummy', algorithm_id, interaction_id, exp_id,
+                exp_version, next_scheduled_check_time, state_name,
+                feconf.TRAINING_JOB_STATUS_NEW, training_data,
+                algorithm_version).validate()
 
-            job_dicts_list.append({
+            job_dicts.append({
                 'algorithm_id': algorithm_id,
                 'interaction_id': interaction_id,
                 'exp_id': exp_id,
@@ -518,20 +509,19 @@ def migrate_exploration_training_jobs(state_training_jobs_mapping):
             })
 
         job_ids = classifier_models.ClassifierTrainingJobModel.create_multi(
-            job_dicts_list)
+            job_dicts)
 
         for algorithm_id, job_id in python_utils.ZIP(
                 algorithm_ids_to_add, job_ids):
-            (
-                state_training_jobs_mapping.algorithm_ids_to_job_ids.
-                set_job_id_for_algorithm_id(algorithm_id, job_id))
+            state_training_jobs_mapping.algorithm_ids_to_job_ids[
+                algorithm_id] = job_id
 
     if algorithm_ids_to_upgrade:
         for algorithm_id in algorithm_ids_to_upgrade:
             classifier_training_job = (
                 classifier_models.ClassifierTrainingJobModel.get_by_id(
-                    state_training_jobs_mapping.algorithm_ids_to_job_ids.
-                    get_job_id_for_algorithm_id(algorithm_id)))
+                    state_training_jobs_mapping.algorithm_ids_to_job_ids[
+                        algorithm_id]))
             classifier_training_job.algorithm_version = (
                 algorithm_id_to_algorithm_version[algorithm_id])
             classifier_training_job.next_scheduled_check_time = (
@@ -542,72 +532,69 @@ def migrate_exploration_training_jobs(state_training_jobs_mapping):
     if algorithm_ids_to_remove:
         for algorithm_id in algorithm_ids_to_remove:
             delete_classifier_training_job(
-                state_training_jobs_mapping.algorithm_ids_to_job_ids.
-                get_job_id_for_algorithm_id(algorithm_id))
-            (
-                state_training_jobs_mapping.algorithm_ids_to_job_ids.
-                remove_algorithm_id(algorithm_id))
+                state_training_jobs_mapping.algorithm_ids_to_job_ids[
+                    algorithm_id])
+            state_training_jobs_mapping.algorithm_ids_to_job_ids.pop(
+                algorithm_id)
 
     state_training_jobs_mapping_model = (
         classifier_models.StateTrainingJobsMappingModel.get_model(
             exp_id, exp_version, state_name))
     state_training_jobs_mapping.validate()
     state_training_jobs_mapping_model.algorithm_ids_to_job_ids = (
-        state_training_jobs_mapping.algorithm_ids_to_job_ids.to_dict())
+        state_training_jobs_mapping.algorithm_ids_to_job_ids)
     state_training_jobs_mapping_model.put()
 
 
 def get_classifier_training_job_maps(exp_id, exp_version, state_names):
-    """Gets the list of classifier training jobs mapped to algorithm id from
-    the exploration attributes.
+    """Gets the list of algorithm-id-to-classifier-training-job mappings for
+    each of the given state names.
 
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. The exploration version.
-        state_names: list(str). The state names for which we retrieve the job.
+        state_names: list(str). The state names for which we retrieve the job
+            mappings.
 
     Returns:
-        list(dict(str: ClassifierTrainingJob)). Domain objects for the
-        Classifier training job model for algorithm_ids.
+        list(dict(str: ClassifierTrainingJob)). A list of dicts, each mapping
+        algorithm IDs to the corresponding ClassifierTrainingJobs. Each element
+        in the list corresponds to the corresponding state name in the
+        state_names input argument.
     """
     state_training_jobs_mapping_models = (
         classifier_models.StateTrainingJobsMappingModel.get_models(
             exp_id, exp_version, state_names))
-    algorithm_ids_to_job_ids = []
-    for mapping_model in state_training_jobs_mapping_models:
-        if mapping_model is None:
+    state_to_algorithm_id_job_id_map = {}
+    for state_mapping_model in state_training_jobs_mapping_models:
+        if state_mapping_model is None:
             continue
-        algorithm_ids_to_job_ids.append(
-            classifier_domain.AlgorithmIdToJobIdMapping(
-                mapping_model.algorithm_ids_to_job_ids))
+        state_to_algorithm_id_job_id_map[state_mapping_model.state_name] = (
+            state_mapping_model.algorithm_ids_to_job_ids)
 
-    job_id_to_algorithm_id_mapping = {
-        job_id: {
-            'algorithm_id': algorithm_id,
-            'state_name': mapping_model.state_name
-        } for mapping_model, map in python_utils.ZIP(
-            state_training_jobs_mapping_models,
-            algorithm_ids_to_job_ids)
-        for algorithm_id, job_id in map.algorithm_ids_to_job_ids.items()
-    }
-    job_ids = job_id_to_algorithm_id_mapping.keys()
+    job_ids = [
+        job_id for algorithm_ids_to_job_ids in (
+            state_to_algorithm_id_job_id_map.values())
+        for job_id in algorithm_ids_to_job_ids]
 
     classifier_training_job_models = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
-    state_to_algorithm_id_job_id_map = {}
+    job_id_to_model = {}
     for job_model in classifier_training_job_models:
-        job_id = job_model.id
-        algorithm_id = job_id_to_algorithm_id_mapping[job_id]['algorithm_id']
-        state_name = job_id_to_algorithm_id_mapping[job_id]['state_name']
-        if state_name not in state_to_algorithm_id_job_id_map:
-            state_to_algorithm_id_job_id_map[state_name] = {}
-        state_to_algorithm_id_job_id_map[state_name][algorithm_id] = job_model
+        job_id_to_model[job_model.id] = job_model
 
     algorithm_id_to_training_job_maps = []
     for state_name in state_names:
-        algorithm_id_to_training_job_maps.append(
-            state_to_algorithm_id_job_id_map.get(state_name, None))
+        if state_name not in state_to_algorithm_id_job_id_map:
+            algorithm_id_to_training_job_maps.append(None)
+            continue
+        algorithm_ids_to_job_ids = state_to_algorithm_id_job_id_map[state_name]
+        algorithm_id_to_training_job_maps.append({
+            algorithm_id: job_id_to_model[job_id]
+            for algorithm_id, job_id in algorithm_ids_to_job_ids
+        })
+
     return algorithm_id_to_training_job_maps
 
 
@@ -623,7 +610,7 @@ def create_classifier_training_job_for_reverted_exploration(
         get_classifier_training_job_maps(
             exploration.id, exploration_to_revert_to.version,
             list(exploration_to_revert_to.states.keys())))
-    state_training_jobs_mappings = []
+    state_training_jobs_maps = []
     state_names = list(exploration_to_revert_to.states.keys())
     for index, classifier_training_job_map in enumerate(
             classifier_training_job_maps_for_old_version):
@@ -639,7 +626,7 @@ def create_classifier_training_job_for_reverted_exploration(
                     exploration.id, exploration.version + 1, state_name,
                     algorithm_ids_to_job_ids))
             state_training_jobs_mapping.validate()
-            state_training_jobs_mappings.append(state_training_jobs_mapping)
+            state_training_jobs_maps.append(state_training_jobs_mapping)
 
     classifier_models.StateTrainingJobsMappingModel.create_multi(
-        state_training_jobs_mappings)
+        state_training_jobs_maps)

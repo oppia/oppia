@@ -322,110 +322,24 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected state_name to be a string'):
             mapping.validate()
 
-
-class AlgorithmIdToJobIdMappingDomainTests(test_utils.GenericTestBase):
-    """Tests for the AlgorithmIdToJobIdMapping domain object."""
-
-    def _get_mapping_from_dict(self, mapping_dict):
-        """Returns the AlgorithmIdToJobIdMapping object after receiving the
-        content from the mapping_dict.
-        """
-        mapping = classifier_domain.AlgorithmIdToJobIdMapping(
-            mapping_dict)
-
-        return mapping
-
-    def test_to_dict(self):
-        expected_mapping_dict = {'TextClassifier': 'job_id1'}
-        observed_mapping = self._get_mapping_from_dict(
-            expected_mapping_dict)
-        self.assertDictEqual(
-            expected_mapping_dict,
-            observed_mapping.to_dict())
-
-    def test_get_all_algorithm_ids(self):
-        mapping_dict = {
-            'TextClassifier': 'job_id1',
-            'CodeClassifier': 'job_id2'}
-        mapping = self._get_mapping_from_dict(mapping_dict)
-        self.assertSetEqual(
-            set(mapping.get_all_algorithm_ids()), set(mapping_dict.keys()))
-
-    def test_contains_algorithm_id(self):
-        mapping_dict = {
-            'TextClassifier': 'job_id1',
-            'CodeClassifier': 'job_id2'}
-        mapping = self._get_mapping_from_dict(mapping_dict)
-        self.assertTrue(mapping.contains_algorithm_id('TextClassifier'))
-        self.assertFalse(mapping.contains_algorithm_id('FakeClassifier'))
-
-    def test_get_job_id_for_algorithm_id(self):
-        mapping_dict = {
-            'TextClassifier': 'job_id1',
-            'CodeClassifier': 'job_id2'}
-        mapping = self._get_mapping_from_dict(mapping_dict)
-        self.assertEqual(
-            mapping.get_job_id_for_algorithm_id('TextClassifier'), 'job_id1')
-
-    def test_get_job_id_raises_exception_on_non_existent_algorithm_id(self):
-        mapping_dict = {
-            'TextClassifier': 'job_id1',
-            'CodeClassifier': 'job_id2'}
-        mapping = self._get_mapping_from_dict(mapping_dict)
-        with self.assertRaisesRegexp(
-            Exception,
-            'Job ID correspond to Algorithm FakeClassifier does not exist'):
-            mapping.get_job_id_for_algorithm_id('FakeClassifier')
-
-    def test_set_job_id_for_algorithm_id(self):
-        mapping_dict = {
-            'TextClassifier': 'job_id1',
-            'CodeClassifier': 'job_id2'}
-        mapping = self._get_mapping_from_dict(mapping_dict)
-        mapping.set_job_id_for_algorithm_id('NewClassifier', 'job_id3')
-        self.assertTrue(mapping.contains_algorithm_id('NewClassifier'))
-        self.assertEqual(
-            mapping.get_job_id_for_algorithm_id('NewClassifier'), 'job_id3')
-
-    def test_remove_algorithm_id(self):
-        mapping_dict = {
-            'TextClassifier': 'job_id1',
-            'CodeClassifier': 'job_id2'}
-        mapping = self._get_mapping_from_dict(mapping_dict)
-        mapping.remove_algorithm_id('TextClassifier')
-        self.assertFalse(mapping.contains_algorithm_id('TextClassifier'))
-        self.assertListEqual(
-            mapping.get_all_algorithm_ids(), ['CodeClassifier'])
-
-    def test_remove_algorithm_id_raises_exception_on_incorrect_algorithm_id(
-            self):
-        mapping_dict = {
-            'TextClassifier': 'job_id1',
-            'CodeClassifier': 'job_id2'}
-        mapping = self._get_mapping_from_dict(mapping_dict)
-        with self.assertRaisesRegexp(
-            Exception, 'Algorithm FakeClassifier not found in mapping'):
-            mapping.remove_algorithm_id('FakeClassifier')
-
-    def test_validation_for_mapping_with_correct_data(self):
-        mapping = self._get_mapping_from_dict({'TextClassifier': 'job_id1'})
-        mapping.validate()
-
     def test_validation_with_invalid_algorithm_ids_to_job_ids(self):
-        mapping = self._get_mapping_from_dict(0)
+        self.mapping_dict['algorithm_ids_to_job_ids'] = 0
+        mapping = self._get_mapping_from_dict(self.mapping_dict)
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected algorithm_ids_to_job_ids to be a dict'):
             mapping.validate()
 
     def test_validation_with_invalid_algorithm_id_in_algorithm_to_job_map(self):
-        mapping = self._get_mapping_from_dict({123: 'job_id'})
+        self.mapping_dict['algorithm_ids_to_job_ids'] = {123: 'job_id'}
+        mapping = self._get_mapping_from_dict(self.mapping_dict)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected algorithm_id to be str'):
             mapping.validate()
 
     def test_validation_with_invalid_job_id_in_algorithm_to_job_map(self):
-        mapping = self._get_mapping_from_dict({'algorithm_id': 12})
+        self.mapping_dict['algorithm_ids_to_job_ids'] = {'algorithm_id': 12}
+        mapping = self._get_mapping_from_dict(self.mapping_dict)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected job_id to be str'):
             mapping.validate()

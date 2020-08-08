@@ -98,11 +98,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         Returns:
             FronzeModel. Protobuf object containing classifier data.
         """
-        filepath = classifier_training_job.classifier_data_file_name
+        filename = classifier_training_job.classifier_data_file_name
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
-        classifier_data = utils.decompress_from_zlib(fs.get(filepath))
+        classifier_data = utils.decompress_from_zlib(fs.get(filename))
         classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
         classifier_data_proto.ParseFromString(classifier_data)
         return classifier_data_proto

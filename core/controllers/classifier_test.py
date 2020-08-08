@@ -58,13 +58,13 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 retrieve the trained model.
 
         Returns:
-            FronzeModel. Protobuf object containing classifier data.
+            FrozenModel. Protobuf object containing classifier data.
         """
-        filepath = classifier_training_job.classifier_data_file_name
+        filename = classifier_training_job.classifier_data_file_name
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
-        classifier_data = utils.decompress_from_zlib(fs.get(filepath))
+        classifier_data = utils.decompress_from_zlib(fs.get(filename))
         classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
         classifier_data_proto.ParseFromString(classifier_data)
         return classifier_data_proto
@@ -138,22 +138,24 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
 
         self.job_result.text_classifier.CopyFrom(classifier_frozen_model)
 
-        self.payload = (
+        self.payload_proto = (
             training_job_response_payload_pb2.TrainingJobResponsePayload())
-        self.payload.job_result.CopyFrom(self.job_result)
-        self.payload.vm_id = feconf.DEFAULT_VM_ID
+        self.payload_proto.job_result.CopyFrom(self.job_result)
+        self.payload_proto.vm_id = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        self.payload.signature = classifier.generate_signature(
+        self.payload_proto.signature = classifier.generate_signature(
             python_utils.convert_to_bytes(secret),
-            self.payload.job_result.SerializeToString(), self.payload.vm_id)
+            self.payload_proto.job_result.SerializeToString(),
+            self.payload_proto.vm_id)
 
-        self.fetch_payload = {}
-        self.fetch_payload['vm_id'] = feconf.DEFAULT_VM_ID
+        self.fetch_next_job_payload = {}
+        self.fetch_next_job_payload['vm_id'] = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        self.fetch_payload['message'] = json.dumps({})
-        self.fetch_payload['signature'] = classifier.generate_signature(
+        self.fetch_next_job_payload['message'] = json.dumps({})
+        self.fetch_next_job_payload['signature'] = classifier.generate_signature(
             python_utils.convert_to_bytes(secret),
-            self.fetch_payload['message'], self.fetch_payload['vm_id'])
+            self.fetch_next_job_payload['message'],
+            self.fetch_next_job_payload['vm_id'])
 
     def test_trained_classifier_handler(self):
         # Normal end-to-end test.
@@ -430,21 +432,20 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         state_training_jobs_mapping = (
             classifier_services.get_state_training_jobs_mapping(
                 self.exp_id, self.exploration.version, 'Home'))
-        self.assertTrue(
-            state_training_jobs_mapping.algorithm_ids_to_job_ids.
-            contains_algorithm_id('NewTextClassifier'))
+        self.assertIn(
+            'NewTextClassifier',
+            state_training_jobs_mapping.algorithm_ids_to_job_ids)
 
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
             json_response = self.post_json(
-                '/ml/nextjobhandler', self.fetch_payload,
+                '/ml/nextjobhandler', self.fetch_next_job_payload,
                 expected_status_int=200)
 
         self.assertEqual(
-            (
-                state_training_jobs_mapping.algorithm_ids_to_job_ids.
-                get_job_id_for_algorithm_id('NewTextClassifier')),
+            state_training_jobs_mapping.algorithm_ids_to_job_ids[
+                'NewTextClassifier'],
             json_response['job_id']
         )
         self.assertEqual(json_response['algorithm_id'], 'NewTextClassifier')
@@ -477,21 +478,20 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         state_training_jobs_mapping = (
             classifier_services.get_state_training_jobs_mapping(
                 self.exp_id, self.exploration.version, 'Home'))
-        self.assertTrue(
-            state_training_jobs_mapping.algorithm_ids_to_job_ids.
-            contains_algorithm_id('TextClassifier'))
+        self.assertIn(
+            'TextClassifier',
+            state_training_jobs_mapping.algorithm_ids_to_job_ids)
 
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
             json_response = self.post_json(
-                '/ml/nextjobhandler', self.fetch_payload,
+                '/ml/nextjobhandler', self.fetch_next_job_payload,
                 expected_status_int=200)
 
         self.assertEqual(
-            (
-                state_training_jobs_mapping.algorithm_ids_to_job_ids.
-                get_job_id_for_algorithm_id('TextClassifier')),
+            state_training_jobs_mapping.algorithm_ids_to_job_ids[
+                'TextClassifier'],
             json_response['job_id']
         )
         self.assertEqual(json_response['algorithm_id'], 'TextClassifier')

@@ -362,16 +362,17 @@ class ClassifierTrainingJob(python_utils.OBJECT):
 
 
 class StateTrainingJobsMapping(python_utils.OBJECT):
-    """Domain object for a state to training job mapping model.
+    """Domain object for a state-to-training job mapping model.
 
-    This is a one-to-many relation between the particular state of the
-    particular version of the particular exploration and classifier training
-    jobs. Each <exp_id, exp_version, state_name> is mapped to a
-    algorithm_id_to_job_id dict which maps all the valid algorithm_ids for the
-    given state to their training jobs. A state may have multiple algorithm_ids
-    valid for it for example, one algorithm would serve Oppia web users while
-    other would support Oppia mobile or android user. How many algorithm_ids are
-    valid for a given state depends upon the interaction_id of that state.
+    This object represents a one-to-many relation between a particular state
+    of the particular version of the particular exploration and a set of
+    classifier training jobs. Each <exp_id, exp_version, state_name> is mapped
+    to a algorithm_id_to_job_id dict which maps all the valid algorithm_ids for
+    the given state to their training jobs. A state may have multiple
+    algorithm_ids valid for it: for example, one algorithm would serve Oppia
+    web users while another might support Oppia mobile or Android user. The
+    number of algorithm_ids are valid for a given state depends upon the
+    interaction_id of that state.
 
     Attributes:
         exp_id: str. ID of the exploration.
@@ -393,14 +394,14 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
                 corresponding classifier's training job was created.
             state_name: str. The name of the state to which the classifier
                 belongs.
-            algorithm_ids_to_job_ids: dict. Mapping of algorithm IDs to
-                corresponding unique training job IDs.
+            algorithm_ids_to_job_ids: dict(str, str). The mapping from
+                algorithm IDs to the IDs of their corresponding classifier
+                training jobs.
         """
         self._exp_id = exp_id
         self._exp_version = exp_version
         self._state_name = state_name
-        self._algorithm_ids_to_job_ids = AlgorithmIdToJobIdMapping(
-            algorithm_ids_to_job_ids)
+        self._algorithm_ids_to_job_ids = algorithm_ids_to_job_ids
 
     @property
     def exp_id(self):
@@ -435,7 +436,7 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
         """Returns the algorithm_ids_to_job_ids of the training jobs.
 
         Returns:
-            dict. Mapping of algorithm IDs to corresponding unique training
+            dict(str, str). Mapping of algorithm IDs to corresponding unique training
             job IDs.
         """
         return self._algorithm_ids_to_job_ids
@@ -453,8 +454,7 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
             'exp_id': self._exp_id,
             'exp_version': self._exp_version,
             'state_name': self.state_name,
-            'algorithm_ids_to_job_ids': (
-                self._algorithm_ids_to_job_ids.to_dict())
+            'algorithm_ids_to_job_ids': self._algorithm_ids_to_job_ids
         }
 
     def validate(self):
@@ -476,109 +476,6 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
 
         self._algorithm_ids_to_job_ids.validate()
 
-
-class AlgorithmIdToJobIdMapping(python_utils.OBJECT):
-    """Domain object for a algorithm_id to training job_id map.
-
-    Each algorithm_id is mapped to a unique job_id which stores the metadata
-    related to the training job for that algorithm_id.
-
-    Attributes:
-        algorithm_ids_to_job_ids. dict. Mapping of algorithm IDs to
-            corresponding unique training job IDs.
-    """
-
-    def __init__(self, algorithm_ids_to_job_ids):
-        """Constructs a AlgorithmIdToJobIdMapping domain object.
-
-        Args:
-            algorithm_ids_to_job_ids: dict. Mapping of algorithm IDs to
-                corresponding unique training job IDs.
-        """
-        self._algorithm_ids_to_job_ids = algorithm_ids_to_job_ids
-
-    @property
-    def algorithm_ids_to_job_ids(self):
-        """Returns the algorithm_ids_to_job_ids of the training jobs.
-
-        Returns:
-            dict. Mapping of algorithm IDs to corresponding unique training
-            job IDs.
-        """
-        return self._algorithm_ids_to_job_ids
-
-    def get_all_algorithm_ids(self):
-        """Return all algorithm ids.
-
-        Returns:
-            list(str). List of algorithm ids present in mapping.
-        """
-        return list(self.algorithm_ids_to_job_ids.keys())
-
-    def contains_algorithm_id(self, algorithm_id):
-        """Returns whether given algorithm_id exists in the mapping or not.
-
-        Args:
-            algorithm_id: str. Algorithm ID to check for membership.
-
-        Returns:
-            bool. Whether algorithm_id exists in mapping or not.
-        """
-        return algorithm_id in self.algorithm_ids_to_job_ids
-
-    def get_job_id_for_algorithm_id(self, algorithm_id):
-        """Returns job_id corresponding to given algorithm_id.
-
-        Args:
-            algorithm_id: str. Algorithm ID for which job_id is required.
-
-        Returns:
-            str. Job ID of the training job corresponding to given algorithm_id.
-
-        Raises:
-            Exception. If algorithm_id is not present in
-            algorithm_ids_to_job_ids.
-        """
-        if algorithm_id not in self._algorithm_ids_to_job_ids:
-            raise Exception(
-                'Job ID correspond to Algorithm %s does not exist' % (
-                    algorithm_id))
-        return self._algorithm_ids_to_job_ids[algorithm_id]
-
-    def set_job_id_for_algorithm_id(self, algorithm_id, job_id):
-        """Sets job_id corresponding to given algorithm_id for the mapping.
-
-        Args:
-            algorithm_id: str. Algorithm ID for which job_id should be set.
-            job_id: str. Job ID.
-        """
-        self._algorithm_ids_to_job_ids[algorithm_id] = job_id
-
-    def remove_algorithm_id(self, algorithm_id):
-        """Removes algorithm_id from the mapping.
-
-        Args:
-            algorithm_id: str. The algorithm_id to remove.
-        """
-        if algorithm_id not in self.algorithm_ids_to_job_ids:
-            raise Exception('Algorithm %s not found in mapping' % algorithm_id)
-        self._algorithm_ids_to_job_ids.pop(algorithm_id)
-
-    def to_dict(self):
-        """Constructs a dict representation of AlgorithmIdToJobId
-        domain object.
-
-        Returns:
-            A dict representation of AlgorithmIdToJobId domain
-            object.
-        """
-
-        return self._algorithm_ids_to_job_ids
-
-    def validate(self):
-        """Validates the algorithm_id to job_id map before it is saved to
-        storage.
-        """
         if not isinstance(self.algorithm_ids_to_job_ids, dict):
             raise utils.ValidationError(
                 'Expected algorithm_ids_to_job_ids to be a dict, '

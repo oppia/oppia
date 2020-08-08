@@ -30,6 +30,7 @@ import string
 import sys
 import time
 import unicodedata
+import zlib
 
 from constants import constants
 import feconf
@@ -756,7 +757,6 @@ def compress_to_zlib(data):
     Returns:
         Compressed data string.
     """
-    import zlib
     return zlib.compress(data)
 
 
@@ -769,7 +769,6 @@ def decompress_from_zlib(data):
     Returns:
         Decompressed data string.
     """
-    import zlib
     return zlib.decompress(data)
 
 

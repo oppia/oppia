@@ -876,8 +876,6 @@ tags: []
             dict. Parsed JSON response received upon invoking the post request.
         """
         data = payload
-        if csrf_token:
-            data['csrf_token'] = csrf_token
 
         expect_errors = False
         if expected_status_int >= 400:

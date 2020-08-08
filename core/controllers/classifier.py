@@ -103,20 +103,20 @@ class TrainedClassifierHandler(base.BaseHandler):
     @acl_decorators.open_access
     def post(self):
         """Handles POST requests."""
-        payload = training_job_response_payload_pb2.TrainingJobResponsePayload()
-        payload.ParseFromString(self.request.body)
-        signature = payload.signature
-        vm_id = payload.vm_id
+        payload_proto = training_job_response_payload_pb2.TrainingJobResponsePayload()
+        payload_proto.ParseFromString(self.request.body)
+        signature = payload_proto.signature
+        vm_id = payload_proto.vm_id
         if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
             raise self.UnauthorizedUserException
 
-        if not validate_job_result_message_proto(payload.job_result):
+        if not validate_job_result_message_proto(payload_proto.job_result):
             raise self.InvalidInputException
         if not verify_signature(
-                payload.job_result.SerializeToString(), vm_id, signature):
+                payload_proto.job_result.SerializeToString(), vm_id, signature):
             raise self.UnauthorizedUserException
 
-        job_id = payload.job_result.job_id
+        job_id = payload_proto.job_result.job_id
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -129,8 +129,8 @@ class TrainedClassifierHandler(base.BaseHandler):
                 'The current status of the job cannot transition to COMPLETE.')
         try:
             classifier_data_proto = getattr(
-                payload.job_result,
-                payload.job_result.WhichOneof('classifier_frozen_model'))
+                payload_proto.job_result,
+                payload_proto.job_result.WhichOneof('classifier_frozen_model'))
             classifier_services.store_classifier_data(
                 job_id, classifier_data_proto)
         except Exception as e:
@@ -145,8 +145,8 @@ class TrainedClassifierHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests.
 
-        Retrieves the name of the file storing (stored on GCS) the trained model
-        parameters and transfers it to frontend.
+        Retrieves the name of the file on GCS storing the trained model
+        parameters and transfers it to the frontend.
         """
         exploration_id = self.request.get('exploration_id')
         state_name = self.request.get('state_name')
@@ -174,28 +174,30 @@ class TrainedClassifierHandler(base.BaseHandler):
         state_training_jobs_mapping = (
             classifier_services.get_state_training_jobs_mapping(
                 exploration_id, exp_version, state_name))
-        if not state_training_jobs_mapping:
+        if state_training_jobs_mapping is None:
             raise self.InvalidInputException
 
         if not (
-                state_training_jobs_mapping.algorithm_ids_to_job_ids.
-                contains_algorithm_id(algorithm_id)):
-            classifier_services.migrate_exploration_training_jobs(
+            algorithm_id in state_training_jobs_mapping.
+            algorithm_ids_to_job_ids):
+            classifier_services.migrate_state_training_jobs(
                 state_training_jobs_mapping)
+            # Since the required training job doesn't exist and old job has to
+            # be migrated, a PageNotFound exception is raised.
             raise self.PageNotFoundException
 
         training_job = classifier_services.get_classifier_training_job_by_id(
-            state_training_jobs_mapping.algorithm_ids_to_job_ids.
-            get_job_id_for_algorithm_id(
-                algorithm_id))
+            state_training_jobs_mapping.algorithm_ids_to_job_ids[algorithm_id])
 
         if training_job is None or (
                 training_job.status != feconf.TRAINING_JOB_STATUS_COMPLETE):
             raise self.PageNotFoundException
 
         if training_job.algorithm_version != algorithm_version:
-            classifier_services.migrate_exploration_training_jobs(
+            classifier_services.migrate_state_training_jobs(
                 state_training_jobs_mapping)
+            # Since the required training job doesn't exist and old job has to
+            # be migrated, a PageNotFound exception is raised.
             raise self.PageNotFoundException
 
         return self.render_json({

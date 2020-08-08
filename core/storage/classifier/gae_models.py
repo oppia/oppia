@@ -304,9 +304,9 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
                 this training job was created.
             state_name: unicode. The name of the state to which the classifier
                 belongs.
-            algorithm_ids_to_job_ids: dict. The ID of the training job
-                corresponding to each possible algorithm_id for the given
-                <exp_id, exp_version, state_name>.
+            algorithm_ids_to_job_ids: dict(str, str). The mapping from
+                algorithm IDs to the IDs of their corresponding classifier
+                training jobs.
 
         Returns:
             str. ID of the new ClassifierExplorationMappingModel entry.
