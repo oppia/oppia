@@ -504,10 +504,8 @@ def get_users_settings(user_ids):
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
-            if model is not None:
-                result.append(_transform_user_settings(model))
-            else:
-                result.append(None)
+            result.append(_transform_user_settings(model) if model is not
+                None else None)
     return result
 
 
@@ -610,13 +608,13 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
         Exception. The value of strict is True and given gae_id does not exist.
     """
     user_settings_model = user_models.UserSettingsModel.get_by_gae_id(gae_id)
-    if user_settings_model:
+    if user_settings_model is not None:
         user_settings = _transform_user_settings(user_settings_model)
         return user_settings
+    elif strict:
+        logging.error('Could not find user with id %s' % gae_id)
+        raise Exception('User not found.')
     else:
-        if strict:
-            logging.error('Could not find user with id %s' % gae_id)
-            raise Exception('User not found.')
         return None
 
 

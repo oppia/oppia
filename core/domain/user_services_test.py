@@ -1332,13 +1332,13 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_validate_user_id(self):
-        self.user_settings.user_id = 'uid_' + 'a' * 31 + 'A'
+        self.user_settings.user_id = 'uid_%sA' % ('a' * 31)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
-        self.user_settings.user_id = 'uid_' + 'a' * 31
+        self.user_settings.user_id = 'uid_%s' % ('a' * 31)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
@@ -1498,13 +1498,13 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
             self.user_auth_details.validate()
 
     def test_validate_user_id(self):
-        self.user_auth_details.user_id = 'uid_' + 'a' * 31 + 'A'
+        self.user_auth_details.user_id = 'uid_%sA' % ('a' * 31)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_auth_details.validate()
 
-        self.user_auth_details.user_id = 'uid_' + 'a' * 31
+        self.user_auth_details.user_id = 'uid_%s' % ('a' * 31)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
@@ -1524,13 +1524,13 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
             self.user_auth_details.validate()
 
     def test_validate_parent_user_id(self):
-        self.user_auth_details.parent_user_id = 'uid_' + 'a' * 31 + 'A'
+        self.user_auth_details.parent_user_id = 'uid_%sA' % ('a' * 31)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'The parent user ID is in a wrong format.'
         ):
             self.user_auth_details.validate()
 
-        self.user_auth_details.parent_user_id = 'uid_' + 'a' * 31
+        self.user_auth_details.parent_user_id = 'uid_%s' % ('a' * 31)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'The parent user ID is in a wrong format.'
         ):
