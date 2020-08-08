@@ -32,7 +32,9 @@ var expectInteractionDetailsToMatch = async function(
     elem, placeholderText, heightOfBox) {
   const textInputInteraction = (
     element(by.tagName('oppia-interactive-text-input')));
-  await waitFor.visibilityOf(
+  // We use presenceOf here instead of visibilityOf because the container
+  // has a height and width of 0.
+  await waitFor.presenceOf(
     textInputInteraction,
     'TextInput interaction taking too long to appear');
   if (placeholderText) {
@@ -44,8 +46,8 @@ var expectInteractionDetailsToMatch = async function(
     expect(placeholderValueUnicode).toEqual(placeholderText);
   }
   if (heightOfBox) {
-    expect((await element(by.tagName('oppia-interactive-text-input'))
-      .getAttribute('rows-with-value'))).toEqual(heightOfBox.toString());
+    expect(textInputInteraction.getAttribute('rows-with-value'))
+      .toEqual(heightOfBox.toString());
   }
   expect(
     await elem.element(by.tagName('oppia-interactive-text-input')).isPresent()
