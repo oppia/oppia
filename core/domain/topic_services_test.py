@@ -1454,6 +1454,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, changelist, 'Update topic name')
 
+    def test_url_fragment_existence_fails_for_non_string_url_fragment(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Topic URL fragment should be a string.'):
+            topic_services.does_topic_with_url_fragment_exist(123)
+
+    def test_name_existence_fails_for_non_string_name(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Name should be a string.'):
+            topic_services.does_topic_with_name_exist(123)
+
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.language_code, 'en')
