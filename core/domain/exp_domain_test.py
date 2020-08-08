@@ -521,9 +521,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_input_translations_mapping': {},
             'rule_inputs': {
-              'Contains': [{
-                'x': 'Test'
-              }]
+                'Contains': [{
+                    'x': 'Test'
+                }]
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -556,12 +556,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Expected inputs to be a dict')
 
         answer_group.rule_inputs = {
-          'FakeRuleType': [{'x': 'Test'}]
+            'FakeRuleType': [{'x': 'Test'}]
         }
         self._assert_validation_error(exploration, 'Unrecognized rule type')
 
         answer_group.rule_inputs = {
-          'Contains': [{'x': 15}]
+            'Contains': [{'x': 15}]
         }
         with self.assertRaisesRegexp(
             Exception, 'Expected unicode string, received 15'
@@ -755,9 +755,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_input_translations_mapping': {},
             'rule_inputs': {
-              'Contains': [{
-                'x': 'Test'
-              }]
+                'Contains': [{
+                    'x': 'Test'
+                }]
             },
             'training_data': [],
             'tagged_skill_misconception_id': 1
@@ -782,9 +782,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_input_translations_mapping': {},
             'rule_inputs': {
-              'Contains': [{
-                'x': 'Test'
-              }]
+                'Contains': [{
+                    'x': 'Test'
+                }]
             },
             'training_data': [],
             'tagged_skill_misconception_id':
@@ -804,15 +804,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.interaction.answer_groups[0].rule_inputs = {}
 
         init_state.interaction.answer_groups[
-          0].rule_input_translations_mapping = []
+            0].rule_input_translations_mapping = []
         self._assert_validation_error(
-            exploration, 
+            exploration,
             (
-              'Expected answer group rule_input_translations_mapping '
-              'to be a dict')
+                'Expected answer group rule_input_translations_mapping '
+                'to be a dict')
         )
         init_state.interaction.answer_groups[
-          0].rule_input_translations_mapping = {}
+            0].rule_input_translations_mapping = {}
 
         first_answer_group = init_state.interaction.answer_groups[0]
         first_answer_group.tagged_skill_misconception_id = None
@@ -1226,9 +1226,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_input_translations_mapping': {},
             'rule_inputs': {
-              'Contains': [{
-                'x': 'Test'
-              }]
+                'Contains': [{
+                    'x': 'Test'
+                }]
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1603,9 +1603,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_input_translations_mapping': {},
             'rule_inputs': {
-              'Contains': [{
-                'x': 'Test'
-              }]
+                'Contains': [{
+                    'x': 'Test'
+                }]
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -9606,11 +9606,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         answer_group_list2 = [{
             'rule_input_translations_mapping': {},
             'rule_inputs': {
-              'Equals': [{
-                'x': 0
-              }, {
-                'x': 1
-              }]
+                'Equals': [{
+                    'x': 0
+                }, {
+                    'x': 1
+                }]
             },
             'outcome': {
                 'dest': 'state1',
@@ -9628,9 +9628,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         }, {
             'rule_input_translations_mapping': {},
             'rule_inputs': {
-              'Equals': [{
-                'x': 0
-              }]
+                'Equals': [{
+                    'x': 0
+                }]
             },
             'outcome': {
                 'dest': 'state3',
@@ -9649,13 +9649,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         answer_group_list3 = [{
             'rule_input_translations_mapping': {},
             'rule_inputs': {
-              'Equals': [{
-                  'x': ['<p>This is value1 for ItemSelectionInput</p>']
-                },
-                {
-                  'x': ['<p>This is value3 for ItemSelectionInput</p>']
-                }
-              ]
+                'Equals': [{
+                    'x': ['<p>This is value1 for ItemSelectionInput</p>']
+                }, {
+                    'x': ['<p>This is value3 for ItemSelectionInput</p>']
+                }]
             },
             'outcome': {
                 'dest': 'state1',

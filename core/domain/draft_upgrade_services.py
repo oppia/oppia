@@ -185,8 +185,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 for answer_group_dict in change.new_value:
-                    # Convert the list of rule specs into the new rule_inputs dict
-                    # format.
+                    # Convert the list of rule specs into the new rule_inputs
+                    # dict format.
                     rule_inputs = {}
                     for rule_spec_dict in answer_group_dict['rule_specs']:
                         rule_type = rule_spec_dict['rule_type']

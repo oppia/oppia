@@ -45,7 +45,7 @@ class AnswerGroup(python_utils.OBJECT):
     example answers dictated by the creator.
     """
     def __init__(
-            self, outcome, rule_inputs, rule_input_translations_mapping, 
+            self, outcome, rule_inputs, rule_input_translations_mapping,
             training_data, tagged_skill_misconception_id):
         """Initializes a AnswerGroup domain object.
 
@@ -177,8 +177,8 @@ class AnswerGroup(python_utils.OBJECT):
         for all the parameters the rule expects.
 
         Args:
-            rule_input: dict. The values of the parameters needed in order to fully
-                specify the rule.
+            rule_input: dict. The values of the parameters needed in order to
+                fully specify the rule.
             rule_type: str. The rule type, e.g. "CodeContains" or "Equals".
             rule_params_list: list(str, object(*)). A list of parameters used by
                 the rule represented by this RuleSpec instance, to be used to
@@ -275,31 +275,37 @@ class AnswerGroup(python_utils.OBJECT):
                         rule_type in
                         interaction_and_rule_details['ruleTypes'].keys())
                     if rule_type_has_html:
-                        html_type_format = interaction_and_rule_details['format']
+                        html_type_format = interaction_and_rule_details[
+                            'format']
                         input_variables_from_html_mapping = (
                             interaction_and_rule_details['ruleTypes'][
-                                rule_type][
-                                    'htmlInputVariables'])
+                                rule_type]['htmlInputVariables'])
                         input_variable_match_found = False
                         for input_variable in rule_input.keys():
-                            if input_variable in input_variables_from_html_mapping:
+                            if (
+                                    input_variable in
+                                    input_variables_from_html_mapping
+                            ):
                                 input_variable_match_found = True
                                 rule_input_variable = (
                                     rule_input[input_variable])
                                 if (html_type_format ==
-                                        feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
-                                    html_list = html_list + [rule_input_variable]
+                                        feconf
+                                        .HTML_RULE_VARIABLE_FORMAT_STRING):
+                                    html_list = html_list + [
+                                        rule_input_variable]
                                 elif (html_type_format ==
                                     feconf.HTML_RULE_VARIABLE_FORMAT_SET):
                                     # Here we are checking the type of the
                                     # rule_input because the rule type
                                     # 'Equals' is used by other interactions as
-                                    # well which don't have HTML and we don't have
-                                    # a reference to the interaction ID.
+                                    # well which don't have HTML and we don't
+                                    # have a reference to the interaction ID.
                                     if isinstance(rule_input_variable, list):
                                         for value in rule_input_variable:
                                             if isinstance(
-                                                    value, python_utils.BASESTRING):
+                                                    value,
+                                                    python_utils.BASESTRING):
                                                 html_list = html_list + [value]
                                 elif (html_type_format ==
                                     feconf.
@@ -308,12 +314,12 @@ class AnswerGroup(python_utils.OBJECT):
                                         html_list = html_list + rule_spec_html
                                 else:
                                     raise Exception(
-                                        'The rule spec does not belong to a valid'
-                                        ' format.')
+                                        'The rule spec does not belong to a '
+                                        'valid format.')
                         if not input_variable_match_found:
                             raise Exception(
-                                'Rule spec should have at least one valid input '
-                                'variable with Html in it.')
+                                'Rule spec should have at least one valid '
+                                'input variable with Html in it.')
         return html_list
 
     @staticmethod

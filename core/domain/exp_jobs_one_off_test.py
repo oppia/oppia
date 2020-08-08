@@ -207,14 +207,12 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'HasElementXAtPositionY': [{
-                        'x': '',
-                        'y': 1
-                    },
-                    {
-                        'x': 'a',
-                        'y': 2
-                    }
-                ]
+                    'x': '',
+                    'y': 1
+                }, {
+                    'x': 'a',
+                    'y': 2
+                }]
             },
             'outcome': {
                 'dest': 'Introduction',
@@ -703,7 +701,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'IsMathematicallyEquivalentTo': [{
-                    'x': "['y=mx+c']"
+                    'x': ['y=mx+c']
                 }]
             },
             'outcome': {
@@ -1503,12 +1501,10 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'Equals': [{
-                        'x': ['<p>This is value1 for ItemSelection</p>']
-                    },
-                    {
-                        'x': ['<p>This is value2 for ItemSelection</p>']
-                    }
-                ]
+                    'x': ['<p>This is value1 for ItemSelection</p>']
+                }, {
+                    'x': ['<p>This is value2 for ItemSelection</p>']
+                }]
             },
             'outcome': {
                 'dest': 'Introduction',
@@ -1557,12 +1553,10 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'Equals': [{
-                        'x': ['<p>This is value1 for ItemSelection</p>']
-                    },
-                    {
-                        'x': ['<p>This is value3 for ItemSelection</p>']
-                    }
-                ]
+                    'x': ['<p>This is value1 for ItemSelection</p>']
+                }, {
+                    'x': ['<p>This is value3 for ItemSelection</p>']
+                }]
             },
             'outcome': {
                 'dest': 'State1',
@@ -1628,12 +1622,10 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'Equals': [{
-                        'x': ['<p>This is value1 for ItemSelection</p>']
-                    },
-                    {
-                        'x': ['<p>This is value3 for ItemSelection</p>']
-                    }
-                ]
+                    'x': ['<p>This is value1 for ItemSelection</p>']
+                }, {
+                    'x': ['<p>This is value3 for ItemSelection</p>']
+                }]
             },
             'outcome': {
                 'dest': 'State1',
@@ -2409,16 +2401,14 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                     'y': invalid_html_content1
                 }],
                 'IsEqualToOrdering': [{
-                        'x': [
-                            [invalid_html_content1]
-                        ]
-                    },
-                    {
-                        'x': [
-                            [invalid_html_content2]
-                        ]
-                    }
-                ],
+                    'x': [
+                        [invalid_html_content1]
+                    ]
+                }, {
+                    'x': [
+                        [invalid_html_content2]
+                    ]
+                }],
                 'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
                     'x': [
                         [invalid_html_content1]
@@ -2700,16 +2690,14 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                     'y': valid_html_content
                 }],
                 'IsEqualToOrdering': [{
-                        'x': [
-                            [valid_html_content]
-                        ]
-                    },
-                    {
-                        'x': [
-                            [valid_html_content]
-                        ]
-                    }
-                ],
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }],
                 'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
                     'x': [
                         [valid_html_content]
@@ -2892,16 +2880,14 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                     'y': valid_html_content
                 }],
                 'IsEqualToOrdering': [{
-                        'x': [
-                            [valid_html_content]
-                        ]
-                    },
-                    {
-                        'x': [
-                            [valid_html_content]
-                        ]
-                    }
-                ],
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }],
                 'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
                     'x': [
                         [valid_html_content]
@@ -3039,16 +3025,14 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
                     'y': valid_html_content1
                 }],
                 'IsEqualToOrdering': [{
-                        'x': [
-                            [valid_html_content1]
-                        ]
-                    },
-                    {
-                        'x': [
-                            [valid_html_content1]
-                        ]
-                    }
-                ],
+                    'x': [
+                        [valid_html_content1]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content1]
+                    ]
+                }],
                 'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
                     'x': [
                         [valid_html_content2]

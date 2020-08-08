@@ -154,8 +154,7 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         state.interaction.answer_groups):
                     for rule_type in answer_group.rule_inputs:
                         for rule_input_index, rule_input in enumerate(
-                            answer_group.rule_inputs[rule_type]
-                        ):
+                                answer_group.rule_inputs[rule_type]):
                             if rule_input['x'] >= choices_length:
                                 yield (
                                     item.id,

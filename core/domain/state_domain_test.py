@@ -1673,16 +1673,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'y': html_with_old_math_schema
                 }],
                 'IsEqualToOrdering': [{
-                        'x': [
-                            [html_with_old_math_schema]
-                        ]
-                    },
-                    {
-                        'x': [
-                            [html_with_old_math_schema]
-                        ]
-                    }
-                ],
+                    'x': [
+                        [html_with_old_math_schema]
+                    ]
+                }, {
+                    'x': [
+                        [html_with_old_math_schema]
+                    ]
+                }],
                 'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
                     'x': [
                         [html_with_old_math_schema]
@@ -1715,16 +1713,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'y': html_with_new_math_schema
                 }],
                 'IsEqualToOrdering': [{
-                        'x': [
-                            [html_with_new_math_schema]
-                        ]
-                    },
-                    {
-                        'x': [
-                            [html_with_new_math_schema]
-                        ]
-                    }
-                ],
+                    'x': [
+                        [html_with_new_math_schema]
+                    ]
+                }, {
+                    'x': [
+                        [html_with_new_math_schema]
+                    ]
+                }],
                 'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
                     'x': [
                         [html_with_new_math_schema]
@@ -3598,7 +3594,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {'x': 'Test'},
                     'Contains',
                     [],
-                    {} )
+                    {})
             )
 
         self.assertEqual(

@@ -1658,24 +1658,22 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'Equals': [{
-                        'x': [
-                            '<p>This is value1 for ItemSelection</p><oppia-noni'
-                            'nteractive-image filepath-with-value="&amp;quot;s3'
-                            'Choice1.png&amp;quot;" caption-with-value="&amp;qu'
-                            'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
-                            ';"></oppia-noninteractive-image>'
-                        ]
-                    },
-                    {
-                        'x': [
-                            '<p>This is value3 for ItemSelection</p><oppia-noni'
-                            'nteractive-image filepath-with-value="&amp;quot;s3'
-                            'Choice3.png&amp;quot;" caption-with-value="&amp;qu'
-                            'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
-                            ';"></oppia-noninteractive-image>'
-                        ]
-                    }
-                ]
+                    'x': [
+                        '<p>This is value1 for ItemSelection</p><oppia-noni'
+                        'nteractive-image filepath-with-value="&amp;quot;s3'
+                        'Choice1.png&amp;quot;" caption-with-value="&amp;qu'
+                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
+                        ';"></oppia-noninteractive-image>'
+                    ]
+                }, {
+                    'x': [
+                        '<p>This is value3 for ItemSelection</p><oppia-noni'
+                        'nteractive-image filepath-with-value="&amp;quot;s3'
+                        'Choice3.png&amp;quot;" caption-with-value="&amp;qu'
+                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
+                        ';"></oppia-noninteractive-image>'
+                    ]
+                }]
             },
             'outcome': {
                 'dest': 'state1',
