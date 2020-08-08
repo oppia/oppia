@@ -325,7 +325,10 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         if key == 'SUCCESS':
-            yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
+            if values[0] == 'None':
+                yield (key, len(values))
+            else:
+                yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
             yield (key, values)
 
