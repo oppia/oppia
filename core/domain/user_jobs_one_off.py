@@ -81,16 +81,16 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 # TODO(#10178): Remove the following migration job once we have verified
-# that UserAuthModels exists for every user.
-class PopulateUserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for creating and populating UserAuthModel for
+# that UserAuthDetailsModels exists for every user.
+class PopulateUserAuthDetailsModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for creating and populating UserAuthDetailsModel for
     all registered users.
     """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         """Marks a job as queued and adds it to a queue for processing."""
-        super(PopulateUserAuthModelOneOffJob, cls).enqueue(
+        super(PopulateUserAuthDetailsModelOneOffJob, cls).enqueue(
             job_id, shard_count=64)
 
     @classmethod
@@ -111,12 +111,12 @@ class PopulateUserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         #    migration job would need modifications if it has to work in such a
         #    setting in future.
 
-        user_models.UserAuthModel(
+        user_models.UserAuthDetailsModel(
             id=item.id,
             gae_id=item.gae_id,
             deleted=item.deleted
         ).put()
-        yield ('SUCCESS - Created UserAuth model', 1)
+        yield ('SUCCESS - Created UserAuthDetails model', 1)
 
     @staticmethod
     def reduce(key, user_counter):

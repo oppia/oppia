@@ -48,7 +48,7 @@ DEFAULT_IDENTICON_DATA_URL = (
 
 
 # TODO(#10178): Deprecate gae_id for UserSettings once we have verified that
-# UserAuthModels exists for every user.
+# UserAuthDetailsModels exists for every user.
 class UserSettings(python_utils.OBJECT):
     """Value object representing a user's settings.
 
@@ -297,8 +297,8 @@ class UserSettings(python_utils.OBJECT):
                         'This username is not available.')
 
 
-class UserAuth(python_utils.OBJECT):
-    """Value object representing a user's authentication information.
+class UserAuthDetails(python_utils.OBJECT):
+    """Value object representing a user's authentication details information.
 
     Attributes:
         user_id: str. The unique ID of the user.
@@ -311,7 +311,7 @@ class UserAuth(python_utils.OBJECT):
     def __init__(
             self, user_id, gae_id, pin=None, parent_user_id=None,
             deleted=False):
-        """Constructs a UserAuth domain object.
+        """Constructs a UserAuthDetails domain object.
 
         Args:
             user_id: str. The unique ID of the user.
@@ -329,8 +329,8 @@ class UserAuth(python_utils.OBJECT):
         self.deleted = deleted
 
     def validate(self):
-        """Checks that user_id, gae_id and email fields of this UserAuth domain
-        object are valid.
+        """Checks that user_id, gae_id and email fields of this UserAuthDetails
+        domain object are valid.
 
         Raises:
             ValidationError. The user_id is not str.
@@ -945,53 +945,56 @@ def create_new_user(gae_id, email):
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
-    _save_user_auth_details(UserAuth(user_id, gae_id))
+    _save_user_auth_details(UserAuthDetails(user_id, gae_id))
     _save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
     return user_settings
 
 
-def _save_user_auth_details(user_auth):
-    """Commits a user auth object to the datastore.
+def _save_user_auth_details(user_auth_details):
+    """Commits a user auth details object to the datastore.
 
     Args:
-        user_auth: UserAuth. The user auth domain object to be saved.
+        user_auth_details: UserAuthDetails. The user auth details domain
+            object to be saved.
     """
-    user_auth.validate()
+    user_auth_details.validate()
 
-    user_auth_dict = {
-        'gae_id': user_auth.gae_id,
-        'pin': user_auth.pin,
-        'parent_user_id': user_auth.parent_user_id,
-        'deleted': user_auth.deleted
+    user_auth_details_dict = {
+        'gae_id': user_auth_details.gae_id,
+        'pin': user_auth_details.pin,
+        'parent_user_id': user_auth_details.parent_user_id,
+        'deleted': user_auth_details.deleted
     }
 
-    # If user auth entry with the given user_id does not exist, create a new
-    # one.
-    user_auth_model = user_models.UserAuthModel.get_by_id(user_auth.user_id)
-    if user_auth_model is not None:
-        user_auth_model.populate(**user_auth_dict)
-        user_auth_model.put()
+    # If user auth details entry with the given user_id does not exist, create
+    # a new one.
+    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_id(
+        user_auth_details.user_id)
+    if user_auth_details_model is not None:
+        user_auth_details_model.populate(**user_auth_details_dict)
+        user_auth_details_model.put()
     else:
-        user_auth_dict['id'] = user_auth.user_id
-        user_models.UserAuthModel(**user_auth_dict).put()
+        user_auth_details_dict['id'] = user_auth_details.user_id
+        user_models.UserAuthDetailsModel(**user_auth_details_dict).put()
 
 
-def _get_user_auth_from_model(user_auth_model):
-    """Transform user auth storage model to domain object.
+def _get_user_auth_details_from_model(user_auth_details_model):
+    """Transform user auth details storage model to domain object.
 
     Args:
-        user_auth_model: UserAuthModel. The model to be converted.
+        user_auth_details_model: UserAuthDetailsModel. The model to be
+            converted.
 
     Returns:
-        UserAuth. Domain object for user auth.
+        UserAuthDetails. Domain object for user auth details.
     """
-    return UserAuth(
-        user_id=user_auth_model.id,
-        gae_id=user_auth_model.gae_id,
-        pin=user_auth_model.pin,
-        parent_user_id=user_auth_model.parent_user_id,
-        deleted=user_auth_model.deleted
+    return UserAuthDetails(
+        user_id=user_auth_details_model.id,
+        gae_id=user_auth_details_model.gae_id,
+        pin=user_auth_details_model.pin,
+        parent_user_id=user_auth_details_model.parent_user_id,
+        deleted=user_auth_details_model.deleted
     )
 
 
@@ -1250,14 +1253,16 @@ def mark_user_for_deletion(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-    user_auth_model = user_models.UserAuthModel.get_by_id(user_id)
+    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_id(
+        user_id)
 
-    # TODO(#10178): Remove the if condition below once UserAuthModel is
+    # TODO(#10178): Remove the if condition below once UserAuthDetailsModel is
     # present for every existing user.
-    if user_auth_model is not None:
-        user_auth = _get_user_auth_from_model(user_auth_model)
-        user_auth.deleted = True
-        _save_user_auth_details(user_auth)
+    if user_auth_details_model is not None:
+        user_auth_details = _get_user_auth_details_from_model(
+            user_auth_details_model)
+        user_auth_details.deleted = True
+        _save_user_auth_details(user_auth_details)
 
 
 def get_human_readable_user_ids(user_ids):

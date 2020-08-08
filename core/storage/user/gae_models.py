@@ -48,7 +48,7 @@ class UserSettingsModel(base_models.BaseModel):
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
     # TODO(#10178): Deprecate gae_id for UserSettingsModel once we have verified
-    # that UserAuthModels exists for every user.
+    # that UserAuthDetailsModels exists for every user.
     gae_id = ndb.StringProperty(required=True, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
@@ -2226,7 +2226,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
         raise Exception('New id generator is producing too many collisions.')
 
 
-class UserAuthModel(base_models.BaseModel):
+class UserAuthDetailsModel(base_models.BaseModel):
     """Stores the authentication details for a particular user.
 
     Instances of this class are keyed by user id.
@@ -2261,7 +2261,7 @@ class UserAuthModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
-        """Delete instances of UserAuthModel for the user.
+        """Delete instances of UserAuthDetailsModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -2270,13 +2270,13 @@ class UserAuthModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserAuthModel exists for the given user.
+        """Check whether UserAuthDetailsModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            bool. Whether any UserAuthModel refers to the given user ID.
+            bool. Whether any UserAuthDetailsModel refers to the given user ID.
         """
         return cls.get_by_id(user_id) is not None
 
@@ -2290,7 +2290,7 @@ class UserAuthModel(base_models.BaseModel):
                 authentication service.
 
         Returns:
-            UserAuthModel. The UserAuthModel instance having a
+            UserAuthDetailsModel. The UserAuthDetailsModel instance having a
             particular user mapped to the given auth_id and the auth service
             if there exists one, else None.
         """
