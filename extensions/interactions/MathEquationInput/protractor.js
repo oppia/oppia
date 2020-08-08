@@ -27,17 +27,9 @@ var customizeInteraction = async function(elem, customLetters) {
     '.protractor-test-custom-letters-div')),
   'The custom letters div took too long to load.');
   for (let letter of customLetters) {
-    await action.click('Math OSK Tab', elem.element(by.buttonText('abc')));
-    let letterIsPresent = true;
-    try {
-      await browser.wait(
-        await waitFor.until.presenceOf(elem.element(by.buttonText(letter))),
-        waitFor.DEFAULT_WAIT_TIME_MSECS,
-        'Button for ' + letter + ' took too long to load.');
-    } catch (e) {
-      letterIsPresent = false;
-    }
-    if (!letterIsPresent) {
+    if (letter.match(/[a-z]/)) {
+      await action.click('Math OSK Tab', elem.element(by.buttonText('abc')));
+    } else {
       await action.click('Math OSK Tab', elem.element(by.buttonText('αβγ')));
     }
     await action.click('Math OSK Letter', elem.element(by.buttonText(letter)));
