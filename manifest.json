@@ -390,8 +390,7 @@
         "rootDirPrefix": "select2-",
         "targetDirPrefix": "select2-",
         "bundle": {
-          "css": ["dist/css/select2.css"],
-          "js": ["dist/js/select2.full.js"]
+          "css": ["dist/css/select2.css"]
         }
       },
       "ckeditor": {
