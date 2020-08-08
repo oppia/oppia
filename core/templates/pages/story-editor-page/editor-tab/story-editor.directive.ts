@@ -300,10 +300,6 @@ angular.module('oppia').directive('storyEditor', [
               )
             );
 
-            $scope.$on('storyGraphUpdated', function(evt, storyContents) {
-              _initEditor();
-            });
-
             ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryInitialized.subscribe(
                 () => _init()
