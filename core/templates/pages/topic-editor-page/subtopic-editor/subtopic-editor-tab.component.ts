@@ -34,7 +34,7 @@ require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
-require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
+require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
 
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
@@ -88,6 +88,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.editableThumbnailBgColor = (
             ctrl.subtopic.getThumbnailBgColor());
           ctrl.editableUrlFragment = ctrl.subtopic.getUrlFragment();
+          ctrl.initialSubtopicUrlFragment = ctrl.subtopic.getUrlFragment();
           ctrl.subtopicPage = (
             TopicEditorStateService.getSubtopicPage());
           ctrl.allowedBgColors = (
@@ -122,7 +123,7 @@ angular.module('oppia').component('subtopicEditorTab', {
       ctrl.updateSubtopicUrlFragment = function(urlFragment) {
         ctrl.subtopicUrlFragmentIsValid = (
           SubtopicValidationService.isUrlFragmentValid(urlFragment));
-        if (urlFragment === ctrl.subtopic.getUrlFragment()) {
+        if (urlFragment === ctrl.initialSubtopicUrlFragment) {
           ctrl.subtopicUrlFragmentExists = false;
           return;
         }

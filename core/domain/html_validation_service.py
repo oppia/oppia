@@ -921,11 +921,7 @@ def add_svg_filenames_for_latex_strings_in_html_string(
             objects.UnicodeString.normalize(math_content_dict['svg_filename']))
         if svg_filename == '' and (
                 raw_latex in raw_latex_to_image_data_dict.keys()):
-            dimensions = (
-                raw_latex_to_image_data_dict[raw_latex].
-                latex_string_svg_image_dimensions)
-            filename = (
-                generate_math_svgs_filename(dimensions))
+            filename = raw_latex_to_image_data_dict[raw_latex].filename
             math_content_dict = {
                 'raw_latex': raw_latex,
                 'svg_filename': objects.UnicodeString.normalize(filename)
@@ -956,7 +952,7 @@ def extract_svg_filename_latex_mapping_in_math_rte_components(html_string):
 
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    filenames_mapping = []
+    filenames_mapping = set()
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
             json.loads(unescape_html(
@@ -967,9 +963,9 @@ def extract_svg_filename_latex_mapping_in_math_rte_components(html_string):
                 objects.UnicodeString.normalize(svg_filename))
             normalized_raw_latex = (
                 objects.UnicodeString.normalize(math_content_dict['raw_latex']))
-            filenames_mapping.append(
+            filenames_mapping.add(
                 (normalized_svg_filename, normalized_raw_latex))
-    return filenames_mapping
+    return list(filenames_mapping)
 
 
 def get_filename_with_dimensions(old_filename, exp_id):
