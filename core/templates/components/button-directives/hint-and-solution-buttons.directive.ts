@@ -16,8 +16,6 @@
  * @fileoverview Directive for hint and solution buttons.
  */
 
-import { Subscription } from 'rxjs';
-
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
@@ -28,8 +26,6 @@ require(
   'hints-and-solution-manager.service.ts');
 require(
   'pages/exploration-player-page/services/hint-and-solution-modal.service.ts');
-require(
-  'pages/exploration-player-page/services/learner-answer-info.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/context.service.ts');
@@ -52,14 +48,14 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
         '$scope', '$rootScope', 'HintsAndSolutionManagerService',
         'PlayerTranscriptService', 'ExplorationPlayerStateService',
         'HintAndSolutionModalService', 'DeviceInfoService', 'ContextService',
-        'PlayerPositionService', 'EVENT_NEW_CARD_OPENED', 'INTERACTION_SPECS',
-        'StatsReportingService',
+        'PlayerPositionService', 'EVENT_ACTIVE_CARD_CHANGED',
+        'EVENT_NEW_CARD_OPENED', 'INTERACTION_SPECS', 'StatsReportingService',
         function(
             $scope, $rootScope, HintsAndSolutionManagerService,
             PlayerTranscriptService, ExplorationPlayerStateService,
             HintAndSolutionModalService, DeviceInfoService, ContextService,
-            PlayerPositionService, EVENT_NEW_CARD_OPENED, INTERACTION_SPECS,
-            StatsReportingService) {
+            PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
+            EVENT_NEW_CARD_OPENED, INTERACTION_SPECS, StatsReportingService) {
           var ctrl = this;
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
@@ -71,7 +67,6 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
               ctrl.hintIndexes.push(index);
             }
           };
-          ctrl.directiveSubscriptions = new Subscription();
 
           ctrl.isHintButtonVisible = function(index) {
             return (
@@ -150,22 +145,15 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
               );
               resetLocalHintsArray();
             });
-            ctrl.directiveSubscriptions.add(
-              PlayerPositionService.onActiveCardChanged.subscribe(
-                () => {
-                  var displayedCardIndex =
-                    (PlayerPositionService.getDisplayedCardIndex());
-                  ctrl.currentlyOnLatestCard =
-                    (PlayerTranscriptService.isLastCard(displayedCardIndex));
-                  if (ctrl.currentlyOnLatestCard) {
-                    resetLocalHintsArray();
-                  }
-                }
-              )
-            );
-          };
-          ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe();
+            $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
+              var displayedCardIndex =
+                PlayerPositionService.getDisplayedCardIndex();
+              ctrl.currentlyOnLatestCard = PlayerTranscriptService.isLastCard(
+                displayedCardIndex);
+              if (ctrl.currentlyOnLatestCard) {
+                resetLocalHintsArray();
+              }
+            });
           };
         }
       ]
