@@ -52,7 +52,12 @@ describe('Review test page component', function() {
     var $rootScope = $injector.get('$rootScope');
     urlService = $injector.get('UrlService');
 
-    spyOn(urlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic_1');
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'story_1');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'classroom_1');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('reviewTestPage', {
@@ -85,7 +90,6 @@ describe('Review test page component', function() {
 
   it('should initialize correctly controller properties after its' +
   ' initialization and get skill details from backend', function() {
-    expect(ctrl.storyId).toBe('story_1');
     expect(ctrl.questionPlayerConfig).toEqual({
       resultActionButtons: [{
         type: 'BOOST_SCORE',
@@ -93,11 +97,11 @@ describe('Review test page component', function() {
       }, {
         type: 'RETRY_SESSION',
         i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
-        url: '/review_test/story_1'
+        url: '/learn/classroom_1/topic_1/review-test/story_1'
       }, {
         type: 'DASHBOARD',
         i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
-        url: '/story/story_1'
+        url: '/learn/classroom_1/topic_1/story/story_1'
       }],
       skillList: ['0', '1'],
       skillDescriptions: ['skill_1', 'skill_2'],

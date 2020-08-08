@@ -38,35 +38,46 @@ require('domain/review_test/review-test-backend-api.service.ts');
 angular.module('oppia').component('reviewTestPage', {
   template: require('./review-test-page.component.html'),
   controller: [
-    'PageTitleService', 'ReviewTestEngineService',
-    'UrlInterpolationService', 'UrlService',
-    'QUESTION_PLAYER_MODE', 'REVIEW_TEST_DATA_URL', 'REVIEW_TESTS_URL',
-    'STORY_VIEWER_PAGE',
+    'PageTitleService', 'ReviewTestEngineService', 'UrlInterpolationService',
+    'UrlService', 'QUESTION_PLAYER_MODE', 'REVIEW_TEST_DATA_URL',
+    'REVIEW_TESTS_URL', 'STORY_VIEWER_PAGE',
     function(
-        PageTitleService, ReviewTestEngineService,
-        UrlInterpolationService, UrlService,
-        QUESTION_PLAYER_MODE, REVIEW_TEST_DATA_URL, REVIEW_TESTS_URL,
-        STORY_VIEWER_PAGE) {
+        PageTitleService, ReviewTestEngineService, UrlInterpolationService,
+        UrlService, QUESTION_PLAYER_MODE, REVIEW_TEST_DATA_URL,
+        REVIEW_TESTS_URL, STORY_VIEWER_PAGE
+    ) {
       var ctrl = this;
 
       ctrl.reviewTestBackendApiService = (
         OppiaAngularRootComponent.reviewTestBackendApiService);
 
       var _fetchSkillDetails = function() {
+        var topicUrlFragment = (
+          UrlService.getTopicUrlFragmentFromLearnerUrl());
+        var storyUrlFragment = (
+          UrlService.getStoryUrlFragmentFromLearnerUrl());
+        var classroomUrlFragment = (
+          UrlService.getClassroomUrlFragmentFromLearnerUrl());
         var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
           REVIEW_TEST_DATA_URL, {
-            story_id: ctrl.storyId
+            topic_url_fragment: topicUrlFragment,
+            classroom_url_fragment: classroomUrlFragment,
+            story_url_fragment: storyUrlFragment
           });
         var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
           REVIEW_TESTS_URL, {
-            story_id: ctrl.storyId
+            topic_url_fragment: topicUrlFragment,
+            classroom_url_fragment: classroomUrlFragment,
+            story_url_fragment: storyUrlFragment
           });
         var storyViewerUrl = UrlInterpolationService.interpolateUrl(
           STORY_VIEWER_PAGE, {
-            story_id: ctrl.storyId
+            topic_url_fragment: topicUrlFragment,
+            classroom_url_fragment: classroomUrlFragment,
+            story_url_fragment: storyUrlFragment
           });
-
-        ctrl.reviewTestBackendApiService.fetchReviewTestData(ctrl.storyId).then(
+        ctrl.reviewTestBackendApiService.fetchReviewTestData(
+          storyUrlFragment).then(
           function(result) {
             var skillIdList = [];
             var skillDescriptions = [];
@@ -107,8 +118,8 @@ angular.module('oppia').component('reviewTestPage', {
             ctrl.questionPlayerConfig = questionPlayerConfig;
           });
       };
+
       ctrl.$onInit = function() {
-        ctrl.storyId = UrlService.getStoryIdFromUrl();
         ctrl.questionPlayerConfig = null;
         _fetchSkillDetails();
       };
