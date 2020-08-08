@@ -78,8 +78,6 @@ describe('Admin misc tab', function() {
   it('should fetch and save SVGs', async function() {
     await adminPage.fetchSVG();
     await adminPage.expectSVGToBeFetched();
-    await adminPage.saveSVG();
-    await adminPage.expectSVGToBeSaved();
   });
 
   it('should regenerate contribution opportunities for a topic',

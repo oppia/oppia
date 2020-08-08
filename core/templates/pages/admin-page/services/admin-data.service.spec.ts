@@ -203,7 +203,7 @@ describe('Admin Data Service', () => {
       expect(response).toEqual(expectedResponse);
     });
     var req = httpTestingController.expectOne(
-      '/adminmathsvghandler');
+      '/explorationslatexsvghandler');
     expect(req.request.method).toEqual('POST');
     req.flush(expectedResponse);
 

@@ -85,10 +85,10 @@ var AdminPage = function() {
     by.css('.protractor-test-regeneration-error-message'));
   var usernameSection = element(
     by.css('.protractor-test-dropdown-username-section'));
-  var fetchSVGButton = element(
+  var startSVGButton = element(
     by.css('.protractor-test-fetch-svg-button'));
-  var saveSVGButton = element(
-    by.css('.protractor-test-save-svg-button'));
+  var stopSVGButton = element(
+    by.css('.protractor-test-stop-svg-button'));
   // Adding a new community reviewer.
   var addReviewerName = element(by.css(
     '.protractor-test-add-reviewer-username'));
@@ -464,19 +464,18 @@ var AdminPage = function() {
   };
 
   this.fetchSVG = async function() {
-    await action.click('Fetch SVG Button', fetchSVGButton);
+    await action.click('Start SVG Button', startSVGButton);
   };
 
   this.expectSVGToBeFetched = async function() {
     await waitFor.visibilityOf(
       statusMessage, 'Status message not visible');
     await waitFor.textToBePresentInElement(
-      statusMessage, '0 LaTeX strings fetched ' +
-        'from backend for 0 explorations. Generating SVGs.....');
+      statusMessage, 'SVGs generated for all explorations .');
   };
 
   this.saveSVG = async function() {
-    await action.click('Save SVG Button', saveSVGButton);
+    await action.click('Save SVG Button', stopSVGButton);
   };
 
   this.expectSVGToBeSaved = async function() {

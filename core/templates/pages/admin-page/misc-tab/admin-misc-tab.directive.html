@@ -73,20 +73,21 @@
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Generate SVGs for exploration</h3>
+  <h3>Number of explorations left to update: <[$ctrl.numberOfExplorationsLeftToUpdate]></h3>
+  <h3>Generate and save SVGs for exploration</h3>
   <div class="oppia-query-form">
     <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForExplorations()">
       <div class="form-group row">
-        <input type="submit" value="Fetch" class="protractor-test-fetch-svg-button">
+        <input type="submit" value="Start" class="protractor-test-fetch-svg-button">
       </div>
     </form>
 
   </div>
-  <h3>Save the SVGs for exploration</h3>
+  <h3>Stop generating SVGs</h3>
   <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.saveSvgsToBackend()">
+    <form class="form" ng-submit="$ctrl.stopGeneration()">
       <div class="form-group row">
-        <input type="submit" value="Save" class="protractor-test-save-svg-button">
+        <input type="submit" value="Stop" class="protractor-test-stop-svg-button">
       </div>
     </form>
   </div>
