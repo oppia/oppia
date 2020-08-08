@@ -32,4 +32,4 @@ jobs:
         run: pip install coverage configparser
       - name: run backend
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --test_target=schema_utils_test.SchemaValidationUnitTests --generate_coverage_report --exclude_load_tests
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
