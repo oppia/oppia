@@ -778,25 +778,8 @@ class Skill(python_utils.OBJECT):
             str. JSON-encoded string encoding all of the information composing
             the object.
         """
-        skill_dict = {
-            'id': self.id,
-            'description': self.description,
-            'misconceptions': [
-                misconception.to_dict()
-                for misconception in self.misconceptions],
-            'rubrics': [
-                rubric.to_dict() for rubric in self.rubrics],
-            'skill_contents': self.skill_contents.to_dict(),
-            'language_code': self.language_code,
-            'misconceptions_schema_version': self.misconceptions_schema_version,
-            'rubric_schema_version': self.rubric_schema_version,
-            'skill_contents_schema_version': self.skill_contents_schema_version,
-            'version': self.version,
-            'next_misconception_id': self.next_misconception_id,
-            'superseding_skill_id': self.superseding_skill_id,
-            'all_questions_merged': self.all_questions_merged,
-            'prerequisite_skill_ids': self.prerequisite_skill_ids
-        }
+        skill_dict = self.to_dict()
+        skill_dict['version'] = self.version
 
         if self.created_on:
             skill_dict['created_on'] = utils.convert_naive_datetime_to_string(

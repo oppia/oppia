@@ -4284,25 +4284,8 @@ class Exploration(python_utils.OBJECT):
             str. JSON-encoded string encoding all of the information composing
             the object.
         """
-        exploration_dict = copy.deepcopy({
-            'id': self.id,
-            'title': self.title,
-            'category': self.category,
-            'author_notes': self.author_notes,
-            'blurb': self.blurb,
-            'states_schema_version': self.states_schema_version,
-            'init_state_name': self.init_state_name,
-            'language_code': self.language_code,
-            'objective': self.objective,
-            'param_changes': self.param_change_dicts,
-            'param_specs': self.param_specs_dict,
-            'tags': self.tags,
-            'auto_tts_enabled': self.auto_tts_enabled,
-            'correctness_feedback_enabled': self.correctness_feedback_enabled,
-            'states': {state_name: state.to_dict()
-                       for (state_name, state) in self.states.items()},
-            'version': self.version
-        })
+        exploration_dict = self.to_dict()
+        exploration_dict['version'] = self.version
 
         if self.created_on:
             exploration_dict['created_on'] = (

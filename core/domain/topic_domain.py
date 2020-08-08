@@ -562,32 +562,8 @@ class Topic(python_utils.OBJECT):
             str. JSON-encoded string encoding all of the information composing
             the object.
         """
-        topic_dict = {
-            'id': self.id,
-            'name': self.name,
-            'abbreviated_name': self.abbreviated_name,
-            'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color,
-            'description': self.description,
-            'canonical_story_references': [
-                reference.to_dict()
-                for reference in self.canonical_story_references
-            ],
-            'additional_story_references': [
-                reference.to_dict()
-                for reference in self.additional_story_references
-            ],
-            'uncategorized_skill_ids': self.uncategorized_skill_ids,
-            'subtopics': [
-                subtopic.to_dict() for subtopic in self.subtopics
-            ],
-            'subtopic_schema_version': self.subtopic_schema_version,
-            'next_subtopic_id': self.next_subtopic_id,
-            'language_code': self.language_code,
-            'story_reference_schema_version': (
-                self.story_reference_schema_version),
-            'version': self.version
-        }
+        topic_dict = self.to_dict()
+        topic_dict['version'] = self.version
 
         if self.created_on:
             topic_dict['created_on'] = utils.convert_naive_datetime_to_string(

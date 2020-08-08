@@ -253,6 +253,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             story_domain.Story.require_valid_story_id(story_id)
 
+    def test_serialize_and_deserialize_returns_unchanged_story(self):
+        """Checks that serializing and then deserializing a default story
+        works as intended by leaving the story unchanged.
+        """
+        topic_id = utils.generate_random_string(12)
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'Title', 'Description', topic_id, 'title')
+        self.assertEqual(
+            story.to_dict(),
+            story_domain.Story.deserialize(story.serialize()).to_dict())
+
     def test_valid_story_id(self):
         self._assert_valid_story_id('Story id should be a string', 10)
         self._assert_valid_story_id('Invalid story id', 'abc')
@@ -1339,7 +1350,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """
         topic_id = utils.generate_random_string(12)
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', 'Description', topic_id)
+            self.STORY_ID, 'Title', 'Description', topic_id, 'title')
         story_dict = story.to_dict()
         story_from_dict = story_domain.Story.from_dict(
             story_dict, story_version=0)

@@ -482,6 +482,14 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_from_dict = skill_domain.Skill.from_dict(skill_dict)
         self.assertEqual(skill_from_dict.to_dict(), skill_dict)
 
+    def test_serialize_and_deserialize_returns_unchanged_skill(self):
+        """Checks that serializing and then deserializing a default skill
+        works as intended by leaving the skill unchanged.
+        """
+        self.assertEqual(
+            self.skill.to_dict(),
+            skill_domain.Skill.deserialize(
+                self.skill.serialize()).to_dict())
 
 class SkillChangeTests(test_utils.GenericTestBase):
 

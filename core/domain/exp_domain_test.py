@@ -1672,6 +1672,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'correct but is a self-loop'):
             exploration.validate(strict=True)
 
+    def test_serialize_and_deserialize_returns_unchanged_exploration(self):
+        """Checks that serializing and then deserializing a default exploration
+        works as intended by leaving the exploration unchanged.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        self.assertEqual(
+            exploration.to_dict(),
+            exp_domain.Exploration.deserialize(
+                exploration.serialize()).to_dict())
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 

@@ -948,19 +948,8 @@ class Story(python_utils.OBJECT):
             str. JSON-encoded string encoding all of the information composing
             the object.
         """
-        story_dict = {
-            'id': self.id,
-            'title': self.title,
-            'description': self.description,
-            'notes': self.notes,
-            'language_code': self.language_code,
-            'story_contents_schema_version': self.story_contents_schema_version,
-            'corresponding_topic_id': self.corresponding_topic_id,
-            'story_contents': self.story_contents.to_dict(),
-            'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color,
-            'version': self.version
-        }
+        story_dict = self.to_dict()
+        story_dict['version'] = self.version
 
         if self.created_on:
             story_dict['created_on'] = utils.convert_naive_datetime_to_string(
@@ -997,7 +986,8 @@ class Story(python_utils.OBJECT):
             StoryContents.from_dict(story_dict['story_contents']),
             story_dict['story_contents_schema_version'],
             story_dict['language_code'], story_dict['corresponding_topic_id'],
-            story_version, story_created_on, story_last_updated)
+            story_version, story_dict['url_fragment'],
+            story_created_on, story_last_updated)
 
         return story
 

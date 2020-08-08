@@ -383,23 +383,8 @@ class Collection(python_utils.OBJECT):
             str. JSON-encoded string encoding all of the information composing
             the object.
         """
-        collection_dict = {
-            'id': self.id,
-            'title': self.title,
-            'category': self.category,
-            'objective': self.objective,
-            'language_code': self.language_code,
-            'tags': self.tags,
-            'schema_version': self.schema_version,
-            'nodes': [
-                node.to_dict() for node in self.nodes
-            ],
-            'version': self.version,
-            'created_on': utils.convert_naive_datetime_to_string(
-                self.created_on),
-            'last_updated': utils.convert_naive_datetime_to_string(
-                self.last_updated)
-        }
+        collection_dict = self.to_dict()
+        collection_dict['version'] = self.version
 
         if self.created_on:
             collection_dict['created_on'] = (
