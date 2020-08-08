@@ -70,17 +70,29 @@ class SuggestionSvgFilenameValidationOneOffJob(
         html_string_list = suggestion.get_all_html_content_strings()
         html_string = ''.join(html_string_list)
         if suggestion.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-            error_list = (
+            invalid_tags = (
                 html_validation_service.
                 validate_svg_filenames_in_math_rich_text(
                     feconf.ENTITY_TYPE_EXPLORATION, item.target_id,
                     html_string))
-            if len(error_list) > 0:
-                yield (item.id, error_list)
+            if len(invalid_tags) > 0:
+                yield (
+                    'suggestion with latex strings having invalid SVG',
+                    (item.id, invalid_tags))
+
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        final_values = [ast.literal_eval(value) for value in values]
+        no_of_invalid_tags = 0
+        for suggestion_id, invalid_tags in final_values:
+            no_of_invalid_tags += len(invalid_tags)
+            yield (suggestion_id, invalid_tags)
+        final_value_dict = {
+            'no_of_suggestions_with_no_svgs': len(final_values),
+            'no_of_invalid_tags': no_of_invalid_tags,
+        }
+        yield ('Overall result', final_value_dict)
 
 
 class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):

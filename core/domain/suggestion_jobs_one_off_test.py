@@ -656,23 +656,31 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
-        actual_output1 = ast.literal_eval(actual_output[0])
+        actual_output1 = ast.literal_eval(sorted(actual_output)[1])
         expected_output1_value = [
-            u'[\'<oppia-noninteractive-math math_content-with-value="{&amp;quo'
-            't;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;quot;svg'
-            '_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractiv'
-            'e-math>\']']
+            u'<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;quot;'
+            'svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninte'
+            'ractive-math>']
         self.assertEqual(actual_output1[0], suggestion1.suggestion_id)
         self.assertEqual(actual_output1[1], expected_output1_value)
 
-        actual_output2 = ast.literal_eval(actual_output[1])
+        actual_output2 = ast.literal_eval(sorted(actual_output)[2])
         expected_output2_value = [
-            u'[\'<oppia-noninteractive-math math_content-with-value="{&amp;quo'
-            't;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;quot;svg'
-            '_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractiv'
-            'e-math>\']']
+            u'<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;quot;'
+            'svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninte'
+            'ractive-math>']
         self.assertEqual(actual_output2[0], suggestion2.suggestion_id)
         self.assertEqual(actual_output2[1], expected_output2_value)
+
+        overall_result = ast.literal_eval(sorted(actual_output)[0])
+        self.assertEqual(
+            overall_result[1],
+            {
+                'no_of_invalid_tags': 2,
+                'no_of_suggestions_with_no_svgs': 2
+            })
 
     def test_job_when_suggestions_have_valid_filenames(self):
         valid_html_content1 = (
