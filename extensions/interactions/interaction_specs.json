@@ -767,8 +767,7 @@
     "rule_descriptions": {
       "StartsWith": "starts with {{x|NormalizedString}}",
       "Contains": "contains {{x|NormalizedString}}",
-      "Equals": "is equal to {{x|NormalizedString}}",
-      "CaseSensitiveEquals": "is equal to {{x|NormalizedString}}, taking case into account",
+      "Equals": "is equal to {{x|NormalizedString}}, without taking case into account",
       "FuzzyEquals": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
     }
   },

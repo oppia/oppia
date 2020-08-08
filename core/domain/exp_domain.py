@@ -2767,6 +2767,14 @@ class Exploration(python_utils.OBJECT):
         customization arguments, normalizes customization arguments against
         its schema, and changes PencilCodeEditor's customization argument
         name from initial_code to initialCode.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             max_existing_content_id_index = -1
@@ -2937,10 +2945,32 @@ class Exploration(python_utils.OBJECT):
                         'voiceovers_mapping'][new_content_id] = {}
 
         return states_dict
-
+    
     @classmethod
     def _convert_states_v36_dict_to_v37_dict(cls, states_dict):
-        """Converts from version 36 to 37. Version 37 adds a customization arg
+        """Converts from version 36 to 37. Version 37 changes all rules with
+        type CaseSensitiveEquals to Equals.
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] != 'TextInput':
+                continue
+            answer_group_dicts = state_dict['interaction']['answer_groups']
+            for answer_group_dict in answer_group_dicts:
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                        rule_spec_dict['rule_type'] = 'Equals'
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v37_dict_to_v38_dict(cls, states_dict):
+        """Converts from version 37 to 38. Version 38 adds a customization arg
         for the Math interactions that allows creators to specify the letters
         that would be displayed to the learner.
 
@@ -3013,7 +3043,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 42
+    CURRENT_EXP_SCHEMA_VERSION = 43
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3973,26 +4003,45 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states_schema_version'] = 36
 
         return exploration_dict
-
+    
     @classmethod
     def _convert_v41_dict_to_v42_dict(cls, exploration_dict):
         """Converts a v41 exploration dict into a v42 exploration dict.
-        Adds a customization arg for the Math interactions that allows creators
-        to specify the letters that would be displayed to the learner.
-
+        Adds translation support to customization args.
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v41.
-
+                with schema version v39.
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v42.
+            following schema version v41.
         """
         exploration_dict['schema_version'] = 42
 
         exploration_dict['states'] = cls._convert_states_v36_dict_to_v37_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 37
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v42_dict_to_v43_dict(cls, exploration_dict):
+        """Converts a v42 exploration dict into a v43 exploration dict.
+        Adds a customization arg for the Math interactions that allows creators
+        to specify the letters that would be displayed to the learner.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v42.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v43.
+        """
+        exploration_dict['schema_version'] = 43
+
+        exploration_dict['states'] = cls._convert_states_v37_dict_to_v38_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 38
 
         return exploration_dict
 
@@ -4238,6 +4287,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v41_dict_to_v42_dict(
                 exploration_dict)
             exploration_schema_version = 42
+        
+        if exploration_schema_version == 42
+            exploration_dict = cls._convert_v42dict_to_v43_dict(
+                exploration_dict)
+            exploration_schema_version = 43
 
         return (exploration_dict, initial_schema_version)
 

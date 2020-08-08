@@ -473,6 +473,14 @@ class Question(python_utils.OBJECT):
         customization arguments, normalizes customization arguments against
         its schema, and changes PencilCodeEditor's customization argument
         name from initial_code to initialCode.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
         """
         max_existing_content_id_index = -1
         translations_mapping = question_state_dict[
@@ -645,7 +653,30 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v36_dict_to_v37_dict(cls, question_state_dict):
-        """Converts from version 36 to 37. Version 37 adds a customization arg
+        """Converts from version 36 to 37. Version 37 changes all rules with
+        type CaseSensitiveEquals to Equals.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] != 'TextInput':
+            return question_state_dict
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for answer_group_dict in answer_group_dicts:
+            for rule_spec_dict in answer_group_dict['rule_specs']:
+                if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                    rule_spec_dict['rule_type'] = 'Equals'
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v37_dict_to_v38_dict(cls, question_state_dict):
+        """Converts from version 37 to 38. Version 38 adds a customization arg
         for the Math interactions that allows creators to specify the letters
         that would be displayed to the learner.
 
