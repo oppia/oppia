@@ -494,7 +494,7 @@ def update_story(
             does_story_exist_with_url_fragment(new_story.url_fragment)):
         raise utils.ValidationError(
             'Story Url Fragment is not unique across the site.')
-     _save_story(
+    _save_story(
         committer_id, new_story, commit_message, change_list,
         is_story_published)
     create_story_summary(new_story.id)
