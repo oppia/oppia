@@ -146,9 +146,9 @@ class AnswerGroup(python_utils.OBJECT):
                     'to be <skill_id>-<misconception_id>, received %s'
                     % self.tagged_skill_misconception_id)
 
-        numOfRules = 0
+        number_of_rules = 0
         for rule_type in self.rule_inputs:
-            numOfRules += len(self.rule_inputs[rule_type])
+            number_of_rules += len(self.rule_inputs[rule_type])
 
             if rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
@@ -163,7 +163,7 @@ class AnswerGroup(python_utils.OBJECT):
                     exp_param_specs_dict
                 )
 
-        if numOfRules == 0 and len(self.training_data) == 0:
+        if number_of_rules == 0 and len(self.training_data) == 0:
             raise utils.ValidationError(
                 'There must be at least one rule or training data for each'
                 ' answer group.')

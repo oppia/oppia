@@ -85,7 +85,7 @@ def try_upgrading_draft_to_exp_version(
         try:
             draft_change_list = conversion_fn(draft_change_list)
         except Exception as error:
-            if str(error) == 'Conversion cannot be completed.':
+            if python_utils.UNICODE(error) == 'Conversion cannot be completed.':
                 return
             # A blank raise will raise the last exception.
             raise
