@@ -46,5 +46,7 @@
     "NumericExpression": "",
     "AlgebraicIdentifier": "x",
     "MathEquation": "",
-    "PositionOfTerms": "both"
+    "PositionOfTerms": "both",
+    "RatioExpression": "1:1"
+
 }

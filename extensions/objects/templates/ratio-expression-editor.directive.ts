@@ -16,7 +16,7 @@
  * @fileoverview Directive for ratio editor.
  */
 
-angular.module('oppia').directive('ratioEditor', [
+angular.module('oppia').directive('ratioExpressionEditor', [
   function() {
     return {
       restrict: 'E',
@@ -37,17 +37,16 @@ angular.module('oppia').directive('ratioEditor', [
 
         ctrl.isValidRatio = function(value) {
           if (value.length === 0) {
-            errorMessage = 'Please enter a non-empty fraction value.';
+            errorMessage = 'Please enter a non-empty ratio value.';
             return false;
           }
-          try {
-            var INTERMEDIATE_REGEX = /^\s*-?\s*$/;
+          var RATIO_REGEX = /^\d+(:\d+)+$/;
+          if (!RATIO_REGEX.test(value)) {
+            errorMessage = 'Please enter in the format of X:Y...N';
+          } else {
             errorMessage = '';
-            return true;
-          } catch (parsingError) {
-            errorMessage = parsingError.message;
-            return false;
           }
+          return true;
         };
 
         ctrl.$onInit = function() {
