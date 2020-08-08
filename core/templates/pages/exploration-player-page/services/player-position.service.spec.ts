@@ -24,6 +24,7 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
+import { EventEmitter } from '@angular/core';
 
 describe('Player position service', () => {
   let pts = null;
@@ -83,5 +84,10 @@ describe('Player position service', () => {
     expect(pps.getDisplayedCardIndex()).toBe(4);
     pps.setDisplayedCardIndex(5);
     expect(pps.getDisplayedCardIndex()).toBe(5);
+  });
+
+  it('should fetch EventEmitter for changing active card', () => {
+    let mockActiveCardChangedEvent = new EventEmitter();
+    expect(pps.onActiveCardChanged).toEqual(mockActiveCardChangedEvent);
   });
 });
