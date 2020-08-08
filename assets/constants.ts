@@ -19,11 +19,11 @@ export = {
 
   // The term 'staging' is used instead of the classroom url fragment field
   // in the URL for topics that are not yet attached to a classroom.
-  "DUMMY_CLASSROOM_URL_FRAGMENT": "staging",
+  "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
 
   // The default classroom URL fragment to use when the provided classroom URL
   // fragment in the controller is invalid.
-  "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "math",
+  "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",

@@ -118,8 +118,7 @@ def does_classroom_exist(handler):
 
         if not classroom:
             _redirect_based_on_return_type(
-                self, '/learn/%s'
-                % constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS,
+                self, '/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT,
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return
 

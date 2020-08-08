@@ -82,4 +82,5 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 topic_id))
         self.assertNotEqual(classroom_url_fragment, 'math-two')
         self.assertEqual(
-            classroom_url_fragment, constants.DUMMY_CLASSROOM_URL_FRAGMENT)
+            classroom_url_fragment,
+            constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)

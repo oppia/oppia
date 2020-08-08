@@ -36,7 +36,7 @@ def get_classroom_url_fragment_for_topic_id(topic_id):
     for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
         if topic_id in classroom_dict['topic_ids']:
             return classroom_dict['url_fragment']
-    return constants.DUMMY_CLASSROOM_URL_FRAGMENT
+    return constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS
 
 
 def get_classroom_by_url_fragment(classroom_url_fragment):
