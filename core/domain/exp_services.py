@@ -367,11 +367,16 @@ def apply_change_list(exploration_id, change_list):
                         list(python_utils.MAP(
                             to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    state.update_content(
+                    content = (
                         state_domain.SubtitledHtml.from_dict(change.new_value))
+                    content.validate()
+                    state.update_content(content)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     state.update_interaction_id(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                    state.update_next_content_id_index(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
@@ -1417,7 +1422,7 @@ def get_image_filenames_from_exploration(exploration):
     for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
-                'imageAndRegions']['value']['imagePath'])
+                'imageAndRegions'].value['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()
     filenames.extend(
@@ -1681,7 +1686,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
                     draft_upgrade_services.try_upgrading_draft_to_exp_version(
                         draft_change_list,
                         exp_user_data.draft_change_list_exp_version,
-                        exploration.version, exp_id))
+                        exploration.version, exploration.id))
                 if new_draft_change_list is not None:
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
@@ -1873,8 +1878,11 @@ def get_batch_of_exps_for_latex_svg_generation():
     number_of_svgs_in_current_batch = 0
     max_number_of_svgs_in_math_svgs_batch = (
         config_domain.MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH.value)
+    max_number_of_explorations_in_math_svgs_batch = (
+        config_domain.MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH.value)
+
     for model_index, model in enumerate(exploration_math_rich_text_info_models):
-        if model_index + 1 > feconf.MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH:
+        if model_index + 1 > max_number_of_explorations_in_math_svgs_batch:
             break
         list_of_latex_strings_in_model = model.latex_strings_without_svg
         if number_of_svgs_in_current_batch >= (
@@ -2001,8 +2009,8 @@ def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
             list_of_latex_string_converted))
 
     commit_message = (
-        'Technical fix: Added %d SVG images to math tags in the exploration' % (
-            number_of_svg_files_saved))
+        'Technical fix: Added %d SVG images to math tags in the '
+        'exploration.' % (number_of_svg_files_saved))
     if list_of_latex_string_left_to_be_converted == []:
         update_exploration(
             feconf.MIGRATION_BOT_USER_ID, exp_id, change_lists,

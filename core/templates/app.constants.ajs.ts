@@ -122,6 +122,19 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'COMPONENT_NAME_WORKED_EXAMPLE', AppConstants.COMPONENT_NAME_WORKED_EXAMPLE);
 
+// Do not modify these without a state migration of all existing content ids.
+// Content id prefixes should indicate what type of content they are
+// associated with.
+angular.module('oppia').constant(
+  'CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS',
+  AppConstants.CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS);
+angular.module('oppia').constant(
+  'CONTENT_ID_PREFIX_HINT',
+  AppConstants.CONTENT_ID_PREFIX_HINT);
+angular.module('oppia').constant(
+  'CONTENT_ID_PREFIX_FEEDBACK',
+  AppConstants.CONTENT_ID_PREFIX_FEEDBACK);
+
 angular.module('oppia').constant(
   'ACTION_TYPE_EXPLORATION_START', AppConstants.ACTION_TYPE_EXPLORATION_START);
 angular.module('oppia').constant(

@@ -198,8 +198,14 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             interaction_dict['customization_arg_specs'], [{
                 'name': 'placeholder',
                 'description': 'Placeholder text (optional)',
-                'schema': {'type': 'unicode'},
-                'default_value': '',
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'SubtitledUnicode'
+                },
+                'default_value': {
+                    'content_id': None,
+                    'unicode_str': ''
+                },
             }, {
                 'name': 'rows',
                 'description': 'Height (in rows)',

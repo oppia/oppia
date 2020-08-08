@@ -5945,12 +5945,12 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
         return [cls._validate_score]
 
 
-class UserCommunityRightsModelValidator(BaseUserModelValidator):
-    """Class for validating UserCommunityRightsModel."""
+class UserContributionRightsModelValidator(BaseUserModelValidator):
+    """Class for validating UserContributionRightsModel."""
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return user_domain.UserCommunityRights(
+        return user_domain.UserContributionRights(
             item.id, item.can_review_translation_for_language_codes,
             item.can_review_voiceover_for_language_codes,
             item.can_review_questions)
@@ -6560,7 +6560,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.UserSkillMasteryModel: UserSkillMasteryModelValidator,
     user_models.UserContributionScoringModel: (
         UserContributionScoringModelValidator),
-    user_models.UserCommunityRightsModel: UserCommunityRightsModelValidator,
+    user_models.UserContributionRightsModel: (
+        UserContributionRightsModelValidator),
     user_models.PendingDeletionRequestModel: (
         PendingDeletionRequestModelValidator),
     stats_models.PlaythroughModel: PlaythroughModelValidator,
@@ -7400,12 +7401,12 @@ class UserContributionScoringModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.UserContributionScoringModel]
 
 
-class UserCommunityRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates UserCommunityRightsModel."""
+class UserContributionRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserContributionRightsModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserCommunityRightsModel]
+        return [user_models.UserContributionRightsModel]
 
 
 class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):

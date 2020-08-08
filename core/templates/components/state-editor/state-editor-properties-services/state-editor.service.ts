@@ -22,7 +22,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
 
-/* eslint-disable max-len */
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
@@ -38,7 +37,6 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
 
 interface AnswerChoice {
   val: string | number;
@@ -53,6 +51,7 @@ export class StateEditorService {
 
   private _stateEditorInitializedEventEmitter = new EventEmitter();
   private _stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
+  private _interactionEditorInitializedEventEmitter = new EventEmitter();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -174,7 +173,7 @@ export class StateEditorService {
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {
       return (<MultipleChoiceInputCustomizationArgs> customizationArgs)
-        .choices.value.map((val, ind) => ({ val: ind, label: val }));
+        .choices.value.map((val, ind) => ({ val: ind, label: val.getHtml() }));
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
       var imageWithRegions = (
@@ -191,11 +190,15 @@ export class StateEditorService {
     } else if (interactionId === 'ItemSelectionInput') {
       return (
         <ItemSelectionInputCustomizationArgs> customizationArgs)
-        .choices.value.map(val => ({ val: val, label: val }));
+        .choices.value.map(val => (
+          { val: val.getHtml(), label: val.getHtml() }
+        ));
     } else if (interactionId === 'DragAndDropSortInput') {
       return (
         <DragAndDropSortInputCustomizationArgs> customizationArgs)
-        .choices.value.map(val => ({ val: val, label: val }));
+        .choices.value.map(val => (
+          { val: val.getHtml(), label: val.getHtml() }
+        ));
     } else {
       return null;
     }
@@ -247,6 +250,10 @@ export class StateEditorService {
 
   get onStateEditorDirectiveInitialized() {
     return this._stateEditorDirectiveInitializedEventEmitter;
+  }
+
+  get onInteractionEditorInitialized() {
+    return this._interactionEditorInitializedEventEmitter;
   }
 }
 
