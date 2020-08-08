@@ -1682,6 +1682,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
 
+
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self):

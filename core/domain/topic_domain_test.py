@@ -899,6 +899,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Topic.deserialize(
                 self.topic.serialize()).to_dict())
 
+
 class TopicChangeTests(test_utils.GenericTestBase):
 
     def test_topic_change_object_with_missing_cmd(self):

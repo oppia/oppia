@@ -485,6 +485,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             collection_domain.Collection.deserialize(
                 self.collection.serialize()).to_dict())
 
+
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
     """Test the general structure of explorations within a collection."""
 

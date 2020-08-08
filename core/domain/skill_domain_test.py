@@ -491,6 +491,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_domain.Skill.deserialize(
                 self.skill.serialize()).to_dict())
 
+
 class SkillChangeTests(test_utils.GenericTestBase):
 
     def test_skill_change_object_with_missing_cmd(self):
