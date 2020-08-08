@@ -7827,7 +7827,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: MultipleChoiceInput
+      id: TextInput
       solution: null
     param_changes: []
     recorded_voiceovers:
@@ -7944,12 +7944,12 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        choices:
+        placeholder:
           value:
-          - content_id: ca_choices_2
-            html: ''
-        showChoicesInShuffledOrder:
-          value: true
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
       default_outcome:
         dest: (untitled state)
         feedback:
@@ -7960,20 +7960,20 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: MultipleChoiceInput
+      id: TextInput
       solution: null
     next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_2: {}
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        ca_choices_2: {}
+        ca_placeholder_2: {}
         content:
           en:
             data_format: html

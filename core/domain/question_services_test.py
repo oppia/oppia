@@ -1899,7 +1899,15 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'training_data': []
                 }],
                 'confirmed_unclassified_answers': [],
-                'customization_args': {},
+                'customization_args': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                },
                 'default_outcome': {
                     'dest': None,
                     'feedback': {
@@ -1913,7 +1921,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'hints': [],
                 'solution': {},
-                'id': None
+                'id': 'TextInput'
             },
             'next_content_id_index': 2,
             'param_changes': [],
