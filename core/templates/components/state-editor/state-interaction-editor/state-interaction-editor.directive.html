@@ -1,22 +1,35 @@
 <div id="tutorialStateInteraction">
   <md-card style="margin: 20px 0; padding: 0;" ng-if="!interactionId">
+    <div class="oppia-exp-interaction-card-header-container oppia-mobile-collapsible-card-header" ng-click="toggleInteractionEditor()">
+      <h3 class="oppia-exp-interaction-card-header">
+        Interaction
+      </h3>
+      <i class="fa fa-caret-down"
+         ng-if="!interactionEditorIsShown"
+         aria-hidden="true">
+      </i>
+      <i class="fa fa-caret-up"
+         ng-if="interactionEditorIsShown"
+         aria-hidden="true">
+      </i>
+    </div>
     <div class="oppia-add-interaction-button-container">
       <button type="button" class="btn btn-secondary btn-lg oppia-add-interaction-button protractor-test-open-add-interaction-modal" ng-click="openInteractionCustomizerModal()">
-        + Add Interaction
+        + ADD INTERACTION
       </button>
     </div>
   </md-card>
 
   <div ng-if="interactionId">
-    <md-card class="oppia-editor-card-with-avatar">
+    <md-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
       <div class="oppia-editor-card-body" title="<[getCurrentInteractionName()]>">
-        <picture>
+        <picture ng-if="!windowIsNarrow">
           <source type="image/webp" ng-srcset="<[getStaticImageUrl('/avatar/user_blue_72px.webp')]>">
           <source type="image/png" ng-srcset="<[getStaticImageUrl('/avatar/user_blue_72px.png')]>">
           <img ng-src="<[getStaticImageUrl('/avatar/user_blue_72px.png')]>" class="oppia-editor-card-avatar" alt="">
         </picture>
         <div class="oppia-editor-card-section-container">
-          <div class="oppia-editor-card-section" style="height: 100%;">
+          <div class="oppia-editor-card-section oppia-mobile-collapsible-card-content" ng-if="interactionEditorIsShown">
             <button type="button" class="protractor-test-delete-interaction oppia-delete-interaction-button oppia-transition-200" ng-click="deleteInteraction()" ng-if="EditabilityService.isEditable()">
               <i class="material-icons md-18">&#xE5CD;</i>
             </button>
@@ -39,3 +52,32 @@
     </md-card>
   </div>
 </div>
+<style>
+  state-interaction-editor .oppia-exp-interaction-card-header {
+    font-size: 16px;
+    padding: 15px 30px 0;
+  }
+  state-interaction-editor .oppia-exp-interaction-card-header-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  state-interaction-editor .oppia-add-interaction-button-container {
+    padding: 10px 30px;
+  }
+  state-interaction-editor .oppia-exp-interaction-card-header-container i {
+    display: none;
+  }
+  @media screen and (max-width: 768px) {
+    state-interaction-editor .oppia-exp-interaction-card-header {
+      font-size: 16px;
+      padding: 0;
+    }
+    state-interaction-editor .oppia-exp-interaction-card-header-container i {
+      display: block;
+    }
+    state-interaction-editor .oppia-exp-interaction-card-header-container {
+      background-color: #FFF;
+    }
+  }
+</style>
