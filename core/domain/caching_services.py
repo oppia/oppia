@@ -31,7 +31,9 @@ import python_utils
 memory_cache_services = models.Registry.import_cache_services()
 
 # NOTE: Namespaces and sub-namespaces cannot contain ':' because this is used as
-# an internal delimiter for cache keys.
+# an internal delimiter for cache keys that separates the namespace, the
+# sub-namespace, and the id in the cache keys.
+MEMCACHE_KEY_DELIMITER = ':'
 
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the explorations within the sub-namespace. The value for
@@ -99,10 +101,6 @@ SERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_CONFIG: lambda x: x,
     CACHE_NAMESPACE_DEFAULT: lambda x: x
 }
-
-# The delimiter for a memcache key that separates the namespace, the
-# sub-namespace, and the id in the key.
-MEMCACHE_KEY_DELIMITER = ':'
 
 
 def _get_memcache_key(namespace, sub_namespace, obj_id):

@@ -238,13 +238,6 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     return result
 
 
-def cleanup():
-    """Cleanup the redis server when the backend tests finish."""
-    python_utils.PRINT('Cleaning up the redis_servers.')
-    # Shutdown the redis server before exiting.
-    common.stop_redis_server()
-
-
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -264,18 +257,6 @@ def main(args=None):
 
     import dev_appserver
     dev_appserver.fix_sys_path()
-
-    # Start the redis local development server.
-    if not common.is_windows_os():
-        # Redis does not run on Windows machines.
-        python_utils.PRINT('Starting Redis development server.')
-        common.start_redis_server()
-        atexit.register(cleanup)
-    else:
-        raise Exception(
-            'THe redis command line interface cannot get installed because ' +
-            'your machine is on the Windows operating system. Most backend ' +
-            'tests will not pass on a Windows machine.')
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(
