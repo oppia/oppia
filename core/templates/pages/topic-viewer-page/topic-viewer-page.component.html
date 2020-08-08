@@ -48,17 +48,21 @@
       </topic-info-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'story'">
-      <topic-viewer-stories-list canonical-story-summaries="$ctrl.canonicalStorySummaries"></topic-viewer-stories-list>
-    </div>
+      <topic-viewer-stories-list [canonical-story-summaries]="$ctrl.canonicalStorySummaries"
+                    [classroom-url-fragment]="$ctrl.classroomUrlFragment"
+                    [topic-url-fragment]="$ctrl.topicUrlFragment">
+      </topic-viewer-stories-list>
+
     <div ng-if="$ctrl.activeTab === 'practice'">
-      <practice-tab subtopics-list="$ctrl.subtopics"
-                    topic-name="$ctrl.topicName">
+      <practice-tab [subtopics-list]="$ctrl.subtopics"
+                    [topic-name]="$ctrl.topicName">
       </practice-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'subtopics'">
-      <subtopics-list subtopics-list="$ctrl.subtopics"
-                      topic-name="$ctrl.topicName"
-                      topic-id="$ctrl.topicId">
+      <subtopics-list [classroom-url-fragment]="$ctrl.classroomUrlFragment"
+                      [subtopics-list]="$ctrl.subtopics"
+                      [topic-id]="$ctrl.topicId"
+                      [topic-url-fragment]="$ctrl.topicUrlFragment">
       </subtopics-list>
     </div>
   </div>

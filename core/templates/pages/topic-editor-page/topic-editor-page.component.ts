@@ -148,6 +148,14 @@ angular.module('oppia').directive('topicEditorPage', [
           };
           ctrl._validateTopic = function() {
             ctrl.validationIssues = ctrl.topic.validate();
+            if (TopicEditorStateService.getTopicWithNameExists()) {
+              ctrl.validationIssues.push(
+                'A topic with this name already exists.');
+            }
+            if (TopicEditorStateService.getTopicWithUrlFragmentExists()) {
+              ctrl.validationIssues.push(
+                'Topic URL fragment already exists.');
+            }
             var prepublishTopicValidationIssues = (
               ctrl.topic.prepublishValidate());
             var subtopicPrepublishValidationIssues = (
