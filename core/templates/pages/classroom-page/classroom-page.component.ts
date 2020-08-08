@@ -55,19 +55,20 @@ angular.module('oppia').component('classroomPage', {
       };
 
       ctrl.$onInit = function() {
-        var classroomName = UrlService.getClassroomNameFromUrl();
+        ctrl.classroomDisplayName = null;
+        ctrl.classroomUrlFragment = (
+          UrlService.getClassroomUrlFragmentFromUrl());
         ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
           '/splash/books.svg');
 
-        ctrl.classroomDisplayName = $filter('capitalize')(classroomName);
-
-        PageTitleService.setPageTitle(
-          ctrl.classroomDisplayName + ' Classroom | Oppia');
-
         LoaderService.showLoadingScreen('Loading');
-        ctrl.classroomBackendApiService.fetchClassroomData(
-          classroomName).then(function(classroomData) {
+        ctrl.classroomBackendApiService.fetchClassroomDataAsync(
+          ctrl.classroomUrlFragment).then(function(classroomData) {
           ctrl.classroomData = classroomData;
+          ctrl.classroomDisplayName = (
+            $filter('capitalize')(classroomData.getName()));
+          PageTitleService.setPageTitle(
+            ctrl.classroomDisplayName + ' Classroom | Oppia');
           LoaderService.hideLoadingScreen();
           ClassroomBackendApiService.onInitializeTranslation.emit();
         }, function(errorResponse) {

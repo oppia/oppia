@@ -13,11 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for review test domain.
+ * @fileoverview Validator to check if input is a valid URL fragment.
  */
 
-export class ReviewTestDomainConstants {
-  public static REVIEW_TEST_DATA_URL = (
-    '/review_test_handler/data/<classroom_url_fragment>/' +
-    '<topic_url_fragment>/<story_url_fragment>');
-}
+import { AppConstants } from 'app.constants';
+
+angular.module('oppia').filter('isUrlFragment', [function() {
+  const VALID_URL_FRAGMENT_REGEX = new RegExp(
+    // TODO(#7434): Use dot notation after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    // eslint-disable-next-line dot-notation
+    AppConstants['VALID_URL_FRAGMENT_REGEX']);
+  return function(input, args) {
+    return (
+      VALID_URL_FRAGMENT_REGEX.test(input) &&
+      input.length <= args.charLimit);
+  };
+}]);
