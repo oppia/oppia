@@ -1522,43 +1522,6 @@ class SuggestionLatexSvgUpdationTests(test_utils.GenericTestBase):
             get_suggestions_with_latex_strings_having_no_svgs(),
             expected_output)
 
-    def test_get_suggestions_latex_strings_when_suggestions_have_invalid_html(
-            self):
-        invalid_html_content = (
-            '<oppia-noninteractive-math></oppia-noninteractive-math>'
-        )
-
-        invalid_change = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'state_1',
-            'new_value': {
-                'content_id': 'content',
-                'html': '<p>Suggestion html</p>'
-            },
-            'old_value': {
-                'content_id': 'content',
-                'html': invalid_html_content
-            }
-        }
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-
-            invalid_suggestion = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, invalid_change, 'test description')
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'failed to parse suggestion %s-u\'math_content-with-value\'' % (
-                invalid_suggestion.suggestion_id)):
-            (
-                suggestion_services.
-                get_suggestions_with_latex_strings_having_no_svgs())
-
     def test_update_suggestions_with_math_svgs(self):
         svg_file_1 = (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
