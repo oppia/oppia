@@ -283,7 +283,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'pencil-code-editor-validation.service.ts',
     'pie-chart.directive.ts',
     'player-correctness-feedback-enabled.service.ts',
-    'player-position.service.ts',
     'player-transcript.service.ts',
     'playthrough-issues.directive.ts',
     'Polyfills.ts',
