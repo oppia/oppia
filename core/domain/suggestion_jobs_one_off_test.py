@@ -20,11 +20,15 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import datetime
+import os
 
 from constants import constants
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import question_domain
 from core.domain import suggestion_jobs_one_off
 from core.domain import suggestion_registry
@@ -534,6 +538,194 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.get_output(job_id))
         self.assertEqual(len(actual_output), 0)
+
+
+class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
+    target_id_1 = 'exp1'
+    target_version_at_submission = 1
+
+
+    AUTHOR_EMAIL_1 = 'author1@example.com'
+    REVIEWER_EMAIL_1 = 'reviewer1@example.com'
+
+    class MockExploration(python_utils.OBJECT):
+        """Mocks an exploration. To be used only for testing."""
+
+        def __init__(self, exploration_id, states):
+            self.id = exploration_id
+            self.states = states
+            self.category = 'Algebra'
+
+        def get_content_html(self, state_name, content_id):
+            """Used to mock the get_content_html method for explorations."""
+            # state_name and content_id are used here to suppress the unused
+            # arguments warning. The main goal of this method is to just
+            # produce content html for the tests.
+            return '<p>State name: %s, Content id: %s</p>' % (
+                state_name, content_id
+            )
+
+    # All mock explorations created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
+    ]
+
+    def mock_get_exploration_by_id(self, exp_id):
+        for exp in self.explorations:
+            if exp.id == exp_id:
+                return exp
+
+    def setUp(self):
+        super(SuggestionSvgFilenameValidationOneOffJobTests, self).setUp()
+
+        self.signup(self.AUTHOR_EMAIL_1, 'author1')
+        self.author_id_1 = self.get_user_id_from_email(self.AUTHOR_EMAIL_1)
+        self.signup(self.REVIEWER_EMAIL_1, 'reviewer1')
+        self.reviewer_id_1 = self.get_user_id_from_email(self.REVIEWER_EMAIL_1)
+        self.process_and_flush_pending_tasks()
+
+    def test_job_when_suggestions_have_invalid_filenames(self):
+        invalid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        invalid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+
+        change1 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Suggestion html</p>'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': invalid_html_content1
+            }
+        }
+
+        change2 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_2',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Suggestion html2</p>'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': invalid_html_content2
+            }
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+
+            suggestion1 = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, change1, 'test description')
+
+            suggestion2 = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, change2, 'test description')
+
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
+        actual_output1 = ast.literal_eval(actual_output[0])
+        expected_output1_value = [
+            u'[\'<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;quot;svg'
+            '_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractiv'
+            'e-math>\']']
+        self.assertEqual(actual_output1[0], suggestion1.suggestion_id)
+        self.assertEqual(actual_output1[1], expected_output1_value)
+
+        actual_output2 = ast.literal_eval(actual_output[1])
+        expected_output2_value = [
+            u'[\'<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;quot;svg'
+            '_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractiv'
+            'e-math>\']']
+        self.assertEqual(actual_output2[0], suggestion2.suggestion_id)
+        self.assertEqual(actual_output2[1], expected_output2_value)
+
+    def test_job_when_suggestions_have_valid_filenames(self):
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;file1.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.target_id_1))
+        fs.commit('image/file1.svg', raw_image, mimetype='image/svg+xml')
+
+        change1 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Suggestion html</p>'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': valid_html_content1
+            }
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, change1, 'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
+        self.assertEqual(actual_output, [])
 
 
 class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):

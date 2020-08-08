@@ -26,6 +26,7 @@ from core import jobs
 from core.domain import html_validation_service
 from core.domain import suggestion_services
 from core.platform import models
+import feconf
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -52,6 +53,34 @@ class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (
             '%d suggestions have Math components in them, with IDs: %s' % (
                 len(values), values))
+
+
+class SuggestionSvgFilenameValidationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of a suggestion and validates the
+    svg_filename fields in each math rich-text components."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        suggestion = suggestion_services.get_suggestion_from_model(item)
+        html_string_list = suggestion.get_all_html_content_strings()
+        html_string = ''.join(html_string_list)
+        if suggestion.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+            error_list = (
+                html_validation_service.
+                validate_svg_filenames_in_math_rich_text(
+                    feconf.ENTITY_TYPE_EXPLORATION, item.target_id,
+                    html_string))
+            if len(error_list) > 0:
+                yield (item.id, error_list)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
 
 
 class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
