@@ -13,14 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the stories list.
+ * @fileoverview Component for the topic viewer stories list.
  */
 
-require('components/summary-tile/story-summary-tile.directive.ts');
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('storiesList', {
-  bindings: {
-    getCanonicalStorySummaries: '&canonicalStorySummaries',
-  },
-  template: require('./topic-viewer-stories-list.component.html')
-});
+import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
+
+@Component({
+  selector: 'stories-list',
+  templateUrl: './topic-viewer-stories-list.component.html',
+  styleUrls: []
+})
+export class StoriesListComponent {
+  @Input() canonicalStorySummaries: StorySummary[];
+  @Input() classroomUrlFragment: string;
+  @Input() topicUrlFragment: string;
+  constructor() {}
+}
+angular.module('oppia').directive(
+  'storiesList', downgradeComponent(
+    {component: StoriesListComponent}));

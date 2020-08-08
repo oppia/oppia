@@ -16,33 +16,35 @@
  * @fileoverview Component for the navbar breadcrumb of the topic viewer.
  */
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/url.service.ts');
+import { ReadOnlyTopic } from
+  'domain/topic_viewer/read-only-topic-object.factory';
+import { TopicViewerBackendApiService } from
+  'domain/topic_viewer/topic-viewer-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
 
-angular.module('oppia').component('topicViewerNavbarBreadcrumb', {
-  template: require('./topic-viewer-navbar-breadcrumb.component.html'),
-  controller: [
-    '$scope', '$rootScope', 'UrlService',
-    function(
-        $scope, $rootScope, UrlService) {
-      var ctrl = this;
-
-      ctrl.topicViewerBackendApiService = (
-        OppiaAngularRootComponent.topicViewerBackendApiService);
-
-      ctrl.$onInit = function() {
-        ctrl.topicViewerBackendApiService.fetchTopicData(
-          UrlService.getTopicNameFromLearnerUrl()).then(
-          function(readOnlyTopic) {
-            $scope.topicName = readOnlyTopic.getTopicName();
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$apply();
-          });
-      };
-    }
-  ]
-});
+@Component({
+  selector: 'topic-viewer-navbar-breadcrumb',
+  templateUrl: './topic-viewer-navbar-breadcrumb.component.html',
+  styleUrls: []
+})
+export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
+  topicName: string = '';
+  constructor(
+    private topicViewerBackendApiService: TopicViewerBackendApiService,
+    private urlService: UrlService
+  ) {}
+  ngOnInit(): void {
+    this.topicViewerBackendApiService.fetchTopicData(
+      this.urlService.getTopicUrlFragmentFromLearnerUrl(),
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl()).then(
+      (readOnlyTopic: ReadOnlyTopic) => {
+        this.topicName = readOnlyTopic.getTopicName();
+      });
+  }
+}
+angular.module('oppia').directive(
+  'topicViewerNavbarBreadcrumb', downgradeComponent(
+    {component: TopicViewerNavbarBreadcrumbComponent}));

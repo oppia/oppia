@@ -257,7 +257,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'player-correctness-feedback-enabled.service.ts',
     'player-transcript.service.ts',
     'Polyfills.ts',
-    'practice-tab.directive.ts',
+    'practice-tab.component.ts',
     'pretest-question-backend-api.service.ts',
     'profile-link-image.component.ts',
     'profile-link-text.component.ts',

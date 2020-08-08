@@ -13,16 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the subtopics list.
+ * @fileoverview Component for topic-viewer subtopics list.
  */
 
-require('components/summary-tile/subtopic-summary-tile.directive.ts');
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('subtopicsList', {
-  bindings: {
-    getSubtopics: '&subtopicsList',
-    getTopicId: '&topicId',
-    getTopicName: '&topicName'
-  },
-  template: require('./subtopics-list.component.html'),
-});
+import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
+
+@Component({
+  selector: 'subtopics-list',
+  templateUrl: './subtopics-list.component.html',
+  styleUrls: []
+})
+export class SubtopicsListComponent {
+  @Input() classroomUrlFragment: string;
+  @Input() subtopicsList: Subtopic[];
+  @Input() topicId: string;
+  @Input() topicUrlFragment: string;
+  constructor() {}
+}
+
+angular.module('oppia').directive(
+  'subtopicsList', downgradeComponent(
+    {component: SubtopicsListComponent}));
