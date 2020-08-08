@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,34 +13,48 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the command executor service
+ * @fileoverview Unit tests for ExplorationPlayerStateService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { CommandExecutorService } from
-  'pages/exploration-player-page/services/command-executor.service';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
-describe('Command executor service', () => {
-  let ces: CommandExecutorService = null;
-  let wrf: WindowRef = null;
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// exploration-player-state.service.ts is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
+require(
+  'pages/exploration-player-page/services/command-executor.service');
+require('services/contextual/window-ref.service.ts');
+require(
+  'pages/exploration-player-page/services/window-wrapper-message.service.ts');
+
+describe('Exploration Player State Service', () => {
+  let ces = null;
+  let wrf = null;
   let spy = null;
-  beforeEach((done) => {
-    TestBed.configureTestingModule({
-      providers: [CommandExecutorService, WindowRef]
-    });
-    ces = TestBed.get(CommandExecutorService);
-    wrf = TestBed.get(WindowRef);
+  let wwms = null;
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', ($provide) => {
+    let ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+
+  beforeEach(angular.mock.inject(function($injector) {
+    ces = $injector.get('CommandExecutorService');
+    wrf = $injector.get('WindowRef');
+    wwms = $injector.get('WindowWrapperMessageService');
     setupWindowRef(wrf);
-    spy = spyOn(ces.windowWrapperMessageService, 'addEventListener');
-    ces.getOuterFrameEvents(wrf);
-    done();
-  });
+    spy = spyOn(wwms, 'addEventListener');
+    ces.initialize();
+  }));
 
   afterEach((done) => {
     var suite =
     wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
     suite.remove();
-    done()
+    done();
   });
 
   var continueBoolean = false;
@@ -48,12 +62,14 @@ describe('Command executor service', () => {
   var deleteBoolean = false;
   var mcBoolean = false;
   var secondaryContinueBoolean = false;
-  var setupWindowRef = function(windowRef: WindowRef) {
+  var itemSelectionBoolean = false;
+  var setupWindowRef = function(windowRef) {
     continueBoolean = false;
     addBoolean = false;
     deleteBoolean = false;
     mcBoolean = false;
     secondaryContinueBoolean = false;
+    itemSelectionBoolean = false;
     var testPage = windowRef.nativeWindow.document.createElement(
       'TESTING_SUITE');
     var continueButton = windowRef.nativeWindow.document.createElement(
@@ -74,12 +90,10 @@ describe('Command executor service', () => {
       'INPUT') as HTMLInputElement;
     textbox.classList.add(
       'form-control');
-    // textbox.value = 'placeholder';
     var secondaryTextbox = windowRef.nativeWindow.document.createElement(
       'INPUT') as HTMLInputElement;
     secondaryTextbox.classList.add(
       'form-control');
-    // secondaryTextbox.value = 'placeholder';
     var addButton = windowRef.nativeWindow.document.createElement(
       'BUTTON');
     addButton.classList.add('oppia-add-list-entry');
@@ -91,7 +105,7 @@ describe('Command executor service', () => {
     deleteButton.classList.add('oppia-delete-list-entry-button');
     deleteButton.onclick = function() {
       deleteBoolean = true;
-   };
+    };
     var fractionBox = windowRef.nativeWindow.document.createElement(
       'TEXT');
     fractionBox.classList.add('form-control');
@@ -112,6 +126,21 @@ describe('Command executor service', () => {
     var mc4 = windowRef.nativeWindow.document.createElement(
       'BUTTON');
     mc4.classList.add('multiple-choice-outer-radio-button');
+    var itemSelection1 = windowRef.nativeWindow.document.createElement(
+      'BUTTON');
+    itemSelection1.classList.add('item-selection-input-checkbox');
+    var itemSelection2 = windowRef.nativeWindow.document.createElement(
+      'BUTTON');
+    itemSelection2.classList.add('item-selection-input-checkbox');
+    itemSelection2.onclick = function() {
+      itemSelectionBoolean = true;
+    };
+    var itemSelection3 = windowRef.nativeWindow.document.createElement(
+      'BUTTON');
+    itemSelection3.classList.add('item-selection-input-checkbox');
+    var itemSelection4 = windowRef.nativeWindow.document.createElement(
+      'BUTTON');
+    itemSelection4.classList.add('item-selection-input-checkbox');
     testPage.appendChild(continueButton);
     testPage.appendChild(textbox);
     testPage.appendChild(secondaryTextbox);
@@ -122,6 +151,10 @@ describe('Command executor service', () => {
     testPage.appendChild(mc2);
     testPage.appendChild(mc3);
     testPage.appendChild(mc4);
+    testPage.appendChild(itemSelection1);
+    testPage.appendChild(itemSelection2);
+    testPage.appendChild(itemSelection3);
+    testPage.appendChild(itemSelection4);
     testPage.appendChild(secondaryContinueButton);
     wrf.nativeWindow.document.body.appendChild(testPage);
   };
@@ -134,7 +167,7 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
   });
 
   it('should click continue', () => {
@@ -145,7 +178,7 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
     var messageEvent = new MessageEvent('message', {
       data: 'CONTINUE'
     });
@@ -165,7 +198,7 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
     var messageEvent = new MessageEvent('message', {
       data: 'ENTER_TEXT_NUMBER_UNITS testText'
     });
@@ -187,7 +220,7 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
     var messageEvent = new MessageEvent('message', {
       data: 'ADD_SET 1'
     });
@@ -208,8 +241,8 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
-    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
     var messageEvent = new MessageEvent('message', {
       data: 'ADD_SET 1'
     });
@@ -239,7 +272,7 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
     var messageEvent = new MessageEvent('message', {
       data: 'ENTER_FRACTION 2/3'
     });
@@ -258,7 +291,7 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
     var messageEvent = new MessageEvent('message', {
       data: 'SELECT_ITEM_BULLET 2'
     });
@@ -274,7 +307,7 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
     var messageEvent = new MessageEvent('message', {
       data: 'SUBMIT'
     });
@@ -290,7 +323,7 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
     var messageEvent = new MessageEvent('message', {
       data: 'ADD_SET 1'
     });
@@ -314,7 +347,7 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.getHostname()).toEqual('mockWindow');
     var messageEvent = new MessageEvent('message', {
       data: 'CONTINUE'
     });
@@ -323,10 +356,9 @@ describe('Command executor service', () => {
   });
 
   it('should attempt to send parent ready state', () => {
-    ces.windowWrapperMessageService.postMessageToParent =
-    jasmine.createSpy('parentMessage spy');
+    wwms.postMessageToParent = jasmine.createSpy('parentMessage spy');
     ces.sendParentReadyState(wrf);
-    expect(ces.windowWrapperMessageService.postMessageToParent)
+    expect(wwms.postMessageToParent)
       .toHaveBeenCalled();
   });
 
@@ -338,28 +370,28 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    ces.windowWrapperMessageService.postMessageToParent =
+    wwms.postMessageToParent =
     jasmine.createSpy('parentMessage spy');
     ces.sendStateToOuterFrame('Continue');
-    expect(ces.windowWrapperMessageService.postMessageToParent)
+    expect(wwms.postMessageToParent)
       .toHaveBeenCalledWith('CONTINUE', 'mockWindow');
   });
 
   it('should send the cached message after hostname load',
     () => {
       ces.sendStateToOuterFrame('SetInput');
-      expect(ces.cachedOuterFrameMessage).toEqual('SET_OPERATION');
+      expect(ces.getCachedOuterFrameMessage()).toEqual('SET_OPERATION');
       expect(spy).toHaveBeenCalled();
       expect(spy.calls.mostRecent().args[0]).toEqual('message');
       var listener = spy.calls.mostRecent().args[1];
-      ces.windowWrapperMessageService.postMessageToParent =
+      wwms.postMessageToParent =
       jasmine.createSpy('parentMessage spy');
       var messageEvent = new MessageEvent('message', {
         data: 'HOSTNAME mockWindow'
       });
       listener(messageEvent);
-      expect(ces.hostname).toEqual('mockWindow');
-      expect(ces.windowWrapperMessageService.postMessageToParent)
+      expect(ces.getHostname()).toEqual('mockWindow');
+      expect(wwms.postMessageToParent)
         .toHaveBeenCalledWith('SET_OPERATION', 'mockWindow');
     });
 
@@ -377,5 +409,21 @@ describe('Command executor service', () => {
     });
     var emptyVal = listener(messageEvent);
     expect(emptyVal).toEqual(undefined);
+  });
+
+  it('should select the box for item selection', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
+    });
+    listener(messageEvent);
+    expect(ces.getHostname()).toEqual('mockWindow');
+    var messageEvent = new MessageEvent('message', {
+      data: 'SELECT_ITEM_CHECKBOX 2'
+    });
+    listener(messageEvent);
+    expect(itemSelectionBoolean).toEqual(true);
   });
 });

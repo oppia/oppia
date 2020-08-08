@@ -13,205 +13,223 @@
 // limitations under the License.
 
 /**
- * @fileoverview Oppia interaction from outer iframe with messaging commands.
+ * @fileoverview A service that maintains a record of the state of the player,
+ *  like engine service.
  */
 
- //oppia-float-form-input, 
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import {WindowRef} from 'services/contextual/window-ref.service.ts';
-import {WindowWrapperMessageService} from
-  'pages/exploration-player-page/services/window-wrapper-message.service';
-require('pages/exploration-player-page/services/exploration-engine.service.ts');
-import {ServicesConstants} from 'services/services.constants';
-
-@Injectable({providedIn: 'root'})
-export class CommandExecutorService {
-  private commandToFunctionMap = {
-    CONTINUE: this.continueClick,
-    ENTER_TEXT_NUMBER_UNITS: this.fillTextBox,
-    ADD_SET: this.addToSet,
-    REMOVE_SET: this.removeFromSet,
-    ENTER_FRACTION: this.enterFraction,
-    SELECT_ITEM_BULLET: this.selectItemBullet,
-    SELECT_ITEM_CHECKBOX: this.selectItemCheckbox,
-    SUBMIT: this.submit,
-  };
-  setElementsOnPage = 0;
-  hostname = '';
-  cachedOuterFrameMessage = '';
-  windowWrapperMessageService = null;
-  constructor(private windowRef: WindowRef) {
-    this.setElementsOnPage = 0;
-    this.hostname = '';
-    this.cachedOuterFrameMessage = '';
-    this.windowWrapperMessageService =
-      new WindowWrapperMessageService(windowRef);
-  }
-
-  sendParentReadyState(windowRef) {
-    this.windowWrapperMessageService.postMessageToParent(
-      'Ready to receive hostname', '*');
-  }
-
-  getOuterFrameEvents(windowRef) {
-    this.windowWrapperMessageService.addEventListener(
-      'message', (event) => {
-        var messageArray = event.data.split(' ');
-        var command = messageArray[0];
-        var message = '';
-        for (var i = 1; i < messageArray.length; i++) {
-          message = message + messageArray[i] + ' ';
-        }
-        message = message.substr(0, message.length - 1);
-        if ((command !== 'HOSTNAME' && this.hostname === '')) {
-          return;
-        } else if (command === 'CONTINUE' || command === 'SUBMIT') {
-          this.commandToFunctionMap[command](windowRef);
-        } else if (command === 'HOSTNAME') {
-          if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(message) >=
-          0) {
-            this.hostname = message;
-          }
-          if (this.cachedOuterFrameMessage !== '' &&
-          this.cachedOuterFrameMessage !== undefined) {
-            this.windowWrapperMessageService.postMessageToParent(
-              this.cachedOuterFrameMessage, this.hostname);
-          }
-        } else {
-          this.commandToFunctionMap[command](windowRef, message);
-        }
-      });
-  }
-
-  sendStateToOuterFrame(id) {
-    var stateToCommand = {
-      Continue: 'CONTINUE',
-      FractionInput: 'ENTER_FRACTION',
-      ItemSelectionInput: 'SELECT_ITEM_CHECKBOX',
-      MultipleChoiceInput: 'SELECT_ITEM_BULLET',
-      NumberWithUnits: 'ENTER_TEXT_NUMBER_UNITS',
-      NumericExpressionInput: 'ENTER_TEXT_NUMBER_UNITS',
-      SetInput: 'SET_OPERATION',
-      TextInput: 'ENTER_TEXT_NUMBER_UNITS',
+require('services/contextual/window-ref.service.ts');
+require(
+  'pages/exploration-player-page/services/window-wrapper-message.service');
+require('./window-wrapper-message.service');
+angular.module('oppia').factory('CommandExecutorService', [
+  'WindowRef', 'WindowWrapperMessageService',
+  function(WindowRef, windowWrapperMessageService) {
+    var setElementsOnPage = 0;
+    var hostname = '';
+    var cachedOuterFrameMessage = '';
+    var sendParentReadyState = function(windowRef) {
+      windowWrapperMessageService.postMessageToParent(
+        'Ready to receive hostname', '*');
     };
-    this.setElementsOnPage = 0;
-    if (!(id in stateToCommand)) {
-      return;
-    }
-    if (this.hostname === '') {
-      this.cachedOuterFrameMessage = stateToCommand[id];
-    } else {
-      this.windowWrapperMessageService.postMessageToParent(stateToCommand[id],
-        this.hostname);
-    }
-  }
+    var initialize = function() {
+      windowWrapperMessageService.addEventListener(
+        'message', (event) => {
+          var messageArray = event.data.split(' ');
+          var command = messageArray[0];
+          var message = '';
+          for (var i = 1; i < messageArray.length; i++) {
+            message = message + messageArray[i] + ' ';
+          }
+          message = message.substr(0, message.length - 1);
+          if ((command !== 'HOSTNAME' && hostname === '')) {
+            return;
+          } else if (command === 'CONTINUE' || command === 'SUBMIT') {
+            commandToFunctionMap[command](WindowRef);
+          } else if (command === 'HOSTNAME') {
+            hostname = message;
+            if (cachedOuterFrameMessage !== '' &&
+            cachedOuterFrameMessage !== undefined) {
+              windowWrapperMessageService.postMessageToParent(
+                cachedOuterFrameMessage, hostname);
+            }
+          } else {
+            commandToFunctionMap[command](WindowRef, message);
+          }
+        });
+    };
 
-  continueClick(windowRef) {
-    try {
-      var button = windowRef.nativeWindow.document.getElementsByClassName(
-        'oppia-learner-confirm-button'
-      )[0] as HTMLElement;
-      button.click();
-    } catch {
-      var button = windowRef.nativeWindow.document.getElementsByClassName(
-        'protractor-test-next-card-button')[0] as HTMLElement;
-      button.click();
-    }
-    this.setElementsOnPage = 0;
-  }
-
-  fillTextBox(windowRef, text) {
-    var box = windowRef.nativeWindow.document.getElementsByClassName(
-      'form-control')[0];
-    box.value = text;
-    var evt = document.createEvent('HTMLEvents');
-    evt.initEvent('change', false, true);
-    box.dispatchEvent(evt);
-    var button = windowRef.nativeWindow.document.getElementsByClassName(
-      'oppia-learner-confirm-button')[0] as HTMLElement;
-    button.click();
-  }
-
-  addToSet(windowRef, message) {
-    var elements = message.split(' ');
-    if (!this.setElementsOnPage) {
-      this.setElementsOnPage = 0;
-    }
-    for (var i = 0; i < elements.length; i++) {
-      if (this.setElementsOnPage === 0) {
-        var box = windowRef.nativeWindow.document.querySelectorAll(
-          '.form-control')[0] as HTMLInputElement;
-        box.value = elements[i];
-        this.setElementsOnPage += 1;
-      } else {
-        var addButton = windowRef.nativeWindow.document.querySelectorAll(
-          '.oppia-add-list-entry'
-        )[0] as HTMLElement;
-        addButton.click();
-        this.setElementsOnPage += 1;
-        var box = windowRef.nativeWindow.document.querySelectorAll(
-          '.form-control')[this.setElementsOnPage - 1] as HTMLInputElement;
-        box.value = elements[i];
+    var sendStateToOuterFrame = function(id) {
+      var stateToCommand = {
+        Continue: 'CONTINUE',
+        FractionInput: 'ENTER_FRACTION',
+        ItemSelectionInput: 'SELECT_ITEM_CHECKBOX',
+        MultipleChoiceInput: 'SELECT_ITEM_BULLET',
+        NumberWithUnits: 'ENTER_TEXT_NUMBER_UNITS',
+        NumericExpressionInput: 'ENTER_TEXT_NUMBER_UNITS',
+        SetInput: 'SET_OPERATION',
+        TextInput: 'ENTER_TEXT_NUMBER_UNITS',
+      };
+      setElementsOnPage = 0;
+      if (!(id in stateToCommand)) {
+        return;
       }
+      if (hostname === '') {
+        cachedOuterFrameMessage = stateToCommand[id];
+      } else {
+        windowWrapperMessageService.postMessageToParent(stateToCommand[id],
+          hostname);
+      }
+    };
+    var continueClick = function(windowRef) {
+      try {
+        var button = windowRef.nativeWindow.document.getElementsByClassName(
+          'oppia-learner-confirm-button'
+        )[0] as HTMLElement;
+        button.click();
+      } catch {
+        var button = windowRef.nativeWindow.document.getElementsByClassName(
+          'protractor-test-next-card-button')[0] as HTMLElement;
+        button.click();
+      }
+      setElementsOnPage = 0;
+    };
+
+    var fillTextBox = function(windowRef, text) {
+      var box = windowRef.nativeWindow.document.getElementsByClassName(
+        'form-control')[0];
+      box.value = text;
       var evt = document.createEvent('HTMLEvents');
       evt.initEvent('change', false, true);
       box.dispatchEvent(evt);
-    }
-  }
+      var button = windowRef.nativeWindow.document.getElementsByClassName(
+        'oppia-learner-confirm-button')[0] as HTMLElement;
+      button.click();
+    };
 
-  removeFromSet(windowRef, element) {
-    var boxes = windowRef.nativeWindow.document.querySelectorAll(
-      '.form-control');
-    for (var i = 0; i < boxes.length; i++) {
-      if (boxes[i].value === element) {
-        var deleteButton =
-        windowRef.nativeWindow.document.querySelectorAll(
-          '.oppia-delete-list-entry-button')[i];
-        deleteButton.click();
+    var addToSet = function(windowRef, message) {
+      var elements = message.split(' ');
+      if (!setElementsOnPage) {
+        setElementsOnPage = 0;
       }
-    }
-    this.setElementsOnPage -= 1;
-  }
+      for (var i = 0; i < elements.length; i++) {
+        if (setElementsOnPage === 0) {
+          var box = windowRef.nativeWindow.document.querySelectorAll(
+            '.form-control')[0] as HTMLInputElement;
+          box.value = elements[i];
+          setElementsOnPage += 1;
+        } else {
+          var addButton = windowRef.nativeWindow.document.querySelectorAll(
+            '.oppia-add-list-entry'
+          )[0] as HTMLElement;
+          addButton.click();
+          setElementsOnPage += 1;
+          var box = windowRef.nativeWindow.document.querySelectorAll(
+            '.form-control')[setElementsOnPage - 1] as HTMLInputElement;
+          box.value = elements[i];
+        }
+        var evt = document.createEvent('HTMLEvents');
+        evt.initEvent('change', false, true);
+        box.dispatchEvent(evt);
+      }
+    };
 
-  submit(windowRef) {
-    var button = windowRef.nativeWindow.document.getElementsByClassName(
-      'oppia-learner-confirm-button')[0] as HTMLElement;
-    button.click();
-    this.setElementsOnPage = 0;
-  }
+    var removeFromSet = function(windowRef, element) {
+      var boxes = windowRef.nativeWindow.document.querySelectorAll(
+        '.form-control');
+      for (var i = 0; i < boxes.length; i++) {
+        if (boxes[i].value === element) {
+          var deleteButton =
+          windowRef.nativeWindow.document.querySelectorAll(
+            '.oppia-delete-list-entry-button')[i];
+          deleteButton.click();
+        }
+      }
+      setElementsOnPage -= 1;
+    };
 
-  enterFraction(windowRef, fraction) {
-    var fractionElementName =
-    'form-control ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r';
-    var fractionBox = windowRef.nativeWindow.document.getElementsByClassName(
-      fractionElementName)[0];
-    fractionBox.value = fraction;
-    var button = windowRef.nativeWindow.document.getElementsByClassName(
-      'oppia-learner-confirm-button')[0] as HTMLElement;
-    button.click();
-    var evt = document.createEvent('HTMLEvents');
-    evt.initEvent('change', false, true);
-    fractionBox.dispatchEvent(evt);
-  }
+    var submit = function(windowRef) {
+      var button = windowRef.nativeWindow.document.getElementsByClassName(
+        'oppia-learner-confirm-button')[0] as HTMLElement;
+      button.click();
+      setElementsOnPage = 0;
+    };
 
-  selectItemBullet(windowRef, message) {
-    message = Number(message);
-    var button = windowRef.nativeWindow.document.getElementsByClassName(
-      'multiple-choice-outer-radio-button')[message - 1] as HTMLElement;
-    button.click();
-  }
+    var enterFraction = function(windowRef, fraction) {
+      var fractionElementName =
+      'form-control ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r';
+      var fractionBox = windowRef.nativeWindow.document.getElementsByClassName(
+        fractionElementName)[0];
+      fractionBox.value = fraction;
+      var button = windowRef.nativeWindow.document.getElementsByClassName(
+        'oppia-learner-confirm-button')[0] as HTMLElement;
+      button.click();
+      var evt = document.createEvent('HTMLEvents');
+      evt.initEvent('change', false, true);
+      fractionBox.dispatchEvent(evt);
+    };
 
-  selectItemCheckbox(windowRef, message) {
-    message = Number(message);
-    var button = windowRef.nativeWindow.document.getElementsByClassName(
-      'item-selection-input-checkbox')[message - 1] as HTMLElement;
-    button.click();
-  }
-}
+    var selectItemBullet = function(windowRef, message) {
+      message = Number(message);
+      var button = windowRef.nativeWindow.document.getElementsByClassName(
+        'multiple-choice-outer-radio-button')[message - 1] as HTMLElement;
+      button.click();
+    };
 
-angular.module('oppia').factory(
-  'CommandExecutorService',
-  downgradeInjectable(CommandExecutorService));
+    var selectItemCheckbox = function(windowRef, message) {
+      message = Number(message);
+      var button = windowRef.nativeWindow.document.getElementsByClassName(
+        'item-selection-input-checkbox')[message - 1] as HTMLElement;
+      button.click();
+    };
+
+    var commandToFunctionMap = {
+      CONTINUE: continueClick,
+      ENTER_TEXT_NUMBER_UNITS: fillTextBox,
+      ADD_SET: addToSet,
+      REMOVE_SET: removeFromSet,
+      ENTER_FRACTION: enterFraction,
+      SELECT_ITEM_BULLET: selectItemBullet,
+      SELECT_ITEM_CHECKBOX: selectItemCheckbox,
+      SUBMIT: submit,
+    };
+
+    return {
+      sendParentReadyState: function(windowRef) {
+        sendParentReadyState(windowRef);
+      },
+      initialize: function() {
+        initialize();
+      },
+      sendStateToOuterFrame: function(id) {
+        sendStateToOuterFrame(id);
+      },
+      continueClick: function(windowRef) {
+        continueClick(windowRef);
+      },
+      addToSet: function(windowRef, message) {
+        addToSet(windowRef, message);
+      },
+      removeFromSet: function(windowRef, message) {
+        removeFromSet(windowRef, message);
+      },
+      submit: function(windowRef) {
+        submit(windowRef);
+      },
+      enterFraction: function(windowRef, fraction) {
+        enterFraction(windowRef, fraction);
+      },
+      selectItemBullet: function(windowRef, message) {
+        selectItemBullet(windowRef, message);
+      },
+      selectItemCheckbox: function(windowRef, message) {
+        selectItemCheckbox(windowRef, message);
+      },
+      getHostname: function() {
+        return hostname;
+      },
+      getCachedOuterFrameMessage: function() {
+        return cachedOuterFrameMessage;
+      }
+    };
+  }]);

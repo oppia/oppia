@@ -17,6 +17,7 @@
  * @fileoverview Component for the explaration player page.
  */
 import 'mousetrap';
+import { ServicesConstants } from 'services/services.constants';
 
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require('base-components/base-content.directive.ts');
@@ -34,24 +35,46 @@ require(
 
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
+require('pages/exploration-player-page/services/command-executor.service.ts');
 
 angular.module('oppia').component('explorationPlayerPage', {
   template: require('./exploration-player-page.component.html'),
   controller: [
     'ContextService', '$timeout', 'PageTitleService',
     'ReadOnlyExplorationBackendApiService',
-    'CommandExecutorService', 'WindowRef', '$rootScope',
+    'CommandExecutorService', 'WindowWrapperMessageService',
+    'WindowRef', '$rootScope',
     function(
         ContextService, $timeout, PageTitleService,
         ReadOnlyExplorationBackendApiService,
-        CommandExecutorService, WindowRef, $rootScope) {
+        CommandExecutorService, WindowWrapperMessageService,
+        WindowRef, $rootScope) {
       var ctrl = this;
+      var keyword = 'secret';
+      var getUrlParams = function() {
+        var urlParams = {};
+        var parts = WindowWrapperMessageService.getLocationHref().replace(
+          /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+            urlParams[key] = value;
+          });
+        return urlParams;
+      };
       ctrl.$onInit = function() {
+        var urlParams = getUrlParams();
         $rootScope.$on('newInteractionLoaded', function(state, id) {
-          CommandExecutorService.sendStateToOuterFrame(id);
+          if (urlParams[keyword] !== undefined &&
+            ServicesConstants.WHITELISTED_IFRAME_SECRETS.indexOf(
+              urlParams[keyword]) >= 0) {
+            CommandExecutorService.sendStateToOuterFrame(id);
+          }
         });
-        CommandExecutorService.getOuterFrameEvents(WindowRef);
-        CommandExecutorService.sendParentReadyState(WindowRef);
+
+        if (urlParams[keyword] !== undefined &&
+          ServicesConstants.WHITELISTED_IFRAME_SECRETS.indexOf(
+            urlParams[keyword]) >= 0) {
+          CommandExecutorService.initialize(WindowRef);
+          CommandExecutorService.sendParentReadyState(WindowRef);
+        }
 
         var explorationId = ContextService.getExplorationId();
         ReadOnlyExplorationBackendApiService.fetchExploration(

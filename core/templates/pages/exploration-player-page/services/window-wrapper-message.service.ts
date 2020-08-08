@@ -13,30 +13,41 @@
 // limitations under the License.
 
 /**
- * @fileoverview Oppia interaction from outer iframe with messaging commands.
+ * @fileoverview A service that maintains a record of the state of the player,
+ *  like engine service.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
-import {WindowRef} from 'services/contextual/window-ref.service.ts';
-require('pages/exploration-player-page/services/exploration-engine.service.ts');
+require('services/contextual/window-ref.service.ts');
 
-@Injectable({providedIn: 'root'})
-export class WindowWrapperMessageService {
-  constructor(private windowRef: WindowRef) {
-    this.windowRef = windowRef;
-  }
+angular.module('oppia').factory('WindowWrapperMessageService', [
+  'WindowRef',
+  function(
+      WindowRef) {
+    var addEventListener = function(type, func) {
+      WindowRef.nativeWindow.addEventListener(type, func);
+    };
 
-  addEventListener(type, func) {
-    this.windowRef.nativeWindow.addEventListener(type, func);
-  }
+    var postMessageToParent = function(message, hostname) {
+      WindowRef.nativeWindow.parent.postMessage(message, hostname);
+    };
 
-  postMessageToParent(message, hostname) {
-    this.windowRef.nativeWindow.parent.postMessage(message, hostname);
-  }
-}
+    var getLocationHref = function() {
+      return WindowRef.nativeWindow.location.href;
+    };
 
-angular.module('oppia').factory(
-  'WindowWrapperMessageService',
-  downgradeInjectable(WindowWrapperMessageService));
+    return {
+      addEventListener: function(type, func) {
+        addEventListener(type, func);
+      },
+
+      postMessageToParent: function(message, hostname) {
+        postMessageToParent(message, hostname);
+      },
+
+      getLocationHref: function() {
+        var url = getLocationHref();
+        return url;
+      }
+    };
+  }]);

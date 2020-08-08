@@ -24,6 +24,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-player-page/exploration-player-page.component.ts');
+require(
+  'pages/exploration-player-page/services/window-wrapper-message.service.ts');
 
 describe('Exploration player page', function() {
   var ctrl = null;
@@ -34,6 +36,7 @@ describe('Exploration player page', function() {
   var PageTitleService = null;
   var ReadOnlyExplorationBackendApiService = null;
   var CommandExecutorService = null;
+  var WindowWrapperMessageService = null;
   var skipButton = document.createElement('button');
   var nextButton = document.createElement('button');
   var continueToNextCardButton = document.createElement('button');
@@ -71,6 +74,8 @@ describe('Exploration player page', function() {
     ContextService = $injector.get('ContextService');
     PageTitleService = $injector.get('PageTitleService');
     CommandExecutorService = $injector.get('CommandExecutorService');
+    WindowWrapperMessageService = $injector.get(
+      'WindowWrapperMessageService');
     ReadOnlyExplorationBackendApiService = $injector.get(
       'ReadOnlyExplorationBackendApiService');
 
@@ -140,21 +145,29 @@ describe('Exploration player page', function() {
       exploration.objective);
   });
 
-  it('should initialize command executor service with getOuterFrameEvents',
-  function() {
-    CommandExecutorService.getOuterFrameEvents = jasmine.createSpy(
-      'outerFrameEvents spy');
+  it('should initialize command executor service',
+    function() {
+      WindowWrapperMessageService.getLocationHref =
+      jasmine.createSpy('parentMessage spy').and.returnValue(
+        'https://www.oppia.org/exploration/embed/fake?' +
+        'secret=25b49a7f706348c29c5b3709ee4570bb');
+      CommandExecutorService.initialize = jasmine.createSpy(
+        'outerFrameEvents spy');
 
-    ctrl.$onInit();
-    $scope.$apply();
+      ctrl.$onInit();
+      $scope.$apply();
 
-    expect(CommandExecutorService.getOuterFrameEvents)
-      .toHaveBeenCalled();
-  });
+      expect(CommandExecutorService.initialize)
+        .toHaveBeenCalled();
+    });
 
   it('should indicate readiness for parent to send host state' +
     ' through command executor sendStateToOuterFrame method',
   function() {
+    WindowWrapperMessageService.getLocationHref =
+    jasmine.createSpy('parentMessage spy').and.returnValue(
+      'https://www.oppia.org/exploration/embed/fake?' +
+      'secret=25b49a7f706348c29c5b3709ee4570bb');
     CommandExecutorService.sendParentReadyState = jasmine.createSpy(
       'sendParentReadyState spy');
 
@@ -162,20 +175,24 @@ describe('Exploration player page', function() {
     $scope.$apply();
 
     expect(CommandExecutorService.sendParentReadyState)
-    .toHaveBeenCalled();
-});
+      .toHaveBeenCalled();
+  });
 
   it('should broadcast player state when newInteractionLoaded' +
     'is received', function() {
-      CommandExecutorService.sendStateToOuterFrame = jasmine.createSpy(
-        'sendStateToOuterFrame spy');
+    WindowWrapperMessageService.getLocationHref =
+      jasmine.createSpy('parentMessage spy').and.returnValue(
+        'https://www.oppia.org/exploration/embed/fake?' +
+        'secret=25b49a7f706348c29c5b3709ee4570bb');
+    CommandExecutorService.sendStateToOuterFrame = jasmine.createSpy(
+      'sendStateToOuterFrame spy');
 
-      ctrl.$onInit();
-      $scope.$apply();
+    ctrl.$onInit();
+    $scope.$apply();
 
-      $rootScope.$broadcast('newInteractionLoaded', 'CONTINUE');
-      $rootScope.$apply();
-      $scope.$apply();
-      expect(CommandExecutorService.sendStateToOuterFrame).toHaveBeenCalled();
-    });
+    $rootScope.$broadcast('newInteractionLoaded', 'CONTINUE');
+    $rootScope.$apply();
+    $scope.$apply();
+    expect(CommandExecutorService.sendStateToOuterFrame).toHaveBeenCalled();
   });
+});
