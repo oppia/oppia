@@ -32,6 +32,11 @@ angular.module('oppia').constant(
   'CONTINUE_BUTTON_FOCUS_LABEL',
   ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
 
+/* Called when a new audio-equippable component is loaded and displayed
+   to the user, allowing for the automatic playing of audio if necessary. */
+angular.module('oppia').constant(
+  'EVENT_AUTOPLAY_AUDIO', ExplorationPlayerConstants.EVENT_AUTOPLAY_AUDIO);
+
 // The enforced waiting period before the first hint request.
 angular.module('oppia').constant(
   'WAIT_FOR_FIRST_HINT_MSEC',

@@ -24,8 +24,6 @@ import { RecordedVoiceoversObjectFactory } from
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 
-import { Subscription } from 'rxjs';
-
 describe('Display Solution Modal Controller', function() {
   var $rootScope = null;
   var $scope = null;
@@ -43,9 +41,6 @@ describe('Display Solution Modal Controller', function() {
 
   var card = null;
   var solution = null;
-
-  var testSubscriptions = null;
-  const autoplayAudioSpy = jasmine.createSpy('autoplayAudio');
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -94,10 +89,7 @@ describe('Display Solution Modal Controller', function() {
       recordedVoiceovers, 'content_id');
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
-    testSubscriptions = new Subscription();
-    testSubscriptions.add(
-      AudioPlayerService.onAutoplayAudio.subscribe(
-        autoplayAudioSpy));
+    spyOn($rootScope, '$broadcast').and.callThrough();
 
     $scope = $rootScope.$new();
     $controller('DisplaySolutionModalController', {
@@ -106,10 +98,6 @@ describe('Display Solution Modal Controller', function() {
       $uibModalInstance: $uibModalInstance
     });
   }));
-
-  afterEach(() => {
-    testSubscriptions.unsubscribe();
-  });
 
   it('should evaluate initialized properties', function() {
     expect($scope.isHint).toBe(false);
@@ -120,7 +108,7 @@ describe('Display Solution Modal Controller', function() {
     });
     expect($scope.solutionExplanationHtml).toBe('Explanation html');
 
-    expect(autoplayAudioSpy).toHaveBeenCalled();
+    expect($rootScope.$broadcast).toHaveBeenCalledWith('autoPlayAudio');
   });
 
   it('should dismiss modal', function() {
