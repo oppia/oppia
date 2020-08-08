@@ -23,7 +23,7 @@ export = {
 
   // The default classroom URL fragment to use when the provided classroom URL
   // fragment in the controller is invalid.
-  "DEFAULT_CLASSROOM_NAME": "math",
+  "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "math",
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
