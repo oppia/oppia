@@ -381,7 +381,7 @@ angular.module('oppia').factory('ResponsesService', [
 
           var key, newInputValue;
           _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-            var newRules = angular.copy(answerGroup.rules);
+            var newRules = angular.copy(answerGroup.getRulesAsList());
             newRules.forEach(function(rule) {
               for (key in rule.inputs) {
                 newInputValue = [];
@@ -440,7 +440,7 @@ angular.module('oppia').factory('ResponsesService', [
 
           if (anyChangesHappened) {
             _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-              var newRules = angular.copy(answerGroup.rules);
+              var newRules = angular.copy(answerGroup.getRulesAsList());
               newRules.forEach(function(rule) {
                 if (rule.type === 'HasElementXAtPositionY') {
                   rule.inputs.x = newAnswerChoices[0].val;

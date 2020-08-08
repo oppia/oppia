@@ -31,8 +31,35 @@ import { StateInteractionStats, StateInteractionStatsService } from
 import { VisualizationInfoObjectFactory } from
   'domain/exploration/visualization-info-object.factory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { RuleInputs, Rule } from 'domain/exploration/RuleObjectFactory';
 
-describe('State Interaction Stats Service', () => {
+class MockAnswerGroup {
+  constructor(public ruleInputs: RuleInputs, public outcome: Object) {}
+
+  getRulesAsList(): Rule[] {
+    const rules = [];
+
+    // Sort rule types so that Equals always is first, followed by all other
+    // rule types sorted alphabetically.
+    const sortedRuleTypes = Object.keys(this.ruleInputs).sort(
+      (x, y) => {
+        if (x === 'Equals') {
+          return -1;
+        }
+        return x < y ? -1 : 1;
+      }
+    );
+    sortedRuleTypes.forEach(ruleType => {
+      this.ruleInputs[ruleType].forEach(ruleInput => {
+        rules.push(this.ruleObjectFactory.createNew(ruleType, ruleInput));
+      });
+    });
+
+    return rules;
+  }
+}
+
+fdescribe('State Interaction Stats Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -64,15 +91,21 @@ describe('State Interaction Stats Service', () => {
         id: 'TextInput',
         answerGroups: [
           {
-            rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
+            ruleInputs: {
+              Equals: [{x: 'hola!'}]
+            },
             outcome: {dest: 'Me Llamo'}
           },
           {
-            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
+            ruleInputs: {
+              Contains: [{x: 'hola'}]
+            },
             outcome: {dest: 'Me Llamo'}
           },
           {
-            rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
+            ruleInputs: {
+              FuzzyEquals: [{x: 'hola'}]
+            },
             outcome: {dest: 'Hola'}
           }
         ],
@@ -88,7 +121,7 @@ describe('State Interaction Stats Service', () => {
     ).toBeTrue();
   });
 
-  describe('when gathering stats from the backend', () => {
+  fdescribe('when gathering stats from the backend', () => {
     it('should provide cached results after first call', fakeAsync(() => {
       this.statsCaptured = [];
       const captureStats = (stats: StateInteractionStats) => {
@@ -201,7 +234,7 @@ describe('State Interaction Stats Service', () => {
       expect(this.onFailure).not.toHaveBeenCalled();
     }));
 
-    it(
+    fit(
       'should determine whether TextInput answers are addressed explicitly',
       fakeAsync(() => {
         this.onSuccess = jasmine.createSpy('success');

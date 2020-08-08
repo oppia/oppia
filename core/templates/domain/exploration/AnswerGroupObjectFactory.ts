@@ -26,7 +26,7 @@ import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 import { RuleObjectFactory, Rule } from 'domain/exploration/RuleObjectFactory';
 
-interface RuleInputs {
+export interface RuleInputs {
   [ruleType: string]: InteractionRuleInputs[];
 }
 
