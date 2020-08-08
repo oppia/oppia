@@ -26,7 +26,6 @@ require('pages/exploration-editor-page/services/parameter-metadata.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'solution-validity.service.ts');
-require('services/improvements.service.ts');
 require('services/state-top-answers-stats.service.ts');
 
 require(
@@ -34,16 +33,12 @@ require(
 
 angular.module('oppia').factory('ExplorationWarningsService', [
   '$injector', 'ExplorationStatesService',
-  'GraphDataService', 'ImprovementsService',
-  'ParameterMetadataService', 'SolutionValidityService',
-  'StateTopAnswersStatsService', 'STATE_ERROR_MESSAGES',
-  'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
+  'GraphDataService', 'ParameterMetadataService', 'SolutionValidityService',
+  'STATE_ERROR_MESSAGES', 'WARNING_TYPES',
   function(
       $injector, ExplorationStatesService,
-      GraphDataService, ImprovementsService,
-      ParameterMetadataService, SolutionValidityService,
-      StateTopAnswersStatsService, STATE_ERROR_MESSAGES,
-      UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD, WARNING_TYPES) {
+      GraphDataService, ParameterMetadataService, SolutionValidityService,
+      STATE_ERROR_MESSAGES, WARNING_TYPES) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -189,21 +184,6 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       return results;
     };
 
-    var _getStatesWithAnswersThatMustBeResolved = function() {
-      var stass = StateTopAnswersStatsService;
-      var states = ExplorationStatesService.getStates();
-      return stass.getStateNamesWithStats().filter(function(stateName) {
-        var mustResolveState =
-          ImprovementsService
-            .isStateForcedToResolveOutstandingUnaddressedAnswers(
-              states.getState(stateName));
-        return mustResolveState &&
-          stass.getUnresolvedStateStats(stateName).some(function(answer) {
-            return answer.frequency >= UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
-          });
-      });
-    };
-
     var _updateWarningsList = function() {
       _warningsList = [];
       stateWarnings = {};
@@ -247,12 +227,6 @@ angular.module('oppia').factory('ExplorationWarningsService', [
           _extendStateWarnings(
             stateWithoutInteractionIds, STATE_ERROR_MESSAGES.ADD_INTERACTION);
         });
-
-      var statesWithAnswersThatMustBeResolved =
-        _getStatesWithAnswersThatMustBeResolved();
-      angular.forEach(statesWithAnswersThatMustBeResolved, function(stateName) {
-        _extendStateWarnings(stateName, STATE_ERROR_MESSAGES.UNRESOLVED_ANSWER);
-      });
 
       var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
       angular.forEach(statesWithIncorrectSolution, function(state) {
