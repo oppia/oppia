@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EventEmitter } from '@angular/core';
-
 /**
  * @fileoverview Service to operate the playback of audio.
  */
+
+import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('AudioPlayerService', [
   '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
