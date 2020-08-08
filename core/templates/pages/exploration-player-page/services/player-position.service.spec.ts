@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the player position service.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { PlayerPositionService } from
@@ -24,7 +25,6 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
-import { EventEmitter } from '@angular/core';
 
 describe('Player position service', () => {
   let pts = null;
