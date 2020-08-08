@@ -954,9 +954,11 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def create_exploration_with_states_schema_version(
-            self, state_schema_version, exp_id, user_id, states_dict):
+            self, states_schema_version, exp_id, user_id, states_dict):
         """Saves a new default exploration with the given states dictionary in
-        the given state schema version.
+        the given state schema version. All passed state dictionaries in 
+        'states_dict' must have the states schema version indicated by
+        'states_schema_version'.
 
         Note that it makes an explicit commit to the datastore instead of using
         the usual functions for updating and creating explorations. This is
@@ -964,10 +966,11 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         *current* states schema version.
 
         Args:
-            state_schema_version: int. The state schema version.
+            states_schema_version: int. The state schema version.
             exp_id: str. The exploration ID.
             user_id: str. The user_id of the creator.
-            states_dict: dict. The dict representation of all the states.
+            states_dict: dict. The dict representation of all the states, in the
+                given states schema version.
         """
         exp_model = exp_models.ExplorationModel(
             id=exp_id,
@@ -978,7 +981,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             tags=[],
             blurb='',
             author_notes='',
-            states_schema_version=state_schema_version,
+            states_schema_version=states_schema_version,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=states_dict,
             param_specs={},
@@ -1043,7 +1046,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-    def test_audit_job_only_runs_for_previous_state_schema_version(self):
+    def test_audit_job_only_runs_for_previous_states_schema_version(self):
         """Tests that the exploration migration job does not convert
         explorations with a state schema that is not the previous state schema
         version.
@@ -1068,7 +1071,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         """Test that the audit job runs correctly on explorations of the
         previous state schema.
         """
-        states_dict = state_domain.State.from_dict({
+        states_dict = {
             'content': {
                 'content_id': 'content_1',
                 'html': 'Question 1'
@@ -1127,115 +1130,20 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
-        }).to_dict()
+        }
 
         self.create_exploration_with_states_schema_version(
-            feconf.CURRENT_STATE_SCHEMA_VERSION - 1,
+            36,
             self.NEW_EXP_ID,
             self.albert_id,
             {'Introduction': states_dict}
         )
 
-        job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
-        exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationMigrationAuditJob.get_output(
-                job_id)
-        )
-
-        expected_output = ['[u\'SUCCESS\', 1]']
-        self.assertEqual(actual_output, expected_output)
-
-    def test_migration_job_audit_failure(self):
-        """Test that the audit job runs correctly on explorations of the
-        previous state schema and catches any errors that occur during the
-        migration.
-        """
-        states_dict = state_domain.State.from_dict({
-            'content': {
-                'content_id': 'content_1',
-                'html': 'Question 1'
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'content_2': {}
-                }
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'content_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'content_2': {}
-                }
-            },
-            'interaction': {
-                'answer_groups': [],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {},
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': 'Correct Answer'
-                    },
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'labelled_as_correct': True,
-                    'missing_prerequisite_skill_id': None
-                },
-                'hints': [{
-                    'hint_content': {
-                        'content_id': 'hint_1',
-                        'html': 'Hint 1'
-                    }
-                }],
-                'solution': {
-                    'correct_answer': {
-                        'ascii': 'x+y',
-                        'latex': 'x+y'
-                    },
-                    'answer_is_exclusive': False,
-                    'explanation': {
-                        'html': 'Solution explanation',
-                        'content_id': 'content_2'
-                    }
-                },
-                'id': 'MathExpressionInput'
-            },
-            'next_content_id_index': 0,
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'classifier_model_id': None
-        }).to_dict()
-
-        self.create_exploration_with_states_schema_version(
-            feconf.CURRENT_STATE_SCHEMA_VERSION - 1,
-            self.NEW_EXP_ID,
-            self.albert_id,
-            {'Introduction': states_dict}
-        )
-
-        current_exp_schema_version = (
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
-        conversion_fn_name = (
-            '_convert_v%i_dict_to_v%i_dict' % (
-                current_exp_schema_version - 1,
-                current_exp_schema_version)
-        )
-
-        # Make a mock conversion function that raises an error.
-        mock_conversion = classmethod(
-            lambda cls, exploration_dict: exploration_dict['property_that_dne'])
-
-        with self.swap(
-            exp_domain.Exploration, conversion_fn_name, mock_conversion
-        ):
+        swap_states_schema_ver = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
+        swap_exp_schema_ver = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
+        with swap_states_schema_ver, swap_exp_schema_ver:
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
             exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
@@ -1245,12 +1153,110 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
                     job_id)
             )
 
-            expected_output = [
-                u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed migratio'
-                'n to v%s: u\'property_that_dne\'"]]' % (
-                    current_exp_schema_version)
-            ]
-            self.assertEqual(actual_output, expected_output)
+        expected_output = ['[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
+
+    def test_migration_job_audit_failure(self):
+        """Test that the audit job runs correctly on explorations of the
+        previous state schema and catches any errors that occur during the
+        migration.
+        """
+        states_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content_1': {},
+                    'feedback_2': {},
+                    'hint_1': {},
+                    'content_2': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content_1': {},
+                    'feedback_2': {},
+                    'hint_1': {},
+                    'content_2': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': 'Hint 1'
+                    }
+                }],
+                'solution': {
+                    'correct_answer': {
+                        'ascii': 'x+y',
+                        'latex': 'x+y'
+                    },
+                    'answer_is_exclusive': False,
+                    'explanation': {
+                        'html': 'Solution explanation',
+                        'content_id': 'content_2'
+                    }
+                },
+                'id': 'MathExpressionInput'
+            },
+            'next_content_id_index': 0,
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+
+        self.create_exploration_with_states_schema_version(
+            36,
+            self.NEW_EXP_ID,
+            self.albert_id,
+            {'Introduction': states_dict}
+        )
+
+        # Make a mock conversion function that raises an error.
+        mock_conversion = classmethod(
+            lambda cls, exploration_dict: exploration_dict['property_that_dne'])
+
+        swap_conversion =  self.swap(
+            exp_domain.Exploration,
+            '_convert_v40_dict_to_v41_dict',
+            mock_conversion)
+        swap_states_schema_ver = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
+        swap_exp_schema_ver = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
+
+        with swap_conversion, swap_states_schema_ver, swap_exp_schema_ver:
+            job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
+            exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            actual_output = (
+                exp_jobs_one_off.ExplorationMigrationAuditJob.get_output(
+                    job_id)
+            )
+
+        expected_output = [
+            u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed migratio'
+            'n to v42: u\'property_that_dne\'"]]'
+        ]
+        self.assertEqual(actual_output, expected_output)
 
 
 class ExplorationMigrationJobTests(test_utils.GenericTestBase):

@@ -7777,7 +7777,7 @@ title: Title
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
     def test_load_from_v41_with_text_inputs_case_sensitive_equals_rule(self):
-        """Test to cover some the case where a TextInput interactions contains
+        """Test to cover the case where a TextInput interactions contains
         an AnswerGroup that has a CaseSensitiveEquals rule.
         """
         sample_yaml_content = (
