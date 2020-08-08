@@ -996,15 +996,60 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             multiple_explorations_math_rich_text_info)
 
         response_dict = self.get_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER)
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            params={'item_to_fetch': 'exp_id_to_latex_mapping'})
         expected_response = {
             'exp_id1': ['abc1', 'xyz1'],
-            'exp_id2': ['abc2', 'xyz2'],
-            'exp_id3': ['abc3', 'xyz3']
+            'exp_id2': ['abc2', 'xyz2']
         }
         self.assertEqual(
             response_dict,
             {'latex_strings_to_exp_id_mapping': expected_response})
+
+    def test_get_when_invalid_item_to_fetch_item_given(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            params={'item_to_fetch': 'invalid'},
+            expected_status_int=400)
+
+        self.assertIn(
+            'Please specify a valid type of item to fetch.',
+            response_dict['error'])
+
+    def test_get_number_explorations_left_to_update(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        multiple_explorations_math_rich_text_info = []
+
+        math_rich_text_info1 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['abc1', 'xyz1']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info1)
+        math_rich_text_info2 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id2', True, ['abc2', 'xyz2']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info2)
+        math_rich_text_info3 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id3', True, ['abc3', 'xyz3']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info3)
+
+        exp_services.save_multi_exploration_math_rich_text_info_model(
+            multiple_explorations_math_rich_text_info)
+
+        response_dict = self.get_json(
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            params={'item_to_fetch': 'number_of_explorations_left_to_update'})
+        self.assertEqual(
+            response_dict,
+            {'number_of_explorations_left_to_update': '3'})
 
     def test_post_svgs_when_all_values_are_valid(self):
         user_email = 'user1@example.com'
@@ -1067,7 +1112,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             estimated_max_size_of_images_in_bytes=20000).put()
 
         response_dict = self.post_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
             {'latexMapping': post_data},
             csrf_token=csrf_token,
             upload_files=(
@@ -1127,7 +1172,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(editor_id, exploration1)
         response_dict = self.post_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
             {'latexMapping': post_data},
             csrf_token=csrf_token,
             upload_files=(
@@ -1466,7 +1511,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             username_change_audit_model.new_username, self.NEW_USERNAME)
 
 
-class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
+class AddContributionReviewerHandlerTest(test_utils.GenericTestBase):
     """Tests related to add reviewers for contributor's
     suggestion/application.
     """
@@ -1476,7 +1521,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(AddCommunityReviewerHandlerTest, self).setUp()
+        super(AddContributionReviewerHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -1494,7 +1539,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'invalid',
                 'review_category': 'translation',
                 'language_code': 'en'
@@ -1512,7 +1557,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'translator',
                 'review_category': 'translation',
                 'language_code': 'hi'
@@ -1526,7 +1571,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'translator',
                 'review_category': 'translation',
                 'language_code': 'invalid'
@@ -1542,7 +1587,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'translator',
                 'review_category': 'translation',
                 'language_code': 'hi'
@@ -1551,7 +1596,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'translator',
                 'review_category': 'translation',
                 'language_code': 'hi'
@@ -1571,7 +1616,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'review_category': 'voiceover',
                 'language_code': 'hi'
@@ -1588,7 +1633,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'review_category': 'voiceover',
                 'language_code': 'invalid'
@@ -1608,7 +1653,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'review_category': 'voiceover',
                 'language_code': 'hi'
@@ -1618,7 +1663,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 self.voiceover_reviewer_id, language_code='hi'))
 
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'review_category': 'voiceover',
                 'language_code': 'hi'
@@ -1637,7 +1682,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'question',
                 'review_category': 'question'
             }, csrf_token=csrf_token)
@@ -1652,7 +1697,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'question',
                 'review_category': 'question'
             }, csrf_token=csrf_token)
@@ -1660,7 +1705,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'question',
                 'review_category': 'question'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -1674,7 +1719,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'question',
                 'review_category': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -1683,15 +1728,15 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid review_category: invalid')
 
 
-class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
-    """Tests related to remove reviewers from community dashboard page."""
+class RemoveContributionReviewerHandlerTest(test_utils.GenericTestBase):
+    """Tests related to remove reviewers from contributor dashboard page."""
 
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(RemoveCommunityReviewerHandlerTest, self).setUp()
+        super(RemoveContributionReviewerHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -1709,7 +1754,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'removal_type': 'all'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -1720,7 +1765,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'invalid',
                 'removal_type': 'all'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -1742,7 +1787,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
                 'review_category': 'translation',
@@ -1757,7 +1802,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
                 'review_category': 'translation',
@@ -1774,7 +1819,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
                 'review_category': 'translation',
@@ -1800,7 +1845,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'review_category': 'voiceover',
@@ -1815,7 +1860,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'review_category': 'voiceover',
@@ -1832,7 +1877,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'review_category': 'voiceover',
@@ -1852,7 +1897,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'review_category': 'question'
@@ -1868,7 +1913,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'review_category': 'question'
@@ -1882,7 +1927,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'review_category': 'invalid'
@@ -1895,7 +1940,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -1924,7 +1969,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'all'
             }, csrf_token=csrf_token)
@@ -1939,15 +1984,15 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
 
 
-class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
-    """Tests CommunityReviewersListHandler."""
+class ContributionReviewersListHandlerTest(test_utils.GenericTestBase):
+    """Tests ContributionReviewersListHandler."""
 
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(CommunityReviewersListHandlerTest, self).setUp()
+        super(ContributionReviewersListHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -1960,14 +2005,14 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
 
-    def test_check_community_reviewer_by_translation_reviewer_role(self):
+    def test_check_contribution_reviewer_by_translation_reviewer_role(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_translation_in_language(
             self.translation_reviewer_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/getcommunityreviewershandler', params={
+            '/getcontributionreviewershandler', params={
                 'review_category': 'translation',
                 'language_code': 'hi'
             })
@@ -1976,14 +2021,14 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('translator' in response['usernames'])
         self.assertTrue('voiceartist' in response['usernames'])
 
-    def test_check_community_reviewer_by_voiceover_reviewer_role(self):
+    def test_check_contribution_reviewer_by_voiceover_reviewer_role(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_voiceover_in_language(
             self.translation_reviewer_id, 'hi')
         user_services.allow_user_to_review_voiceover_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/getcommunityreviewershandler', params={
+            '/getcontributionreviewershandler', params={
                 'review_category': 'voiceover',
                 'language_code': 'hi'
             })
@@ -1992,12 +2037,12 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('translator' in response['usernames'])
         self.assertTrue('voiceartist' in response['usernames'])
 
-    def test_check_community_reviewer_by_question_reviewer_role(self):
+    def test_check_contribution_reviewer_by_question_reviewer_role(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_question(self.voiceover_reviewer_id)
         response = self.get_json(
-            '/getcommunityreviewershandler', params={
+            '/getcontributionreviewershandler', params={
                 'review_category': 'question'
             })
 
@@ -2005,11 +2050,11 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('question' in response['usernames'])
         self.assertTrue('voiceartist' in response['usernames'])
 
-    def test_check_community_reviewer_with_invalid_language_code_raise_error(
+    def test_check_contribution_reviewer_with_invalid_language_code_raise_error(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/getcommunityreviewershandler', params={
+            '/getcontributionreviewershandler', params={
                 'review_category': 'voiceover',
                 'language_code': 'invalid'
             }, expected_status_int=400)
@@ -2017,11 +2062,11 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Invalid language_code: invalid')
         self.logout()
 
-    def test_check_community_reviewer_with_invalid_review_category_raise_error(
+    def test_check_contribution_reviewer_with_invalid_review_category_raise_error( # pylint: disable=line-too-long
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/getcommunityreviewershandler', params={
+            '/getcontributionreviewershandler', params={
                 'review_category': 'invalid',
                 'language_code': 'hi'
             }, expected_status_int=400)
@@ -2030,22 +2075,22 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
-    """Tests CommunityReviewerRightsDataHandler."""
+class ContributionReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
+    """Tests ContributionReviewerRightsDataHandler."""
 
     REVIEWER_EMAIL = 'reviewer@example.com'
 
     def setUp(self):
-        super(CommunityReviewerRightsDataHandlerTest, self).setUp()
+        super(ContributionReviewerRightsDataHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
 
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
-    def test_check_community_reviewer_rights(self):
+    def test_check_contribution_reviewer_rights(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/communityreviewerrightsdatahandler', params={
+            '/contributionreviewerrightsdatahandler', params={
                 'username': 'reviewer'
             })
         self.assertEqual(
@@ -2061,7 +2106,7 @@ class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
             self.reviewer_id, 'hi')
 
         response = self.get_json(
-            '/communityreviewerrightsdatahandler', params={
+            '/contributionreviewerrightsdatahandler', params={
                 'username': 'reviewer'
             })
         self.assertEqual(
@@ -2070,20 +2115,20 @@ class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
             response['can_review_voiceover_for_language_codes'], ['hi'])
         self.assertEqual(response['can_review_questions'], True)
 
-    def test_check_community_reviewer_rights_invalid_username(self):
+    def test_check_contribution_reviewer_rights_invalid_username(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/communityreviewerrightsdatahandler', params={
+            '/contributionreviewerrightsdatahandler', params={
                 'username': 'invalid'
             }, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Invalid username: invalid')
         self.logout()
 
-    def test_check_community_reviewer_rights_without_username(self):
+    def test_check_contribution_reviewer_rights_without_username(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/communityreviewerrightsdatahandler', params={},
+            '/contributionreviewerrightsdatahandler', params={},
             expected_status_int=400)
 
         self.assertEqual(response['error'], 'Missing username param')

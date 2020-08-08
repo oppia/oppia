@@ -2029,8 +2029,8 @@ class UserContributionScoringModel(base_models.BaseModel):
             model.put()
 
 
-class UserCommunityRightsModel(base_models.BaseModel):
-    """Model for storing user's rights on community dashboard.
+class UserContributionRightsModel(base_models.BaseModel):
+    """Model for storing user's rights in the contributor dashboard.
 
     Instances of this class are keyed by the user id.
     """
@@ -2050,7 +2050,7 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserCommunityRightsModel exists for the given user.
+        """Check whether UserContributionRightsModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -2062,7 +2062,7 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
-        """Delete instances of UserCommunityRightsModel for the user.
+        """Delete instances of UserContributionRightsModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -2071,14 +2071,14 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """(Takeout) Exports the data from UserCommunityRightsModel
+        """(Takeout) Exports the data from UserContributionRightsModel
         into dict format.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from UserCommunityRightsModel.
+            dict. Dictionary of the data from UserContributionRightsModel.
         """
         rights_model = cls.get_by_id(user_id)
 
