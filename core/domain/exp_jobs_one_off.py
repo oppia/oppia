@@ -292,7 +292,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 logging.error(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
                 break
-            
+
             # TODO(iamprayush): Revert these changes (special-casing the
             # SUCCESS output for math interactions) after the migration job
             # for math interactions has been successfully run.
