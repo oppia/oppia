@@ -5,7 +5,8 @@
 <div class="modal-body" style="min-height: 300px;">
   <div class="oppia-profile-image-uploader">
     <div ng-hide="uploadedImage">
-      <image-uploader on-file-changed="onFileChanged">
+      <image-uploader on-file-changed="onFileChanged"
+                      allowed-image-type="allowedImageFormats">
       </image-uploader>
     </div>
 

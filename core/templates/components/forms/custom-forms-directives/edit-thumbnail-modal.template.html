@@ -14,7 +14,8 @@
           <li>Please ensure that the uploaded image is less than 100 KB.</li>
         </ul>
       </div>
-      <image-uploader on-file-changed="onFileChanged">
+      <image-uploader on-file-changed="onFileChanged"
+                      allowed-image-type="allowedImageFormats">
       </image-uploader>
     </div>
     <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;">

@@ -10,7 +10,7 @@
     <div class="fabric-canvas" ng-attr-id="<[$ctrl.canvasContainerId]>">
       <canvas ng-attr-id="<[$ctrl.canvasID]>" class="fabric-canvas-container"></canvas>
     </div>
-    <div ng-if="$ctrl.isDrawModeSVGUpload()" class="fabric-canvas custom-tool-form">
+    <div ng-if="$ctrl.isDrawModeSvgUpload()" class="fabric-canvas custom-tool-form">
       <div class="container upload-warning">
         Note: The uploaded svg may not be rendered exactly.
       </div>
@@ -19,18 +19,18 @@
         </image-uploader>
       </div>
       <div ng-if="$ctrl.isFileUploaded()">
-        <img ng-src="<[$ctrl.uploadedSVG]>" class="uploaded-svg-image">
+        <img ng-src="<[$ctrl.uploadedSvgDataUrl]>" class="uploaded-svg-image">
         <div class="container">
           <label>
             <input type="radio" ng-model="$ctrl.loadType" value="group" checked>
             <span>
-              Load as Group
+              Load as Single Image
             </span>
           </label>
           <label>
             <input type="radio" ng-model="$ctrl.loadType" value="nogroup">
             <span>
-              Load without Grouping
+              Load as Individual Shapes
             </span>
           </label>
         </div>
@@ -118,8 +118,8 @@
           <i class="fas fa-chart-pie pie-chart"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-svgupload"
-                ng-class="{'disabled' : !$ctrl.isSVGUploadEnabled()}" ng-click="$ctrl.uploadSVGFile()"
-                tooltip-placement="right" uib-tooltip="Upload SVG" ng-disabled="!$ctrl.isSVGUploadEnabled()">
+                ng-class="{'disabled' : !$ctrl.isSvgUploadEnabled()}" ng-click="$ctrl.uploadSvgFile()"
+                tooltip-placement="right" uib-tooltip="Upload SVG" ng-disabled="!$ctrl.isSvgUploadEnabled()">
           <i class="far fa-file-image file-upload"></i>
         </button>
         <div class="vert-bottom-toolbar">
@@ -180,7 +180,7 @@
       </div>
     </div>
     <div class="horizontal-toolbar top-toolbar">
-      <div class="info-tag" ng-if="$ctrl.isDrawModeSVGUpload()">
+      <div class="info-tag" ng-if="$ctrl.isDrawModeSvgUpload()">
         Click the svg upload button to load the svg.
       </div>
       <div class="info-tag" ng-if="$ctrl.isDrawModePieChart()">
@@ -212,7 +212,7 @@
         </select>
       </div>
     </div>
-    <div class="horizontal-toolbar bottom-toolbar" ng-if="!$ctrl.isDrawModePieChart() && !$ctrl.isDrawModeSVGUpload()">
+    <div class="horizontal-toolbar bottom-toolbar" ng-if="!$ctrl.isDrawModePieChart() && !$ctrl.isDrawModeSvgUpload()">
       <div class="input-tag" ng-if="$ctrl.isSizeVisible()">
         <select ng-model="$ctrl.fabricjsOptions.size" ng-options="size for size in $ctrl.sizes"
                 ng-change="$ctrl.onSizeChange()">
@@ -229,11 +229,11 @@
          title="Continue editing the diagram">
         &#xE254;
       </i>
-      <img ng-src="<[$ctrl.data.savedSVGUrl]>" ng-style="$ctrl.svgContainerStyle">
+      <img ng-src="<[$ctrl.data.savedSvgUrl]>" ng-style="$ctrl.svgContainerStyle">
     </div>
   </div>
   <div ng-if="$ctrl.isDiagramCreated()" class="diagram-editor-save-box">
-    <button type="button" class="btn btn-success float-right protractor-test-save-diagram" ng-click="$ctrl.saveSVGFile()" ng-disabled="$ctrl.isUserDrawing()">
+    <button type="button" class="btn btn-success float-right protractor-test-save-diagram" ng-click="$ctrl.saveSvgFile()" ng-disabled="$ctrl.isUserDrawing()">
       Use This Image
     </button>
   </div>

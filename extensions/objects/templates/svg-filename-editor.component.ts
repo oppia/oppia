@@ -117,7 +117,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.undoFlag = false;
       ctrl.isRedo = false;
       ctrl.undoLimit = 5;
-      ctrl.savedSVGDiagram = '';
+      ctrl.savedSvgDiagram = '';
       ctrl.entityId = ContextService.getEntityId();
       ctrl.entityType = ContextService.getEntityType();
       ctrl.imageSaveDestination = ContextService.getImageSaveDestination();
@@ -147,8 +147,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         color: '#00ff00',
         angle: 0
       }];
-      ctrl.imageType = 'svg';
-      ctrl.uploadedSVG = null;
+      ctrl.imageType = ['svg'];
+      ctrl.uploadedSvgDataUrl = null;
       ctrl.loadType = 'group';
 
       ctrl.onWidthInputBlur = function() {
@@ -189,7 +189,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         return Boolean(ctrl.canvas && ctrl.drawMode !== DRAW_MODE_NONE);
       };
 
-      var getTrustedResourceUrlForSVGFileName = function(svgFileName) {
+      var getTrustedResourceUrlForSvgFileName = function(svgFileName) {
         if (
           ctrl.imageSaveDestination ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
@@ -203,13 +203,13 @@ angular.module('oppia').component('svgFilenameEditor', {
             ctrl.entityType, ctrl.entityId, encodedFilepath));
       };
 
-      ctrl.setSavedSVGFilename = function(filename, setData) {
+      ctrl.setSavedSvgFilename = function(filename, setData) {
         ctrl.diagramStatus = STATUS_SAVED;
         // Reset fabric js parameters.
         ctrl.onClear();
         ctrl.data = {
-          savedSVGFileName: filename,
-          savedSVGUrl: getTrustedResourceUrlForSVGFileName(filename)
+          savedSvgFileName: filename,
+          savedSvgUrl: getTrustedResourceUrlForSvgFileName(filename)
         };
         ctrl.value = filename;
         if (setData) {
@@ -221,13 +221,13 @@ angular.module('oppia').component('svgFilenameEditor', {
           };
           ctrl.diagramWidth = dimensions.width;
           ctrl.diagramHeight = dimensions.height;
-          $http.get(ctrl.data.savedSVGUrl).then(function(response) {
-            ctrl.savedSVGDiagram = response.data;
+          $http.get(ctrl.data.savedSvgUrl).then(function(response) {
+            ctrl.savedSvgDiagram = response.data;
           });
         }
       };
 
-      ctrl.postSVGToServer = function(dimensions, resampledFile) {
+      ctrl.postSvgToServer = function(dimensions, resampledFile) {
         return $q(function(successCallback, errorCallback) {
           let form = new FormData();
           form.append('image', resampledFile);
@@ -281,7 +281,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           ImageLocalStorageService.saveImage(filename, imageData);
           var img = new Image();
           img.onload = function() {
-            ctrl.setSavedSVGFilename(filename, false);
+            ctrl.setSavedSvgFilename(filename, false);
             var dimensions = (
               ImagePreloaderService.getDimensionsOfImage(filename));
             ctrl.svgContainerStyle = {
@@ -290,12 +290,12 @@ angular.module('oppia').component('svgFilenameEditor', {
             };
             $scope.$applyAsync();
           };
-          img.src = getTrustedResourceUrlForSVGFileName(filename);
+          img.src = getTrustedResourceUrlForSvgFileName(filename);
         };
         reader.readAsDataURL(resampledFile);
       };
 
-      var getSVGString = function() {
+      var getSvgString = function() {
         var svgString = ctrl.canvas.toSVG().replace('\t\t', '');
         var domParser = new DOMParser();
         var doc = domParser.parseFromString(svgString, 'text/xml');
@@ -339,7 +339,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         return true;
       };
 
-      ctrl.saveSVGFile = function() {
+      ctrl.saveSvgFile = function() {
         AlertsService.clearWarnings();
 
         if (!ctrl.isDiagramCreated()) {
@@ -347,7 +347,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           return;
         }
 
-        var svgString = getSVGString();
+        var svgString = getSvgString();
         var svgDataURI = (
           'data:image/svg+xml;base64,' +
           btoa(unescape(encodeURIComponent(svgString))));
@@ -358,7 +358,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         let resampledFile;
 
         if (ctrl.isSvgTagValid(svgString)) {
-          ctrl.savedSVGDiagram = svgString;
+          ctrl.savedSvgDiagram = svgString;
           resampledFile = (
             ImageUploadHelperService.convertImageDataToImageFile(
               svgDataURI));
@@ -367,12 +367,12 @@ angular.module('oppia').component('svgFilenameEditor', {
             IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
             ctrl.saveImageToLocalStorage(dimensions, resampledFile);
           } else {
-            ctrl.postSVGToServer(
+            ctrl.postSvgToServer(
               dimensions, resampledFile).then(function(data) {
               // Pre-load image before marking the image as saved.
               var img = new Image();
               img.onload = function() {
-                ctrl.setSavedSVGFilename(data.filename, false);
+                ctrl.setSavedSvgFilename(data.filename, false);
                 var dimensions = (
                   ImagePreloaderService.getDimensionsOfImage(data.filename));
                 ctrl.svgContainerStyle = {
@@ -381,7 +381,7 @@ angular.module('oppia').component('svgFilenameEditor', {
                 };
                 $scope.$applyAsync();
               };
-              img.src = getTrustedResourceUrlForSVGFileName(data.filename);
+              img.src = getTrustedResourceUrlForSvgFileName(data.filename);
             }, function(parsedResponse) {
               AlertsService.addWarning(
                 parsedResponse.error || 'Error communicating with server.');
@@ -408,18 +408,18 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.continueDiagramEditing = function() {
         if (
-          ctrl.data.savedSVGFileName &&
+          ctrl.data.savedSvgFileName &&
           ctrl.imageSaveDestination ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
           ImageLocalStorageService.deleteImage(
-            ctrl.data.savedSVGFileName);
+            ctrl.data.savedSvgFileName);
         }
         ctrl.diagramStatus = STATUS_EDITING;
         ctrl.data = {};
         angular.element(document).ready(function() {
           initializeFabricJs();
           fabric.loadSVGFromString(
-            ctrl.savedSVGDiagram, function(objects, options, elements) {
+            ctrl.savedSvgDiagram, function(objects, options, elements) {
               var groupedObjects = [];
               objects.forEach(function(obj, index) {
                 var objId = elements[index].id;
@@ -513,11 +513,12 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.validate = function() {
         return (
-          ctrl.isDiagramSaved() && ctrl.data.savedSVGFileName &&
-          ctrl.data.savedSVGFileName.length > 0);
+          ctrl.isDiagramSaved() && ctrl.data.savedSvgFileName &&
+          ctrl.data.savedSvgFileName.length > 0);
       };
 
       ctrl.createRect = function() {
+        ctrl.canvas.discardActiveObject();
         var size = ctrl.fabricjsOptions.size;
         var rect = new fabric.Rect({
           top: 50,
@@ -533,6 +534,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.createLine = function() {
+        ctrl.canvas.discardActiveObject();
         var size = ctrl.fabricjsOptions.size;
         var line = new fabric.Line([50, 50, 100, 100], {
           stroke: ctrl.fabricjsOptions.stroke,
@@ -543,6 +545,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.createCircle = function() {
+        ctrl.canvas.discardActiveObject();
         var size = ctrl.fabricjsOptions.size;
         var circle = new fabric.Circle({
           top: 50,
@@ -589,6 +592,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.togglePencilDrawing = function() {
+        ctrl.canvas.discardActiveObject();
         var size = ctrl.fabricjsOptions.size;
         ctrl.canvas.isDrawingMode = !ctrl.canvas.isDrawingMode;
         ctrl.canvas.freeDrawingBrush.color = ctrl.fabricjsOptions.stroke;
@@ -651,6 +655,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.drawMode = DRAW_MODE_NONE;
           createPolyShape();
         } else {
+          ctrl.canvas.discardActiveObject();
           ctrl.drawMode = DRAW_MODE_POLY;
           ctrl.canvas.hoverCursor = 'default';
           ctrl.canvas.forEachObject(function(object) {
@@ -901,6 +906,7 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.createPieChart = function() {
         if (ctrl.drawMode === DRAW_MODE_NONE) {
+          ctrl.canvas.discardActiveObject();
           ctrl.drawMode = DRAW_MODE_PIECHART;
         } else {
           createChart();
@@ -930,13 +936,14 @@ angular.module('oppia').component('svgFilenameEditor', {
         return Boolean(ctrl.drawMode === DRAW_MODE_PIECHART);
       };
 
-      ctrl.uploadSVGFile = function() {
+      ctrl.uploadSvgFile = function() {
         if (ctrl.drawMode === DRAW_MODE_NONE) {
+          ctrl.canvas.discardActiveObject();
           ctrl.drawMode = DRAW_MODE_SVG_UPLOAD;
         } else {
           ctrl.drawMode = DRAW_MODE_NONE;
-          if (ctrl.uploadedSVG !== null) {
-            var svgString = atob(ctrl.uploadedSVG.split(',')[1]);
+          if (ctrl.uploadedSvgDataUrl !== null) {
+            var svgString = atob(ctrl.uploadedSvgDataUrl.split(',')[1]);
             fabric.loadSVGFromString(svgString, function(objects) {
               if (ctrl.loadType === 'group') {
                 objects.forEach(function(obj) {
@@ -956,7 +963,7 @@ angular.module('oppia').component('svgFilenameEditor', {
             });
           }
           ctrl.canvas.renderAll();
-          ctrl.uploadedSVG = null;
+          ctrl.uploadedSvgDataUrl = null;
           $scope.$applyAsync();
         }
       };
@@ -966,7 +973,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         reader.onload = function() {
           var img = new Image();
           img.onload = function() {
-            ctrl.uploadedSVG = reader.result;
+            ctrl.uploadedSvgDataUrl = reader.result;
             $scope.$apply();
           };
           img.src = <string>(reader.result);
@@ -979,14 +986,14 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.isFileUploaded = function() {
-        return Boolean(ctrl.uploadedSVG !== null);
+        return Boolean(ctrl.uploadedSvgDataUrl !== null);
       };
 
-      ctrl.isDrawModeSVGUpload = function() {
+      ctrl.isDrawModeSvgUpload = function() {
         return Boolean(ctrl.drawMode === DRAW_MODE_SVG_UPLOAD);
       };
 
-      ctrl.isSVGUploadEnabled = function() {
+      ctrl.isSvgUploadEnabled = function() {
         return Boolean(
           ctrl.areAllToolsEnabled() ||
           ctrl.drawMode === DRAW_MODE_SVG_UPLOAD);
@@ -1385,6 +1392,7 @@ angular.module('oppia').component('svgFilenameEditor', {
             if (strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
               ctrl.fabricjsOptions.size = (
                 shape.get('strokeWidth').toString() + 'px');
+              ctrl.displayFontStyles = false;
             } else if (shape.get('type') === 'textbox') {
               ctrl.displayFontStyles = true;
               ctrl.fabricjsOptions.size = (
@@ -1392,6 +1400,8 @@ angular.module('oppia').component('svgFilenameEditor', {
               ctrl.fabricjsOptions.fontFamily = shape.get('fontFamily');
               ctrl.fabricjsOptions.italic = shape.get('fontStyle') === 'italic';
               ctrl.fabricjsOptions.bold = shape.get('fontWeight') === 'bold';
+            } else {
+              ctrl.displayFontStyles = false;
             }
             $scope.$applyAsync();
           }
@@ -1435,7 +1445,7 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.$onInit = function() {
         if (ctrl.value) {
-          ctrl.setSavedSVGFilename(ctrl.value, true);
+          ctrl.setSavedSvgFilename(ctrl.value, true);
           var dimensions = (
             ImagePreloaderService.getDimensionsOfImage(ctrl.value));
           ctrl.svgContainerStyle = {
