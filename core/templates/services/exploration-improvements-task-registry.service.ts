@@ -172,7 +172,7 @@ export class ExplorationImprovementsTaskRegistryService {
       expStats: ExplorationStats,
       openTasks: readonly ExplorationTask[],
       resolvedTaskTypesByStateName: ReadonlyMap<string, ExplorationTaskType[]>,
-      topAnswersByStateName: ReadonlyMap<string, AnswerStats[]>,
+      topAnswersByStateName: ReadonlyMap<string, readonly AnswerStats[]>,
       playthroughIssues: readonly PlaythroughIssue[]): void {
     this.config = config;
     this.validateInitializationArgs(
@@ -304,7 +304,7 @@ export class ExplorationImprovementsTaskRegistryService {
       expStats: ExplorationStats,
       openTasks: readonly ExplorationTask[],
       resolvedTaskTypesByStateName: ReadonlyMap<string, ExplorationTaskType[]>,
-      topAnswersByStateName: ReadonlyMap<string, AnswerStats[]>,
+      topAnswersByStateName: ReadonlyMap<string, readonly AnswerStats[]>,
       playthroughIssues: readonly PlaythroughIssue[]): void {
     // Validate that the exploration stats correspond with provided exploration.
     if (expStats.expId !== config.explorationId) {

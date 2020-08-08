@@ -21,18 +21,29 @@ import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
 
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('services/context.service.ts');
 require('services/exploration-improvements-backend-api.service.ts');
+require('services/exploration-improvements-task-registry.service.ts');
+require('services/exploration-stats.service.ts');
+require('services/playthrough-issues.service.ts');
+require('services/state-top-answers-stats.service.ts');
 
 angular.module('oppia').factory('ExplorationImprovementsService', [
   'ContextService', 'ExplorationImprovementsBackendApiService',
-  'ExplorationRightsService', 'UserExplorationPermissionsService',
+  'ExplorationImprovementsTaskRegistryService', 'ExplorationRightsService',
+  'ExplorationStatesService', 'ExplorationStatsService',
+  'PlaythroughIssuesService', 'StateTopAnswersStatsService',
+  'UserExplorationPermissionsService',
   function(
       ContextService, ExplorationImprovementsBackendApiService,
-      ExplorationRightsService, UserExplorationPermissionsService) {
+      ExplorationImprovementsTaskRegistryService, ExplorationRightsService,
+      ExplorationStatesService, ExplorationStatsService,
+      PlaythroughIssuesService, StateTopAnswersStatsService,
+      UserExplorationPermissionsService) {
     /** @private */
     let initializationHasStarted: boolean;
     /** @private */
@@ -48,26 +59,47 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
     let config: ExplorationImprovementsConfig;
     /** @private */
     let improvementsTabIsAccessible: boolean;
+    /** @private */
+    const doInitAsync = async() => {
+      const expId = ContextService.getExplorationId();
+      const userPermissions = (
+        await UserExplorationPermissionsService.getPermissionsAsync());
+
+      improvementsTabIsAccessible = (
+        ExplorationRightsService.isPublic() && userPermissions.canEdit);
+
+      if (!improvementsTabIsAccessible) {
+        return;
+      }
+
+      config = (
+        await ExplorationImprovementsBackendApiService.getConfigAsync(expId));
+
+      if (!config.improvementsTabIsEnabled) {
+        return;
+      }
+
+      PlaythroughIssuesService.initSession(expId, config.explorationVersion);
+
+      const states = ExplorationStatesService.getStates();
+      const expStats = (
+        await ExplorationStatsService.getExplorationStats(expId));
+      const {openTasks, resolvedTaskTypesByStateName} = (
+        await ExplorationImprovementsBackendApiService.getTasksAsync(expId));
+      const topAnswersByStateName = (
+        await StateTopAnswersStatsService.getTopAnswersByStateNameAsync());
+      const playthroughIssues = await PlaythroughIssuesService.getIssues();
+
+      await ExplorationImprovementsTaskRegistryService.initialize(
+        config, states, expStats, openTasks, resolvedTaskTypesByStateName,
+        topAnswersByStateName, playthroughIssues);
+    };
 
     return {
-      async initAsync(): Promise<void> {
+      initAsync(): Promise<void> {
         if (!initializationHasStarted) {
           initializationHasStarted = true;
-          try {
-            const expId = ContextService.getExplorationId();
-            const userPermissions = (
-              await UserExplorationPermissionsService.getPermissionsAsync());
-            improvementsTabIsAccessible = (
-              ExplorationRightsService.isPublic() && userPermissions.canEdit);
-            if (improvementsTabIsAccessible) {
-              config = (
-                await ExplorationImprovementsBackendApiService.getConfigAsync(
-                  expId));
-            }
-            resolveInitPromise();
-          } catch (error) {
-            rejectInitPromise(error);
-          }
+          doInitAsync().then(resolveInitPromise, rejectInitPromise);
         }
         return initPromise;
       },

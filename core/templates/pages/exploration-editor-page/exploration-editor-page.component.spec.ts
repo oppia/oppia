@@ -57,7 +57,6 @@ describe('Exploration editor page component', function() {
   var cls = null;
   var cs = null;
   var efbas = null;
-  var eibas = null;
   var eis = null;
   var ers = null;
   var es = null;
@@ -198,7 +197,6 @@ describe('Exploration editor page component', function() {
     cls = $injector.get('ChangeListService');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
-    eibas = $injector.get('ExplorationImprovementsBackendApiService');
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
@@ -663,6 +661,7 @@ describe('Exploration editor page component', function() {
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures')
         .and.returnValue(Promise.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
@@ -677,14 +676,10 @@ describe('Exploration editor page component', function() {
     });
 
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
-      spyOn(eibas, 'getConfigAsync')
-        .and.returnValue(Promise.resolve({improvementsTabIsEnabled: true}));
+      spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
+        Promise.resolve(true));
 
       ctrl.$onInit();
-      // We need to flush and $apply twice to fire the callback under test. In
-      // practice, this will occur seamlessly.
-      flushMicrotasks();
-      $scope.$apply();
       flushMicrotasks();
       $scope.$apply();
 
@@ -692,14 +687,10 @@ describe('Exploration editor page component', function() {
     }));
 
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
-      spyOn(eibas, 'getConfigAsync')
-        .and.returnValue(Promise.resolve({improvementsTabIsEnabled: false}));
+      spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
+        Promise.resolve(false));
 
       ctrl.$onInit();
-      // We need to flush and $apply twice to fire the callback under test. In
-      // practice, this will occur seamlessly.
-      flushMicrotasks();
-      $scope.$apply();
       flushMicrotasks();
       $scope.$apply();
 

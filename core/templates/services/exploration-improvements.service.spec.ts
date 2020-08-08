@@ -15,15 +15,24 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ExplorationPermissions } from
-  'domain/exploration/exploration-permissions-object.factory';
+import { ContextService } from 'services/context.service';
+import {
+  ExplorationImprovementsBackendApiService, ExplorationImprovementsResponse
+} from 'services/exploration-improvements-backend-api.service';
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
+import { ExplorationImprovementsTaskRegistryService } from
+  'services/exploration-improvements-task-registry.service';
+import { ExplorationPermissions } from
+  'domain/exploration/exploration-permissions-object.factory';
+import { ExplorationStatsService } from
+  'services/exploration-stats.service';
+import { StateTopAnswersStatsService } from
+  'services/state-top-answers-stats.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { ContextService } from 'services/context.service';
-import { ExplorationImprovementsBackendApiService } from
-  'services/exploration-improvements-backend-api.service';
+import { ExplorationStats } from
+  'domain/statistics/ExplorationStatsObjectFactory';
 
 /**
  * @fileoverview Tests for ExplorationImprovementsService.
@@ -32,6 +41,12 @@ import { ExplorationImprovementsBackendApiService } from
 describe('ExplorationImprovementsService', function() {
   let explorationImprovementsService;
 
+  let explorationImprovementsTaskRegistryService:
+    ExplorationImprovementsTaskRegistryService;
+  let explorationStatesService;
+  let explorationStatsService: ExplorationStatsService;
+  let playthroughIssuesService;
+  let stateTopAnswersStatsService: StateTopAnswersStatsService;
   let contextService: ContextService;
   let explorationImprovementsBackendApiService:
     ExplorationImprovementsBackendApiService;
@@ -57,13 +72,31 @@ describe('ExplorationImprovementsService', function() {
       $injector.get('ExplorationImprovementsBackendApiService'));
     explorationImprovementsService = (
       $injector.get('ExplorationImprovementsService'));
+    explorationImprovementsTaskRegistryService = (
+      $injector.get('ExplorationImprovementsTaskRegistryService'));
     explorationRightsService = $injector.get('ExplorationRightsService');
+    explorationStatesService = $injector.get('ExplorationStatesService');
+    explorationStatsService = $injector.get('ExplorationStatsService');
+    playthroughIssuesService = $injector.get('PlaythroughIssuesService');
+    stateTopAnswersStatsService = $injector.get('StateTopAnswersStatsService');
     userExplorationPermissionsService = (
       $injector.get('UserExplorationPermissionsService'));
   }));
 
   beforeEach(() => {
     spyOn(contextService, 'getExplorationId').and.returnValue('eid');
+    spyOn(explorationImprovementsBackendApiService, 'getTasksAsync')
+      .and.returnValue(Promise.resolve(
+        new ExplorationImprovementsResponse([], new Map())));
+    spyOn(explorationImprovementsTaskRegistryService, 'initialize');
+    spyOn(explorationStatsService, 'getExplorationStats')
+      .and.returnValue(Promise.resolve(
+        new ExplorationStats('eid', 1, 0, 0, 0, new Map())));
+    spyOn(playthroughIssuesService, 'getIssues')
+      .and.returnValue(Promise.resolve());
+    spyOn(playthroughIssuesService, 'initSession').and.stub();
+    spyOn(stateTopAnswersStatsService, 'getTopAnswersByStateNameAsync')
+      .and.returnValue(Promise.resolve(new Map()));
   });
 
   it('should enable improvements tab based on backend response',
