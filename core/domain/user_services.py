@@ -355,7 +355,7 @@ class UserAuth(python_utils.OBJECT):
             )
 
         if (self.pin is not None and
-                not isinstance(self.gae_id, python_utils.BASESTRING)):
+                not isinstance(self.pin, python_utils.BASESTRING)):
             raise utils.ValidationError(
                 'Expected PIN to be a string, received %s' %
                 self.pin
@@ -365,6 +365,17 @@ class UserAuth(python_utils.OBJECT):
                 not is_user_id_correct(self.parent_user_id)):
             raise utils.ValidationError(
                 'The parent user ID is in a wrong format.')
+
+        if self.parent_user_id and self.gae_id:
+            raise utils.ValidationError(
+                'The parent user ID and gae_id cannot be present together '
+                'for a user.')         
+
+        if not self.parent_user_id and not self.gae_id:
+            raise utils.ValidationError(
+                'The parent user ID and gae_id cannot be None together '
+                'for a user.')
+
 
 
 def is_user_id_correct(user_id):
@@ -495,7 +506,10 @@ def get_users_settings(user_ids):
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
-            result.append(_transform_user_settings(model))
+            if model is not None:
+                result.append(_transform_user_settings(model))
+            else:
+                result.append(None)
     return result
 
 
@@ -597,13 +611,15 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     Raises:
         Exception. The value of strict is True and given gae_id does not exist.
     """
-    user_settings = _transform_user_settings(
-        user_models.UserSettingsModel.get_by_gae_id(gae_id))
-    if strict and user_settings is None:
-        logging.error('Could not find user with id %s' % gae_id)
-        raise Exception('User not found.')
-    return user_settings
-
+    user_settings_model = user_models.UserSettingsModel.get_by_gae_id(gae_id)
+    if user_settings_model:
+        user_settings = _transform_user_settings(user_settings_model)
+        return user_settings
+    else:
+        if strict:
+            logging.error('Could not find user with id %s' % gae_id)
+            raise Exception('User not found.')
+        return None
 
 def get_user_role_from_id(user_id):
     """Returns role of the user with given user_id.
@@ -825,42 +841,39 @@ def _transform_user_settings(user_settings_model):
     Returns:
         UserSettings. Domain object for user settings.
     """
-    if user_settings_model:
-        return UserSettings(
-            user_id=user_settings_model.id,
-            gae_id=user_settings_model.gae_id,
-            email=user_settings_model.email,
-            role=user_settings_model.role,
-            username=user_settings_model.username,
-            last_agreed_to_terms=user_settings_model.last_agreed_to_terms,
-            last_started_state_editor_tutorial=(
-                user_settings_model.last_started_state_editor_tutorial),
-            last_started_state_translation_tutorial=(
-                user_settings_model.last_started_state_translation_tutorial),
-            last_logged_in=user_settings_model.last_logged_in,
-            last_edited_an_exploration=(
-                user_settings_model.last_edited_an_exploration),
-            last_created_an_exploration=(
-                user_settings_model.last_created_an_exploration),
-            profile_picture_data_url=(
-                user_settings_model.profile_picture_data_url),
-            default_dashboard=user_settings_model.default_dashboard,
-            creator_dashboard_display_pref=(
-                user_settings_model.creator_dashboard_display_pref),
-            user_bio=user_settings_model.user_bio,
-            subject_interests=user_settings_model.subject_interests,
-            first_contribution_msec=(
-                user_settings_model.first_contribution_msec),
-            preferred_language_codes=(
-                user_settings_model.preferred_language_codes),
-            preferred_site_language_code=(
-                user_settings_model.preferred_site_language_code),
-            preferred_audio_language_code=(
-                user_settings_model.preferred_audio_language_code),
-            deleted=user_settings_model.deleted
-        )
-    else:
-        return None
+    return UserSettings(
+        user_id=user_settings_model.id,
+        gae_id=user_settings_model.gae_id,
+        email=user_settings_model.email,
+        role=user_settings_model.role,
+        username=user_settings_model.username,
+        last_agreed_to_terms=user_settings_model.last_agreed_to_terms,
+        last_started_state_editor_tutorial=(
+            user_settings_model.last_started_state_editor_tutorial),
+        last_started_state_translation_tutorial=(
+            user_settings_model.last_started_state_translation_tutorial),
+        last_logged_in=user_settings_model.last_logged_in,
+        last_edited_an_exploration=(
+            user_settings_model.last_edited_an_exploration),
+        last_created_an_exploration=(
+            user_settings_model.last_created_an_exploration),
+        profile_picture_data_url=(
+            user_settings_model.profile_picture_data_url),
+        default_dashboard=user_settings_model.default_dashboard,
+        creator_dashboard_display_pref=(
+            user_settings_model.creator_dashboard_display_pref),
+        user_bio=user_settings_model.user_bio,
+        subject_interests=user_settings_model.subject_interests,
+        first_contribution_msec=(
+            user_settings_model.first_contribution_msec),
+        preferred_language_codes=(
+            user_settings_model.preferred_language_codes),
+        preferred_site_language_code=(
+            user_settings_model.preferred_site_language_code),
+        preferred_audio_language_code=(
+            user_settings_model.preferred_audio_language_code),
+        deleted=user_settings_model.deleted
+    )
 
 
 def is_user_registered(user_id):
@@ -968,22 +981,19 @@ def _get_user_auth_from_model(user_auth_model):
     """Transform user auth storage model to domain object.
 
     Args:
-        user_auth_model: UserAuthModel or None. The model to be converted or
-            a None object.
+        user_auth_model: UserAuthModel. The model to be converted.
 
     Returns:
-        UserAuth. Domain object for user auth or None.
+        UserAuth. Domain object for user auth.
     """
-    if user_auth_model:
-        return UserAuth(
-            user_id=user_auth_model.id,
-            gae_id=user_auth_model.gae_id,
-            pin=user_auth_model.pin,
-            parent_user_id=user_auth_model.parent_user_id,
-            deleted=user_auth_model.deleted
-        )
-    else:
-        return None
+    return UserAuth(
+        user_id=user_auth_model.id,
+        gae_id=user_auth_model.gae_id,
+        pin=user_auth_model.pin,
+        parent_user_id=user_auth_model.parent_user_id,
+        deleted=user_auth_model.deleted
+    )
+
 
 
 def get_username(user_id):
@@ -1241,12 +1251,12 @@ def mark_user_for_deletion(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-    user_auth = _get_user_auth_from_model(
-        user_models.UserAuthModel.get_by_id(user_id))
+    user_auth_model = user_models.UserAuthModel.get_by_id(user_id)
 
     # TODO(#10178): Remove the if condition below once UserAuthModel is
     # present for every existing user.
-    if user_auth is not None:
+    if user_auth_model is not None:
+        user_auth = _get_user_auth_from_model(user_auth_model)
         user_auth.deleted = True
         _save_user_auth_details(user_auth)
 

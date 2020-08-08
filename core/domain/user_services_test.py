@@ -1511,6 +1511,32 @@ class UserAuthTests(test_utils.GenericTestBase):
         ):
             self.user_auth.validate()
 
+    def test_validate_empty_user_id(self):
+        self.user_auth.user_id = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'No user id specified.'
+        ):
+            self.user_auth.validate()
+
+    def test_validate_parent_user_id(self):
+        self.user_auth.parent_user_id = 'uid_' + 'a' * 31 + 'A'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The parent user ID is in a wrong format.'
+        ):
+            self.user_auth.validate()
+
+        self.user_auth.parent_user_id = 'uid_' + 'a' * 31
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The parent user ID is in a wrong format.'
+        ):
+            self.user_auth.validate()
+
+        self.user_auth.parent_user_id = 'a' * 36
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The parent user ID is in a wrong format.'
+        ):
+            self.user_auth.validate()
+
     def test_validate_non_str_gae_id(self):
         self.user_auth.gae_id = 0
         with self.assertRaisesRegexp(
@@ -1518,10 +1544,28 @@ class UserAuthTests(test_utils.GenericTestBase):
         ):
             self.user_auth.validate()
 
-    def test_validate_empty_user_id(self):
-        self.user_auth.user_id = ''
+    def test_validate_non_str_pin_id(self):
+        self.user_auth.pin = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'No user id specified.'
+            utils.ValidationError, 'Expected PIN to be a string'
+        ):
+            self.user_auth.validate()
+
+    def test_parent_user_id_gae_id_together_raises_error(self):
+        self.user_auth.parent_user_id = (
+            user_models.UserSettingsModel.get_new_id(''))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The parent user ID and gae_id cannot be '
+            'present together for a user.'
+        ):
+            self.user_auth.validate()
+
+    def test_both_parent_user_id_and_gae_id_none_raises_error(self):
+        self.user_auth.parent_user_id = None
+        self.user_auth.gae_id = None
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The parent user ID and gae_id cannot be '
+            'None together for a user.'
         ):
             self.user_auth.validate()
 

@@ -37,7 +37,7 @@ import utils
 class UserSettingsModelTest(test_utils.GenericTestBase):
     """Tests for UserSettingsModel class."""
 
-    NONEXISTENT_USER_ID = 'id_x'
+    NONEXISTENT_USER_ID = 'auth_method_x'
     USER_1_ID = 'user_id'
     USER_1_GAE_ID = 'gae_id'
     USER_1_EMAIL = 'user@example.com'
