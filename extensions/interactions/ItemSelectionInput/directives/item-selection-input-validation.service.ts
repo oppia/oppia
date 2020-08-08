@@ -21,9 +21,9 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IItemSelectionInputCustomizationArgs } from
+import { ItemSelectionInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class ItemSelectionInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IItemSelectionInputCustomizationArgs): IWarning[] {
+      customizationArgs: ItemSelectionInputCustomizationArgs): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -52,7 +52,7 @@ export class ItemSelectionInputValidationService {
     var numChoices = customizationArgs.choices.value.length;
 
     for (var i = 0; i < numChoices; i++) {
-      var choice = customizationArgs.choices.value[i];
+      var choice = customizationArgs.choices.value[i].getHtml();
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }
@@ -111,8 +111,8 @@ export class ItemSelectionInputValidationService {
 
   getAllWarnings(
       stateName: string, customizationArgs:
-      IItemSelectionInputCustomizationArgs, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      ItemSelectionInputCustomizationArgs, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
@@ -136,7 +136,7 @@ export class ItemSelectionInputValidationService {
     if (maxAllowedCount === 1) {
       var answerChoiceToIndex = {};
       seenChoices.forEach((seenChoice, choiceIndex) => {
-        answerChoiceToIndex[seenChoice] = choiceIndex;
+        answerChoiceToIndex[seenChoice.getHtml()] = choiceIndex;
       });
 
       answerGroups.forEach((answerGroup, answerIndex) => {

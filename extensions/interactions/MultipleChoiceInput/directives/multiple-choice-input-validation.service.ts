@@ -21,9 +21,9 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IMultipleChoiceInputCustomizationArgs } from
+import { MultipleChoiceInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class MultipleChoiceInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IMultipleChoiceInputCustomizationArgs): IWarning[] {
+      customizationArgs: MultipleChoiceInputCustomizationArgs): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -49,7 +49,7 @@ export class MultipleChoiceInputValidationService {
     var areAnyChoicesDuplicated = false;
     var seenChoices = [];
     for (var i = 0; i < customizationArgs.choices.value.length; i++) {
-      var choice = customizationArgs.choices.value[i];
+      var choice = customizationArgs.choices.value[i].getHtml();
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }
@@ -76,8 +76,8 @@ export class MultipleChoiceInputValidationService {
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: IMultipleChoiceInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      customizationArgs: MultipleChoiceInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(

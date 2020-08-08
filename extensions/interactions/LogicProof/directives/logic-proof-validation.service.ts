@@ -21,9 +21,9 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { ILogicCustomizationArgs } from
+import { LogicProofCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -37,14 +37,14 @@ export class LogicProofValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: ILogicCustomizationArgs): IWarning[] {
+      customizationArgs: LogicProofCustomizationArgs): Warning[] {
     // TODO(juansaba): Implement customization args validations.
     return [];
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: ILogicCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      stateName: string, customizationArgs: LogicProofCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     // We do not require a default rule for this interaction, since the
     // feedback is mostly provided from within the interaction itself.
     return this.getCustomizationArgsWarnings(customizationArgs).concat(

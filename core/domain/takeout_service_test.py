@@ -68,6 +68,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
     GENERIC_LANGUAGE_CODES = ['en', 'es']
+    GENERIC_DISPLAY_ALIAS = 'display_alias'
     USER_1_IMPACT_SCORE = 0.87
     USER_1_TOTAL_PLAYS = 33
     USER_1_AVERAGE_RATINGS = 4.37
@@ -324,8 +325,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             subject_interests=self.GENERIC_SUBJECT_INTERESTS,
             first_contribution_msec=1,
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
-            preferred_site_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
-            preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0])
+            preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            display_alias=self.GENERIC_DISPLAY_ALIAS
         ).put()
 
         # Setup for GeneralFeedbackReplyToId.
@@ -369,7 +371,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             content='<p>Some content</p>',
             rejection_message=None).put()
 
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=['hi'],
@@ -462,6 +464,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             resolver_id=self.USER_ID_1
         ).put()
 
+        config_models.PlatformParameterSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -473,10 +481,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         ).put()
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
-    def test_export_nonexistent_user(self):
+    def test_export_nonexistent_user_raises_error(self):
         """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaises(
-            user_models.UserSettingsModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            user_models.UserSettingsModel.EntityNotFoundError,
+            'Entity for class UserSettingsModel with id fake_user_id '
+            'not found'):
             takeout_service.export_data_for_user('fake_user_id')
 
     def test_export_data_trivial(self):
@@ -526,7 +536,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'first_contribution_msec': None,
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
-            'preferred_audio_language_code': None
+            'preferred_audio_language_code': None,
+            'display_alias': None
         }
         skill_data = {}
         stats_data = {}
@@ -547,7 +558,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         expected_voiceover_application_data = {}
         expected_contrib_score_data = {}
-        expected_community_rights_data = {}
+        expected_contribution_rights_data = {}
         expected_collection_rights_sm = {}
         expected_collection_sm = {}
         expected_skill_sm = {}
@@ -559,6 +570,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_config_property_sm = {}
         expected_exploration_rights_sm = {}
         expected_exploration_sm = {}
+        expected_platform_parameter_sm = {}
 
         expected_data = {
             'user_stats': stats_data,
@@ -586,7 +598,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_voiceover_application':
                 expected_voiceover_application_data,
             'user_contribution_scoring': expected_contrib_score_data,
-            'user_community_rights': expected_community_rights_data,
+            'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
             'collection_snapshot_metadata':
@@ -605,6 +617,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
+            'platform_parameter_snapshot_metadata':
+                expected_platform_parameter_sm,
         }
 
         # Perform export and compare.
@@ -761,8 +775,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
         expected_general_suggestion_data = {
             'exploration.exp1.thread_1': {
-                'suggestion_type': (suggestion_models.
-                                    SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
                 'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
@@ -797,7 +811,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'first_contribution_msec': 1,
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0]
+            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'display_alias': self.GENERIC_DISPLAY_ALIAS
         }
 
         expected_reply_to_data = {
@@ -842,7 +857,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        expected_community_rights_data = {
+        expected_contribution_rights_data = {
             'can_review_translation_for_language_codes': ['hi', 'en'],
             'can_review_voiceover_for_language_codes': ['hi'],
             'can_review_questions': True
@@ -955,6 +970,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        expected_platform_parameter_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+
         expected_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_settings_data,
@@ -984,7 +1007,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_voiceover_application':
                 expected_voiceover_application_data,
             'user_contribution_scoring': expected_contrib_score_data,
-            'user_community_rights': expected_community_rights_data,
+            'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
             'collection_snapshot_metadata':
@@ -1003,6 +1026,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
+            'platform_parameter_snapshot_metadata':
+                expected_platform_parameter_sm,
         }
         user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)

@@ -44,15 +44,18 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     def test_install_hook_with_existing_symlink(self):
         def mock_islink(unused_file):
             return True
+        def mock_exists(unused_file):
+            return True
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             return ('Output', None)
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
-        with islink_swap, subprocess_swap, self.print_swap:
+        with islink_swap, exists_swap, subprocess_swap, self.print_swap:
             pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertTrue(
@@ -61,15 +64,18 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     def test_install_hook_with_error_in_making_pre_push_executable(self):
         def mock_islink(unused_file):
             return True
+        def mock_exists(unused_file):
+            return True
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             return ('Output', 'Error')
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
-        with islink_swap, subprocess_swap, self.print_swap:
+        with islink_swap, exists_swap, subprocess_swap, self.print_swap:
             with self.assertRaisesRegexp(ValueError, 'Error'):
                 pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
@@ -82,18 +88,22 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         }
         def mock_islink(unused_file):
             return False
+        def mock_exists(unused_file):
+            return False
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             return ('Output', None)
         def mock_symlink(unused_path, unused_file):
             check_function_calls['symlink_is_called'] = True
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
 
-        with islink_swap, subprocess_swap, symlink_swap, self.print_swap:
+        with islink_swap, exists_swap, subprocess_swap, self.print_swap, (
+            symlink_swap):
             pre_commit_hook.install_hook()
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue(
@@ -112,6 +122,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         }
         def mock_islink(unused_file):
             return False
+        def mock_exists(unused_file):
+            return False
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             return ('Output', None)
         def mock_symlink(unused_path, unused_file):
@@ -121,13 +133,14 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             check_function_calls['copy_is_called'] = True
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
         copy_swap = self.swap(shutil, 'copy', mock_copy)
 
-        with islink_swap, subprocess_swap, symlink_swap, copy_swap:
+        with islink_swap, exists_swap, subprocess_swap, symlink_swap, copy_swap:
             with self.print_swap:
                 pre_commit_hook.install_hook()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -135,15 +148,47 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         self.assertTrue(
             'pre-commit hook file is now executable!' in self.print_arr)
 
+    def test_install_hook_with_broken_symlink(self):
+        check_function_calls = {
+            'unlink_is_called': False,
+            'symlink_is_called': False
+        }
+        def mock_islink(unused_file):
+            return True
+        def mock_exists(unused_file):
+            return False
+        def mock_start_subprocess_for_result(unused_cmd_tokens):
+            return ('Output', None)
+        def mock_unlink(unused_file):
+            check_function_calls['unlink_is_called'] = True
+        def mock_symlink(unused_path, unused_file):
+            check_function_calls['symlink_is_called'] = True
+
+        islink_swap = self.swap(os.path, 'islink', mock_islink)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        subprocess_swap = self.swap(
+            pre_commit_hook, 'start_subprocess_for_result',
+            mock_start_subprocess_for_result)
+        unlink_swap = self.swap(os, 'unlink', mock_unlink)
+        symlink_swap = self.swap(os, 'symlink', mock_symlink)
+
+        with islink_swap, exists_swap, subprocess_swap, self.print_swap:
+            with unlink_swap, symlink_swap:
+                pre_commit_hook.install_hook()
+        self.assertTrue(check_function_calls['unlink_is_called'])
+        self.assertTrue(check_function_calls['symlink_is_called'])
+        self.assertTrue('Removing broken symlink' in self.print_arr)
+        self.assertTrue(
+            'pre-commit hook file is now executable!'in self.print_arr)
+
+
     def test_start_subprocess_for_result(self):
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # pylint: disable=unused-argument
-        def mock_popen(
+        def mock_popen(  # pylint: disable=unused-argument
                 unused_cmd_tokens, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE):
             return process
-        # pylint: enable=unused-argument
 
         with self.swap(subprocess, 'Popen', mock_popen):
             self.assertEqual(
@@ -257,8 +302,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             pre_commit_hook, 'check_changes_in_config',
             mock_check_changes_in_config)
         with package_lock_swap, package_lock_in_current_folder_swap:
-            with check_config_swap, self.print_swap, self.assertRaises(
-                SystemExit):
+            with check_config_swap, self.print_swap, self.assertRaisesRegexp(
+                SystemExit, '1'):
                 pre_commit_hook.main(args=[])
         self.assertTrue(
             '-----------COMMIT ABORTED-----------' in self.print_arr)

@@ -81,6 +81,7 @@ describe('Parameter Metadata Service', function() {
             },
             param_changes: [],
             interaction: {
+              id: null,
               answer_groups: [{
                 rule_specs: [],
                 outcome: {
@@ -120,6 +121,7 @@ describe('Parameter Metadata Service', function() {
             },
             param_changes: [],
             interaction: {
+              id: null,
               answer_groups: [{
                 rule_specs: [],
                 outcome: {
@@ -159,6 +161,7 @@ describe('Parameter Metadata Service', function() {
             },
             param_changes: [],
             interaction: {
+              id: null,
               answer_groups: [{
                 rule_specs: [],
                 outcome: {
@@ -198,6 +201,7 @@ describe('Parameter Metadata Service', function() {
             },
             param_changes: [],
             interaction: {
+              id: null,
               answer_groups: [{
                 rule_specs: [],
                 outcome: {

@@ -59,7 +59,7 @@ def require_release_version_to_have_correct_format(
             match.
 
     Raises:
-        argparse.ArgumentTypeError: The release version name does not match
+        argparse.ArgumentTypeError. The release version name does not match
             the pattern.
 
     Returns:
@@ -94,8 +94,8 @@ def verify_target_branch_does_not_already_exist(remote_alias, new_branch_name):
         new_branch_name: str. The name of the new branch to cut.
 
     Raises:
-        Exception: The target branch name already exists locally.
-        Exception: The target branch name already exists on the remote
+        Exception. The target branch name already exists locally.
+        Exception. The target branch name already exists on the remote
             oppia repository.
     """
 
@@ -121,16 +121,16 @@ def verify_target_version_compatible_with_latest_release(
         target_version: str. The release version.
 
     Raises:
-        Exception: Failed to fetch latest release info from GitHub.
-        Exception: Could not parse version number of latest GitHub release.
-        AssertionError: The previous and the current major version are not the
+        Exception. Failed to fetch latest release info from GitHub.
+        Exception. Could not parse version number of latest GitHub release.
+        AssertionError. The previous and the current major version are not the
             same.
-        AssertionError: The current patch version is not equal to previous patch
+        AssertionError. The current patch version is not equal to previous patch
             version plus one.
-        AssertionError: The current patch version is greater or equal to 10.
-        AssertionError: The current minor version is not equal to previous
+        AssertionError. The current patch version is greater or equal to 10.
+        AssertionError. The current minor version is not equal to previous
             minor version plus one.
-        AssertionError: The current patch version is different than 0.
+        AssertionError. The current patch version is different than 0.
     """
     response = python_utils.url_open(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
@@ -153,10 +153,15 @@ def verify_target_version_compatible_with_latest_release(
     # This will need to be overridden if the major version changes.
     assert prev_major == curr_major, 'Unexpected major version change.'
     if prev_minor == curr_minor:
-        assert int(curr_patch) == int(prev_patch) + 1
+        assert int(curr_patch) == int(prev_patch) + 1, (
+            'The current patch version is not equal to previous patch '
+            'version plus one.')
     else:
-        assert int(curr_minor) == int(prev_minor) + 1
-        assert int(curr_patch) == 0
+        assert int(curr_minor) == int(prev_minor) + 1, (
+            'The current minor version is not equal to previous '
+            'minor version plus one.')
+        assert int(curr_patch) == 0, (
+            'The current patch version is different than 0.')
 
 
 def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
@@ -174,7 +179,7 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
         hotfix_number: int. The number for the hotfix branch.
 
     Raises:
-        Exception: The difference between two continuous hotfix numbers
+        Exception. The difference between two continuous hotfix numbers
             is not one.
     """
     all_branches = subprocess.check_output([
@@ -194,8 +199,9 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             if branch_hotfix_number > last_hotfix_number:
                 last_hotfix_number = branch_hotfix_number
 
-    assert release_branch_exists
-    assert hotfix_number == last_hotfix_number + 1
+    assert release_branch_exists, 'Release branch is missing.'
+    assert hotfix_number == last_hotfix_number + 1, (
+        'The difference between two continuous hotfix numbers is not one.')
 
 
 def _get_release_branch_type_and_name(target_version):
@@ -234,7 +240,7 @@ def execute_branch_cut(target_version, hotfix_number):
         hotfix_number: int. The number for the hotfix branch.
 
     Raises:
-        Exception: Travis tests are failing on the branch from which
+        Exception. Travis tests are failing on the branch from which
             the new branch is cut.
     """
 

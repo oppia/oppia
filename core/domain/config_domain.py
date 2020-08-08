@@ -71,6 +71,22 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
                 'type': 'unicode'
             }
         }, {
+            'name': 'course_details',
+            'schema': {
+                'type': 'unicode',
+                'ui_config': {
+                    'rows': 8,
+                }
+            }
+        }, {
+            'name': 'topic_list_intro',
+            'schema': {
+                'type': 'unicode',
+                'ui_config': {
+                    'rows': 5,
+                }
+            }
+        }, {
             'name': 'topic_ids',
             'schema': {
                 'type': 'list',
@@ -113,6 +129,10 @@ UNICODE_SCHEMA = {
 
 FLOAT_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_FLOAT
+}
+
+INT_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_INT
 }
 
 
@@ -251,7 +271,7 @@ class ConfigProperty(python_utils.OBJECT):
         necessary.
 
         Args:
-            value: The value of the configuration property.
+            value: str. The value of the configuration property.
 
         Returns:
             instance. The normalized object.
@@ -341,11 +361,13 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
         '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
         'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
 
-TOPIC_IDS_FOR_CLASSROOM_PAGES = ConfigProperty(
-    'topic_ids_for_classroom_pages', SET_OF_CLASSROOM_DICTS_SCHEMA,
-    'The set of topic IDs for each classroom page.', [{
+CLASSROOM_PAGES_DATA = ConfigProperty(
+    'classroom_pages_data', SET_OF_CLASSROOM_DICTS_SCHEMA,
+    'The details for each classroom page.', [{
         'name': 'math',
-        'topic_ids': []
+        'topic_ids': [],
+        'course_details': '',
+        'topic_list_intro': ''
     }]
 )
 
@@ -372,3 +394,36 @@ FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
     LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA,
     'Featured Translation Languages', []
 )
+
+HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(
+    'high_bounce_rate_task_state_bounce_rate_creation_threshold',
+    FLOAT_SCHEMA,
+    'The bounce-rate a state must exceed to create a new improvements task.',
+    0.20)
+
+HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = ConfigProperty(
+    'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',
+    FLOAT_SCHEMA,
+    'The bounce-rate a state must fall under to discard its improvement task.',
+    0.20)
+
+HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
+    'high_bounce_rate_task_minimum_exploration_starts',
+    INT_SCHEMA,
+    'The minimum number of times an exploration is started before it can '
+    'generate high bounce-rate improvements tasks.',
+    100)
+
+MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH = ConfigProperty(
+    'max_number_of_svgs_in_math_svgs_batch',
+    INT_SCHEMA,
+    'The maximum number of Math SVGs that can be send in a batch of math rich '
+    'text svgs.',
+    25)
+
+MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
+    'max_number_of_explorations_in_math_svgs_batch',
+    INT_SCHEMA,
+    'The maximum number of explorations that can be send in a batch of math '
+    'rich text svgs.',
+    2)

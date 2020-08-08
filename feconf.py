@@ -61,6 +61,10 @@ ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
+INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
+    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs'))
+INTERACTIONS_SPECS_FILE_PATH = (
+    os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
@@ -206,7 +210,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 34
+CURRENT_STATE_SCHEMA_VERSION = 36
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -227,7 +231,7 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
 CURRENT_RUBRIC_SCHEMA_VERSION = 3
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 2
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 3
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
@@ -243,6 +247,10 @@ CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
 # dict schema changes.
 CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 
+# This value should be updated if the schema of PlatformParameterRule dict
+# schema changes.
+CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION = 1
+
 # The default number of exploration tiles to load at a time in the search
 # results page.
 SEARCH_RESULTS_PAGE_SIZE = 20
@@ -255,7 +263,7 @@ COMMIT_LIST_PAGE_SIZE = 50
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
 
-# The default number of opportunities to show on community dashboard page.
+# The default number of opportunities to show on contributor dashboard page.
 OPPORTUNITIES_PAGE_SIZE = 20
 
 # The maximum number of top unresolved answers which should be aggregated
@@ -386,12 +394,10 @@ def get_empty_ratings():
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
-# To use GAE email service.
-EMAIL_SERVICE_PROVIDER_GAE = 'gae_email_service'
 # To use mailgun email service.
 EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
-EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_GAE
+EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun API key.
 MAILGUN_API_KEY = None
@@ -454,8 +460,8 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
-# Whether community dashboard is ready to use for contributors.
-COMMUNITY_DASHBOARD_ENABLED = False
+# Whether contributor dashboard is ready to use for contributors.
+CONTRIBUTOR_DASHBOARD_ENABLED = False
 
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
@@ -529,6 +535,10 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # NOTE TO DEVELOPERS: This format should not be changed, since it is used in
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
+
+# We generate images for existing math rich text components in batches. This
+# gives the maximum size for a batch of Math SVGs in bytes.
+MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
@@ -671,6 +681,7 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+EXPLORATIONS_LATEX_SVG_HANDLER = '/explorationslatexsvghandler'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -680,9 +691,9 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
-COMMUNITY_DASHBOARD_URL = '/community-dashboard'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
+CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
+CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
 CSRF_HANDLER_URL = '/csrfhandler'
@@ -716,6 +727,7 @@ FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 IMPROVEMENTS_URL_PREFIX = '/improvements'
 IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
+IMPROVEMENTS_CONFIG_URL_PREFIX = '/improvements/config'
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
@@ -774,6 +786,7 @@ STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
 STORY_PROGRESS_URL_PREFIX = '/story_progress_handler'
 STORY_PUBLISH_HANDLER = '/story_publish_handler'
+STORY_URL_FRAGMENT_HANDLER = '/story_url_fragment_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
@@ -906,6 +919,7 @@ HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 # Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'
 ROLE_ID_BANNED_USER = 'BANNED_USER'
+ROLE_ID_LEARNER = 'LEARNER'
 ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
 ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
@@ -1028,5 +1042,8 @@ AVAILABLE_LANDING_PAGES = {
 }
 
 # Classroom page names for generating URLs. These need to be kept in sync with
-# TOPIC_IDS_FOR_CLASSROOM_PAGES property in config_domain.
+# CLASSROOM_PAGES_DATA property in config_domain.
 CLASSROOM_PAGES = ['math']
+
+# Authentication method using GAE ID (google sign in)
+AUTH_METHOD_GAE = 'gae'

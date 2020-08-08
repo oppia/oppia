@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import contextlib
 import copy
 import datetime
@@ -35,6 +36,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -52,6 +54,7 @@ import main
 import main_mail
 import main_taskqueue
 import python_utils
+import schema_utils
 import utils
 
 from google.appengine.api import apiproxy_stub
@@ -64,6 +67,7 @@ import webtest
         models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
+email_services = models.Registry.import_email_services()
 
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
@@ -150,7 +154,7 @@ def check_image_png_or_webp(image_string):
     """Checks if the image is in png or webp format only.
 
     Args:
-        image_string: str. image url in base64 format.
+        image_string: str. Image url in base64 format.
 
     Returns:
         boolean. Returns true if image is in WebP format.
@@ -303,8 +307,8 @@ class TestBase(unittest.TestCase):
                 'labelled_as_correct': True
             },
             'customization_args': {
-                u'rows': 1,
-                u'placeholder': u'Enter text here'
+                u'rows': {u'value': 1},
+                u'placeholder': {u'value': u'Enter text here'}
             },
             'confirmed_unclassified_answers': [],
             'id': u'TextInput',
@@ -475,7 +479,8 @@ class TestBase(unittest.TestCase):
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
 
-    SAMPLE_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -508,6 +513,7 @@ states:
       hints: []
       id: null
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -539,6 +545,7 @@ states:
       hints: []
       id: null
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -559,7 +566,8 @@ title: Title
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_UNTITLED_YAML_CONTENT = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: %s
@@ -664,7 +672,6 @@ tags: []
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
 
-    # pylint: enable=invalid-name
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
@@ -711,8 +718,8 @@ tags: []
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(response.status_int, expected_status_int)
         if not expect_errors:
-            self.assertTrue(response.status_int >= 200 and
-                            response.status_int < 400)
+            self.assertTrue(
+                response.status_int >= 200 and response.status_int < 400)
         else:
             self.assertTrue(response.status_int >= 400)
         self.assertEqual(
@@ -831,8 +838,9 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def post_json(self, url, payload, csrf_token=None,
-                  expected_status_int=200, upload_files=None):
+    def post_json(
+            self, url, payload, csrf_token=None,
+            expected_status_int=200, upload_files=None):
         """Post an object to the server by JSON; return the received object."""
         data = {'payload': json.dumps(payload)}
         if csrf_token:
@@ -843,7 +851,7 @@ tags: []
             expect_errors = True
         json_response = self._send_post_request(
             self.testapp, url, data,
-            expect_errors=expect_errors,
+            expect_errors,
             expected_status_int=expected_status_int,
             upload_files=upload_files)
         # Testapp takes in a status parameter which is the expected status of
@@ -904,7 +912,7 @@ tags: []
             headers: dict(str, *). Extra headers to send.
 
         Returns:
-            webtest.TestResponse: The response of the POST request.
+            webtest.TestResponse. The response of the POST request.
         """
         # Convert the files to bytes.
         if upload_files is not None:
@@ -949,8 +957,8 @@ tags: []
         incoming_email_url = '/_ah/mail/%s' % recipient_email
 
         return self._send_post_request(
-            app, incoming_email_url, data, headers=headers,
-            expect_errors=expect_errors,
+            app, incoming_email_url, data,
+            expect_errors, headers=headers,
             expected_status_int=expected_status_int)
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
@@ -1125,6 +1133,77 @@ tags: []
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
+    def set_interaction_for_state(self, state, interaction_id):
+        """Sets the interaction_id, sets the fully populated default
+        interaction customization arguments, and increments
+        next_content_id_index as needed.
+
+        Args:
+            state: State. The state domain object to set the interaction for.
+            interaction_id: str. The interaction id to set. Also sets the
+                default customization args for the given interaction id.
+        """
+
+        # We wrap next_content_id_index in a dict so that modifying it in the
+        # inner function modifies the value.
+        next_content_id_index_dict = {
+            'value': state.next_content_id_index
+        }
+
+        def traverse_schema_and_assign_content_ids(value, schema, contentId):
+            """Generates content_id from recursively traversing the schema, and
+            assigning to the current value.
+
+            Args:
+                value: *. The current traversed value in customization
+                    arguments.
+                schema: dict. The current traversed schema.
+                contentId: str. The content_id generated so far.
+            """
+            is_subtitled_html_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+            is_subtitled_unicode_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+
+            if is_subtitled_html_spec or is_subtitled_unicode_spec:
+                value['content_id'] = '%s_%i' % (
+                    contentId, next_content_id_index_dict['value'])
+                next_content_id_index_dict['value'] += 1
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
+                for x in value:
+                    traverse_schema_and_assign_content_ids(
+                        x, schema['items'], contentId)
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
+                for schema_property in schema['properties']:
+                    traverse_schema_and_assign_content_ids(
+                        x[schema_property.name],
+                        schema_property['schema'],
+                        '%s_%s' % (contentId, schema_property.name)
+                    )
+
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id)
+        ca_specs = interaction.customization_arg_specs
+        customization_args = {}
+
+        for ca_spec in ca_specs:
+            ca_name = ca_spec.name
+            ca_value = ca_spec.default_value
+            traverse_schema_and_assign_content_ids(
+                ca_value,
+                ca_spec.schema,
+                'ca_%s' % ca_name
+            )
+            customization_args[ca_name] = {'value': ca_value}
+
+        state.update_interaction_id(interaction_id)
+        state.update_interaction_customization_args(customization_args)
+        state.update_next_content_id_index(next_content_id_index_dict['value'])
+
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
@@ -1149,15 +1228,16 @@ tags: []
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
             language_code=language_code)
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            interaction_id)
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], interaction_id)
+
         exploration.objective = objective
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
-            end_state.update_interaction_id('EndExploration')
+            self.set_interaction_for_state(end_state, 'EndExploration')
             end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
@@ -1206,10 +1286,11 @@ tags: []
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
-            from_state.update_interaction_id(python_utils.NEXT(interaction_ids))
+            self.set_interaction_for_state(
+                from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(owner_id, exploration)
@@ -1261,6 +1342,126 @@ tags: []
         exp_summary_model = exp_models.ExpSummaryModel(
             id=exp_id,
             title=title,
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+    def save_new_exp_with_states_schema_v34(self, exp_id, user_id, states_dict):
+        """Saves a new default exploration with a default version 34 states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=34,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+    def save_new_exp_with_states_schema_v35(self, exp_id, user_id, states_dict):
+        """Saves a new default exploration with a default version 35 states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=35,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
             category='category',
             objective='Old objective',
             language_code='en',
@@ -1425,9 +1626,10 @@ tags: []
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(
-            self, story_id, owner_id, title, description, notes,
-            corresponding_topic_id,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            self, story_id, owner_id, corresponding_topic_id,
+            title='Title', description='Description', notes='Notes',
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='title'):
         """Creates an Oppia Story and saves it.
 
         NOTE: Callers are responsible for ensuring that the
@@ -1445,16 +1647,18 @@ tags: []
                 belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
+            url_fragment: str. The url fragment of the story.
 
         Returns:
             Story. A newly-created story.
         """
         story = story_domain.Story.create_default_story(
-            story_id, title, corresponding_topic_id)
+            story_id, title, description, corresponding_topic_id, url_fragment)
         story.title = title
         story.description = description
         story.notes = notes
         story.language_code = language_code
+        story.url_fragment = url_fragment
         story_services.save_new_story(owner_id, story)
         return story
 
@@ -1857,12 +2061,11 @@ tags: []
             print datetime.datetime.utcnow()  # prints current time.
 
         Args:
-            mocked_datetime: datetime.datetime.
-                The datetime which will be used instead of
-                the current UTC datetime.
+            mocked_datetime: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
 
         Yields:
-            nothing.
+            None. Empty yield statement.
         """
         if not isinstance(mocked_datetime, datetime.datetime):
             raise utils.ValidationError(
@@ -1955,7 +2158,7 @@ tags: []
                     function_that_invokes_popen()
 
         Args:
-            obj: *. the Python object whose attribute you want to swap.
+            obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
             new_value: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you
@@ -1971,7 +2174,7 @@ tags: []
                 will always be checked.
 
         Yields:
-            context: The context with function replaced.
+            context. The context with function replaced.
         """
         original = getattr(obj, attr)
         # The actual error message will also include detail assert error message
@@ -1986,11 +2189,11 @@ tags: []
             invoked.
 
             Args:
-                *args: tuple. The args passed into `attr` function.
+                *args: list(*). The args passed into `attr` function.
                 **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                Result of `new_value`.
+                *. Result of `new_value`.
             """
             wrapper.called = True
             if expected_args is not None:
@@ -2045,6 +2248,23 @@ tags: []
             self.logout()
             os.environ.update(initial_user_env)
 
+    def assertRaises(self, exc, fun, *args, **kwds):
+        raise NotImplementedError(
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.')
+
+    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
+            self, expected_exception, expected_regexp, callable_obj=None,
+            *args, **kwargs):
+        if expected_regexp == '':
+            raise Exception(
+                'Please provide a sufficiently strong regexp string to '
+                'validate that the correct error is being raised.')
+
+        return super(TestBase, self).assertRaisesRegexp(
+            expected_exception, expected_regexp,
+            callable_obj=callable_obj, *args, **kwargs)
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
@@ -2084,9 +2304,6 @@ class AppEngineTestBase(TestBase):
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
 
-        self.testbed.init_mail_stub()
-        self.mail_stub = self.testbed.get_stub(testbed.MAIL_SERVICE_NAME)
-
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
@@ -2124,7 +2341,7 @@ class AppEngineTestBase(TestBase):
                 that header.
 
         Yields:
-            None.
+            None. Yields nothing.
         """
         if headers is None:
             response_headers = {}
@@ -2161,8 +2378,8 @@ class AppEngineTestBase(TestBase):
         """Execute queued tasks.
 
         Args:
-            tasks: list(google.appengine.api.taskqueue.taskqueue.Task).
-                The queued tasks.
+            tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
+                queued tasks.
         """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':
@@ -2234,7 +2451,7 @@ class AppEngineTestBase(TestBase):
         """
         state = state_domain.State.create_default_state(
             default_dest_state_name, is_initial_state=True)
-        state.interaction.id = 'TextInput'
+        state.update_interaction_id('TextInput')
         solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
@@ -2252,13 +2469,43 @@ class AppEngineTestBase(TestBase):
             state.interaction.id, solution_dict)
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
-        state.interaction.customization_args = {
-            'placeholder': 'Enter text here',
-            'rows': 1
-        }
+        state.update_interaction_customization_args({
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder',
+                    'unicode_str': 'Enter text here'
+                }
+            },
+            'rows': {'value': 1}
+        })
+        state.update_next_content_id_index(2)
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state
+
+
+GenericTestBase = AppEngineTestBase
+
+
+class LinterTestBase(GenericTestBase):
+    """Base class for linter tests."""
+
+    def setUp(self):
+        super(LinterTestBase, self).setUp()
+        self.linter_stdout = []
+
+        def mock_print(*args):
+            """Mock for python_utils.PRINT. Append the values to print to
+            linter_stdout list.
+
+            Args:
+                *args: list(*). Variable length argument list of values to print
+                    in the same line of output.
+            """
+            self.linter_stdout.append(
+                ' '.join(python_utils.UNICODE(arg) for arg in args))
+
+        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def assert_same_list_elements(self, phrases, stdout):
         """Checks to see if all of the phrases appear in at least one of the
@@ -2275,11 +2522,168 @@ class AppEngineTestBase(TestBase):
                 method's execution.
         """
         self.assertTrue(
-            any(all(phrase in output for phrase in phrases) for
+            any(
+                all(phrase in output for phrase in phrases) for
                 output in stdout))
 
+    def assert_failed_messages_count(self, stdout, expected_failed_count):
+        """Assert number of expected failed checks to actual number of failed
+        checks.
 
-GenericTestBase = AppEngineTestBase
+        Args:
+            stdout: list(str). A list of linter output messages.
+
+            expected_failed_count: int. Expected number of failed messages.
+        """
+        failed_count = sum(msg.startswith('FAILED') for msg in stdout)
+        self.assertEqual(failed_count, expected_failed_count)
+
+
+class EmailMessageMock(python_utils.OBJECT):
+    """Mock for core.platform.models email services messages."""
+
+    def __init__(
+            self, sender_email, recipient_email, subject, plaintext_body,
+            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        """Inits a mock email message with all the necessary data.
+
+        Args:
+            sender_email: str. The email address of the sender. This should be
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+                'SENDER_EMAIL_ADDRESS'. Must be utf-8.
+            recipient_email: str. The email address of the recipient.
+                Must be utf-8.
+            subject: str. The subject line of the email, Must be utf-8.
+            plaintext_body: str. The plaintext body of the email. Must be utf-8.
+            html_body: str. The HTML body of the email. Must fit in a datastore
+                entity. Must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails.
+                Emails must be utf-8.
+            reply_to: str|None. Optional argument. Reply address formatted like
+                “reply+<reply_id>@<incoming_email_domain_name>
+                reply_id is the unique id of the sender.
+            recipient_variables: dict|None. Optional argument. If batch sending
+                requires differentiating each email based on the recipient, we
+                assign a unique id to each recipient, including info relevant to
+                that recipient so that we can reference it when composing the
+                email like so:
+                    recipient_variables =
+                        {"bob@example.com": {"first":"Bob", "id":1},
+                        "alice@example.com": {"first":"Alice", "id":2}}
+                    subject = 'Hey, %recipient.first%’
+                More info about this format at:
+                https://documentation.mailgun.com/en/
+                    latest/user_manual.html#batch-sending.
+        """
+        self.sender = sender_email
+        self.to = recipient_email
+        self.subject = subject
+        self.body = plaintext_body
+        self.html = html_body
+        self.bcc = bcc
+        self.reply_to = reply_to
+        self.recipient_variables = recipient_variables
+
+
+class GenericEmailTestBase(GenericTestBase):
+    """Base class for tests requiring email services."""
+
+    emails_dict = collections.defaultdict(list)
+
+    def run(self, result=None):
+        """Adds a context swap on top of the test_utils.run() method so that
+        test classes extending GenericEmailTestBase will automatically have
+        a mailgun api key, mailgun domain name and mocked version of
+        send_email_to_recipients().
+        """
+        with self.swap(
+            email_services, 'send_email_to_recipients',
+            self._send_email_to_recipients):
+            super(EmailTestBase, self).run(result=result)
+
+    def setUp(self):
+        super(GenericEmailTestBase, self).setUp()
+        self._wipe_emails_dict()
+
+    def _wipe_emails_dict(self):
+        """Reset email dictionary for a new test."""
+        self.emails_dict = collections.defaultdict(list)
+
+    def _send_email_to_recipients(
+            self, sender_email, recipient_emails, subject, plaintext_body,
+            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        """Mocks sending an email to each email in recipient_emails.
+
+        Args:
+            sender_email: str. The email address of the sender. This should be
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+                'SENDER_EMAIL_ADDRESS'. Must be utf-8.
+            recipient_emails: list(str). The email addresses of the recipients.
+                Must be utf-8.
+            subject: str. The subject line of the email, Must be utf-8.
+            plaintext_body: str. The plaintext body of the email. Must be utf-8.
+            html_body: str. The HTML body of the email. Must fit in a datastore
+                entity. Must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails.
+                Must be utf-8.
+            reply_to: str|None. Optional Argument. Reply address formatted like
+                “reply+<reply_id>@<incoming_email_domain_name>
+                reply_id is the unique id of the sender.
+            recipient_variables: dict|None. Optional Argument.
+                If batch sending requires differentiating each email based on
+                the recipient, we assign a unique id to each recipient,
+                including info relevant to that recipient so that we can
+                reference it when composing the email like so:
+                    recipient_variables =
+                        {"bob@example.com": {"first":"Bob", "id":1},
+                        "alice@example.com": {"first":"Alice", "id":2}}
+                    subject = 'Hey, %recipient.first%’
+                More info about this format at:
+                https://documentation.mailgun.com/en/
+                    latest/user_manual.html#batch-sending
+
+        Returns:
+            bool. Whether the emails are sent successfully.
+        """
+        bcc_emails = None
+
+        if bcc:
+            bcc_emails = bcc[0] if len(bcc) == 1 else bcc
+
+        new_email = EmailMessageMock(
+            sender_email, recipient_emails, subject, plaintext_body, html_body,
+            bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
+            recipient_variables=(
+                recipient_variables if (recipient_variables) else None))
+        for recipient_email in recipient_emails:
+            self.emails_dict[recipient_email].append(new_email)
+        return True
+
+    def _get_sent_email_messages(self, to):
+        """Gets messages to a single recipient email.
+
+        Args:
+            to: str. The recipient email address.
+
+        Returns:
+            list(EmailMessageMock). The list of email messages corresponding to
+            that recipient email.
+        """
+        return self.emails_dict[to] if to in self.emails_dict else []
+
+    def _get_all_sent_email_messages(self):
+        """Gets the entire messages dictionary.
+
+        Returns:
+            dict(str, (list(EmailMessageMock))). The dict keyed by recipient
+            email. Each value contains a list of EmailMessageMock objects
+            corresponding to that recipient email; in other words, all
+            individual emails sent to that specific recipient email.
+        """
+        return self.emails_dict
+
+
+EmailTestBase = GenericEmailTestBase
 
 
 class FunctionWrapper(python_utils.OBJECT):

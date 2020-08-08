@@ -31,6 +31,9 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+    'change-subtopic-assignment-modal.template.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
@@ -44,6 +47,7 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
+require('services/page-title.service.ts');
 require('domain/question/question-backend-api.service.ts');
 
 
@@ -59,24 +63,22 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
-        'ContextService', 'CsrfTokenService', 'WindowDimensionsService',
-        'ImageUploadHelperService',
-        'SkillCreationService', 'StoryCreationService',
-        'EntityCreationService', 'TopicEditorRoutingService',
-        'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
-        'UrlInterpolationService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
+        '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        'CsrfTokenService', 'EntityCreationService', 'ImageUploadHelperService',
+        'PageTitleService', 'SkillCreationService', 'StoryCreationService',
+        'TopicEditorRoutingService', 'TopicEditorStateService',
+        'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
+        'WindowDimensionsService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
-            $scope, $uibModal, AlertsService,
-            ContextService, CsrfTokenService, WindowDimensionsService,
-            ImageUploadHelperService,
-            SkillCreationService, StoryCreationService,
-            EntityCreationService, TopicEditorRoutingService,
-            TopicEditorStateService, TopicUpdateService, UndoRedoService,
-            UrlInterpolationService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
+            $scope, $uibModal, AlertsService, ContextService,
+            CsrfTokenService, EntityCreationService, ImageUploadHelperService,
+            PageTitleService, SkillCreationService, StoryCreationService,
+            TopicEditorRoutingService, TopicEditorStateService,
+            TopicUpdateService, UndoRedoService, UrlInterpolationService,
+            WindowDimensionsService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
             MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
@@ -86,6 +88,8 @@ angular.module('oppia').directive('topicEditorTab', [
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
+            $scope.skillQuestionCountDict = (
+              TopicEditorStateService.getSkillQuestionCountDict());
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
@@ -98,6 +102,15 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.editableDescription === '');
             $scope.topicDescriptionChanged = false;
             $scope.subtopics = $scope.topic.getSubtopics();
+            $scope.subtopicQuestionCountDict = {};
+            $scope.subtopics.map((subtopic) => {
+              const subtopicId = subtopic.getId();
+              $scope.subtopicQuestionCountDict[subtopicId] = 0;
+              subtopic.getSkillSummaries().map((skill) => {
+                $scope.subtopicQuestionCountDict[subtopicId] += (
+                  $scope.skillQuestionCountDict[skill.id]);
+              });
+            });
             $scope.uncategorizedSkillSummaries = (
               $scope.topic.getUncategorizedSkillSummaries());
             $scope.editableThumbnailDataUrl = (
@@ -139,6 +152,7 @@ angular.module('oppia').directive('topicEditorTab', [
               backdrop: true,
               windowClass: 'rearrange-skills-modal',
               controller: 'RearrangeSkillsInSubtopicsModalController',
+              controllerAs: '$ctrl',
               size: 'xl'
             }).result.then(function() {
               _initEditor();
@@ -163,8 +177,7 @@ angular.module('oppia').directive('topicEditorTab', [
                 // No further action is needed.
               });
             } else {
-              StoryCreationService.createNewCanonicalStory(
-                $scope.topic.getId());
+              StoryCreationService.createNewCanonicalStory();
             }
           };
 
@@ -257,7 +270,9 @@ angular.module('oppia').directive('topicEditorTab', [
             _initEditor();
           };
 
-          $scope.navigateToSubtopic = function(subtopicId) {
+          $scope.navigateToSubtopic = function(subtopicId, subtopicName) {
+            PageTitleService.setPageTitleForMobileView('Subtopic Editor');
+            PageTitleService.setPageSubtitleForMobileView(subtopicName);
             TopicEditorRoutingService.navigateToSubtopicEditorWithId(
               subtopicId);
           };
@@ -285,16 +300,65 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.togglePreviewListCards = function(listType) {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
             if (listType === $scope.SUBTOPIC_LIST) {
               $scope.subtopicsListIsShown = !$scope.subtopicsListIsShown;
-            }
-            if (listType === $scope.STORY_LIST) {
+            } else if (listType === $scope.STORY_LIST) {
               $scope.storiesListIsShown = !$scope.storiesListIsShown;
+            } else {
+              $scope.mainTopicCardIsShown = !$scope.mainTopicCardIsShown;
             }
           };
 
           $scope.showSubtopicEditOptions = function(index) {
-            $scope.subtopicEditOptionsAreShown = index;
+            $scope.subtopicEditOptionsAreShown = (
+                ($scope.subtopicEditOptionsAreShown === index) ? null : index);
+          };
+
+          $scope.toggleUncategorizedSkillOptions = function(index) {
+            $scope.uncategorizedEditOptionsIndex = (
+                ($scope.uncategorizedEditOptionsIndex === index) ?
+                    null : index);
+          };
+
+          $scope.changeSubtopicAssignment = function(
+              oldSubtopicId, skillSummary) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic-editor-page/modal-templates/' +
+                      'change-subtopic-assignment-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                subtopics: () => $scope.subtopics
+              },
+              controller: 'ChangeSubtopicAssignmentModalController'
+            }).result.then(function(newSubtopicId) {
+              if (oldSubtopicId === newSubtopicId) {
+                return;
+              }
+              TopicUpdateService.moveSkillToSubtopic(
+                $scope.topic, oldSubtopicId, newSubtopicId,
+                skillSummary);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
+          };
+
+          $scope.onRearrangeSubtopicStart = function(fromIndex) {
+            $scope.fromIndex = fromIndex;
+          };
+
+          $scope.onRearrangeSubtopicEnd = function(toIndex) {
+            if ($scope.fromIndex === toIndex) {
+              return;
+            }
+            TopicUpdateService.rearrangeSubtopic(
+              $scope.topic, $scope.fromIndex, toIndex);
+            _initEditor();
           };
 
           $scope.showSkillEditOptions = function(subtopicIndex, skillIndex) {
@@ -303,8 +367,9 @@ angular.module('oppia').directive('topicEditorTab', [
               return;
             }
             $scope.selectedSkillEditOptionsIndex[subtopicIndex] = {};
-            $scope.selectedSkillEditOptionsIndex[subtopicIndex][skillIndex] = (
-              true);
+            $scope.selectedSkillEditOptionsIndex[subtopicIndex] = {
+              [skillIndex]: true
+            };
           };
 
           ctrl.$onInit = function() {
@@ -318,6 +383,7 @@ angular.module('oppia').directive('topicEditorTab', [
               !WindowDimensionsService.isWindowNarrow());
             $scope.storiesListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
+            $scope.mainTopicCardIsShown = true;
             $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);

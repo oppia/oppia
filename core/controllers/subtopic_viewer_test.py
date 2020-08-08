@@ -37,26 +37,38 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.topic_id = 'topic_id'
-        self.subtopic_id = 1
-        self.subtopic_page = (
+        self.subtopic_id_1 = 1
+        self.subtopic_id_2 = 2
+        self.subtopic_page_1 = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id, self.topic_id))
+                self.subtopic_id_1, self.topic_id))
+        self.subtopic_page_2 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_2, self.topic_id))
         subtopic_page_services.save_subtopic_page(
-            self.admin_id, self.subtopic_page, 'Added subtopic',
+            self.admin_id, self.subtopic_page_1, 'Added subtopic',
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': self.subtopic_id,
+                'subtopic_id': self.subtopic_id_1,
                 'title': 'Sample'
             })]
         )
-        subtopic_page_2 = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id, 'topic_id_2'))
         subtopic_page_services.save_subtopic_page(
-            self.admin_id, subtopic_page_2, 'Added subtopic',
+            self.admin_id, self.subtopic_page_2, 'Added subtopic',
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': self.subtopic_id,
+                'subtopic_id': self.subtopic_id_2,
+                'title': 'Sample'
+            })]
+        )
+        subtopic_page_private_topic = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_1, 'topic_id_2'))
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id, subtopic_page_private_topic, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': self.subtopic_id_1,
                 'title': 'Sample'
             })]
         )
@@ -96,22 +108,40 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 'content': {}
             }
         }
-        self.subtopic_page.update_page_contents_html(
+        self.subtopic_page_1.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world</p>',
                 'content_id': 'content'
             }))
-        self.subtopic_page.update_page_contents_audio(
+        self.subtopic_page_1.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
                 self.recorded_voiceovers_dict))
         subtopic_page_services.save_subtopic_page(
-            self.admin_id, self.subtopic_page, 'Updated page contents',
+            self.admin_id, self.subtopic_page_1, 'Updated page contents',
             [subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                'subtopic_id': self.subtopic_id,
+                'subtopic_id': self.subtopic_id_1,
                 'property_name': 'page_contents_html',
-                'new_value': 'a',
-                'old_value': 'b'
+                'new_value': '<p>hello world</p>',
+                'old_value': ''
+            })]
+        )
+        self.subtopic_page_2.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': '<p>hello world 2</p>',
+                'content_id': 'content'
+            }))
+        self.subtopic_page_2.update_page_contents_audio(
+            state_domain.RecordedVoiceovers.from_dict(
+                self.recorded_voiceovers_dict))
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id, self.subtopic_page_2, 'Updated page contents',
+            [subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'subtopic_id': self.subtopic_id_2,
+                'property_name': 'page_contents_html',
+                'new_value': '<p>hello world 2</p>',
+                'old_value': ''
             })]
         )
 
@@ -146,7 +176,7 @@ class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
 
 
 class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
-    def test_get(self):
+    def test_get_for_first_subtopic_in_topic(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/%s/%s' % (
@@ -164,13 +194,44 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 'skill_ids': ['skill_id_2'],
                 'id': 2,
                 'thumbnail_filename': None,
-                'title': 'Subtopic Title 2'
+                'title': 'Subtopic Title 2',
+                'url_fragment': ''
             }
 
             expected_dict = {
                 'topic_id': 'topic_id',
                 'page_contents': expected_page_contents_dict,
                 'subtopic_title': 'Subtopic Title',
+                'next_subtopic_dict': expected_next_subtopic_dict
+            }
+            self.assertDictContainsSubset(expected_dict, json_response)
+
+    def test_get_for_last_subtopic_in_topic(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            json_response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 2))
+            expected_page_contents_dict = {
+                'recorded_voiceovers': self.recorded_voiceovers_dict,
+                'subtitled_html': {
+                    'content_id': 'content',
+                    'html': '<p>hello world 2</p>'
+                },
+                'written_translations': self.written_translations_dict
+            }
+            expected_next_subtopic_dict = {
+                'thumbnail_bg_color': None,
+                'skill_ids': ['skill_id_1'],
+                'id': 1,
+                'thumbnail_filename': None,
+                'title': 'Subtopic Title',
+                'url_fragment': ''
+            }
+
+            expected_dict = {
+                'topic_id': 'topic_id',
+                'page_contents': expected_page_contents_dict,
+                'subtopic_title': 'Subtopic Title 2',
                 'next_subtopic_dict': expected_next_subtopic_dict
             }
             self.assertDictContainsSubset(expected_dict, json_response)

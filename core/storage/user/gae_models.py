@@ -34,7 +34,6 @@ from google.appengine.ext import ndb
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
 
-
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
 
@@ -44,6 +43,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
+    # Attributes used for both full users and profile users.
 
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
@@ -56,48 +57,24 @@ class UserSettingsModel(base_models.BaseModel):
     # migration (to give role to all users) is run.
     role = ndb.StringProperty(
         required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
-    # Identifiable username to display in the UI. May be None.
-    username = ndb.StringProperty(indexed=True)
-    # Normalized username to use for duplicate-username queries. May be None.
-    normalized_username = ndb.StringProperty(indexed=True)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
-    # When the user last started the state editor tutorial. May be None.
-    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
-    # When the user last started the state translation tutorial. May be None.
-    last_started_state_translation_tutorial = ndb.DateTimeProperty(default=None)
     # When the user last logged in. This may be out-of-date by up to
     # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     last_logged_in = ndb.DateTimeProperty(default=None)
-    # When the user last edited an exploration.
-    last_edited_an_exploration = ndb.DateTimeProperty(default=None)
-    # When the user last created an exploration.
-    last_created_an_exploration = ndb.DateTimeProperty(default=None)
-    # User uploaded profile picture as a dataURI string. May be None.
-    profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
-    # The preferred dashboard of the user.
-    default_dashboard = ndb.StringProperty(
-        default=constants.DASHBOARD_TYPE_LEARNER,
-        indexed=True,
-        choices=[
-            constants.DASHBOARD_TYPE_LEARNER,
-            constants.DASHBOARD_TYPE_CREATOR])
-    # The preferred dashboard display preference.
-    creator_dashboard_display_pref = ndb.StringProperty(
-        default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
-        indexed=True,
-        choices=list(
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()))
+    # Name of a user displayed in Android UI. Unlike username, it can be
+    # edited and is unique only among the profiles of the corresponding
+    # regular user account.
+    display_alias = ndb.StringProperty(default=None)
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
+    # User uploaded profile picture as a dataURI string. May be None.
+    profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # Subject interests specified by the user.
     subject_interests = ndb.StringProperty(repeated=True, indexed=True)
-    # The time, in milliseconds, when the user first contributed to Oppia.
-    # May be None.
-    first_contribution_msec = ndb.FloatProperty(default=None)
+    # When the user last edited an exploration.
     # Exploration language preferences specified by the user.
-    # TODO(sll): Add another field for the language that the user wants the
-    # site to display in. These language preferences are mainly for the purpose
+    # These language preferences are mainly for the purpose
     # of figuring out what to show by default in the library index page.
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
@@ -111,6 +88,36 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+
+    # Attributes used for full users only.
+
+    # Identifiable username to display in the UI. May be None.
+    username = ndb.StringProperty(indexed=True)
+    # Normalized username to use for duplicate-username queries. May be None.
+    normalized_username = ndb.StringProperty(indexed=True)
+    # When the user last started the state editor tutorial. May be None.
+    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
+    # When the user last started the state translation tutorial. May be None.
+    last_started_state_translation_tutorial = ndb.DateTimeProperty(default=None)
+    last_edited_an_exploration = ndb.DateTimeProperty(default=None)
+    # When the user last created an exploration.
+    last_created_an_exploration = ndb.DateTimeProperty(default=None)
+    # The preferred dashboard of the user.
+    default_dashboard = ndb.StringProperty(
+        default=constants.DASHBOARD_TYPE_LEARNER,
+        indexed=True,
+        choices=[
+            constants.DASHBOARD_TYPE_LEARNER,
+            constants.DASHBOARD_TYPE_CREATOR])
+    # The preferred dashboard display preference.
+    creator_dashboard_display_pref = ndb.StringProperty(
+        default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
+        indexed=True,
+        choices=list(
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()))
+    # The time, in milliseconds, when the user first contributed to Oppia.
+    # May be None.
+    first_contribution_msec = ndb.FloatProperty(default=None)
 
     # DEPRECATED in 2.8.7. Do not use.
     gae_user_id = ndb.StringProperty(required=False, indexed=False)
@@ -200,11 +207,12 @@ class UserSettingsModel(base_models.BaseModel):
             'first_contribution_msec': user.first_contribution_msec,
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
-            'preferred_audio_language_code': user.preferred_audio_language_code
+            'preferred_audio_language_code': user.preferred_audio_language_code,
+            'display_alias': user.display_alias
         }
 
     @classmethod
-    def get_new_id(cls, unused_entity_name):
+    def get_new_id(cls, unused_entity_name=''):
         """Gets a new id for an entity, based on its name.
 
         The returned id is guaranteed to be unique among all instances of this
@@ -218,7 +226,7 @@ class UserSettingsModel(base_models.BaseModel):
             str. New unique id for this entity class.
 
         Raises:
-            Exception: An ID cannot be generated within a reasonable number
+            Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
@@ -1975,15 +1983,16 @@ class UserContributionScoringModel(base_models.BaseModel):
             score: float. The score of the user.
 
         Raises:
-            Exception: There is already an entry with the given id.
+            Exception. There is already an entry with the given id.
         """
         instance_id = cls._get_instance_id(user_id, score_category)
 
         if cls.get_by_id(instance_id):
-            raise Exception('There is already an entry with the given id: %s' %
-                            instance_id)
+            raise Exception(
+                'There is already an entry with the given id: %s' % instance_id)
 
-        cls(id=instance_id, user_id=user_id, score_category=score_category,
+        cls(
+            id=instance_id, user_id=user_id, score_category=score_category,
             score=score).put()
 
     @classmethod
@@ -2005,8 +2014,8 @@ class UserContributionScoringModel(base_models.BaseModel):
             model.put()
 
 
-class UserCommunityRightsModel(base_models.BaseModel):
-    """Model for storing user's rights on community dashboard.
+class UserContributionRightsModel(base_models.BaseModel):
+    """Model for storing user's rights in the contributor dashboard.
 
     Instances of this class are keyed by the user id.
     """
@@ -2026,7 +2035,7 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserCommunityRightsModel exists for the given user.
+        """Check whether UserContributionRightsModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -2038,7 +2047,7 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
-        """Delete instances of UserCommunityRightsModel for the user.
+        """Delete instances of UserContributionRightsModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -2047,14 +2056,14 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """(Takeout) Exports the data from UserCommunityRightsModel
+        """(Takeout) Exports the data from UserContributionRightsModel
         into dict format.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from UserCommunityRightsModel.
+            dict. Dictionary of the data from UserContributionRightsModel.
         """
         rights_model = cls.get_by_id(user_id)
 
@@ -2136,10 +2145,16 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     email = ndb.StringProperty(required=True)
     # Whether the deletion is completed.
     deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
+
     # IDs of all the private explorations created by this user.
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    # A dict mapping story IDs to pseudonymous user IDs. For each story, we
+    # use a different pseudonymous user ID. Note that all these pseudonymous
+    # user IDs originate from the same about-to-be-deleted user.
+    story_mappings = ndb.JsonProperty(default={})
 
     @staticmethod
     def get_deletion_policy():
@@ -2167,3 +2182,113 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+
+class PseudonymizedUserModel(base_models.BaseModel):
+    """Model for storing pseudonymized user IDs."""
+
+    @staticmethod
+    def get_deletion_policy():
+        """PseudonymizedUserModel contains only pseudonymous ids."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """PseudonymizedUserModel contains only pseudonymous ids."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_new_id(cls, unused_entity_name):
+        """Gets a new id for an entity, based on its name.
+
+        The returned id is guaranteed to be unique among all instances of this
+        entity.
+
+        Args:
+            unused_entity_name: The name of the entity. Coerced to a utf-8
+                encoded string. Defaults to ''.
+
+        Returns:
+            str. New unique id for this entity class.
+
+        Raises:
+            Exception. An ID cannot be generated within a reasonable number
+                of attempts.
+        """
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+            new_id = 'pid_%s' % ''.join(
+                random.choice(string.ascii_lowercase)
+                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
+
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception('New id generator is producing too many collisions.')
+
+
+class UserAuthModel(base_models.BaseModel):
+    """Stores the authentication details for a particular user.
+
+    Instances of this class are keyed by user id.
+    """
+
+    # Authentication detail for sign-in using google id (GAE).
+    gae_id = ndb.StringProperty(indexed=True)
+    # A code associated with profile and full user on Android to provide a PIN
+    # based authentication within the account.
+    pin = ndb.StringProperty(default=None)
+
+    @staticmethod
+    def get_deletion_policy():
+        """The model can be deleted since it only contains information
+        relevant to one user account.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Currently, the model holds authentication details relevant only for
+        backend, and no exportable user data. It may contain user data in
+        the future.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserAuthModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserAuthModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any UserAuthModel refers to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @classmethod
+    def get_by_auth_id(cls, auth_service, auth_id):
+        """Fetch a user entry by auth_id of a particular auth service.
+
+        Args:
+            auth_service: str. Name of the auth service.
+            auth_id: str. Authentication detail corresponding to the
+                authentication service.
+
+        Returns:
+            UserAuthModel. The UserAuthModel instance having a
+            particular user mapped to the given auth_id and the auth service
+            if there exists one, else None.
+        """
+
+        if auth_service == feconf.AUTH_METHOD_GAE:
+            return cls.query(cls.gae_id == auth_id).get()
+        return None

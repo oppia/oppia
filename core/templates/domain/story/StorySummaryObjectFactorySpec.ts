@@ -35,7 +35,8 @@ describe('Story summary object factory', () => {
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#F8BF74',
       description: 'Description',
-      story_is_published: true
+      story_is_published: true,
+      completed_node_titles: ['Chapter 1']
     };
     _sampleStorySummary = factory.createFromBackendDict(
       sampleStorySummaryBackendDict
@@ -51,5 +52,7 @@ describe('Story summary object factory', () => {
     expect(_sampleStorySummary.getThumbnailBgColor()).toEqual('#F8BF74');
     expect(_sampleStorySummary.getDescription()).toEqual('Description');
     expect(_sampleStorySummary.isStoryPublished()).toBe(true);
+    expect(_sampleStorySummary.isNodeCompleted('Chapter 1')).toBe(true);
+    expect(_sampleStorySummary.isNodeCompleted('Chapter 2')).toBe(false);
   });
 });

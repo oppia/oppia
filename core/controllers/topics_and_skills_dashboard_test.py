@@ -85,8 +85,13 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         # Check that admins can access the topics and skills dashboard data.
         self.login(self.ADMIN_EMAIL)
         config_services.set_property(
-            self.admin_id, 'topic_ids_for_classroom_pages', [{
-                'name': 'math', 'topic_ids': [self.topic_id]}])
+            self.admin_id, 'classroom_pages_data', [{
+                'name': 'math',
+                'topic_ids': [self.topic_id],
+                'topic_list_intro': 'Topics covered',
+                'course_details': 'Course details'
+            }]
+        )
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)
@@ -104,7 +109,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             if skill_dict['description'] == 'Description 3':
                 self.assertEqual(skill_dict['id'], self.linked_skill_id)
         self.assertEqual(
-            len(json_response['categorized_skills_dict']), 2)
+            len(json_response['categorized_skills_dict']), 1)
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
@@ -192,7 +197,8 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'title': 'subtopic1',
             'skill_ids': [skill_id],
             'thumbnail_filename': None,
-            'thumbnail_bg_color': None
+            'thumbnail_bg_color': None,
+            'url_fragment': 'subtopic-url'
         })
         self.save_new_topic(
             topic_id_2, self.admin_id, name='Topic2',
@@ -498,7 +504,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_image = f.read()
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -534,7 +540,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
@@ -553,7 +559,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         super(NewSkillHandlerTests, self).setUp()
         self.url = feconf.NEW_SKILL_URL
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             self.original_image_content = f.read()
 
@@ -690,7 +696,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_image = f.read()
 
         json_response = self.post_json(

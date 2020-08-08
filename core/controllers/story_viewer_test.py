@@ -65,8 +65,8 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.publish_exploration(self.admin_id, self.EXP_ID_7)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', self.TOPIC_ID)
-        story.description = ('Description')
+            self.STORY_ID, 'Title', 'Description', self.TOPIC_ID, 'title-one')
+
         exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_7], user=self.admin))
@@ -183,7 +183,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
     def test_can_not_access_story_viewer_page_with_unpublished_story(self):
         new_story_id = 'new_story_id'
         story = story_domain.Story.create_default_story(
-            new_story_id, 'Title', self.TOPIC_ID)
+            new_story_id, 'Title', 'Description', self.TOPIC_ID, 'title-two')
         story_services.save_new_story(self.admin_id, story)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
@@ -198,7 +198,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
-            new_story_id, 'Title', 'topic_id_1')
+            new_story_id, 'Title', 'Description', 'topic_id_1', 'title-three')
         story_services.save_new_story(self.admin_id, story)
         topic_services.publish_story(
             'topic_id_1', new_story_id, self.admin_id)
@@ -214,7 +214,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             expected_dict = {
                 'story_title': 'Title',
                 'story_description': 'Description',
-                'story_nodes': [self.node_2, self.node_1, self.node_3]
+                'story_nodes': [self.node_2, self.node_1, self.node_3],
+                'topic_name': 'Topic'
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 

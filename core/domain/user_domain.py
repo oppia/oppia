@@ -59,7 +59,7 @@ class UserGlobalPrefs(python_utils.OBJECT):
         """
         self.can_receive_email_updates = can_receive_email_updates
         self.can_receive_editor_role_email = can_receive_editor_role_email
-        self.can_receive_feedback_message_email = ( #pylint: disable=invalid-name
+        self.can_receive_feedback_message_email = ( # pylint: disable=invalid-name
             can_receive_feedback_message_email)
         self.can_receive_subscription_email = can_receive_subscription_email
 
@@ -283,8 +283,8 @@ class UserContributionScoring(python_utils.OBJECT):
         self.has_email_been_sent = has_email_been_sent
 
 
-class UserCommunityRights(python_utils.OBJECT):
-    """Domain object for the UserCommunityRightsModel."""
+class UserContributionRights(python_utils.OBJECT):
+    """Domain object for the UserContributionRightsModel."""
 
     def __init__(
             self, user_id, can_review_translation_for_language_codes,

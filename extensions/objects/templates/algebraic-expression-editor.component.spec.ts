@@ -36,18 +36,22 @@ describe('AlgebraicExpressionEditor', function() {
   var guppyConfigurationService = null;
   var mathInteractionsService = null;
   var guppyInitializationService = null;
+  let deviceInfoService = null;
 
   class MockGuppy {
+    static focused = true;
     constructor(id: string, config: Object) {}
 
     asciimath() {
       return 'Dummy value';
     }
+    configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
-      handler();
+      handler({focused: MockGuppy.focused});
     }
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
+    static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));
@@ -56,6 +60,7 @@ describe('AlgebraicExpressionEditor', function() {
       new DeviceInfoService(new WindowRef()));
     mathInteractionsService = new MathInteractionsService();
     guppyInitializationService = new GuppyInitializationService();
+    deviceInfoService = new DeviceInfoService(new WindowRef());
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);
@@ -64,6 +69,7 @@ describe('AlgebraicExpressionEditor', function() {
     $window = $injector.get('$window');
     ctrl = $componentController('algebraicExpressionEditor');
     $window.Guppy = MockGuppy;
+    ctrl.currentValue = '';
   }));
 
   it('should add the change handler to guppy', function() {
@@ -73,6 +79,14 @@ describe('AlgebraicExpressionEditor', function() {
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
+  it('should not show warnings if the editor is active', function() {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject);
+    ctrl.warningText = '';
+    ctrl.isCurrentAnswerValid();
+    expect(ctrl.warningText).toBe('');
+  });
+
   it('should initialize ctrl.value with an empty string', function() {
     ctrl.value = null;
     ctrl.$onInit();
@@ -80,15 +94,31 @@ describe('AlgebraicExpressionEditor', function() {
   });
 
   it('should correctly validate current answer', function() {
-    // This should be validated as true if the editor hasn't been touched.
-    ctrl.value = '';
-    expect(ctrl.isCurrentAnswerValid()).toBeTrue();
+    // This should not show warnings if the editor hasn't been touched.
+    ctrl.currentValue = '';
+    ctrl.isCurrentAnswerValid();
     expect(ctrl.warningText).toBe('');
 
     ctrl.hasBeenTouched = true;
     // This should be validated as false if the editor has been touched.
-    ctrl.value = '';
+    ctrl.currentValue = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
+    expect(ctrl.warningText).toBe('Please enter an answer before submitting.');
+
+    ctrl.currentValue = 'x/2';
+    expect(ctrl.isCurrentAnswerValid()).toBeTrue();
+    expect(ctrl.warningText).toBe('');
+  });
+
+  it('should set the value of showOSK to true', function() {
+    spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
+    spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
+
+    expect(guppyInitializationService.getShowOSK()).toBeFalse();
+    ctrl.showOSK();
+    expect(guppyInitializationService.getShowOSK()).toBeTrue();
+
+    MockGuppy.focused = false;
+    ctrl.$onInit();
   });
 });

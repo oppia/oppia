@@ -1130,6 +1130,19 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Choice 1</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })], 'commit')
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
@@ -1366,12 +1379,13 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             exp_models.ExplorationModel.get('%s' % exp_id).delete(
                 self.owner_id, 'deleted exploration')
 
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
-                .activity_ids), 3)
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
-                .activity_ids), 3)
+        owner_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.owner_id)
+        self.assertEqual(len(owner_subscription_model.activity_ids), 3)
+
+        user_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.user_id)
+        self.assertEqual(len(user_subscription_model.activity_ids), 3)
 
         job = user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob # pylint: disable=line-too-long
         job_id = job.create_new()
@@ -1381,12 +1395,13 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
-                .activity_ids), 0)
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
-                .activity_ids), 0)
+        owner_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.owner_id)
+        self.assertEqual(len(owner_subscription_model.activity_ids), 0)
+
+        user_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.user_id)
+        self.assertEqual(len(user_subscription_model.activity_ids), 0)
         actual_output = job.get_output(job_id)
         expected_output = [
             u'[u\'Successfully cleaned up UserSubscriptionsModel %s and '

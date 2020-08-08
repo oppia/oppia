@@ -40,6 +40,9 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
+        // TODO(#10197): Upgrade to MathJax 3, after proper investigation
+        // and testing. MathJax 3 provides a faster and more cleaner way to
+        // convert a LaTeX string to an SVG.
         var convertLatexStringToSvg = function(inputLatexString) {
           var emptyDiv = document.createElement('div');
           var outputElement = angular.element(emptyDiv);
@@ -81,7 +84,11 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           var fileName = (
             ImageUploadHelperService.generateMathExpressionImageFilename(
               dimensions.height, dimensions.width, dimensions.verticalPadding));
-          var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
+          // We need use unescape and encodeURIComponent in order to
+          // handle the case when SVGs have non-ascii unicode characters.
+          var dataURI = (
+            'data:image/svg+xml;base64,' +
+            btoa(unescape(encodeURIComponent(cleanedSvgString))));
           var invalidTagsAndAttributes = (
             ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
           var tags = invalidTagsAndAttributes.tags;
