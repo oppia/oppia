@@ -220,7 +220,7 @@ angular.module('oppia').directive('topicEditorTab', [
               return;
             }
             if (newName) {
-              TopicEditorStateService.changeTopicWithNameExists(
+              TopicEditorStateService.updateExistenceOfTopicName(
                 newName, function() {
                   $scope.topicNameExists = (
                     TopicEditorStateService.getTopicWithNameExists());
@@ -240,7 +240,7 @@ angular.module('oppia').directive('topicEditorTab', [
               return;
             }
             if (newTopicUrlFragment) {
-              TopicEditorStateService.changeTopicWithUrlFragmentExists(
+              TopicEditorStateService.updateExistenceOfTopicUrlFragment(
                 newTopicUrlFragment, function() {
                   $scope.topicUrlFragmentExists = (
                     TopicEditorStateService.getTopicWithUrlFragmentExists());

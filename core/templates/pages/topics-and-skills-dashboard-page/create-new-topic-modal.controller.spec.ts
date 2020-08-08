@@ -90,7 +90,7 @@ describe('Create new topic modal', function() {
   it('should check if url fragment already exists', function() {
     spyOn(
       TopicEditorStateService,
-      'changeTopicWithUrlFragmentExists').and.callFake(
+      'updateExistenceOfTopicUrlFragment').and.callFake(
       (urlFragment, callback) => callback());
     spyOn(
       TopicEditorStateService,
@@ -101,20 +101,20 @@ describe('Create new topic modal', function() {
     expect($scope.topicUrlFragmentExists).toBeTrue();
   });
 
-  it('should not call changeTopicWithUrlFragmentExists for empty url fragment',
+  it('should not update topic url fragment existence for empty url fragment',
     function() {
-      spyOn(TopicEditorStateService, 'changeTopicWithUrlFragmentExists');
+      spyOn(TopicEditorStateService, 'updateExistenceOfTopicUrlFragment');
       $scope.newlyCreatedTopic.urlFragment = '';
       $scope.onTopicUrlFragmentChange();
       expect(
-        TopicEditorStateService.changeTopicWithUrlFragmentExists
+        TopicEditorStateService.updateExistenceOfTopicUrlFragment
       ).not.toHaveBeenCalled();
     });
 
   it('should check if topic name already exists', function() {
     spyOn(
       TopicEditorStateService,
-      'changeTopicWithNameExists').and.callFake(
+      'updateExistenceOfTopicName').and.callFake(
       (urlFragment, callback) => callback());
     spyOn(
       TopicEditorStateService,
@@ -125,13 +125,13 @@ describe('Create new topic modal', function() {
     expect($scope.topicNameExists).toBeTrue();
   });
 
-  it('should not call changeTopicWithNameExists for empty url fragment',
+  it('should not call updateExistenceOfTopicName for empty url fragment',
     function() {
-      spyOn(TopicEditorStateService, 'changeTopicWithNameExists');
+      spyOn(TopicEditorStateService, 'updateExistenceOfTopicName');
       $scope.newlyCreatedTopic.name = '';
       $scope.onTopicNameChange();
       expect(
-        TopicEditorStateService.changeTopicWithNameExists
+        TopicEditorStateService.updateExistenceOfTopicName
       ).not.toHaveBeenCalled();
     });
 });

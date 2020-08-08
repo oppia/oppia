@@ -248,7 +248,7 @@ angular.module('oppia').directive('storyEditor', [
               return;
             }
             if (newUrlFragment) {
-              StoryEditorStateService.changeStoryWithUrlFragmentExists(
+              StoryEditorStateService.updateExistenceOfStoryUrlFragment(
                 newUrlFragment, function() {
                   $scope.storyUrlFragmentExists = (
                     StoryEditorStateService.getStoryWithUrlFragmentExists());

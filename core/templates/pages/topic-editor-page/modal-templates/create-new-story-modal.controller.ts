@@ -50,7 +50,7 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
       if (!$scope.story.urlFragment) {
         return;
       }
-      StoryEditorStateService.changeStoryWithUrlFragmentExists(
+      StoryEditorStateService.updateExistenceOfStoryUrlFragment(
         $scope.story.urlFragment, function() {
           $scope.storyUrlFragmentExists = (
             StoryEditorStateService.getStoryWithUrlFragmentExists());

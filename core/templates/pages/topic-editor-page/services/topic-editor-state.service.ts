@@ -224,10 +224,16 @@ angular.module('oppia').factory('TopicEditorStateService', [
         return _skillQuestionCountDict;
       },
 
+      /**
+       * Returns whether the topic name already exists on the server.
+       */
       getTopicWithNameExists: function() {
         return _topicWithNameExists;
       },
 
+      /**
+       * Returns whether the topic URL fragment already exists on the server.
+       */
       getTopicWithUrlFragmentExists: function() {
         return _topicWithUrlFragmentExists;
       },
@@ -464,7 +470,15 @@ angular.module('oppia').factory('TopicEditorStateService', [
         return _classroomUrlFragment;
       },
 
-      changeTopicWithNameExists: function(topicName, successCallback) {
+      /**
+       * Attempts to set the boolean variable _topicWithNameExists based
+       * on the value returned by doesTopicWithNameExistAsync and
+       * executes the success callback provided. No arguments are passed to the
+       * success callback. Execution of the success callback indicates that the
+       * async backend call was successful and that _topicWithNameExists
+       * has been successfully updated.
+       */
+      updateExistenceOfTopicName: function(topicName, successCallback) {
         EditableTopicBackendApiService.doesTopicWithNameExistAsync(
           topicName).then(
           function(topicNameExists) {
@@ -480,7 +494,15 @@ angular.module('oppia').factory('TopicEditorStateService', [
           });
       },
 
-      changeTopicWithUrlFragmentExists: function(
+      /**
+       * Attempts to set the boolean variable _topicWithUrlFragmentExists based
+       * on the value returned by doesTopicWithUrlFragmentExistAsync and
+       * executes the success callback provided. No arguments are passed to the
+       * success callback. Execution of the success callback indicates that the
+       * async backend call was successful and that _topicWithUrlFragmentExists
+       * has been successfully updated.
+       */
+      updateExistenceOfTopicUrlFragment: function(
           topicUrlFragment, successCallback) {
         EditableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
           topicUrlFragment).then(

@@ -63,7 +63,7 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
       if (!$scope.newlyCreatedTopic.urlFragment) {
         return;
       }
-      TopicEditorStateService.changeTopicWithUrlFragmentExists(
+      TopicEditorStateService.updateExistenceOfTopicUrlFragment(
         $scope.newlyCreatedTopic.urlFragment, function() {
           $scope.topicUrlFragmentExists = (
             TopicEditorStateService.getTopicWithUrlFragmentExists());
@@ -75,7 +75,7 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
       if (!$scope.newlyCreatedTopic.name) {
         return;
       }
-      TopicEditorStateService.changeTopicWithNameExists(
+      TopicEditorStateService.updateExistenceOfTopicName(
         $scope.newlyCreatedTopic.name, function() {
           $scope.topicNameExists = (
             TopicEditorStateService.getTopicWithNameExists());

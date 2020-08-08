@@ -214,20 +214,20 @@ describe('Topic editor tab directive', function() {
 
   it('should call the TopicUpdateService if name is updated', function() {
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
-    spyOn(TopicEditorStateService, 'changeTopicWithNameExists').and.callFake(
+    spyOn(TopicEditorStateService, 'updateExistenceOfTopicName').and.callFake(
       (newName, successCallback) => successCallback());
     $scope.updateTopicName('Different Name');
     expect(topicNameSpy).toHaveBeenCalled();
   });
 
-  it('should not call changeTopicWithNameExists if name is empty',
+  it('should not call updateExistenceOfTopicName if name is empty',
     function() {
       var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
-      spyOn(TopicEditorStateService, 'changeTopicWithNameExists');
+      spyOn(TopicEditorStateService, 'updateExistenceOfTopicName');
       $scope.updateTopicName('');
       expect(topicNameSpy).toHaveBeenCalled();
       expect(
-        TopicEditorStateService.changeTopicWithNameExists
+        TopicEditorStateService.updateExistenceOfTopicName
       ).not.toHaveBeenCalled();
     });
 
@@ -251,21 +251,21 @@ describe('Topic editor tab directive', function() {
         TopicUpdateService, 'setTopicUrlFragment');
       spyOn(
         TopicEditorStateService,
-        'changeTopicWithUrlFragmentExists').and.callFake(
+        'updateExistenceOfTopicUrlFragment').and.callFake(
         (newUrlFragment, successCallback) => successCallback());
       $scope.updateTopicUrlFragment('topic');
       expect(topicUrlFragmentSpy).toHaveBeenCalled();
     });
 
-  it('should not call changeTopicWithUrlFragmentExists for empty url fragment',
+  it('should not update topic url fragment existence for empty url fragment',
     function() {
       var topicUrlFragmentSpy = spyOn(
         TopicUpdateService, 'setTopicUrlFragment');
-      spyOn(TopicEditorStateService, 'changeTopicWithUrlFragmentExists');
+      spyOn(TopicEditorStateService, 'updateExistenceOfTopicUrlFragment');
       $scope.updateTopicUrlFragment('');
       expect(topicUrlFragmentSpy).toHaveBeenCalled();
       expect(
-        TopicEditorStateService.changeTopicWithUrlFragmentExists
+        TopicEditorStateService.updateExistenceOfTopicUrlFragment
       ).not.toHaveBeenCalled();
     });
 
