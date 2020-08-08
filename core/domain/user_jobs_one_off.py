@@ -25,7 +25,6 @@ from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-import feconf
 import python_utils
 import utils
 
@@ -103,40 +102,23 @@ class PopulateUserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Assumptions:
         # 1) We are only having full users in the database, and no
-        #    profile users. For profiles we need to do a role check and ensure
-        #    the gae_id attribute is None for them.
-        # 2) This migration works correctly only if gae_id cannot be updated
-        #   in any way for a user. If a gae_id is mapped to some other user by
-        #   deleing it, an error will be raised while migration (see below).
+        #    profile users (For profiles we need to do a role check also and
+        #    ensure the gae_id attribute is None for them).
+        # 2) This migration assumes that, once a gae_id is assigned to a user,
+        #    it cannot be updated. Currently, there is no way to do so, but the
+        #    migration job would need modifications if it has to work in such a
+        #    setting in future.
 
-        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
-            feconf.AUTH_METHOD_GAE, item.gae_id)
-        if user_auth_model is not None:
-            if user_auth_model.id != item.id:
-                yield (
-                    'Error, gae_id already existing',
-                    {'user_id': item.id, 'gae_id': item.gae_id}
-                )
-            else:
-                if (item.deleted is True and
-                        user_auth_model.deleted is not True):
-                    user_auth_model.deleted = item.deleted
-                    user_auth_model.put()
-                    yield (
-                        'Updated', {'user_id': item.id, 'gae_id': item.gae_id})
-        else:
-            user_models.UserAuthModel(
-                id=item.id,
-                gae_id=item.gae_id,
-                deleted=item.deleted
-            ).put()
-            yield ('Created', {'user_id': item.id, 'gae_id': item.gae_id})
+        user_models.UserAuthModel(
+            id=item.id,
+            gae_id=item.gae_id,
+            deleted=item.deleted
+        ).put()
+        yield ('SUCCESS - Created UserAuth model', 1)
 
     @staticmethod
-    def reduce(message_category, values):
-        users_list = [
-            ast.literal_eval(v) for v in values]
-        yield (message_category, users_list)
+    def reduce(key, user_counter):
+        yield (key, len(user_counter))
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):

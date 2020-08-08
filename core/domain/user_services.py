@@ -1244,8 +1244,8 @@ def mark_user_for_deletion(user_id):
     user_auth = _get_user_auth_from_model(
         user_models.UserAuthModel.get_by_id(user_id))
 
-    # TODO(#10178): Remove the if condition below when UserAuthModel will
-    # be present for every existing user.
+    # TODO(#10178): Remove the if condition below once UserAuthModel is
+    # present for every existing user.
     if user_auth is not None:
         user_auth.deleted = True
         _save_user_auth_details(user_auth)

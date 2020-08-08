@@ -221,11 +221,15 @@ class PopulateUserAuthModelOneOffJobTests(test_utils.GenericTestBase):
         output = {}
         for stringified_distribution in stringified_output:
             message_list = ast.literal_eval(stringified_distribution)
-            output[message_list[0]] = sorted(message_list[1])
+            # The following is output:
+            # ['SUCCESS - Created UserAuth model'] = number of users.
+            output[message_list[0]] = int(message_list[1])
         return output
 
     def setUp(self):
         super(PopulateUserAuthModelOneOffJobTests, self).setUp()
+        user_models.UserSettingsModel.get_by_id(
+            self.get_user_id_from_email('tmpsuperadmin@example.com')).delete()
         self.user_a_model = user_models.UserSettingsModel(
             id=self.USER_A_ID,
             gae_id=self.USER_A_GAE_ID,
@@ -237,30 +241,22 @@ class PopulateUserAuthModelOneOffJobTests(test_utils.GenericTestBase):
             email=self.USER_B_EMAIL
         )
         self.user_a_model.put()
+        self.user_b_model.put()
 
-    def test_before_migration_user_does_not_exist_in_user_auth_model(self):
+    def test_before_migration_old_users_do_not_exist_in_user_auth_model(self):
         self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_B_ID))
 
-    def test_one_off_job_migrate_single_new_user_successfully(self):
+    def test_one_off_job_migrates_old_users_successfully(self):
+
         self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_B_ID))
 
         output = self._run_one_off_job()
-
-        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
-            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
-        self.assertEqual(user_auth_model.id, self.USER_A_ID)
-
         expected_output = {
-            'Created': [
-                {'user_id': self.USER_A_ID, 'gae_id': self.USER_A_GAE_ID}]
+            'SUCCESS - Created UserAuth model': 2
         }
         self.assertEqual(output, expected_output)
-
-    def test_one_off_job_migrate_multiple_new_users_successfully(self):
-        self.user_b_model.put()
-        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_A_ID))
-
-        output = self._run_one_off_job()
 
         user_auth_model = user_models.UserAuthModel.get_by_auth_id(
             feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
@@ -269,66 +265,50 @@ class PopulateUserAuthModelOneOffJobTests(test_utils.GenericTestBase):
             feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
         self.assertEqual(user_auth_model.id, self.USER_B_ID)
 
-        expected_output = {
-            'Created': [
-                {'user_id': self.USER_A_ID, 'gae_id': self.USER_A_GAE_ID},
-                {'user_id': self.USER_B_ID, 'gae_id': self.USER_B_GAE_ID}
-            ]
-        }
-        self.assertEqual(expected_output, output)
+    def test_one_off_job_migrates_old_and_new_users_combined_successfully(self):
+        new_gae_id = 'new_gae_id'
+        new_email = 'new@example.com'
+        user_services.create_new_user(new_gae_id, new_email)
+        new_user_id = user_services.get_user_settings_by_gae_id(
+            new_gae_id).user_id
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, new_gae_id)
+        # To ensure that UserAuthModel was created for newly registered user.
+        self.assertEqual(user_auth_model.id, new_user_id)
 
-    def test_one_off_job_existing_user_updated_successfully(self):
-        self._run_one_off_job()
-        self.user_a_model.deleted = True
-        self.user_a_model.put()
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_B_ID))
 
         output = self._run_one_off_job()
-        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
-            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
-        self.assertEqual(user_auth_model.id, self.USER_A_ID)
-        self.assertTrue(user_auth_model.deleted)
-
         expected_output = {
-            'Updated': [
-                {'user_id': self.USER_A_ID, 'gae_id': self.USER_A_GAE_ID}]
+            'SUCCESS - Created UserAuth model': 3
         }
         self.assertEqual(output, expected_output)
 
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        self.assertEqual(user_auth_model.id, self.USER_A_ID)
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        self.assertEqual(user_auth_model.id, self.USER_B_ID)
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, new_gae_id)
+        self.assertEqual(user_auth_model.id, new_user_id)
 
-    def test_one_off_job_gae_id_registered_to_multiple_users_raises_error(self):
-        self._run_one_off_job()
-        self.user_b_model.gae_id = self.USER_A_GAE_ID
-        self.user_b_model.put()
-        output = self._run_one_off_job()
-
+    def test_one_off_job_run_multiple_times_fills_auth_model_correctly(self):
         expected_output = {
-            'Error, gae_id already existing': [
-                {'user_id': self.USER_B_ID, 'gae_id': self.USER_A_GAE_ID}]
+            'SUCCESS - Created UserAuth model': 2
         }
-        self.assertEqual(
-            expected_output, output)
-
-    def test_one_off_job_with_create_and_update_entries_works_correctly(self):
-        self._run_one_off_job()
-        self.user_a_model.deleted = True
-        self.user_a_model.put()
-        self.user_b_model.put()
         output = self._run_one_off_job()
-
-        expected_output = {
-            'Created': [
-                {'user_id': self.USER_B_ID, 'gae_id': self.USER_B_GAE_ID}],
-            'Updated': [
-                {'user_id': self.USER_A_ID, 'gae_id': self.USER_A_GAE_ID}]
-        }
-        self.assertEqual(
-            expected_output, output)
-
-    def test_one_off_job_run_multiple_times_raises_no_error(self):
-        self.user_b_model.put()
-        self._run_one_off_job()
+        self.assertEqual(output, expected_output)
         output = self._run_one_off_job()
-        self.assertEqual(output, {})
+        self.assertEqual(output, expected_output)
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        self.assertEqual(user_auth_model.id, self.USER_A_ID)
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        self.assertEqual(user_auth_model.id, self.USER_B_ID)
 
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):

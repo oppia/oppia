@@ -13092,8 +13092,8 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
 
-        # Note: There will a total of 2 UserSettingsModel (hence 2
-        # UserAuthModel too) even though only one user signs up in the test
+        # Note: There will be a total of 2 UserSettingsModels (hence 2
+        # UserAuthModels too) even though only one user signs up in the test
         # since superadmin signup is also done in test_utils.GenericTestBase.
         self.model_instance = user_models.UserAuthModel.get_by_id(
             self.user_id)
