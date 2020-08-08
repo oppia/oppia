@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the Oppia profile page.
+ * @fileoverview This file imports the jQuery, jQuery UI.
  */
 
-// Jquery needs to be loaded before anything else to make angular js work.
-require('third-party-imports/jquery.import');
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/signup-page/signup-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+window.$ = require('static/jquery-3.5.1/jquery.min.js');
+window.jQuery = window.$;
 
-require('pages/signup-page/signup-page.component.ts');
+require('static/jqueryui-1.12.1/jquery-ui.min.js');
+require('static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js');

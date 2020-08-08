@@ -24,4 +24,6 @@ interface Window {
     encodeURIComponent: (decodedURIComponent: string) => string;
     ga: Function;
     $: JQueryStatic;
+    jQuery: JQueryStatic;
+    Headroom: Headroom;
 }
