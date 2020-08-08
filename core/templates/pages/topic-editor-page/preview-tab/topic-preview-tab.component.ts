@@ -18,12 +18,12 @@
 
 require('components/summary-tile/subtopic-summary-tile.directive.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
+require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
 require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +
-    'topic-viewer-stories-list.directive.ts');
-require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
+    'topic-viewer-stories-list.component.ts');
+require('pages/topic-viewer-page/practice-tab/practice-tab.component.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -41,6 +41,7 @@ angular.module('oppia').component('topicPreviewTab', {
       var TAB_PRACTICE = 'practice';
       ctrl.$onInit = function() {
         ctrl.topic = TopicEditorStateService.getTopic();
+        ctrl.topicName = ctrl.topic.getName();
         ctrl.subtopics = ctrl.topic.getSubtopics();
         ctrl.activeTab = TAB_INFO;
         ctrl.canonicalStorySummaries = (

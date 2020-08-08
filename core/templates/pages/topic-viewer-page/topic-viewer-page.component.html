@@ -48,11 +48,11 @@
       </topic-info-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'story'">
-      <topic-viewer-stories-list [canonical-story-summaries]="$ctrl.canonicalStorySummaries"
+      <stories-list [canonical-story-summaries]="$ctrl.canonicalStorySummaries"
                     [classroom-url-fragment]="$ctrl.classroomUrlFragment"
                     [topic-url-fragment]="$ctrl.topicUrlFragment">
-      </topic-viewer-stories-list>
-
+      </stories-list>
+    </div>
     <div ng-if="$ctrl.activeTab === 'practice'">
       <practice-tab [subtopics-list]="$ctrl.subtopics"
                     [topic-name]="$ctrl.topicName">
