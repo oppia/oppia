@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the Oppia profile page.
+ * @fileoverview Component for the 'terms' page.
  */
 
-// Jquery needs to be loaded before anything else to make angular js work.
-require('third-party-imports/jquery.import');
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/signup-page/signup-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('pages/signup-page/signup-page.component.ts');
+@Component({
+  selector: 'terms-page',
+  templateUrl: './terms-page.component.html',
+  styleUrls: []
+})
+export class TermsPageComponent {
+  scrollTo(el: HTMLElement): void {
+    el.scrollIntoView({behavior: 'smooth'});
+  }
+}
+
+angular.module('oppia').directive(
+  'termsPage', downgradeComponent({component: TermsPageComponent}));
