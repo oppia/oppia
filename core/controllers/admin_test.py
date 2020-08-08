@@ -1205,7 +1205,6 @@ class SuggestionsLatexSvgHandlerTest(test_utils.GenericTestBase):
         'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
         '-noninteractive-math>'
     )
-
     change1 = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1219,7 +1218,6 @@ class SuggestionsLatexSvgHandlerTest(test_utils.GenericTestBase):
             'html': valid_html_content1
         }
     }
-
     change2 = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1233,8 +1231,6 @@ class SuggestionsLatexSvgHandlerTest(test_utils.GenericTestBase):
             'html': valid_html_content2
         }
     }
-
-
 
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
@@ -1286,7 +1282,6 @@ class SuggestionsLatexSvgHandlerTest(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.editor_id, self.change2, 'test description')
-
 
     def test_get_latex_to_svg_mapping(self):
         user_email = 'user1@example.com'
@@ -1398,8 +1393,6 @@ class SuggestionsLatexSvgHandlerTest(test_utils.GenericTestBase):
                 }
             }
         }
-
-        # Check role correctly gets updated.
         csrf_token = self.get_new_csrf_token()
         svg_file_1 = (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'

@@ -543,8 +543,6 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
 class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
     target_id_1 = 'exp1'
     target_version_at_submission = 1
-
-
     AUTHOR_EMAIL_1 = 'author1@example.com'
     REVIEWER_EMAIL_1 = 'reviewer1@example.com'
 
@@ -643,7 +641,6 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, change2, 'test description')
-
 
         job_id = (
             suggestion_jobs_one_off.

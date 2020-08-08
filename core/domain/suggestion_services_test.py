@@ -1426,7 +1426,6 @@ class SuggestionLatexSvgUpdationTests(test_utils.GenericTestBase):
         'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
         '-noninteractive-math>'
     )
-
     change1 = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1440,7 +1439,6 @@ class SuggestionLatexSvgUpdationTests(test_utils.GenericTestBase):
             'html': valid_html_content1
         }
     }
-
     change2 = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1454,8 +1452,6 @@ class SuggestionLatexSvgUpdationTests(test_utils.GenericTestBase):
             'html': valid_html_content2
         }
     }
-
-
     AUTHOR_EMAIL_1 = 'author1@example.com'
     REVIEWER_EMAIL_1 = 'reviewer1@example.com'
 

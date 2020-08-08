@@ -91,7 +91,6 @@ class SuggestionSvgFilenameValidationOneOffJob(
                     SuggestionSvgFilenameValidationOneOffJob._SUCCESS_KEY,
                     (item.id, invalid_tags))
 
-
     @staticmethod
     def reduce(key, values):
         if key == SuggestionSvgFilenameValidationOneOffJob._SUCCESS_KEY:
