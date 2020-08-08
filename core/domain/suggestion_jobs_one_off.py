@@ -60,6 +60,8 @@ class SuggestionSvgFilenameValidationOneOffJob(
     """Job that checks the html content of a suggestion and validates the
     svg_filename fields in each math rich-text components."""
 
+    _ERROR_KEY = 'found-suggestion-with-invalid-math'
+    _SUCCESS_KEY = 'suggestion-with-latex-strings-having-no-svg'
     @classmethod
     def entity_classes_to_map_over(cls):
         return [suggestion_models.GeneralSuggestionModel]
@@ -70,6 +72,15 @@ class SuggestionSvgFilenameValidationOneOffJob(
         html_string_list = suggestion.get_all_html_content_strings()
         html_string = ''.join(html_string_list)
         if suggestion.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+            error_list = (
+                html_validation_service.
+                validate_math_tags_in_html_with_attribute_math_content(
+                    html_string))
+            if len(error_list) > 0:
+                yield (
+                    SuggestionSvgFilenameValidationOneOffJob._ERROR_KEY,
+                    item.id)
+                return
             invalid_tags = (
                 html_validation_service.
                 validate_svg_filenames_in_math_rich_text(
@@ -77,22 +88,25 @@ class SuggestionSvgFilenameValidationOneOffJob(
                     html_string))
             if len(invalid_tags) > 0:
                 yield (
-                    'suggestion with latex strings having invalid SVG',
+                    SuggestionSvgFilenameValidationOneOffJob._SUCCESS_KEY,
                     (item.id, invalid_tags))
 
 
     @staticmethod
     def reduce(key, values):
-        final_values = [ast.literal_eval(value) for value in values]
-        no_of_invalid_tags = 0
-        for suggestion_id, invalid_tags in final_values:
-            no_of_invalid_tags += len(invalid_tags)
-            yield (suggestion_id, invalid_tags)
-        final_value_dict = {
-            'no_of_suggestions_with_no_svgs': len(final_values),
-            'no_of_invalid_tags': no_of_invalid_tags,
-        }
-        yield ('Overall result', final_value_dict)
+        if key == SuggestionSvgFilenameValidationOneOffJob._SUCCESS_KEY:
+            final_values = [ast.literal_eval(value) for value in values]
+            no_of_invalid_tags = 0
+            for suggestion_id, invalid_tags in final_values:
+                no_of_invalid_tags += len(invalid_tags)
+                yield (suggestion_id, invalid_tags)
+            final_value_dict = {
+                'no_of_suggestions_with_no_svgs': len(final_values),
+                'no_of_invalid_tags': no_of_invalid_tags,
+            }
+            yield ('Overall result', final_value_dict)
+        else:
+            yield (key, values)
 
 
 class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):

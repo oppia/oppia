@@ -823,12 +823,17 @@ def get_suggestions_with_latex_strings_having_no_svgs():
         suggestion = get_suggestion_from_model(model)
         html_string = ''.join(suggestion.get_all_html_content_strings())
         try:
-            latex_strings_without_svg = (
-                html_validation_service.get_latex_strings_without_svg_from_html(
+            error_list = (
+                html_validation_service.
+                validate_math_tags_in_html_with_attribute_math_content(
                     html_string))
-            if len(latex_strings_without_svg) > 0:
-                suggestion_id_to_latex_strings[suggestion.suggestion_id] = (
-                    latex_strings_without_svg)
+            if len(error_list) == 0:
+                latex_strings_without_svg = (
+                    html_validation_service.
+                    get_latex_strings_without_svg_from_html(html_string))
+                if len(latex_strings_without_svg) > 0:
+                    suggestion_id_to_latex_strings[suggestion.suggestion_id] = (
+                        latex_strings_without_svg)
         except Exception as e:
             raise Exception(
                 'failed to parse suggestion %s-%s' % (

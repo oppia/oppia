@@ -735,6 +735,58 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
+    def test_job_when_suggestions_have_invalid_math_tags(self):
+        invalid_html = (
+            '<oppia-noninteractive-math></oppia-noninteractive-math>')
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.target_id_1))
+        fs.commit('image/file1.svg', raw_image, mimetype='image/svg+xml')
+
+        change1 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Suggestion html</p>'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': invalid_html
+            }
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+
+            suggestion = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, change1, 'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
+        expected_output = [
+            u'[u\'found-suggestion-with-invalid-math\', [u\'%s\']]' % (
+                suggestion.suggestion_id)]
+        self.assertEqual(actual_output, expected_output)
+
 
 class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
 
