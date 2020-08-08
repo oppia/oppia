@@ -633,7 +633,7 @@ def build_using_webpack(config_path):
 
     python_utils.PRINT('Building webpack')
 
-    cmd = '%s %s --config %s --max-old-space-size=2048' % (
+    cmd = '%s %s --config %s' % (
         common.NODE_BIN_PATH, WEBPACK_FILE, config_path)
     subprocess.check_call(cmd, shell=True)
 
