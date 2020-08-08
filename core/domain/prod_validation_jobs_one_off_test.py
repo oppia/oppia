@@ -2350,7 +2350,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
+            'story-one')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -5956,7 +5957,8 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(2)]
 
         for story in stories:
@@ -8239,7 +8241,8 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(3)]
 
         for index, story in enumerate(stories):
@@ -8441,7 +8444,8 @@ class StorySnapshotMetadataModelValidatorTests(
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(3)]
 
         for story in stories:
@@ -8608,7 +8612,8 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(3)]
 
         for story in stories:
@@ -8727,7 +8732,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(3)]
 
         for story in stories:
@@ -8953,7 +8959,8 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(3)]
 
         for index, story in enumerate(stories):
@@ -9493,7 +9500,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -9790,7 +9798,8 @@ class TopicSnapshotMetadataModelValidatorTests(
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -9984,7 +9993,8 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10146,7 +10156,8 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10323,7 +10334,8 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10529,7 +10541,8 @@ class TopicRightsSnapshotContentModelValidatorTests(
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10689,7 +10702,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10974,7 +10988,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11140,12 +11155,12 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_0.put()
         expected_output = [
             (
-                u'[u\'failed validation check for subtopic count check of Topi'
-                'cSummaryModel\', [u"Entity id 0: Subtopic count: 10 does not '
-                'match the total number of subtopics in topic model: [{u\'thum'
-                'bnail_bg_color\': None, u\'skill_ids\': [u\'0\', '
-                'u\'1\'], u\'id\': 1, u\'thumbnail_filename\': None, u\'title'
-                '\': u\'subtopic1\'}] "]]'
+                u'[u\'failed validation check for subtopic count check of '
+                'TopicSummaryModel\', [u"Entity id 0: Subtopic count: 10 '
+                'does not match the total number of subtopics in topic model: '
+                '[{u\'thumbnail_bg_color\': None, u\'skill_ids\': [u\'0\', '
+                'u\'1\'], u\'title\': u\'subtopic1\', u\'url_fragment\': u\'\','
+                ' u\'thumbnail_filename\': None, u\'id\': 1}] "]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -11199,7 +11214,8 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11412,7 +11428,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11620,7 +11637,8 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11789,7 +11807,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -14076,7 +14095,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             'story',
             'title %d',
             'description %d',
-            '0'
+            '0',
+            'title-z'
         )
 
         story.add_node('node_1', 'Node1')
@@ -14635,7 +14655,7 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
 
-class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
+class UserContributionRightsModelValidatorTests(test_utils.GenericTestBase):
 
     TRANSLATOR_EMAIL = 'translator@community.org'
     TRANSLATOR_USERNAME = 'translator'
@@ -14644,7 +14664,7 @@ class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
     VOICE_ARTIST_USERNAME = 'voiceartist'
 
     def setUp(self):
-        super(UserCommunityRightsModelValidatorTests, self).setUp()
+        super(UserContributionRightsModelValidatorTests, self).setUp()
 
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
         self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
@@ -14658,17 +14678,19 @@ class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
             self.voice_artist_id, 'hi')
 
         self.translator_model_instance = (
-            user_models.UserCommunityRightsModel.get_by_id(self.translator_id))
+            user_models.UserContributionRightsModel.get_by_id(
+                self.translator_id))
         self.voice_artist_model_instance = (
-            user_models.UserCommunityRightsModel.get_by_id(
+            user_models.UserContributionRightsModel.get_by_id(
                 self.voice_artist_id))
 
         self.job_class = (
-            prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob)
+            prod_validation_jobs_one_off
+            .UserContributionRightsModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
-            u'[u\'fully-validated UserCommunityRightsModel\', 2]']
+            u'[u\'fully-validated UserContributionRightsModel\', 2]']
         run_job_and_check_output(self, expected_output)
 
     def test_get_external_id_relationship_failure(self):
@@ -14677,11 +14699,11 @@ class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids field '
-                'check of UserCommunityRightsModel\', [u"Entity id %s: based '
-                'on field user_settings_ids having value %s, expect model '
-                'UserSettingsModel with id %s but it doesn\'t exist"]]'
+                'check of UserContributionRightsModel\', [u"Entity id %s: '
+                'based on field user_settings_ids having value %s, expect '
+                'model UserSettingsModel with id %s but it doesn\'t exist"]]'
             ) % (self.translator_id, self.translator_id, self.translator_id),
-            u'[u\'fully-validated UserCommunityRightsModel\', 1]']
+            u'[u\'fully-validated UserContributionRightsModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_object_validation_failure(self):
@@ -14693,11 +14715,11 @@ class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for domain object check of '
-                'UserCommunityRightsModel\', [u\'Entity id %s: Entity fails '
+                'UserContributionRightsModel\', [u\'Entity id %s: Entity fails '
                 'domain validation with the error Invalid language_code: '
                 'invalid_lang_code\']]'
             ) % self.translator_id,
-            u'[u\'fully-validated UserCommunityRightsModel\', 1]']
+            u'[u\'fully-validated UserContributionRightsModel\', 1]']
 
         run_job_and_check_output(self, expected_output, sort=True)
 
