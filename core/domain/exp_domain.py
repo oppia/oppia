@@ -4288,8 +4288,8 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 42
         
-        if exploration_schema_version == 42
-            exploration_dict = cls._convert_v42dict_to_v43_dict(
+        if exploration_schema_version == 42:
+            exploration_dict = cls._convert_v42_dict_to_v43_dict(
                 exploration_dict)
             exploration_schema_version = 43
 
