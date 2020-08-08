@@ -1235,7 +1235,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
         swap_conversion =  self.swap(
             exp_domain.Exploration,
-            '_convert_v40_dict_to_v41_dict',
+            '_convert_v41_dict_to_v42_dict',
             mock_conversion)
         swap_states_schema_ver = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
