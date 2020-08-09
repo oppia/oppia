@@ -42,7 +42,7 @@ require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('interactions/codemirrorRequires.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');

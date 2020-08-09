@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,3 +22,4 @@ require('static/code-mirror-5.17.0/mode/python/python.js');
 require('static/code-mirror-5.17.0/mode/yaml/yaml.js');
 require('static/ui-codemirror-5d04fa/src/ui-codemirror.js');
 require('static/diff-match-patch-1.0.0/diff_match_patch.js');
+require('static/code-mirror-5.17.0/addon/merge/merge.js');
