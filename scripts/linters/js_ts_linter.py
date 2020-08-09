@@ -1222,13 +1222,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 cnt = 0
                 if dep:
                     if re.findall(r'\$', dep):
-                        dep = '\%s' % dep
+                        dep = '\' + dep
                     cnt = len(re.findall(r'' + dep + '[^\']', content))
                     if cnt < 2:
                         if start_point == 0:
                             python_utils.PRINT('Checking the file:', filepath)
                         python_utils.PRINT(dep, ':', cnt,
                                            '---------------Unused Dependency')
+
                         failed = True
                         start_point += 1
                     else:
