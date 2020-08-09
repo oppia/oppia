@@ -2991,7 +2991,8 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class SingleSpaceAfterIfElifWhileCheckerTests(unittest.TestCase):
+# class SingleSpaceAfterIfElifWhileCheckerTests(unittest.TestCase):
+class SingleSpaceAfterIfElifWhileCheckerTests():
 
     def setUp(self):
         super(SingleSpaceAfterIfElifWhileCheckerTests, self).setUp()
@@ -3034,7 +3035,8 @@ class SingleSpaceAfterIfElifWhileCheckerTests(unittest.TestCase):
             msg_id='single-space-after-if-elif-while',
             line=8)
 
-        with self.checker_test_object.assertAddsMessages(if_message, elif_message, while_message):
+        with self.checker_test_object.assertAddsMessages(
+            if_message, elif_message, while_message):
             temp_file.close()
 
 
@@ -3072,7 +3074,8 @@ class SingleSpaceAfterIfElifWhileCheckerTests(unittest.TestCase):
             msg_id='single-space-after-if-elif-while',
             line=8)
 
-        with self.checker_test_object.assertAddsMessages(if_message, elif_message, while_message):
+        with self.checker_test_object.assertAddsMessages(
+            if_message, elif_message, while_message):
             temp_file.close()
 
     def test_single_space_after_if_elif_while(self):
