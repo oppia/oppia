@@ -36,7 +36,7 @@ angular.module('oppia').directive('imageUploader', [
         onFileChanged: '=',
         errorMessage: '@',
         width: '@',
-        allowedImageType: '='
+        allowedImageType: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
@@ -76,25 +76,25 @@ angular.module('oppia').directive('imageUploader', [
             }
           };
 
-          var check1 = true;
-          var check2 = false;
-
+          var imageFormatCheck = true;
+          var imageExtensionCheck = false;
 
           for (var i = 0; i < scope.allowedImageType.length; i++) {
             var fileType = scope.allowedImageType[i];
-            check1 = (
-              check1 && !file.type.match(imageTypeMapping[fileType].format));
-            check2 = (
-              check2 ||
+            imageFormatCheck = (
+              imageFormatCheck &&
+              !file.type.match(imageTypeMapping[fileType].format));
+            imageExtensionCheck = (
+              imageExtensionCheck ||
               (file.type.match(imageTypeMapping[fileType].condition[0]) &&
               !file.name.match(imageTypeMapping[fileType].condition[1])));
           }
 
-          if (check1) {
+          if (imageFormatCheck) {
             return 'This image format is not supported.';
           }
 
-          if (check2) {
+          if (imageExtensionCheck) {
             return 'This image format does not match the filename extension.';
           }
 
