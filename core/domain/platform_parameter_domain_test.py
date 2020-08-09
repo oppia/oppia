@@ -1757,9 +1757,3 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'cannot be enabled in production'):
             parameter.validate()
-
-    def test_get_memcache_key_returns_correct_key(self):
-        self.assertEqual(
-            parameter_domain.PlatformParameter.get_memcache_key('param_name'),
-            'PLATFORM_PARAMETER:param_name'
-        )

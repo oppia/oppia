@@ -52,14 +52,6 @@ class RedisCacheServicesUnitTests(test_utils.GenericTestBase):
         response = redis_cache_services.set_multi(key_value_mapping)
         self.assertTrue(response)
 
-    def test_delete_correctly_deletes_single_cache_element(self):
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
-        redis_cache_services.set_multi(key_value_mapping)
-        is_successful = redis_cache_services.delete('a')
-        self.assertTrue(is_successful)
-        is_successful = redis_cache_services.delete('d')
-        self.assertFalse(is_successful)
-
     def test_delete_multi_correctly_deletes_cache_elements(self):
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         redis_cache_services.set_multi(key_value_mapping)
