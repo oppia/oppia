@@ -1917,6 +1917,49 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                         'single-line-pragma', line=line_num)
 
 
+class SingleSpaceAfterIfElifWhileChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks that there is a single space
+    between an `if`, `elif`, or `while` statement and a bracket `(` if
+    a bracket is used.
+    """
+
+    __implements__ = interfaces.IRawChecker
+
+    name = 'single-space-after-if-elif-while'
+    priority = -1
+    msgs = {
+        # TODO: Figure out how to name this message. Does 'C0029' make sense?
+        'C0029': (
+            (
+                'A single space is needed between an `if`, `elif`, or `while` '
+                'and the parenthesis.'),
+            'single-space-after-if-elif-while',
+            (
+                'Add a single space between the `if`, `elif`, or `while` and the '
+                'parenthesis.')
+        ),
+    }
+
+    def process_module(self, node):
+        """Process a module.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        file_content = read_from_node(node)
+        for (line_num, line) in enumerate(file_content):
+            error = False
+            line = line.strip()
+            regexes = [br'^if\s*\(', br'^elif\s*\(', br'^while\s*\(']
+            if any([re.search(regex, line) for regex in regexes]):
+                parenthesis_index = line.find('(')
+                first_space_index = line.find(' ', 0, parenthesis_index)
+                # There should be exactly one space between these indices.
+                if parenthesis_index - first_space_index != 1:
+                    self.add_message(
+                        'single-space-after-if-elif-while', line=line_num + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1937,3 +1980,4 @@ def register(linter):
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))
+    linter.register_checker(SingleSpaceAfterIfElifWhileChecker(linter))

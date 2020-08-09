@@ -2989,3 +2989,115 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
+
+
+class SingleSpaceAfterIfElifWhileCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(SingleSpaceAfterIfElifWhileCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.SingleSpaceAfterIfElifWhileChecker)
+        self.checker_test_object.setup_method()
+
+    def test_no_space_after_if_elif_while(self):
+        node_no_space_after_if_elif_while = astroid.scoped_nodes.Module(
+            name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    if(boolean_a and boolean_b):
+                        pass
+                    elif(boolean_a and boolean_b):
+                        pass
+                    else:
+                        pass
+                    while(True):
+                        break
+                """)
+        node_no_space_after_if_elif_while.file = filename
+        node_no_space_after_if_elif_while.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_no_space_after_if_elif_while)
+
+        if_message = testutils.Message(
+            msg_id='single-space-after-if-elif-while',
+            line=2)
+        elif_message = testutils.Message(
+            msg_id='single-space-after-if-elif-while',
+            line=4)
+        while_message = testutils.Message(
+            msg_id='single-space-after-if-elif-while',
+            line=8)
+
+        with self.checker_test_object.assertAddsMessages(if_message, elif_message, while_message):
+            temp_file.close()
+
+
+    def test_multiple_spaces_after_if_elif_while(self):
+        node_multiple_spaces_after_if_elif_while = astroid.scoped_nodes.Module(
+            name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    if  (boolean_a and boolean_b):
+                        pass
+                    elif  (boolean_a and boolean_b):
+                        pass
+                    else:
+                        pass
+                    while  (True):
+                        break
+                """)
+        node_multiple_spaces_after_if_elif_while.file = filename
+        node_multiple_spaces_after_if_elif_while.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_multiple_spaces_after_if_elif_while)
+
+        if_message = testutils.Message(
+            msg_id='single-space-after-if-elif-while',
+            line=2)
+        elif_message = testutils.Message(
+            msg_id='single-space-after-if-elif-while',
+            line=4)
+        while_message = testutils.Message(
+            msg_id='single-space-after-if-elif-while',
+            line=8)
+
+        with self.checker_test_object.assertAddsMessages(if_message, elif_message, while_message):
+            temp_file.close()
+
+    def test_single_space_after_if_elif_while(self):
+        node_single_space_after_if_elif_while = astroid.scoped_nodes.Module(
+            name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    if (boolean_a and boolean_b):
+                        pass
+                    elif (boolean_a and boolean_b):
+                        pass
+                    else:
+                        pass
+                    while (True):
+                        break
+                """)
+        node_single_space_after_if_elif_while.file = filename
+        node_single_space_after_if_elif_while.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_single_space_after_if_elif_while)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
