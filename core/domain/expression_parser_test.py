@@ -272,6 +272,12 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
             '(a-2)^beta = alpha/gamma'), ['a', 'alpha', 'beta', 'gamma'])
         self.assertEqual(expression_parser.get_variables(
             '4=abs(-4)'), [])
+        self.assertEqual(expression_parser.get_variables(
+            'a^pi + e/2'), ['a', 'pi', 'e'])
+        self.assertEqual(expression_parser.get_variables(
+            'pi-3.14e'), ['pi', 'e'])
+        self.assertEqual(expression_parser.get_variables(
+            'epi'), ['pi', 'e'])
 
 
 class TokenUnitTests(test_utils.GenericTestBase):

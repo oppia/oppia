@@ -180,7 +180,7 @@ def tokenize(expression):
 
 
 def get_variables(expression):
-    """Extracts all variables from a given expression.
+    """Extracts all variables along with pi and e from a given expression.
 
     Args:
         expression: str. A math expression.
@@ -196,7 +196,8 @@ def get_variables(expression):
         token_list = tokenize(expression)
     variables = set()
     for token in token_list:
-        if token.category == _TOKEN_CATEGORY_IDENTIFIER:
+        if token.category == _TOKEN_CATEGORY_IDENTIFIER or token.text in [
+                'pi', 'e']:
             variables.add(token.text)
     return list(variables)
 
