@@ -31,7 +31,7 @@ VALID_INTERACTION_IDS = [
 
 SUPPORTED_LANGUAGES = ['en']
 
-VALID_RTE_COMPONENTS = ['image', 'link', 'skillreview']
+VALID_RTE_COMPONENTS = ['image', 'link', 'math', 'skillreview']
 
 # If any of the following values are changed, edit the corresponding value in
 # app.constants.ts as well.
