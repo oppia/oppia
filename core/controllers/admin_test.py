@@ -27,6 +27,7 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import question_fetchers
@@ -39,6 +40,7 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -47,12 +49,14 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
-(exp_models, job_models, opportunity_models, audit_models) = (
-    models.Registry.import_models(
+(
+    exp_models, job_models, opportunity_models, audit_models,
+    suggestion_models) = models.Registry.import_models(
         [models.NAMES.exploration, models.NAMES.job, models.NAMES.opportunity,
-         models.NAMES.audit]))
+         models.NAMES.audit, models.NAMES.suggestion])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -1182,6 +1186,246 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
         self.assertIn(
             'SVG for LaTeX string \\frac{x}{y} in exploration exp_id1 is not '
             'supplied.', response_dict['error'])
+        self.logout()
+
+
+class SuggestionsLatexSvgHandlerTest(test_utils.GenericTestBase):
+    """Tests for Saving Math SVGs in suggestions."""
+
+    target_id_1 = 'exp1'
+    target_version_at_submission = 1
+    valid_html_content1 = (
+        '<oppia-noninteractive-math math_content-with-value="{&amp;'
+        'quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;'
+        'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+        '-noninteractive-math>'
+    )
+    valid_html_content2 = (
+        '<oppia-noninteractive-math math_content-with-value="{&amp;'
+        'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+        'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+        '-noninteractive-math>'
+    )
+    change1 = {
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'state_name': 'state_1',
+        'new_value': {
+            'content_id': 'content',
+            'html': '<p>Suggestion html</p>'
+        },
+        'old_value': {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+    }
+    change2 = {
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'state_name': 'state_2',
+        'new_value': {
+            'content_id': 'content',
+            'html': '<p>Suggestion html2</p>'
+        },
+        'old_value': {
+            'content_id': 'content',
+            'html': valid_html_content2
+        }
+    }
+
+    class MockExploration(python_utils.OBJECT):
+        """Mocks an exploration. To be used only for testing."""
+
+        def __init__(self, exploration_id, states):
+            self.id = exploration_id
+            self.states = states
+            self.category = 'Algebra'
+
+    # All mock explorations created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
+    ]
+
+    def mock_get_exploration_by_id(self, exp_id):
+        for exp in self.explorations:
+            if exp.id == exp_id:
+                return exp
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(SuggestionsLatexSvgHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.editor_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+
+            self.suggestion1 = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.editor_id, self.change1, 'test description')
+
+            self.suggestion2 = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.editor_id, self.change2, 'test description')
+
+    def test_get_latex_to_svg_mapping(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(feconf.SUGGESTIONS_LATEX_SVG_HANDLER)
+        expected_response = {
+            self.suggestion1.suggestion_id: ['-,-,-,-'],
+            self.suggestion2.suggestion_id: ['+,+,+,+']
+        }
+        self.assertEqual(
+            response_dict,
+            {'latex_strings_to_suggestion_ids_mapping': expected_response})
+
+    def test_post_svgs_when_all_values_are_valid(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        post_data = {
+            self.suggestion1.suggestion_id: {
+                '-,-,-,-': {
+                    'latexId': 'latex_id1',
+                    'dimensions': {
+                        'encoded_height_string': '1d429',
+                        'encoded_width_string': '1d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                }
+            },
+            self.suggestion2.suggestion_id: {
+                '+,+,+,+': {
+                    'latexId': 'latex_id2',
+                    'dimensions': {
+                        'encoded_height_string': '1d525',
+                        'encoded_width_string': '3d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                }
+            }
+        }
+        csrf_token = self.get_new_csrf_token()
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        svg_file_2 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        response_dict = self.post_json(
+            feconf.SUGGESTIONS_LATEX_SVG_HANDLER,
+            {'latexMapping': post_data},
+            csrf_token=csrf_token,
+            upload_files=(
+                ('latex_id1', 'latex_id1', svg_file_1),
+                ('latex_id2', 'latex_id2', svg_file_2), ),
+            expected_status_int=200)
+        self.assertEqual(
+            response_dict,
+            {
+                'number_of_suggestions_updated': '2'
+            })
+        self.logout()
+
+    def test_post_svgs_when_some_images_are_not_supplied(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        post_data = {
+            self.suggestion1.suggestion_id: {
+                '-,-,-,-': {
+                    'latexId': 'latex_id1',
+                    'dimensions': {
+                        'encoded_height_string': '1d429',
+                        'encoded_width_string': '1d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                }
+            },
+            self.suggestion2.suggestion_id: {
+                '+,+,+,+': {
+                    'latexId': 'latex_id2',
+                    'dimensions': {
+                        'encoded_height_string': '1d525',
+                        'encoded_width_string': '3d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                }
+            }
+        }
+        csrf_token = self.get_new_csrf_token()
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        response_dict = self.post_json(
+            feconf.SUGGESTIONS_LATEX_SVG_HANDLER,
+            {'latexMapping': post_data},
+            csrf_token=csrf_token,
+            upload_files=(
+                ('latex_id1', 'latex_id1', svg_file_1),),
+            expected_status_int=400)
+        self.assertIn(
+            'SVG for LaTeX string +,+,+,+ in suggestion %s is not '
+            'supplied.' % (self.suggestion2.suggestion_id),
+            response_dict['error'])
+        self.logout()
+
+    def test_post_svgs_when_latex_to_svg_mappings_is_invalid(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        post_data = []
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.post_json(
+            feconf.SUGGESTIONS_LATEX_SVG_HANDLER,
+            {'latexMapping': post_data},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertIn(
+            'Expected latex_to_svg_mappings to be a dict.',
+            response_dict['error'])
         self.logout()
 
 
