@@ -175,7 +175,6 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.saveThisDestination = function() {
-            console.log('Emit: saveOutcomeDestDetails in outcome-editor');
             StateEditorService.onSaveOutcomeDestDetails.emit();
             ctrl.destinationEditorIsOpen = false;
             ctrl.savedOutcome.dest = angular.copy(ctrl.outcome.dest);
