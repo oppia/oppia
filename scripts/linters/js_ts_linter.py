@@ -1180,7 +1180,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             matched_pattern)
                         stringfied_dependencies = (
                             stringfied_dependencies.strip().replace(
-                              '\'', '').replace(' ', '').replace('\n', ''))[:-1]
+                                '\'', '').replace(' ', '').replace(
+                                    '\n', ''))[:-1]
                         string1 = stringfied_dependencies
                 else:
                     string1 = ''
@@ -1192,7 +1193,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             matched_pattern)
                         stringfied_dependencies = (
                             stringfied_dependencies.strip().replace(
-                              '\'', '').replace(' ', '').replace('\n', ''))[:-1]
+                                '\'', '').replace(' ', '').replace(
+                                    '\n', ''))[:-1]
                         string2 = stringfied_dependencies
                 else:
                     string2 = ''
@@ -1206,7 +1208,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             matched_pattern)
                         stringfied_dependencies = (
                             stringfied_dependencies.strip().replace(
-                              '\'', '').replace(' ', '').replace('\n', ''))[:-1]
+                                '\'', '').replace(' ', '').replace(
+                                    '\n', ''))[:-1]
                         string3 = stringfied_dependencies
                 else:
                     string3 = ''
@@ -1222,9 +1225,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     cnt = len(re.findall(r'' + dep + '[^\']', content))
                     if cnt < 2:
                         if start_point == 0:
-                            python_utils.PRINT(
-                                               '---Checking the file:', filepath)
-                        python_utils.PRINT(dep, ':', cnt, 
+                            python_utils.PRINT('---Checking the file:', filepath)
+                        python_utils.PRINT(dep, ':', cnt,
                                            '------------------Unused Dependency')
                         failed = True
                         start_point += 1
