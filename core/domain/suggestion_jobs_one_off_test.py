@@ -570,6 +570,10 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
     ]
 
+    def mock_generate_new_skill_thread_id(
+            self, unused_entity_type, unused_entity_id):
+        return 'skill1.thread1'
+
     def mock_get_exploration_by_id(self, exp_id):
         for exp in self.explorations:
             if exp.id == exp_id:
@@ -659,7 +663,10 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             't;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;quot;'
             'svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninte'
             'ractive-math>']
-        self.assertEqual(actual_output1[0], suggestion1.suggestion_id)
+        self.assertEqual(
+            actual_output1[0],
+            'math tags with no SVGs in suggestion with ID %s' % (
+                suggestion1.suggestion_id))
         self.assertEqual(actual_output1[1], expected_output1_value)
 
         actual_output2 = ast.literal_eval(sorted(actual_output)[2])
@@ -668,15 +675,18 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             't;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;quot;'
             'svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninte'
             'ractive-math>']
-        self.assertEqual(actual_output2[0], suggestion2.suggestion_id)
+        self.assertEqual(
+            actual_output2[0],
+            'math tags with no SVGs in suggestion with ID %s' % (
+                suggestion2.suggestion_id))
         self.assertEqual(actual_output2[1], expected_output2_value)
 
         overall_result = ast.literal_eval(sorted(actual_output)[0])
         self.assertEqual(
             overall_result[1],
             {
-                'no_of_invalid_tags': 2,
-                'no_of_suggestions_with_no_svgs': 2
+                'number_of_math_tags_with_invalid_svg_filename': 2,
+                'number_of_suggestions_with_no_svgs': 2
             })
 
     def test_job_when_suggestions_have_valid_filenames(self):
@@ -780,9 +790,67 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
         expected_output = [
-            u'[u\'found-suggestion-with-invalid-math\', [u\'%s\']]' % (
+            u'[u\'invalid-math-content-attribute-in-math-tag\', [u\'%s\']]' % (
                 suggestion.suggestion_id)]
         self.assertEqual(actual_output, expected_output)
+
+    def test_job_acts_only_on_suggestion_edit_state_content(self):
+
+        change1 = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1']
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3,
+        }
+
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+                suggestion_models.TARGET_TYPE_SKILL,
+                'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
+                self.author_id_1, change1, 'test description')
+
+        change2 = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'state_1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>State name: state_1, Content id: content</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, 1, self.author_id_1,
+                    change2, 'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
+        self.assertEqual(actual_output, [])
 
 
 class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):

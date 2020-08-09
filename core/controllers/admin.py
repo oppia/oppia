@@ -688,7 +688,7 @@ class SuggestionsLatexSvgHandler(base.BaseHandler):
     def get(self):
         latex_strings_to_suggestion_ids_mapping = (
             suggestion_services.
-            get_suggestions_with_latex_strings_having_no_svgs())
+            get_latex_strings_to_suggestion_ids_mapping())
         self.render_json({
             'latex_strings_to_suggestion_ids_mapping': (
                 latex_strings_to_suggestion_ids_mapping)
@@ -697,6 +697,10 @@ class SuggestionsLatexSvgHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def post(self):
         latex_to_svg_mappings = self.payload.get('latexMapping')
+        if not isinstance(latex_to_svg_mappings, dict):
+            raise self.InvalidInputException(
+                'Expected latex_to_svg_mappings to be a dict.')
+
         for suggestion_id, latex_to_svg_mapping_dict in (
                 latex_to_svg_mappings.items()):
             for latex_string in latex_to_svg_mapping_dict.keys():

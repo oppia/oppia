@@ -1499,14 +1499,14 @@ class SuggestionLatexSvgUpdationTests(test_utils.GenericTestBase):
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, self.change2, 'test description')
 
-    def test_get_suggestions_with_latex_strings_having_no_svgs(self):
+    def test_get_latex_strings_to_suggestion_ids_mapping(self):
         expected_output = {
             self.suggestion1.suggestion_id: [b'-,-,-,-'],
             self.suggestion2.suggestion_id: [b'+,+,+,+']
         }
         self.assertEqual(
             suggestion_services.
-            get_suggestions_with_latex_strings_having_no_svgs(),
+            get_latex_strings_to_suggestion_ids_mapping(),
             expected_output)
 
     def test_update_suggestions_with_math_svgs(self):

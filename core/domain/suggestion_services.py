@@ -801,7 +801,7 @@ def update_suggestions_with_math_svgs(suggestions_raw_latex_to_image_data_dict):
     _update_suggestions(suggestions_to_update, update_last_updated_time=False)
 
 
-def get_suggestions_with_latex_strings_having_no_svgs():
+def get_latex_strings_to_suggestion_ids_mapping():
     """Returns a batch of LaTeX strings from suggestion which have LaTeX
     strings without SVGs.
 
@@ -817,7 +817,10 @@ def get_suggestions_with_latex_strings_having_no_svgs():
     exploration_suggestion_models = (
         suggestion_models.GeneralSuggestionModel.get_all().filter(
             suggestion_models.GeneralSuggestionModel.
-            target_type == 'exploration'))
+            target_type == suggestion_models.TARGET_TYPE_EXPLORATION).filter(
+                suggestion_models.GeneralSuggestionModel.
+                suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)))
     suggestion_id_to_latex_strings = {}
     for model in exploration_suggestion_models:
         suggestion = get_suggestion_from_model(model)

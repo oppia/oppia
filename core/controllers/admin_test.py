@@ -1408,6 +1408,25 @@ class SuggestionsLatexSvgHandlerTest(test_utils.GenericTestBase):
             response_dict['error'])
         self.logout()
 
+    def test_post_svgs_when_latex_to_svg_mappings_is_invalid(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        post_data = []
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.post_json(
+            feconf.SUGGESTIONS_LATEX_SVG_HANDLER,
+            {'latexMapping': post_data},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertIn(
+            'Expected latex_to_svg_mappings to be a dict.',
+            response_dict['error'])
+        self.logout()
+
 
 class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
     """Tests for data extraction handler."""
