@@ -989,6 +989,8 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
 class MemoryCacheAdminHandler(base.BaseHandler):
     """Handler for memory cache functions used in the Misc Page."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @acl_decorators.can_access_admin_page
     def get(self):
         cache_stats = caching_services.get_memory_cache_stats()

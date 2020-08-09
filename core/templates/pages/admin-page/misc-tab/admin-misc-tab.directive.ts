@@ -52,7 +52,7 @@ angular.module('oppia').directive('adminMiscTab', [
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
           '/senddummymailtoadminhandler');
-        var FLUSH_MEMORY_CACHE_URL = '/refreshmemorycache';
+        var FLUSH_MEMORY_CACHE_URL = '/adminmemorycachehandler';
         var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
         var EXPLORATIONS_LATEX_SVG_HANDLER = '/explorationslatexsvghandler';
         var irreversibleActionMessage = (

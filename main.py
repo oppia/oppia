@@ -215,6 +215,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
+        r'/adminmemorycachehandler', admin.MemoryCacheAdminHandler),
+    get_redirect_route(
         r'/explorationslatexsvghandler', admin.ExplorationsLatexSvgHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
@@ -783,8 +785,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(
         r'/senddummymailtoadminhandler', admin.SendDummyMailToAdminHandler),
-    get_redirect_route(
-        r'/refreshmemorycache', admin.MemoryCacheAdminHandler),
     get_redirect_route(r'/updateusernamehandler', admin.UpdateUsernameHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
