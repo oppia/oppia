@@ -67,7 +67,7 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
         'CsrfTokenService', 'EntityCreationService', 'ImageUploadHelperService',
         'PageTitleService', 'SkillCreationService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
@@ -77,7 +77,7 @@ angular.module('oppia').directive('topicEditorTab', [
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         function(
-            $scope, $uibModal, AlertsService, ContextService,
+            $rootScope, $scope, $uibModal, AlertsService, ContextService,
             CsrfTokenService, EntityCreationService, ImageUploadHelperService,
             PageTitleService, SkillCreationService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
@@ -88,6 +88,8 @@ angular.module('oppia').directive('topicEditorTab', [
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
+          $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
+            topicConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT);
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
@@ -98,10 +100,14 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
-            $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
+            $scope.initialTopicName = $scope.topic.getName();
+            $scope.initialTopicUrlFragment = $scope.topic.getUrlFragment();
+            $scope.editableTopicUrlFragment = $scope.topic.getUrlFragment();
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.allowedBgColors = (
               topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
+            $scope.topicNameExists = false;
+            $scope.topicUrlFragmentExists = false;
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -214,11 +220,43 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicName = function(newName) {
-            if (newName === $scope.topic.getName()) {
+            if (newName === $scope.initialTopicName) {
+              $scope.topicNameExists = false;
               return;
             }
-            TopicUpdateService.setTopicName($scope.topic, newName);
-            $scope.topicNameEditorIsShown = false;
+            if (newName) {
+              TopicEditorStateService.updateExistenceOfTopicName(
+                newName, function() {
+                  $scope.topicNameExists = (
+                    TopicEditorStateService.getTopicWithNameExists());
+                  TopicUpdateService.setTopicName($scope.topic, newName);
+                  $scope.topicNameEditorIsShown = false;
+                  $rootScope.$applyAsync();
+                });
+            } else {
+              TopicUpdateService.setTopicName($scope.topic, newName);
+              $scope.topicNameEditorIsShown = false;
+            }
+          };
+
+          $scope.updateTopicUrlFragment = function(newTopicUrlFragment) {
+            if (newTopicUrlFragment === $scope.initialTopicUrlFragment) {
+              $scope.topicUrlFragmentExists = false;
+              return;
+            }
+            if (newTopicUrlFragment) {
+              TopicEditorStateService.updateExistenceOfTopicUrlFragment(
+                newTopicUrlFragment, function() {
+                  $scope.topicUrlFragmentExists = (
+                    TopicEditorStateService.getTopicWithUrlFragmentExists());
+                  TopicUpdateService.setTopicUrlFragment(
+                    $scope.topic, newTopicUrlFragment);
+                  $rootScope.$applyAsync();
+                });
+            } else {
+              TopicUpdateService.setTopicUrlFragment(
+                $scope.topic, newTopicUrlFragment);
+            }
           };
 
           $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {

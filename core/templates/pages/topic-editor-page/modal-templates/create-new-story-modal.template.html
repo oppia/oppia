@@ -12,9 +12,9 @@
       <input class="form-control protractor-test-new-story-title-field" ng-model="story.title" maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" autofocus>
       <div>
         <span class="oppia-input-box-subtitle">
-          <i>
+          <em>
             Story title should be at most <[MAX_CHARS_IN_STORY_TITLE]> characters.
-          </i>
+          </em>
         </span>
       </div>
     </div>
@@ -23,6 +23,26 @@
         <span>Description*</span>
       </div>
       <textarea rows="3" cols="50" ng-model="story.description" class="form-control protractor-test-new-story-description-field"></textarea>
+    </div>
+    <div class="story-input">
+      <div class="story-input-header">
+        <span>Url Fragment*</span>
+      </div>
+      <input class="form-control protractor-test-new-story-url-fragment-field" ng-model="story.urlFragment" maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>"
+             ng-class="{'is-invalid': storyUrlFragmentExists}"
+             ng-change="onStoryUrlFragmentChange()">
+      <div>
+        <span class="oppia-input-box-subtitle">
+          <em>
+            The story URL fragment is used to uniquely access the story viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_STORY_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+          </em>
+        </span>
+        <div ng-if="storyUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
+          <em>
+            This story URL fragment already exists.
+          </em>
+        </div>
+      </div>
     </div>
     <div class="story-input story-input-thumbnail">
       <div class="story-input-header">
