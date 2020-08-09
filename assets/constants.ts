@@ -17,6 +17,14 @@ export = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
+  // The term 'staging' is used instead of the classroom url fragment field
+  // in the URL for topics that are not yet attached to a classroom.
+  "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
+
+  // The default classroom URL fragment to use when the provided classroom URL
+  // fragment in the controller is invalid.
+  "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
+
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
@@ -5227,7 +5235,17 @@ export = {
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
+
+  // This represents the maximum number of characters in the URL fragment for
+  // classroom in the classroom page URL. E.g. in /learn/math/...,
+  // 'math' is the 'classroom URL fragment'.
+  "MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_NAME": 39,
+  "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 12,
+  // This represents the maximum number of characters in the URL fragment for
+  // topic in the topic page URL. E.g. in /learn/math/fractions/...,
+  // 'fractions' is the 'topic URL fragment'.
+  "MAX_CHARS_IN_TOPIC_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
@@ -5235,6 +5253,16 @@ export = {
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
+  // This represents the maximum number of characters in the URL fragment for
+  // story in the story page URL. E.g.
+  // in /learn/math/fractions/story/bakery/..., 'bakery' is the
+  // 'story URL fragment'.
+  "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
+  // This represents the maximum number of characters in the URL fragment for
+  // subtopic in the revision page URL. E.g.
+  // in /learn/math/fractions/revision/place-values, 'place-values' is the
+  // 'subtopic URL fragment'.
+  "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
@@ -5261,6 +5289,7 @@ export = {
       "hints": [],
       "solution": null
     },
+    "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
       "voiceovers_mapping": {
@@ -5285,6 +5314,9 @@ export = {
 
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
+
+  // A regular expression for allowed characters in URL fragment fields.
+  "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
 
   // Invalid names for parameters used in expressions.
   "INVALID_PARAMETER_NAMES": [

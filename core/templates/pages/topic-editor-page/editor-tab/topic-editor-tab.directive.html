@@ -1,12 +1,16 @@
+<p class="topic-dashboard-link">
+  <a href="/topics-and-skills-dashboard">
+    Back to Topics Dashboard <i class="fa fa-angle-left"></i>
+  </a>
+  <span><[editableName]></span>
+</p>
+<a class="oppia-mobile-back-to-parent" href="/topics-and-skills-dashboard">
+  <i class="fa fa-angle-left"></i>
+  <span>Back to Topics Dashboard</span>
+</a>
 <div role="form" class="form-horizontal topic-editor">
   <div class="topic-content-container">
-    <p class="topic-dashboard-link">
-      <a href="/topics-and-skills-dashboard">
-        Back to Topics Dashboard <i class="fa fa-angle-left"></i>
-      </a>
-      <span><[editableName]></span>
-    </p>
-    <md-card class="oppia-long-text oppia-mobile-collapsible-card">
+    <md-card class="oppia-long-text topic-item-card oppia-mobile-collapsible-card">
       <div class="topic-editor-main-container">
         <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards()">
           <h3 class="topic-card-header">Details</h3>
@@ -21,6 +25,61 @@
         </div>
         <div ng-if="mainTopicCardIsShown">
           <div class="oppia-mobile-collapsible-card-content">
+            <div class="topic-name">
+              <label for="topicName" class="form-heading protractor-test-topic-name-heading">Name</label>
+              <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
+                     ng-disabled="!topicRights.canEditTopic()"
+                     ng-model="editableName" ng-blur="updateTopicName(editableName)"
+                     placeholder="Enter a name for the topic."
+                     maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>"
+                     ng-trim="false"
+                     ng-class="{'is-invalid': topicNameExists}">
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+                </em>
+              </span>
+              <div ng-if="topicNameExists" class="oppia-input-box-subtitle text-danger">
+                <em>
+                  A topic with this name already exists.
+                </em>
+              </div>
+            </div>
+            <div class="topic-url-fragment">
+              <label for="topicUrlFragment" class="form-heading protractor-test-topic-url-fragment-heading">Topic URL Fragment</label>
+              <input id="topicUrlFragment" type="text" class="form-control protractor-test-topic-url-fragment-field"
+                     ng-disabled="!topicRights.canEditTopic()"
+                     ng-model="editableTopicUrlFragment" ng-blur="updateTopicUrlFragment(editableTopicUrlFragment)"
+                     maxlength="<[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]>" ng-trim="true"
+                     ng-class="{'is-invalid': topicUrlFragmentExists}">
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]> characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                </em>
+              </span>
+              <div ng-if="topicUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
+                <em>
+                  This topic URL fragment already exists.
+                </em>
+              </div>
+            </div>
+            <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
+              <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
+              <textarea type="text" class="form-control topic-description protractor-test-topic-description-field"
+                        ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
+                        ng-change="updateTopicDescriptionStatus(editableDescription)"
+                        ng-blur="updateTopicDescription(editableDescription)"
+                        placeholder="Enter the description of the topic">
+              </textarea>
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+                </em>
+              </span>
+              <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
+                What does this topic contain?
+              </span>
+            </div>
             <label class="form-heading">Thumbnail</label>
             <thumbnail-uploader disabled="!topicRights.canEditTopic()"
                                 filename="topic.getThumbnailFilename()"
@@ -34,35 +93,6 @@
                                 preview-description-bg-color="'#2F6687'"
                                 preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
             </thumbnail-uploader>
-            <div class="topic-name">
-              <label for="topicName" class="form-heading protractor-test-topic-name-heading">Name</label>
-              <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
-                     ng-disabled="!topicRights.canEditTopic()"
-                     ng-model="editableName" ng-blur="updateTopicName(editableName)"
-                     placeholder="Enter a name for the topic." maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" ng-trim="false">
-              <span class="oppia-input-box-subtitle">
-                <i>
-                  Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
-                </i>
-              </span>
-            </div>
-            <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
-              <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
-              <textarea type="text" class="form-control topic-description protractor-test-topic-description-field"
-                        ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
-                        ng-change="updateTopicDescriptionStatus(editableDescription)"
-                        ng-blur="updateTopicDescription(editableDescription)"
-                        placeholder="Enter the description of the topic">
-              </textarea>
-              <span class="oppia-input-box-subtitle">
-                <i>
-                  Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
-                </i>
-              </span>
-              <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
-                What does this topic contain?
-              </span>
-            </div>
           </div>
         </div>
       </div>
@@ -90,11 +120,11 @@
         </div>
       </div>
     </md-card>
-    <md-card class="item-list-card subtopic-skill-card-container oppia-mobile-collapsible-card">
+    <md-card class="item-list-card subtopic-skill-card-container topic-bottom-card oppia-mobile-collapsible-card">
       <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(SUBTOPIC_LIST)">
         <div class="subtopic-reassign-header">
           <h3>Subtopics</h3>
-          <span class="reassign-button protractor-test-reassign-skill-button" ng-click="reassignSkillsInSubtopics()">Reassign</span>
+          <span class="reassign-button protractor-test-reassign-skill-button" ng-click="reassignSkillsInSubtopics()">REASSIGN</span>
           <i class="fa fa-caret-down"
              ng-if="!subtopicsListIsShown"
              aria-hidden="true">
@@ -196,7 +226,7 @@
     </md-card>
   </div>
   <div class="topic-info-container">
-    <md-card class="item-list-card oppia-mobile-collapsible-card">
+    <md-card class="item-list-card topic-item-card topic-bottom-card oppia-mobile-collapsible-card">
       <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(STORY_LIST)">
         <h3>Canonical Stories</h3>
         <i class="fa fa-caret-down"
@@ -240,27 +270,33 @@
   </div>
 </div>
 <style>
-  .topic-editor thumbnail-uploader {
+  topic-editor-tab .topic-editor thumbnail-uploader {
     margin-bottom: 15px;
   }
 
-  .topic-editor textarea {
+  topic-editor-tab .topic-editor textarea {
     resize: vertical;
   }
 
-  .topic-editor {
+  topic-editor-tab .topic-editor {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    margin: 0 auto;
+    width: 85%;
   }
 
   .topic-editor .topic-content-container {
-    width: 45%;
+    margin-right: 3%;
+    width: 50%;
   }
 
   .topic-editor .topic-info-container {
-    margin-top: 34px;
     width: 35%;
+  }
+
+  .topic-editor .topic-item-card {
+    margin: 0;
   }
 
   .topic-editor .add-entity-text {
@@ -268,12 +304,13 @@
     margin-top: 20px;
   }
 
-  .topic-editor .topic-dashboard-link {
-    font-weight: bold;
+  topic-editor-tab .topic-dashboard-link {
+    font-size: 15px;
+    margin-bottom: 35px;
+    margin-left: 4%;
   }
 
-  .topic-editor .topic-dashboard-link a {
-    margin-left: 1%;
+  topic-editor-tab .topic-dashboard-link a {
     text-decoration: none;
   }
 
@@ -367,7 +404,8 @@
     font-size: 15px;
   }
 
-  .topic-editor .topic-name {
+  .topic-editor .topic-name,
+  .topic-editor .topic-url-fragment {
     margin-bottom: 25px;
     margin-top: 32px;
   }
@@ -394,7 +432,7 @@
   }
 
   .topic-editor .add-skill-btn {
-    width: 120px;
+    width: 108px;
   }
 
   .topic-editor .add-story-btn {
@@ -556,8 +594,17 @@
   }
 
   @media screen and (max-width: 768px) {
-    .topic-editor {
+    topic-editor-tab .topic-editor {
       margin-bottom: 15px;
+      width: 100%;
+    }
+
+    topic-editor-tab .topic-dashboard-link {
+      display: none;
+    }
+
+    .topic-editor .topic-bottom-card {
+      margin-top: 40px;
     }
 
     .topic-editor .item-list-card {
@@ -606,6 +653,7 @@
     }
 
     .topic-editor .topic-content-container {
+      margin-right: 0;
       margin-top: 30px;
       width: 100%;
     }
