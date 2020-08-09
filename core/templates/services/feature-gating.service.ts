@@ -130,7 +130,7 @@ export class FeatureGatingService {
       return 'Safari';
     }
 
-    return 'Others';
+    return 'Unknown';
   }
 
   /**
