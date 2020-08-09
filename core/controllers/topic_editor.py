@@ -23,6 +23,7 @@ import logging
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classroom_services
 from core.domain import email_manager
 from core.domain import fs_services
 from core.domain import image_validation_services
@@ -242,6 +243,9 @@ class EditableTopicDataHandler(base.BaseHandler):
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
+        classroom_url_fragment = (
+            classroom_services.get_classroom_url_fragment_for_topic_id(
+                topic_id))
         skill_question_count_dict = {}
         for skill_id in topic.get_all_skill_ids():
             skill_question_count_dict[skill_id] = (
@@ -249,6 +253,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                     [skill_id]))
 
         self.values.update({
+            'classroom_url_fragment': classroom_url_fragment,
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
             'skill_question_count_dict': skill_question_count_dict,
@@ -405,4 +410,40 @@ class TopicPublishHandler(base.BaseHandler):
         except Exception as e:
             raise self.UnauthorizedUserException(e)
 
+        self.render_json(self.values)
+
+
+class TopicUrlFragmentHandler(base.BaseHandler):
+    """A data handler for checking if a topic with given url fragment exists.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, topic_url_fragment):
+        """Handler that receives a topic url fragment and checks whether
+        a topic with the same url fragment exists.
+        """
+        self.values.update({
+            'topic_url_fragment_exists': (
+                topic_services.does_topic_with_url_fragment_exist(
+                    topic_url_fragment))
+        })
+        self.render_json(self.values)
+
+
+class TopicNameHandler(base.BaseHandler):
+    """A data handler for checking if a topic with given name exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, topic_name):
+        """Handler that receives a topic name and checks whether
+        a topic with the same name exists.
+        """
+        self.values.update({
+            'topic_name_exists': (
+                topic_services.does_topic_with_name_exist(topic_name))
+        })
         self.render_json(self.values)

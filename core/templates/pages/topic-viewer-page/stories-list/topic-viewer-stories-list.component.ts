@@ -28,6 +28,8 @@ import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
 })
 export class StoriesListComponent {
   @Input() canonicalStorySummaries: StorySummary[];
+  @Input() classroomUrlFragment: string;
+  @Input() topicUrlFragment: string;
   constructor() {}
 }
 angular.module('oppia').directive(
