@@ -29,6 +29,9 @@ require(
 require(
   'pages/exploration-editor-page/editor-tab/state-param-changes-editor/' +
   'state-param-changes-editor.component.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/unresolved-answers-overview/' +
+  'unresolved-answers-overview.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require(

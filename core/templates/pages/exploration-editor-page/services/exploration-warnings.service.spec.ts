@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for ExplorationWarningsService.
  */
 
+import { fakeAsync } from '@angular/core/testing';
+
+import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { StateTopAnswersStats } from
+  'domain/statistics/state-top-answers-stats-object.factory';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-editor-tab.directive.ts is upgraded to Angular 8.
 import { AngularNameService } from
@@ -34,6 +40,7 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { ImprovementsService } from 'services/improvements.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
@@ -100,6 +107,7 @@ describe('Exploration Warnings Service', function() {
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));
+    $provide.value('ImprovementsService', new ImprovementsService());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
@@ -520,6 +528,108 @@ describe('Exploration Warnings Service', function() {
             ]
           });
       });
+
+    it('should update warnings when state top answers stats is initiated',
+      fakeAsync(async function() {
+        ExplorationStatesService.init({
+          Hola: {
+            content: {
+              content_id: 'content',
+              html: '{{HtmlValue}}'
+            },
+            recorded_voiceovers: {
+              voiceovers_mapping: {},
+            },
+            param_changes: [],
+            interaction: {
+              id: 'TextInput',
+              solution: {
+                correct_answer: 'This is the correct answer',
+                answer_is_exclusive: false,
+                explanation: {
+                  html: 'Solution explanation'
+                }
+              },
+              answer_groups: [{
+                outcome: {
+                  dest: '',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ''
+                  },
+                },
+                rule_specs: [],
+                training_data: []
+              }],
+              default_outcome: {
+                dest: 'Hola',
+                feedback: {
+                  content_id: '',
+                  html: '',
+                },
+              },
+              customization_args: {
+                rows: {
+                  value: true
+                },
+                placeholder: {
+                  value: 1
+                }
+              },
+              hints: [],
+            },
+            written_translations: {
+              translations_mapping: {
+                content: {},
+                default_outcome: {},
+              },
+            },
+          }
+        });
+        spyOn(StateTopAnswersStatsBackendApiService, 'fetchStatsAsync')
+          .and.returnValue(Promise.resolve(
+            new StateTopAnswersStats(
+              {Hola: [new AnswerStats('hola', 'hola', 7, false)]},
+              {Hola: 'TextInput'})));
+        await StateTopAnswersStatsService.initAsync(
+          'expId', ExplorationStatesService.getStates());
+
+        ExplorationWarningsService.updateWarnings();
+
+        expect(ExplorationWarningsService.getWarnings()).toEqual([{
+          type: 'critical',
+          message: 'Please ensure the value of parameter "ParamChange2" is' +
+          ' set before it is referred to in the initial list of parameter' +
+          ' changes.'
+        }, {
+          type: 'critical',
+          message: 'Please ensure the value of parameter "HtmlValue" is set' +
+          ' before using it in "Hola".'
+        }, {
+          type: 'error',
+          message: 'The following card has errors: Hola.'
+        }, {
+          type: 'error',
+          message: 'In \'Hola\', the following answer group has a classifier' +
+          ' with no training data: 0'
+        }]);
+        expect(ExplorationWarningsService.countWarnings()).toBe(4);
+        expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+        expect(ExplorationWarningsService.getAllStateRelatedWarnings())
+          .toEqual({
+            Hola: [
+              'Placeholder text must be a string.',
+              'Number of rows must be integral.',
+              'There is an answer among the top 10 which has no explicit' +
+              ' feedback.',
+              'The current solution does not lead to another card.',
+              'There\'s no way to complete the exploration starting from' +
+              ' this card. To fix this, make sure that the last card in' +
+              ' the chain starting from this one has an \'End Exploration\'' +
+              ' question type.'
+            ]
+          });
+      }));
 
     it('should update warnings when state name is not equal to the default' +
     ' outcome destination', function() {

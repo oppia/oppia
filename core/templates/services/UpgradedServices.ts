@@ -262,6 +262,7 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
+import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { InteractionAttributesExtractorService } from
@@ -767,6 +768,7 @@ export class UpgradedServices {
     upgradedServices['ImageClickInputRulesService'] =
       new ImageClickInputRulesService();
     upgradedServices['ImageFileObjectFactory'] = new ImageFileObjectFactory();
+    upgradedServices['ImprovementsService'] = new ImprovementsService();
     upgradedServices['IneffectiveFeedbackLoopTaskObjectFactory'] =
       new IneffectiveFeedbackLoopTaskObjectFactory();
     upgradedServices['InteractionDetailsCacheService'] =
