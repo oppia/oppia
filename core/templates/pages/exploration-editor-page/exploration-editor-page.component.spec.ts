@@ -45,7 +45,7 @@ import { StateTopAnswersStatsBackendApiService } from
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
-fdescribe('Exploration editor page component', function() {
+describe('Exploration editor page component', function() {
   var ctrl = null;
 
   var $q = null;

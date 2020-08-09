@@ -16,21 +16,31 @@
  * @fileoverview Unit tests for editorNavbarBreadcrumb.
  */
 
+import { EventEmitter } from '@angular/core';
+
 describe('Editor Navbar Breadcrumb directive', function() {
   var $rootScope = null;
   var $scope = null;
   var ExplorationTitleService = null;
+  var ExplorationPropertyService = null;
   var FocusManagerService = null;
   var RouterService = null;
+
+  var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
+    ExplorationPropertyService = $injector.get('ExplorationPropertyService');
     FocusManagerService = $injector.get('FocusManagerService');
     RouterService = $injector.get('RouterService');
 
     ExplorationTitleService.init('Exploration Title Example Very Long');
+
+    spyOnProperty(ExplorationPropertyService,
+      'onExplorationPropertyChanged').and.returnValue(
+      mockExplorationPropertyChangedEventEmitter);
 
     $scope = $rootScope.$new();
     var ctrl = $componentController('editorNavbarBreadcrumb', {
@@ -69,7 +79,7 @@ describe('Editor Navbar Breadcrumb directive', function() {
 
   it('should update nav bar title when exploration property changes',
     function() {
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect($scope.navbarTitle).toBe(
         'Exploration Title...');
