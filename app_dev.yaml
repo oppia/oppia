@@ -245,8 +245,12 @@ libraries:
 - name: webapp2
   version: "2.5.2"
 
+vpc_access_connector:
+  name: oppia-redis-connector-1
+
 env_variables:
   PYTHONHTTPSVERIFY: 1
+  GAE_USE_SOCKETS_HTTPLIB : 'anyvalue’
 
 skip_files:
 # .pyc and .pyo files
