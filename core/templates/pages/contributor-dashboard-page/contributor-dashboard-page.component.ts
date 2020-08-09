@@ -31,7 +31,7 @@ require(
   'translation-language-selector.component.ts');
 require(
   'pages/contributor-dashboard-page/question-opportunities/' +
-  'question-opportunities.component.ts');
+  'question-opportunities.directive.ts');
 require(
   'pages/contributor-dashboard-page/translation-opportunities/' +
   'translation-opportunities.directive.ts');
