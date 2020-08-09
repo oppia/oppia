@@ -568,6 +568,14 @@ class Topic(python_utils.OBJECT):
             the object.
         """
         topic_dict = self.to_dict()
+        # The only reason we add the version parameter separately is that our
+        # yaml encoding/decoding of this object does not handle the version
+        # parameter.
+        # NOTE: If this changes in the future (i.e the version parameter is
+        # added as part of the yaml representation of this object), all YAML
+        # files must add a version parameter to their files with the correct
+        # version of this object. The line below must then be moved to
+        # to_dict().
         topic_dict['version'] = self.version
 
         if self.created_on:

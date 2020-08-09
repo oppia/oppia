@@ -173,8 +173,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             exp_ids_to_explorations[exploration_id].to_dict())
 
     def test_partial_fetches_returns_correct_elements(self):
-        """Testing that querying the cache for elements where only a subsection
-        of the queried ids exist in the cache returns reasonable output.
+        """Testing that querying the cache returns reasonable output for
+        elements where only a subsection of the queried ids exist in the cache.
         """
         key_value_mapping = {'a': '1', 'c': '3'}
         exploration_id = 'id'

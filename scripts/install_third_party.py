@@ -372,7 +372,8 @@ def install_redis_cli():
         python_utils.PRINT('Installing redis-cli...')
 
         download_and_untar_files(
-            'https://download.redis.io/releases/redis-6.0.6.tar.gz',
+            ('https://download.redis.io/releases/redis-%s.tar.gz') %
+            common.REDIS_CLI_VERSION,
             TARGET_DOWNLOAD_DIRS['oppiaTools'],
             'redis-%s' % common.REDIS_CLI_VERSION,
             'redis-cli-%s' % common.REDIS_CLI_VERSION)
@@ -390,6 +391,7 @@ def install_redis_cli():
             # run the server from inside the oppia folder by executing the
             # script src/redis-cli and src/redis-server.
             subprocess.call(['make'])
+            subprocess.call(['make', 'test'])
 
         # Make the scripts executable.
         subprocess.call([
