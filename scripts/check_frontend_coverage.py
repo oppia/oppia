@@ -413,7 +413,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'voiceover-opportunities.directive.ts',
     'voiceover-recording.service.ts',
     'warnings-and-alerts.directive.ts',
-    'window-wrapper-message.service.ts',
     'worked-example-editor.directive.ts',
 ]
 
