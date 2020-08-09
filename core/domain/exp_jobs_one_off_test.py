@@ -659,8 +659,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }).to_dict()
 
-        self.save_new_exp_with_states_schema_v34(
-            self.VALID_EXP_ID, 'user_id', states_dict)
+        self.save_new_exp_with_custom_states_schema_version(
+            self.VALID_EXP_ID, 'user_id', states_dict, 34)
 
         job_id = (
             exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new())
@@ -1046,10 +1046,9 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-    def test_audit_job_only_runs_for_previous_states_schema_version(self):
-        """Tests that the exploration migration job does not convert
-        explorations with a state schema that is not the previous state schema
-        version.
+    def test_audit_job_runs_for_any_state_schema_version(self):
+        """Tests that the exploration migration converts older explorations to a
+        previous state schema version before running the audit job.
         """
         self.save_new_exp_with_states_schema_v0(
             self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
@@ -1060,12 +1059,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off.ExplorationMigrationAuditJob.get_output(job_id))
 
-        self.assertEqual(
-            actual_output,
-            [
-                u'[u\'WRONG_STATE_VERSION\', [u\'Exploration exp_id1 was not ' +
-                'migrated because its states schema verison is 0\']]'
-            ])
+        self.assertEqual(actual_output, [u'[u\'SUCCESS\', 1]'])
 
     def test_migration_job_audit_success(self):
         """Test that the audit job runs correctly on explorations of the
@@ -1240,7 +1234,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
         with swap_states_schema_version, swap_exp_schema_version, self.swap(
             exp_domain.Exploration,
-            '_convert_v41_dict_to_v42_dict',
+            '_convert_states_v36_dict_to_v37_dict',
             mock_conversion
         ):
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
@@ -1254,7 +1248,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed migratio'
-            'n to v42: u\'property_that_dne\'"]]'
+            'n to states v37: u\'property_that_dne\'"]]'
         ]
         self.assertEqual(actual_output, expected_output)
 
