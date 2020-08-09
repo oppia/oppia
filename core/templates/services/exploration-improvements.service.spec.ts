@@ -15,6 +15,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { StateObjectsBackendDict } from
   'domain/exploration/StatesObjectFactory';
 import { ExplorationPermissions } from
@@ -44,7 +45,6 @@ import { StateTopAnswersStatsService } from
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 
 /**
  * @fileoverview Tests for ExplorationImprovementsService.

@@ -43,6 +43,9 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
 describe('Exploration editor page component', function() {
@@ -185,6 +188,10 @@ describe('Exploration editor page component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
     $provide.value('ExplorationDataService', mockExplorationDataService);
   }));
 

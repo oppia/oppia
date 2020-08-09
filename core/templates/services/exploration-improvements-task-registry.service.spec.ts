@@ -273,7 +273,6 @@ describe('Exploration improvements task registrar service', () => {
 
   describe('Validating initialize arguments', () => {
     it('should throw if stats is for wrong exploration', () => {
-      const expId = 'eid';
       expStatsBackendDict.exp_id = 'wrong_exp_id';
       expect(
         () => taskRegistryService.initialize(
@@ -285,7 +284,6 @@ describe('Exploration improvements task registrar service', () => {
     });
 
     it('should throw if stats is for wrong exploration version', () => {
-      const expVersion = 1;
       expStatsBackendDict.exp_version = 2;
       expect(
         () => taskRegistryService.initialize(
@@ -368,7 +366,6 @@ describe('Exploration improvements task registrar service', () => {
     });
 
     it('should throw if task targets wrong exploration', () => {
-      const expId = 'eid';
       taskBackendDict.entity_id = 'wrong_exp_id';
       expect(
         () => taskRegistryService.initialize(
@@ -380,7 +377,6 @@ describe('Exploration improvements task registrar service', () => {
     });
 
     it('should throw if task targets wrong exploration version', () => {
-      const expVersion = 1;
       taskBackendDict.entity_version = 2;
       expect(
         () => taskRegistryService.initialize(
