@@ -24,16 +24,16 @@ require(
 require('./window-wrapper-message.service');
 angular.module('oppia').factory('CommandExecutorService', [
   'WindowRef', 'WindowWrapperMessageService',
-  function(WindowRef, windowWrapperMessageService) {
+  function(WindowRef, WindowWrapperMessageService) {
     var setElementsOnPage = 0;
     var hostname = '';
     var cachedOuterFrameMessage = '';
     var sendParentReadyState = function(windowRef) {
-      windowWrapperMessageService.postMessageToParent(
+      WindowWrapperMessageService.postMessageToParent(
         'Ready to receive hostname', '*');
     };
     var initialize = function() {
-      windowWrapperMessageService.addEventListener(
+      WindowWrapperMessageService.addEventListener(
         'message', (event) => {
           var messageArray = event.data.split(' ');
           var command = messageArray[0];
@@ -50,7 +50,7 @@ angular.module('oppia').factory('CommandExecutorService', [
             hostname = message;
             if (cachedOuterFrameMessage !== '' &&
             cachedOuterFrameMessage !== undefined) {
-              windowWrapperMessageService.postMessageToParent(
+              WindowWrapperMessageService.postMessageToParent(
                 cachedOuterFrameMessage, hostname);
             }
           } else {
@@ -77,7 +77,7 @@ angular.module('oppia').factory('CommandExecutorService', [
       if (hostname === '') {
         cachedOuterFrameMessage = stateToCommand[id];
       } else {
-        windowWrapperMessageService.postMessageToParent(stateToCommand[id],
+        WindowWrapperMessageService.postMessageToParent(stateToCommand[id],
           hostname);
       }
     };
