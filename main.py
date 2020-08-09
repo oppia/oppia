@@ -323,6 +323,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
         topic_editor.TopicUrlFragmentHandler),
     get_redirect_route(
+        r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        topic_viewer.TopicViewerPage),
+    get_redirect_route(
         r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
     get_redirect_route(
@@ -334,6 +337,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/<subtopic_url_fragment>' % feconf.SUBTOPIC_DATA_HANDLER,
         subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
+        r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        topic_viewer.TopicViewerPage),
+    get_redirect_route(
         r'%s/revision/<subtopic_url_fragment>' %
         feconf.TOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
     get_redirect_route(
@@ -343,8 +349,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
-        r'%s/<:revision|story|practice>'
-        % feconf.TOPIC_VIEWER_URL_PREFIX,
+        r'%s/practice' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'

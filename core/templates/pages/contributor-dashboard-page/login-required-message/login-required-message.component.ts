@@ -23,10 +23,10 @@ angular.module('oppia').component('loginRequiredMessage', {
   template: require('./login-required-message.component.html'),
   controller: [
     '$timeout', '$window', 'SiteAnalyticsService', 'UrlInterpolationService',
-    'UserService',
+    'UserService', 'OPPIA_AVATAR_LINK_URL',
     function(
         $timeout, $window, SiteAnalyticsService, UrlInterpolationService,
-        UserService) {
+        UserService, OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
       ctrl.onLoginButtonClicked = function() {
         UserService.getLoginUrlAsync().then(
@@ -43,6 +43,7 @@ angular.module('oppia').component('loginRequiredMessage', {
         );
       };
       ctrl.$onInit = function() {
+        ctrl.OPPIA_AVATAR_LINK_URL = OPPIA_AVATAR_LINK_URL;
         ctrl.OPPIA_AVATAR_IMAGE_URL = (
           UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg'));
