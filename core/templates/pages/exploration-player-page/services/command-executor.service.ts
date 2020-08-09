@@ -204,27 +204,6 @@ angular.module('oppia').factory('CommandExecutorService', [
       sendStateToOuterFrame: function(id) {
         sendStateToOuterFrame(id);
       },
-      continueClick: function(windowRef) {
-        continueClick(windowRef);
-      },
-      addToSet: function(windowRef, message) {
-        addToSet(windowRef, message);
-      },
-      removeFromSet: function(windowRef, message) {
-        removeFromSet(windowRef, message);
-      },
-      submit: function(windowRef) {
-        submit(windowRef);
-      },
-      enterFraction: function(windowRef, fraction) {
-        enterFraction(windowRef, fraction);
-      },
-      selectItemBullet: function(windowRef, message) {
-        selectItemBullet(windowRef, message);
-      },
-      selectItemCheckbox: function(windowRef, message) {
-        selectItemCheckbox(windowRef, message);
-      },
       getHostname: function() {
         return hostname;
       },
