@@ -17,8 +17,14 @@
  * of data related to exploration improvement tasks.
  */
 
+import { merge } from 'd3-array';
+
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
+import { HighBounceRateTask } from
+  'domain/improvements/HighBounceRateTaskObjectFactory';
+import { NeedsGuidingResponsesTask } from
+  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -55,6 +61,11 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
       resolveInitPromise = resolve;
       rejectInitPromise = reject;
     });
+
+    /** @private */
+    let openHbrTasks: HighBounceRateTask[] = [];
+    let ngrTasksOpenSinceInit: NeedsGuidingResponsesTask[] = [];
+
     /** @private */
     let config: ExplorationImprovementsConfig;
     /** @private */
@@ -90,6 +101,11 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
         await StateTopAnswersStatsService.getTopAnswersByStateNameAsync());
       const playthroughIssues = await PlaythroughIssuesService.getIssues();
 
+      openHbrTasks = (
+        openTasks.filter(t => t.taskType === 'high_bounce_rate'));
+      ngrTasksOpenSinceInit = (
+        openTasks.filter(t => t.taskType === 'needs_guiding_responses'));
+
       await ExplorationImprovementsTaskRegistryService.initialize(
         config, states, expStats, openTasks, resolvedTaskTypesByStateName,
         topAnswersByStateName, playthroughIssues);
@@ -102,6 +118,21 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
           doInitAsync().then(resolveInitPromise, rejectInitPromise);
         }
         return initPromise;
+      },
+
+      async flushUpdatedTasksToBackend(): Promise<void> {
+        const openHbrTasksRemaining = (
+          ExplorationImprovementsTaskRegistryService
+            .getOpenHighBounceRateTasks());
+        await ExplorationImprovementsBackendApiService.postTasksAsync(
+          config.explorationId,
+          merge([
+            openHbrTasks.filter(t => t.isObsolete()),
+            ngrTasksOpenSinceInit.filter(t => t.isResolved()),
+            openHbrTasksRemaining.filter(t => !openHbrTasks.includes(t)),
+          ]));
+        openHbrTasks = openHbrTasksRemaining;
+        ngrTasksOpenSinceInit = ngrTasksOpenSinceInit.filter(t => t.isOpen());
       },
 
       async isImprovementsTabEnabledAsync(): Promise<boolean> {
