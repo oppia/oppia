@@ -2996,8 +2996,8 @@ class State(python_utils.OBJECT):
                 AnswerGroup.convert_html_in_answer_group(
                     answer_group,
                     conversion_fn,
-                    state_uses_old_rule_spec_schema=
-                    state_uses_old_rule_spec_schema
+                    state_uses_old_rule_spec_schema=(
+                        state_uses_old_rule_spec_schema)
                 )
             )
 
