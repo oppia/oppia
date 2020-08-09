@@ -18,26 +18,25 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { HttpClientTestingModule, HttpTestingController } from
+   '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationDataService } from
   'pages/exploration-editor-page/services/exploration-data.service';
-import { TestBed } from '@angular/core/testing';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/local-storage.service');
-require('services/alerts.service');
-require('services/contextual/logger.service');
+import { AlertsService } from 'services/alerts.service';
+import { LocalStorageService } from 'services/local-storage.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
 describe('Exploration data service', () => {
-  var eds = null;
-  var lss = null;
-  var ls = null;
-  var als = null;
-  var $q = null;
-  var $httpBackend = null;
-  var CsrfService = null;
-  var sampleDataResults = {
+  let eds: ExplorationDataService = null;
+  let httpTestingController: HttpTestingController;
+  let lss: LocalStorageService = null;
+  let ls = null;
+  let als = null;
+  let $q = null;
+  let $httpBackend = null;
+  let CsrfService = null;
+  let sampleDataResults = {
     draft_change_list_id: 3,
     version: 1,
     exploration: {
@@ -68,7 +67,7 @@ describe('Exploration data service', () => {
       }
     },
   };
-  var windowMock = {
+  let windowMock = {
     nativeWindow: {
       location: {
         reload: function() {}
@@ -76,338 +75,375 @@ describe('Exploration data service', () => {
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [ExplorationDataService, LocalStorageService, 
+        LoggerService, AlertsService]
+    });
+    httpTestingController = TestBed.get(HttpTestingController);
+    eds = TestBed.get(ExplorationDataService);
+    lss = TestBed.get(LocalStorageService);
+    ls = TestBed.get(LoggerService);
+    als = TestBed.get(LocalStorageService);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  beforeEach(angular.mock.module('oppia', ($provide) => {
     $provide.value('UrlService', {
-      getPathname: function() {
-        return '/create/0';
-      }
+      getPathname: () => '/create/0'
     });
     $provide.value('WindowRef', windowMock);
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    eds = $injector.get('ExplorationDataService');
-    lss = $injector.get('LocalStorageService');
-    ls = $injector.get('LoggerService');
-    als = $injector.get('AlertsService');
-    $q = $injector.get('$q');
-    $httpBackend = $injector.get('$httpBackend');
-    CsrfService = $injector.get('CsrfTokenService');
+  // beforeEach(angular.mock.inject(function($injector) {
+  //   eds = $injector.get('ExplorationDataService');
+  //   lss = $injector.get('LocalStorageService');
+  //   ls = $injector.get('LoggerService');
+  //   als = $injector.get('AlertsService');
+  //   $q = $injector.get('$q');
+  //   $httpBackend = $injector.get('$httpBackend');
+  //   CsrfService = $injector.get('CsrfTokenService');
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
-    });
-  }));
+  //   spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+  //     let deferred = $q.defer();
+  //     deferred.resolve('sample-csrf-token');
+  //     return deferred.promise;
+  //   });
+  // }));
 
-  it('should autosave draft changes when draft ids match', function() {
-    var errorCallback = jasmine.createSpy('error');
+  it('should autosave draft changes when draft ids match', fakeAsync(() => {
+    let errorCallback = jasmine.createSpy('error');
     spyOn(lss, 'getExplorationDraft').and.returnValue({
-      isValid: function() {
+      draftChanges: [],
+      draftChangeListId:  0,
+      isValid: () => {
         return true;
       },
-      getChanges: function() {
+      getChanges: () => {
         return [];
       }
     });
-    $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-      .respond(sampleDataResults);
-    $httpBackend.expectPUT('/createhandler/autosave_draft/0').respond({
-      sampleDataResults
-    });
-    eds.getData(errorCallback).then(function(data) {
+
+    eds.getData(errorCallback).then((data) => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).not.toHaveBeenCalled();
     });
-    $httpBackend.flush(2);
-  });
+    let req = httpTestingController.expectOne('/createhandler/data/0?apply_draft=true');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    req = httpTestingController.expectOne('/createhandler/autosave_draft/0');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+  }));
 
   it('should not autosave draft changes when draft is already cached',
-    function() {
-      var errorCallback = jasmine.createSpy('error');
+    fakeAsync(() => {
+      let errorCallback = jasmine.createSpy('error');
       spyOn(lss, 'getExplorationDraft').and.returnValue({
-        isValid: function() {
-          return true;
-        },
-        getChanges: function() {
-          return [];
-        }
-      });
+        draftChanges: [],
+        draftChangeListId:  0,
+        isValid: () => true,
+        getChanges: () => []
+        });
 
-      $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-        .respond(sampleDataResults);
-      $httpBackend.expectPUT('/createhandler/autosave_draft/0').respond({
-        sampleDataResults
-      });
       // Save draft.
-      eds.getData(errorCallback).then(function(data) {
+      eds.getData(errorCallback).then((data) => {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
       });
-      $httpBackend.flush(2);
-      $httpBackend.verifyNoOutstandingExpectation();
+      let req = httpTestingController.expectOne(
+        '/createhandler/data/0?apply_draft=true');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      req = httpTestingController.expectOne(
+        '/createhandler/autosave_draft/0');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(sampleDataResults);
+      
+      flushMicrotasks();
+      httpTestingController.verify()
 
-      var logInfoSpy = spyOn(ls, 'info').and.callThrough();
+      let logInfoSpy = spyOn(ls, 'info').and.callThrough();
       // Draft is already saved and it's in cache.
-      eds.getData(errorCallback).then(function(data) {
+      eds.getData(errorCallback).then((data) => {
         expect(logInfoSpy).toHaveBeenCalledWith(
           'Found exploration data in cache.');
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
       });
-      $httpBackend.verifyNoOutstandingRequest();
-    });
+      httpTestingController.verify()
+    }));
 
-  it('should autosave draft changes when draft ids match', function() {
-    var errorCallback = jasmine.createSpy('error');
+  it('should autosave draft changes when draft ids match', fakeAsync(() => {
+    let errorCallback = jasmine.createSpy('error');
     spyOn(lss, 'getExplorationDraft').and.returnValue({
-      isValid: function() {
-        return true;
-      },
-      getChanges: function() {
-        return [];
-      }
+      draftChanges: [],
+      draftChangeListId:  0,
+      isValid: () => true,
+      getChanges: () => []
     });
-    var windowRefSpy = spyOn(windowMock.nativeWindow.location, 'reload')
+    let windowRefSpy = spyOn(windowMock.nativeWindow.location, 'reload')
       .and.callThrough();
-    $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-      .respond(sampleDataResults);
-    $httpBackend.expectPUT('/createhandler/autosave_draft/0')
-      .respond(500);
-    eds.getData(errorCallback).then(function(data) {
+    eds.getData(errorCallback).then((data) => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).not.toHaveBeenCalled();
       expect(windowRefSpy).not.toHaveBeenCalled();
     });
-    $httpBackend.flush(2);
-  });
+    let req = httpTestingController.expectOne(
+      '/createhandler/data/0?apply_draft=true');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    req = httpTestingController.expectOne(
+      '/createhandler/autosave_draft/0');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(500);
+    
+    flushMicrotasks();
+  }));
 
-  it('should call error callback when draft ids do not match', function() {
+  it('should call error callback when draft ids do not match', fakeAsync(() => {
     spyOn(lss, 'getExplorationDraft').and.returnValue({
-      isValid: function() {
-        return false;
-      },
-      getChanges: function() {
-        return [];
-      }
+      draftChanges: [],
+      draftChangeListId:  0,
+      isValid: () => true,
+      getChanges: () => []
     });
-    $httpBackend.expect(
-      'GET', '/createhandler/data/0?apply_draft=true').respond(
-      sampleDataResults);
-    var errorCallback = jasmine.createSpy('error');
-    eds.getData(errorCallback).then(function(data) {
+    let errorCallback = jasmine.createSpy('error');
+    eds.getData(errorCallback).then((data) => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).toHaveBeenCalled();
     });
-    $httpBackend.flush();
-  });
+    let req = httpTestingController.expectOne(
+      '/createhandler/data/0?apply_draft=true');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    
+    flushMicrotasks();
+  }));
 
-  it('should discard draft', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    $httpBackend.expectPOST('/createhandler/autosave_draft/0')
-      .respond(200);
+  it('should discard draft', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
     eds.discardDraft(
       successHandler, failHandler);
-    $httpBackend.flush();
+    var req = httpTestingController.expectOne(
+      '/createhandler/autosave_draft/0');
+    expect(req.request.method).toEqual('POST');
+    req.flush(200);
+    
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should use reject handler when discard draft fails', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    $httpBackend.expectPOST('/createhandler/autosave_draft/0')
-      .respond(500);
+  it('should use reject handler when discard draft fails', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
     eds.discardDraft(
       successHandler, failHandler);
-    $httpBackend.flush();
+    var req = httpTestingController.expectOne(
+      '/createhandler/autosave_draft/0');
+    expect(req.request.method).toEqual('POST');
+    req.flush(500);
+    
+    flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
-  });
+  }));
 
-  it('should get last saved data', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    var logInfoSpy = spyOn(ls, 'info').and.callThrough();
+  it('should get last saved data', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let logInfoSpy = spyOn(ls, 'info').and.callThrough();
 
-    $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-      sampleDataResults);
     eds.getLastSavedData().then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/explorehandler/init/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
       sampleDataResults.exploration);
     expect(logInfoSpy).toHaveBeenCalledTimes(2);
-  });
+  }));
 
-  it('should resolve answers', function() {
-    var stateName = 'First State';
-    var clearWarningsSpy = spyOn(als, 'clearWarnings').and.callThrough();
+  it('should resolve answers', fakeAsync(() => {
+    let stateName = 'First State';
+    let clearWarningsSpy = spyOn(als, 'clearWarnings').and.callThrough();
 
-    $httpBackend.expectPUT('/createhandler/resolved_answers/0/' +
-      encodeURIComponent(stateName)).respond(200);
     eds.resolveAnswers(stateName, []);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/createhandler/resolved_answers/0/' +
+      encodeURIComponent(stateName));
+    expect(req.request.method).toEqual('PUT');
+    req.flush(200);
+    
+    flushMicrotasks();
 
     expect(clearWarningsSpy).toHaveBeenCalled();
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
+    httpTestingController.verify();
+  }));
 
-  it('should save an exploration to the backend', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+  it('should save an exploration to the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-    var errorCallback = jasmine.createSpy('error');
+    let errorCallback = jasmine.createSpy('error');
     spyOn(lss, 'getExplorationDraft').and.returnValue({
-      isValid: function() {
-        return true;
-      },
-      getChanges: function() {
-        return [];
-      }
+      draftChanges: [],
+      draftChangeListId:  0,
+      isValid: () => true,
+      getChanges: () => []
     });
-    var changeList = [];
-    var response = {
+    let changeList = [];
+    let response = {
       is_version_of_draft_valid: true,
       draft_changes: ''
     };
 
-    $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-      .respond(sampleDataResults);
-    $httpBackend.expectPUT('/createhandler/autosave_draft/0').respond({
-      sampleDataResults
-    });
-    eds.getData(errorCallback).then(function(data) {
+    eds.getData(errorCallback).then((data) => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).not.toHaveBeenCalled();
     });
-    $httpBackend.flush(2);
+    let req = httpTestingController.expectOne(
+      '/createhandler/data/0?apply_draft=true');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(sampleDataResults);
+    req = httpTestingController.expectOne(
+      '/createhandler/autosave_draft/0');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(sampleDataResults);
+    
+    flushMicrotasks();
 
-    $httpBackend.expectPUT('/createhandler/data/0').respond(response);
     eds.save(changeList, 'Commit Message', successHandler, failHandler);
-    $httpBackend.flush();
+    req = httpTestingController.expectOne(
+      '/createhandler/autosave_draft/0');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(response);
+    
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
       response.is_version_of_draft_valid, response.draft_changes);
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should save an exploration to the backend even when ' +
-    'data.exploration is not defined', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    'data.exploration is not defined', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-    var errorCallback = jasmine.createSpy('error');
+    let errorCallback = jasmine.createSpy('error');
     spyOn(lss, 'getExplorationDraft').and.returnValue({
-      isValid: function() {
-        return false;
-      }
+      draftChanges: [],
+      draftChangeListId:  0,
+      isValid: () => true,
+      getChanges: () => []
     });
-    var changeList = [];
-    var response = {
+    let changeList = [];
+    let response = {
       is_version_of_draft_valid: true,
       draft_changes: ''
     };
 
     // The data.exploration won't receive a value.
-    $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-      .respond(500);
-    eds.getData(errorCallback).then(function() {
+    eds.getData(errorCallback).then(() => {
       expect(errorCallback).toHaveBeenCalled();
     });
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/createhandler/data/0?apply_draft=true');
+    expect(req.request.method).toEqual('GET');
+    req.flush(500);
+    
+    flushMicrotasks();
 
-    $httpBackend.expectPUT('/createhandler/data/0').respond(response);
     eds.save(changeList, 'Commit Message', successHandler, failHandler);
-    $httpBackend.flush();
+    req = httpTestingController.expectOne(
+      '/createhandler/data/0');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(response);
+    
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
       response.is_version_of_draft_valid, response.draft_changes);
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should use reject handler when save an exploration to the backend fails',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      var errorCallback = jasmine.createSpy('error');
+      let errorCallback = jasmine.createSpy('error');
       spyOn(lss, 'getExplorationDraft').and.returnValue({
-        isValid: function() {
-          return true;
-        },
-        getChanges: function() {
-          return [];
-        }
-      });
-      var changeList = [];
+        draftChanges: [],
+        draftChangeListId:  0,
+        isValid: () => true,
+        getChanges: () => []
+        });
+      let changeList = [];
 
-      $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-        .respond(sampleDataResults);
-      $httpBackend.expectPUT('/createhandler/autosave_draft/0').respond({
-        sampleDataResults
-      });
-      eds.getData(errorCallback).then(function(data) {
+      eds.getData(errorCallback).then((data) => {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
       });
-      $httpBackend.flush(2);
 
-      $httpBackend.expectPUT('/createhandler/data/0').respond(500);
+      let req = httpTestingController.expectOne(
+        '/createhandler/data/0?apply_draft=true');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      req = httpTestingController.expectOne(
+        '/createhandler/autosave_draft/0');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
+
       eds.save(changeList, 'Commit Message', successHandler, failHandler);
-      $httpBackend.flush();
+      req = httpTestingController.expectOne(
+        '/createHandler/data/0');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(500);
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-    });
+    }));
 });
 
 describe('Exploration data service', () => {
-  var eds = null;
-  var ls = null;
-  var logErrorSpy;
-  var pathname = '/exploration/0';
+  let eds = null;
+  let logErrorSpy;
+  let pathname = '/exploration/0';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UrlService', {
-      getPathname: function() {
-        return pathname;
-      }
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [ExplorationDataService]
     });
-  }));
+    eds = TestBed.get(ExplorationDataService)
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ls = $injector.get('LoggerService');
-    logErrorSpy = spyOn(ls, 'error').and.callThrough();
-    eds = $injector.get('ExplorationDataService');
-  }));
-
-  it('should throw error when pathname is not valid', function() {
+  it('should throw error when pathname is not valid', () => {
     expect(logErrorSpy).toHaveBeenCalledWith(
       'Unexpected call to ExplorationDataService for pathname ', pathname);
 
-    var errorCallback = jasmine.createSpy('error');
-    expect(function() {
+    let errorCallback = jasmine.createSpy('error');
+    expect(() => {
       eds.getData(errorCallback);
     }).toThrowError('eds.getData is not a function');
   });
