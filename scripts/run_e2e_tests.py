@@ -541,7 +541,7 @@ def main(args=None):
     # Redis-cli is only required in a development environment.
     python_utils.PRINT('Starting Redis development server.')
     # Start the redis local development server. Redis doesn't run on
-    # Windows machine.
+    # Windows machines.
     if not common.is_windows_os():
         common.start_redis_server()
     else:

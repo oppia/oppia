@@ -445,9 +445,6 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.url_fragment = story.url_fragment
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
-
-    # This must come after the story is retrieved. Otherwise the memcache
-    # key will be reinstated.
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_STORY, None, [story.id])
     story.version += 1
@@ -542,6 +539,8 @@ def delete_story(committer_id, story_id, force_deletion=False):
     exp_models.ExplorationContextModel.delete_multi(
         exploration_context_models_to_be_deleted)
 
+    # This must come after the story is retrieved. Otherwise the memcache
+    # key will be reinstated.
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_STORY, None, [story_id])
 
