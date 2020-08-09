@@ -22,14 +22,15 @@
 
 require('interactions/Continue/directives/continue-rules.service.ts');
 require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/context.service.ts');
-require('services/html-escaper.service.ts');
-require('services/contextual/window-dimensions.service.ts');
+
 
 angular.module('oppia').directive('oppiaInteractiveContinue', [
-  'ContinueRulesService', 'HtmlEscaperService',
-  function(ContinueRulesService, HtmlEscaperService) {
+  'ContinueRulesService', 'InteractionAttributesExtractorService',
+  function(ContinueRulesService, InteractionAttributesExtractorService) {
     return {
       restrict: 'E',
       scope: {},
@@ -37,11 +38,9 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
       template: require('./continue-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'WindowDimensionsService',
-        'CurrentInteractionService', 'ContextService',
+        '$attrs', 'CurrentInteractionService', 'ContextService',
         function(
-            $attrs, WindowDimensionsService,
-            CurrentInteractionService, ContextService) {
+            $attrs, CurrentInteractionService, ContextService) {
           var ctrl = this;
           var DEFAULT_BUTTON_TEXT = 'Continue';
           var DEFAULT_HUMAN_READABLE_ANSWER = 'Please continue.';
@@ -60,8 +59,13 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
               humanReadableAnswer, ContinueRulesService);
           };
           ctrl.$onInit = function() {
-            ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
-              $attrs.buttonTextWithValue);
+            const {
+              buttonText
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'Continue',
+              $attrs
+            );
+            ctrl.buttonText = buttonText.getUnicode();
 
             ctrl.isInEditorMode = ContextService.isInExplorationEditorMode();
 

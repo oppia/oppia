@@ -41,6 +41,7 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _storyIsPublished = false;
     var _skillSummaries = [];
     var _expIdsChanged = false;
+    var _storyWithUrlFragmentExists = false;
 
     var _storyInitializedEventEmitter = new EventEmitter();
     var _storyReinitializedEventEmitter = new EventEmitter();
@@ -72,6 +73,10 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _updateStory = function(newBackendStoryObject) {
       _setStory(
         StoryObjectFactory.createFromBackendDict(newBackendStoryObject));
+    };
+
+    var _setStoryWithUrlFragmentExists = function(storyWithUrlFragmentExists) {
+      _storyWithUrlFragmentExists = storyWithUrlFragmentExists;
     };
 
     return {
@@ -243,6 +248,37 @@ angular.module('oppia').factory('StoryEditorStateService', [
 
       get onRecalculateAvailableNodes() {
         return _recalculateAvailableNodesEventEmitter;
+      },
+      /**
+       * Returns whether the story URL fragment already exists on the server.
+       */
+      getStoryWithUrlFragmentExists: function() {
+        return _storyWithUrlFragmentExists;
+      },
+
+      /**
+       * Attempts to set the boolean variable _storyWithUrlFragmentExists based
+       * on the value returned by doesStoryWithUrlFragmentExistAsync and
+       * executes the success callback provided. No arguments are passed to the
+       * success callback. Execution of the success callback indicates that the
+       * async backend call was successful and that _storyWithUrlFragmentExists
+       * has been successfully updated.
+       */
+      updateExistenceOfStoryUrlFragment: function(
+          storyUrlFragment, successCallback) {
+        EditableStoryBackendApiService.doesStoryWithUrlFragmentExistAsync(
+          storyUrlFragment).then(
+          function(storyUrlFragmentExists) {
+            _setStoryWithUrlFragmentExists(storyUrlFragmentExists);
+            if (successCallback) {
+              successCallback();
+            }
+          }, function(error) {
+            AlertsService.addWarning(
+              error ||
+              'There was an error when checking if the story url fragment ' +
+              'exists for another story.');
+          });
       }
     };
   }
