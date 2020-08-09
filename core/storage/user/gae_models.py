@@ -40,7 +40,6 @@ USER_ID_LENGTH = 36
 
 class UserSettingsModel(base_models.BaseModel):
     """Settings and preferences for a particular user.
-
     Instances of this class are keyed by the user id.
     """
 
@@ -48,6 +47,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
+    # TODO(#10178): Deprecate gae_id for UserSettingsModel once we have verified
+    # that UserAuthDetailsModels exists for every user.
     gae_id = ndb.StringProperty(required=True, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
@@ -214,7 +215,6 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def get_new_id(cls, unused_entity_name=''):
         """Gets a new id for an entity, based on its name.
-
         The returned id is guaranteed to be unique among all instances of this
         entity.
 
@@ -2226,17 +2226,23 @@ class PseudonymizedUserModel(base_models.BaseModel):
         raise Exception('New id generator is producing too many collisions.')
 
 
-class UserAuthModel(base_models.BaseModel):
+class UserAuthDetailsModel(base_models.BaseModel):
     """Stores the authentication details for a particular user.
 
     Instances of this class are keyed by user id.
     """
 
-    # Authentication detail for sign-in using google id (GAE).
+    # Authentication detail for sign-in using google id (GAE). Exists only
+    # for full users. None for profile users.
     gae_id = ndb.StringProperty(indexed=True)
     # A code associated with profile and full user on Android to provide a PIN
     # based authentication within the account.
     pin = ndb.StringProperty(default=None)
+    # For profile users, the user ID of the full user associated with that
+    # profile. None for full users. Required for profiles because gae_id
+    # attribute is None for them, hence this attribute stores their association
+    # with a full user who do have a gae_id.
+    parent_user_id = ndb.StringProperty(indexed=True, default=None)
 
     @staticmethod
     def get_deletion_policy():
@@ -2255,7 +2261,7 @@ class UserAuthModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
-        """Delete instances of UserAuthModel for the user.
+        """Delete instances of UserAuthDetailsModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -2264,13 +2270,13 @@ class UserAuthModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserAuthModel exists for the given user.
+        """Check whether UserAuthDetailsModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            bool. Whether any UserAuthModel refers to the given user ID.
+            bool. Whether any UserAuthDetailsModel refers to the given user ID.
         """
         return cls.get_by_id(user_id) is not None
 
@@ -2284,7 +2290,7 @@ class UserAuthModel(base_models.BaseModel):
                 authentication service.
 
         Returns:
-            UserAuthModel. The UserAuthModel instance having a
+            UserAuthDetailsModel. The UserAuthDetailsModel instance having a
             particular user mapped to the given auth_id and the auth service
             if there exists one, else None.
         """

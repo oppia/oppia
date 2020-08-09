@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
@@ -70,6 +71,17 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
             'schema': {
                 'type': 'unicode'
             }
+        }, {
+            'name': 'url_fragment',
+            'schema': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_url_fragment',
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+                }]
+            },
         }, {
             'name': 'course_details',
             'schema': {
@@ -372,6 +384,7 @@ CLASSROOM_PAGES_DATA = ConfigProperty(
     'classroom_pages_data', SET_OF_CLASSROOM_DICTS_SCHEMA,
     'The details for each classroom page.', [{
         'name': 'math',
+        'url_fragment': 'math',
         'topic_ids': [],
         'course_details': '',
         'topic_list_intro': ''

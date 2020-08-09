@@ -60,7 +60,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
-            'abbreviated_name': 'abbrev',
+            'abbreviated_name': 'Name',
+            'url_fragment': 'abbrev',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
             'description': 'description',
@@ -590,6 +591,31 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Topic name should be at most 39 characters')
 
+    def test_validation_fails_with_invalid_url_fragment(self):
+        self.topic.url_fragment = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Topic URL Fragment field must be a string. Received 0.'):
+            self.topic.validate()
+
+    def test_validation_fails_with_empty_url_fragment(self):
+        self.topic.url_fragment = ''
+        validation_message = 'Topic URL Fragment field should not be empty.'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic.validate()
+
+    def test_validation_fails_with_lenghty_url_fragment(self):
+        self.topic.url_fragment = 'a' * 25
+        url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        validation_message = (
+            'Topic URL Fragment field should not exceed %d characters, '
+            'received %s.' % (
+                url_fragment_char_limit, self.topic.url_fragment))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic.validate()
+
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'
         self._assert_validation_error(
@@ -776,9 +802,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.language_code, 'bn')
 
     def test_update_abbreviated_name(self):
+        self.assertEqual(self.topic.abbreviated_name, 'Name')
+        self.topic.update_abbreviated_name('abbrev')
         self.assertEqual(self.topic.abbreviated_name, 'abbrev')
-        self.topic.update_abbreviated_name('name')
-        self.assertEqual(self.topic.abbreviated_name, 'name')
 
     def test_update_thumbnail_filename(self):
         self.assertEqual(self.topic.thumbnail_filename, None)
@@ -1185,6 +1211,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         current_time = datetime.datetime.utcnow()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.topic_summary_dict = {
+            'url_fragment': 'url-frag',
             'id': 'topic_id',
             'name': 'name',
             'description': 'topic description',
@@ -1198,12 +1225,12 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': '#C6DCDA',
             'topic_model_created_on': time_in_millisecs,
-            'topic_model_last_updated': time_in_millisecs
+            'topic_model_last_updated': time_in_millisecs,
         }
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', current_time,
+            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag', current_time,
             current_time)
 
     def _assert_validation_error(self, expected_error_substring):
@@ -1251,6 +1278,31 @@ class TopicSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_empty_name(self):
         self.topic_summary.name = ''
         self._assert_validation_error('Name field should not be empty')
+
+    def test_validation_fails_with_invalid_url_fragment(self):
+        self.topic_summary.url_fragment = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Topic URL Fragment field must be a string. Received 0.'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_empty_url_fragment(self):
+        self.topic_summary.url_fragment = ''
+        validation_message = 'Topic URL Fragment field should not be empty.'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_lenghty_url_fragment(self):
+        self.topic_summary.url_fragment = 'a' * 25
+        url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        validation_message = (
+            'Topic URL Fragment field should not exceed %d characters, '
+            'received %s.' % (
+                url_fragment_char_limit, self.topic_summary.url_fragment))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_description(self):
         self.topic_summary.description = 3

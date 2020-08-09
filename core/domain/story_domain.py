@@ -1603,5 +1603,6 @@ class StorySummary(python_utils.OBJECT):
             'description': self.description,
             'node_titles': self.node_titles,
             'thumbnail_bg_color': self.thumbnail_bg_color,
-            'thumbnail_filename': self.thumbnail_filename
+            'thumbnail_filename': self.thumbnail_filename,
+            'url_fragment': self.url_fragment
         }
