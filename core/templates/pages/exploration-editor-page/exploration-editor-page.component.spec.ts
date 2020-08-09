@@ -239,6 +239,10 @@ describe('Exploration editor page component', function() {
       ctrl.$onInit();
     });
 
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     it('should mark exploration as editable and translatable', () => {
       spyOn(es, 'markEditable').and.callThrough();
       spyOn(es, 'markTranslatable').and.callThrough();
@@ -302,6 +306,10 @@ describe('Exploration editor page component', function() {
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
     });
 
     it('should link exploration to story when initing exploration page', () => {
@@ -728,6 +736,10 @@ describe('Exploration editor page component', function() {
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
     });
 
     it('should callback state-added method for stats', fakeAsync(() => {

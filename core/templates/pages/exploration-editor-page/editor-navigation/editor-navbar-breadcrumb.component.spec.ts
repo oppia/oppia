@@ -19,6 +19,7 @@
 import { EventEmitter } from '@angular/core';
 
 describe('Editor Navbar Breadcrumb directive', function() {
+  var ctrl = null;
   var $rootScope = null;
   var $scope = null;
   var ExplorationTitleService = null;
@@ -43,11 +44,15 @@ describe('Editor Navbar Breadcrumb directive', function() {
       mockExplorationPropertyChangedEventEmitter);
 
     $scope = $rootScope.$new();
-    var ctrl = $componentController('editorNavbarBreadcrumb', {
+    ctrl = $componentController('editorNavbarBreadcrumb', {
       $scope: $scope
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should evaluate scope properties after controller initialization',
     function() {
