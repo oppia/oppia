@@ -104,11 +104,12 @@ SERIALIZATION_FUNCTIONS = {
 
 
 def _get_memcache_key(namespace, sub_namespace, obj_id):
-    """Returns a memcache key for the class under namespace and sub_namespace.
+    """Returns a memcache key for the class under the corresponding
+    namespace and sub_namespace.
 
     Args:
         namespace: str. The namespace under which the values associated with the
-            id lie. Use CACHE_NAMESPACE_DEFAULT as namespace for ids that
+            id lie. Use CACHE_NAMESPACE_DEFAULT as the namespace for ids that
             are not associated with a conceptual domain-layer entity and
             therefore don't require serialization.
         sub_namespace: str|None. The sub-namespace further differentiates the
@@ -144,8 +145,9 @@ def get_multi(namespace, sub_namespace, obj_ids):
         namespace: str. The namespace under which the values associated with
             these object ids lie. The namespace determines how the objects are
             decoded from their JSON-encoded string. Use CACHE_NAMESPACE_DEFAULT
-            as namespace for objects that are not associated with a conceptual
-            domain-layer entity and therefore don't require serialization.
+            as the namespace for objects that are not associated with a
+            conceptual domain-layer entity and therefore don't require
+            serialization.
         sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,
             the sub-namespace is either None or the stringified version number
@@ -185,8 +187,8 @@ def set_multi(namespace, sub_namespace, id_value_mapping):
 
     Args:
         namespace: str. The namespace under which the values associated with the
-            id lie. Use CACHE_NAMESPACE_DEFAULT as namespace for objects that
-            are not associated with a conceptual domain-layer entity and
+            id lie. Use CACHE_NAMESPACE_DEFAULT as the namespace for objects
+            that are not associated with a conceptual domain-layer entity and
             therefore don't require serialization.
         sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,

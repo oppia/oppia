@@ -174,7 +174,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
     def test_partial_fetches_returns_correct_elements(self):
         """Testing that querying the cache for elements where only a subsection
-        of the queried ids exist in the cache, returns reasonable output.
+        of the queried ids exist in the cache returns reasonable output.
         """
         key_value_mapping = {'a': '1', 'c': '3'}
         exploration_id = 'id'

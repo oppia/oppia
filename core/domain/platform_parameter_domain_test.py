@@ -1757,3 +1757,30 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'cannot be enabled in production'):
             parameter.validate()
+
+    def test_serialize_and_deserialize_returns_unchanged_platform_parameter(
+            self):
+        """Checks that serializing and then deserializing a default parameter
+        works as intended by leaving the parameter unchanged.
+        """
+        parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': '',
+            'data_type': 'bool',
+            'rules': [
+                {
+                    'filters': [
+                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
+                    'value_when_matched': True
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
+            'is_feature': True,
+            'feature_stage': 'test',
+        })
+        self.assertEqual(
+            parameter.to_dict(),
+            parameter_domain.PlatformParameter.deserialize(
+                parameter.serialize()).to_dict())
