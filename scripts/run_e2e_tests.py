@@ -273,7 +273,7 @@ def setup_and_install_dependencies(skip_install):
 
 
 def build_js_files(
-    dev_mode_setting, deparallelize_terser=False, source_maps=False):
+        dev_mode_setting, deparallelize_terser=False, source_maps=False):
     """Build the javascript files.
 
     Args:
@@ -281,7 +281,7 @@ def build_js_files(
             in dev mode.
         deparallelize_terser: bool. Represents whether to use webpack
             compilation config that disables parallelism on terser plugin.
-        soure_maps: bool. Represents whether to use source maps while
+        source_maps: bool. Represents whether to use source maps while
             building webpack.
     """
     if not dev_mode_setting:

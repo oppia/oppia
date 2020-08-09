@@ -546,7 +546,9 @@
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek
+/webpack.dev.sourcemap.config.ts @nishantwrp @vojtechjelinek
 /webpack.prod.config.ts @jameesjohn @vojtechjelinek
+/webpack.prod.sourcemap.config.ts @nishantwrp @vojtechjelinek
 /webpack.terser.config.ts @nishantwrp @vojtechjelinek
 
 
