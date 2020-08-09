@@ -41,12 +41,10 @@ export class ExplorationSummaryBackendApiService {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
       this.alertsService.addWarning('Please enter a valid exploration ID.');
-
       var returnValue = [];
       for (var i = 0; i < explorationIds.length; i++) {
         returnValue.push(null);
       }
-
       if (errorCallback) {
         errorCallback(returnValue);
       }
@@ -54,28 +52,36 @@ export class ExplorationSummaryBackendApiService {
     }
     var explorationSummaryDataUrl =
     AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
-
     this.httpClient.get(explorationSummaryDataUrl, {
       params: {
         stringified_exp_ids: JSON.stringify(explorationIds),
         include_private_explorations: JSON.stringify(
           includePrivateExplorations)
       }
-    }).toPromise().then((response: any) => {
-      console.log(response);
-      var summaries = angular.copy(response.data.summaries);
-      if (successCallback) {
-        if (summaries === null) {
-          var summariesError = (
-            'Summaries fetched are null for explorationIds: ' + explorationIds
-          );
-          throw new Error(summariesError);
+    }).toPromise().then((response: Array<Object>) => {
+      var summaries = angular.copy(response);
+      try {
+        if (successCallback) {
+          if (summaries === null) {
+            var summariesError = (
+              'Summaries fetched are null for explorationIds: ' + explorationIds
+            );
+            throw new Error(summariesError);
+          } else if ( typeof (summaries) === 'string') {
+            var fetchingError =
+            'Error on loading public exploration summaries.';
+            throw new Error(fetchingError);
+          }
+          successCallback(summaries);
         }
-        successCallback(summaries);
+      } catch (errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse);
+        }
       }
     }, (errorResponse) =>{
       if (errorCallback) {
-        errorCallback(errorResponse);
+        errorCallback(errorResponse.error.error);
       }
     });
   }

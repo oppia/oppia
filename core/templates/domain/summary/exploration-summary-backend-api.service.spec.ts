@@ -54,7 +54,7 @@ fdescribe('Exploration Summary Backend Api Service', () => {
   });
 
   it('should not load public exploration summaries from backend when' +
-    ' exploration id is not valid', function() {
+    ' exploration id is not valid', fakeAsync(()=> {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let explorationIds = ['#', null, '1'];
@@ -63,14 +63,16 @@ fdescribe('Exploration Summary Backend Api Service', () => {
     explorationSummaryBackendApiService.loadPublicExplorationSummaries(
       explorationIds).then(successHandler, failHandler);
 
+    flushMicrotasks();
+
     expect(alertSpy).toHaveBeenCalledWith(
       'Please enter a valid exploration ID.');
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith([null, null, null]);
-  });
+  }));
 
   it('should load public exploration summaries from backend',
-    function() {
+    fakeAsync(()=> {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       let explorationIds = ['0', '1', '2'];
@@ -97,7 +99,7 @@ fdescribe('Exploration Summary Backend Api Service', () => {
 
       expect(successHandler).toHaveBeenCalledWith(sampleResults);
       expect(failHandler).not.toHaveBeenCalled();
-    });
+    }));
 
   it('should load public and private exploration summaries from backend',
     fakeAsync(() => {
@@ -183,6 +185,6 @@ fdescribe('Exploration Summary Backend Api Service', () => {
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(errorMessage);
+    expect(failHandler).toHaveBeenCalledWith(Error(errorMessage));
   }));
 });
