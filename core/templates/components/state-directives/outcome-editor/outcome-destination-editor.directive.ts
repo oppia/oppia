@@ -73,6 +73,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
             ctrl.directiveSubscriptions.add(
               StateEditorService.onSaveOutcomeDestDetails.subscribe(
                 () => {
+                  console.log('Caught: saveOutcomeDestDetails in outcome-dest');
                   if (ctrl.isSelfLoop()) {
                     ctrl.outcome.dest = StateEditorService.getActiveStateName();
                   }

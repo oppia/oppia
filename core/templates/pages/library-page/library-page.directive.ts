@@ -346,6 +346,7 @@ angular.module('oppia').directive('libraryPage', [
                   }
                 });
 
+                console.log('Emit: prefLangCodesLoaded in library-page');
                 I18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
                   response.data.preferred_language_codes);
 

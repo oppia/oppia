@@ -87,6 +87,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     $scope.addAnswerGroupForm = {};
 
     $scope.saveResponse = function(reopen) {
+      console.log('Emit: saveOutcomeDestDetails in expl-editor-page');
       StateEditorService.onSaveOutcomeDestDetails.emit();
 
       EditorFirstTimeEventsService.registerFirstSaveRuleEvent();

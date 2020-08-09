@@ -261,6 +261,7 @@ angular.module('oppia').directive('searchBar', [
             ctrl.directiveSubscriptions.add(
               I18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe(
                 (preferredLanguageCodesList) => {
+                  console.log('Caught: prefLangCodesLoaded in search-bar');
                   preferredLanguageCodesList.forEach(function(languageCode) {
                     var selections =
                      ctrl.selectionDetails.languageCodes.selections;
