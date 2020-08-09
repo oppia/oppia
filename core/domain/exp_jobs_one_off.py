@@ -293,32 +293,8 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
                 break
 
-            # TODO(iamprayush): Revert these changes (special-casing the
-            # SUCCESS output for math interactions) after the migration job
-            # for math interactions has been successfully run.
             if states_schema_version == current_state_schema_version:
-                extracted_variables_output = []
-                for state_name, state_dict in versioned_exploration_states[
-                        'states'].items():
-                    if state_dict['interaction']['id'] in (
-                            'AlgebraicExpressionInput', 'MathEquationInput'):
-                        rule_inputs = []
-                        for group in state_dict['interaction']['answer_groups']:
-                            for rule_spec in group['rule_specs']:
-                                rule_inputs.append(rule_spec['inputs']['x'])
-                        customization_args = state_dict['interaction'][
-                            'customization_args']['customOskLetters']['value']
-                        extracted_variables_output.append(
-                            'State Name: %s, Rule Inputs: %s, Variables: %s' %
-                            (state_name, ', '.join(rule_inputs), ', '.join(
-                                customization_args)))
-
-                if len(extracted_variables_output):
-                    output_values = 'Exp ID: %s: %s' % (
-                        item.id, extracted_variables_output)
-                    yield ('SUCCESS_WITH_OUTPUT', output_values.encode('utf-8'))
-                else:
-                    yield ('SUCCESS', None)
+                yield ('SUCCESS', None)
 
     @staticmethod
     def reduce(key, values):
