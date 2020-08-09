@@ -1141,14 +1141,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
     def _check_unused_dependencies(self):
         """Checks if there are the unused dependencies in directives
-        and services.
-        Check unused dependencies in directives (Inline Array Annotation,
-        $inject Property Annotation).
-        there are two types of dependencies in directives:
+        and services. Check unused dependencies in directives (Inline
+        Array Annotation, $inject Property Annotation). There are two  
+        types of dependencies in directives:
         1. directive('directive_name', ['dependency',function(dependency){
         2. controller in directive
         """
-
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting unused dependencies check')
             python_utils.PRINT('----------------------------------------')
@@ -1223,6 +1221,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if dep:
                     if re.findall(r'\$', dep):
                         dep = '\\%s' % dep
+                        python_utils.PRINT(dep) 
                     cnt = len(re.findall(r'' + dep + '[^\']', content))
                     if cnt < 2:
                         if start_point == 0:
