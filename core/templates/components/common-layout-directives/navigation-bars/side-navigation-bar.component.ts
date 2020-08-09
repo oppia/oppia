@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the side navigation bar.
+ * @fileoverview Component for the side navigation bar.
  */
 
 import { Component, OnInit } from '@angular/core';
