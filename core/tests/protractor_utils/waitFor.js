@@ -172,5 +172,3 @@ exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
 exports.modalPopupToAppear = modalPopupToAppear;
-exports.until = until;
-exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
