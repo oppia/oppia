@@ -1928,7 +1928,7 @@ class SingleSpaceAfterIfElifWhileChecker(checkers.BaseChecker):
     name = 'single-space-after-if-elif-while'
     priority = -1
     msgs = {
-        # TODO: Figure out how to name this message. Does 'C0029' make sense?
+        # ERIC: Figure out how to name this message. Does 'C0029' make sense?
         'C0029': (
             (
                 'A single space is needed between an `if`, `elif`, or `while` '
