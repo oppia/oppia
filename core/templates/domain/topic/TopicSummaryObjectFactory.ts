@@ -31,6 +31,8 @@ export interface TopicSummaryBackendDict {
   'subtopic_count': number;
   'total_skill_count': number;
   'uncategorized_skill_count': number;
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
   'topic_model_created_on': number;
   'topic_model_last_updated': number;
   // These properties are optional because they are only present in the
@@ -38,6 +40,7 @@ export interface TopicSummaryBackendDict {
   'can_edit_topic'?: boolean;
   'is_published'?: boolean;
   'classroom'?: string;
+  'url_fragment': string;
 }
 
 export class TopicSummary {
@@ -56,7 +59,10 @@ export class TopicSummary {
       public topicModelLastUpdated: number,
       public canEditTopic: boolean,
       public isPublished: boolean,
-      public classroom: string) { }
+      public classroom: string,
+      public thumbnailFilename: string,
+      public thumbnailBgColor: string,
+      public urlFragment: string) { }
 
   getId(): string {
     return this.id;
@@ -105,6 +111,22 @@ export class TopicSummary {
   getTopicModelLastUpdated(): number {
     return this.topicModelLastUpdated;
   }
+
+  getClassroom(): string {
+    return this.classroom;
+  }
+
+  getUrlFragment(): string {
+    return this.urlFragment;
+  }
+
+  getThumbnailFilename(): string {
+    return this.thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string {
+    return this.thumbnailBgColor;
+  }
 }
 
 @Injectable({
@@ -128,7 +150,10 @@ export class TopicSummaryObjectFactory {
       topicSummaryBackendDict.topic_model_last_updated,
       topicSummaryBackendDict.can_edit_topic,
       topicSummaryBackendDict.is_published,
-      topicSummaryBackendDict.classroom);
+      topicSummaryBackendDict.classroom,
+      topicSummaryBackendDict.thumbnail_filename,
+      topicSummaryBackendDict.thumbnail_bg_color,
+      topicSummaryBackendDict.url_fragment);
   }
 }
 

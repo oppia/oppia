@@ -29,6 +29,8 @@ import { TextInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 interface Warning {
   type: string,
@@ -48,7 +50,11 @@ export class TextInputValidationService {
       ['placeholder', 'rows']);
 
     var placeholder = customizationArgs.placeholder.value;
-    if (!angular.isString(placeholder)) {
+
+    if (
+      !(placeholder instanceof SubtitledUnicode) ||
+      !angular.isString(placeholder.getUnicode())
+    ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (

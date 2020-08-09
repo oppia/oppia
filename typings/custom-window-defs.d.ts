@@ -25,4 +25,6 @@ interface Window {
     ga: Function;
     $: JQueryStatic;
     Base64Binary: Base64Binary;
+    jQuery: JQueryStatic;
+    Headroom: Headroom;
 }
