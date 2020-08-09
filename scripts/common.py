@@ -53,10 +53,10 @@ YARN_VERSION = '1.22.4'
 
 # Versions of libraries used in backend.
 PILLOW_VERSION = '6.2.2'
-# Redis 6.0.5 not latest stable build of redis (6.0.6) because there is a
-# 'make test' bug where the solution has not been released explained in this
-# issue: https://github.com/redis/redis/issues/7540.
-# TODO: Upgrade to stable build when the make test bug is resolved.
+# We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
+# there is a 'make test' bug in redis 6.0.6 where the solution has not been
+# released. This is explained in this issue:
+# https://github.com/redis/redis/issues/7540.
 REDIS_CLI_VERSION = '6.0.5'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'

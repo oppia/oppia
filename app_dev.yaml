@@ -245,12 +245,20 @@ libraries:
 - name: webapp2
   version: "2.5.2"
 
+# This is an access connector that connects to the Google Cloud Redis instance
+# used for memory caching.
+vpc_access_connector:
+- name: projects/[PROJECT_ID]/locations/uscentral/connectors/oppia-redis-connector-1
+
 env_variables:
   PYTHONHTTPSVERIFY: 1
+# GAE_USE_SOCKETS_HTTPLIB is needed for the redis connector in the Python 2
+# runtime. More information can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/connecting-vpc#configuring
+# (The second note under 'Configuring your app to use a connector') which
+# redirects to these instructions to disable URL fetch:
+# https://cloud.google.com/appengine/docs/standard/python/sockets#making_httplib_use_sockets.
   GAE_USE_SOCKETS_HTTPLIB : "anyvalue"
-
-vpc_access_connector:
-  name: "oppia-redis-connector-1"
 
 skip_files:
 # .pyc and .pyo files
