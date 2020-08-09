@@ -162,7 +162,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationFeaturesService', 'ExplorationImprovementsService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
-    'ExplorationParamSpecsService', 'ExporationPropertyService',
+    'ExplorationParamSpecsService', 'ExplorationPropertyService',
     'ExplorationRightsService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',

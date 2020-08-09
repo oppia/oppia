@@ -45,7 +45,7 @@ import { StateTopAnswersStatsBackendApiService } from
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
-describe('Exploration editor page component', function() {
+fdescribe('Exploration editor page component', function() {
   var ctrl = null;
 
   var $q = null;
@@ -61,6 +61,7 @@ describe('Exploration editor page component', function() {
   var eis = null;
   var ers = null;
   var es = null;
+  var eps = null;
   var ess = null;
   var ets = null;
   var ews = null;
@@ -202,6 +203,7 @@ describe('Exploration editor page component', function() {
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
+    eps = $injector.get('ExplorationPropertyService');
     ess = $injector.get('ExplorationStatesService');
     ets = $injector.get('ExplorationTitleService');
     ews = $injector.get('ExplorationWarningsService');
