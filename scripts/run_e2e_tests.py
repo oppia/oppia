@@ -521,6 +521,12 @@ def cleanup_portserver(portserver_process):
     if portserver_process.poll():
         portserver_process.kill()
 
+    if not common.is_windows_os():
+        # Redis does not run on Windows machines.
+        python_utils.PRINT('Cleaning up the redis_servers.')
+        # Shutdown the redis server before exiting.
+        common.stop_redis_server()
+
 
 def main(args=None):
     """Run the scripts to start end-to-end tests."""
@@ -532,6 +538,17 @@ def main(args=None):
         sys.exit(1)
     setup_and_install_dependencies(parsed_args.skip_install)
 
+    # Redis-cli is only required in a development environment.
+    python_utils.PRINT('Starting Redis development server.')
+    # Start the redis local development server. Redis doesn't run on
+    # Windows machine.
+    if not common.is_windows_os():
+        common.start_redis_server()
+    else:
+        raise Exception(
+            'Redis command line interface is not installed because your ' +
+            'machine is on the Windows operating system. Caching will ' +
+            'not work on a Windows machine.')
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
