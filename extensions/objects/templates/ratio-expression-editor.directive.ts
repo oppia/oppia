@@ -44,6 +44,7 @@ angular.module('oppia').directive('ratioExpressionEditor', [
           if (!RATIO_REGEX.test(value)) {
             errorMessage = 'Please enter in the format of X:Y...N';
           } else {
+            ctrl.value = value.toString();
             errorMessage = '';
           }
           return true;

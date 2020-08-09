@@ -197,7 +197,7 @@ interface RuleTemplates {
     ResultsInError: IRuleDescription;
     ErrorContains: IRuleDescription;
   };
-  RatioInput: {
+  RatioExpressionInput: {
     Equals: IRuleDescription;
     HasNumberOfTermsEqualTo: IRuleDescription;
   };

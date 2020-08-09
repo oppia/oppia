@@ -267,7 +267,7 @@
       "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
     }
   },
-  "RatioInput": {
+  "RatioExpressionInput": {
     "Equals": {
       "description": "is equal to {{x|RatioExpression}}"
     },
