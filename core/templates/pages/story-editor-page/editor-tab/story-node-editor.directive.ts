@@ -437,7 +437,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               StoryEditorStateService.onStoryReinitialized.subscribe(
                 () => _init()
               ));
-            ctrl.directiveSubscription.add(
+            ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onRecalculateAvailableNodes.subscribe(
                 () => {
                   _recalculateAvailableNodes();
