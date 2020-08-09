@@ -1935,8 +1935,8 @@ class SingleSpaceAfterIfElifWhileChecker(checkers.BaseChecker):
                 'and the parenthesis.'),
             'single-space-after-if-elif-while',
             (
-                'Add a single space between the `if`, `elif`, or `while` and the '
-                'parenthesis.')
+                'Add a single space between the `if`, `elif`, or `while` '
+                'and the parenthesis.')
         ),
     }
 
@@ -1948,7 +1948,6 @@ class SingleSpaceAfterIfElifWhileChecker(checkers.BaseChecker):
         """
         file_content = read_from_node(node)
         for (line_num, line) in enumerate(file_content):
-            error = False
             line = line.strip()
             regexes = [br'^if\s*\(', br'^elif\s*\(', br'^while\s*\(']
             if any([re.search(regex, line) for regex in regexes]):
