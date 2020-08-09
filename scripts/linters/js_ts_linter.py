@@ -1145,7 +1145,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         Array Annotation, $inject Property Annotation). There are two  
         types of dependencies in directives:
         1. directive('directive_name', ['dependency',function(dependency){
-        2. controller in directive
+        2. controller in directive.
         """
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting unused dependencies check')
@@ -1221,14 +1221,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if dep:
                     if re.findall(r'\$', dep):
                         dep = '\\%s' % dep
-                        python_utils.PRINT(dep) 
+                        python_utils.PRINT("what is dependency:", dep) 
                     cnt = len(re.findall(r'' + dep + '[^\']', content))
                     if cnt < 2:
                         if start_point == 0:
                             python_utils.PRINT('Checking the file:', filepath)
-                        python_utils.PRINT(dep, ':', cnt,
-                                           '---------------Unused Dependency')
-
+                        python_utils.PRINT(
+                            dep, ':', cnt, '---------------Unused Dependency')
                         failed = True
                         start_point += 1
                     else:
