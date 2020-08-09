@@ -92,8 +92,8 @@ angular.module('oppia').directive('tutorCard', [
         'COMPONENT_NAME_CONTENT', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'DEFAULT_PROFILE_IMAGE_PATH',
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_NEW_CARD_AVAILABLE',
-        'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS', 'PAGE_CONTEXT',
-        'TWO_CARD_THRESHOLD_PX',
+        'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
+        'OPPIA_AVATAR_LINK_URL', 'PAGE_CONTEXT', 'TWO_CARD_THRESHOLD_PX',
         function(
             $anchorScroll, $location, $rootScope, $scope,
             AudioBarStatusService, AudioPlayerService, AudioPreloaderService,
@@ -105,8 +105,8 @@ angular.module('oppia').directive('tutorCard', [
             COMPONENT_NAME_CONTENT, CONTENT_FOCUS_LABEL_PREFIX,
             CONTINUE_BUTTON_FOCUS_LABEL, DEFAULT_PROFILE_IMAGE_PATH,
             EVENT_ACTIVE_CARD_CHANGED, EVENT_NEW_CARD_AVAILABLE,
-            INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS, PAGE_CONTEXT,
-            TWO_CARD_THRESHOLD_PX) {
+            INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS,
+            OPPIA_AVATAR_LINK_URL, PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX) {
           var ctrl = this;
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           var updateDisplayedCard = function() {
@@ -219,6 +219,7 @@ angular.module('oppia').directive('tutorCard', [
             $scope.OPPIA_AVATAR_IMAGE_URL = (
               UrlInterpolationService.getStaticImageUrl(
                 '/avatar/oppia_avatar_100px.svg'));
+            $scope.OPPIA_AVATAR_LINK_URL = OPPIA_AVATAR_LINK_URL;
 
             $scope.profilePicture = UrlInterpolationService.getStaticImageUrl(
               '/avatar/user_blue_72px.png');
