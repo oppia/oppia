@@ -1587,7 +1587,9 @@ export class UpgradedServices {
         upgradedServices['AnswerGroupObjectFactory'],
         upgradedServices['HintObjectFactory'],
         upgradedServices['SolutionObjectFactory'],
-        upgradedServices['OutcomeObjectFactory']);
+        upgradedServices['OutcomeObjectFactory'],
+        upgradedServices['SubtitledHtmlObjectFactory'],
+        upgradedServices['SubtitledUnicodeObjectFactory']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],

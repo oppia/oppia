@@ -26,6 +26,7 @@ import { ExplorationDataService } from
 import { AlertsService } from 'services/alerts.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Exploration data service', () => {
   let eds: ExplorationDataService = null;
@@ -78,14 +79,14 @@ describe('Exploration data service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [ExplorationDataService, LocalStorageService, 
-        LoggerService, AlertsService, CsrfService]
+        LoggerService, AlertsService, CsrfTokenService]
     });
     httpTestingController = TestBed.get(HttpTestingController);
     eds = TestBed.get(ExplorationDataService);
     lss = TestBed.get(LocalStorageService);
     ls = TestBed.get(LoggerService);
     als = TestBed.get(LocalStorageService);
-    CsrfService = TestBed.get(CsrfService);
+    CsrfService = TestBed.get(CsrfTokenService);
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(() => {
       return new Promise((resolve) => {
