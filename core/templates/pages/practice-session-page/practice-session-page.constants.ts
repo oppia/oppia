@@ -19,13 +19,15 @@
 export class PracticeSessionPageConstants {
   public static TOTAL_QUESTIONS = 20;
 
-  public static PRACTICE_SESSIONS_DATA_URL =
-    '/practice_session/data/<topic_name>?' +
-    'selected_subtopic_ids=<comma_separated_subtopic_ids>';
+  public static PRACTICE_SESSIONS_DATA_URL = (
+    '/practice_session/data/<classroom_url_fragment>/' +
+    '<topic_url_fragment>?selected_subtopic_ids=' +
+    '<comma_separated_subtopic_ids>');
 
-  public static TOPIC_VIEWER_PAGE = '/topic/<topic_name>';
+  public static TOPIC_VIEWER_PAGE = (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>');
 
-  public static PRACTICE_SESSIONS_URL =
-    '/practice_session/<topic_name>?' +
-    'selected_subtopic_ids=<comma_separated_subtopic_ids>';
+  public static PRACTICE_SESSIONS_URL = (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/practice/' +
+    'session?selected_subtopic_ids=<comma_separated_subtopic_ids>');
 }

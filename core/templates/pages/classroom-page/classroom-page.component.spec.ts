@@ -111,11 +111,12 @@ describe('Classroom page', () => {
       classroomData = ClassroomDataObjectFactory.createFromBackendData(
         'Math', [], 'Course details', 'Topics covered'
       );
-      spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
-        $q.resolve(classroomData));
+      spyOn(
+        ClassroomBackendApiService,
+        'fetchClassroomDataAsync').and.returnValue($q.resolve(classroomData));
       spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-      spyOn(UrlService, 'getClassroomNameFromUrl').and.returnValue(
+      spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
         'mock');
     });
 
@@ -128,10 +129,10 @@ describe('Classroom page', () => {
 
       expect(loadingMessage).toBe('');
       expect(ctrl.bannerImageFileUrl).toBe('/assets/images/splash/books.svg');
-      expect(ctrl.classroomDisplayName).toBe('Mock');
+      expect(ctrl.classroomDisplayName).toBe('Math');
 
       expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-        'Mock Classroom | Oppia');
+        'Math Classroom | Oppia');
 
       expect(translationInitializedSpy).toHaveBeenCalled();
       expect(ctrl.classroomData.getName()).toEqual('Math');
@@ -142,12 +143,14 @@ describe('Classroom page', () => {
     beforeEach(function() {
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         ClassroomBackendApiService);
-      spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
+      spyOn(
+        ClassroomBackendApiService,
+        'fetchClassroomDataAsync').and.returnValue(
         $q.reject({
           status: 404
         }));
       spyOn(AlertsService, 'addWarning').and.callThrough();
-      spyOn(UrlService, 'getClassroomNameFromUrl').and.returnValue(
+      spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
         'mock');
     });
 

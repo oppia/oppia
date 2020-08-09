@@ -936,6 +936,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, user_id, name='Name',
+            abbreviated_name='abbrev', url_fragment='url-fragment',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)

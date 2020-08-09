@@ -210,7 +210,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 36
+CURRENT_STATE_SCHEMA_VERSION = 37
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -796,13 +796,16 @@ SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
-TOPIC_VIEWER_URL_PREFIX = '/topic'
+TOPIC_VIEWER_URL_PREFIX = (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>')
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
+TOPIC_NAME_HANDLER = '/topic_name_handler'
 TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
 TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
+TOPIC_URL_FRAGMENT_HANDLER = '/topic_url_fragment_handler'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 UNASSIGN_SKILL_DATA_HANDLER_URL = '/topics_and_skills_dashboard/unassign_skill'
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics-and-skills-dashboard'
