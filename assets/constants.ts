@@ -5325,12 +5325,45 @@ export = {
   ],
 
   // Greek letters allowed in math interactions.
-  "GREEK_LETTERS": [
-    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
-    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
-    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
-    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
-  ],
+  "GREEK_LETTER_NAMES_TO_SYMBOLS": {
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "ε",
+    "zeta": "ζ",
+    "eta": "η",
+    "theta": "θ",
+    "iota": "ι",
+    "kappa": "κ",
+    "lambda": "λ",
+    "mu": "μ",
+    "nu": "ν",
+    "xi": "ξ",
+    "pi": "π",
+    "rho": "ρ",
+    "sigma": "σ",
+    "tau": "τ",
+    "upsilon": "υ",
+    "phi": "φ",
+    "chi": "χ",
+    "psi": "ψ",
+    "omega": "ω",
+    "Gamma": "Γ",
+    "Delta": "Δ",
+    "Theta": "Θ",
+    "Lambda": "Λ",
+    "Xi": "Ξ",
+    "Pi": "Π",
+    "Sigma": "Σ",
+    "Phi": "Φ",
+    "Psi": "Ψ",
+    "Omega": "Ω"
+  },
+
+  // Number of custom letters allowed in the on-screen keyboard for math
+  // interactions.
+  "MAX_CUSTOM_LETTERS_FOR_OSK": 10,
 
   // Functions allowed in math interactions.
   "MATH_FUNCTION_NAMES": [
@@ -5341,6 +5374,9 @@ export = {
   "OSK_MAIN_TAB": "mainTab",
   "OSK_FUNCTIONS_TAB": "functionsTab",
   "OSK_LETTERS_TAB": "lettersTab",
+
+  "CUSTOM_LETTERS_LATIN_TAB": "latinTab",
+  "CUSTOM_LETTERS_GREEK_TAB": "greekTab",
 
   // Name to human readable form mapping of the position of terms object.
   "POSITION_OF_TERMS_MAPPING": [{
@@ -5383,6 +5419,9 @@ export = {
 
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": false,
+
+  // Link to open when the Oppia avatar is clicked on any page.
+  "OPPIA_AVATAR_LINK_URL": null,
 
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
