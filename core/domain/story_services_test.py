@@ -453,8 +453,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'New description.'
         })]
 
-
-
         with self.assertRaisesRegexp(
             Exception,
             'Expected a commit message but received none.'):
