@@ -262,13 +262,33 @@ export class FractionInputValidationService {
         for (var k = 0; k < ranges.length; k++) {
           var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1]
             .getRulesAsList()[ranges[k].ruleIndex - 1];
-          const earlierEnclosed = (
-            isEnclosedBy(range, ranges[k]) &&
-            shouldCheckRangeCriteria(earlierRule, rule));
-          const currentEnclosed = (
-            isEnclosedBy(ranges[k], range) &&
-            shouldCheckRangeCriteria(rule, earlierRule));
-          if (earlierEnclosed || currentEnclosed) {
+          // Rules inside an AnswerGroup do not have a set order. We should
+          // check for redundant rules in both directions if rules are in the
+          // same AnswerGroup.
+          const redundantWithinAnswerGroup = (
+            ranges[k].answerGroupIndex - 1 === i &&
+            (
+              (
+                isEnclosedBy(range, ranges[k]) &&
+                shouldCheckRangeCriteria(earlierRule, rule)
+              ) || (
+                isEnclosedBy(ranges[k], range) &&
+                shouldCheckRangeCriteria(rule, earlierRule)
+              )
+            )
+          );
+
+          // AnswerGroups do have a set order. If rules are not in the same
+          // AnswerGroup we only check in one direction.
+          const redundantBetweenAnswerGroups = (
+            ranges[k].answerGroupIndex - 1 !== i &&
+            (
+              isEnclosedBy(range, ranges[k]) &&
+              shouldCheckRangeCriteria(earlierRule, rule)
+            )
+          );
+
+          if (redundantWithinAnswerGroup || redundantBetweenAnswerGroups) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (

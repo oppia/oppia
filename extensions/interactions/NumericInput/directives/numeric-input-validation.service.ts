@@ -138,9 +138,22 @@ export class NumericInputValidationService {
           default:
         }
         for (var k = 0; k < ranges.length; k++) {
-          if (isEnclosedBy(range, ranges[k]) ||
-            isEnclosedBy(ranges[k], range)
-          ) {
+          // Rules inside an AnswerGroup do not have a set order. We should
+          // check for redundant rules in both directions if rules are in the
+          // same AnswerGroup.
+          const redundantWithinAnswerGroup = (
+            ranges[k].answerGroupIndex - 1 === i &&
+            (isEnclosedBy(range, ranges[k]) || isEnclosedBy(ranges[k], range))
+          );
+
+          // AnswerGroups do have a set order. If rules are not in the same
+          // AnswerGroup we only check in one direction.
+          const redundantBetweenAnswerGroups = (
+            ranges[k].answerGroupIndex - 1 !== i &&
+            isEnclosedBy(range, ranges[k])
+          );
+
+          if (redundantWithinAnswerGroup || redundantBetweenAnswerGroups) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (

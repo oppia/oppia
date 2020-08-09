@@ -291,6 +291,21 @@ describe('DragAndDropSortInputValidationService', () => {
     }]);
   });
 
+  it('should catch redundancy of rules accross answer groups', () => {
+    answerGroups[0].updateRuleInputs(
+      [equalsListWithValuesRule]);
+    answerGroups[1].updateRuleInputs(
+      [equalsListWithAllowedValuesRule]);
+
+    var warnings = validatorService.getAllWarnings(currentState,
+      customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 1 from answer group 2 will never be matched ' +
+          'because it is made redundant by rule 1 from answer group 1.'
+    }]);
+  });
+
   it('should catch non-distinct selected choices', () => {
     answerGroups[0].updateRuleInputs([hasXBeforeYRule]);
 
