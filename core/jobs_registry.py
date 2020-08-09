@@ -88,7 +88,11 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.StoryMathRteAuditOneOffJob,
     suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
+<<<<<<< HEAD
     takeout_domain_jobs_one_off.SnapshotMetadataCommitMsgMigrationOneOffJob,
+=======
+    suggestion_jobs_one_off.SuggestionSvgFilenameValidationOneOffJob,
+>>>>>>> 32b7badd7779191d10e83cbc5e21ed7182e40b57
     topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
