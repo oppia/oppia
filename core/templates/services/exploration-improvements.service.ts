@@ -72,7 +72,6 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
     let improvementsTabIsAccessible: boolean;
     /** @private */
     const doInitAsync = async() => {
-      const expId = ContextService.getExplorationId();
       const userPermissions = (
         await UserExplorationPermissionsService.getPermissionsAsync());
 
@@ -83,6 +82,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
         return;
       }
 
+      const expId = ContextService.getExplorationId();
       config = (
         await ExplorationImprovementsBackendApiService.getConfigAsync(expId));
 
@@ -101,14 +101,15 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
         await StateTopAnswersStatsService.getTopAnswersByStateNameAsync());
       const playthroughIssues = await PlaythroughIssuesService.getIssues();
 
-      openHbrTasks = (
-        openTasks.filter(t => t.taskType === 'high_bounce_rate'));
-      ngrTasksOpenSinceInit = (
-        openTasks.filter(t => t.taskType === 'needs_guiding_responses'));
+      openHbrTasks = openTasks.filter(t => t.taskType === 'high_bounce_rate');
 
-      await ExplorationImprovementsTaskRegistryService.initialize(
+      ExplorationImprovementsTaskRegistryService.initialize(
         config, states, expStats, openTasks, resolvedTaskTypesByStateName,
         topAnswersByStateName, playthroughIssues);
+
+      ngrTasksOpenSinceInit = (
+        ExplorationImprovementsTaskRegistryService
+          .getOpenNeedsGuidingResponsesTasks());
     };
 
     return {
@@ -121,17 +122,18 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
       },
 
       async flushUpdatedTasksToBackend(): Promise<void> {
-        const openHbrTasksRemaining = (
+        await initPromise;
+        const hbrTasksStillOpen = (
           ExplorationImprovementsTaskRegistryService
             .getOpenHighBounceRateTasks());
         await ExplorationImprovementsBackendApiService.postTasksAsync(
           config.explorationId,
           merge([
             openHbrTasks.filter(t => t.isObsolete()),
+            hbrTasksStillOpen.filter(t => !openHbrTasks.includes(t)),
             ngrTasksOpenSinceInit.filter(t => t.isResolved()),
-            openHbrTasksRemaining.filter(t => !openHbrTasks.includes(t)),
           ]));
-        openHbrTasks = openHbrTasksRemaining;
+        openHbrTasks = hbrTasksStillOpen;
         ngrTasksOpenSinceInit = ngrTasksOpenSinceInit.filter(t => t.isOpen());
       },
 
