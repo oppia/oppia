@@ -128,6 +128,8 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
+import { ClassroomDataObjectFactory } from
+  'domain/classroom/ClassroomDataObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
@@ -165,7 +167,7 @@ import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
-  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+  'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -731,6 +733,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ckEditorCopyContentService: CkEditorCopyContentService;
   static classifierObjectFactory: ClassifierObjectFactory;
   static classroomBackendApiService: ClassroomBackendApiService;
+  static classroomDataObjectFactory: ClassroomDataObjectFactory;
   static codeNormalizerService: CodeNormalizerService;
   static codeReplPredictionService: CodeReplPredictionService;
   static codeReplRulesService: CodeReplRulesService;
@@ -1053,6 +1056,7 @@ private changeObjectFactory: ChangeObjectFactory,
 private ckEditorCopyContentService: CkEditorCopyContentService,
 private classifierObjectFactory: ClassifierObjectFactory,
 private classroomBackendApiService: ClassroomBackendApiService,
+private classroomDataObjectFactory: ClassroomDataObjectFactory,
 private codeNormalizerService: CodeNormalizerService,
 private codeReplPredictionService: CodeReplPredictionService,
 private codeReplRulesService: CodeReplRulesService,
@@ -1376,6 +1380,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.ckEditorCopyContentService = this.ckEditorCopyContentService,
     OppiaAngularRootComponent.classifierObjectFactory = this.classifierObjectFactory;
     OppiaAngularRootComponent.classroomBackendApiService = this.classroomBackendApiService;
+    OppiaAngularRootComponent.classroomDataObjectFactory = this.classroomDataObjectFactory;
     OppiaAngularRootComponent.codeNormalizerService = this.codeNormalizerService;
     OppiaAngularRootComponent.codeReplPredictionService = this.codeReplPredictionService;
     OppiaAngularRootComponent.codeReplRulesService = this.codeReplRulesService;

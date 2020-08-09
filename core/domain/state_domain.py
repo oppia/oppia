@@ -660,9 +660,7 @@ class InteractionInstance(python_utils.OBJECT):
         except KeyError:
             raise utils.ValidationError('Invalid interaction id: %s' % self.id)
 
-        customization_args_util.validate_customization_args_and_values(
-            'interaction', self.id, self.customization_args,
-            interaction.customization_arg_specs)
+        self._validate_customization_args()
 
         if not isinstance(self.answer_groups, list):
             raise utils.ValidationError(
@@ -696,6 +694,52 @@ class InteractionInstance(python_utils.OBJECT):
         if self.solution and not self.hints:
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
+
+    def _validate_customization_args(self):
+        """Validates the customization arguments keys and values using
+        customization_args_util.validate_customization_args_and_values().
+        """
+        # Because validate_customization_args_and_values() takes in
+        # customization argument values that are dictionaries, we first convert
+        # the InteractionCustomizationArg domain objects into dictionaries
+        # before passing it to the method.
+
+        # First, do some basic validation.
+        if not isinstance(self.customization_args, dict):
+            raise utils.ValidationError(
+                'Expected customization args to be a dict, received %s'
+                % self.customization_args)
+
+        # customization_args_dict here indicates a dict that maps customization
+        # argument names to a customization argument dict, the dict
+        # representation of InteractionCustomizationArg.
+        customization_args_dict = {}
+        if self.id:
+            for ca_name in self.customization_args:
+                try:
+                    customization_args_dict[ca_name] = (
+                        self.customization_args[
+                            ca_name].to_customization_arg_dict()
+                    )
+                except AttributeError:
+                    raise utils.ValidationError(
+                        'Expected customization arg value to be a '
+                        'InteractionCustomizationArg domain object, '
+                        'recieved %s' % self.customization_args[ca_name])
+
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            self.id)
+        customization_args_util.validate_customization_args_and_values(
+            'interaction', self.id, customization_args_dict,
+            interaction.customization_arg_specs)
+
+        self.customization_args = (
+            InteractionInstance
+            .convert_customization_args_dict_to_customization_args(
+                self.id,
+                customization_args_dict
+            )
+        )
 
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):

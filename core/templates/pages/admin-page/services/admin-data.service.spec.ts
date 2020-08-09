@@ -67,7 +67,9 @@ describe('Admin Data Service', () => {
         description: '',
         id: 'VqgPTpt7JyJy',
         topic_model_last_updated: 1591196558882.2,
-        language_code: 'en'
+        language_code: 'en',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA'
       }
     ],
     one_off_job_status_summaries: [],
@@ -201,7 +203,7 @@ describe('Admin Data Service', () => {
       expect(response).toEqual(expectedResponse);
     });
     var req = httpTestingController.expectOne(
-      '/adminmathsvghandler');
+      '/explorationslatexsvghandler');
     expect(req.request.method).toEqual('POST');
     req.flush(expectedResponse);
 

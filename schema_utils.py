@@ -30,6 +30,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import numbers
 import re
 
+from constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
 import python_utils
@@ -373,6 +374,19 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object has no duplicates.
         """
         return sorted(list(set(obj))) == sorted(obj)
+
+    @staticmethod
+    def is_url_fragment(obj):
+        """Returns True iff the given object (a string) is a valid
+        URL fragment.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid URL fragment.
+        """
+        return re.match(constants.VALID_URL_FRAGMENT_REGEX, obj)
 
     @staticmethod
     def is_at_least(obj, min_value):
