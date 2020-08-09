@@ -13,60 +13,76 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the stories list.
+ * @fileoverview Component for the topic viewer practice tab.
  */
 
-require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/window-dimensions.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('practiceTab', {
-  bindings: {
-    getTopicName: '&topicName',
-    getSubtopicsList: '&subtopicsList'
-  },
-  template: require('./practice-tab.component.html'),
-  controller: [
-    '$scope', '$window', 'UrlInterpolationService', 'PRACTICE_SESSIONS_URL',
-    function(
-        $scope, $window, UrlInterpolationService, PRACTICE_SESSIONS_URL) {
-      var ctrl = this;
+import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { PracticeSessionPageConstants } from
+  'pages/practice-session-page/practice-session-page.constants.ts';
+import { UrlService } from 'services/contextual/url.service';
 
-      ctrl.openNewPracticeSession = function() {
-        var selectedSubtopicIds = [];
-        for (var idx in ctrl.selectedSubtopicIndices) {
-          if (ctrl.selectedSubtopicIndices[idx]) {
-            selectedSubtopicIds.push(
-              ctrl.availableSubtopics[idx].getId());
-          }
-        }
-        var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
-          PRACTICE_SESSIONS_URL, {
-            topic_name: ctrl.getTopicName(),
-            comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
-          });
-        $window.location.href = practiceSessionsUrl;
-      };
+@Component({
+  selector: 'practice-tab',
+  templateUrl: './practice-tab.component.html',
+  styleUrls: []
+})
+export class PracticeTabComponent implements OnInit {
+  @Input() topicName: string;
+  @Input() subtopicsList: Array<Subtopic>;
+  selectedSubtopics: Array<Subtopic> = [];
+  availableSubtopics: Array<Subtopic> = [];
+  selectedSubtopicIndices: Array<Boolean> = [];
 
-      ctrl.isStartButtonDisabled = function() {
-        for (var idx in ctrl.selectedSubtopicIndices) {
-          if (ctrl.selectedSubtopicIndices[idx]) {
-            return false;
-          }
-        }
-        return true;
-      };
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService
+  ) {}
 
-      ctrl.$onInit = function() {
-        ctrl.selectedSubtopics = [];
-        ctrl.availableSubtopics = ctrl.getSubtopicsList().filter(
-          function(subtopic) {
-            return subtopic.getSkillSummaries().length > 0;
-          }
-        );
-        ctrl.selectedSubtopicIndices = Array(
-          ctrl.availableSubtopics.length).fill(false);
-      };
+  ngOnInit(): void {
+    this.selectedSubtopics = [];
+    this.availableSubtopics = this.subtopicsList.filter(
+      (subtopic: Subtopic) => {
+        return subtopic.getSkillSummaries().length > 0;
+      }
+    );
+    this.selectedSubtopicIndices = Array(
+      this.availableSubtopics.length).fill(false);
+  }
+
+  isStartButtonDisabled(): boolean {
+    for (var idx in this.selectedSubtopicIndices) {
+      if (this.selectedSubtopicIndices[idx]) {
+        return false;
+      }
     }
-  ]
-});
+    return true;
+  }
+
+  openNewPracticeSession(): void {
+    const selectedSubtopicIds = [];
+    for (let idx in this.selectedSubtopicIndices) {
+      if (this.selectedSubtopicIndices[idx]) {
+        selectedSubtopicIds.push(
+          this.availableSubtopics[idx].getId());
+      }
+    }
+    const practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
+        topic_url_fragment: (
+          this.urlService.getTopicUrlFragmentFromLearnerUrl()),
+        classroom_url_fragment: (
+          this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
+        comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
+      });
+    window.location.href = practiceSessionsUrl;
+  }
+}
+
+angular.module('oppia').directive(
+  'practiceTab', downgradeComponent(
+    {component: PracticeTabComponent}));

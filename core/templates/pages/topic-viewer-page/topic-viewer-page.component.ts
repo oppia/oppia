@@ -24,9 +24,7 @@ require('components/skills-mastery-list/skills-mastery-list.directive.ts');
 require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +
-  'topic-viewer-stories-list.directive.ts');
-require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
-require('pages/topic-viewer-page/practice-tab/practice-tab.component.ts');
+  'topic-viewer-stories-list.component.ts');
 require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
@@ -57,17 +55,28 @@ angular.module('oppia').component('topicViewerPage', {
       };
       ctrl.$onInit = function() {
         ctrl.canonicalStorySummaries = [];
-        ctrl.setActiveTab('info');
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-
-        PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
+        if (UrlService.getPathname().endsWith('revision')) {
+          ctrl.setActiveTab('subtopics');
+        } else if (UrlService.getPathname().endsWith('practice')) {
+          ctrl.setActiveTab('practice');
+        } else if (UrlService.getPathname().endsWith('story')) {
+          ctrl.setActiveTab('story');
+        } else {
+          ctrl.setActiveTab('info');
+        }
+        ctrl.topicUrlFragment = (
+          UrlService.getTopicUrlFragmentFromLearnerUrl());
+        ctrl.classroomUrlFragment = (
+          UrlService.getClassroomUrlFragmentFromLearnerUrl());
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.topicIsLoading = true;
-        TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
+        TopicViewerBackendApiService.fetchTopicData(
+          ctrl.topicUrlFragment, ctrl.classroomUrlFragment).then(
           function(readOnlyTopic) {
             ctrl.topicId = readOnlyTopic.getTopicId();
             ctrl.topicName = readOnlyTopic.getTopicName();
+            PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
             ctrl.topicDescription = readOnlyTopic.getTopicDescription();
             ctrl.canonicalStorySummaries = (
               readOnlyTopic.getCanonicalStorySummaries());
@@ -83,6 +92,11 @@ angular.module('oppia').component('topicViewerPage', {
             LoaderService.hideLoadingScreen();
             ctrl.trainTabShouldBeDisplayed = (
               readOnlyTopic.getTrainTabShouldBeDisplayed());
+            if (
+              !ctrl.trainTabShouldBeDisplayed &&
+              ctrl.activeTab === 'practice') {
+              ctrl.setActiveTab('info');
+            }
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
             $rootScope.$apply();
