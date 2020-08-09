@@ -20,6 +20,7 @@ import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { TestBed } from '@angular/core/testing';
+
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
@@ -29,11 +30,19 @@ import { StateCustomizationArgsService } from
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateNextContentIdIndexService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Customize Interaction Modal Controller', function() {
   var $injector = null;
@@ -42,9 +51,11 @@ describe('Customize Interaction Modal Controller', function() {
   var imageClickInputValidationService = null;
   var editorFirstTimeEventsService = null;
   var interactionDetailsCacheService = null;
+  var interactionObjectFactory = null;
   var stateCustomizationArgsService = null;
   var stateEditorService = null;
   var stateInteractionIdService = null;
+  var stateNextContentIdIndexService = null;
 
   var stateName = 'Introduction';
 
@@ -56,9 +67,12 @@ describe('Customize Interaction Modal Controller', function() {
       ImageClickInputValidationService);
     interactionDetailsCacheService = TestBed.get(
       InteractionDetailsCacheService);
+    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateEditorService = TestBed.get(StateEditorService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
+    stateNextContentIdIndexService = TestBed.get(
+      StateNextContentIdIndexService);
   });
 
   describe('when state editor is in question mode', function() {
@@ -70,7 +84,13 @@ describe('Customize Interaction Modal Controller', function() {
         '$uibModalInstance', ['close', 'dismiss']);
 
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-      stateCustomizationArgsService.init(stateName, {});
+      stateCustomizationArgsService.init(stateName, {
+        imageAndRegions: {value: {
+          imagePath: '',
+          labeledRegions: []
+        }},
+        highlightRegionsOnHover: {value: false}
+      });
       stateInteractionIdService.init(stateName, 'ImageClickInput');
 
       $scope = $rootScope.$new();
@@ -83,9 +103,11 @@ describe('Customize Interaction Modal Controller', function() {
         EditorFirstTimeEventsService: editorFirstTimeEventsService,
         imageClickInputValidationService: imageClickInputValidationService,
         InteractionDetailsCacheService: interactionDetailsCacheService,
+        InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
-        StateInteractionIdService: stateInteractionIdService
+        StateInteractionIdService: stateInteractionIdService,
+        StateNextContentIdIndexService: stateNextContentIdIndexService
       });
     }));
 
@@ -100,9 +122,7 @@ describe('Customize Interaction Modal Controller', function() {
             labeledRegions: []
           }
         },
-        highlightRegionsOnHover: {
-          value: false
-        }
+        highlightRegionsOnHover: {value: false}
       });
 
       expect($scope.$broadcast).toHaveBeenCalledWith('schemaBasedFormsShown');
@@ -119,9 +139,8 @@ describe('Customize Interaction Modal Controller', function() {
     it('should get a customization args warning message when' +
       ' customization args warning message button has no value', function() {
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {
-          value: ''
-        }
+        imageAndRegions: {value: ''},
+        highlightRegionsOnHover: {value: false}
       };
       stateCustomizationArgsService.saveDisplayedValue();
 
@@ -144,23 +163,21 @@ describe('Customize Interaction Modal Controller', function() {
 
       expect($scope.customizationArgSpecs.length).toBe(1);
       expect(stateCustomizationArgsService.displayed).toEqual({
-        question: {
-          value: {
-            assumptions: [{
-              arguments: [],
-              top_kind_name: 'variable',
-              dummies: [],
-              top_operator_name: 'p'
-            }],
-            results: [{
-              arguments: [],
-              top_kind_name: 'variable',
-              dummies: [],
-              top_operator_name: 'p'
-            }],
-            default_proof_string: ''
-          }
-        }
+        question: {value: {
+          assumptions: [{
+            arguments: [],
+            top_kind_name: 'variable',
+            dummies: [],
+            top_operator_name: 'p'
+          }],
+          results: [{
+            arguments: [],
+            top_kind_name: 'variable',
+            dummies: [],
+            top_operator_name: 'p'
+          }],
+          default_proof_string: ''
+        }}
       });
       expect($scope.hasCustomizationArgs).toBe(true);
 
@@ -222,9 +239,8 @@ describe('Customize Interaction Modal Controller', function() {
         $valid: true
       };
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {
-          value: ''
-        }
+        imageAndRegions: {value: ''},
+        highlightRegionsOnHover: {value: false}
       };
       stateCustomizationArgsService.saveDisplayedValue();
 
@@ -241,14 +257,12 @@ describe('Customize Interaction Modal Controller', function() {
     it('should have save interaction button disabled when form entries' +
       ' are invalid', function() {
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {
-          value: {
-            imagePath: 'imagepath',
-            labeledRegions: [{
-              label: 'abc'
-            }]
-          }
-        }
+        imageAndRegions: {value: {
+          imagePath: 'imagepath',
+          labeledRegions: [{
+            label: 'abc'
+          }]
+        }}
       };
       stateCustomizationArgsService.saveDisplayedValue();
 
@@ -269,14 +283,13 @@ describe('Customize Interaction Modal Controller', function() {
     it('should have save interaction button enabled when there is no' +
       ' warning message', function() {
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {
-          value: {
-            imagePath: 'imagepath',
-            labeledRegions: [{
-              label: 'abc'
-            }]
-          }
-        }
+        imageAndRegions: {value: {
+          imagePath: 'imagepath',
+          labeledRegions: [{
+            label: 'abc'
+          }]
+        }},
+        highlightRegionsOnHover: {value: false}
       };
       stateCustomizationArgsService.saveDisplayedValue();
       $scope.form.schemaForm = {
@@ -308,9 +321,11 @@ describe('Customize Interaction Modal Controller', function() {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         InteractionDetailsCacheService: interactionDetailsCacheService,
+        InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
-        StateInteractionIdService: stateInteractionIdService
+        StateInteractionIdService: stateInteractionIdService,
+        StateNextContentIdIndexService: stateNextContentIdIndexService
       });
     }));
 
@@ -325,7 +340,8 @@ describe('Customize Interaction Modal Controller', function() {
       ' interaction being displayed', function() {
       // Change customization args.
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {}
+        imageAndRegions: {value: null},
+        highlightRegionsOnHover: {value: false}
       };
       // Save logicProof on cache.
       stateInteractionIdService.displayed = 'LogicProof';
@@ -348,5 +364,152 @@ describe('Customize Interaction Modal Controller', function() {
       // Remove logicProof from cache in order to not affect other specs.
       interactionDetailsCacheService.removeDetails('LogicProof');
     });
+
+    it('should correctly populate null content ids on save', () => {
+      stateNextContentIdIndexService.displayed = 0;
+      stateInteractionIdService.displayed = 'MultipleChoiceInput';
+      stateCustomizationArgsService.displayed = {
+        choices: {value: [
+          new SubtitledHtml('<p>1</p>', null),
+          new SubtitledHtml('<p>2</p>', null)
+        ]},
+        showChoicesInShuffledOrder: {value: false}
+      };
+
+      $scope.save();
+      expect(stateCustomizationArgsService.displayed).toEqual({
+        choices: {value: [
+          new SubtitledHtml('<p>1</p>', 'ca_choices_0'),
+          new SubtitledHtml('<p>2</p>', 'ca_choices_1')
+        ]},
+        showChoicesInShuffledOrder: {value: false}
+      });
+      expect(stateNextContentIdIndexService.displayed).toEqual(2);
+    });
+  });
+
+  it('should error when a saved customization arg is missing', () => {
+    angular.mock.inject(function($injector, $controller) {
+      var $rootScope = $injector.get('$rootScope');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
+
+      stateCustomizationArgsService.init(stateName, {
+        imageAndRegions: { value: {
+          imagePath: '',
+          labeledRegions: []
+        } }
+      });
+      stateInteractionIdService.init(stateName, 'ImageClickInput');
+
+      $scope = $rootScope.$new();
+      expect(() => {
+        $controller('CustomizeInteractionModalController', {
+          $scope: $scope,
+          $uibModalInstance: $uibModalInstance,
+          InteractionDetailsCacheService: interactionDetailsCacheService,
+          InteractionObjectFactory: interactionObjectFactory,
+          StateCustomizationArgsService: stateCustomizationArgsService,
+          StateEditorService: stateEditorService,
+          StateInteractionIdService: stateInteractionIdService,
+          StateNextContentIdIndexService: stateNextContentIdIndexService
+        });
+      }).toThrowError(
+        'Interaction is missing customization argument highlightRegionsOnHover'
+      );
+    });
+    // Change customizationArgs to the older one in order to not affect other
+    // specs.
+    stateCustomizationArgsService.displayed = {};
+  });
+
+  it('should correctly populate null content ids of complex nested ' +
+     'customization arguments on save', () => {
+    // While no interaction currently contains a dictionary in the customization
+    // arguments, we test dictionaries and more complex nested forms of
+    // customization arguments for future changes.
+
+    angular.mock.inject(function($injector, $controller) {
+      var $rootScope = $injector.get('$rootScope');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
+
+      stateCustomizationArgsService.init(stateName, {
+        dummyCustArg: {value: [{
+          content: new SubtitledUnicode('first', null),
+          show: true
+        },
+        {
+          content: new SubtitledUnicode('second', null),
+          show: true
+        }]}
+      });
+      stateInteractionIdService.init(stateName, 'DummyInteraction');
+
+      const INTERACTION_SPECS = {
+        DummyInteraction: {
+          customization_arg_specs: [{
+            name: 'dummyCustArg',
+            schema: {
+              type: 'list',
+              items: {
+                type: 'dict',
+                properties: [{
+                  name: 'content',
+                  schema: {
+                    type: 'custom',
+                    obj_type: 'SubtitledUnicode'
+                  }
+                }, {
+                  name: 'show',
+                  schema: {
+                    type: 'boolean'
+                  }
+                }]
+              }
+            }
+          }]
+        }
+      };
+
+      $scope = $rootScope.$new();
+
+      $controller('CustomizeInteractionModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        InteractionDetailsCacheService: interactionDetailsCacheService,
+        InteractionObjectFactory: interactionObjectFactory,
+        StateCustomizationArgsService: stateCustomizationArgsService,
+        StateEditorService: stateEditorService,
+        StateInteractionIdService: stateInteractionIdService,
+        StateNextContentIdIndexService: stateNextContentIdIndexService,
+        INTERACTION_SPECS: INTERACTION_SPECS
+      });
+    });
+    stateNextContentIdIndexService.displayed = 0;
+    $scope.save();
+    expect(stateCustomizationArgsService.displayed).toEqual({
+      dummyCustArg: {value: [{
+        content:
+          new SubtitledUnicode('first', 'ca_dummyCustArg_content_0'),
+        show: true
+      },
+      {
+        content:
+          new SubtitledUnicode('second', 'ca_dummyCustArg_content_1'),
+        show: true
+      }]}
+    });
+    expect(stateNextContentIdIndexService.displayed).toEqual(2);
+
+    // Change customizationArgs to the older one in order to not affect other
+    // specs.
+    stateCustomizationArgsService.displayed = {};
   });
 });

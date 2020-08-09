@@ -55,8 +55,8 @@ describe('Topic editor functionality', function() {
       'creator@topicEditor.com', 'creatorTopicEditor');
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic('Topic 1',
-      'Description', false);
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic 1', 'unique-topic', 'Description', false);
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
@@ -69,7 +69,8 @@ describe('Topic editor functionality', function() {
 
   it('should add and delete subtopics correctly', async function() {
     await topicEditorPage.addSubtopic(
-      'Subtopic 1', '../data/test2_svg.svg', 'Subtopic content');
+      'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
+      'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
 
     await topicEditorPage.get(topicId);
@@ -126,7 +127,8 @@ describe('Topic editor functionality', function() {
   it('should add a canonical story to topic correctly', async function() {
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
-      'Story Title', 'Story description', Constants.TEST_SVG_PATH);
+      'Story Title', 'topic-and-story-editor-one', 'Story description',
+      Constants.TEST_SVG_PATH);
     await storyEditorPage.returnToTopic();
 
     await topicEditorPage.expectNumberOfStoriesToBe(1);
@@ -163,10 +165,11 @@ describe('Topic editor functionality', function() {
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
           'Skill 3', 'Concept card explanation', true));
       var TOPIC_NAME = 'TASE2';
+      var TOPIC_URL_FRAGMENT_NAME = 'tase-two';
       var TOPIC_DESCRIPTION = 'TASE2 description';
       await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
-        TOPIC_DESCRIPTION, false);
+      await topicsAndSkillsDashboardPage.createTopic(
+        TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
@@ -185,12 +188,14 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
 
       await topicEditorPage.addSubtopic(
-        'Subtopic 1', '../data/test2_svg.svg', 'Subtopic1 Content');
+        'Subtopic 1', 'subtopic-two', '../data/test2_svg.svg',
+        'Subtopic1 Content');
       await topicEditorPage.saveTopic('Added subtopic.');
 
       await topicEditorPage.navigateToTopicEditorTab();
       await topicEditorPage.addSubtopic(
-        'Subtopic 2', '../data/test2_svg.svg', 'Subtopic2 Content');
+        'Subtopic 2', 'subtopic-three', '../data/test2_svg.svg',
+        'Subtopic2 Content');
       await topicEditorPage.saveTopic('Added subtopics.');
 
       await topicEditorPage.navigateToTopicEditorTab();
@@ -230,6 +235,7 @@ describe('Chapter editor functionality', function() {
   var dummySkills = [];
   var allowedErrors = [];
   var topicName = 'Topic 0';
+  var topicUrlFragment = 'topic-zero';
   var userEmail = 'creator@chapterTest.com';
 
   var createDummyExplorations = async function(numExplorations) {
@@ -270,10 +276,11 @@ describe('Chapter editor functionality', function() {
     var handle = await browser.getWindowHandle();
     dummyExplorationIds = await createDummyExplorations(3);
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(topicName,
-      'Description', false);
+    await topicsAndSkillsDashboardPage.createTopic(
+      topicName, topicUrlFragment, 'Description', false);
     await topicEditorPage.createStory(
-      'Story 0', 'Story description', Constants.TEST_SVG_PATH);
+      'Story 0', 'topic-and-story-editor-two', 'Story description',
+      Constants.TEST_SVG_PATH);
     var url = await browser.getCurrentUrl();
     storyId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
@@ -288,6 +295,7 @@ describe('Chapter editor functionality', function() {
   it('should create a basic chapter.', async function() {
     await storyEditorPage.createNewChapter(
       'Chapter 1', dummyExplorationIds[0], Constants.TEST_SVG_PATH);
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
     await storyEditorPage.changeNodeDescription('Chapter description 1');
     await storyEditorPage.changeNodeOutline(
       await forms.toRichText('First outline'));
@@ -297,6 +305,7 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.editTopic(topicName);
     await topicEditorPage.navigateToStoryWithIndex(0);
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
     await storyEditorPage.expectNodeDescription('Chapter description 1');
   });
 
@@ -322,7 +331,7 @@ describe('Chapter editor functionality', function() {
   it('should add one more chapter to the story', async function() {
     await storyEditorPage.createNewChapter(
       'Chapter 2', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
-    await storyEditorPage.navigateToChapterByIndex(1);
+    await storyEditorPage.navigateToChapterWithName('Chapter 2');
     await storyEditorPage.changeNodeDescription('Chapter description 2');
     await storyEditorPage.changeNodeOutline(
       await forms.toRichText('Second outline'));
@@ -332,7 +341,7 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.editTopic(topicName);
     await topicEditorPage.navigateToStoryWithIndex(0);
-    await storyEditorPage.navigateToChapterByIndex(1);
+    await storyEditorPage.navigateToChapterWithName('Chapter 2');
     await storyEditorPage.expectNodeDescription('Chapter description 2');
   });
 
@@ -348,7 +357,8 @@ describe('Chapter editor functionality', function() {
     async function() {
       await storyEditorPage.createNewChapter(
         'Chapter 3', dummyExplorationIds[2], Constants.TEST_SVG_PATH);
-      await storyEditorPage.navigateToChapterByIndex(2);
+      await storyEditorPage.navigateToChapterWithName('Chapter 3');
+      await storyEditorPage.navigateToStoryEditorTab();
       await storyEditorPage.expectChaptersListToBe(
         ['Chapter 1', 'Chapter 2', 'Chapter 3']);
 
@@ -366,7 +376,7 @@ describe('Chapter editor functionality', function() {
 
   it('should add one prerequisite and acquired skill to chapter 1',
     async function() {
-      await storyEditorPage.navigateToChapterByIndex(0);
+      await storyEditorPage.navigateToChapterWithName('Chapter 1');
       await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
       await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
       await storyEditorPage.addAcquiredSkill(dummySkills[0]);
@@ -378,6 +388,7 @@ describe('Chapter editor functionality', function() {
 
   it('should fail to add one prerequisite skill which is already added as' +
     ' acquired skill', async function() {
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
     await storyEditorPage.addAcquiredSkill(dummySkills[1]);
     await storyEditorPage.expectSaveStoryDisabled();
     var warningRegex = new RegExp(
@@ -388,6 +399,7 @@ describe('Chapter editor functionality', function() {
   });
 
   it('should delete prerequisite skill and acquired skill', async function() {
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
     await storyEditorPage.deleteAcquiredSkillByIndex(0);
     await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
     await storyEditorPage.deletePrerequisiteSkillByIndex(0);

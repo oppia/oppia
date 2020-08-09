@@ -57,7 +57,7 @@ class BaseObject(python_utils.OBJECT):
             this class.
 
         Raises:
-            TypeError: The Python object cannot be normalized.
+            TypeError. The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
@@ -129,6 +129,54 @@ class Html(BaseObject):
 
     SCHEMA = {
         'type': 'html',
+    }
+
+
+class SubtitledUnicode(BaseObject):
+    """SubtitledUnicode class."""
+
+    description = 'A dictionary with properties "content_id" and "unicode".'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'content_id',
+            'schema': {
+                # The default content id is none. However, it should be
+                # populated before being saved (SubtitledUnicode in state_domain
+                # has validation checks for this).
+                'type': 'unicode_or_none'
+            }
+        }, {
+            'name': 'unicode_str',
+            'schema': {
+                'type': 'unicode'
+            }
+        }]
+    }
+
+
+class SubtitledHtml(BaseObject):
+    """SubtitledHtml class."""
+
+    description = 'A dictionary with properties "content_id" and "html".'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'content_id',
+            'schema': {
+                # The default content id is none. However, it should be
+                # populated before being saved (SubtitledHtml in state_domain
+                # has validation checks for this).
+                'type': 'unicode_or_none'
+            }
+        }, {
+            'name': 'html',
+            'schema': {
+                'type': 'html'
+            }
+        }]
     }
 
 
@@ -506,7 +554,7 @@ class CheckedProof(BaseObject):
                     error has occurred.
 
         Raises:
-            TypeError: Cannot convert to the CheckedProof schema.
+            TypeError. Cannot convert to the CheckedProof schema.
         """
         try:
             assert isinstance(raw, dict)
@@ -564,7 +612,7 @@ class LogicQuestion(BaseObject):
                 default_proof_string: str. The default proof string.
 
         Raises:
-            TypeError: Cannot convert to LogicQuestion schema.
+            TypeError. Cannot convert to LogicQuestion schema.
         """
 
         def _validate_expression(expression):
@@ -575,7 +623,7 @@ class LogicQuestion(BaseObject):
                     dict format.
 
             Raises:
-                AssertionError: The specified expression is not in the correct
+                AssertionError. The specified expression is not in the correct
                     format.
             """
             assert isinstance(expression, dict)
@@ -593,7 +641,7 @@ class LogicQuestion(BaseObject):
                 array: list(dict(str, *)). The expression array to be verified.
 
             Raises:
-                AssertionError: The specified expression array is not in the
+                AssertionError. The specified expression array is not in the
                     list format.
             """
             assert isinstance(array, list)
@@ -794,7 +842,7 @@ class NormalizedRectangle2D(BaseObject):
             float values as coordinates of the rectangle.
 
         Raises:
-            TypeError: Cannot convert to the NormalizedRectangle2D schema.
+            TypeError. Cannot convert to the NormalizedRectangle2D schema.
         """
         def clamp(value):
             """Clamps a number to range [0, 1].
@@ -1075,13 +1123,12 @@ class AlgebraicExpression(BaseObject):
     """
 
     description = 'A unicode string for an algebraic expression.'
-    default_value = 'x'
+    default_value = ''
 
     SCHEMA = {
         'type': 'unicode',
         'validators': [{
-            'id': 'is_valid_math_expression',
-            'algebraic': True
+            'id': 'is_valid_algebraic_expression'
         }]
     }
 
@@ -1107,7 +1154,7 @@ class MathEquation(BaseObject):
     """
 
     description = 'A unicode string for a math equation.'
-    default_value = 'x=y'
+    default_value = ''
 
     SCHEMA = {
         'type': 'unicode',
@@ -1123,7 +1170,7 @@ class NumericExpression(BaseObject):
     """
 
     description = 'A unicode string for an numeric expression.'
-    default_value = '1'
+    default_value = ''
 
     SCHEMA = {
         'type': 'unicode',

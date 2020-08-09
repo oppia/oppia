@@ -32,7 +32,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
   expect(
     await objects.MathEditor(elem.element(by.tagName(
       'oppia-interactive-math-equation-input'))).getValue()
-  ).toBe('\\color{grey}{\\text{\\small{Type a formula here.}}}');
+  ).toBe('\\color{grey}{\\text{\\small{Type an equation here.}}}');
 };
 
 var submitAnswer = async function(elem, answer) {
@@ -59,7 +59,7 @@ var testSuite = [{
     '(2*x+1)*(-x+3)=0']
 }, {
   interactionArguments: [],
-  ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on LHS'],
+  ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on Left Hand Side'],
   expectedInteractionDetails: [],
   wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
   correctAnswers: ['y=m*x+c', 'y=m*x^2+c', '2*y-y=m*x+c', 'y=0', 'y=m*x-c']

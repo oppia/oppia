@@ -30,6 +30,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import numbers
 import re
 
+from constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
 import python_utils
@@ -54,6 +55,10 @@ SCHEMA_TYPE_HTML = 'html'
 SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
+SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
+
+SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
+SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
 
 
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
@@ -70,7 +75,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         *. The normalized object.
 
     Raises:
-        AssertionError: The object fails to validate against the schema.
+        AssertionError. The object fails to validate against the schema.
     """
     normalized_obj = None
 
@@ -143,6 +148,17 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             obj = python_utils.UNICODE(obj)
         assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
+        normalized_obj = obj
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE_OR_NONE:
+        assert obj is None or isinstance(obj, python_utils.BASESTRING), (
+            'Expected unicode string or None, received %s' % obj)
+        if obj is not None:
+            if isinstance(obj, bytes):
+                obj = obj.decode('utf-8')
+            else:
+                obj = python_utils.UNICODE(obj)
+            assert isinstance(obj, python_utils.UNICODE), (
+                'Expected unicode, received %s' % obj)
         normalized_obj = obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
@@ -218,7 +234,7 @@ class Normalizers(python_utils.OBJECT):
             normalizer_id.
 
         Raises:
-            Exception: The normalizer_id is not valid.
+            Exception. The normalizer_id is not valid.
         """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
@@ -229,16 +245,16 @@ class Normalizers(python_utils.OBJECT):
         """Takes a string representing a URL and sanitizes it.
 
         Args:
-            obj: a string representing a URL.
+            obj: str. A string representing a URL.
 
         Returns:
-            An empty string if the URL does not start with http:// or https://
-            except when the string is empty. Otherwise, returns the original
-            URL.
+            str. An empty string if the URL does not start with http:// or
+            https:// except when the string is empty. Otherwise, returns the
+            original URL.
 
         Raises:
-            AssertionError: The string is non-empty and does not start with
-                http:// or https://
+            AssertionError. The string is non-empty and does not start with
+                http:// or https://.
         """
         if obj == '':
             return obj
@@ -258,10 +274,10 @@ class Normalizers(python_utils.OBJECT):
         """Collapses multiple spaces into single spaces.
 
         Args:
-            obj: a string.
+            obj: str. String to be processed for multiple spaces.
 
         Returns:
-            A string that is the same as `obj`, except that each block of
+            str. A string that is the same as `obj`, except that each block of
             whitespace is collapsed into a single space character. If the
             block of whitespace is at the front or end of obj, then it
             is simply removed.
@@ -352,6 +368,19 @@ class _Validators(python_utils.OBJECT):
         return sorted(list(set(obj))) == sorted(obj)
 
     @staticmethod
+    def is_url_fragment(obj):
+        """Returns True iff the given object (a string) is a valid
+        URL fragment.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid URL fragment.
+        """
+        return re.match(constants.VALID_URL_FRAGMENT_REGEX, obj)
+
+    @staticmethod
     def is_at_least(obj, min_value):
         """Ensures that `obj` (an int/float) is at least `min_value`.
 
@@ -390,19 +419,21 @@ class _Validators(python_utils.OBJECT):
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
 
     @staticmethod
-    def is_valid_math_expression(obj, algebraic=True):
+    def is_valid_math_expression(obj, algebraic):
         """Checks if the given obj (a string) represents a valid algebraic or
         numeric expression. Note that purely-numeric expressions are NOT
         considered valid algebraic expressions.
 
         Args:
-            obj: str. The given expression.
+            obj: str. The given math expression string.
             algebraic: bool. True if the given expression is algebraic
                 else numeric.
 
         Returns:
             bool. Whether the given object is a valid expression.
         """
+        if len(obj) == 0:
+            return True
 
         if not expression_parser.is_valid_expression(obj):
             return False
@@ -414,31 +445,59 @@ class _Validators(python_utils.OBJECT):
         return not algebraic ^ expression_is_algebraic
 
     @staticmethod
+    def is_valid_algebraic_expression(obj):
+        """Checks if the given obj (a string) represents a valid algebraic
+        expression.
+
+        Args:
+            obj: str. The given math expression string.
+
+        Returns:
+            bool. Whether the given object is a valid algebraic expression.
+        """
+        return get_validator('is_valid_math_expression')(obj, algebraic=True)
+
+    @staticmethod
+    def is_valid_numeric_expression(obj):
+        """Checks if the given obj (a string) represents a valid numeric
+        expression.
+
+        Args:
+            obj: str. The given math expression string.
+
+        Returns:
+            bool. Whether the given object is a valid numeric expression.
+        """
+        return get_validator('is_valid_math_expression')(obj, algebraic=False)
+
+    @staticmethod
     def is_valid_math_equation(obj):
         """Checks if the given obj (a string) represents a valid math equation.
 
         Args:
-            obj: str. A string.
+            obj: str. The given math equation string.
 
         Returns:
             bool. Whether the given object is a valid math equation.
         """
+        if len(obj) == 0:
+            return True
         if obj.count('=') != 1:
             return False
 
-        is_valid_math_expression = get_validator(
-            'is_valid_math_expression')
+        is_valid_algebraic_expression = get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = get_validator(
+            'is_valid_numeric_expression')
         lhs, rhs = obj.split('=')
 
         # Both sides have to be valid expressions and at least one of them has
         # to be a valid algebraic expression.
-        lhs_is_algebraically_valid = is_valid_math_expression(lhs)
-        rhs_is_algebraically_valid = is_valid_math_expression(rhs)
+        lhs_is_algebraically_valid = is_valid_algebraic_expression(lhs)
+        rhs_is_algebraically_valid = is_valid_algebraic_expression(rhs)
 
-        lhs_is_numerically_valid = is_valid_math_expression(
-            lhs, algebraic=False)
-        rhs_is_numerically_valid = is_valid_math_expression(
-            rhs, algebraic=False)
+        lhs_is_numerically_valid = is_valid_numeric_expression(lhs)
+        rhs_is_numerically_valid = is_valid_numeric_expression(rhs)
 
         if lhs_is_algebraically_valid and rhs_is_algebraically_valid:
             return True

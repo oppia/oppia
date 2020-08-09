@@ -64,7 +64,9 @@ describe('Admin backend api service', () => {
         description: '',
         id: 'VqgPTpt7JyJy',
         topic_model_last_updated: 1591196558882.2,
-        language_code: 'en'
+        language_code: 'en',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA'
       }
     ],
     one_off_job_status_summaries: [],
@@ -162,6 +164,76 @@ describe('Admin backend api service', () => {
     expect(req.request.method).toEqual('GET');
     req.flush(adminBackendResponse);
 
+    flushMicrotasks();
+  }));
+
+  it('should send SVGs to the backend.', fakeAsync(() => {
+    var successResponse = {
+      result: 'successfully updated'
+    };
+    var latexToSvgMapping = {
+      exp_id1: {
+        latex_string1: {
+          file: new Blob(),
+          dimensions: {
+            encoded_height_string: '4d456',
+            encoded_width_string: '3d467',
+            encoded_vertical_padding_string: '0d234'
+          },
+          latexId: '3rmYki9MyZ'
+        }
+      },
+      exp_id2: {
+        latex_string2: {
+          file: new Blob(),
+          dimensions: {
+            encoded_height_string: '3d456',
+            encoded_width_string: '5d467',
+            encoded_vertical_padding_string: '0d234'
+          },
+          latexId: '4rm6ki9MsZ'
+        }
+      }
+    };
+    var expectedPayload = {
+      latexMapping: {
+        exp_id1: {
+          latex_string1: {
+            dimensions: {
+              encoded_height_string: '4d456',
+              encoded_width_string: '3d467',
+              encoded_vertical_padding_string: '0d234'
+            },
+            latexId: '3rmYki9MyZ'
+          }
+        },
+        exp_id2: {
+          latex_string2: {
+            dimensions: {
+              encoded_height_string: '3d456',
+              encoded_width_string: '5d467',
+              encoded_vertical_padding_string: '0d234'
+            },
+            latexId: '4rm6ki9MsZ'
+          }
+        }
+      }
+    };
+
+    abas.sendMathSvgsToBackend(latexToSvgMapping);
+    let req = httpTestingController.expectOne(
+      '/explorationslatexsvghandler');
+    var requestBody = req.request.body;
+    expect(requestBody instanceof FormData).toBeTruthy();
+    var rawImageSentToBackend = null;
+    var image1 = requestBody.get('3rmYki9MyZ');
+    var image2 = requestBody.get('4rm6ki9MsZ');
+    var payLoadSentoBackend = requestBody.get('payload');
+    expect(image1 instanceof File).toBeTruthy();
+    expect(image2 instanceof File).toBeTruthy();
+    expect(payLoadSentoBackend).toEqual(JSON.stringify(expectedPayload));
+    expect(req.request.method).toEqual('POST');
+    req.flush(successResponse);
     flushMicrotasks();
   }));
 

@@ -62,6 +62,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         subtopic.skill_ids = [self.subtopic_skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name', url_fragment='name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.linked_skill_id],
@@ -85,8 +86,14 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         # Check that admins can access the topics and skills dashboard data.
         self.login(self.ADMIN_EMAIL)
         config_services.set_property(
-            self.admin_id, 'topic_ids_for_classroom_pages', [{
-                'name': 'math', 'topic_ids': [self.topic_id]}])
+            self.admin_id, 'classroom_pages_data', [{
+                'url_fragment': 'math',
+                'name': 'math',
+                'topic_ids': [self.topic_id],
+                'topic_list_intro': 'Topics covered',
+                'course_details': 'Course details'
+            }]
+        )
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)
@@ -183,6 +190,7 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
         topic_id_2 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Topic1',
+            abbreviated_name='topic-one', url_fragment='topic-one',
             description='Description1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id],
@@ -192,10 +200,12 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'title': 'subtopic1',
             'skill_ids': [skill_id],
             'thumbnail_filename': None,
-            'thumbnail_bg_color': None
+            'thumbnail_bg_color': None,
+            'url_fragment': 'subtopic-url'
         })
         self.save_new_topic(
             topic_id_2, self.admin_id, name='Topic2',
+            abbreviated_name='topic-two', url_fragment='topic-two',
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
@@ -490,10 +500,11 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name',
-            'abbreviated_name': 'name',
+            'abbreviatedName': 'name-one',
             'description': 'Topic description',
             'filename': 'test_svg.svg',
             'thumbnailBgColor': '#C6DCDA',
+            'url_fragment': 'name-one'
         }
 
         with python_utils.open_file(
@@ -515,7 +526,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name that is too long for validation.',
-            'abbreviated_name': 'name'
+            'abbreviatedName': 'name-two'
         }
         self.post_json(
             self.url, payload, csrf_token=csrf_token, expected_status_int=400)
@@ -526,10 +537,11 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name',
-            'abbreviated_name': 'name',
+            'abbreviatedName': 'name-three',
             'description': 'Topic description',
             'filename': 'cafe.flac',
             'thumbnailBgColor': '#C6DCDA',
+            'url_fragment': 'name-three'
         }
 
         with python_utils.open_file(

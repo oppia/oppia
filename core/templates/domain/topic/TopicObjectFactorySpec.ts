@@ -31,6 +31,7 @@ describe('Topic object factory', () => {
       id: 'sample_topic_id',
       name: 'Topic name',
       abbreviated_name: 'abbrev',
+      url_fragment: 'topic-one',
       thumbnail_filename: 'img.png',
       thumbnail_bg_color: '#a33f40',
       description: 'Topic description',
@@ -55,7 +56,8 @@ describe('Topic object factory', () => {
         title: 'Title',
         skill_ids: ['skill_3'],
         thumbnail_filename: 'img.png',
-        thumbnail_bg_color: '#a33f40'
+        thumbnail_bg_color: '#a33f40',
+        url_fragment: 'title'
       }],
       next_subtopic_id: 1,
       language_code: 'en'
@@ -119,6 +121,7 @@ describe('Topic object factory', () => {
       id: 'topic_id_2',
       name: 'Another name',
       abbreviated_name: 'abbrev',
+      url_fragment: 'topic-two',
       thumbnail_filename: 'img.png',
       thumbnail_bg_color: '#a33f40',
       description: 'Another description',
@@ -139,7 +142,8 @@ describe('Topic object factory', () => {
         title: 'Title',
         skill_ids: ['skill_1'],
         thumbnail_filename: 'img.png',
-        thumbnail_bg_color: '#a33f40'
+        thumbnail_bg_color: '#a33f40',
+        url_fragment: 'title'
       }]
     }, {
       skill_1: 'Description 1',

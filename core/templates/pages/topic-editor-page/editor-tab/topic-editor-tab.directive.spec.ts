@@ -55,6 +55,10 @@ describe('Topic editor tab directive', function() {
   var UndoRedoService = null;
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
+  var MockWindowDimensionsService = {
+    isWindowNarrow: () => false
+  };
+
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -74,9 +78,6 @@ describe('Topic editor tab directive', function() {
       getTrustedResourceUrlForThumbnailFilename: (filename,
           entityType,
           entityId) => (entityType + '/' + entityId + '/' + filename)
-    };
-    var MockWindowDimensionsService = {
-      isWindowNarrow: () => false
     };
     SkillCreationService = $injector.get('SkillCreationService');
     TopicUpdateService = $injector.get('TopicUpdateService');
@@ -111,6 +112,8 @@ describe('Topic editor tab directive', function() {
     story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
     story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
+    topic.setName('New Name');
+    topic.setUrlFragment('topic-url-fragment');
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     ctrl.$onInit();
   }));
@@ -211,16 +214,60 @@ describe('Topic editor tab directive', function() {
 
   it('should call the TopicUpdateService if name is updated', function() {
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
-    $scope.updateTopicName('New Name');
+    spyOn(TopicEditorStateService, 'updateExistenceOfTopicName').and.callFake(
+      (newName, successCallback) => successCallback());
+    $scope.updateTopicName('Different Name');
     expect(topicNameSpy).toHaveBeenCalled();
   });
 
+  it('should not call updateExistenceOfTopicName if name is empty',
+    function() {
+      var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
+      spyOn(TopicEditorStateService, 'updateExistenceOfTopicName');
+      $scope.updateTopicName('');
+      expect(topicNameSpy).toHaveBeenCalled();
+      expect(
+        TopicEditorStateService.updateExistenceOfTopicName
+      ).not.toHaveBeenCalled();
+    });
+
   it('should not call the TopicUpdateService if name is same', function() {
-    $scope.updateTopicName('New Name');
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
     $scope.updateTopicName('New Name');
     expect(topicNameSpy).not.toHaveBeenCalled();
   });
+
+  it('should not call the TopicUpdateService if url fragment is same',
+    function() {
+      var topicUrlFragmentSpy = spyOn(
+        TopicUpdateService, 'setTopicUrlFragment');
+      $scope.updateTopicUrlFragment('topic-url-fragment');
+      expect(topicUrlFragmentSpy).not.toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if url fragment is updated',
+    function() {
+      var topicUrlFragmentSpy = spyOn(
+        TopicUpdateService, 'setTopicUrlFragment');
+      spyOn(
+        TopicEditorStateService,
+        'updateExistenceOfTopicUrlFragment').and.callFake(
+        (newUrlFragment, successCallback) => successCallback());
+      $scope.updateTopicUrlFragment('topic');
+      expect(topicUrlFragmentSpy).toHaveBeenCalled();
+    });
+
+  it('should not update topic url fragment existence for empty url fragment',
+    function() {
+      var topicUrlFragmentSpy = spyOn(
+        TopicUpdateService, 'setTopicUrlFragment');
+      spyOn(TopicEditorStateService, 'updateExistenceOfTopicUrlFragment');
+      $scope.updateTopicUrlFragment('');
+      expect(topicUrlFragmentSpy).toHaveBeenCalled();
+      expect(
+        TopicEditorStateService.updateExistenceOfTopicUrlFragment
+      ).not.toHaveBeenCalled();
+    });
 
   it('should call the TopicUpdateService if thumbnail is updated', function() {
     var topicThumbnailSpy = (
@@ -341,7 +388,12 @@ describe('Topic editor tab directive', function() {
     expect($scope.getPreviewFooter()).toEqual('1 Story');
   });
 
-  it('should toggle preview of entity lists', function() {
+  it('should only toggle preview of entity lists in mobile view', function() {
+    expect($scope.mainTopicCardIsShown).toEqual(true);
+    $scope.togglePreviewListCards('topic');
+    expect($scope.mainTopicCardIsShown).toEqual(true);
+
+    MockWindowDimensionsService.isWindowNarrow = () => true;
     expect($scope.subtopicsListIsShown).toEqual(true);
     expect($scope.storiesListIsShown).toEqual(true);
 
@@ -352,6 +404,12 @@ describe('Topic editor tab directive', function() {
     $scope.togglePreviewListCards('story');
     expect($scope.subtopicsListIsShown).toEqual(false);
     expect($scope.storiesListIsShown).toEqual(false);
+
+    expect($scope.mainTopicCardIsShown).toEqual(true);
+    $scope.togglePreviewListCards('topic');
+    expect($scope.mainTopicCardIsShown).toEqual(false);
+
+    MockWindowDimensionsService.isWindowNarrow = () => false;
   });
 
   it('should toggle uncategorized skill options', function() {

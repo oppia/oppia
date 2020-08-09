@@ -25,7 +25,6 @@ import re
 
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import draft_upgrade_services
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -197,6 +196,165 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             ['exp_id'])
 
 
+class PopulateUserAuthDetailsModelOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off PopulateUserAuthDetailsModel migration job."""
+
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_ID = 'uid_voxecidnxaqdvhmoilhxxgeixffkauxc'
+    USER_A_GAE_ID = 'user_a_gae_id'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_ID = 'uid_mjmohemylmjjdqredntquhfvcyuindem'
+    USER_B_GAE_ID = 'user_b_gae_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.PopulateUserAuthDetailsModelOneOffJob.
+            create_new()
+        )
+        user_jobs_one_off.PopulateUserAuthDetailsModelOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        stringified_output = (
+            user_jobs_one_off.PopulateUserAuthDetailsModelOneOffJob.get_output(
+                job_id))
+        output = {}
+        for stringified_distribution in stringified_output:
+            message_list = ast.literal_eval(stringified_distribution)
+            # The following is output:
+            # ['SUCCESS - Created UserAuthDetails model'] = number of users.
+            output[message_list[0]] = int(message_list[1])
+        return output
+
+    def setUp(self):
+        super(PopulateUserAuthDetailsModelOneOffJobTests, self).setUp()
+        user_models.UserSettingsModel.get_by_id(
+            self.get_user_id_from_email('tmpsuperadmin@example.com')).delete()
+        self.user_a_model = user_models.UserSettingsModel(
+            id=self.USER_A_ID,
+            gae_id=self.USER_A_GAE_ID,
+            email=self.USER_A_EMAIL,
+        )
+        self.user_b_model = user_models.UserSettingsModel(
+            id=self.USER_B_ID,
+            gae_id=self.USER_B_GAE_ID,
+            email=self.USER_B_EMAIL
+        )
+        self.user_a_model.put()
+        self.user_b_model.put()
+
+    def test_before_migration_old_users_do_not_exist_in_user_auth_model(self):
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_B_ID))
+
+    def test_one_off_job_migrates_old_users_successfully(self):
+
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_B_ID))
+
+        output = self._run_one_off_job()
+        expected_output = {
+            'SUCCESS - Created UserAuthDetails model': 2
+        }
+        self.assertEqual(output, expected_output)
+
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_A_ID)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_B_ID)
+
+    def test_one_off_job_migrates_old_and_new_users_combined_successfully(self):
+        new_gae_id = 'new_gae_id'
+        new_email = 'new@example.com'
+        user_services.create_new_user(new_gae_id, new_email)
+        new_user_id = user_services.get_user_settings_by_gae_id(
+            new_gae_id).user_id
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, new_gae_id)
+        )
+        # To ensure that UserAuthDetailsModel was created for newly registered
+        # user.
+        self.assertEqual(user_auth_details_model.id, new_user_id)
+
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_B_ID))
+
+        output = self._run_one_off_job()
+        expected_output = {
+            'SUCCESS - Created UserAuthDetails model': 3
+        }
+        self.assertEqual(output, expected_output)
+
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_A_ID)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_B_ID)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, new_gae_id)
+        )
+        self.assertEqual(user_auth_details_model.id, new_user_id)
+
+    def test_one_off_job_run_multiple_times_fills_auth_model_correctly(self):
+        expected_output = {
+            'SUCCESS - Created UserAuthDetails model': 2
+        }
+        output = self._run_one_off_job()
+        self.assertEqual(output, expected_output)
+        output = self._run_one_off_job()
+        self.assertEqual(output, expected_output)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_A_ID)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_B_ID)
+
+    def test_mark_user_for_deletion_for_migrated_old_users_is_correct(self):
+        self._run_one_off_job()
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_A_ID)
+        self.assertFalse(user_auth_details_model.deleted)
+        user_services.mark_user_for_deletion(self.USER_A_ID)
+
+        self._run_one_off_job()
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_A_ID)
+        self.assertTrue(user_auth_details_model.deleted)
+
+
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off username length distribution job."""
 
@@ -221,7 +379,6 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         stringified_output = (
             user_jobs_one_off.UsernameLengthDistributionOneOffJob.get_output(
                 job_id))
-
         output = {}
         for stringified_distribution in stringified_output:
             value = re.findall(r'\d+', stringified_distribution)
@@ -1131,6 +1288,19 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Choice 1</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })], 'commit')
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
@@ -1184,524 +1354,6 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
-
-
-class DraftChangeMathRichTextAuditOneOffJobTests(
-        test_utils.GenericTestBase):
-
-    DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
-
-    def setUp(self):
-        super(
-            DraftChangeMathRichTextAuditOneOffJobTests,
-            self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.exp_id = 'exp'
-
-    def test_draft_changes_having_math_with_version_same_as_exploration(self):
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration(self.owner_id, exploration1)
-        exploration2 = exp_domain.Exploration.create_default_exploration(
-            'exp_id2')
-        exp_services.save_new_exploration(self.owner_id, exploration2)
-        exploration3 = exp_domain.Exploration.create_default_exploration(
-            'exp_id3')
-        exp_services.save_new_exploration(self.owner_id, exploration3)
-
-        change_list_with_math_tags1 = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'State1',
-            'property_name': 'widget_customization_args',
-            'new_value': {
-                'choices': {
-                    'value': [
-                        '<p>1</p>',
-                        '<p>2</p>',
-                        (
-                            '<p>Value</p><oppia-noninteractive-math math_conten'
-                            't-with-value="{&amp;quot;raw_latex&amp;quot;: &amp'
-                            ';quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&am'
-                            'p;quot;'': &amp;quot;&amp;quot;}"></oppia-noninter'
-                            'active-math>'),
-                        '<p>4</p>'
-                    ]
-                },
-                'maxAllowableSelectionCount': {
-                    'value': 1
-                },
-                'minAllowableSelectionCount': {
-                    'value': 1
-                }
-            }
-        }).to_dict()]
-        change_list_with_math_tags2 = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'Intro',
-            'property_name': 'content',
-            'new_value': {
-                'content_id': 'content',
-                'html': (
-                    '<p>Value</p><oppia-noninteractive-math math_content-'
-                    'with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot'
-                    ';++++&amp;quot;, &amp;quot;svg_filename&amp;quot;'
-                    ': &amp;quot;&amp;quot;}"></oppia-noninteractive-mat'
-                    'h>')
-            }
-        }).to_dict()]
-
-        change_list_without_math_tags = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'State1',
-            'property_name': 'widget_customization_args',
-            'new_value': {
-                'choices': {
-                    'value': [
-                        '<p>1</p>',
-                        '<p>2</p>',
-                        '<p>3</p>',
-                        '<p>4</p>'
-                    ]
-                },
-                'maxAllowableSelectionCount': {
-                    'value': 1
-                },
-                'minAllowableSelectionCount': {
-                    'value': 1
-                }
-            }
-        }).to_dict()]
-
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, 'exp_id'), user_id=self.owner_id,
-            exploration_id='exp_id',
-            draft_change_list=change_list_with_math_tags1,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=1).put()
-
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, 'exp_id2'), user_id=self.owner_id,
-            exploration_id='exp_id2',
-            draft_change_list=change_list_with_math_tags2,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=1).put()
-
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, 'exp_id3'), user_id=self.owner_id,
-            exploration_id='exp_id3',
-            draft_change_list=change_list_without_math_tags,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=1).put()
-
-
-        job = (
-            user_jobs_one_off.
-            DraftChangeMathRichTextAuditOneOffJob)
-        job_id = job.create_new()
-        job.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        actual_output = job.get_output(job_id)
-        actual_output_list = ast.literal_eval(actual_output[0])
-        expected_value_list = ['exp_id', 'exp_id2']
-        self.assertEqual(
-            sorted(expected_value_list), sorted(actual_output_list[1]))
-
-    def test_draft_changes_whose_corresponding_exploration_is_deleted(self):
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration(self.owner_id, exploration1)
-        change_list_with_math_tags1 = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'State1',
-            'property_name': 'widget_customization_args',
-            'new_value': {
-                'choices': {
-                    'value': [
-                        '<p>1</p>',
-                        '<p>2</p>',
-                        (
-                            '<p>Value</p><oppia-noninteractive-math math_conten'
-                            't-with-value="{&amp;quot;raw_latex&amp;quot;: &amp'
-                            ';quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&am'
-                            'p;quot;: &amp;quot;&amp;quot;}"></oppia-noninterac'
-                            'tive-math>'),
-                        '<p>4</p>'
-                    ]
-                },
-                'maxAllowableSelectionCount': {
-                    'value': 1
-                },
-                'minAllowableSelectionCount': {
-                    'value': 1
-                }
-            }
-        }).to_dict()]
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, 'exp_id'), user_id=self.owner_id,
-            exploration_id='exp_id',
-            draft_change_list=change_list_with_math_tags1,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=1).put()
-        exp_models.ExplorationModel.get_by_id('exp_id').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', True)
-
-        job = (
-            user_jobs_one_off.
-            DraftChangeMathRichTextAuditOneOffJob)
-        job_id = job.create_new()
-        job.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        actual_output = job.get_output(job_id)
-        expected_output = (
-            [u'[u\'Invalid Draft change list found.\', [u\'Exploration corre'
-             'sponding to Draft change %s.exp_id does not exist' % (
-                 self.owner_id) + '\']]'])
-        self.assertEqual(actual_output, expected_output)
-
-
-    def test_user_exploration_models_with_no_draft_changes(self):
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration(self.owner_id, exploration1)
-
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, 'exp_id'), user_id=self.owner_id,
-            exploration_id='exp_id',
-            draft_change_list=None,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=None,
-            draft_change_list_id=1).put()
-
-        job = (
-            user_jobs_one_off.
-            DraftChangeMathRichTextAuditOneOffJob)
-        job_id = job.create_new()
-        job.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        actual_output = job.get_output(job_id)
-        self.assertEqual(actual_output, [])
-
-
-    def test_draft_changes_having_math_with_version_less_than_exploration(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration(self.owner_id, exploration)
-        exp_migration_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': '33',
-            'to_version': '34'
-        })]
-        exp_services.update_exploration(
-            self.owner_id, 'exp_id', exp_migration_change_list,
-            'Ran Exploration Migration job.')
-
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'State1',
-            'property_name': 'widget_customization_args',
-            'new_value': {
-                'choices': {
-                    'value': [
-                        '<p>1</p>',
-                        '<p>2</p>',
-                        (
-                            '<oppia-noninteractive-math raw_latex-with-value="&'
-                            'amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&a'
-                            'mp;q''uot;"></oppia-noninteractive-math>'),
-                        '<p>4</p>'
-                    ]
-                },
-                'maxAllowableSelectionCount': {
-                    'value': 1
-                },
-                'minAllowableSelectionCount': {
-                    'value': 1
-                }
-            }
-        }).to_dict()]
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, 'exp_id'), user_id=self.owner_id,
-            exploration_id='exp_id',
-            draft_change_list=change_list,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=2).put()
-
-        job = (
-            user_jobs_one_off.
-            DraftChangeMathRichTextAuditOneOffJob)
-        job_id = job.create_new()
-        job.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        actual_output = job.get_output(job_id)
-        actual_output_list = ast.literal_eval(actual_output[0])
-        self.assertEqual(['exp_id'], actual_output_list[1])
-
-    def test_draft_changes_failing_updation_to_exploration_version(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration(self.owner_id, exploration)
-        other_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'property_name': 'title',
-            'new_value': 'New title'
-        })]
-        exp_services.update_exploration(
-            self.owner_id, 'exp_id', other_change_list,
-            'Changed exploration title.')
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'State1',
-            'property_name': 'widget_customization_args',
-            'new_value': {
-                'choices': {
-                    'value': [
-                        '<p>1</p>',
-                        '<p>2</p>',
-                        '<p>3</p>',
-                        '<p>4</p>'
-                    ]
-                },
-                'maxAllowableSelectionCount': {
-                    'value': 1
-                },
-                'minAllowableSelectionCount': {
-                    'value': 1
-                }
-            }
-        }).to_dict()]
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, 'exp_id'), user_id=self.owner_id,
-            exploration_id='exp_id',
-            draft_change_list=change_list,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=1).put()
-        job = (
-            user_jobs_one_off.
-            DraftChangeMathRichTextAuditOneOffJob)
-        job_id = job.create_new()
-        job.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        actual_output = job.get_output(job_id)
-        self.assertEqual(actual_output, [])
-
-
-    def test_invalid_draft_changes_with_version_same_as_exploration(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration(self.owner_id, exploration)
-
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'State1',
-            'property_name': 'widget_customization_args',
-            'new_value': {
-                'choices': {
-                    'invalid_value': [
-                        '<p>1</p>',
-                        '<p>2</p>',
-                        '<p>3</p>',
-                        '<p>4</p>'
-                    ]
-                },
-                'maxAllowableSelectionCount': {
-                    'value': 1
-                },
-                'minAllowableSelectionCount': {
-                    'value': 1
-                }
-            }
-        }).to_dict()]
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, 'exp_id'), user_id=self.owner_id,
-            exploration_id='exp_id',
-            draft_change_list=change_list,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=1).put()
-        job = (
-            user_jobs_one_off.
-            DraftChangeMathRichTextAuditOneOffJob)
-        job_id = job.create_new()
-        job.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = job.get_output(job_id)
-        expected_output = (
-            [u'[u\'failed to parse draft change list.\', [u"Draft change' +
-             ' %s.exp_id parsing failed' % (self.owner_id) +
-             ': u\'value\'"]]'])
-        self.assertEqual(actual_output, expected_output)
-
-    def test_changes_with_version_greater_than_exploration_raise_error(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration(self.owner_id, exploration)
-
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'State1',
-            'property_name': 'widget_customization_args',
-            'new_value': {
-                'choices': {
-                    'value': [
-                        '<p>1</p>',
-                        '<p>2</p>',
-                        '<p>3</p>',
-                        '<p>4</p>'
-                    ]
-                },
-                'maxAllowableSelectionCount': {
-                    'value': 1
-                },
-                'minAllowableSelectionCount': {
-                    'value': 1
-                }
-            }
-        }).to_dict()]
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, 'exp_id'), user_id=self.owner_id,
-            exploration_id='exp_id',
-            draft_change_list=change_list,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=2,
-            draft_change_list_id=1).put()
-        job = (
-            user_jobs_one_off.
-            DraftChangeMathRichTextAuditOneOffJob)
-        job_id = job.create_new()
-        job.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = job.get_output(job_id)
-        expected_output = (
-            [u'[u\'Invalid Draft change list found.\', [u\'Draft change %s.exp'
-             '_id version greater than exploration version\']]' % (
-                 self.owner_id)])
-        self.assertEqual(actual_output, expected_output)
-
-    def test_invalid_draft_changes_after_updation_to_exploration_version(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration(self.owner_id, exploration)
-        exp_migration_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': '33',
-            'to_version': '34'
-        })]
-        exp_services.update_exploration(
-            self.owner_id, 'exp_id', exp_migration_change_list,
-            'Ran Exploration Migration job.')
-
-        def _mock_try_upgrading_draft_to_exp_version(*unused_args):
-            """Function to return an invalid draft change to mock the method
-            try_upgrading_draft_to_exp_version().
-            """
-            invalid_change_list = [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'State1',
-                'property_name': 'widget_customization_args',
-                'new_value': {
-                    'choices': {
-                        'invalid_value': [
-                            '<p>1</p>',
-                            '<p>2</p>',
-                            '<p>3</p>',
-                            '<p>4</p>'
-                        ]
-                    },
-                    'maxAllowableSelectionCount': {
-                        'value': 1
-                    },
-                    'minAllowableSelectionCount': {
-                        'value': 1
-                    }
-                }
-            })]
-            return invalid_change_list
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'State1',
-            'property_name': 'widget_customization_args',
-            'new_value': {
-                'choices': {
-                    'value': [
-                        '<p>1</p>',
-                        '<p>2</p>',
-                        '<p>3</p>',
-                        '<p>4</p>'
-                    ]
-                },
-                'maxAllowableSelectionCount': {
-                    'value': 1
-                },
-                'minAllowableSelectionCount': {
-                    'value': 1
-                }
-            }
-        }).to_dict()]
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.owner_id, 'exp_id'), user_id=self.owner_id,
-            exploration_id='exp_id',
-            draft_change_list=change_list,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=1).put()
-
-        with self.swap(
-            draft_upgrade_services, 'try_upgrading_draft_to_exp_version',
-            _mock_try_upgrading_draft_to_exp_version):
-            job = (
-                user_jobs_one_off.
-                DraftChangeMathRichTextAuditOneOffJob)
-            job_id = job.create_new()
-            job.enqueue(job_id)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-            self.process_and_flush_pending_tasks()
-
-        actual_output = job.get_output(job_id)
-
-        expected_output = (
-            [u'[u\'failed to parse draft change list.\', [u"Draft change' +
-             ' %s.exp_id parsing failed' % (self.owner_id) +
-             ': u\'value\'"]]'])
-        self.assertEqual(actual_output, expected_output)
-
 
 
 class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):

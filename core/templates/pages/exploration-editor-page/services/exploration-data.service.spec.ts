@@ -34,7 +34,6 @@ describe('Exploration data service', () => {
   let ls = null;
   let als = null;
   let $q = null;
-  let $httpBackend = null;
   let CsrfService = null;
   let sampleDataResults = {
     draft_change_list_id: 3,
@@ -79,13 +78,20 @@ describe('Exploration data service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [ExplorationDataService, LocalStorageService, 
-        LoggerService, AlertsService]
+        LoggerService, AlertsService, CsrfService]
     });
     httpTestingController = TestBed.get(HttpTestingController);
     eds = TestBed.get(ExplorationDataService);
     lss = TestBed.get(LocalStorageService);
     ls = TestBed.get(LoggerService);
     als = TestBed.get(LocalStorageService);
+    CsrfService = TestBed.get(CsrfService);
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(() => {
+      return new Promise((resolve) => {
+        resolve('sample-csrf-token');
+      })
+    });
   });
 
   afterEach(() => {
@@ -98,22 +104,6 @@ describe('Exploration data service', () => {
     });
     $provide.value('WindowRef', windowMock);
   }));
-
-  // beforeEach(angular.mock.inject(function($injector) {
-  //   eds = $injector.get('ExplorationDataService');
-  //   lss = $injector.get('LocalStorageService');
-  //   ls = $injector.get('LoggerService');
-  //   als = $injector.get('AlertsService');
-  //   $q = $injector.get('$q');
-  //   $httpBackend = $injector.get('$httpBackend');
-  //   CsrfService = $injector.get('CsrfTokenService');
-
-  //   spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-  //     let deferred = $q.defer();
-  //     deferred.resolve('sample-csrf-token');
-  //     return deferred.promise;
-  //   });
-  // }));
 
   it('should autosave draft changes when draft ids match', fakeAsync(() => {
     let errorCallback = jasmine.createSpy('error');

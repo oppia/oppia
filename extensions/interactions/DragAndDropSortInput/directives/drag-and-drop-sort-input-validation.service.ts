@@ -58,7 +58,7 @@ export class DragAndDropSortInputValidationService {
     }
 
     for (var i = 0; i < numChoices; i++) {
-      var choice = customizationArgs.choices.value[i];
+      var choice = customizationArgs.choices.value[i].getHtml();
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }
@@ -144,9 +144,11 @@ export class DragAndDropSortInputValidationService {
         areAnyItemsEmpty = false;
         areAnyItemsDuplicated = false;
 
+        let choiceValues = (
+          customizationArgs.choices.value.map(x => x.getHtml()));
         switch (rule.type) {
           case 'HasElementXAtPositionY':
-            if (!customizationArgs.choices.value.includes(<string>inputs.x)) {
+            if (!choiceValues.includes(<string>inputs.x)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -175,8 +177,8 @@ export class DragAndDropSortInputValidationService {
               });
             }
             if (
-              !customizationArgs.choices.value.includes(<string>inputs.x) ||
-              !customizationArgs.choices.value.includes(<string>inputs.y)) {
+              !choiceValues.includes(<string>inputs.x) ||
+              !choiceValues.includes(<string>inputs.y)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -233,8 +235,7 @@ export class DragAndDropSortInputValidationService {
                   'elements cannot occupy the same position.')
               });
             }
-            var sortedCustomArgsChoices = (
-              customizationArgs.choices.value.sort());
+            var sortedCustomArgsChoices = choiceValues.sort();
             var flattenedAndSortedXInputs = (
               xInputs.reduce((acc, val) => acc.concat(val), []).sort());
             if (

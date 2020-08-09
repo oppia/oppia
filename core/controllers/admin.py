@@ -32,6 +32,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import html_domain
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -256,7 +257,7 @@ class AdminHandler(base.BaseHandler):
             exploration_id: str. The exploration id.
 
         Raises:
-            Exception: Cannot reload an exploration in production.
+            Exception. Cannot reload an exploration in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -286,11 +287,24 @@ class AdminHandler(base.BaseHandler):
         state = state_domain.State.create_default_state(
             'ABC', is_initial_state=True)
         state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args({
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1}
+        })
+
+        state.update_next_content_id_index(1)
         state.update_content(state_domain.SubtitledHtml('1', question_content))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
         written_translations = state_domain.WrittenTranslations({})
+        recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
         recorded_voiceovers.add_content_id_for_voiceover('1')
         recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
+        written_translations.add_content_id_for_translation('ca_placeholder_0')
         written_translations.add_content_id_for_translation('1')
         written_translations.add_content_id_for_translation('default_outcome')
 
@@ -307,10 +321,6 @@ class AdminHandler(base.BaseHandler):
 
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
-        state.update_interaction_customization_args({
-            'placeholder': 'Enter text here',
-            'rows': 1
-        })
         state.update_interaction_default_outcome(
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
@@ -353,8 +363,8 @@ class AdminHandler(base.BaseHandler):
         attached to each skill.
 
         Raises:
-            Exception: Cannot load new structures data in production mode.
-            Exception: User does not have enough rights to generate data.
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
             if self.user.role != feconf.ROLE_ID_ADMIN:
@@ -395,9 +405,9 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'abbrev', 'description')
+                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'abbrev', 'description')
+                topic_id_2, 'Empty Topic', 'empty-topic', 'description')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
@@ -418,7 +428,7 @@ class AdminHandler(base.BaseHandler):
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',
-                topic_id_1)
+                topic_id_1, 'help-jamie-win-arcade')
 
             story_node_dicts = [{
                 'exp_id': '15',
@@ -500,8 +510,8 @@ class AdminHandler(base.BaseHandler):
         linked to the skill.
 
         Raises:
-            Exception: Cannot load new structures data in production mode.
-            Exception: User does not have enough rights to generate data.
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
             if self.user.role != feconf.ROLE_ID_ADMIN:
@@ -536,7 +546,7 @@ class AdminHandler(base.BaseHandler):
             collection_id: str. The collection id.
 
         Raises:
-            Exception: Cannot reload a collection in production.
+            Exception. Cannot reload a collection in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -561,7 +571,7 @@ class AdminHandler(base.BaseHandler):
                 be published.
 
         Raises:
-            Exception: Environment is not DEVMODE.
+            Exception. Environment is not DEVMODE.
         """
 
         if constants.DEV_MODE:
@@ -589,6 +599,78 @@ class AdminHandler(base.BaseHandler):
                 exploration_ids_to_publish)
         else:
             raise Exception('Cannot generate dummy explorations in production.')
+
+
+class ExplorationsLatexSvgHandler(base.BaseHandler):
+    """Handler updating explorations having math rich-text components with
+    math SVGs.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        item_to_fetch = self.request.get('item_to_fetch')
+        if item_to_fetch == 'exp_id_to_latex_mapping':
+            latex_strings_to_exp_id_mapping = (
+                exp_services.get_batch_of_exps_for_latex_svg_generation())
+            self.render_json({
+                'latex_strings_to_exp_id_mapping': (
+                    latex_strings_to_exp_id_mapping)
+            })
+        elif item_to_fetch == 'number_of_explorations_left_to_update':
+            number_of_explorations_left_to_update = (
+                exp_services.
+                get_number_explorations_having_latex_strings_without_svgs())
+            self.render_json({
+                'number_of_explorations_left_to_update': '%d' % (
+                    number_of_explorations_left_to_update)
+            })
+        else:
+            raise self.InvalidInputException(
+                'Please specify a valid type of item to fetch.')
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        latex_to_svg_mappings = self.payload.get('latexMapping')
+        for exp_id, latex_to_svg_mapping_dict in latex_to_svg_mappings.items():
+            for latex_string in latex_to_svg_mapping_dict.keys():
+                svg_image = self.request.get(
+                    latex_to_svg_mappings[exp_id][latex_string]['latexId'])
+                if not svg_image:
+                    raise self.InvalidInputException(
+                        'SVG for LaTeX string %s in exploration %s is not '
+                        'supplied.' % (latex_string, exp_id))
+
+                dimensions = (
+                    latex_to_svg_mappings[exp_id][latex_string]['dimensions'])
+                latex_string_svg_image_dimensions = (
+                    html_domain.LatexStringSvgImageDimensions(
+                        dimensions['encoded_height_string'],
+                        dimensions['encoded_width_string'],
+                        dimensions['encoded_vertical_padding_string']))
+                latex_string_svg_image_data = (
+                    html_domain.LatexStringSvgImageData(
+                        svg_image, latex_string_svg_image_dimensions))
+                latex_to_svg_mappings[exp_id][latex_string] = (
+                    latex_string_svg_image_data)
+
+        for exp_id in latex_to_svg_mappings.keys():
+            exp_services.update_exploration_with_math_svgs(
+                exp_id, latex_to_svg_mappings[exp_id])
+            logging.info('Successfully updated exploration %s' % (exp_id))
+        number_of_explorations_left_to_update = (
+            exp_services.
+            get_number_explorations_having_latex_strings_without_svgs())
+        self.render_json({
+            'number_of_explorations_updated': '%d' % (
+                len(latex_to_svg_mappings.keys())),
+            'number_of_explorations_left_to_update': '%d' % (
+                number_of_explorations_left_to_update)
+        })
 
 
 class AdminRoleHandler(base.BaseHandler):
@@ -721,8 +803,8 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class AddCommunityReviewerHandler(base.BaseHandler):
-    """Handles adding reviewer for community dashboard page."""
+class AddContributionReviewerHandler(base.BaseHandler):
+    """Handles adding reviewer for contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -774,13 +856,13 @@ class AddCommunityReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid review_category: %s' % review_category)
 
-        email_manager.send_email_to_new_community_reviewer(
+        email_manager.send_email_to_new_contribution_reviewer(
             new_reviewer_user_id, review_category, language_code=language_code)
         self.render_json({})
 
 
-class RemoveCommunityReviewerHandler(base.BaseHandler):
-    """Handles removing reviewer for community dashboard."""
+class RemoveContributionReviewerHandler(base.BaseHandler):
+    """Handles removing reviewer for contributor dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -803,7 +885,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                 'Invalid language_code: %s' % language_code)
 
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
-            user_services.remove_community_reviewer(user_id)
+            user_services.remove_contribution_reviewer(user_id)
         elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:
             review_category = self.payload.get('review_category')
             if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
@@ -832,7 +914,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Invalid review_category: %s' % review_category)
 
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 user_id, review_category, language_code=language_code)
         else:
             raise self.InvalidInputException(
@@ -841,7 +923,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
         self.render_json({})
 
 
-class CommunityReviewersListHandler(base.BaseHandler):
+class ContributionReviewersListHandler(base.BaseHandler):
     """Handler to show the existing reviewers."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -860,12 +942,12 @@ class CommunityReviewersListHandler(base.BaseHandler):
                 constants.REVIEW_CATEGORY_QUESTION]:
             raise self.InvalidInputException(
                 'Invalid review_category: %s' % review_category)
-        usernames = user_services.get_community_reviewer_usernames(
+        usernames = user_services.get_contribution_reviewer_usernames(
             review_category, language_code=language_code)
         self.render_json({'usernames': usernames})
 
 
-class CommunityReviewerRightsDataHandler(base.BaseHandler):
+class ContributionReviewerRightsDataHandler(base.BaseHandler):
     """Handler to show the review rights of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -880,7 +962,7 @@ class CommunityReviewerRightsDataHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
         user_rights = (
-            user_services.get_user_community_rights(user_id))
+            user_services.get_user_contribution_rights(user_id))
         self.render_json({
             'can_review_translation_for_language_codes': (
                 user_rights.can_review_translation_for_language_codes),
