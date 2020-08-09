@@ -174,10 +174,18 @@ class InteractionCustomizationArgsValidationOneOffJob(
                     interaction_registry.Registry.get_interaction_by_id(
                         state.interaction.id).customization_arg_specs
                 )
+
+                customization_args_dict = {}
+                for ca_name in state.interaction.customization_args:
+                    customization_args_dict[ca_name] = (
+                        state.interaction.customization_args[
+                            ca_name].to_customization_arg_dict()
+                    )
+
                 customization_args_util.validate_customization_args_and_values(
                     'interaction',
                     state.interaction.id,
-                    state.interaction.customization_args,
+                    customization_args_dict,
                     ca_specs,
                     fail_on_validation_errors=True
                 )
