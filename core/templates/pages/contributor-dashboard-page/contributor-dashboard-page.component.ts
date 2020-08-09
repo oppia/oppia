@@ -36,7 +36,7 @@ require(
   'pages/contributor-dashboard-page/translation-opportunities/' +
   'translation-opportunities.directive.ts');
 require(
-  'pages/community-dashboard-page/voiceover-opportunities/' +
+  'pages/contributor-dashboard-page/voiceover-opportunities/' +
   'voiceover-opportunities.component.ts');
 
 require('domain/utilities/language-util.service.ts');

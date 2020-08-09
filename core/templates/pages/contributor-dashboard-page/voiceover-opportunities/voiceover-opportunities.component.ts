@@ -17,11 +17,11 @@
  */
 
 require(
-  'pages/community-dashboard-page/opportunities-list/' +
+  'pages/contributor-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
 
 require(
-  'pages/community-dashboard-page/services/' +
+  'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +

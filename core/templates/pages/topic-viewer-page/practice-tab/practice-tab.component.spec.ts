@@ -16,85 +16,112 @@
  * @fileoverview Unit tests for practiceTab.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { PracticeTabComponent } from './practice-tab.component';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-describe('Practice tab component', function() {
-  var ctrl = null;
-  var $scope = null;
-  var subtopicObjectFactory = null;
+class MockUrlService {
+  getTopicUrlFragmentFromLearnerUrl() {
+    return 'topic_1';
+  }
 
-  var mockWindow = {
+  getClassroomUrlFragmentFromLearnerUrl() {
+    return 'classroom_1';
+  }
+}
+
+class MockWindowRef {
+  _window = {
     location: {
       href: '',
-      reload: () => {}
-    }
+      reload: (val) => val
+    },
   };
+  get nativeWindow() {
+    return this._window;
+  }
+}
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', mockWindow);
+describe('Practice tab component', function() {
+  let component: PracticeTabComponent;
+  let fixture: ComponentFixture<PracticeTabComponent>;
+  let subtopicObjectFactory = null;
+  let windowRef: MockWindowRef;
+
+  beforeEach(async(() => {
+    windowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      declarations: [PracticeTabComponent],
+      providers: [
+        UrlInterpolationService,
+        { provide: UrlService, useClass: MockUrlService },
+        { provide: WindowRef, useValue: windowRef },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(function() {
+  beforeEach(() => {
     subtopicObjectFactory = TestBed.get(SubtopicObjectFactory);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    var $rootScope = $injector.get('$rootScope');
-
-    $scope = $rootScope.$new();
-    ctrl = $componentController('practiceTab', {
-      $scope: $scope
-    }, {
-      getTopicName: () => 'Topic Name',
-      getSubtopicsList: () => ([
-        subtopicObjectFactory.create({
-          id: 1,
-          title: 'Subtopic 1',
-          skill_ids: ['1', '2'],
-          thumbnail_filename: '',
-          thumbnail_bg_color: ''
-        }, {
-          1: 'First skill',
-          2: 'Second skill'
-        }),
-        subtopicObjectFactory.create({
-          id: 2,
-          title: 'Subtopic 2',
-          skill_ids: [],
-          thumbnail_filename: '',
-          thumbnail_bg_color: ''
-        })
-      ])
-    });
-    ctrl.$onInit();
-  }));
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PracticeTabComponent);
+    component = fixture.componentInstance;
+    component.topicName = 'Topic Name';
+    component.subtopicsList = [
+      subtopicObjectFactory.create({
+        id: 1,
+        title: 'Subtopic 1',
+        skill_ids: ['1', '2'],
+        thumbnail_filename: '',
+        thumbnail_bg_color: ''
+      }, {
+        1: 'First skill',
+        2: 'Second skill'
+      }),
+      subtopicObjectFactory.create({
+        id: 2,
+        title: 'Subtopic 2',
+        skill_ids: [],
+        thumbnail_filename: '',
+        thumbnail_bg_color: ''
+      })
+    ];
+    fixture.detectChanges();
+  });
 
   it('should initialize controller properties after its initilization',
     function() {
-      expect(ctrl.selectedSubtopics).toEqual([]);
-      expect(ctrl.availableSubtopics.length).toBe(1);
-      expect(ctrl.selectedSubtopicIndices).toEqual([false]);
+      component.ngOnInit();
+      expect(component.selectedSubtopics).toEqual([]);
+      expect(component.availableSubtopics.length).toBe(1);
+      expect(component.selectedSubtopicIndices).toEqual([false]);
     });
 
   it('should have start button enabled when a subtopic is selected',
     function() {
-      ctrl.selectedSubtopicIndices[0] = true;
-      expect(ctrl.isStartButtonDisabled()).toBe(false);
+      component.selectedSubtopicIndices[0] = true;
+      expect(component.isStartButtonDisabled()).toBe(false);
     });
 
   it('should have start button disabled when there is no subtopic selected',
     function() {
-      ctrl.selectedSubtopicIndices[0] = false;
-      expect(ctrl.isStartButtonDisabled()).toBe(true);
+      component.selectedSubtopicIndices[0] = false;
+      expect(component.isStartButtonDisabled()).toBe(true);
     });
 
   it('should open a new practice session containing the selected subtopic' +
     ' when start button is clicked', function() {
-    ctrl.selectedSubtopicIndices[0] = true;
-    ctrl.openNewPracticeSession();
+    component.selectedSubtopicIndices[0] = true;
+    component.openNewPracticeSession();
 
-    expect(mockWindow.location.href).toBe(
-      '/practice_session/Topic%20Name?selected_subtopic_ids=1');
+    expect(windowRef.nativeWindow.location.href).toBe(
+      '/learn/classroom_1/topic_1/practice/session?selected_subtopic_ids=1');
   });
 });
