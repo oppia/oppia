@@ -811,15 +811,17 @@ class PlatformParameter(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, json_string):
-        """Returns a Story domain object decoded from a JSON string.
+        """Returns a PlatformParameter domain object decoded from a JSON
+        string.
 
         Args:
             json_string: str. A JSON-encoded string that can be
-                decoded into a dictionary representing a Story. Only call
-                on strings that were created using serialize().
+                decoded into a dictionary representing a PlatformParameter.
+                Only call on strings that were created using serialize().
 
         Returns:
-            Story. The corresponding Story domain object.
+            PlatformParameter. The corresponding PlatformParameter domain
+            object.
         """
         platform_parameter_dict = json.loads(json_string)
 

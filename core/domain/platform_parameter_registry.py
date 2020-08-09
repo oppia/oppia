@@ -278,7 +278,7 @@ class Registry(python_utils.OBJECT):
         """
         cached_parameter = caching_services.get_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM, None, [name]
-            ).get(name)
+        ).get(name)
         return cached_parameter
 
     @classmethod
