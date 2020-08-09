@@ -803,7 +803,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
+        def mock_build_js_files(
+                unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
             return
 
         def mock_start_webdriver_manager(unused_arg):
@@ -1084,7 +1085,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
+        def mock_build_js_files(
+                unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
             return
 
         def mock_start_webdriver_manager(unused_arg):
@@ -1202,7 +1204,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
+        def mock_build_js_files(
+                unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
             return
 
         def mock_start_webdriver_manager(unused_arg):
