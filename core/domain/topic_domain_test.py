@@ -43,7 +43,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url')]
         self.topic.next_subtopic_id = 2
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
@@ -59,7 +60,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
-            'abbreviated_name': 'abbrev',
+            'abbreviated_name': 'Name',
+            'url_fragment': 'abbrev',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
             'description': 'description',
@@ -96,7 +98,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'id': 1,
                 'thumbnail_filename': 'image.svg',
                 'thumbnail_bg_color': '#FFFFFF',
-                'title': 'Title'}])
+                'title': 'Title',
+                'url_fragment': 'dummy-subtopic-url'}])
 
     def test_delete_canonical_story(self):
         self.topic.canonical_story_references = [
@@ -248,7 +251,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
 
         skill_ids = self.topic.subtopics[0].skill_ids
 
@@ -318,9 +322,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_subtopic(self):
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title1', [], None, None),
-            topic_domain.Subtopic(2, 'Title2', [], None, None),
-            topic_domain.Subtopic(3, 'Title3', [], None, None)]
+            topic_domain.Subtopic(1, 'Title1', [], None, None, 'title-one'),
+            topic_domain.Subtopic(2, 'Title2', [], None, None, 'title-two'),
+            topic_domain.Subtopic(3, 'Title3', [], None, None, 'title-three')]
 
         subtopics = self.topic.subtopics
 
@@ -587,6 +591,31 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Topic name should be at most 39 characters')
 
+    def test_validation_fails_with_invalid_url_fragment(self):
+        self.topic.url_fragment = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Topic URL Fragment field must be a string. Received 0.'):
+            self.topic.validate()
+
+    def test_validation_fails_with_empty_url_fragment(self):
+        self.topic.url_fragment = ''
+        validation_message = 'Topic URL Fragment field should not be empty.'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic.validate()
+
+    def test_validation_fails_with_lenghty_url_fragment(self):
+        self.topic.url_fragment = 'a' * 25
+        url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        validation_message = (
+            'Topic URL Fragment field should not exceed %d characters, '
+            'received %s.' % (
+                url_fragment_char_limit, self.topic.url_fragment))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic.validate()
+
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'
         self._assert_validation_error(
@@ -692,7 +721,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics.append(
             topic_domain.Subtopic(
                 'id_2', 'Title2', ['skill_id_2'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-title-two'))
         with self.assertRaisesRegexp(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):
@@ -772,9 +802,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.language_code, 'bn')
 
     def test_update_abbreviated_name(self):
+        self.assertEqual(self.topic.abbreviated_name, 'Name')
+        self.topic.update_abbreviated_name('abbrev')
         self.assertEqual(self.topic.abbreviated_name, 'abbrev')
-        self.topic.update_abbreviated_name('name')
-        self.assertEqual(self.topic.abbreviated_name, 'name')
 
     def test_update_thumbnail_filename(self):
         self.assertEqual(self.topic.thumbnail_filename, None)
@@ -825,6 +855,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.update_subtopic_thumbnail_filename(
                 'invalid_id', 'new title')
 
+    def test_update_subtopic_url_fragment(self):
+        self.assertEqual(len(self.topic.subtopics), 1)
+        self.assertEqual(
+            self.topic.subtopics[0].url_fragment, 'dummy-subtopic-url')
+        self.topic.update_subtopic_url_fragment(1, 'new-subtopic-url')
+        self.assertEqual(
+            self.topic.subtopics[0].url_fragment, 'new-subtopic-url')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id invalid_id does not exist.'):
+            self.topic.update_subtopic_url_fragment('invalid_id', 'new-url')
+
     def test_update_subtopic_thumbnail_bg_color(self):
         self.assertEqual(len(self.topic.subtopics), 1)
         self.topic.subtopics[0].thumbnail_bg_color = None
@@ -855,10 +897,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]),
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-one'),
             topic_domain.Subtopic(
                 2, 'Another title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-two')]
         with self.assertRaisesRegexp(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):
@@ -1150,6 +1194,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         current_time = datetime.datetime.utcnow()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.topic_summary_dict = {
+            'url_fragment': 'url-frag',
             'id': 'topic_id',
             'name': 'name',
             'description': 'topic description',
@@ -1160,13 +1205,27 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'uncategorized_skill_count': 1,
             'subtopic_count': 1,
             'total_skill_count': 1,
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': '#C6DCDA',
             'topic_model_created_on': time_in_millisecs,
-            'topic_model_last_updated': time_in_millisecs
+            'topic_model_last_updated': time_in_millisecs,
         }
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            1, 1, 1, 1, 1, 1, current_time, current_time)
+            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag', current_time,
+            current_time)
+
+    def _assert_validation_error(self, expected_error_substring):
+        """Checks that the topic summary passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            self.topic_summary.validate()
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(
@@ -1177,133 +1236,140 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_invalid_name(self):
         self.topic_summary.name = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Name should be a string.'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Name should be a string.')
+
+    def test_thumbnail_filename_validation(self):
+        self.topic_summary.thumbnail_filename = []
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string')
+
+    def test_thumbnail_bg_validation(self):
+        self.topic_summary.thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Topic thumbnail background color #FFFFFF is not supported.')
+
+    def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.topic_summary.thumbnail_bg_color = '#C6DCDA'
+        self.topic_summary.thumbnail_filename = None
+        self._assert_validation_error(
+            'Topic thumbnail image is not provided.')
+        self.topic_summary.thumbnail_bg_color = None
+        self.topic_summary.thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Topic thumbnail background color is not specified.')
 
     def test_validation_fails_with_empty_name(self):
         self.topic_summary.name = ''
+        self._assert_validation_error('Name field should not be empty')
+
+    def test_validation_fails_with_invalid_url_fragment(self):
+        self.topic_summary.url_fragment = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Name field should not be empty'):
+            utils.ValidationError,
+            'Topic URL Fragment field must be a string. Received 0.'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_empty_url_fragment(self):
+        self.topic_summary.url_fragment = ''
+        validation_message = 'Topic URL Fragment field should not be empty.'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_lenghty_url_fragment(self):
+        self.topic_summary.url_fragment = 'a' * 25
+        url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        validation_message = (
+            'Topic URL Fragment field should not exceed %d characters, '
+            'received %s.' % (
+                url_fragment_char_limit, self.topic_summary.url_fragment))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
             self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_description(self):
         self.topic_summary.description = 3
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected description to be a string, received 3'):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected description to be a string, received 3')
 
     def test_validation_fails_with_invalid_canonical_name(self):
         self.topic_summary.canonical_name = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Canonical name should be a string.'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Canonical name should be a string.')
 
     def test_validation_fails_with_empty_canonical_name(self):
         self.topic_summary.canonical_name = ''
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Canonical name field should not be empty'):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Canonical name field should not be empty')
 
     def test_validation_fails_with_invalid_language_code(self):
         self.topic_summary.language_code = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected language code to be a string, received 0'):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected language code to be a string, received 0')
 
     def test_validation_fails_with_unallowed_language_code(self):
         self.topic_summary.language_code = 'invalid'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid language code: invalid'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Invalid language code: invalid')
 
     def test_validation_fails_with_invalid_canonical_story_count(self):
         self.topic_summary.canonical_story_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected canonical story count to be an integer, received \'10\''):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected canonical story count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_canonical_story_count(self):
         self.topic_summary.canonical_story_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected canonical_story_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected canonical_story_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_additional_story_count(self):
         self.topic_summary.additional_story_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected additional story count to be an '
-                'integer, received \'10\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected additional story count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_additional_story_count(self):
         self.topic_summary.additional_story_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected additional_story_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected additional_story_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_uncategorized_skill_count(self):
         self.topic_summary.uncategorized_skill_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected uncategorized skill count to be an integer, '
-                'received \'10\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected uncategorized skill count to be an integer, '
+            'received \'10\'')
 
     def test_validation_fails_with_negative_uncategorized_skill_count(self):
         self.topic_summary.uncategorized_skill_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected uncategorized_skill_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected uncategorized_skill_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_total_skill_count(self):
         self.topic_summary.total_skill_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected total skill count to be an integer, received \'10\''):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected total skill count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_total_skill_count(self):
         self.topic_summary.total_skill_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected total_skill_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected total_skill_count to be non-negative, received \'-1\'')
 
     def test_validation_fails_with_invalid_total_skill_count_value(self):
         self.topic_summary.total_skill_count = 5
         self.topic_summary.uncategorized_skill_count = 10
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected total_skill_count to be greater than or equal to '
-                'uncategorized_skill_count 10, received \'5\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected total_skill_count to be greater than or equal to '
+            'uncategorized_skill_count 10, received \'5\'')
 
     def test_validation_fails_with_invalid_subtopic_count(self):
         self.topic_summary.subtopic_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected subtopic count to be an integer, received \'10\''):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected subtopic count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_subtopic_count(self):
         self.topic_summary.subtopic_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected subtopic_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected subtopic_count to be non-negative, received \'-1\'')
 
 
 class TopicRightsTests(test_utils.GenericTestBase):

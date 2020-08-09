@@ -21,11 +21,18 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
+import { StateNextContentIdIndexService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GenerateContentIdService {
+  constructor(
+      private stateNextContentIdIndexService: StateNextContentIdIndexService
+  ) {}
+
   generateIdForComponent(existingComponentIds: Array<string>,
       componentName: string): string {
     let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
@@ -46,9 +53,9 @@ export class GenerateContentIdService {
 
   _getNextId(existingComponentIds: Array<string>,
       componentName: string): string {
-    if (componentName === AppConstants.COMPONENT_NAME_FEEDBACK ||
-        componentName === AppConstants.COMPONENT_NAME_HINT ||
-        componentName === AppConstants.COMPONENT_NAME_WORKED_EXAMPLE.QUESTION ||
+    // Worked example questions and explanations do not live in the State domain
+    // so they do not use next content id index.
+    if (componentName === AppConstants.COMPONENT_NAME_WORKED_EXAMPLE.QUESTION ||
         componentName ===
         AppConstants.COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION) {
       return this.generateIdForComponent(existingComponentIds, componentName);
@@ -57,9 +64,21 @@ export class GenerateContentIdService {
     }
   }
 
+  _getNextStateId(prefix: string) {
+    // This function is used to generate content_ids for content that live in
+    // the State domain. This includes hints, feedback, and customization args.
+    const contentIdIndex = this.stateNextContentIdIndexService.displayed;
+    this.stateNextContentIdIndexService.displayed += 1;
+    return `${prefix}_${contentIdIndex}`;
+  }
+
   getNextId(existingComponentIds: Array<string>,
       componentName: string): string {
     return this._getNextId(existingComponentIds, componentName);
+  }
+
+  getNextStateId(prefix: string) {
+    return this._getNextStateId(prefix);
   }
 }
 
