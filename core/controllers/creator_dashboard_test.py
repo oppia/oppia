@@ -776,7 +776,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-            self.assertIsNone(response.get('topic_summary_dicts'))
+            self.assertEqual(response.get('topic_summary_dicts'), [])
         self.logout()
 
     def test_can_update_display_preference(self):

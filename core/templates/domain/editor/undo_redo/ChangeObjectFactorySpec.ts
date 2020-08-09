@@ -32,7 +32,7 @@ describe('Factory for Change domain objects', () => {
 
     const backendChangeObject: BackendChangeObject = {
       cmd: 'update_question_property',
-      property_name: 'value',
+      property_name: 'language_code',
       new_value: 'newVal',
       old_value: 'oldVal'
     };
@@ -48,7 +48,7 @@ describe('Factory for Change domain objects', () => {
 
     const backendChangeObject: BackendChangeObject = {
       cmd: 'update_question_property',
-      property_name: 'value',
+      property_name: 'language_code',
       new_value: 'newVal',
       old_value: 'oldVal'
     };
@@ -57,7 +57,7 @@ describe('Factory for Change domain objects', () => {
 
     const fakeDomainObject: BackendChangeObject = {
       cmd: 'update_question_property',
-      property_name: 'fake value',
+      property_name: 'language_code',
       new_value: 'newVal',
       old_value: 'oldVal'
     };
@@ -74,7 +74,7 @@ describe('Factory for Change domain objects', () => {
 
     const backendChangeObject: BackendChangeObject = {
       cmd: 'update_question_property',
-      property_name: 'value',
+      property_name: 'language_code',
       new_value: 'newVal',
       old_value: 'oldVal'
     };
@@ -83,7 +83,7 @@ describe('Factory for Change domain objects', () => {
 
     const fakeDomainObject: BackendChangeObject = {
       cmd: 'update_question_property',
-      property_name: 'fake value',
+      property_name: 'language_code',
       new_value: 'newVal',
       old_value: 'oldVal'
     };
@@ -98,7 +98,7 @@ describe('Factory for Change domain objects', () => {
     () => {
       const backendChangeObject: BackendChangeObject = {
         cmd: 'update_question_property',
-        property_name: 'value',
+        property_name: 'language_code',
         new_value: 'newVal',
         old_value: 'oldVal'
       };
@@ -107,11 +107,11 @@ describe('Factory for Change domain objects', () => {
 
       const returnedBackendObject = changeDomainObject.getBackendChangeObject();
       (<typeof backendChangeObject> returnedBackendObject)
-        .property_name = 'new value';
+        .property_name = 'language_code';
 
       expect(changeDomainObject.getBackendChangeObject()).toEqual({
         cmd: 'update_question_property',
-        property_name: 'value',
+        property_name: 'language_code',
         new_value: 'newVal',
         old_value: 'oldVal'
       });
@@ -120,28 +120,28 @@ describe('Factory for Change domain objects', () => {
   it('should set new backend change object when using specific method', () => {
     const changeDomainObject = changeObjectFactory.create({
       cmd: 'update_question_property',
-      property_name: 'value',
+      property_name: 'language_code',
       new_value: 'newVal',
       old_value: 'oldVal'
     }, () => {}, () => {});
 
     expect(changeDomainObject.getBackendChangeObject()).toEqual({
       cmd: 'update_question_property',
-      property_name: 'value',
+      property_name: 'language_code',
       new_value: 'newVal',
       old_value: 'oldVal'
     });
 
     changeDomainObject.setBackendChangeObject({
       cmd: 'update_question_property',
-      property_name: 'new value',
+      property_name: 'language_code',
       new_value: 'newVal',
       old_value: 'oldVal'
     });
 
     expect(changeDomainObject.getBackendChangeObject()).toEqual({
       cmd: 'update_question_property',
-      property_name: 'new value',
+      property_name: 'language_code',
       new_value: 'newVal',
       old_value: 'oldVal'
     });
