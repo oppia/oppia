@@ -1141,7 +1141,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
     def _check_unused_dependencies(self):
         """Checks if there are the unused dependencies in directives
-        and services
+        and services.
         Check unused dependencies in directives (Inline Array Annotation,
         $inject Property Annotation)
         there are two types of dependencies in directives
@@ -1186,7 +1186,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 else:
                     string1 = ''
 
-                matched_patterns = re.findall(controller_pattern_to_match, content)
+                matched_patterns = re.findall(
+                    controller_pattern_to_match, content)
                 if matched_patterns:
                     for matched_pattern in matched_patterns:
                         stringfied_dependencies, function_parameters = (
@@ -1225,9 +1226,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     cnt = len(re.findall(r'' + dep + '[^\']', content))
                     if cnt < 2:
                         if start_point == 0:
-                            python_utils.PRINT('---Checking the file:', filepath)
+                            python_utils.PRINT('Checking the file:', filepath)
                         python_utils.PRINT(dep, ':', cnt,
-                                           '------------------Unused Dependency')
+                                           '---------------Unused Dependency')
                         failed = True
                         start_point += 1
                     else:
