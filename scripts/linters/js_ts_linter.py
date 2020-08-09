@@ -1139,9 +1139,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             summary_messages.append(summary_message)
         return summary_messages
     def _check_unused_dependencies(self):
-        """Checks if there are the unused dependencies in directives 
+        """Checks if there are the unused dependencies in directives
         and services
-        Check unused dependencies in directives (Inline Array Annotation, 
+        Check unused dependencies in directives (Inline Array Annotation,
         $inject Property Annotation)
         there are two types of dependencies in directives
         1. directive('directive_name', ['dependency',function(dependency){
@@ -1171,7 +1171,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     'Reading %s file ...' % filepath)
             content = self.file_cache.read(filepath)
             if 'directive' in content:
-                matched_patterns = re.findall(inline_array_pattern_to_match, content)
+                matched_patterns = re.findall(
+                    inline_array_pattern_to_match, content)
                 if matched_patterns:
                     for matched_pattern in matched_patterns:
                         stringfied_dependencies, function_parameters = (
@@ -1197,8 +1198,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 string = string1 + ',' + string2
                 dependencies = string.split(',')
             elif 'factory' in content:
-                python_utils.PRINT(
-                    'Check dependencies in factory')
                 matched_patterns = re.findall(factory_pattern_to_match, content)
                 if matched_patterns:
                     for matched_pattern in matched_patterns:
@@ -1223,22 +1222,23 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     if cnt < 2:
                         if start_point == 0:
                             python_utils.PRINT('------Checking the file:', filepath)
-                        python_utils.PRINT(dep, ':', cnt, '----------------------Unused Dependency')
+                        python_utils.PRINT(dep, ':', cnt, 
+                            '----------------------Unused Dependency')
                         failed = True
-                        start_point +=1
+                        start_point += 1
                     else:
                         continue
 
-            if failed:
-                summary_message = (
-                    '%s unused dependencies check failed' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s unused dependencies check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-            python_utils.PRINT(summary_message)
-            summary_messages.append(summary_message)
+        if failed:
+            summary_message = (
+                '%s unused dependencies check failed' % (
+                    linter_utils.FAILED_MESSAGE_PREFIX))
+        else:
+            summary_message = (
+                '%s unused dependencies check passed' % (
+                    linter_utils.SUCCESS_MESSAGE_PREFIX))
+        python_utils.PRINT(summary_message)
+        summary_messages.append(summary_message)
         return summary_messages
 
     def perform_all_lint_checks(self):
