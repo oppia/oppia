@@ -1416,66 +1416,6 @@ tags: []
         )
         exp_summary_model.put()
 
-    def save_new_exp_with_states_schema_v35(self, exp_id, user_id, states_dict):
-        """Saves a new default exploration with a default version 35 states
-        dictionary.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            states_dict: dict. The dict representation of all the states.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id,
-            category='category',
-            title='title',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            states_schema_version=35,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=states_dict,
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'title\'.'
-        exp_model.commit(
-            user_id, commit_message, [{
-                'cmd': 'create_new',
-                'title': 'title',
-                'category': 'category',
-            }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id,
-            title='title',
-            category='category',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids,
-            contributor_ids=[],
-            contributors_summary={},
-        )
-        exp_summary_model.put()
-
     def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
         """Saves a new default exploration with a default version 21 states
         dictionary. Version 21 is where training data of exploration is stored
@@ -1716,6 +1656,7 @@ tags: []
 
     def save_new_topic(
             self, topic_id, owner_id, name='topic', abbreviated_name='topic',
+            url_fragment='topic',
             thumbnail_filename='topic.svg',
             thumbnail_bg_color=(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
@@ -1730,6 +1671,7 @@ tags: []
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
+            url_fragment: str. The url fragment of the topic.
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
@@ -1760,7 +1702,7 @@ tags: []
         uncategorized_skill_ids = (uncategorized_skill_ids or [])
         subtopics = (subtopics or [])
         topic = topic_domain.Topic(
-            topic_id, name, abbreviated_name,
+            topic_id, name, abbreviated_name, url_fragment,
             thumbnail_filename, thumbnail_bg_color,
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
@@ -1771,7 +1713,7 @@ tags: []
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(
-            self, topic_id, owner_id, name, abbreviated_name,
+            self, topic_id, owner_id, name, abbreviated_name, url_fragment,
             canonical_name, description, thumbnail_filename,
             thumbnail_bg_color, canonical_story_references,
             additional_story_references,
@@ -1794,6 +1736,7 @@ tags: []
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
+            url_fragment: str. The url fragment of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The description of the topic.
             thumbnail_filename: str. The thumbnail file name of the topic.
@@ -1820,6 +1763,7 @@ tags: []
             id=topic_id,
             name=name,
             abbreviated_name=abbreviated_name,
+            url_fragment=url_fragment,
             thumbnail_filename=thumbnail_filename,
             thumbnail_bg_color=thumbnail_bg_color,
             canonical_name=canonical_name,
