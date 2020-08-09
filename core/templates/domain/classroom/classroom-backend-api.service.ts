@@ -48,12 +48,6 @@ export class ClassroomBackendApiService {
     private http: HttpClient,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory
   ) {}
-  /**
-   * 
-   * @param {String} classroomName -For the Classroom name
-   * @param {Object} successCallback -
-   * @param {any} errorCallback 
-   */
   _fetchClassroomData(classroomName: string,
       successCallback: (value: TopicSummary[]) => void,
       errorCallback: (reason: string) => void): void {
@@ -96,12 +90,7 @@ export class ClassroomBackendApiService {
       }
     });
   }
-
-  
-
-
   fetchClassroomData(classroomName: string): Promise<TopicSummary[]> {
-
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomName, resolve, reject);
     });

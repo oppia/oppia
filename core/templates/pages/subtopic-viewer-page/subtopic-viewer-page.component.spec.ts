@@ -21,6 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+
 require('pages/subtopic-viewer-page/subtopic-viewer-page.component.ts');
 
 describe('Subtopic viewer page', function() {
@@ -65,6 +66,8 @@ describe('Subtopic viewer page', function() {
       $scope: $scope
     });
   }));
+
+
 
   it('should succesfully get subtopic data and set context', function() {
     spyOn(UrlService, 'getTopicNameFromLearnerUrl').and.returnValue(topicName);

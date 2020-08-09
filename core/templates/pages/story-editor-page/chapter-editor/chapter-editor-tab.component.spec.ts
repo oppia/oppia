@@ -17,7 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
@@ -27,11 +30,19 @@ describe('Chapter Editor tab', function() {
   var ctrl = null;
   var MockStoryEditorNavigationService = null;
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [StoryObjectFactory, StoryEditorNavigationService,
+        EditableStoryBackendApiService]
+    });
+  });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StoryObjectFactory', TestBed.get(StoryObjectFactory));
-    $provide.value(
-      'StoryEditorNavigationService',
+    $provide.value('StoryEditorNavigationService',
       TestBed.get(StoryEditorNavigationService));
+    $provide.value('EditableStoryBackendApiService',
+      TestBed.get(EditableStoryBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

@@ -16,20 +16,26 @@
  * @fileoverview Unit tests for EditableStoryBackendApiService.
  */
 
-// starts here
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from
+  '@angular/core/testing';
 export {};
+class MockEditableStory extends EditableStoryBackendApiService {
+  isAuthenticated() {
+    return 'Mocked';
+  }
+}
 describe('Editable story backend API service', () => {
   let editableStoryBackendApiService: EditableStoryBackendApiService = null;
   let sampleDataResults = null;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
+  // Sample story object returnable from the backend.
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,7 +51,6 @@ describe('Editable story backend API service', () => {
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');
     });
-
 
     // Sample story object returnable from the backend.
 
@@ -151,6 +156,7 @@ describe('Editable story backend API service', () => {
 
       // Loading a story the first time should fetch it from the backend.
       editableStoryBackendApiService.fetchStory('storyId').then(
+        // eslint-disable-next-line
         (data: any) => {
           story = data.story;
         });
@@ -167,11 +173,11 @@ describe('Editable story backend API service', () => {
         story: story
       };
 
-      // var req = httpTestingController.expectOne(
-        // '/story_editor_handler/data/storyId');
+      //  Var req = httpTestingController.expectOne(
+      // '/story_editor_handler/data/storyId');
       // expect(req.request.method).toEqual('PUT');
       // req.flush(storyWrapper);
-      // flushMicrotasks();
+      // flushMicrotasks()
 
       // Send a request to update story.
       editableStoryBackendApiService.updateStory(
@@ -217,7 +223,7 @@ describe('Editable story backend API service', () => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    // send a request to update story
+    // Send a request to update story.
     editableStoryBackendApiService.changeStoryPublicationStatus(
       'storyId', true).then(successHandler, failHandler);
     var req = httpTestingController.expectOne(
@@ -253,8 +259,3 @@ describe('Editable story backend API service', () => {
     }
     ));
 });
-
-
-
-// ends here
-

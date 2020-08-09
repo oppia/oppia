@@ -719,12 +719,10 @@ export class UpgradedServices {
     upgradedServices['EditabilityService'] = new EditabilityService();
 
     upgradedServices['EditableStoryBackendApiService'] =
-      new EditableStoryBackendApiService();
-    upgradedServices['EmailDashboardDataService'] =
-      new EmailDashboardDataService(
-        new HttpClient(new HttpXhrBackend(
-          new ɵangular_packages_common_http_http_d())));
-
+      new EditableStoryBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']
+      );
     upgradedServices['EmailDashboardQueryObjectFactory'] =
       new EmailDashboardQueryObjectFactory();
     upgradedServices['EndExplorationRulesService'] =
@@ -1318,6 +1316,7 @@ export class UpgradedServices {
         upgradedServices['ContextService'],
         upgradedServices['PlayerPositionService'],
         upgradedServices['PlayerTranscriptService']);
+
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationFeaturesBackendApiService'] =

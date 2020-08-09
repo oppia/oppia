@@ -16,7 +16,11 @@
  * @fileoverview Unit tests for CreateNewChapterModalController.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
@@ -39,12 +43,20 @@ describe('Create New Chapter Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [StoryObjectFactory, EditableStoryBackendApiService]
+    });
+  });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StoryObjectFactory',
       new StoryObjectFactory(new StoryContentsObjectFactory(
         new StoryNodeObjectFactory())));
     $provide.value('AlertsService', new AlertsService(new LoggerService()));
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value('EditableStoryBackendApiService',
+      TestBed.get(EditableStoryBackendApiService));
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $rootScope = $injector.get('$rootScope');

@@ -16,7 +16,6 @@
  * @fileoverview Service to send changes to a story to the backend.
  */
 
-// changes made for #8472
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -39,7 +38,7 @@ export class EditableStoryBackendApiService {
   private _fetchStory(
       storyId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: Object | Promise<Object>) => void): void {
+      errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
     var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
         story_id: storyId
@@ -161,7 +160,8 @@ export class EditableStoryBackendApiService {
           }
         });
     };
-    //  return {
+    /*
+    Return { */
     fetchStory(storyId: string): Promise<object> {
       return new Promise((resolve, reject) => {
         this._fetchStory(storyId, resolve, reject);
@@ -210,10 +210,3 @@ export class EditableStoryBackendApiService {
 angular.module('oppia').factory(
   'EditableStoryBackendApiService', downgradeInjectable(
     EditableStoryBackendApiService));
-
-
-
-// ends here-----------------------------------------------
-
-
-

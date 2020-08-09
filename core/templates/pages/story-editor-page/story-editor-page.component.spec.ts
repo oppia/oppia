@@ -21,6 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+
 require('pages/story-editor-page/story-editor-page.component.ts');
 
 describe('Story editor page', function() {
@@ -32,7 +33,7 @@ describe('Story editor page', function() {
   var PageTitleService = null;
   var StoryEditorStateService = null;
   var StoryEditorNavigationService = null;
-  var EditableStoryBackendApiService = null;
+  let EditableStoryBackendApiService = null;
   var StoryObjectFactory = null;
   var UndoRedoService = null;
   var UrlService = null;
@@ -232,7 +233,6 @@ describe('Story editor page', function() {
       () => 'story_preview');
     ctrl.$onInit();
     expect(ctrl.isMainEditorTabSelected()).toEqual(false);
-
     MockStoryEditorNavigationService.activeTab = 'story_editor';
     MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
   });
