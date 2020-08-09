@@ -76,9 +76,12 @@ describe('Display Solution Modal Controller', function() {
     var interaction = interactionObjectFactory.createFromBackendDict({
       answer_groups: [],
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        placeholder: {value: {content_id: 'ca_placeholder', unicode_str: ''}},
+        rows: {value: 1}
+      },
       hints: [],
-      id: 'interaction_1'
+      id: 'TextInput'
     });
     var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
     card = stateCardObjectFactory.createNewCard(
@@ -100,8 +103,8 @@ describe('Display Solution Modal Controller', function() {
     expect($scope.isHint).toBe(false);
     expect($scope.shortAnswerHtml).toEqual({
       prefix: 'The only',
-      answer: '<oppia-short-response-interaction_1 answer="&amp;quot;' +
-        'Correct answer&amp;quot;"></oppia-short-response-interaction_1>'
+      answer: '<oppia-short-response-text-input answer="&amp;quot;' +
+        'Correct answer&amp;quot;"></oppia-short-response-text-input>'
     });
     expect($scope.solutionExplanationHtml).toBe('Explanation html');
 
