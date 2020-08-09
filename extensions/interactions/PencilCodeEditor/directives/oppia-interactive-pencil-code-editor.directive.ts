@@ -30,12 +30,15 @@ require(
   'interactions/PencilCodeEditor/directives/' +
   'pencil-code-editor-rules.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
-  '$timeout', 'HtmlEscaperService', 'EVENT_NEW_CARD_AVAILABLE',
-  function($timeout, HtmlEscaperService, EVENT_NEW_CARD_AVAILABLE) {
+  '$timeout', 'InteractionAttributesExtractorService',
+  'EVENT_NEW_CARD_AVAILABLE',
+  function($timeout, InteractionAttributesExtractorService,
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -84,8 +87,14 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             pce = new PencilCodeEmbed(iframeDiv);
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
 
+            const {
+              initialCode
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'PencilCodeEditor',
+              $attrs
+            );
             ctrl.initialCode = ctrl.interactionIsActive ?
-              HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
+              initialCode :
               ctrl.getLastAnswer().code;
 
             pce.beginLoad(ctrl.initialCode);

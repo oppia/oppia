@@ -161,7 +161,7 @@ export class AdminBackendApiService {
     }
     body.append(
       'payload', JSON.stringify({latexMapping: latexToSvgMapping}));
-    return this.http.post('/adminmathsvghandler', body).toPromise();
+    return this.http.post('/explorationslatexsvghandler', body).toPromise();
   }
 }
 

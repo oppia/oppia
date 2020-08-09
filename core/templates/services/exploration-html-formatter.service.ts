@@ -28,6 +28,7 @@ import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 
+
 // A service that provides a number of utility functions useful to both the
 // editor and player.
 @Injectable({
@@ -35,9 +36,10 @@ import { InteractionCustomizationArgs } from
 })
 export class ExplorationHtmlFormatterService {
   constructor(
-    private camelCaseToHyphens: CamelCaseToHyphensPipe,
-    private extensionTagAssembler: ExtensionTagAssemblerService,
-    private htmlEscaper: HtmlEscaperService) {}
+      private camelCaseToHyphens: CamelCaseToHyphensPipe,
+      private extensionTagAssembler: ExtensionTagAssemblerService,
+      private htmlEscaper: HtmlEscaperService
+  ) {}
   /**
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgSpecs - The various
@@ -53,7 +55,8 @@ export class ExplorationHtmlFormatterService {
    *   the interaction.
    */
   getInteractionHtml(
-      interactionId: string, interactionCustomizationArgSpecs: object,
+      interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
@@ -61,7 +64,7 @@ export class ExplorationHtmlFormatterService {
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
-        element, interactionCustomizationArgSpecs));
+        element, interactionCustomizationArgs));
     element.attr('last-answer', parentHasLastAnswerProperty ?
       'lastAnswer' : 'null');
     if (labelForFocusTarget) {
@@ -75,8 +78,10 @@ export class ExplorationHtmlFormatterService {
       interactionCustomizationArgs: InteractionCustomizationArgs): string {
     // TODO(sll): Get rid of this special case for multiple choice.
     var interactionChoices = null;
+
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
+      interactionChoices = interactionCustomizationArgs.choices.value.map(
+        choice => choice.getHtml());
     }
 
     var el = $(
@@ -93,10 +98,12 @@ export class ExplorationHtmlFormatterService {
   getShortAnswerHtml(
       answer: InteractionAnswer, interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs) : string {
-    // TODO(sll): Get rid of this special case for multiple choice.
     var interactionChoices = null;
+
+    // TODO(sll): Get rid of this special case for multiple choice.
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
+      interactionChoices = interactionCustomizationArgs.choices.value.map(
+        choice => choice.getHtml());
     }
 
     var el = $(

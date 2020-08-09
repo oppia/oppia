@@ -66,7 +66,7 @@
         <span class="topic-list-status-text" ng-if="topic.isPublished"> Published </span>
         <span class="topic-list-status-text" ng-if="!topic.isPublished"> Not Published </span>
         <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" ng-click="$ctrl.changeEditOptions(topic.id)"></p>
-        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
+        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-click="$ctrl.changeEditOptions(null)">
           <a class="topic-edit-options-edit protractor-test-edit-topic-button" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
             <i class="fa fa-pen"></i>
             <span>Edit</span>
@@ -195,7 +195,7 @@
     border: 1px solid #000;
     display: flex;
     flex-wrap: wrap;
-    left: 0;
+    left: -35px;
     position: absolute;
     top: 10px;
     width: 120px;
@@ -339,7 +339,10 @@
       width: 25%;
     }
     topics-list .topic-item-status {
+      align-items: center;
       border-right: none;
+      display: flex;
+      justify-content: center;
     }
     topics-list .topic-edit-options {
       left: auto;
