@@ -1194,3 +1194,25 @@ class PositionOfTerms(BaseObject):
         'type': 'unicode',
         'choices': ['lhs', 'rhs', 'both', 'irrelevant']
     }
+
+
+class CustomOskLetters(BaseObject):
+    """Class for custom OSK letters. These are the letters that will be
+    displayed to the learner for AlgebraicExpressionInput and MathEquationInput
+    interactions when the on-screen keyboard is being used. This includes Latin
+    and Greek alphabets.
+    """
+
+    description = (
+        'Shortcut variables that the learner can access in the '
+        'on-screen keyboard. (The order of these variables will be reflected '
+        'in the learner\'s keyboard)')
+    default_value = []
+
+    SCHEMA = {
+        'type': 'list',
+        'items': AlgebraicIdentifier.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
+        }]
+    }

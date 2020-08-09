@@ -78,6 +78,7 @@ angular.module('oppia').component('mathEquationEditor', {
 
       ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
+        GuppyInitializationService.interactionType = 'MathEquationInput';
       };
 
       ctrl.$onInit = function() {

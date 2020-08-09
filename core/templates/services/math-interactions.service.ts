@@ -184,6 +184,36 @@ export class MathInteractionsService {
   }
 
   insertMultiplicationSigns(expressionString: string): string {
+    // TODO(#7434): Use dot notation after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    /* eslint-disable dot-notation */
+    let greekLetters = Object.keys(
+      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+    let greekSymbols = Object.values(
+      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+    /* eslint-enable dot-notation */
+    let greekLettersAndSymbols = [];
+    for (let i = 0; i < greekLetters.length; i++) {
+      greekLettersAndSymbols.push([greekLetters[i], greekSymbols[i]]);
+    }
+    // Sorting by length in descending order so that longer letters get replaced
+    // before shorted ones. For eg. 'alphabeta' should have variables list as
+    // ['alpha', 'beta'] and not ['alpha', 'b', 'eta'].
+    greekLettersAndSymbols.sort((a, b) => b[0].length - a[0].length);
+
+    let greekLetterToSymbol = {};
+    let greekSymbolToLetter = {};
+    for (let letterAndSymbol of greekLettersAndSymbols) {
+      greekLetterToSymbol[letterAndSymbol[0]] = letterAndSymbol[1];
+      greekSymbolToLetter[letterAndSymbol[1]] = letterAndSymbol[0];
+    }
+
+    // Temporarily replacing letters with symbols.
+    for (let letter in greekLetterToSymbol) {
+      expressionString = expressionString.replace(
+        new RegExp(letter, 'g'), greekLetterToSymbol[letter]);
+    }
+
     expressionString = expressionString.replace(/\s/g, '');
     // Assumes that given expressionString is valid.
     // Nerdamer allows multi-character variables so, 'ax+b' will be considered
@@ -193,16 +223,16 @@ export class MathInteractionsService {
     // each other. So, 'ax+b' would be transformed to 'a*x+b' via this function.
     let variables = nerdamer(expressionString).variables();
     for (let variable of variables) {
-      // We wouldn't want to interpolate '*' signs between valid greek letters.
-      // TODO(#7434): Use dot notation after we find a way to get
-      // rid of the TS2339 error on AppConstants.
-      // eslint-disable-next-line dot-notation
-      if (AppConstants['GREEK_LETTERS'].indexOf(variable) === -1) {
-        let separatedVariables = variable.split('').join('*');
-        expressionString = expressionString.replace(
-          variable, separatedVariables);
-      }
+      let separatedVariables = variable.split('').join('*');
+      expressionString = expressionString.replace(
+        new RegExp(variable, 'g'), separatedVariables);
     }
+    // Reverting the temporary replacement of letters.
+    for (let symbol in greekSymbolToLetter) {
+      expressionString = expressionString.replace(
+        new RegExp(symbol, 'g'), greekSymbolToLetter[symbol]);
+    }
+
     // Inserting multiplication signs before functions. For eg. 5sqrt(x) should
     // be treated as 5*sqrt(x).
     for (let functionName of this.mathFunctionNames) {

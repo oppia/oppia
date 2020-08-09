@@ -1,6 +1,9 @@
 {
+    "AlgebraicExpression": "",
+    "AlgebraicIdentifier": "x",
     "CodeString": "",
     "CoordTwoDim": [0.0, 0.0],
+    "CustomOskLetters": [],
     "DragAndDropHtmlString": "",
     "DragAndDropPositiveInt": 1,
     "Graph": {
@@ -31,6 +34,7 @@
       "numerator": 0,
       "denominator": 1
     },
+    "MathEquation": "",
     "NumberWithUnits": {
       "type": "real",
       "real": 0.0,
@@ -42,9 +46,6 @@
       },
       "units": []
     },
-    "AlgebraicExpression": "",
     "NumericExpression": "",
-    "AlgebraicIdentifier": "x",
-    "MathEquation": "",
     "PositionOfTerms": "both"
 }

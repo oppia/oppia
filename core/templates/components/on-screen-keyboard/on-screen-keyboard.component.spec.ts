@@ -103,6 +103,7 @@ describe('OnScreenKeyboard', function() {
 
       expect(ctrl.isActive).toBeFalse();
       ctrl.insertString('x');
+      ctrl.insertString('α');
       expect(ctrl.isActive).toBeTrue();
 
       ctrl.isActive = false;

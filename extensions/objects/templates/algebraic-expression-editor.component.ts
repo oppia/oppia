@@ -72,6 +72,7 @@ angular.module('oppia').component('algebraicExpressionEditor', {
 
       ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
+        GuppyInitializationService.interactionType = 'AlgebraicExpressionInput';
       };
 
       ctrl.$onInit = function() {

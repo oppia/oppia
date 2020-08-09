@@ -40,8 +40,16 @@ interface ReadableMusicNote {
   readableNoteName: string;
 }
 
-export interface AlgebraicExpressionInputCustomizationArgs { }
-interface AlgebraicExpressionInputCustomizationArgsBackendDict { }
+export interface AlgebraicExpressionInputCustomizationArgs {
+  customOskLetters: {
+    value: string[];
+  };
+}
+interface AlgebraicExpressionInputCustomizationArgsBackendDict {
+  customOskLetters: {
+    value: string[];
+  };
+}
 
 
 interface CodeReplCustomizationArgsBackendDict {
@@ -278,8 +286,16 @@ export interface LogicProofCustomizationArgs {
 }
 
 
-interface MathEquationInputCustomizationArgsBackendDict { }
-export interface MathEquationInputCustomizationArgs { }
+interface MathEquationInputCustomizationArgsBackendDict {
+  customOskLetters: {
+    value: string[];
+  };
+}
+export interface MathEquationInputCustomizationArgs {
+  customOskLetters: {
+    value: string[];
+  };
+}
 
 
 export interface MultipleChoiceInputCustomizationArgsBackendDict {
