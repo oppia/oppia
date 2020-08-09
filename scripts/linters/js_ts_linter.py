@@ -1138,6 +1138,108 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
         return summary_messages
+    def _check_unused_dependencies(self):
+        """Checks if there are the unused dependencies in directives 
+        and services
+        Check unused dependencies in directives (Inline Array Annotation, 
+        $inject Property Annotation)
+        there are two types of dependencies in directives
+        1. directive('directive_name', ['dependency',function(dependency){
+        2. controller in directive
+        """
+
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting unused dependencies check')
+            python_utils.PRINT('----------------------------------------')
+
+        summary_messages = []
+        files_to_check = self.all_filepaths
+        inline_array_pattern_to_match = (
+            r'directive.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
+            r'function\((?P<function_parameters>[\S\s]*?)\)')
+        controller_pattern_to_match = (
+            r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
+            r'function\((?P<function_parameters>[\S\s]*?)\)')
+        factory_pattern_to_match = (
+            r'factory.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
+            r'function\((?P<function_parameters>[\S\s]*?)\)')
+        failed = False
+        for filepath in files_to_check:
+            dependencies = []
+            if self.verbose_mode_enabled:
+                python_utils.PRINT(
+                    'Reading %s file ...' % filepath)
+            content = self.file_cache.read(filepath)
+            if 'directive' in content:
+                matched_patterns = re.findall(inline_array_pattern_to_match, content)
+                if matched_patterns:
+                    for matched_pattern in matched_patterns:
+                        stringfied_dependencies, function_parameters = (
+                            matched_pattern)
+                        stringfied_dependencies = (
+                            stringfied_dependencies.strip().replace(
+                                '\'', '').replace(' ', '').replace('\n', ''))[:-1]
+                        string1 = stringfied_dependencies
+                else:
+                    string1 = '' 
+
+                matched_patterns = re.findall(controller_pattern_to_match, content)
+                if matched_patterns:
+                    for matched_pattern in matched_patterns:
+                        stringfied_dependencies, function_parameters = (
+                            matched_pattern)
+                        stringfied_dependencies = (
+                            stringfied_dependencies.strip().replace(
+                                '\'', '').replace(' ', '').replace('\n', ''))[:-1]
+                        string2 = stringfied_dependencies
+                else:
+                        string2 = '' 
+                string = string1 + ',' + string2
+                dependencies = string.split(',')
+            elif 'factory' in content:
+                python_utils.PRINT(
+                    'Check dependencies in factory')
+                matched_patterns = re.findall(factory_pattern_to_match, content)
+                if matched_patterns:
+                    for matched_pattern in matched_patterns:
+                        stringfied_dependencies, function_parameters = (
+                            matched_pattern)
+                        stringfied_dependencies = (
+                            stringfied_dependencies.strip().replace(
+                                '\'', '').replace(' ', '').replace('\n', ''))[:-1]
+                        string3 = stringfied_dependencies
+                else:
+                    string3 = '' 
+                dependencies = string3.split(',')
+            else:
+                continue
+            start_point = 0
+            for dep in dependencies:
+                cnt = 0
+                if dep:
+                    if re.findall(r'\$', dep):
+                        dep = '\%s' % dep
+                    cnt = len(re.findall(r'' + dep + '[^\']', content))
+                    if cnt < 2:
+                        if start_point == 0:
+                            python_utils.PRINT('------Checking the file:', filepath)
+                        python_utils.PRINT(dep, ':', cnt, '----------------------Unused Dependency')
+                        failed = True
+                        start_point +=1
+                    else:
+                        continue
+
+            if failed:
+                summary_message = (
+                    '%s unused dependencies check failed' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+            else:
+                summary_message = (
+                    '%s unused dependencies check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+        return summary_messages
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -1174,6 +1276,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             self._match_line_breaks_in_controller_dependencies())
         constant_declaration_messages = self._check_constants_declaration()
         comments_style_messages = self._check_comments()
+        unused_dependency_messages = self._check_unused_dependencies()
 
         # Clear temp compiled typescipt files.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
@@ -1183,7 +1286,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             extra_js_files_messages + http_requests_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
-            constant_declaration_messages + comments_style_messages)
+            constant_declaration_messages + comments_style_messages +
+            unused_dependency_messages)
         return all_messages
 
 
