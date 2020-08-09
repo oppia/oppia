@@ -86,7 +86,16 @@ class CollectionModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            'title': None,
+            'category': None,
+            'objective': None,
+            'language_code': None,
+            'tags': None,
+            'schema_version': None,
+            'nodes': None,
+            'collection_contents': None,
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -240,7 +249,10 @@ class CollectionRightsModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            'owner_ids': None,
+            ''
+        }
 
     @staticmethod
     def convert_to_valid_dict(model_dict):

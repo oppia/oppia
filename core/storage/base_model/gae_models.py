@@ -1082,7 +1082,12 @@ class BaseSnapshotMetadataModel(BaseModel):
     @staticmethod
     def get_export_policy():
         """Snapshot Metadata is relevant to the user for Takeout."""
-        return EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            'committer_id': None,
+            'commit_type': 'commit_type',
+            'commit_message': 'commit_message'
+            'commit_cmds': 'commit_cmds'
+        }
 
     @classmethod
     def exists_for_user_id(cls, user_id):
@@ -1173,7 +1178,9 @@ class BaseSnapshotContentModel(BaseModel):
         """The contents of snapshots are not relevant to the user for
         Takeout.
         """
-        return EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            'content': None
+        }
 
     @classmethod
     def create(cls, snapshot_id, content):

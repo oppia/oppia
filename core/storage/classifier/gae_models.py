@@ -74,7 +74,17 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            'algorithm_id': None,
+            'interaction_id': None,
+            'exp_id': None,
+            'exp_version': None,
+            'state_name': None,
+            'status': None,
+            'training_data': None,
+            'next_scheduled_check_time': None,
+            'data_schema_version': None
+        }
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -229,7 +239,12 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            'exp_id': None,
+            'exp_version': None,
+            'state_name': None,
+            'job_id': None
+        }
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):

@@ -57,7 +57,12 @@ class RoleQueryAuditModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            'user_id': None,
+            'intent:' None,
+            'role': None,
+            'username': None
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -96,7 +101,11 @@ class UsernameChangeAuditModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            'committer_id': None,
+            'old_username': None,
+            'new_username': None
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
