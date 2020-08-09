@@ -19,10 +19,17 @@
 describe('Story viewer navbar breadcrumb component', function() {
   var ctrl = null;
   var $rootScope = null;
+  var urlService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
+    urlService = $injector.get('UrlService');
+
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic1');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'classroom1');
 
     $rootScope = $rootScope.$new();
     ctrl = $componentController('storyViewerNavbarBreadcrumb', {
@@ -31,20 +38,12 @@ describe('Story viewer navbar breadcrumb component', function() {
     ctrl.$onInit();
   }));
 
-  it('should not get topic url when story data is not loaded yet', function() {
-    expect(function() {
-      ctrl.getTopicUrl();
-    }).toThrowError(
-      'Every parameter passed into interpolateUrl must have' +
-      ' string values, but received: {topic_name: undefined}');
-  });
-
   it('should get topic url when story data is already loaded', function() {
     $rootScope.$broadcast('storyData', {
       topicName: 'topic_1',
       storyTitle: 'Story title'
     });
 
-    expect(ctrl.getTopicUrl()).toBe('/topic/topic_1');
+    expect(ctrl.getTopicUrl()).toBe('/learn/classroom1/topic1/story');
   });
 });

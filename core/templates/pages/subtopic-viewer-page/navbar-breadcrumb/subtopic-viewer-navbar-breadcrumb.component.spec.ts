@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for the subtopic viewer navbar breadcrumb.
  */
 
-import { ComponentFixture, TestBed, async, fakeAsync, tick } from
-  '@angular/core/testing';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SubtopicViewerNavbarBreadcrumbComponent } from
   './subtopic-viewer-navbar-breadcrumb.component';
@@ -30,12 +29,16 @@ import { ReadOnlySubtopicPageObjectFactory } from
   'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 
 class MockUrlService {
-  getTopicNameFromLearnerUrl() {
+  getTopicUrlFragmentFromLearnerUrl() {
     return 'topic_1';
   }
 
-  getSubtopicIdFromUrl() {
-    return 'a';
+  getClassroomUrlFragmentFromLearnerUrl() {
+    return 'classroom_1';
+  }
+
+  getSubtopicUrlFragmentFromLearnerUrl() {
+    return 'subtopic_1';
   }
 }
 
@@ -68,7 +71,8 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
                       }
                     },
                     next_subtopic_dict: null,
-                    topic_id: 'topic_1'
+                    topic_id: 'topic_1',
+                    topic_name: 'topic_1'
                   }));
               })
             )
@@ -88,16 +92,17 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
     fixture.detectChanges();
   });
 
-  it('should set subtopic title when component is initialized',
-    fakeAsync(() => {
-      component.ngOnInit();
-      expect(component.topicName).toBe('topic_1');
-      tick();
-      expect(component.subtopicTitle).toBe('Subtopic Title');
-    }));
-
-  it('should get topic url after component is initialized', (() => {
+  it('should set subtopic title when component is initialized', async(() => {
     component.ngOnInit();
-    expect(component.getTopicUrl()).toBe('/topic/topic_1');
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.topicName).toBe('topic_1');
+      expect(component.subtopicTitle).toBe('Subtopic Title');
+    });
   }));
+
+  it('should get topic url after component is initialized', () => {
+    component.ngOnInit();
+    expect(component.getTopicUrl()).toBe('/learn/classroom_1/topic_1/revision');
+  });
 });

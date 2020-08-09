@@ -26,7 +26,7 @@ require(
   'pages/contributor-dashboard-page/modal-templates/' +
   'translation-modal.controller.ts');
 require(
-  'pages/community-dashboard-page/opportunities-list/' +
+  'pages/contributor-dashboard-page/opportunities-list/' +
   'opportunities-list.component.ts');
 
 require(

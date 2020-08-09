@@ -30,7 +30,7 @@ require('filters/format-rte-preview.filter.ts');
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 require(
-  'pages/community-dashboard-page/login-required-message/' +
+  'pages/contributor-dashboard-page/login-required-message/' +
   'login-required-message.component.ts');
 require(
   'pages/contributor-dashboard-page/modal-templates/' +

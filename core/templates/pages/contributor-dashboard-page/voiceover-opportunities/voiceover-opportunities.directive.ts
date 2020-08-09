@@ -17,7 +17,7 @@
  */
 
 require(
-  'pages/community-dashboard-page/opportunities-list/' +
+  'pages/contributor-dashboard-page/opportunities-list/' +
   'opportunities-list.component.ts');
 
 require(

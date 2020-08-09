@@ -44,7 +44,7 @@ require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('interactions/codemirrorRequires.ts');
 require(
-  'pages/community-dashboard-page/opportunities-list/' +
+  'pages/contributor-dashboard-page/opportunities-list/' +
   'opportunities-list.component.ts');
 require(
   'pages/contributor-dashboard-page/services/' +
