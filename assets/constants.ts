@@ -5421,7 +5421,7 @@ export = {
   "ENABLE_ACCOUNT_EXPORT": false,
 
   // Link to open when the Oppia avatar is clicked on any page.
-  "OPPIA_AVATAR_LINK_URL": null,
+  "OPPIA_AVATAR_LINK_URL": "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/when-and-how-to-use-masks",
 
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
