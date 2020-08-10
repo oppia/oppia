@@ -22,5 +22,4 @@ export class TopicEditorPageConstants {
 
   public static EVENT_TOPIC_INITIALIZED = 'topicInitialized';
   public static EVENT_TOPIC_REINITIALIZED = 'topicReinitialized';
-  public static EVENT_SUBTOPIC_PAGE_LOADED = 'subtopicPageLoaded';
 }

@@ -31,6 +31,3 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'EVENT_TOPIC_REINITIALIZED',
   TopicEditorPageConstants.EVENT_TOPIC_REINITIALIZED);
-angular.module('oppia').constant(
-  'EVENT_SUBTOPIC_PAGE_LOADED',
-  TopicEditorPageConstants.EVENT_SUBTOPIC_PAGE_LOADED);

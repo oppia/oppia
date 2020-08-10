@@ -40,14 +40,14 @@ angular.module('oppia').factory('TopicEditorStateService', [
   'RubricObjectFactory', 'StorySummaryObjectFactory',
   'SubtopicPageObjectFactory', 'TopicObjectFactory',
   'TopicRightsBackendApiService', 'TopicRightsObjectFactory', 'UndoRedoService',
-  'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
+  'EVENT_TOPIC_INITIALIZED',
   'EVENT_TOPIC_REINITIALIZED', function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
       RubricObjectFactory, StorySummaryObjectFactory,
       SubtopicPageObjectFactory, TopicObjectFactory,
       TopicRightsBackendApiService, TopicRightsObjectFactory, UndoRedoService,
-      EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
+      EVENT_TOPIC_INITIALIZED,
       EVENT_TOPIC_REINITIALIZED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
@@ -73,6 +73,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
     };
     var _classroomUrlFragment = 'staging';
     var _storySummariesInitializedEventEmitter = new EventEmitter();
+    var _subtopicPageLoadedEventEmitter = new EventEmitter();
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -140,7 +141,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
     var _setSubtopicPage = function(subtopicPage) {
       _subtopicPage.copyFromSubtopicPage(subtopicPage);
       _cachedSubtopicPages.push(angular.copy(subtopicPage));
-      $rootScope.$broadcast(EVENT_SUBTOPIC_PAGE_LOADED);
+      _subtopicPageLoadedEventEmitter.emit();
     };
     var _updateSubtopicPage = function(newBackendSubtopicPageObject) {
       _setSubtopicPage(SubtopicPageObjectFactory.createFromBackendDict(
@@ -248,7 +249,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
         if (_getSubtopicPageIndex(subtopicPageId) !== null) {
           _subtopicPage = angular.copy(
             _cachedSubtopicPages[_getSubtopicPageIndex(subtopicPageId)]);
-          $rootScope.$broadcast(EVENT_SUBTOPIC_PAGE_LOADED);
+          _subtopicPageLoadedEventEmitter.emit();
           return;
         }
         EditableTopicBackendApiService.fetchSubtopicPage(
@@ -522,6 +523,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
 
       get onStorySummariesInitialized() {
         return _storySummariesInitializedEventEmitter;
+      },
+
+      get onSubtopicPageLoaded() {
+        return _subtopicPageLoadedEventEmitter;
       }
     };
   }
