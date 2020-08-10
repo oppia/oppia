@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateEditorService } from
@@ -44,6 +45,9 @@ import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'state-tutorial-first-time.service.ts');
 
 describe('Exploration editor page component', function() {
   var ctrl = null;
@@ -72,7 +76,7 @@ describe('Exploration editor page component', function() {
   var stass = null;
   var tds = null;
   var ueps = null;
-
+  var mockEnterEditorForTheFirstTime = null;
   var explorationId = 'exp1';
   var explorationData = {
     exploration_is_linked_to_story: true,
@@ -210,6 +214,7 @@ describe('Exploration editor page component', function() {
     rs = $injector.get('RouterService');
     sas = $injector.get('SiteAnalyticsService');
     ses = $injector.get('StateEditorService');
+    sts = $injector.get('StateTutorialFirstTimeService');
     stass = $injector.get('StateTopAnswersStatsService');
     tds = $injector.get('ThreadDataService');
     ueps = $injector.get('UserExplorationPermissionsService');
@@ -217,6 +222,10 @@ describe('Exploration editor page component', function() {
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationEditorPage');
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   describe('when user permission is true and draft changes not valid', () => {
     beforeEach(() => {
@@ -659,6 +668,7 @@ describe('Exploration editor page component', function() {
 
   describe('Initializing improvements tab', () => {
     beforeEach(() => {
+      mockEnterEditorForTheFirstTime = new EventEmitter();
       spyOnAllFunctions(sas);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures')
@@ -672,6 +682,8 @@ describe('Exploration editor page component', function() {
         .and.returnValue(Promise.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve({canEdit: true}));
+      spyOnProperty(sts, 'onEnterEditorForTheFirstTime').and.returnValue(
+        mockEnterEditorForTheFirstTime);
 
       explorationData.is_version_of_draft_valid = true;
     });
@@ -705,6 +717,13 @@ describe('Exploration editor page component', function() {
 
       expect(ctrl.isImprovementsTabEnabled()).toBeFalse();
     }));
+
+    it('should react to enterEditorForTheFirstTime event', () => {
+      spyOn(ctrl, 'showWelcomeExplorationModal').and.callThrough();
+      ctrl.$onInit();
+      mockEnterEditorForTheFirstTime.emit();
+      expect(ctrl.showWelcomeExplorationModal).toHaveBeenCalled();
+    });
   });
 
   describe('State-change registration', () => {

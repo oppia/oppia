@@ -19,6 +19,8 @@
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('StateTutorialFirstTimeService', [
   '$http', '$rootScope', 'EditorFirstTimeEventsService',
   function($http, $rootScope, EditorFirstTimeEventsService) {
@@ -30,6 +32,8 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
     var _translationTutorialNotSeenBefore = false;
     var STARTED_TRANSLATION_TUTORIAL_EVENT_URL = '/createhandler/' +
     'started_translation_tutorial_event';
+    /** @private */
+    var enterEditorForTheFirstTime = new EventEmitter();
 
     return {
       initEditor: function(firstTime, expId) {
@@ -39,7 +43,7 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
         }
 
         if (_currentlyInEditorFirstVisit) {
-          $rootScope.$broadcast('enterEditorForTheFirstTime');
+          enterEditorForTheFirstTime.emit();
           EditorFirstTimeEventsService.initRegisterEvents(expId);
           $http.post(STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId).then(
             null, function() {
@@ -84,6 +88,9 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
         }
 
         _currentlyInTranslationFirstVisit = false;
+      },
+      get onEnterEditorForTheFirstTime() {
+        return enterEditorForTheFirstTime;
       },
     };
   }
