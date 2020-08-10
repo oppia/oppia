@@ -123,7 +123,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-           'rule_input_translations_mapping': {},
+            'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'IsEqualToOrdering': [{
                     'x': [
@@ -193,14 +193,12 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'HasElementXAtPositionY': [{
-                        'x': '',
-                        'y': 1
-                    },
-                    {
-                        'x': 'a',
-                        'y': 2
-                    }
-                ]
+                    'x': '',
+                    'y': 1
+                }, {
+                    'x': 'a',
+                    'y': 2
+                }]
             },
             'outcome': {
                 'dest': 'Introduction',
@@ -598,12 +596,10 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'Equals': [{
-                        'x': ['<p>This is value1 for ItemSelection</p>']
-                    },
-                    {
-                        'x': ['<p>This is value2 for ItemSelection</p>']
-                    }
-                ]
+                    'x': ['<p>This is value1 for ItemSelection</p>']
+                }, {
+                    'x': ['<p>This is value2 for ItemSelection</p>']
+                }]
             },
             'outcome': {
                 'dest': 'Introduction',
@@ -729,12 +725,10 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'Equals': [{
-                        'x': ['<p>This is value1 for ItemSelection</p>']
-                    },
-                    {
-                        'x': ['<p>This is value3 for ItemSelection</p>']
-                    }
-                ]
+                    'x': ['<p>This is value1 for ItemSelection</p>']
+                }, {
+                    'x': ['<p>This is value3 for ItemSelection</p>']
+                }]
             },
             'outcome': {
                 'dest': 'State1',
