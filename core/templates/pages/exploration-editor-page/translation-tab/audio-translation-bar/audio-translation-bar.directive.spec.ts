@@ -203,6 +203,8 @@ describe('State Graph Visualization directive', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: false
     });
+    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+      $q.resolve());
     $scope.checkAndStartRecording();
 
     expect($scope.unsupportedBrowser).toBe(true);
