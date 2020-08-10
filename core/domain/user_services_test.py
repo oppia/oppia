@@ -185,7 +185,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
-    def test_invalid_emails(self):
+    def test_create_new_user_with_invalid_emails_raises_exception(self):
         bad_email_addresses_with_expected_error_message = [
             ('@', 'Invalid email address: @'),
             ('@@', 'Invalid email address: @@'),
