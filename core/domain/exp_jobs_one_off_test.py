@@ -969,7 +969,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             self.albert_id, 'Changed language_code.', [])
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None,
-            self.VALID_EXP_ID)
+            [self.VALID_EXP_ID])
 
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
