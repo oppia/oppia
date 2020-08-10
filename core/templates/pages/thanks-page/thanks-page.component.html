@@ -11,14 +11,14 @@
         <picture>
           <source type="image/webp" [srcset]="getStaticImageUrl('/general/donate.webp')">
           <source type="image/png" [srcset]="getStaticImageUrl('/general/donate.png')">
-          <img [src]="getStaticImageUrl('/general/donate.png')" alt="Otter holding a gift" style="height: 250px;">
+          <img [src]="getStaticImageUrl('/general/donate.png')" alt="Otter holding a gift" class="oppia-otter-image">
         </picture>
       </div>
       <div class="oppia-float-right">
         <p>
           Your contribution will be used towards:
         </p>
-        <ul style="margin-left: 30px;">
+        <ul class="oppia-contribution-use-container">
           <li>Maintaining our servers</li>
           <li>Marketing</li>
           <li>Distributing learning materials to students</li>
@@ -41,6 +41,12 @@
   }
   .oppia-float-right {
     float: right;
+  }
+  .oppia-otter-image {
+    height: 250px;
+  }
+  .oppia-contribution-use-container {
+    margin-left: 30px;
   }
   @media only screen and (max-width: 500px) {
     .oppia-default-height {

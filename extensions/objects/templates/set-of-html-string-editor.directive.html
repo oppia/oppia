@@ -8,7 +8,7 @@
   <div ng-repeat="choice in $ctrl.choices track by $index">
     <md-checkbox ng-click="$ctrl.toggleSelection($index)"
                  ng-model="$ctrl.selections[$index]"
-                 style="max-width: 300px;" aria-label="choice">
+                 class="oppia-check-box" aria-label="choice">
       <span>
         <angular-html-bind class="protractor-test-html-item-select-option" html-data="choice.id">
         </angular-html-bind>
@@ -16,3 +16,9 @@
     </md-checkbox>
   </div>
 </div>
+
+<style>
+  .oppia-check-box {
+    max-width: 300px;
+  }
+</style>

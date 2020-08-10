@@ -3,14 +3,14 @@
     Search By Skill
     <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
   </md-card>
-  <div style="max-height: 50vh; overflow-y: auto;">
+  <div class="skill-selector-item-container">
     <div class="list-group-item protractor-test-rte-skill-selector-item"
          ng-repeat="skill in $ctrl.skills | filter:skillFilterText"
          ng-click="$ctrl.selectSkill(skill.id, skill.description)"
          ng-class="{'list-group-item-success': (skill.id === $ctrl.value)}"
          style="color: black;">
       <label class="list-group-item-heading"><[skill.description]></label>
-      <div ng-if="skill.id === $ctrl.value" style="color: black;">
+      <div ng-if="skill.id === $ctrl.value" style="color: red;">
         <strong> Explanation </strong>
         <div style="padding-bottom: 10px; padding-top: 5px;">
           <angular-html-bind html-data="skill.skill_contents.explanation.html">
@@ -36,5 +36,9 @@
 <style>
   .worked-example-explanation-section {
     margin-top: 1.5vh;
+  }
+  .skill-selector-item-container {
+    max-height: 50vh;
+    overflow-y: auto;
   }
 </style>

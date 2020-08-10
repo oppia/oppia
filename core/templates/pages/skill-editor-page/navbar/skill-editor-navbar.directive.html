@@ -1,11 +1,10 @@
 <ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" id="skill-editor-navbar-desktop"
     ng-if="!isLoadingSkill()">
-  <li style="margin-right: 5px; margin-top: 8px;">
+  <li class="oppia-publish-button-container">
     <div uib-dropdown>
-      <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
+      <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button oppia-save-publish-skill-button protractor-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable()}"
               ng-click="saveChanges()"
-              style="float: left; width: 155px;"
               ng-disabled="!isSkillSaveable()">
         <span ng-if="!isSaveInProgress()">
           <span title="Publish Changes">
@@ -14,7 +13,7 @@
               &#xE161;
             </i>
             <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
-            <span class="d-none d-md-block float-left" style="opacity:0.5;margin-left: 2px;"
+            <span class="d-none d-md-block float-left oppia-changes-count-text"
                   ng-if="getChangeListCount() > 0">
               (<[getChangeListCount()]>)
             </span>
@@ -26,10 +25,10 @@
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle dropdown-toggle"
+      <button type="button" class="btn btn-light uib-dropdown-toggle dropdown-toggle oppia-dropdown-toggle-icon"
               ng-disabled="!getChangeListCount()" uib-dropdown-toggle>
       </button>
-      <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListCount() ? '150px' : '120px' }">
+      <ul uib-dropdown-menu role="menu" class="oppia-discard-draft-button-container" ng-style="{ width: getChangeListCount() ? '150px' : '120px' }">
         <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListCount()}" class="dropdown-item">Discard Draft</a></li>
       </ul>
     </div>
@@ -89,6 +88,25 @@
 <style>
   skill-editor-navbar .skill-editor-nav-mobile {
     display: none;
+  }
+  .oppia-publish-button-container {
+    margin-right: 5px;
+    margin-top: 8px;
+  }
+  .oppia-save-publish-skill-button {
+    float: left;
+    width: 155px;
+  }
+  .oppia-changes-count-text {
+    margin-left: 2px;
+    opacity: 0.5;
+  }
+  .oppia-dropdown-toggle-icon {
+    height: 34px;
+  }
+  .oppia-discard-draft-button-container {
+    min-width: 125px;
+    right: inherit;
   }
 
   @media screen and (max-width: 768px) {

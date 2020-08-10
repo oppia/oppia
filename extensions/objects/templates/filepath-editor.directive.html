@@ -87,10 +87,10 @@
       Discard
     </button>
   </div>
-  <div class="oppia-form-error" ng-if="$ctrl.invalidTagsAndAttributes.tags.length" style="margin-top: 15px;">
+  <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" ng-if="$ctrl.invalidTagsAndAttributes.tags.length">
     Unsupported SVG tags found: <[$ctrl.invalidTagsAndAttributes.tags]>
   </div>
-  <div class="oppia-form-error" ng-if="$ctrl.invalidTagsAndAttributes.attrs.length" style="margin-top: 15px;">
+  <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" ng-if="$ctrl.invalidTagsAndAttributes.attrs.length">
     Unsupported SVG attributes found: <[$ctrl.invalidTagsAndAttributes.attrs]>
   </div>
 </div>
@@ -275,5 +275,9 @@
 
   .filepath-editor-save-box button {
     margin-left: 6px;
+  }
+
+  .oppia-unsupported-svg-tag-attribute-error {
+    margin-top: 15px;
   }
 </style>

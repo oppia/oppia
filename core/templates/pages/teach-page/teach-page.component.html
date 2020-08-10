@@ -68,7 +68,7 @@
             <p [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_PARAGRAPH_1' | translate">
             </p>
 
-            <ul style="margin-left: 25px;">
+            <ul class="oppia-publication-instructions-container">
               <li [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_1' | translate">
               </li>
               <li [innerHTML]="'I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_2' | translate ">
@@ -125,5 +125,8 @@
   .oppia-teach-button {
     display: block;
     margin: 0 auto 0 auto;
+  }
+  .oppia-publication-instructions-container {
+    margin-left: 25px;
   }
 </style>

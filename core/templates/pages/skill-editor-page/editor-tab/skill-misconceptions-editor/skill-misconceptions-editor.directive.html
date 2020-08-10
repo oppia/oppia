@@ -20,14 +20,13 @@
             </i>
           </span>
         </div>
-        <div ng-if="misconceptions.length > 0" style="padding-bottom: 10px;">
+        <div ng-if="misconceptions.length > 0" class="oppia-option-list-container">
           <ul class="nav oppia-option-list nav-stacked nav-pills"
               role="tablist"
               ng-model="misconceptions">
             <li ng-repeat="misconception in misconceptions"
                 ng-class="{'active': activeMisconceptionIndex === $index, 'last-element': $index === misconceptions.length - 1}"
-                class="oppia-rule-block oppia-prevent-selection protractor-test-misconception-list-item"
-                style="margin-top: 0;">
+                class="oppia-rule-block oppia-prevent-selection oppia-misconception-list-item protractor-test-misconception-list-item">
               <a ng-click="changeActiveMisconceptionIndex($index)"
                  class="oppia-rule-tab protractor-test-misconception-<[$index]>"
                  ng-class="{'oppia-rule-tab-active': activeMisconceptionIndex === $index}">
@@ -91,6 +90,14 @@
 
   skill-misconceptions-editor .oppia-misconception-card-header i {
     display: none;
+  }
+
+  .oppia-option-list-container {
+    padding-bottom: 10px;
+  }
+
+  .oppia-misconception-list-item {
+    margin-top: 0;
   }
 
   @media screen and (max-width: 768px) {

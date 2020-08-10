@@ -7,6 +7,11 @@
   .add-misconception-modal .oppia-misconception-editor-section {
     padding-bottom: 10px;
   }
+
+  .oppia-misconception-editor-warning-text {
+    color: red;
+    font-size: smaller;
+  }
 </style>
 
 <div class="add-misconception-modal protractor-test-add-misconception-modal">
@@ -23,7 +28,7 @@
         </div>
         <div>
           <input class="form-control protractor-test-misconception-name-field" type="text" ng-model="misconceptionName" maxlength="<[MAX_CHARS_IN_MISCONCEPTION_NAME]>" autofocus>
-          <span ng-if="misconceptionName.length === MAX_CHARS_IN_MISCONCEPTION_NAME" class="form-text" style="color: red; font-size: smaller">
+          <span ng-if="misconceptionName.length === MAX_CHARS_IN_MISCONCEPTION_NAME" class="form-text oppia-misconception-editor-warning-text">
             <em>Please use at most <[MAX_CHARS_IN_MISCONCEPTION_NAME]> characters.</em>
           </span>
         </div>

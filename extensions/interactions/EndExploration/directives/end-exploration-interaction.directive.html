@@ -1,3 +1,11 @@
-<div ng-if="$ctrl.isInEditorPage" style="color: red; font-size: 0.8em; margin-top: 20px;">
+<div ng-if="$ctrl.isInEditorPage" class="oppia-error-message-text">
   <span><[$ctrl.errorMessage]></span>
 </div>
+
+<style>
+  .oppia-error-message-text {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 20px;
+  }
+</style>

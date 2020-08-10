@@ -1,9 +1,9 @@
 <div class="oppia-splash-section-one text-center" dir="auto">
   <h1 class="oppia-splash-h1" translate="I18N_SPLASH_TITLE"></h1>
-  <div style="position: relative; margin-left: auto; margin-right: auto; max-width: 2000px;">
-    <div style="padding-left: 200px;">
+  <div class="oppia-splash-rows-container">
+    <div class="oppia-splash-background-icon-rows-container">
       <div class="oppia-splash-background-icon-row">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/books.svg')]>" class="oppia-splash-books" style="margin-left: -250px; width: 500px; top: 95px;" alt="">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/books.svg')]>" class="oppia-splash-books oppia-splash-books-image" alt="">
 
         <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Humor')]>" class="oppia-splash-background-icon" alt="">
         <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-splash-background-icon" alt="">
@@ -103,8 +103,7 @@
 
     <div class="oppia-splash-button-container">
       <button type="button" ng-click="$ctrl.onClickBrowseLibraryButton()"
-              class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
-              style="bottom: 210px; z-index: 10;"
+              class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
               translate="I18N_ACTION_BROWSE_LESSONS">
       </button>
 
@@ -112,28 +111,26 @@
       <button type="button"
               ng-if="!$ctrl.userIsLoggedIn"
               ng-click="$ctrl.onRedirectToLogin('/creator-dashboard?mode=create')"
-              class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-              style="bottom: 150px; z-index: 10;"
+              class="btn oppia-splash-button oppia-splash-button-create oppia-splash-create-button-position oppia-transition-200"
               translate="I18N_ACTION_CREATE_LESSON">
       </button>
       <button type="button"
               ng-if="$ctrl.userIsLoggedIn"
               ng-click="$ctrl.onClickCreateExplorationButton()"
-              class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-              style="bottom: 150px; z-index: 10;"
+              class="btn oppia-splash-button oppia-splash-button-create oppia-splash-create-button-position oppia-transition-200"
               translate="I18N_ACTION_CREATE_LESSON">
       </button>
     </div>
   </div>
 
   <div class="oppia-splash-h2-container">
-    <h2 class="oppia-splash-h2" translate="I18N_SPLASH_SUBTITLE" style="padding-bottom: 30px; font-size: 1.6em; padding-top: 100px; max-width: 700px;"></h2>
+    <h2 class="oppia-splash-h2 oppia-splash-h2-text" translate="I18N_SPLASH_SUBTITLE"></h2>
   </div>
 </div>
 
 <div class="oppia-splash-section-two">
-  <div class="oppia-splash-section-two-content" style="padding-top: 0;">
-    <div class="oppia-splash-bullet" style="clear: both; overflow: visible;">
+  <div class="oppia-splash-section-two-content oppia-splash-section-two-content-extra-info">
+    <div class="oppia-splash-bullet oppia-splash-bullet-extra-info">
       <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
         <img ng-src="<[$ctrl.getStaticImageUrl('/splash/bullet1icon.svg')]>" class="oppia-splash-overlapping-image-1" alt="">
       </div>
@@ -164,3 +161,41 @@
     </div>
   </div>
 </div>
+
+<style>
+  .oppia-splash-rows-container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 2000px;
+    position: relative;
+  }
+  .oppia-splash-background-icon-rows-container {
+    padding-left: 200px;
+  }
+  .oppia-splash-books-image {
+    margin-left: -250px;
+    top: 95px;
+    width: 500px;
+  }
+  .oppia-splash-browse-button-position {
+    bottom: 210px;
+    z-index: 10;
+  }
+  .oppia-splash-create-button-position {
+    bottom: 150px;
+    z-index: 10;
+  }
+  .oppia-splash-h2-text {
+    font-size: 1.6em;
+    max-width: 700px;
+    padding-bottom: 30px;
+    padding-top: 100px;
+  }
+  .oppia-splash-section-two-content-extra-info {
+    padding-top: 0;
+  }
+  .oppia-splash-bullet-extra-info {
+    clear: both;
+    overflow: visible;
+  }
+</style>

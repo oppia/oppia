@@ -54,7 +54,7 @@
         <button class="icon-tool toolbar-button thin-button protractor-test-create-line"
                 ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createLine()"
                 tooltip-placement="right" uib-tooltip="Line" ng-disabled="!$ctrl.areAllToolsEnabled()">
-          <i class="fas fa-slash" style="font-size: 19px;"></i>
+          <i class="fas fa-slash oppia-slash-icon"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-rectangle"
                 ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createRect()"
@@ -71,13 +71,11 @@
                 tooltip-placement="left" uib-tooltip="Text" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="fas fa-font"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/closed_polygon.svg);"
+        <button class="icon-tool toolbar-button thin-button oppia-closed-polygon-icon" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
                 ng-click="$ctrl.createClosedPolygon()" tooltip-placement="right" uib-tooltip="Closed Polygon"
                 ng-disabled="!$ctrl.isClosedPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/open_polygon.svg);"
+        <button class="icon-tool toolbar-button thin-button oppia-open-polygon-icon" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabled()}"
                 ng-click="$ctrl.createOpenPolygon()" tooltip-placement="left" uib-tooltip="Open Polygon"
                 ng-disabled="!$ctrl.isOpenPolygonEnabled()">
         </button>
@@ -116,13 +114,11 @@
             </div>
           </div>
           <div>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
-                    style="background-image:url(/assets/svg_diagram_editor/bring_forward.svg);"
+            <button class="icon-tool toolbar-button thin-button oppia-bring-forward-icon" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
                     ng-click="$ctrl.bringObjectForward()" tooltip-placement="left" uib-tooltip="Bring Forward"
                     ng-disabled="!$ctrl.objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
-                    style="background-image:url(/assets/svg_diagram_editor/send_backward.svg);"
+            <button class="icon-tool toolbar-button thin-button oppia-send-backward-icon" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
                     ng-click="$ctrl.sendObjectBackward()" tooltip-placement="right" uib-tooltip="Send Backward"
                     ng-disabled="!$ctrl.objectIsSelected">
             </button>
@@ -166,11 +162,11 @@
       </div>
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.italic" ng-change="$ctrl.onItalicToggle()">
-        <span style="padding-left: 3px;">Italic</span>
+        <span class="oppia-font-styles-text">Italic</span>
       </div>
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.bold" ng-change="$ctrl.onBoldToggle()">
-        <span style="padding-left: 3px;">Bold</span>
+        <span class="oppia-font-styles-text">Bold</span>
       </div>
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <select ng-model="$ctrl.fabricjsOptions.fontFamily" ng-options="font for font in $ctrl.fontFamily"
@@ -401,5 +397,29 @@
   .svg-editor .color-well .alphaSquare.bottom {
     left: 50%;
     position: absolute;
+  }
+
+  .oppia-slash-icon {
+    font-size: 19px;
+  }
+
+  .oppia-closed-polygon-icon {
+    background-image:url(/assets/svg_diagram_editor/closed_polygon.svg);
+  }
+
+  .oppia-open-polygon-icon {
+    background-image:url(/assets/svg_diagram_editor/open_polygon.svg);
+  }
+
+  .oppia-bring-forward-icon {
+    background-image:url(/assets/svg_diagram_editor/bring_forward.svg);
+  }
+
+  .oppia-send-backward-icon {
+    background-image:url(/assets/svg_diagram_editor/send_backward.svg);
+  }
+
+  .oppia-font-styles-text {
+    padding-left: 3px;
   }
 </style>
