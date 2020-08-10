@@ -28,20 +28,23 @@ require(
 require('services/contextual/device-info.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/guppy-initialization.service.ts');
+require('services/html-escaper.service.ts');
 require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   template: require('./algebraic-expression-input-interaction.component.html'),
   controller: [
-    '$scope', 'AlgebraicExpressionInputRulesService',
+    '$attrs', '$scope', 'AlgebraicExpressionInputRulesService',
     'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
-    'MathInteractionsService', 'MATH_INTERACTION_PLACEHOLDERS',
+    'HtmlEscaperService', 'MathInteractionsService',
+    'MATH_INTERACTION_PLACEHOLDERS',
     function(
-        $scope, AlgebraicExpressionInputRulesService,
+        $attrs, $scope, AlgebraicExpressionInputRulesService,
         CurrentInteractionService, DeviceInfoService,
         GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService, MATH_INTERACTION_PLACEHOLDERS) {
+        HtmlEscaperService, MathInteractionsService,
+        MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
@@ -74,11 +77,15 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
 
       ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
+        GuppyInitializationService.interactionType = 'AlgebraicExpressionInput';
       };
 
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
+        GuppyInitializationService.customOskLetters = (
+          HtmlEscaperService.escapedJsonToObj(
+            $attrs.customOskLettersWithValue));
         GuppyInitializationService.init(
           'guppy-div-learner',
           MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);
