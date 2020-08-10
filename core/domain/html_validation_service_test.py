@@ -1194,7 +1194,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
                 '&amp;quot;Savjet 1&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
-            'invalid literal for int() with base 10: \'Hello\'': [(
+            'Could not convert unicode to int: Hello': [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
                 'end-with-value="0" start-with-value="&amp;quot;Hello&amp;'
                 'quot;" video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
