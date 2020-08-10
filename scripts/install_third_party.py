@@ -361,7 +361,7 @@ def install_redis_cli():
     """
     try:
         subprocess.call(
-            ['%s' % common.REDIS_SERVER_PATH, '--version'],
+            [common.REDIS_SERVER_PATH, '--version'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)

@@ -145,10 +145,7 @@ def main(args=None):
             '--config', 'webpack.dev.config.ts', '--watch']))
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)
-        # Redis-cli is only required in a development environment.
-        python_utils.PRINT('Starting Redis development server.')
-        # Start the redis local development server. Redis doesn't run on
-        # Windows machines.
+
         if not common.is_windows_os():
             background_processes.append(common.start_redis_server())
         else:

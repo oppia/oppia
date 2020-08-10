@@ -406,7 +406,8 @@ MAILGUN_API_KEY = None
 MAILGUN_DOMAIN_NAME = None
 
 # Replace this with the correct Redis Host and Port when switching to prod
-# server.
+# server. Keep this in sync with redis.conf in the root folder. Specifically,
+# REDISPORT should always be the same as the port in redis.conf.
 REDISHOST = 'localhost'
 REDISPORT = '6379'
 

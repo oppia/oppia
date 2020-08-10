@@ -38,6 +38,8 @@ import python_utils
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
 
+DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
+
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 
@@ -432,7 +434,7 @@ def convert_naive_datetime_to_string(datetime_obj):
     Returns:
         str. The string representing the naive datetime object.
     """
-    return datetime_obj.strftime('%m/%d/%Y, %H:%M:%S:%f')
+    return datetime_obj.strftime(DATETIME_FORMAT)
 
 
 def convert_string_to_naive_datetime_object(date_time_string):
@@ -447,7 +449,7 @@ def convert_string_to_naive_datetime_object(date_time_string):
         datetime. An object of type naive datetime.datetime corresponding to
         that string.
     """
-    return datetime.datetime.strptime(date_time_string, '%m/%d/%Y, %H:%M:%S:%f')
+    return datetime.datetime.strptime(date_time_string, DATETIME_FORMAT)
 
 
 def get_current_time_in_millisecs():

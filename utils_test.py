@@ -251,6 +251,19 @@ class UtilsTests(test_utils.GenericTestBase):
                 utils.convert_naive_datetime_to_string(now)),
             now)
 
+    def test_datetime_conversion_to_string_returns_correct_format(self):
+        initial_time = datetime.datetime(2016, 12, 1, 1, 2, 3)
+        self.assertEqual(
+            utils.convert_naive_datetime_to_string(initial_time),
+            '12/01/2016, 01:02:03:000000')
+
+    def test_string_to_datetime_conversion_returns_correct_datetime(self):
+        time_string = '12/01/2016, 01:02:03:000000'
+        initial_time = datetime.datetime(2016, 12, 1, 1, 2, 3)
+        self.assertEqual(
+            utils.convert_string_to_naive_datetime_object(time_string),
+            initial_time)
+
     def test_get_hashable_value(self):
         json1 = ['foo', 'bar', {'baz': 3}]
         json2 = ['fee', {'fie': ['foe', 'fum']}]

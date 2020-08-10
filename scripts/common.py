@@ -620,8 +620,12 @@ def start_redis_server():
     the redis-server from exiting on its own.
 
     Returns:
-        subprocess.Popen object. The process object of the redis server.
+        subprocess.Popen. The process object of the redis server.
     """
+    # Redis-cli is only required in a development environment.
+    python_utils.PRINT('Starting Redis development server.')
+    # Start the redis local development server. Redis doesn't run on
+    # Windows machines.
     return subprocess.Popen([
         REDIS_SERVER_PATH, REDIS_CONF_PATH,
         '--daemonize', 'yes'
@@ -630,7 +634,7 @@ def start_redis_server():
 
 def stop_redis_server():
     """Stops the redis server by shutting it down."""
-    subprocess.call(['%s' % REDIS_CLI_PATH, 'shutdown'])
+    subprocess.call([REDIS_CLI_PATH, 'shutdown'])
 
 
 class CD(python_utils.OBJECT):

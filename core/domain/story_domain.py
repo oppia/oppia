@@ -910,7 +910,6 @@ class Story(python_utils.OBJECT):
             'url_fragment': self.url_fragment
         }
 
-
     @classmethod
     def deserialize(cls, json_string):
         """Returns a Story domain object decoded from a JSON string.

@@ -167,8 +167,7 @@ def get_multi(namespace, sub_namespace, obj_ids):
         return result_dict
 
     if namespace not in DESERIALIZATION_FUNCTIONS:
-        raise ValueError(
-            'Invalid namespace: %s.' % namespace)
+        raise ValueError('Invalid namespace: %s.' % namespace)
 
     memcache_keys = [
         _get_memcache_key(namespace, sub_namespace, obj_id)
