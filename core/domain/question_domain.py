@@ -716,35 +716,8 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
-    def update_state_from_model(
-            cls, versioned_question_state, current_state_schema_version):
-        """Converts the state object contained in the given
-        versioned_question_state dict from current_state_schema_version to
-        current_state_schema_version + 1.
-        Note that the versioned_question_state being passed in is modified
-        in-place.
-
-        Args:
-            versioned_question_state: dict. A dict with two keys:
-                - state_schema_version: int. The state schema version for the
-                    question.
-                - state: The State domain object representing the question
-                    state data.
-            current_state_schema_version: int. The current state
-                schema version.
-        """
-        versioned_question_state['state_schema_version'] = (
-            current_state_schema_version + 1)
-
-        conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
-            current_state_schema_version, current_state_schema_version + 1))
-
-        versioned_question_state['state'] = conversion_fn(
-            versioned_question_state['state'])
-
-    @classmethod
-    def _convert_state_v36_dict_to_v37_dict(cls, question_state_dict):
-        """Converts from version 36 to 37. Version 37 removes the fields
+    def _convert_state_v38_dict_to_v39_dict(cls, question_state_dict):
+        """Converts from version 38 to 39. Version 39 removes the fields
         rule_specs in AnswerGroups, and adds new fields rule_inputs and
         rule_input_translations_mapping. rule_inputs is a dictionary that maps
         rule type to a list of rule inputs that share the rule type.
@@ -775,6 +748,33 @@ class Question(python_utils.OBJECT):
             answer_group_dicts[i]['rule_input_translations_mapping'] = {}
             answer_group_dicts[i]['rule_inputs'] = rule_inputs
         return question_state_dict
+
+    @classmethod
+    def update_state_from_model(
+            cls, versioned_question_state, current_state_schema_version):
+        """Converts the state object contained in the given
+        versioned_question_state dict from current_state_schema_version to
+        current_state_schema_version + 1.
+        Note that the versioned_question_state being passed in is modified
+        in-place.
+
+        Args:
+            versioned_question_state: dict. A dict with two keys:
+                - state_schema_version: int. The state schema version for the
+                    question.
+                - state: The State domain object representing the question
+                    state data.
+            current_state_schema_version: int. The current state
+                schema version.
+        """
+        versioned_question_state['state_schema_version'] = (
+            current_state_schema_version + 1)
+
+        conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
+            current_state_schema_version, current_state_schema_version + 1))
+
+        versioned_question_state['state'] = conversion_fn(
+            versioned_question_state['state'])
 
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the

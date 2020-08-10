@@ -170,7 +170,7 @@ def extract_html_from_draft_change_list(draft_change_list):
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
-     @classmethod
+    @classmethod
     def _convert_states_v38_dict_to_v39_dict(cls, draft_change_list):
         """Converts draft change list from version 38 to 39.
 

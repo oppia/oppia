@@ -3139,7 +3139,7 @@ class Exploration(python_utils.OBJECT):
 
         return states_dict
 
-        @classmethod
+    @classmethod
     def _convert_states_v38_dict_to_v39_dict(cls, states_dict):
         """Converts from version 38 to 39. Version 39 removes the fields
         rule_specs in AnswerGroups, and adds new fields rule_inputs and
@@ -4214,7 +4214,7 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
-     @classmethod
+    @classmethod
     def _convert_v43_dict_to_v44_dict(cls, exploration_dict):
         """Converts a v43 exploration dict into a v44 exploration dict.
         Removes the fields rule_specs in AnswerGroups, and adds new fields

@@ -6377,7 +6377,7 @@ tags: []
 title: Title
 """)
 
-YAML_CONTENT_V44 = (
+    YAML_CONTENT_V44 = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -7079,7 +7079,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 38
+states_schema_version: 39
 tags: []
 title: Title
 """)
@@ -7240,7 +7240,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 38
+states_schema_version: 39
 tags: []
 title: Title
 """)
@@ -7426,7 +7426,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 38
+states_schema_version: 39
 tags: []
 title: Title
 """)
@@ -7586,7 +7586,7 @@ states:
         ca_customPlaceholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 38
+states_schema_version: 39
 tags: []
 title: Title
 """)
@@ -7769,7 +7769,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 38
+states_schema_version: 39
 tags: []
 title: Title
 """)
@@ -8072,7 +8072,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 38
+states_schema_version: 39
 tags: []
 title: Title
 """)
@@ -8349,7 +8349,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 38
+states_schema_version: 39
 tags: []
 title: Title
 """)

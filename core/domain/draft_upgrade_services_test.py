@@ -392,7 +392,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }]
             })
         ]
-        draft_change_list_v38 = [
+        draft_change_list_v39 = [
             exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': 'Intro',
