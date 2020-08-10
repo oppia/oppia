@@ -130,8 +130,8 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
 
 
 class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
-    """A reusable one-off job for testing exploration migration from the
-    previous exploration schema version to the latest. This job runs the state
+    """A reusable one-off job for testing exploration migration from any
+    exploration schema version to the latest. This job runs the state
     migration, but does not commit the new exploration to the store.
     """
 
@@ -150,30 +150,28 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         current_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
-        if item.states_schema_version == current_state_schema_version - 1:
+
+        states_schema_version = item.states_schema_version
+        versioned_exploration_states = {
+            'states_schema_version': states_schema_version,
+            'states': item.states
+        }
+        while states_schema_version < current_state_schema_version:
             try:
-                current_exp_schema_version = (
-                    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
-                conversion_fn = getattr(
-                    exp_domain.Exploration,
-                    '_convert_v%i_dict_to_v%i_dict' % (
-                        current_exp_schema_version - 1,
-                        current_exp_schema_version)
-                )
-                conversion_fn(item.to_dict())
-                yield ('SUCCESS', None)
+                exp_domain.Exploration.update_states_from_model(
+                    versioned_exploration_states, states_schema_version,
+                    item.id)
+                states_schema_version += 1
             except Exception as e:
                 error_message = (
-                    'Exploration %s failed migration to v%s: %s' %
-                    (item.id, current_exp_schema_version, e))
+                    'Exploration %s failed migration to states v%s: %s' %
+                    (item.id, states_schema_version + 1, e))
                 logging.error(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
-        else:
-            error_message = (
-                'Exploration %s was not migrated because its states '
-                'schema verison is %i' %
-                (item.id, item.states_schema_version))
-            yield ('WRONG_STATE_VERSION', error_message.encode('utf-8'))
+                break
+
+            if states_schema_version == current_state_schema_version:
+                yield ('SUCCESS', None)
 
     @staticmethod
     def reduce(key, values):
