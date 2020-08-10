@@ -944,7 +944,7 @@ def create_new_user(gae_id, email):
     return create_new_user_models_as_a_transaction(gae_id, email)
 
 
-@ndb.transactional(xg=True)
+@ndb.transactional(xg=True, retries=0) # pylint: disable=no-value-for-parameter
 def create_new_user_models_as_a_transaction(gae_id, email):
     """Creates new user model for auth_details, settings and contributions
     in a transaction manner.

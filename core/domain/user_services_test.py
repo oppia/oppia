@@ -206,15 +206,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(utils.ValidationError, error_msg):
             user_services.create_new_user('gae_id', bad_email)
         tmp_admin_user_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
-        user_ids_in_user_settings = [model.id for model in
-            user_models.UserAuthDetailsModel.get_all()]
-        user_ids_in_user_auth_details = [model.id for model in
-            user_models.UserAuthDetailsModel.get_all()]
-        user_ids_in_user_contributions = [model.id for model in
-            user_models.UserAuthDetailsModel.get_all()]
+        user_ids_in_user_settings = [
+            model.id for model in user_models.UserSettingsModel.get_all()]
+        user_ids_in_user_auth_details = [
+            model.id for model in user_models.UserAuthDetailsModel.get_all()]
+        user_ids_in_user_contributions = [
+            model.id for model in user_models.UserContributionsModel.get_all()]
         self.assertEqual(user_ids_in_user_settings, [tmp_admin_user_id])
-        self.assertEqual(user_ids_in_user_contributions, [tmp_admin_user_id])
         self.assertEqual(user_ids_in_user_auth_details, [tmp_admin_user_id])
+        self.assertEqual(user_ids_in_user_contributions, [tmp_admin_user_id])
 
     def test_email_truncation(self):
         email_addresses = [
