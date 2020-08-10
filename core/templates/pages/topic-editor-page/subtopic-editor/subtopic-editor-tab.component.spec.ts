@@ -97,6 +97,10 @@ describe('Subtopic editor tab', function() {
     ctrl.$onInit();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should initialize the variables', function() {
     expect(ctrl.editableTitle).toEqual('Subtopic1');
   });

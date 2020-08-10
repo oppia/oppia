@@ -22,6 +22,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { EventEmitter } from '@angular/core';
+
 describe('Topic editor tab directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -55,6 +57,7 @@ describe('Topic editor tab directive', function() {
   var UndoRedoService = null;
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
+  var mockStorySummariesInitializedEventEmitter = new EventEmitter();
   var MockWindowDimensionsService = {
     isWindowNarrow: () => false
   };
@@ -115,8 +118,15 @@ describe('Topic editor tab directive', function() {
     topic.setName('New Name');
     topic.setUrlFragment('topic-url-fragment');
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOnProperty(TopicEditorStateService,
+      'onStorySummariesInitialized').and.returnValue(
+      mockStorySummariesInitializedEventEmitter);
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should initialize the variables', function() {
     expect($scope.topic).toEqual(topic);
@@ -474,5 +484,12 @@ describe('Topic editor tab directive', function() {
       spyOn(TopicUpdateService, 'rearrangeSubtopic'));
     $scope.onRearrangeSubtopicEnd(0);
     expect(moveSubtopicSpy).not.toHaveBeenCalled();
+  });
+
+  it('should react to event when story summaries are initialized', () => {
+    spyOn(TopicEditorStateService, 'getCanonicalStorySummaries');
+    mockStorySummariesInitializedEventEmitter.emit();
+    expect(
+      TopicEditorStateService.getCanonicalStorySummaries).toHaveBeenCalled();
   });
 });

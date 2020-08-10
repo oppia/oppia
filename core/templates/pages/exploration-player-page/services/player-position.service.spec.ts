@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the player position service.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { PlayerPositionService } from
@@ -83,5 +84,10 @@ describe('Player position service', () => {
     expect(pps.getDisplayedCardIndex()).toBe(4);
     pps.setDisplayedCardIndex(5);
     expect(pps.getDisplayedCardIndex()).toBe(5);
+  });
+
+  it('should get onNewCardOpened EventEmitter', () => {
+    let mockNewCardOpenedEventEmitter = new EventEmitter();
+    expect(pps.onNewCardOpened).toEqual(mockNewCardOpenedEventEmitter);
   });
 });
