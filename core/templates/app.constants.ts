@@ -45,7 +45,6 @@ export class AppConstants {
   public static EVENT_ACTIVE_CARD_CHANGED = 'activeCardChanged';
   /* Called when the learner moves to a new card that they haven't seen
      before. */
-  public static EVENT_NEW_CARD_OPENED = 'newCardOpened';
   public static EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE =
     '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>';
   public static EDITABLE_EXPLORATION_DATA_URL_TEMPLATE =

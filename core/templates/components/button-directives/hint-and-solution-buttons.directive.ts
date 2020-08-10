@@ -34,6 +34,8 @@ require('services/contextual/device-info.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('hintAndSolutionButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -49,14 +51,15 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
         'PlayerTranscriptService', 'ExplorationPlayerStateService',
         'HintAndSolutionModalService', 'DeviceInfoService', 'ContextService',
         'PlayerPositionService', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_OPENED', 'INTERACTION_SPECS', 'StatsReportingService',
+        'INTERACTION_SPECS', 'StatsReportingService',
         function(
             $scope, $rootScope, HintsAndSolutionManagerService,
             PlayerTranscriptService, ExplorationPlayerStateService,
             HintAndSolutionModalService, DeviceInfoService, ContextService,
             PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_OPENED, INTERACTION_SPECS, StatsReportingService) {
+            INTERACTION_SPECS, StatsReportingService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -138,13 +141,17 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.solutionModalIsActive = false;
             ctrl.currentlyOnLatestCard = true;
             resetLocalHintsArray();
-            $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
-              ctrl.displayedCard = newCard;
-              HintsAndSolutionManagerService.reset(
-                newCard.getHints(), newCard.getSolution()
-              );
-              resetLocalHintsArray();
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardOpened.subscribe(
+                (newCard) => {
+                  ctrl.displayedCard = newCard;
+                  HintsAndSolutionManagerService.reset(
+                    newCard.getHints(), newCard.getSolution()
+                  );
+                  resetLocalHintsArray();
+                }
+              )
+            );
             $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
               var displayedCardIndex =
                 PlayerPositionService.getDisplayedCardIndex();
@@ -154,6 +161,9 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
                 resetLocalHintsArray();
               }
             });
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
