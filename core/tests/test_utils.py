@@ -2346,6 +2346,14 @@ class AppEngineTestBase(TestBase):
         of the cache services functionality. All test classes that inherit
         AppEngineTestBase will use a mocked version of the platform.cache cache
         services API that can be found in the MemoryCacheServicesStub class.
+
+        Args:
+            result: TestResult|None. Optional result object that, if provided,
+                will collect the results of the test and returned to the caller
+                of run(). If None is provided, a default result object is
+                created and used. More details can be found here:
+                https://docs.python.org/3/library/unittest.html#unittest.
+                TestCase.run.
         """
         swap_flush_cache = self.swap(
             memory_cache_services, 'flush_cache',
