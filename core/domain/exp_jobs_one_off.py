@@ -142,7 +142,7 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         for state_name, state in exploration.states.items():
             if state.interaction.id == 'MultipleChoiceInput':
                 choices_length = len(
-                    state.interaction.customization_args['choices']['value'])
+                    state.interaction.customization_args['choices'].value)
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
                     for rule_index, rule_spec in enumerate(
@@ -252,6 +252,58 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
+class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-off job for testing exploration migration from any
+    exploration schema version to the latest. This job runs the state
+    migration, but does not commit the new exploration to the store.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExplorationMigrationAuditJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        current_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+
+        states_schema_version = item.states_schema_version
+        versioned_exploration_states = {
+            'states_schema_version': states_schema_version,
+            'states': item.states
+        }
+        while states_schema_version < current_state_schema_version:
+            try:
+                exp_domain.Exploration.update_states_from_model(
+                    versioned_exploration_states, states_schema_version,
+                    item.id)
+                states_schema_version += 1
+            except Exception as e:
+                error_message = (
+                    'Exploration %s failed migration to states v%s: %s' %
+                    (item.id, states_schema_version + 1, e))
+                logging.error(error_message)
+                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+                break
+
+            if states_schema_version == current_state_schema_version:
+                yield ('SUCCESS', None)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
 class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
     versions. This job will load all existing explorations from the data store
@@ -332,8 +384,12 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exploration = exp_fetchers.get_exploration_from_model(item)
         for state_name, state in exploration.states.items():
             if state.interaction.id == 'ItemSelectionInput':
-                choices = (
-                    state.interaction.customization_args['choices']['value'])
+                choices = [
+                    choice.html
+                    for choice in state.interaction.customization_args[
+                        'choices'].value
+                ]
+
                 for group in state.interaction.answer_groups:
                     for rule_spec in group.rule_specs:
                         for rule_item in rule_spec.inputs['x']:

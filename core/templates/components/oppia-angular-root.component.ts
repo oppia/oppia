@@ -128,6 +128,8 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
+import { ClassroomDataObjectFactory } from
+  'domain/classroom/ClassroomDataObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
@@ -165,7 +167,7 @@ import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
-  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+  'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -304,6 +306,8 @@ import { ImageFileObjectFactory } from
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+import { InteractionAttributesExtractorService } from
+  'interactions/interaction-attributes-extractor.service';
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -459,6 +463,8 @@ import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
+import { ProfileLinkImageBackendApiService } from
+  'components/profile-link-directives/profile-link-image-backend-api.service';
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { ProfileSummaryObjectFactory } from
@@ -556,6 +562,9 @@ import { StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 import { StateNameService } from
   'components/state-editor/state-editor-properties-services/state-name.service';
+import { StateNextContentIdIndexService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
@@ -604,6 +613,8 @@ import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicodeObjectFactory } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
@@ -722,6 +733,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ckEditorCopyContentService: CkEditorCopyContentService;
   static classifierObjectFactory: ClassifierObjectFactory;
   static classroomBackendApiService: ClassroomBackendApiService;
+  static classroomDataObjectFactory: ClassroomDataObjectFactory;
   static codeNormalizerService: CodeNormalizerService;
   static codeReplPredictionService: CodeReplPredictionService;
   static codeReplRulesService: CodeReplRulesService;
@@ -816,6 +828,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static imageFileObjectFactory: ImageFileObjectFactory;
   static improvementsService: ImprovementsService;
   static ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory;
+  static interactionAttributesExtractorService: InteractionAttributesExtractorService;
   static interactionDetailsCacheService: InteractionDetailsCacheService;
   static interactionObjectFactory: InteractionObjectFactory;
   static interactionRulesRegistryService: InteractionRulesRegistryService;
@@ -890,6 +903,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   static predictionResultObjectFactory: PredictionResultObjectFactory;
   static pretestQuestionBackendApiService: PretestQuestionBackendApiService;
+  static profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static profileSummaryObjectFactory: ProfileSummaryObjectFactory;
   static pythonProgramTokenizer: PythonProgramTokenizer;
@@ -940,6 +954,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateInteractionStatsBackendApiService: StateInteractionStatsBackendApiService;
   static stateInteractionStatsService: StateInteractionStatsService;
   static stateNameService: StateNameService;
+  static stateNextContentIdIndexService: StateNextContentIdIndexService;
   static stateObjectFactory: StateObjectFactory;
   static stateParamChangesService: StateParamChangesService;
   static stateRecordedVoiceoversService: StateRecordedVoiceoversService;
@@ -963,6 +978,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static storySummaryObjectFactory: StorySummaryObjectFactory;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   static subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
+  static subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   static subtopicObjectFactory: SubtopicObjectFactory;
   static subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory;
   static subtopicPageObjectFactory: SubtopicPageObjectFactory;
@@ -1040,6 +1056,7 @@ private changeObjectFactory: ChangeObjectFactory,
 private ckEditorCopyContentService: CkEditorCopyContentService,
 private classifierObjectFactory: ClassifierObjectFactory,
 private classroomBackendApiService: ClassroomBackendApiService,
+private classroomDataObjectFactory: ClassroomDataObjectFactory,
 private codeNormalizerService: CodeNormalizerService,
 private codeReplPredictionService: CodeReplPredictionService,
 private codeReplRulesService: CodeReplRulesService,
@@ -1134,6 +1151,7 @@ private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
 private improvementsService: ImprovementsService,
 private ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
+private interactionAttributesExtractorService: InteractionAttributesExtractorService,
 private interactionDetailsCacheService: InteractionDetailsCacheService,
 private interactionObjectFactory: InteractionObjectFactory,
 private interactionRulesRegistryService: InteractionRulesRegistryService,
@@ -1208,6 +1226,7 @@ private playthroughService: PlaythroughService,
 private predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService,
 private predictionResultObjectFactory: PredictionResultObjectFactory,
 private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
+private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
 private profilePageBackendApiService: ProfilePageBackendApiService,
 private profileSummaryObjectFactory: ProfileSummaryObjectFactory,
 private pythonProgramTokenizer: PythonProgramTokenizer,
@@ -1258,6 +1277,7 @@ private stateInteractionIdService: StateInteractionIdService,
 private stateInteractionStatsBackendApiService: StateInteractionStatsBackendApiService,
 private stateInteractionStatsService: StateInteractionStatsService,
 private stateNameService: StateNameService,
+private stateNextContentIdIndexService: StateNextContentIdIndexService,
 private stateObjectFactory: StateObjectFactory,
 private stateParamChangesService: StateParamChangesService,
 private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
@@ -1281,6 +1301,7 @@ private storyReferenceObjectFactory: StoryReferenceObjectFactory,
 private storySummaryObjectFactory: StorySummaryObjectFactory,
 private storyViewerBackendApiService: StoryViewerBackendApiService,
 private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
+private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
 private subtopicObjectFactory: SubtopicObjectFactory,
 private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory,
 private subtopicPageObjectFactory: SubtopicPageObjectFactory,
@@ -1359,6 +1380,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.ckEditorCopyContentService = this.ckEditorCopyContentService,
     OppiaAngularRootComponent.classifierObjectFactory = this.classifierObjectFactory;
     OppiaAngularRootComponent.classroomBackendApiService = this.classroomBackendApiService;
+    OppiaAngularRootComponent.classroomDataObjectFactory = this.classroomDataObjectFactory;
     OppiaAngularRootComponent.codeNormalizerService = this.codeNormalizerService;
     OppiaAngularRootComponent.codeReplPredictionService = this.codeReplPredictionService;
     OppiaAngularRootComponent.codeReplRulesService = this.codeReplRulesService;
@@ -1452,8 +1474,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.imageClickInputValidationService = this.imageClickInputValidationService;
     OppiaAngularRootComponent.imageFileObjectFactory = this.imageFileObjectFactory;
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
-    OppiaAngularRootComponent.interactionDetailsCacheService = this.interactionDetailsCacheService;
     OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = this.ineffectiveFeedbackLoopTaskObjectFactory;
+    OppiaAngularRootComponent.interactionAttributesExtractorService = this.interactionAttributesExtractorService;
+    OppiaAngularRootComponent.interactionDetailsCacheService = this.interactionDetailsCacheService;
     OppiaAngularRootComponent.interactionObjectFactory = this.interactionObjectFactory;
     OppiaAngularRootComponent.interactionRulesRegistryService = this.interactionRulesRegistryService;
     OppiaAngularRootComponent.interactionSpecsService = this.interactionSpecsService;
@@ -1527,6 +1550,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.predictionAlgorithmRegistryService = this.predictionAlgorithmRegistryService;
     OppiaAngularRootComponent.predictionResultObjectFactory = this.predictionResultObjectFactory;
     OppiaAngularRootComponent.pretestQuestionBackendApiService = this.pretestQuestionBackendApiService;
+    OppiaAngularRootComponent.profileLinkImageBackendApiService = this.profileLinkImageBackendApiService;
     OppiaAngularRootComponent.profilePageBackendApiService = this.profilePageBackendApiService;
     OppiaAngularRootComponent.profileSummaryObjectFactory = this.profileSummaryObjectFactory;
     OppiaAngularRootComponent.pythonProgramTokenizer = this.pythonProgramTokenizer;
@@ -1577,6 +1601,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateInteractionStatsBackendApiService = this.stateInteractionStatsBackendApiService;
     OppiaAngularRootComponent.stateInteractionStatsService = this.stateInteractionStatsService;
     OppiaAngularRootComponent.stateNameService = this.stateNameService;
+    OppiaAngularRootComponent.stateNextContentIdIndexService = this.stateNextContentIdIndexService;
     OppiaAngularRootComponent.stateObjectFactory = this.stateObjectFactory;
     OppiaAngularRootComponent.stateParamChangesService = this.stateParamChangesService;
     OppiaAngularRootComponent.stateRecordedVoiceoversService = this.stateRecordedVoiceoversService;
@@ -1600,6 +1625,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.storySummaryObjectFactory = this.storySummaryObjectFactory;
     OppiaAngularRootComponent.storyViewerBackendApiService = this.storyViewerBackendApiService;
     OppiaAngularRootComponent.subtitledHtmlObjectFactory = this.subtitledHtmlObjectFactory;
+    OppiaAngularRootComponent.subtitledUnicodeObjectFactory = this.subtitledUnicodeObjectFactory;
     OppiaAngularRootComponent.subtopicObjectFactory = this.subtopicObjectFactory;
     OppiaAngularRootComponent.subtopicPageContentsObjectFactory = this.subtopicPageContentsObjectFactory;
     OppiaAngularRootComponent.subtopicPageObjectFactory = this.subtopicPageObjectFactory;

@@ -28,20 +28,23 @@ require(
 require('services/contextual/device-info.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/guppy-initialization.service.ts');
+require('services/html-escaper.service.ts');
 require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
   template: require('./math-equation-input-interaction.component.html'),
   controller: [
-    '$scope', 'MathEquationInputRulesService',
+    '$attrs', '$scope', 'MathEquationInputRulesService',
     'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
-    'MathInteractionsService', 'MATH_INTERACTION_PLACEHOLDERS',
+    'HtmlEscaperService', 'MathInteractionsService',
+    'MATH_INTERACTION_PLACEHOLDERS',
     function(
-        $scope, MathEquationInputRulesService,
+        $attrs, $scope, MathEquationInputRulesService,
         CurrentInteractionService, DeviceInfoService,
         GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService, MATH_INTERACTION_PLACEHOLDERS) {
+        HtmlEscaperService, MathInteractionsService,
+        MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
@@ -74,6 +77,7 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
 
       ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
+        GuppyInitializationService.interactionType = 'MathEquationInput';
       };
 
       ctrl.$onInit = function() {
@@ -82,6 +86,9 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
         GuppyInitializationService.init(
           'guppy-div-learner',
           MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
+        GuppyInitializationService.customOskLetters = (
+          HtmlEscaperService.escapedJsonToObj(
+            $attrs.customOskLettersWithValue));
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

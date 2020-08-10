@@ -20,6 +20,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import html_validation_service
 import python_utils
 import utils
 
@@ -76,7 +77,7 @@ class LatexStringSvgImageDimensions(python_utils.OBJECT):
         """Validates properties of the LatexStringSvgImageDimensions.
 
         Raises:
-            ValidationError: attributes of the LatexStringSvgImageDimensions
+            ValidationError. Attributes of the LatexStringSvgImageDimensions
                 are invalid.
         """
 
@@ -119,6 +120,8 @@ class LatexStringSvgImageData(python_utils.OBJECT):
         self.latex_string_svg_image_dimensions = (
             latex_string_svg_image_dimensions)
         self.validate()
+        self.filename = html_validation_service.generate_math_svgs_filename(
+            latex_string_svg_image_dimensions)
 
     def to_dict(self):
         """Returns a dict representing this LatexStringSvgImageData domain
@@ -131,14 +134,14 @@ class LatexStringSvgImageData(python_utils.OBJECT):
         return {
             'raw_image': self.raw_image,
             'latex_string_svg_image_dimensions': (
-                self.latex_string_svg_image_dimensions.to_dict())
+                self.latex_string_svg_image_dimensions.to_dict()),
         }
 
     def validate(self):
         """Validates properties of the LatexStringSvgImageData.
 
         Raises:
-            ValidationError: attributes of the LatexStringSvgImageData
+            ValidationError. Attributes of the LatexStringSvgImageData
                 are invalid.
         """
         if not isinstance(self.raw_image, python_utils.BASESTRING):

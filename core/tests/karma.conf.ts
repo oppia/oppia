@@ -12,16 +12,16 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
     files: [
       // Constants must be loaded before everything else.
-      // Since jquery, jquery-ui, angular, angular-mocks and math-expressions
+      // Since jquery, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.5.1/jquery.min.js',
-      'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
-      'third_party/static/angularjs-1.7.9/angular.js',
+      // Any of the *.module.ts files could be used here, we use
+      // about-page.module.ts because it is first alphabetically.
+      // The module needs to be loaded directly after jquery because
+      // it imports angular js.
+      'core/templates/pages/about-page/about-page.module.ts',
       'third_party/static/angularjs-1.7.9/angular-mocks.js',
-      'third_party/static/headroom-js-0.9.4/headroom.min.js',
-      'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
-      'third_party/static/ckeditor-4.12.1/ckeditor.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -30,9 +30,6 @@ module.exports = function(config) {
       'core/templates/**/*.directive.html',
       'core/templates/**/*.component.html',
       'core/templates/**/*.template.html',
-      // Any of the *.module.ts files could be used here, we use
-      // about-page.module.ts because it is first alphabetically.
-      'core/templates/pages/about-page/about-page.module.ts',
       // This is a file that is generated on running the run_frontend_tests.py
       // script. This generated file is a combination of all the spec files
       // since Karma is unable to run tests on multiple files due to some
@@ -165,12 +162,11 @@ module.exports = function(config) {
             test: /\.ts$/,
             use: [
               'cache-loader',
-              'thread-loader',
               {
                 loader: 'ts-loader',
                 options: {
-                  // This is needed for thread-loader to work correctly.
-                  happyPackMode: true
+                  // Typescript checks do the type checking.
+                  transpileOnly: true
                 }
               },
               {

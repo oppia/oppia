@@ -35,13 +35,13 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         """Test that values are normalized correctly.
 
         Args:
-            object_class: child of BaseObject. The class whose normalize()
+            object_class: object(BaseObject). The class whose normalize()
                 method is to be tested.
-            mappings: a list of 2-element tuples. The first element of
+            mappings: list(tuple(str, str)). The first element of
                 each item is expected to be normalized to the second.
-            invalid_items_with_error_messages: a list of values and
-                corresponding error messages. Each of the value is expected to
-                raise an Exception when normalized.
+            invalid_items_with_error_messages: list(tuple(str, str)). A list of
+                values and corresponding error messages. Each of the value is
+                expected to raise an Exception when normalized.
         """
         for item in mappings:
             assert object_class.normalize(item[0]) == item[1], (
@@ -776,7 +776,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEqual(count, 45)
+        self.assertEqual(count, 48)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):

@@ -1694,3 +1694,102 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             self.assertItemsEqual(self.run_one_off_job(), [
                 ['EXPECTED', '1 ExplorationStats model is valid']
             ])
+
+
+class StatisticsCustomizationArgsAuditTests(OneOffJobTestBase):
+
+    ONE_OFF_JOB_CLASS = stats_jobs_one_off.StatisticsCustomizationArgsAudit
+    EXP_ID = 'EXP_ID'
+    EXP_VERSION = 1
+    STATE_NAME = 'state_1'
+
+    def setUp(self):
+        super(StatisticsCustomizationArgsAuditTests, self).setUp()
+
+        # ExplorationIssues with one valid ExplorationIssue, and one invalid.
+        stats_models.ExplorationIssuesModel.create(
+            exp_id=self.EXP_ID,
+            exp_version=self.EXP_VERSION,
+            unresolved_issues=[{
+                'issue_type': 'MultipleIncorrectSubmissions',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': ''
+                    },
+                    'num_times_answered_incorrectly': {
+                        'value': 1
+                    }
+                },
+                'playthrough_ids': [],
+                'schema_version': 0,
+                'is_valid': False
+            }, {
+                'issue_type': 'MultipleIncorrectSubmissions',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': ''
+                    },
+                },
+                'playthrough_ids': [],
+                'schema_version': 0,
+                'is_valid': False
+            }]
+        )
+
+        # PlaythroughModel with valid customization args, and action with valid
+        # customization args.
+        stats_models.PlaythroughModel.create(
+            exp_id=self.EXP_ID,
+            exp_version=self.EXP_VERSION,
+            issue_type='EarlyQuit',
+            issue_customization_args={
+                'state_name': {
+                    'value': ''
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 0
+                }
+            },
+            actions=[{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': ''
+                    }
+                },
+                'schema_version': 1
+            }]
+        )
+
+        # PlaythroughModel with invalid customization args, and action with
+        # invalid customization args.
+        stats_models.PlaythroughModel.create(
+            exp_id=self.EXP_ID,
+            exp_version=self.EXP_VERSION,
+            issue_type='EarlyQuit',
+            issue_customization_args={},
+            actions=[{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {},
+                'schema_version': 1
+            }]
+        )
+
+    def test_statistics_customization_args_audit(self):
+        self.assertItemsEqual(
+            self.run_one_off_job(),
+            [
+                u'[u\'ExplorationIssue -- SUCCESS\', 1]',
+                (
+                    u'[u\'Playthrough Action -- FAILURE\', [u"(\'EXP_ID\', \'Ex'
+                    'plorationStart\', [])"]]'),
+                (
+                    u'[u\'Playthrough Issue -- FAILURE\', [u"(\'EXP_ID\', \'Ear'
+                    'lyQuit\', [])"]]'),
+                u'[u\'Playthrough Action -- SUCCESS\', 1]',
+                (
+                    u'[u\'ExplorationIssue -- FAILURE\', [u"(\'EXP_ID\', \'Mult'
+                    'ipleIncorrectSubmissions\', [\'state_name\'])"]]'),
+                u'[u\'Playthrough Issue -- SUCCESS\', 1]'
+            ]
+        )
