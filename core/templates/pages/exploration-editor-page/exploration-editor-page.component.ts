@@ -461,6 +461,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ctrl.initExplorationPage().then(successCallback);
         });
         ctrl.directiveSubscriptions.add(
+          // eslint-disable-next-line max-len
           StateTutorialFirstTimeService.onEnterEditorForTheFirstTime.subscribe(() => {
             ctrl.showWelcomeExplorationModal();
           })

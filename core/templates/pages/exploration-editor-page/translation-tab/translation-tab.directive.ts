@@ -53,6 +53,8 @@ require(
 require('services/context.service.ts');
 require('services/editability.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('translationTab', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -76,6 +78,7 @@ angular.module('oppia').directive('translationTab', [
             StateWrittenTranslationsService, TranslationTabActiveModeService,
             UserExplorationPermissionsService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
             '#tutorialTranslationLanguage';
           var _ID_TUTORIAL_TRANSLATION_STATE = '#tutorialTranslationState';
@@ -316,10 +319,16 @@ angular.module('oppia').directive('translationTab', [
               .then(function(explorationPermissions) {
                 permissions = explorationPermissions;
               });
-            $scope.$on('enterTranslationForTheFirstTime',
-              $scope.showWelcomeTranslationModal
+            ctrl.directiveSubscriptions.add(
+              // eslint-disable-next-line max-len
+              StateTutorialFirstTimeService.onEnterTranslationForTheFirstTime.subscribe(
+                () => ctrl.showWelcomeTranslationModal()
+              )
             );
             $scope.$on('openTranslationTutorial', $scope.onStartTutorial);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }]
     };

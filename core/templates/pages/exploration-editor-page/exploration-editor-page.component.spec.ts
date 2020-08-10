@@ -73,6 +73,7 @@ describe('Exploration editor page component', function() {
   var rs = null;
   var sas = null;
   var ses = null;
+  var sts = null;
   var stass = null;
   var tds = null;
   var ueps = null;
