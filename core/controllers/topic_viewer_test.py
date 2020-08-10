@@ -367,7 +367,7 @@ class TopicPageDataHandlerTests(
 
     def test_get_with_twenty_or_more_questions_with_multiple_skills(self):
         number_of_skills = 3
-        number_of_questions = [1,2,2]
+        number_of_questions = [1, 2, 2]
         self.topic_id = 'new_topic'
         self.skill_ids = (
             [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
@@ -393,7 +393,7 @@ class TopicPageDataHandlerTests(
                     self._create_valid_question_data(j), [self.skill_ids[i]])
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, self.skill_ids[i], 0.5)
-    
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
@@ -409,7 +409,7 @@ class TopicPageDataHandlerTests(
 
     def test_get_with_lesser_questions_with_fifty_or_more_skills(self):
         number_of_skills = 60
-        number_of_questions = [0]*60
+        number_of_questions = [0] * 60
         number_of_questions[46] = 2
         self.topic_id = 'new_topic'
         self.skill_ids = (
@@ -436,7 +436,7 @@ class TopicPageDataHandlerTests(
                     self._create_valid_question_data(j), [self.skill_ids[i]])
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, self.skill_ids[i], 0.5)
-    
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
@@ -452,7 +452,7 @@ class TopicPageDataHandlerTests(
 
     def test_get_with_more_questions_with_fifty_or_more_skills(self):
         number_of_skills = 60
-        number_of_questions = [0]*60
+        number_of_questions = [0] * 60
         number_of_questions[46] = 2
         number_of_questions[20] = 3
         number_of_questions[29] = 10
@@ -481,7 +481,7 @@ class TopicPageDataHandlerTests(
                     self._create_valid_question_data(j), [self.skill_ids[i]])
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, self.skill_ids[i], 0.5)
-    
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
