@@ -792,7 +792,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        # TODO(#9143): Apply deletion policy also to creator_ids.
+        ndb.delete_multi(
+            cls.query(cls.creator_ids == user_id).fetch(keys_only=True))
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -868,7 +869,8 @@ class UserSubscribersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        # TODO(#9143): Apply deletion policy also to subscriber_ids.
+        ndb.delete_multi(
+            cls.query(cls.subscriber_ids == user_id).fetch(keys_only=True))
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -2151,10 +2153,23 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    # A dict mapping story IDs to pseudonymous user IDs. For each story, we
-    # use a different pseudonymous user ID. Note that all these pseudonymous
-    # user IDs originate from the same about-to-be-deleted user.
-    story_mappings = ndb.JsonProperty(default={})
+    # A dict mapping model IDs to pseudonymous user IDs. Each type of activity
+    # is grouped under different key (story, skill, question), the keys need to
+    # be from the core.platform.models.NAMES enum. For each activity, we use
+    # a different pseudonymous user ID. Note that all these pseudonymous
+    # user IDs originate from the same about-to-be-deleted user. If a key is
+    # absent from the activity_mappings dict, this means that for this activity
+    # type the mappings are not yet generated.
+    # Example structure: {
+    #     'skill': {'skill_id': 'pseudo_user_id_1'},
+    #     'story': {
+    #         'story_1_id': 'pseudo_user_id_2',
+    #         'story_2_id': 'pseudo_user_id_3',
+    #         'story_3_id': 'pseudo_user_id_4'
+    #     },
+    #     'question': {}
+    # }
+    activity_mappings = ndb.JsonProperty(default={})
 
     @staticmethod
     def get_deletion_policy():
