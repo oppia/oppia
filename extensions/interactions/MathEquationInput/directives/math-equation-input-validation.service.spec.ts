@@ -188,14 +188,14 @@ describe('MathEquationInputValidationService', () => {
   });
 
   it('should warn if there are missing custom variables', function() {
-    answerGroups[0].rules = [
+    answerGroups[0].updateRuleInputs([
       rof.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
           x: 'x^2 = alpha - y/b'
         }
       })
-    ];
+    ]);
     customizationArgs = {
       customOskLetters: {
         value: ['y', 'a', 'b']
@@ -213,14 +213,14 @@ describe('MathEquationInputValidationService', () => {
   });
 
   it('should warn if there are too many custom variables', function() {
-    answerGroups[0].rules = [
+    answerGroups[0].updateRuleInputs([
       rof.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
           x: 'x=y'
         }
       })
-    ];
+    ]);
     customizationArgs = {
       customOskLetters: {
         value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
