@@ -146,33 +146,33 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         complete_customization_args = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
-            'choices': ['']
+            'choices': {'value': ['']}
         }
 
         complete_customization_args_with_invalid_arg_name = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
-            'choices': [''],
+            'choices': {'value': ['']},
             23: {'value': ''}
         }
 
         complete_customization_args_with_extra_arg = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
-            'choices': [''],
+            'choices': {'value': ['']},
             'extraArg': {'value': ''}
         }
 
         complete_customization_args_with_invalid_arg_type = {
             'minAllowableSelectionCount': {'value': 'invalid'},
             'maxAllowableSelectionCount': {'value': 1},
-            'choices': ['']
+            'choices': {'value': ['']}
         }
 
         expected_customization_args_after_validation = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
-            'choices': ['']
+            'choices': {'value': ['']}
         }
 
         expected_customization_args_after_validation_with_invalid_arg_type = (
@@ -353,6 +353,30 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                 'FractionInput',
                 customization_args_with_invalid_type,
                 ca_fraction_input_specs
+            )
+
+    def test_validate_customization_args_and_values_with_invalid_schema(self):
+        """Test validate customization args and values method with
+        invalid schema and errors raised on validation failure.
+        """
+        ca_item_selection_specs = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'ItemSelectionInput').customization_arg_specs
+        )
+        invalid_customization_args = {
+            'minAllowableSelectionCount': {'value': '1b'},
+            'maxAllowableSelectionCount': {'value': 1},
+            'choices': {'value': ['']}
+        }
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Could not convert unicode to int: 1b'
+        ):
+            customization_args_util.validate_customization_args_and_values(
+                'interaction',
+                'ItemSelectionInput',
+                invalid_customization_args,
+                ca_item_selection_specs,
+                fail_on_validation_errors=True
             )
 
     def test_frontend_customization_args_defs_coverage(self):
