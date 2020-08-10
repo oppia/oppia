@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import datetime
 
 from constants import constants
@@ -262,16 +263,17 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
     COLLECTION_ID_1 = '1'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
-    USER_ID_COMMITTER = 'id_3'  # User id used in commits
+    USER_ID_3 = 'id_3'
+    USER_ID_COMMITTER = 'id_4'  # User id used in commits
 
     def setUp(self):
         super(CollectionRightsModelRevertUnitTest, self).setUp()
         self.collection_model = collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_1,
             owner_ids=[self.USER_ID_1],
-            editor_ids=[self.USER_ID_1],
-            voice_artist_ids=[self.USER_ID_1],
-            viewer_ids=[self.USER_ID_1],
+            editor_ids=[],
+            voice_artist_ids=[self.USER_ID_2],
+            viewer_ids=[],
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
@@ -281,24 +283,34 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             self.USER_ID_COMMITTER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}]
         )
-        self.original_dict = (
-            collection_models.CollectionRightsModel.get_by_id(
-                self.COLLECTION_ID_1).to_dict())
-        self.collection_model.owner_ids = [self.USER_ID_1, self.USER_ID_2]
+        self.excluded_fields = ['created_on', 'last_updated', 'version']
+        # Here copy.deepcopy is needed to mitigate
+        # https://github.com/googlecloudplatform/datastore-ndb-python/issues/208
+        self.original_dict = copy.deepcopy(
+            self.collection_model.to_dict(exclude=self.excluded_fields))
+        self.collection_model.owner_ids = [self.USER_ID_1, self.USER_ID_3]
         self.collection_model.save(
             self.USER_ID_COMMITTER, 'Add owner',
             [{'cmd': rights_manager.CMD_CHANGE_ROLE}]
         )
+        self.allow_revert_swap = self.swap(
+            collection_models.CollectionRightsModel, 'ALLOW_REVERT', True)
 
-    def test_revert_with_to_valid_version(self):
-        collection_models.CollectionRightsModel.revert(
-            self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
+
+    def test_revert_to_valid_version_is_successful(self):
+        with self.allow_revert_swap:
+            collection_models.CollectionRightsModel.revert(
+                self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
+
         new_collection_model = (
             collection_models.CollectionRightsModel.get_by_id(
                 self.COLLECTION_ID_1))
-        self.assertEqual(self.original_dict, new_collection_model.to_dict())
+        self.assertDictEqual(
+            self.original_dict,
+            new_collection_model.to_dict(exclude=self.excluded_fields)
+        )
 
-    def test_revert_with_to_version_with_invalid_status(self):
+    def test_revert_to_version_with_invalid_status_is_successful(self):
         broken_dict = dict(**self.original_dict)
         broken_dict['status'] = 'publicized'
 
@@ -310,18 +322,22 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         snapshot_model.content = broken_dict
         snapshot_model.put()
+        with self.allow_revert_swap:
+            collection_models.CollectionRightsModel.revert(
+                self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
 
-        collection_models.CollectionRightsModel.revert(
-            self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
         new_collection_model = (
             collection_models.CollectionRightsModel.get_by_id(
                 self.COLLECTION_ID_1))
-        self.assertEqual(self.original_dict, new_collection_model.to_dict())
+        self.assertDictEqual(
+            self.original_dict,
+            new_collection_model.to_dict(exclude=self.excluded_fields)
+        )
 
-    def test_convert_to_valid_dict_format_translator_ids(self):
+    def test_revert_to_version_with_translator_ids_field_is_successful(self):
         broken_dict = dict(**self.original_dict)
         del broken_dict['voice_artist_ids']
-        broken_dict['translator_ids'] = [self.USER_ID_1]
+        broken_dict['translator_ids'] = [self.USER_ID_2]
 
         snapshot_model = (
             collection_models.CollectionRightsSnapshotContentModel
@@ -331,13 +347,17 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         snapshot_model.content = broken_dict
         snapshot_model.put()
+        with self.allow_revert_swap:
+            collection_models.CollectionRightsModel.revert(
+                self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
 
-        collection_models.CollectionRightsModel.revert(
-            self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
         new_collection_model = (
             collection_models.CollectionRightsModel.get_by_id(
                 self.COLLECTION_ID_1))
-        self.assertEqual(self.original_dict, new_collection_model.to_dict())
+        self.assertDictEqual(
+            self.original_dict,
+            new_collection_model.to_dict(exclude=self.excluded_fields)
+        )
 
 
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
