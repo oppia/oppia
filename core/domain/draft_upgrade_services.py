@@ -34,6 +34,7 @@ import utils
 
 CANNOT_CONVERT_DRAFT_EXCEPTION_MESSAGE = 'Conversion cannot be completed.'
 
+
 def try_upgrading_draft_to_exp_version(
         draft_change_list, current_draft_version, to_exp_version, exp_id):
     """Try upgrading a list of ExplorationChange domain objects to match the
