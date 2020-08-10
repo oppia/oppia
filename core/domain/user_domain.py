@@ -283,8 +283,8 @@ class UserContributionScoring(python_utils.OBJECT):
         self.has_email_been_sent = has_email_been_sent
 
 
-class UserCommunityRights(python_utils.OBJECT):
-    """Domain object for the UserCommunityRightsModel."""
+class UserContributionRights(python_utils.OBJECT):
+    """Domain object for the UserContributionRightsModel."""
 
     def __init__(
             self, user_id, can_review_translation_for_language_codes,

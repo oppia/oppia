@@ -27,6 +27,7 @@ import { ItemSelectionInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
@@ -77,7 +78,11 @@ describe('ItemSelectionInputValidationService', () => {
 
     customizationArguments = {
       choices: {
-        value: ['Selection 1', 'Selection 2', 'Selection 3']
+        value: [
+          new SubtitledHtml('Selection 1', ''),
+          new SubtitledHtml('Selection 2', ''),
+          new SubtitledHtml('Selection 3', '')
+        ]
       },
       maxAllowableSelectionCount: {
         value: 2
@@ -216,7 +221,8 @@ describe('ItemSelectionInputValidationService', () => {
 
   it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
-    customizationArguments.choices.value[0] = '';
+    customizationArguments.choices.value[0] = (
+      new SubtitledHtml('', ''));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -229,7 +235,8 @@ describe('ItemSelectionInputValidationService', () => {
 
   it('should expect all choices to be unique', () => {
     // Repeat the last choice.
-    customizationArguments.choices.value.push('Selection 3');
+    customizationArguments.choices.value.push(
+      new SubtitledHtml('Selection 3', ''));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,

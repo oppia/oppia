@@ -43,10 +43,11 @@ describe('Test Interaction Panel directive', function() {
       .returnValue(false);
 
     $scope = $rootScope.$new();
-    $scope.getStateName = () => stateName;
     var ctrl = $componentController('testInteractionPanel', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
+    }, {
+      getStateName: () => stateName
     });
     ctrl.$onInit();
   }));

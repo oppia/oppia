@@ -37,9 +37,11 @@ describe('Subtopic viewer page', function() {
   var ContextService = null;
 
   var topicName = 'Topic Name';
+  var abbreviatedTopicName = 'abbrev';
   var topicId = '1';
   var subtopicId = '1';
   var subtopicTitle = 'Subtopic Title';
+  var subtopicUrlFragment = 'subtopic-title';
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -70,11 +72,16 @@ describe('Subtopic viewer page', function() {
 
 
   it('should succesfully get subtopic data and set context', function() {
-    spyOn(UrlService, 'getTopicNameFromLearnerUrl').and.returnValue(topicName);
-    spyOn(UrlService, 'getSubtopicIdFromUrl').and.returnValue(subtopicId);
+    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      abbreviatedTopicName);
+    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'math');
+    spyOn(UrlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+      subtopicUrlFragment);
     var subtopicDataObject = (
       ReadOnlySubtopicPageObjectFactory.createFromBackendDict({
         topic_id: topicId,
+        topic_name: topicName,
         subtopic_title: subtopicTitle,
         page_contents: {
           subtitled_html: {
@@ -90,7 +97,8 @@ describe('Subtopic viewer page', function() {
           title: '',
           skill_ids: [],
           thumbnail_filename: '',
-          thumbnail_bg_color: ''
+          thumbnail_bg_color: '',
+          url_fragment: subtopicUrlFragment
         }
       }));
     spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicData').and.returnValue(
@@ -121,9 +129,13 @@ describe('Subtopic viewer page', function() {
 
   it('should use reject handler when fetching subtopic data fails',
     function() {
-      spyOn(UrlService, 'getTopicNameFromLearnerUrl').and.returnValue(
-        topicName);
-      spyOn(UrlService, 'getSubtopicIdFromUrl').and.returnValue(subtopicId);
+      spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        abbreviatedTopicName);
+      spyOn(
+        UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+        'math');
+      spyOn(UrlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+        subtopicUrlFragment);
       spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicData').and
         .returnValue(
           $q.reject({

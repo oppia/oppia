@@ -39,6 +39,7 @@ EXCLUDED_PATHS = (
     'core/tests/release_sources/tmp_unzip.zip', 'scripts/linters/test_files/*',
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
+    'core/templates/css/oppia-material.css',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
@@ -535,7 +536,7 @@ def is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
         filepath: str. Path of the file.
 
     Returns:
-        bool: Whether to exclude the given file from this
+        bool. Whether to exclude the given file from this
         particular pattern check.
     """
     return (any(
@@ -600,7 +601,7 @@ def check_file_type_specific_bad_pattern(filepath, content):
         content: str. Contents of the file.
 
     Returns:
-        failed: bool. True if there is bad pattern else false.
+        bool. True if there is bad pattern else false.
         total_error_count: int. The number of errors.
     """
     summary_messages = []
@@ -863,7 +864,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            str. All the messages returned by the lint checks.
         """
         mandatory_patterns_messages = self._check_mandatory_patterns()
         pattern_messages = self._check_bad_patterns()

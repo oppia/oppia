@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for chapter editor tab controller.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -29,6 +30,9 @@ describe('Chapter Editor tab', function() {
   var $scope = null;
   var ctrl = null;
   var MockStoryEditorNavigationService = null;
+  var storyInitializedEventEmitter = null;
+  var storyReinitializedEventEmitter = null;
+
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -85,6 +89,19 @@ describe('Chapter Editor tab', function() {
       version: '1',
       corresponding_topic_id: 'topic_id'
     });
+
+    storyInitializedEventEmitter = new EventEmitter();
+    storyReinitializedEventEmitter = new EventEmitter();
+
+    spyOnProperty(StoryEditorStateService, 'onStoryInitialized').and.callFake(
+      function() {
+        return storyInitializedEventEmitter;
+      });
+    spyOnProperty(StoryEditorStateService, 'onStoryReinitialized').and.callFake(
+      function() {
+        return storyReinitializedEventEmitter;
+      });
+
     StoryEditorStateService.setStory(newStory);
     ctrl = $componentController('chapterEditorTab', {
       $scope: $scope,
@@ -92,6 +109,10 @@ describe('Chapter Editor tab', function() {
       StoryEditorNavigationService: MockStoryEditorNavigationService,
     });
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should set initialize chapter index from the story', function() {
     ctrl.$onInit();
@@ -104,5 +125,14 @@ describe('Chapter Editor tab', function() {
       ctrl.$onInit();
       ctrl.navigateToStoryEditor();
       expect(MockStoryEditorNavigationService.getActiveTab()).toEqual('story');
+    });
+
+  it('should called initEditor on calls from story being initialized',
+    function() {
+      spyOn(ctrl, 'initEditor').and.callThrough();
+      ctrl.$onInit();
+      storyInitializedEventEmitter.emit();
+      storyReinitializedEventEmitter.emit();
+      expect(ctrl.initEditor).toHaveBeenCalledTimes(3);
     });
 });

@@ -23,6 +23,7 @@ require('pages/OppiaFooterDirective.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/contextual/url.service.ts');
 require('services/keyboard-shortcut.service.ts');
+require('services/page-title.service.ts');
 require('services/stateful/background-mask.service.ts');
 
 angular.module('oppia').directive('baseContent', [
@@ -43,12 +44,14 @@ angular.module('oppia').directive('baseContent', [
       },
       template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$rootScope', '$window', 'BackgroundMaskService',
+      controller: ['$rootScope', '$scope', '$window', 'BackgroundMaskService',
         'BottomNavbarStatusService', 'KeyboardShortcutService',
-        'LoaderService', 'SidebarStatusService', 'UrlService',
-        function($rootScope, $window, BackgroundMaskService,
+        'LoaderService', 'PageTitleService', 'SidebarStatusService',
+        'UrlService',
+        function($rootScope, $scope, $window, BackgroundMaskService,
             BottomNavbarStatusService, KeyboardShortcutService,
-            LoaderService, SidebarStatusService, UrlService) {
+            LoaderService, PageTitleService, SidebarStatusService,
+            UrlService) {
           // Mimic redirection behaviour in the backend (see issue #7867 for
           // details).
           if ($window.location.hostname === 'oppiaserver.appspot.com') {
@@ -58,6 +61,14 @@ angular.module('oppia').directive('baseContent', [
               $window.location.search +
               $window.location.hash);
           }
+
+          $scope.getHeaderText = () => {
+            return PageTitleService.getPageTitleForMobileView();
+          };
+
+          $scope.getSubheaderText = () => {
+            return PageTitleService.getPageSubtitleForMobileView();
+          };
 
           var ctrl = this;
           ctrl.loadingMessage = '';
