@@ -69,8 +69,11 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                     'answers': ['a2', 'a3']
                 }
             ]
-        algorithm_version: int. Schema version of the classifier model to be
-            trained. This depends on the algorithm ID.
+        algorithm_version: int. The version of the classifier algorithm to be
+            trained. The algorithm version determines the training algorithm,
+            format in which trained parameters are stored along with the
+            prediction algorithm to be used. We expect this to change only when
+            classifier algorithm is updated. This depends on the algorithm ID.
     """
 
     def __init__(
