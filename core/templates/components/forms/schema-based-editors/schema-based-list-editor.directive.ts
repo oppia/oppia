@@ -215,7 +215,6 @@ angular.module('oppia').directive('schemaBasedListEditor', [
 
             $scope.deleteElement = function(index) {
               // Need to let the RTE know that HtmlContent has been changed.
-              $scope.$broadcast('externalHtmlContentChange');
               $scope.localValue.splice(index, 1);
             };
           } else {

@@ -34,12 +34,10 @@ require(
 
 angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
   'InteractionAttributesExtractorService',
-  'InteractiveMapRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
       InteractionAttributesExtractorService,
-      InteractiveMapRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -127,34 +125,6 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
               ctrl.interactionIsActive = false;
               ctrl.setOverlay();
             });
-
-            $scope.$on('showInteraction', function() {
-              refreshMap();
-            });
-
-            $scope.$on('leafletDirectiveMap.interactiveMap.mouseover',
-              function() {
-                if (!ctrl.interactionIsActive) {
-                  ctrl.setOverlay();
-                }
-              });
-
-            $scope.$on(
-              'leafletDirectiveMap.interactiveMap.mouseout', function() {
-                if (!ctrl.interactionIsActive) {
-                  ctrl.hideOverlay();
-                }
-              });
-            $scope.$on('leafletDirectiveMap.interactiveMap.click',
-              function(evt, args) {
-                if (ctrl.interactionIsActive) {
-                  var newLat = args.leafletEvent.latlng.lat;
-                  var newLng = args.leafletEvent.latlng.lng;
-                  changeMarkerPosition(newLat, newLng);
-                  CurrentInteractionService.onSubmit(
-                    [newLat, newLng], InteractiveMapRulesService);
-                }
-              });
 
             const {
               latitude,
