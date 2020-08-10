@@ -32,6 +32,7 @@ import utils
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
 
+CANNOT_CONVERT_DRAFT_EXCEPTION_MESSAGE = 'Conversion cannot be completed.'
 
 def try_upgrading_draft_to_exp_version(
         draft_change_list, current_draft_version, to_exp_version, exp_id):
@@ -85,7 +86,9 @@ def try_upgrading_draft_to_exp_version(
         try:
             draft_change_list = conversion_fn(draft_change_list)
         except Exception as error:
-            if python_utils.UNICODE(error) == 'Conversion cannot be completed.':
+            if (
+                    python_utils.UNICODE(error) ==
+                    CANNOT_CONVERT_DRAFT_EXCEPTION_MESSAGE):
                 return
             # A blank raise will raise the last exception.
             raise
@@ -263,7 +266,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.
-                raise Exception('Conversion cannot be completed.')
+                raise Exception(CANNOT_CONVERT_DRAFT_EXCEPTION_MESSAGE)
         return draft_change_list
 
     @classmethod
@@ -298,7 +301,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         'IsMathematicallyEquivalentTo')))
             if interaction_id_change_condition or (
                     answer_groups_change_condition):
-                raise Exception('Conversion cannot be completed.')
+                raise Exception(CANNOT_CONVERT_DRAFT_EXCEPTION_MESSAGE)
 
         return draft_change_list
 
