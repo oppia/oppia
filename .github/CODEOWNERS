@@ -85,13 +85,13 @@
 /core/templates/pages/collection-player-page/ @kevintab95
 
 
-# Community contribution project
-/core/controllers/community_dashboard*.py @sagangwee
-/core/domain/opportunity*.py @sagangwee
-/core/domain/voiceover_services*.py @sagangwee
-/core/storage/opportunity/ @sagangwee
-/core/templates/domain/opportunity/ @sagangwee
-/core/templates/pages/community-dashboard-page/ @sagangwee
+# Contributor Dashboard project
+/core/controllers/community_dashboard*.py @DubeySandeep
+/core/domain/opportunity*.py @DubeySandeep
+/core/domain/voiceover_services*.py @DubeySandeep
+/core/storage/opportunity/ @DubeySandeep
+/core/templates/domain/opportunity/ @DubeySandeep
+/core/templates/pages/community-dashboard-page/ @DubeySandeep
 
 
 # Core documentation
