@@ -92,7 +92,7 @@ def start_google_app_engine_server():
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' %
         (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
+            common.CURRENT_PYTHON_BIN, common.GOOGLE_CLOUD_SDK_BIN,
             GOOGLE_APP_ENGINE_PORT, app_yaml_filepath
         ),
         shell=True)
