@@ -609,7 +609,9 @@ class Topic(python_utils.OBJECT):
         """
         topic = cls(
             topic_dict['id'], topic_dict['name'],
-            topic_dict['abbreviated_name'], topic_dict['thumbnail_filename'],
+            topic_dict['abbreviated_name'],
+            topic_dict['url_fragment'],
+            topic_dict['thumbnail_filename'],
             topic_dict['thumbnail_bg_color'], topic_dict['description'],
             [
                 StoryReference.from_dict(reference_dict)

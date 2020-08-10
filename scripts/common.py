@@ -620,10 +620,10 @@ def start_redis_server():
     Returns:
         subprocess.Popen object. The process object of the redis server.
     """
-    return subprocess.Popen(
-        '%s %s %s %s' % (
-            REDIS_SERVER_PATH, REDIS_CONF_PATH, '--daemonize', 'yes'
-        ), shell=True)
+    return subprocess.Popen([
+        REDIS_SERVER_PATH, REDIS_CONF_PATH,
+        '--daemonize', 'yes'
+    ])
 
 
 def stop_redis_server():
