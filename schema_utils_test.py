@@ -71,7 +71,7 @@ ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
     'ListOfTabs', 'SkillSelector', 'SubtitledHtml', 'SubtitledUnicode',
-    'SvgFilename']
+    'SvgFilename', 'CustomOskLetters']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not
@@ -184,7 +184,13 @@ VALIDATOR_SPECS = {
         'is_valid_algebraic_expression': {},
         'is_valid_numeric_expression': {},
         'is_valid_math_equation': {},
-        'is_supported_audio_language_code': {}
+        'is_supported_audio_language_code': {},
+        'is_url_fragment': {},
+        'has_length_at_most': {
+            'max_value': {
+                'type': SCHEMA_TYPE_INT
+            }
+        }
     },
 }
 
@@ -626,6 +632,18 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_supported_audio_language_code(''))
         self.assertFalse(is_supported_audio_language_code('zz'))
         self.assertFalse(is_supported_audio_language_code('test'))
+
+    def test_is_url_fragment(self):
+        validate_url_fragment = schema_utils.get_validator(
+            'is_url_fragment')
+
+        self.assertTrue(validate_url_fragment('math'))
+        self.assertTrue(validate_url_fragment('computer-science'))
+        self.assertTrue(validate_url_fragment('bio-tech'))
+
+        self.assertFalse(validate_url_fragment(''))
+        self.assertFalse(validate_url_fragment('Abc'))
+        self.assertFalse(validate_url_fragment('!@#$%^&*()_+='))
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):

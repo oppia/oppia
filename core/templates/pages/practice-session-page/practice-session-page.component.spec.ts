@@ -57,18 +57,22 @@ describe('Practice session page', function() {
 
   it('should load topic based on its id on url when component is initialized' +
     ' and set page title', function() {
-    spyOn(UrlService, 'getTopicNameFromLearnerUrl').and.returnValue(
-      'Foo Topic');
+    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'abbrev-topic');
     spyOn(UrlService, 'getSelectedSubtopicsFromUrl').and.returnValue(
       '1,2,3,4,5');
+    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'math');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
-    $httpBackend.expectGET('/practice_session/data/Foo%20Topic?' +
+    $httpBackend.expectGET(
+      '/practice_session/data/math/abbrev-topic?' +
       'selected_subtopic_ids=1%2C2%2C3%2C4%2C5').respond({
       skill_ids_to_descriptions_map: {
         skill_1: 'Description 1',
         skill_2: 'Description 2',
-      }
+      },
+      topic_name: 'Foo Topic'
     });
     ctrl.$onInit();
     $httpBackend.flush();
@@ -84,13 +88,13 @@ describe('Practice session page', function() {
         {
           type: 'RETRY_SESSION',
           i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
-          url: '/practice_session/Foo%20Topic?' +
+          url: '/learn/math/abbrev-topic/practice/session?' +
           'selected_subtopic_ids=1%2C2%2C3%2C4%2C5'
         },
         {
           type: 'DASHBOARD',
           i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
-          url: '/topic/Foo%20Topic'
+          url: '/learn/math/abbrev-topic'
         }
       ],
       skillList: ['skill_1', 'skill_2'],

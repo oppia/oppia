@@ -659,8 +659,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }).to_dict()
 
-        self.save_new_exp_with_states_schema_v34(
-            self.VALID_EXP_ID, 'user_id', states_dict)
+        self.save_new_exp_with_custom_states_schema_version(
+            self.VALID_EXP_ID, 'user_id', states_dict, 34)
 
         job_id = (
             exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new())
@@ -953,6 +953,67 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
+    def create_exploration_with_states_schema_version(
+            self, states_schema_version, exp_id, user_id, states_dict):
+        """Saves a new default exploration with the given states dictionary in
+        the given state schema version. All passed state dictionaries in
+        'states_dict' must have the states schema version indicated by
+        'states_schema_version'.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            states_schema_version: int. The state schema version.
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states, in the
+                given states schema version.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=states_schema_version,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
     def test_migration_audit_job_skips_deleted_explorations(self):
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
@@ -985,10 +1046,9 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-    def test_audit_job_only_runs_for_previous_state_schema_version(self):
-        """Tests that the exploration migration job does not convert
-        explorations with a state schema that is not the previous state schema
-        version.
+    def test_audit_job_runs_for_any_state_schema_version(self):
+        """Tests that the exploration migration converts older explorations to a
+        previous state schema version before running the audit job.
         """
         self.save_new_exp_with_states_schema_v0(
             self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
@@ -999,18 +1059,13 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off.ExplorationMigrationAuditJob.get_output(job_id))
 
-        self.assertEqual(
-            actual_output,
-            [
-                u'[u\'WRONG_STATE_VERSION\', [u\'Exploration exp_id1 was not ' +
-                'migrated because its states schema verison is 0\']]'
-            ])
+        self.assertEqual(actual_output, [u'[u\'SUCCESS\', 1]'])
 
     def test_migration_job_audit_success(self):
         """Test that the audit job runs correctly on explorations of the
         previous state schema.
         """
-        states_dict = state_domain.State.from_dict({
+        states_dict = {
             'content': {
                 'content_id': 'content_1',
                 'html': 'Question 1'
@@ -1069,21 +1124,28 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
-        }).to_dict()
+        }
 
-        self.save_new_exp_with_states_schema_v35(
-            self.NEW_EXP_ID, self.albert_id, {
-                'Introduction': states_dict
-            })
-
-        job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
-        exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationMigrationAuditJob.get_output(
-                job_id)
+        self.create_exploration_with_states_schema_version(
+            36,
+            self.NEW_EXP_ID,
+            self.albert_id,
+            {'Introduction': states_dict}
         )
+
+        swap_states_schema_version = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
+        swap_exp_schema_version = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
+        with swap_states_schema_version, swap_exp_schema_version:
+            job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
+            exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            actual_output = (
+                exp_jobs_one_off.ExplorationMigrationAuditJob.get_output(
+                    job_id)
+            )
 
         expected_output = ['[u\'SUCCESS\', 1]']
         self.assertEqual(actual_output, expected_output)
@@ -1093,7 +1155,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         previous state schema and catches any errors that occur during the
         migration.
         """
-        states_dict = state_domain.State.from_dict({
+        states_dict = {
             'content': {
                 'content_id': 'content_1',
                 'html': 'Question 1'
@@ -1152,27 +1214,28 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
-        }).to_dict()
+        }
 
-        self.save_new_exp_with_states_schema_v35(
-            self.NEW_EXP_ID, self.albert_id, {
-                'Introduction': states_dict
-            })
-
-        current_exp_schema_version = (
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
-        conversion_fn_name = (
-            '_convert_v%i_dict_to_v%i_dict' % (
-                current_exp_schema_version - 1,
-                current_exp_schema_version)
+        self.create_exploration_with_states_schema_version(
+            36,
+            self.NEW_EXP_ID,
+            self.albert_id,
+            {'Introduction': states_dict}
         )
 
         # Make a mock conversion function that raises an error.
         mock_conversion = classmethod(
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
-        with self.swap(
-            exp_domain.Exploration, conversion_fn_name, mock_conversion
+        swap_states_schema_version = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
+        swap_exp_schema_version = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
+
+        with swap_states_schema_version, swap_exp_schema_version, self.swap(
+            exp_domain.Exploration,
+            '_convert_states_v36_dict_to_v37_dict',
+            mock_conversion
         ):
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
             exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
@@ -1183,11 +1246,11 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
                     job_id)
             )
 
-            expected_output = [
-                u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed migratio'
-                'n to v41: u\'property_that_dne\'"]]'
-            ]
-            self.assertEqual(actual_output, expected_output)
+        expected_output = [
+            u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed migratio'
+            'n to states v37: u\'property_that_dne\'"]]'
+        ]
+        self.assertEqual(actual_output, expected_output)
 
 
 class ExplorationMigrationJobTests(test_utils.GenericTestBase):
