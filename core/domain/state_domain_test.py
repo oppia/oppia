@@ -958,13 +958,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('TextInput')
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('ImageClickInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
 
         # Invalid interactions.
         init_state.update_interaction_id('CodeRepl')
         self.assertFalse(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('GraphInput')
-        self.assertFalse(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('ImageClickInput')
         self.assertFalse(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('InteractiveMap')
         self.assertFalse(init_state.interaction.is_supported_on_android_app())
