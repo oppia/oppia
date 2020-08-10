@@ -1006,11 +1006,8 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                     ca_value['content_id'], ca_value['unicode_str'])
 
             if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
-                try:
-                    return SubtitledHtml(
-                        ca_value['content_id'], ca_value['html'])
-                except Exception:
-                    raise Exception(ca_value)
+                return SubtitledHtml(
+                    ca_value['content_id'], ca_value['html'])
 
         ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
             ca_schema,
