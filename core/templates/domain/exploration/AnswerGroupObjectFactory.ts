@@ -96,6 +96,8 @@ export class AnswerGroup {
       (x, y) => {
         if (x === 'Equals') {
           return -1;
+        } else if (y === 'Equals') {
+          return 1;
         }
         return x < y ? -1 : 1;
       }
