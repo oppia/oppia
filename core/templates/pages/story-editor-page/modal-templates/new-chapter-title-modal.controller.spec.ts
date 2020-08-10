@@ -25,6 +25,10 @@ import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ExplorationSummaryBackendApiService } from
+  'domain/summary/exploration-summary-backend-api.service.ts';
+import { TestBed } from '@angular/core/testing';
 
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;
@@ -38,7 +42,15 @@ describe('Create New Chapter Modal Controller', function() {
   var nodeTitles = ['title 1', 'title 2', 'title 3'];
 
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ExplorationSummaryBackendApiService',
+      TestBed.get(ExplorationSummaryBackendApiService));
+  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StoryObjectFactory',
       new StoryObjectFactory(new StoryContentsObjectFactory(

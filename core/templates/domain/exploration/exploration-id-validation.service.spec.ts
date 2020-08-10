@@ -19,17 +19,29 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ExplorationSummaryBackendApiService } from
+  'domain/summary/exploration-summary-backend-api.service.ts';
+
 // ^^^ This block is to be removed.
 require('domain/exploration/exploration-id-validation.service.ts');
 
-describe('Exploration id validation service', function() {
+fdescribe('Exploration id validation service', function() {
   var ExplorationIdValidationService = null;
   var invalidExpResults = null;
   var validExpResults = null;
   var $httpBackend = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ExplorationSummaryBackendApiService',
+      TestBed.get(ExplorationSummaryBackendApiService));
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
@@ -89,39 +101,39 @@ describe('Exploration id validation service', function() {
 
       // The service should respond false when the summaries array
       // contains null.
-      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
-        summaries: [null]
-      });
       ExplorationIdValidationService.isExpPublished('0').then(
         function(response) {
           expect(response).toEqual(false);
         });
+      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
+        summaries: [null]
+      });
       $httpBackend.flush();
 
       // The service should respond false when the summaries array
       // contains more than one element.
+      ExplorationIdValidationService.isExpPublished('0').then(
+        function(response) {
+          expect(response).toEqual(false);
+        });
       $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
         summaries: [
           'exp_1',
           'exp_2'
         ]
       });
-      ExplorationIdValidationService.isExpPublished('0').then(
-        function(response) {
-          expect(response).toEqual(false);
-        });
       $httpBackend.flush();
     }
   );
 
   it('should correctly validate the valid exploration id',
     function() {
-      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond(
-        validExpResults);
       ExplorationIdValidationService.isExpPublished('0').then(
         function(response) {
           expect(response).toEqual(true);
         });
+      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond(
+        validExpResults);
       $httpBackend.flush();
     }
   );
