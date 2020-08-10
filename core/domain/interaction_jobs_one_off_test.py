@@ -651,12 +651,10 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'Equals': [{
-                        'x': ['<p>This is value1 for ItemSelection</p>']
-                    },
-                    {
-                        'x': ['<p>This is value3 for ItemSelection</p>']
-                    }
-                ]
+                    'x': ['<p>This is value1 for ItemSelection</p>']
+                }, {
+                    'x': ['<p>This is value3 for ItemSelection</p>']
+                }]
             },
             'outcome': {
                 'dest': 'State1',
