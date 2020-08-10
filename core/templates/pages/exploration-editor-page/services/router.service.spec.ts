@@ -18,6 +18,7 @@
 
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import $ from 'jquery';
+import { Subscription } from 'rxjs';
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
@@ -29,6 +30,8 @@ describe('Router Service', () => {
   var $rootScope = null;
   var $location = null;
   var $timeout = null, $interval = null;
+  var testSubscriptions: Subscription;
+  const centerGraphSpy = jasmine.createSpy('centerGraphSpy');
 
   beforeEach(angular.mock.module('oppia', $provide => {
     var ugs = new UpgradedServices();
@@ -155,6 +158,16 @@ describe('Router Service', () => {
     });
   }));
 
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(RouterService.onCenterGraph.subscribe(
+      centerGraphSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   it('should navigate to main tab when tab is already on main', done => {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
@@ -265,7 +278,7 @@ describe('Router Service', () => {
     $interval.flush(300);
 
     expect(broadcastSpy).toHaveBeenCalledWith('refreshStateEditor');
-    expect(broadcastSpy).toHaveBeenCalledWith('centerGraph');
+    expect(centerGraphSpy).toHaveBeenCalled();
   });
 
   it('should navigate to translation tab', () => {
@@ -501,7 +514,7 @@ describe('Router Service', () => {
     $interval.flush(300);
 
     expect(broadcastSpy).toHaveBeenCalledWith('refreshStateEditor');
-    expect(broadcastSpy).toHaveBeenCalledWith('centerGraph');
+    expect(centerGraphSpy).toHaveBeenCalled();
   });
 
   it('should save pending changes', () => {

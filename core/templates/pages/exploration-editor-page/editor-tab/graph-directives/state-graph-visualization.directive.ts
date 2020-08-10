@@ -23,9 +23,12 @@ require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-status.service.ts');
+
+import { Subscription } from 'rxjs';
 
 /* eslint-disable angular/directive-restrict */
 angular.module('oppia').directive('stateGraphVisualization', [
@@ -83,15 +86,15 @@ angular.module('oppia').directive('stateGraphVisualization', [
         'state-graph-visualization.directive.html'),
       controller: [
         '$element', '$filter', '$scope', '$timeout',
-        'ExplorationWarningsService', 'StateGraphLayoutService',
-        'TranslationStatusService', 'WindowDimensionsService',
-        'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
-        function(
-            $element, $filter, $scope, $timeout,
-            ExplorationWarningsService, StateGraphLayoutService,
-            TranslationStatusService, WindowDimensionsService,
-            MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
+        'ExplorationWarningsService', 'RouterService',
+        'StateGraphLayoutService', 'TranslationStatusService',
+        'WindowDimensionsService', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
+        function($element, $filter, $scope, $timeout,
+            ExplorationWarningsService, RouterService,
+            StateGraphLayoutService, TranslationStatusService,
+            WindowDimensionsService, MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var graphBounds = {
             bottom: 0,
             left: 0,
@@ -395,9 +398,11 @@ angular.module('oppia').directive('stateGraphVisualization', [
               redrawGraph();
             });
 
-            $scope.$on('centerGraph', function() {
-              centerGraph();
-            });
+            ctrl.directiveSubscriptions.add(
+              RouterService.onCenterGraph.subscribe(() => {
+                centerGraph();
+              })
+            );
 
             $scope.$watch('graphData()', redrawGraph, true);
             $scope.$watch('currentStateId()', redrawGraph);
@@ -417,6 +422,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
             if (ctrl.resizeSubscription) {
               ctrl.resizeSubscription.unsubscribe();
             }
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

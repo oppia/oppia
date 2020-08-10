@@ -25,6 +25,8 @@ require(
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/exploration-improvements.service.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$q', '$rootScope', '$timeout', '$window',
   'ExplorationImprovementsService', 'ExplorationInitStateNameService',
@@ -43,7 +45,8 @@ angular.module('oppia').factory('RouterService', [
       HISTORY: {name: 'history', path: '/history'},
       FEEDBACK: {name: 'feedback', path: '/feedback'},
     };
-
+    /** @private */
+    var centerGraph = new EventEmitter();
     var SLUG_GUI = 'gui';
     var SLUG_PREVIEW = 'preview';
     // PREVIEW_TAB_WAIT_TIME_MSEC is the minimum duration to wait
@@ -142,7 +145,7 @@ angular.module('oppia').factory('RouterService', [
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
               // Fire an event to center the Graph in the Editor.
-              $rootScope.$broadcast('centerGraph');
+              centerGraph.emit();
             }
           } else {
             $location.path(pathBase +
@@ -259,6 +262,9 @@ angular.module('oppia').factory('RouterService', [
       navigateToFeedbackTab: function() {
         _savePendingChanges();
         $location.path(TABS.FEEDBACK.path);
+      },
+      get onCenterGraph() {
+        return centerGraph;
       },
     };
 

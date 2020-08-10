@@ -49,6 +49,7 @@ import { of } from 'rxjs';
 
 require('pages/exploration-editor-page/editor-tab/graph-directives/' +
   'state-graph-visualization.directive.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 describe('State Graph Visualization directive', function() {
   var ctrl = null;
@@ -57,6 +58,7 @@ describe('State Graph Visualization directive', function() {
   var $rootScope = null;
   var $scope = null;
   var explorationWarningsService = null;
+  var routerService = null;
   var stateGraphLayoutService = null;
   var translationStatusService = null;
 
@@ -126,6 +128,7 @@ describe('State Graph Visualization directive', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     explorationWarningsService = $injector.get('ExplorationWarningsService');
+    routerService = $injector.get('RouterService');
     translationStatusService = $injector.get('TranslationStatusService');
 
     spyOn(stateGraphLayoutService, 'computeLayout').and.returnValue(nodes);
@@ -318,7 +321,7 @@ describe('State Graph Visualization directive', function() {
       }
     });
 
-    $rootScope.$broadcast('centerGraph');
+    routerService.onCenterGraph.emit();
     $flushPendingTasks();
 
     expect(d3.event.transform.x).toBe(0);
@@ -351,7 +354,7 @@ describe('State Graph Visualization directive', function() {
       }
     });
 
-    $rootScope.$broadcast('centerGraph');
+    routerService.onCenterGraph.emit();
     $flushPendingTasks();
 
     expect(d3.event.transform.x).toBe(10);
