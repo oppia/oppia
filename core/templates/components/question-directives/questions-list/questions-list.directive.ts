@@ -553,7 +553,7 @@ angular.module('oppia').directive('questionsList', [
 
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
-              QuestionsListService.onQuestionSummartiesInitialized.subscribe(
+              QuestionsListService.onQuestionSummariesInitialized.subscribe(
                 () => _initTab(false)));
             ctrl.skillIds = [];
             ctrl.selectedSkillIds = [];
