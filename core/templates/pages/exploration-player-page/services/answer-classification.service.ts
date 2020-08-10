@@ -183,13 +183,8 @@ export class AnswerClassificationService {
   isClassifiedExplicitlyOrGoesToNewState(
       stateName: string, state: State, answer: InteractionAnswer,
       interactionRulesService): boolean {
-    console.log(stateName, answer)
     const result = this.getMatchingClassificationResult(
       stateName, state.interaction, answer, interactionRulesService);
-    console.log((
-      result.outcome.dest !== state.name ||
-      result.classificationCategorization !==
-        ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION), result)
     return (
       result.outcome.dest !== state.name ||
       result.classificationCategorization !==
