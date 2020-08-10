@@ -34,6 +34,7 @@ import python_utils
 import utils
 
 from google.appengine.api import urlfetch
+from google.appengine.ext import ndb
 
 current_user_services = models.Registry.import_current_user_services()
 (user_models, audit_models) = models.Registry.import_models(
@@ -940,13 +941,27 @@ def create_new_user(gae_id, email):
         raise Exception(
             'User %s already exists for gae_id %s.'
             % (user_settings.user_id, gae_id))
+    return create_new_user_models_as_a_transaction(gae_id, email)
 
+
+@ndb.transactional(xg=True)
+def create_new_user_models_as_a_transaction(gae_id, email):
+    """Creates new user model for auth_details, settings and contributions
+    in a transaction manner.
+
+    Args:
+        gae_id: str. The unique GAE user ID of the user.
+        email: str. The user email.
+
+    Returns:
+        UserSettings. The newly-created user settings domain object.
+    """
     user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
-    _save_user_settings(user_settings)
     _save_user_auth_details(UserAuthDetails(user_id, gae_id))
+    _save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
     return user_settings
 
