@@ -142,8 +142,9 @@ def main(args=None):
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
-        'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 --admin_port '
-        '8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check true %s' % (
+        'yes | python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 '
+        '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '
+        'true %s' % (
             common.GOOGLE_CLOUD_SDK_BIN, clear_datastore_arg,
             enable_console_arg, disable_host_checking_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),

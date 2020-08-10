@@ -734,7 +734,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_start_google_app_engine_server_in_dev_mode(self):
 
         expected_command = (
-            '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
+            'yes | %s %s/dev_appserver.py --host 0.0.0.0 --port %s '
             '--clear_datastore=yes --dev_appserver_log_level=critical '
             '--log_level=critical --skip_sdk_update_check=true %s' % (
                 common.CURRENT_PYTHON_BIN, common.GOOGLE_CLOUD_SDK_BIN,
@@ -755,7 +755,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_start_google_app_engine_server_in_prod_mode(self):
 
         expected_command = (
-            '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
+            'yes | %s %s/dev_appserver.py --host 0.0.0.0 --port %s '
             '--clear_datastore=yes --dev_appserver_log_level=critical '
             '--log_level=critical --skip_sdk_update_check=true %s' % (
                 common.CURRENT_PYTHON_BIN, common.GOOGLE_CLOUD_SDK_BIN,

@@ -419,7 +419,7 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
     app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode_setting else '')
 
     p = subprocess.Popen(
-        '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
+        'yes | %s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=%s '
         '--log_level=%s --skip_sdk_update_check=true %s' % (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_CLOUD_SDK_BIN,
