@@ -187,7 +187,6 @@ describe('Router Service', () => {
 
         expect(applyAsyncSpy).toHaveBeenCalled();
         done();
-
       }, 20);
       $timeout.flush(150);
     }, 400);
