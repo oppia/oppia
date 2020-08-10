@@ -376,9 +376,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         for line in lines:
             # Search for XCustomizationArgsBackendDict interfaces and extract X,
             # where X is a interaction id.
-            # Group 1: The characters 'interface'.
-            # Group 2: The interaction id.
-            # Group 3: The characters 'CustomizationArgsBackendDict'.
+            # Match 1: The characters 'interface'.
+            # Match 2: The interaction id.
+            # Match 3: The characters 'CustomizationArgsBackendDict'.
             ca_backend_interface_match = (
                 re.search(
                     r'(interface )([a-zA-Z]+)(CustomizationArgsBackendDict)',
@@ -390,10 +390,10 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
             # Search for XCustomizationArgs interfaces and extract X,
             # where X is a interaction id.
-            # Group 1: The characters 'interface'.
-            # Group 2: The interaction id.
-            # Group 3: The characters 'CustomizationArgs'.
-            # Group 4: A space or an open bracket.
+            # Match 1: The characters 'interface'.
+            # Match 2: The interaction id.
+            # Match 3: The characters 'CustomizationArgs'.
+            # Match 4: A space or an open bracket.
             ca_frontend_interface_match = (
                 re.search(
                     r'(interface )([a-zA-Z]+)(CustomizationArgs)( |{)',
@@ -434,11 +434,11 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             # to typecast the customization args. Matches patterns
             # <XCustomizationArgs> or <XCustomizationArgsBackendDict> where
             # X is a interaction id.
-            # Group 1: The character '<'.
-            # Group 2: The interaction id.
-            # Group 3: The characters 'CustomizationArgs'.
-            # Group 4: The characters 'BackendDict' (optional).
-            # Group 5: The character '>'.
+            # Match 1: The character '<'.
+            # Match 2: The interaction id.
+            # Match 3: The characters 'CustomizationArgs'.
+            # Match 4: The characters 'BackendDict' (optional).
+            # Match 5: The character '>'.
             used_match = (
                 re.search(
                     r'(<)([a-zA-Z]+)(CustomizationArgs)(BackendDict)?(>)',
