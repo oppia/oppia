@@ -2733,7 +2733,7 @@ class State(python_utils.OBJECT):
                             except Exception:
                                 raise Exception(
                                     '%s has the wrong type. It should '
-                                    'be a %s.' & (value, param_type.__name__))
+                                    'be a %s.' % (value, param_type.__name__))
                         answer_group_dict['rule_inputs'][rule_type][
                             rule_input_index][param_name] = normalized_param
 
