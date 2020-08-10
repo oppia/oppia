@@ -53,7 +53,7 @@ angular.module('oppia').directive('questionsTab', [
         'TopicsAndSkillsDashboardBackendApiService',
         'SkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'QuestionsListService',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
+        'StateEditorService',
         'QuestionUndoRedoService', 'UndoRedoService',
         'NUM_QUESTIONS_PER_PAGE', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED', function(
@@ -63,7 +63,7 @@ angular.module('oppia').directive('questionsTab', [
             TopicsAndSkillsDashboardBackendApiService,
             SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, QuestionsListService,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
+            StateEditorService,
             QuestionUndoRedoService, UndoRedoService,
             NUM_QUESTIONS_PER_PAGE, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {

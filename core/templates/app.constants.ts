@@ -153,9 +153,6 @@ export class AppConstants {
 
   public static LOGOUT_URL = '/logout';
 
-  public static EVENT_QUESTION_SUMMARIES_INITIALIZED =
-    'questionSummariesInitialized';
-
   // TODO(vojtechjelinek): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).
   public static SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE =

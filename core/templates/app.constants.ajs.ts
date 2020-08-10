@@ -160,10 +160,6 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant('LOGOUT_URL', AppConstants.LOGOUT_URL);
 
-angular.module('oppia').constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED',
-  AppConstants.EVENT_QUESTION_SUMMARIES_INITIALIZED);
-
 // TODO(vojtechjelinek): Move these to separate file later, after we establish
 // process to follow for Angular constants (#6731).
 angular.module('oppia').constant(
