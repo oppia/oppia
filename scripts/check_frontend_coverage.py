@@ -393,7 +393,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts',
     'translate-text.service.ts',
     'translation-file-hash-loader.service.ts',
-    'translation-opportunities.directive.ts',
     'translation-tab.directive.ts',
     'translator-overview.directive.ts',
     'truncate-and-capitalize.filter.ts',

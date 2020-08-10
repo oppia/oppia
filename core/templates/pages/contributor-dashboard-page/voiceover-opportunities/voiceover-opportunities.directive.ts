@@ -36,7 +36,7 @@ angular.module('oppia').directive('voiceoverOpportunities', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/contributor-dashboard-page/translation-opportunities/' +
-      'translation-opportunities.directive.html'),
+        'translation-opportunities.component.html'),
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', '$scope', 'ContributionOpportunitiesService',
