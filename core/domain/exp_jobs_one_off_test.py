@@ -231,7 +231,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             'rule_input_translations_mapping': {},
             'rule_inputs': {
                 'IsMathematicallyEquivalentTo': [{
-                    'x': ['y=mx+c']
+                    'x': u'[\'y=mx+c\']'
                 }]
             },
             'outcome': {
