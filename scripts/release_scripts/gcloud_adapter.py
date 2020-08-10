@@ -23,7 +23,7 @@ import subprocess
 import sys
 
 GCLOUD_PATH = os.path.join(
-    '..', 'oppia_tools', 'google-cloud-sdk-251.0.0', 'google-cloud-sdk',
+    '..', 'oppia_tools', 'google-cloud-sdk-304.0.0', 'google-cloud-sdk',
     'bin', 'gcloud')
 
 CURR_DIR = os.path.abspath(os.getcwd())
