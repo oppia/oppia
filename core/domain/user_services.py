@@ -329,8 +329,8 @@ class UserAuthDetails(python_utils.OBJECT):
         self.deleted = deleted
 
     def validate(self):
-        """Checks that user_id, gae_id and email fields of this UserAuthDetails
-        domain object are valid.
+        """Checks that user_id, gae_id, pin and parent_user_id fields of this
+        UserAuthDetails domain object are valid.
 
         Raises:
             ValidationError. The user_id is not str.
