@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EventEmitter } from '@angular/core';
-
-
 /**
  * @fileoverview Unit tests for the topics and skills dashboard directive.
  */
+
+import { EventEmitter } from '@angular/core';
+
 
 fdescribe('Topics List Directive', function() {
   var $uibModal = null;
@@ -40,8 +40,6 @@ fdescribe('Topics List Directive', function() {
     directive = $injector.get('topicsListDirective')[0];
     $q = $injector.get('$q');
     AlertsService = $injector.get('AlertsService');
-    TopicsAndSkillsDashboardBackendApiService = (
-      $injector.get('TopicsAndSkillsDashboardBackendApiService'));
 
     var sampleEmitter = new EventEmitter();
 
