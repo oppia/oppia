@@ -369,13 +369,13 @@ class TopicPageDataHandlerTests(
         number_of_skills = 3
         number_of_questions = [1, 2, 2]
         self.topic_id = 'new_topic'
-        self.skill_ids = (
+        skill_ids = (
             [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'new-topic', 'description')
         for index in python_utils.RANGE(number_of_skills):
-            self.topic.uncategorized_skill_ids.append(self.skill_ids[index])
+            self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -383,16 +383,16 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in python_utils.RANGE(number_of_skills):
             self.save_new_skill(
-                self.skill_ids[i], self.admin_id,
-                description='Skill Description ' + str(i))
+                skill_ids[i], self.admin_id,
+                description='Skill Description')
         for i in python_utils.RANGE(number_of_skills):
             for j in python_utils.RANGE(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j), [self.skill_ids[i]])
+                    self._create_valid_question_data(j), [skill_ids[i]])
                 question_services.create_new_question_skill_link(
-                    self.admin_id, question_id, self.skill_ids[i], 0.5)
+                    self.admin_id, question_id, skill_ids[i], 0.5)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
@@ -412,13 +412,13 @@ class TopicPageDataHandlerTests(
         number_of_questions = [0] * 60
         number_of_questions[46] = 2
         self.topic_id = 'new_topic'
-        self.skill_ids = (
+        skill_ids = (
             [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'new-topic', 'description')
         for index in python_utils.RANGE(number_of_skills):
-            self.topic.uncategorized_skill_ids.append(self.skill_ids[index])
+            self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -426,16 +426,16 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in python_utils.RANGE(number_of_skills):
             self.save_new_skill(
-                self.skill_ids[i], self.admin_id,
-                description='Skill Description ' + str(i))
+                skill_ids[i], self.admin_id,
+                description='Skill Description')
         for i in python_utils.RANGE(number_of_skills):
             for j in python_utils.RANGE(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j), [self.skill_ids[i]])
+                    self._create_valid_question_data(j), [skill_ids[i]])
                 question_services.create_new_question_skill_link(
-                    self.admin_id, question_id, self.skill_ids[i], 0.5)
+                    self.admin_id, question_id, skill_ids[i], 0.5)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
@@ -457,13 +457,13 @@ class TopicPageDataHandlerTests(
         number_of_questions[20] = 3
         number_of_questions[29] = 10
         self.topic_id = 'new_topic'
-        self.skill_ids = (
+        skill_ids = (
             [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'new-topic', 'description')
         for index in python_utils.RANGE(number_of_skills):
-            self.topic.uncategorized_skill_ids.append(self.skill_ids[index])
+            self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -471,16 +471,16 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in python_utils.RANGE(number_of_skills):
             self.save_new_skill(
-                self.skill_ids[i], self.admin_id,
-                description='Skill Description ' + str(i))
+                skill_ids[i], self.admin_id,
+                description='Skill Description')
         for i in python_utils.RANGE(number_of_skills):
             for j in python_utils.RANGE(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j), [self.skill_ids[i]])
+                    self._create_valid_question_data(j), [skill_ids[i]])
                 question_services.create_new_question_skill_link(
-                    self.admin_id, question_id, self.skill_ids[i], 0.5)
+                    self.admin_id, question_id, skill_ids[i], 0.5)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
