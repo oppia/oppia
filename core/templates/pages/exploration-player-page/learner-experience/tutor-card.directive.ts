@@ -49,6 +49,8 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').animation(
   '.conversation-skin-responses-animate-slide', function() {
     return {
@@ -108,6 +110,7 @@ angular.module('oppia').directive('tutorCard', [
             INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS,
             OPPIA_AVATAR_LINK_URL, PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           var updateDisplayedCard = function() {
             $scope.arePreviousResponsesShown = false;
@@ -238,24 +241,30 @@ angular.module('oppia').directive('tutorCard', [
               updateDisplayedCard();
             });
 
-            $scope.$on('oppiaFeedbackAvailable', function() {
-              $scope.waitingForOppiaFeedback = false;
+            ctrl.directiveSubscriptions.add(
+              ExplorationPlayerStateService.onOppiaFeedbackAvailable.subscribe(
+                () => {
+                  $scope.waitingForOppiaFeedback = false;
 
-              // Auto scroll to the new feedback on mobile device.
-              if (DeviceInfoService.isMobileDevice()) {
-                var latestFeedbackIndex = (
-                  $scope.getDisplayedCard().getInputResponsePairs().length - 1);
-                /* Reference: https://stackoverflow.com/questions/40134381
-                  $anchorScroll() without changing actual hash value of url
-                  works only when written inside a timeout of 0 ms. */
-                $anchorScroll.yOffset = 80;
-                $location.hash(
-                  $scope.getInputResponsePairId(latestFeedbackIndex));
-                $anchorScroll();
-              }
-            });
-
+                  // Auto scroll to the new feedback on mobile device.
+                  if (DeviceInfoService.isMobileDevice()) {
+                    var latestFeedbackIndex = (
+                      $scope.getDisplayedCard()
+                        .getInputResponsePairs().length - 1);
+                    /* Reference: https://stackoverflow.com/questions/40134381
+                      $anchorScroll() without changing actual hash value of url
+                      works only when written inside a timeout of 0 ms. */
+                    $anchorScroll.yOffset = 80;
+                    $location.hash(
+                      $scope.getInputResponsePairId(latestFeedbackIndex));
+                    $anchorScroll();
+                  }
+                })
+            );
             updateDisplayedCard();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

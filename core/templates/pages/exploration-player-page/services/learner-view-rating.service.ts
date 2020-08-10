@@ -18,12 +18,15 @@
 
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('LearnerViewRatingService', [
   '$http', '$rootScope', 'ExplorationEngineService',
   function($http, $rootScope, ExplorationEngineService) {
     var explorationId = ExplorationEngineService.getExplorationId();
     var ratingsUrl = '/explorehandler/rating/' + explorationId;
     var userRating;
+    var _ratingUpdatedEventEmitter = new EventEmitter();
     return {
       init: function(successCallback) {
         $http.get(ratingsUrl).then(function(response) {
@@ -37,10 +40,13 @@ angular.module('oppia').factory('LearnerViewRatingService', [
           user_rating: ratingValue
         });
         userRating = ratingValue;
-        $rootScope.$broadcast('ratingUpdated');
+        _ratingUpdatedEventEmitter.emit();
       },
       getUserRating: function() {
         return userRating;
+      },
+      get onRatingUpdated() {
+        return _ratingUpdatedEventEmitter;
       }
     };
   }

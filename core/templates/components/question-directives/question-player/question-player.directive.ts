@@ -16,6 +16,7 @@
  * @fileoverview Controller for the questions player directive.
  */
 
+
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
@@ -85,6 +86,9 @@ require(
   'components/question-directives/question-player/' +
   'question-player-concept-card-modal.controller.ts');
 require(
+  'components/question-directives/question-player/services/' +
+  'question-player-state.service.ts');
+require(
   'components/question-directives/question-player/' +
   'skill-mastery-modal.controller.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
@@ -143,7 +147,8 @@ angular.module('oppia').directive('questionPlayer', [
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$uibModal', '$window',
         'AlertsService', 'ExplorationPlayerStateService', 'HtmlEscaperService',
-        'QuestionBackendApiService', 'SkillMasteryBackendApiService',
+        'QuestionBackendApiService', 'QuestionPlayerStateService',
+        'SkillMasteryBackendApiService',
         'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
         'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
@@ -154,7 +159,8 @@ angular.module('oppia').directive('questionPlayer', [
             $scope, $sce, $rootScope, $location,
             $sanitize, $uibModal, $window,
             AlertsService, ExplorationPlayerStateService, HtmlEscaperService,
-            QuestionBackendApiService, SkillMasteryBackendApiService,
+            QuestionBackendApiService, QuestionPlayerStateService,
+            SkillMasteryBackendApiService,
             UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
             QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
@@ -550,10 +556,13 @@ angular.module('oppia').directive('questionPlayer', [
               )
             );
 
-            $rootScope.$on('questionSessionCompleted', function(event, result) {
-              $location.hash(HASH_PARAM +
-                encodeURIComponent(JSON.stringify(result)));
-            });
+            ctrl.directiveSubscriptions.add(
+              QuestionPlayerStateService.onQuestionSessionCompleted.subscribe(
+                (result) => {
+                  $location.hash(HASH_PARAM +
+                    encodeURIComponent(JSON.stringify(result)));
+                })
+            );
 
             $scope.$on('$locationChangeSuccess', function(event) {
               var hashContent = $location.hash();

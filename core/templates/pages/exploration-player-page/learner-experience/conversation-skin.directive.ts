@@ -114,6 +114,8 @@ interface ConversationSkinCustomScope extends ng.IScope {
   directiveTemplate?: string;
 }
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').animation(
   '.conversation-skin-animate-tutor-card-on-narrow', function() {
     var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
@@ -411,6 +413,7 @@ angular.module('oppia').directive('conversationSkin', [
             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
           // The minimum width, in pixels, needed to be able to show two cards
@@ -873,7 +876,7 @@ angular.module('oppia').directive('conversationSkin', [
               FatigueDetectionService.recordSubmissionTimestamp();
               if (FatigueDetectionService.isSubmittingTooFast()) {
                 FatigueDetectionService.displayTakeBreakMessage();
-                $scope.$broadcast('oppiaFeedbackAvailable');
+                ExplorationPlayerStateService.onOppiaFeedbackAvailable();
                 return;
               }
             }
@@ -959,7 +962,7 @@ angular.module('oppia').directive('conversationSkin', [
                   1.0));
 
                 $timeout(function() {
-                  $scope.$broadcast('oppiaFeedbackAvailable');
+                  ExplorationPlayerStateService.onOppiaFeedbackAvailable();
                   var pairs = (
                     PlayerTranscriptService.getLastCard().
                       getInputResponsePairs());
@@ -1149,8 +1152,7 @@ angular.module('oppia').directive('conversationSkin', [
               return;
             }
             if ($scope.questionSessionCompleted) {
-              $rootScope.$broadcast(
-                'questionSessionCompleted',
+              QuestionPlayerStateService.onQuestionSessionCompleted.emit(
                 QuestionPlayerStateService.getQuestionPlayerStateData());
               return;
             }
@@ -1351,9 +1353,11 @@ angular.module('oppia').directive('conversationSkin', [
                 }
               }
             });
-            $scope.$on('ratingUpdated', function() {
-              $scope.userRating = LearnerViewRatingService.getUserRating();
-            });
+            ctrl.directiveSubscriptions.add(
+              LearnerViewRatingService.onRatingUpdated.subscribe(() => {
+                $scope.userRating = LearnerViewRatingService.getUserRating();
+              })
+            );
 
             $window.addEventListener('beforeunload', function(e) {
               if ($scope.redirectToRefresherExplorationConfirmed) {
