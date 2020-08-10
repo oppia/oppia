@@ -52,10 +52,11 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
-    exp_jobs_one_off.ExplorationMathTagValidationOneOffJob,
+    exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob,
     exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob,
     exp_jobs_one_off.ExplorationMathRichTextInfoModelGenerationOneOffJob,
     exp_jobs_one_off.ExplorationMathRichTextInfoModelDeletionOneOffJob,
+    exp_jobs_one_off.ExplorationMigrationAuditJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
@@ -68,8 +69,10 @@ ONE_OFF_JOB_MANAGERS = [
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
+    question_jobs_one_off.QuestionsMathRteAuditOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
+    skill_jobs_one_off.SkillMathRteAuditOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
@@ -78,16 +81,21 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAuditV1,
     stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
+    stats_jobs_one_off.StatisticsCustomizationArgsAudit,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
+    story_jobs_one_off.StoryMathRteAuditOneOffJob,
     suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
+    suggestion_jobs_one_off.SuggestionSvgFilenameValidationOneOffJob,
+    topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
+    topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob,
     user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
-    user_jobs_one_off.DraftChangeMathRichTextAuditOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
+    user_jobs_one_off.PopulateUserAuthDetailsModelOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
@@ -215,8 +223,9 @@ AUDIT_JOB_MANAGERS = [
         .TrainingJobExplorationMappingModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserContributionRightsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserEmailPreferencesModelAuditOneOffJob,
@@ -253,7 +262,7 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
 
         Args:
             event_type: str. The type of the event.
-            *args: *. Positional arguments to pass to on_incoming_event().
+            *args: list(*). Positional arguments to pass to on_incoming_event().
             **kwargs: *. Keyword arguments to pass to on_incoming_event().
         """
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:

@@ -33,6 +33,7 @@ from core.domain import interaction_registry
 from core.domain import state_domain
 from core.tests import test_utils
 import feconf
+import schema_utils
 import utils
 
 
@@ -59,10 +60,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_customization_args_dict = {
             'choices': {
                 'value': [
-                    '<p>state customization arg html 1</p>',
-                    '<p>state customization arg html 2</p>',
-                    '<p>state customization arg html 3</p>',
-                    '<p>state customization arg html 4</p>'
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '<p>state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>state customization arg html 2</p>'
+                    }, {
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>state customization arg html 3</p>'
+                    }, {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>state customization arg html 4</p>'
+                    }
                 ]
             },
             'allowMultipleItemsInSamePosition': {
@@ -127,51 +137,150 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': '<p>state written_translation content-en</p>',
+                        'data_format': 'html',
+                        'translation':
+                            '<p>state written_translation content-en</p>',
                         'needs_update': True
                     },
                     'hi': {
-                        'html': '<p>state written_translation content-hi</p>',
+                        'data_format': 'html',
+                        'translation':
+                            '<p>state written_translation content-hi</p>',
+                        'needs_update': False
+                    }
+                },
+                'ca_choices_0': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation':
+                            (
+                                '<p>state written_translation ca_choices_0-hi'
+                                '</p>'
+                            ),
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation':
+                            (
+                                '<p>state written_translation ca_choices_0'
+                                '-en</p>'
+                            ),
+                        'needs_update': False
+                    }
+                },
+                'ca_choices_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation':
+                            (
+                                '<p>state written_translation ca_choices_1-hi'
+                                '</p>'
+                            ),
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation':
+                            (
+                                '<p>state written_translation ca_choices_1-en'
+                                '</p>'
+                            ),
+                        'needs_update': False
+                    }
+                },
+                'ca_choices_2': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation':
+                            (
+                                '<p>state written_translation ca_choices_2-hi'
+                                '</p>'
+                            ),
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation':
+                            (
+                                '<p>state written_translation ca_choices_2-en'
+                                '</p>'
+                            ),
+                        'needs_update': False
+                    }
+                },
+                'ca_choices_3': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': (
+                            '<p>state written_translation ca_choices_3-hi'
+                            '</p>'
+                        ),
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation':
+                            (
+                                '<p>state written_translation ca_choices_3-en'
+                                '</p>'
+                            ),
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>state written_translation outcome-hi</p>',
+                        'data_format': 'html',
+                        'translation':
+                            '<p>state written_translation outcome-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'html': '<p>state written_translation outcome-en</p>',
+                        'data_format': 'html',
+                        'translation':
+                            '<p>state written_translation outcome-en</p>',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': '<p>state written_translation feedback-hi</p>',
+                        'data_format': 'html',
+                        'translation':
+                            '<p>state written_translation feedback-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'html': '<p>state written_translation feedback-en</p>',
+                        'data_format': 'html',
+                        'translation':
+                            '<p>state written_translation feedback-en</p>',
                         'needs_update': False
                     }
                 },
                 'hint_1': {
                     'hi': {
-                        'html': '<p>state written_translation hint_1-hi</p>',
+                        'data_format': 'html',
+                        'translation':
+                            '<p>state written_translation hint_1-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'html': '<p>state written_translation hint_1-en</p>',
+                        'data_format': 'html',
+                        'translation':
+                            '<p>state written_translation hint_1-en</p>',
                         'needs_update': False
                     }
                 },
                 'solution': {
                     'hi': {
-                        'html': '<p>state written_translation solution-hi</p>',
+                        'data_format': 'html',
+                        'translation':
+                            '<p>state written_translation solution-hi</p>',
                         'needs_update': False
                     },
                     'en': {
-                        'html': '<p>state written_translation solution-en</p>',
+                        'data_format': 'html',
+                        'translation':
+                            '<p>state written_translation solution-en</p>',
                         'needs_update': False
                     }
                 }
@@ -204,6 +313,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('DragAndDropSortInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
+        state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
 
         solution = state_domain.Solution.from_dict(
@@ -221,23 +331,33 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             html_list,
             [
+                '<p>state written_translation solution-hi</p>',
+                '<p>state written_translation solution-en</p>',
                 '<p>state written_translation content-hi</p>',
                 '<p>state written_translation content-en</p>',
-                '<p>state written_translation outcome-hi</p>',
-                '<p>state written_translation outcome-en</p>',
                 '<p>state written_translation feedback-hi</p>',
                 '<p>state written_translation feedback-en</p>',
                 '<p>state written_translation hint_1-hi</p>',
                 '<p>state written_translation hint_1-en</p>',
-                '<p>state written_translation solution-hi</p>',
-                '<p>state written_translation solution-en</p>',
+                '<p>state written_translation outcome-hi</p>',
+                '<p>state written_translation outcome-en</p>',
+                '<p>state written_translation ca_choices_0-hi</p>',
+                '<p>state written_translation ca_choices_0-en</p>',
+                '<p>state written_translation ca_choices_1-hi</p>',
+                '<p>state written_translation ca_choices_1-en</p>',
+                '<p>state written_translation ca_choices_2-hi</p>',
+                '<p>state written_translation ca_choices_2-en</p>',
+                '<p>state written_translation ca_choices_3-hi</p>',
+                '<p>state written_translation ca_choices_3-en</p>',
                 '<p>State Feedback</p>',
                 '<p>IsEqualToOrdering rule_spec htmls</p>',
                 '<p>HasElementXAtPositionY rule_spec html</p>',
                 '<p>y input for HasElementXAtPositionY rule_spec </p>',
                 '<p>x input for HasElementXAtPositionY rule_spec </p>',
-                ('<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
-                 'pec htmls</p>'), '',
+                (
+                    '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
+                    'pec htmls</p>'),
+                '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
                 '<p>state customization arg html 1</p>',
@@ -310,10 +430,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1}
+        }
 
+        state.update_next_content_id_index(3)
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args(state_interaction_cust_args)
         state.update_interaction_answer_groups(
             [state_answer_group_dict])
         state.update_interaction_default_outcome(state_default_outcome)
@@ -357,10 +488,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'choices': {
                 'value': [
-                    '<p>init_state customization arg html 1</p>',
-                    '<p>init_state customization arg html 2</p>',
-                    '<p>init_state customization arg html 3</p>',
-                    '<p>init_state customization arg html 4</p>'
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '<p>init_state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>init_state customization arg html 2</p>'
+                    }, {
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>init_state customization arg html 3</p>'
+                    }, {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>init_state customization arg html 4</p>'
+                    },
                 ]
             }
         }
@@ -427,6 +567,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_answer_groups(state_answer_groups)
         state.update_interaction_customization_args(
             state_customization_args_dict)
+        state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
 
         solution = state_domain.Solution.from_dict(
@@ -523,6 +664,43 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'The rule spec does not belong to a valid format.'):
                 state.get_all_html_content_strings()
 
+    def test_update_customization_args_with_invalid_content_id(self):
+        """Test the method for updating interaction customization arguments
+        when a content_id is invalid (set to None).
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_customization_args_dict = {
+            'maxAllowableSelectionCount': {
+                'value': 1
+            },
+            'minAllowableSelectionCount': {
+                'value': 1
+            },
+            'choices': {
+                'value': [
+                    {
+                        'content_id': None,
+                        'html': '<p>init_state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>init_state customization arg html 2</p>'
+                    }
+                ]
+            }
+        }
+
+        state.update_interaction_id('ItemSelectionInput')
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected content id to be a string, received None'
+        ):
+            state.update_interaction_customization_args(
+                state_customization_args_dict)
+
     def test_rule_spec_with_html_having_invalid_input_variable(self):
         """Test the method for extracting all the HTML from a state
         when the rule_spec has html but the input variable is invalid.
@@ -562,10 +740,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'choices': {
                 'value': [
-                    '<p>init_state customization arg html 1</p>',
-                    '<p>init_state customization arg html 2</p>',
-                    '<p>init_state customization arg html 3</p>',
-                    '<p>init_state customization arg html 4</p>'
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '<p>init_state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>init_state customization arg html 2</p>'
+                    }, {
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>init_state customization arg html 3</p>'
+                    }, {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>init_state customization arg html 4</p>'
+                    }
                 ]
             }
         }
@@ -610,10 +797,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_customization_args_dict = {
             'choices': {
                 'value': [
-                    '<p>state customization arg html 1</p>',
-                    '<p>state customization arg html 2</p>',
-                    '<p>state customization arg html 3</p>',
-                    '<p>state customization arg html 4</p>'
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '<p>state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>state customization arg html 2</p>'
+                    }, {
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>state customization arg html 3</p>'
+                    }, {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>state customization arg html 4</p>'
+                    }
                 ]
             },
             'allowMultipleItemsInSamePosition': {
@@ -649,6 +845,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('DragAndDropSortInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
+        state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
@@ -717,6 +914,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -812,10 +1010,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': (
-                    '<p>Value</p><oppia-noninteractive-math math_content-with'
-                    '-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,'
-                    '+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
-                    ';&amp;quot;}"></oppia-noninteractive-math>')
+                    '<oppia-noninteractive-collapsible content-with-value='
+                    '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
+                    'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
+                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>')
             },
         }
 
@@ -850,10 +1048,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
                 'default_outcome', (
-                    '<p>Value</p><oppia-noninteractive-math math_content-with'
-                    '-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,'
-                    '+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
-                    ';&amp;quot;}"></oppia-noninteractive-math>')),
+                    '<oppia-noninteractive-collapsible content-with-value='
+                    '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
+                    'quot;" heading-with-value="&amp;quot;Sub&amp;quot;">'
+                    '</oppia-noninteractive-collapsible><p>&nbsp;</p>')),
             False, [], None, None
         )
 
@@ -958,13 +1156,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('TextInput')
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('ImageClickInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
 
         # Invalid interactions.
         init_state.update_interaction_id('CodeRepl')
         self.assertFalse(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('GraphInput')
-        self.assertFalse(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('ImageClickInput')
         self.assertFalse(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('InteractiveMap')
         self.assertFalse(init_state.interaction.is_supported_on_android_app())
@@ -1063,7 +1261,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>hello!</p>',
+                        'data_format': 'html',
+                        'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
                 },
@@ -1154,8 +1353,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.states['State 2'].interaction.default_outcome.dest = 'END'
 
         # Ensure the other states have interactions.
-        exploration.states['Renamed state'].update_interaction_id('TextInput')
-        exploration.states['State 2'].update_interaction_id('TextInput')
+        self.set_interaction_for_state(
+            exploration.states['Renamed state'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
 
         # Other miscellaneous requirements for validation.
         exploration.title = 'Title'
@@ -1174,7 +1375,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # default outcome or answer groups.
         exploration.rename_state('END', 'AnotherEnd')
         another_end_state = exploration.states['AnotherEnd']
-        another_end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(another_end_state, 'EndExploration')
         another_end_state.update_interaction_default_outcome(None)
         exploration.validate(strict=True)
 
@@ -1231,9 +1432,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': [{
+                            'html': 'hello',
+                            'content_id': 'ca_choices_0'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                },
                 'confirmed_unclassified_answers': [],
-                'id': None,
+                'id': 'MultipleChoiceInput',
                 'hints': []
             }
         }
@@ -1264,9 +1473,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>hello</p>',
+                            'content_id': 'ca_choices_0'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                },
                 'confirmed_unclassified_answers': [],
-                'id': None,
+                'id': 'MultipleChoiceInput',
                 'hints': []
             }
         }
@@ -1298,9 +1515,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>hello</p>',
+                            'content_id': 'ca_choices_0'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                },
                 'confirmed_unclassified_answers': [],
-                'id': None,
+                'id': 'MultipleChoiceInput',
                 'hints': []
             }
         }
@@ -1332,9 +1557,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>hello</p>',
+                            'content_id': 'ca_choices_0'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                },
                 'confirmed_unclassified_answers': [],
-                'id': None,
+                'id': 'MultipleChoiceInput',
                 'hints': []
             }
         }
@@ -1380,21 +1613,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': html_with_old_math_schema,
+                        'data_format': 'html',
+                        'translation': html_with_old_math_schema,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': html_with_old_math_schema,
+                        'data_format': 'html',
+                        'translation': html_with_old_math_schema,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -1404,21 +1641,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': html_with_new_math_schema,
+                        'data_format': 'html',
+                        'translation': html_with_new_math_schema,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': html_with_new_math_schema,
+                        'data_format': 'html',
+                        'translation': html_with_new_math_schema,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -1541,13 +1782,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {
                     'choices': {
-                        'value': [
-                            html_with_old_math_schema,
-                            '<p>2</p>',
-                            '<p>3</p>',
-                            '<p>4</p>'
-                        ]
-                    }
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': html_with_old_math_schema
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>2</p>'
+                        }, {
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>3</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>4</p>'
+                        }]
+                    },
+                    'allowMultipleItemsInSamePosition': {'value': True}
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'DragAndDropSortInput',
@@ -1613,13 +1862,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {
                     'choices': {
-                        'value': [
-                            html_with_new_math_schema,
-                            '<p>2</p>',
-                            '<p>3</p>',
-                            '<p>4</p>'
-                        ]
-                    }
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': html_with_new_math_schema
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>2</p>'
+                        }, {
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>3</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>4</p>'
+                        }]
+                    },
+                    'allowMultipleItemsInSamePosition': {'value': True}
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'DragAndDropSortInput',
@@ -1796,12 +2053,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'choices': {
-                        'value': [
-                            '<p>init_state customization arg html 1</p>',
-                            html_with_old_math_schema,
-                            '<p>init_state customization arg html 3</p>',
-                            '<p>init_state customization arg html 4</p>'
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>init_state customization arg html 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': html_with_old_math_schema
+                        }, {
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>init_state customization arg html 3</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>init_state customization arg html 4</p>'
+                        }]
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -1858,12 +2122,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'choices': {
-                        'value': [
-                            '<p>init_state customization arg html 1</p>',
-                            html_with_new_math_schema,
-                            '<p>init_state customization arg html 3</p>',
-                            '<p>init_state customization arg html 4</p>'
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>init_state customization arg html 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': html_with_new_math_schema
+                        }, {
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>init_state customization arg html 3</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>init_state customization arg html 4</p>'
+                        }]
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -1972,7 +2243,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'placeholder': {
-                        'value': ''
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -2028,7 +2302,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'placeholder': {
-                        'value': ''
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -2488,6 +2765,29 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
 
+    def test_subtitled_unicode_validation_with_invalid_html_type(self):
+        """Test validation of subtitled unicode with invalid unicode type."""
+        subtitled_unicode = state_domain.SubtitledUnicode(
+            'content_id', 'some string')
+        subtitled_unicode.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid content unicode'
+            ):
+            with self.swap(subtitled_unicode, 'unicode_str', 20):
+                subtitled_unicode.validate()
+
+    def test_subtitled_unicode_validation_with_invalid_content(self):
+        """Test validation of subtitled unicode with invalid content."""
+        subtitled_unicode = state_domain.SubtitledUnicode(
+            'content_id', 'some html string')
+        subtitled_unicode.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected content id to be a string, ' +
+            'received 20'):
+            with self.swap(subtitled_unicode, 'content_id', 20):
+                subtitled_unicode.validate()
+
     def test_voiceover_validation(self):
         """Test validation of voiceover."""
         audio_voiceover = state_domain.Voiceover('a.mp3', 20, True, 24.5)
@@ -2550,12 +2850,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_written_translation_validation(self):
         """Test validation of translation script."""
-        written_translation = state_domain.WrittenTranslation('Test.', True)
+        written_translation = state_domain.WrittenTranslation(
+            'html', 'Test.', True)
         written_translation.validate()
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid content HTML'):
-            with self.swap(written_translation, 'html', 30):
+            utils.ValidationError, 'Invalid translation'):
+            with self.swap(written_translation, 'translation', 30):
                 written_translation.validate()
 
         with self.assertRaisesRegexp(
@@ -2564,12 +2865,24 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(written_translation, 'needs_update', 20):
                 written_translation.validate()
 
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid data_format'
+            ):
+            with self.swap(written_translation, 'data_format', 'int'):
+                written_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid data_format'
+            ):
+            with self.swap(written_translation, 'data_format', 2):
+                written_translation.validate()
+
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         exploration.validate()
 
         hints_list = [
@@ -2614,16 +2927,41 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         del hints_list[1]
         init_state.update_interaction_hints(hints_list)
+        init_state.update_next_content_id_index(4)
 
         self.assertEqual(len(init_state.interaction.hints), 2)
         exploration.validate()
+
+    def test_update_customization_args_with_non_unique_content_ids(self):
+        """Test that update customization args throws an error when passed
+        customization args with non-unique content ids.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.set_interaction_for_state(init_state, 'MultipleChoiceInput')
+        with self.assertRaisesRegexp(
+            Exception,
+            'All customization argument content_ids should be unique.'
+        ):
+            init_state.update_interaction_customization_args({
+                'choices': {
+                    'value': [{
+                        'content_id': 'non-unique-content-id',
+                        'html': '1'
+                    }, {
+                        'content_id': 'non-unique-content-id',
+                        'html': '2'
+                    }]
+                },
+                'showChoicesInShuffledOrder': {'value': True}
+            })
 
     def test_solution_validation(self):
         """Test validation of state solution."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         exploration.validate()
 
         # Solution should be set to None as default.
@@ -2664,6 +3002,53 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 init_state.interaction.id, solution_dict))
         exploration.validate()
 
+    def test_validate_state_unique_content_ids(self):
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('MultipleChoiceInput')
+        init_state.update_interaction_customization_args({
+            'choices': {
+                'value': [{
+                    'content_id': '',
+                    'html': 'one'
+                }]
+            },
+            'showChoicesInShuffledOrder': {'value': True}
+        })
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected all content_ids to be unique, received'
+        ):
+            with self.swap(
+                init_state.interaction.customization_args['choices'].value[0],
+                'content_id',
+                'content'
+            ):
+                exploration.validate()
+
+    def test_validate_state_content_id_indexes(self):
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('MultipleChoiceInput')
+        init_state.update_interaction_customization_args({
+            'choices': {
+                'value': [{
+                    'content_id': 'ca_choices_10',
+                    'html': 'one'
+                }]
+            },
+            'showChoicesInShuffledOrder': {'value': True}
+        })
+        init_state.update_next_content_id_index(9)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected all content id indexes to be less than the "next '
+            'content id index"'
+        ):
+            exploration.validate()
+
     def test_validate_state_solicit_answer_details(self):
         """Test validation of solicit_answer_details."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -2675,7 +3060,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(init_state, 'solicit_answer_details', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.solicit_answer_details, False)
-        init_state.update_interaction_id('Continue')
+        self.set_interaction_for_state(init_state, 'Continue')
         self.assertEqual(init_state.interaction.id, 'Continue')
         exploration.validate()
         with self.assertRaisesRegexp(
@@ -2683,7 +3068,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'support soliciting answer details from learners.'):
             with self.swap(init_state, 'solicit_answer_details', True):
                 exploration.validate()
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         self.assertEqual(init_state.interaction.id, 'TextInput')
         self.assertEqual(init_state.solicit_answer_details, False)
         exploration.validate()
@@ -2885,7 +3270,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>Test!</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
                 },
@@ -2966,13 +3352,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'hint_2': {
                     'hi': {
-                        'html': '<p>Test!</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
                 },
                 'hint_1': {
                     'hi': {
-                        'html': '<p>Test1!</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Test1!</p>',
                         'needs_update': True
                     }
                 },
@@ -3066,7 +3454,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'Expected solution to be a Solution object,'
-            'recieved test string'):
+            'received test string'):
             exploration.init_state.update_interaction_solution('test string')
 
     def test_update_interaction_solution_with_no_solution(self):
@@ -3277,6 +3665,99 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )
 
 
+class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
+    """Test methods for InteractionCustomizationArg domain object."""
+
+    def test_traverse_by_schema_and_convert(self):
+        html = []
+        def extract_html(value, unused_schema_obj_type):
+            """Extracts html from SubtitledHtml values.
+
+            Args:
+                value: SubtitledHtml|SubtitledUnicode. The value in the
+                    customization argument value to be converted.
+                unused_schema_obj_type: str. The schema obj_type for the
+                    customization argument value, which is one of
+                    'SubtitledUnicode' or 'SubtitledHtml'.
+
+            Returns:
+                SubtitledHtml|SubtitledUnicode. The converted SubtitledHtml
+                object, if schema_type is 'SubititledHtml', otherwise the
+                unmodified SubtitledUnicode object.
+            """
+            html.append(value.html)
+            return html
+
+        schema = {
+            'type': 'dict',
+            'properties': [{
+                'name': 'content',
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'SubtitledHtml',
+                }
+            }]
+        }
+        value = {
+            'content': state_domain.SubtitledHtml('id', '<p>testing</p>')
+        }
+
+        state_domain.InteractionCustomizationArg.traverse_by_schema_and_convert(
+            schema, value, extract_html)
+
+        self.assertEqual(html, ['<p>testing</p>'])
+
+    def test_traverse_by_schema_and_get(self):
+        html = []
+
+        schema = {
+            'type': 'dict',
+            'properties': [{
+                'name': 'content',
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'SubtitledHtml',
+                }
+            }]
+        }
+        value = {
+            'content': state_domain.SubtitledHtml('id', '<p>testing</p>')
+        }
+
+        html = (
+            state_domain.InteractionCustomizationArg.traverse_by_schema_and_get(
+                schema,
+                value,
+                [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+                lambda x: x.html)
+        )
+
+        self.assertEqual(html, ['<p>testing</p>'])
+
+
+class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
+    """Test SubtitledUnicode domain object methods."""
+
+    def test_from_and_to_dict(self):
+        subtitled_unicode_dict = {
+            'content_id': 'id',
+            'unicode_str': ''
+        }
+        subtitled_unicode = state_domain.SubtitledUnicode.from_dict(
+            subtitled_unicode_dict)
+        self.assertEqual(subtitled_unicode.to_dict(), subtitled_unicode_dict)
+
+    def test_create_default(self):
+        subtitled_unicode = (
+            state_domain.SubtitledUnicode.create_default_subtitled_unicode(
+                'id')
+        )
+        self.assertEqual(subtitled_unicode.to_dict(), {
+            'content_id': 'id',
+            'unicode_str': ''
+        })
+
+
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
 
@@ -3285,21 +3766,25 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': 'hello',
+                        'data_format': 'html',
+                        'translation': 'hello',
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': 'Testing!',
+                        'data_format': 'html',
+                        'translation': 'Testing!',
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -3329,7 +3814,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': '<p> In English.</p>',
+                        'data_format': 'html',
+                        'translation': '<p> In English.</p>',
                         'needs_update': False
                     }
                 }
@@ -3349,7 +3835,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': '<p> In English.</p>',
+                        'data_format': 'html',
+                        'translation': '<p> In English.</p>',
                         'needs_update': False
                     }
                 }
@@ -3397,7 +3884,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'feedback_1': {
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -3417,7 +3905,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -3487,7 +3976,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     123: {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -3506,7 +3996,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'ed': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -3524,7 +4015,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': '<p>hello!</p>',
+                        'data_format': 'html',
+                        'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
                 }
@@ -3561,7 +4053,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>hello!</p>',
+                        'data_format': 'html',
+                        'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
                 },
@@ -3580,7 +4073,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>hello!</p>',
+                        'data_format': 'html',
+                        'translation': '<p>hello!</p>',
                         'needs_update': True
                     }
                 },

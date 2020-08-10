@@ -658,7 +658,10 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         super(ExplorationIssueTests, self).setUp()
 
         self.exp_issue = stats_domain.ExplorationIssue(
-            'EarlyQuit', {}, [], 1, True)
+            'EarlyQuit', {
+                'state_name': {'value': ''},
+                'time_spent_in_exp_in_msecs': {'value': 0}
+            }, [], 1, True)
 
     def _dummy_convert_issue_v1_dict_to_v2_dict(self, issue_dict):
         """A test implementation of schema conversion function. It sets all the
@@ -672,7 +675,16 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         return issue_dict
 
     def test_to_dict(self):
-        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
+        exp_issue = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            {
+                'time_spent_in_exp_in_msecs': {
+                    'value': 0
+                },
+                'state_name': {
+                    'value': ''
+                }
+            }, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
         expected_customization_args = {
             'time_spent_in_exp_in_msecs': {
@@ -734,7 +746,16 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
     def test_update_exp_issue_from_model(self):
         """Test the migration of exploration issue domain objects."""
-        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
+        exp_issue = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            {
+                'time_spent_in_exp_in_msecs': {
+                    'value': 0
+                },
+                'state_name': {
+                    'value': ''
+                }
+            }, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
         stats_models.ExplorationIssuesModel.create(
             'exp_id', 1, [exp_issue_dict])
@@ -762,7 +783,10 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         # For other issue types, no changes happen during migration.
         exp_issue1 = stats_domain.ExplorationIssue(
-            'MultipleIncorrectSubmissions', {}, [], 1, True)
+            'MultipleIncorrectSubmissions', {
+                'state_name': {'value': ''},
+                'num_times_answered_incorrectly': {'value': 7}
+            }, [], 1, True)
         exp_issue_dict1 = exp_issue1.to_dict()
 
         stats_models.ExplorationIssuesModel.create(
@@ -871,7 +895,11 @@ class LearnerActionTests(test_utils.GenericTestBase):
         super(LearnerActionTests, self).setUp()
 
         self.learner_action = stats_domain.LearnerAction(
-            'ExplorationStart', {}, 1)
+            'ExplorationStart', {
+                'state_name': {
+                    'value': ''
+                }
+            }, 1)
 
     def _dummy_convert_action_v1_dict_to_v2_dict(self, action_dict):
         """A test implementation of schema conversion function."""
@@ -883,7 +911,13 @@ class LearnerActionTests(test_utils.GenericTestBase):
         return action_dict
 
     def test_to_dict(self):
-        learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 1)
+        learner_action = stats_domain.LearnerAction(
+            'ExplorationStart',
+            {
+                'state_name': {
+                    'value': ''
+                }
+            }, 1)
         learner_action_dict = learner_action.to_dict()
         expected_customization_args = {
             'state_name': {

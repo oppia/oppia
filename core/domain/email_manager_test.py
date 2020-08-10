@@ -150,8 +150,9 @@ class DummyMailTest(test_utils.EmailTestBase):
             self.assertEqual(messages[0].to, [dummy_receiver_address])
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
-            self.assertIn('This is a test mail from DUMMY_SYSTEM_NAME',
-                          messages[0].html.decode())
+            self.assertIn(
+                'This is a test mail from DUMMY_SYSTEM_NAME',
+                messages[0].html.decode())
 
 
 class EmailRightsTest(test_utils.GenericTestBase):
@@ -1241,8 +1242,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            email_sent_time = (datetime.datetime.utcnow() -
-                               datetime.timedelta(minutes=4))
+            email_sent_time = (
+                datetime.datetime.utcnow() - datetime.timedelta(minutes=4))
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
@@ -1255,8 +1256,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            email_sent_time = (datetime.datetime.utcnow() -
-                               datetime.timedelta(minutes=2))
+            email_sent_time = (
+                datetime.datetime.utcnow() - datetime.timedelta(minutes=2))
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
@@ -2340,8 +2341,8 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             'language English got rejected and the reviewer has left a message.'
             '<br><br>Review message: A rejection message!<br><br>'
             'You can create a new voiceover application through the'
-            '<a href="https://oppia.org/community-dashboard">'
-            'community dashboard</a> page.<br><br>'
+            '<a href="https://oppia.org/contributor-dashboard">'
+            'contributor dashboard</a> page.<br><br>'
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
@@ -2697,8 +2698,9 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
     def test_correct_email_draft_received_on_exploration_unpublish(self):
-        expected_draft_text_body = ('I\'m writing to inform you that '
-                                    'I have unpublished the above exploration.')
+        expected_draft_text_body = (
+            'I\'m writing to inform you that '
+            'I have unpublished the above exploration.')
         with self.can_send_emails_ctx, self.can_send_email_moderator_action_ctx:
             d_text = email_manager.get_moderator_unpublish_exploration_email()
             self.assertEqual(d_text, expected_draft_text_body)
@@ -2723,15 +2725,15 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 1)
 
 
-class CommunityReviewerEmailTest(test_utils.EmailTestBase):
-    """Test for assignment and removal of reviewer in community."""
+class ContributionReviewerEmailTest(test_utils.EmailTestBase):
+    """Test for assignment and removal of contribution reviewers."""
 
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(CommunityReviewerEmailTest, self).setUp()
+        super(ContributionReviewerEmailTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -2758,7 +2760,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
     def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
             self):
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_new_community_reviewer(
+            email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
@@ -2769,7 +2771,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
     def test_assign_translation_reviewer_email_for_invalid_review_category(
             self):
         with self.assertRaisesRegexp(Exception, 'Invalid review_category'):
-            email_manager.send_email_to_new_community_reviewer(
+            email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
     def test_schema_of_new_reviewer_email_data_constant(self):
@@ -2798,14 +2800,14 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'review translation suggestions made by contributors in the '
             'Hindi language.<br><br>'
             'You can check the translation suggestions waiting for review in '
-            'the <a href="https://www.oppia.org/community-dashboard">'
-            'Community Dashboard</a>.<br><br>'
+            'the <a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_community_reviewer(
+            email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
@@ -2844,14 +2846,14 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'review voiceover applications made by contributors in the '
             'Hindi language.<br><br>'
             'You can check the voiceover applications waiting for review in '
-            'the <a href="https://www.oppia.org/community-dashboard">'
-            'Community Dashboard</a>.<br><br>'
+            'the <a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_community_reviewer(
+            email_manager.send_email_to_new_contribution_reviewer(
                 self.voiceover_reviewer_id,
                 constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
 
@@ -2889,14 +2891,14 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'reviewer for questions. This allows you to review question '
             'suggestions made by contributors.<br><br>'
             'You can check the question suggestions waiting for review in the '
-            '<a href="https://www.oppia.org/community-dashboard">'
-            'Community Dashboard</a>.<br><br>'
+            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_community_reviewer(
+            email_manager.send_email_to_new_contribution_reviewer(
                 self.question_reviewer_id,
                 constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
 
@@ -2926,7 +2928,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_email_is_not_sent_can_send_emails_is_false(self):
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
@@ -2937,7 +2939,7 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
     def test_remove_translation_reviewer_email_for_invalid_review_category(
             self):
         with self.assertRaisesRegexp(Exception, 'Invalid review_category'):
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
     def test_schema_of_removed_reviewer_email_data_constant(self):
@@ -2967,15 +2969,15 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'in the Hindi language. You won\'t be able to review translation '
             'suggestions made by contributors in the Hindi language any more, '
             'but you can still contribute translations through the '
-            '<a href="https://www.oppia.org/community-dashboard">'
-            'Community Dashboard</a>.<br><br>'
+            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
 
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
@@ -3013,15 +3015,15 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'in the Hindi language. You won\'t be able to review voiceover '
             'applications made by contributors in the Hindi language any more, '
             'but you can still contribute voiceovers through the '
-            '<a href="https://www.oppia.org/community-dashboard">'
-            'Community Dashboard</a>.<br><br>'
+            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
 
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 self.voiceover_reviewer_id,
                 constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
 
@@ -3057,15 +3059,15 @@ class CommunityReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia team has removed you from the question reviewer role. '
             'You won\'t be able to review question suggestions made by '
             'contributors any more, but you can still contribute questions '
-            'through the <a href="https://www.oppia.org/community-dashboard">'
-            'Community Dashboard</a>.<br><br>'
+            'through the <a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
 
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 self.question_reviewer_id, constants.REVIEW_CATEGORY_QUESTION,
                 language_code='hi')
 

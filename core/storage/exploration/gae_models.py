@@ -429,8 +429,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
         # The voice_artist_ids field was previously named translator_ids. We
         # need to move the values from translator_ids field to voice_artist_ids
         # and delete translator_ids.
-        if 'translator_ids' in snapshot_dict and snapshot_dict[
-            'translator_ids']:
+        if (
+                'translator_ids' in snapshot_dict and
+                snapshot_dict['translator_ids']
+        ):
             snapshot_dict['voice_artist_ids'] = snapshot_dict['translator_ids']
             snapshot_dict['translator_ids'] = []
 
@@ -758,7 +760,7 @@ class ExpSummaryModel(base_models.BaseModel):
         given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with private exp summaries that are at least
@@ -767,10 +769,11 @@ class ExpSummaryModel(base_models.BaseModel):
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ndb.OR(ExpSummaryModel.owner_ids == user_id,
-                   ExpSummaryModel.editor_ids == user_id,
-                   ExpSummaryModel.voice_artist_ids == user_id,
-                   ExpSummaryModel.viewer_ids == user_id)
+            ndb.OR(
+                ExpSummaryModel.owner_ids == user_id,
+                ExpSummaryModel.editor_ids == user_id,
+                ExpSummaryModel.voice_artist_ids == user_id,
+                ExpSummaryModel.viewer_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -780,15 +783,16 @@ class ExpSummaryModel(base_models.BaseModel):
         """Fetches exp summaries that are at least editable by the given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with exp summaries that are at least
             editable by the given user.
         """
         return ExpSummaryModel.query().filter(
-            ndb.OR(ExpSummaryModel.owner_ids == user_id,
-                   ExpSummaryModel.editor_ids == user_id)
+            ndb.OR(
+                ExpSummaryModel.owner_ids == user_id,
+                ExpSummaryModel.editor_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

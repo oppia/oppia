@@ -654,11 +654,7 @@ class ExplorationIssue(python_utils.OBJECT):
         """
         return {
             'issue_type': self.issue_type,
-            'issue_customization_args': (
-                customization_args_util.get_full_customization_args(
-                    self.issue_customization_args,
-                    playthrough_issue_registry.Registry.get_issue_by_type(
-                        self.issue_type).customization_arg_specs)),
+            'issue_customization_args': self.issue_customization_args,
             'playthrough_ids': self.playthrough_ids,
             'schema_version': self.schema_version,
             'is_valid': self.is_valid
@@ -782,11 +778,7 @@ class LearnerAction(python_utils.OBJECT):
         """
         return {
             'action_type': self.action_type,
-            'action_customization_args': (
-                customization_args_util.get_full_customization_args(
-                    self.action_customization_args,
-                    action_registry.Registry.get_action_by_type(
-                        self.action_type).customization_arg_specs)),
+            'action_customization_args': self.action_customization_args,
             'schema_version': self.schema_version
         }
 
@@ -850,7 +842,6 @@ class LearnerAction(python_utils.OBJECT):
         except KeyError:
             raise utils.ValidationError(
                 'Invalid action type: %s' % self.action_type)
-
         customization_args_util.validate_customization_args_and_values(
             'action', self.action_type, self.action_customization_args,
             action.customization_arg_specs)
@@ -869,16 +860,17 @@ class StateAnswers(python_utils.OBJECT):
         """Constructs a StateAnswers domain object.
 
         Args:
-            exploration_id: The ID of the exploration corresponding to submitted
-                answers.
-            exploration_version: The version of the exploration corresponding to
+            exploration_id: str. The ID of the exploration corresponding to
                 submitted answers.
-            state_name: The state to which the answers were submitted.
-            interaction_id: The ID of the interaction which created the answers.
-            submitted_answer_list: The list of SubmittedAnswer domain objects
-                that were submitted to the exploration and version specified in
-                this object.
-            schema_version: The schema version of this answers object.
+            exploration_version: str. The version of the exploration
+                corresponding to submitted answers.
+            state_name: str. The state to which the answers were submitted.
+            interaction_id: str. The ID of the interaction which created the
+                answers.
+            submitted_answer_list: list. The list of SubmittedAnswer domain
+                objects that were submitted to the exploration and version
+                specified in this object.
+            schema_version: str. The schema version of this answers object.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -1513,7 +1505,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
                 the learner_answer_info_list.
 
         Raises:
-            Exception: If the learner answer info with the given id is not
+            Exception. If the learner answer info with the given id is not
                 found in the learner answer info list.
         """
         new_learner_answer_info_list = []
@@ -1630,8 +1622,8 @@ class LearnerAnswerInfo(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The answer details submitted cannot be an empty string.')
         if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
-            raise utils.ValidationError('The answer details size is to large '
-                                        'to be stored')
+            raise utils.ValidationError(
+                'The answer details size is to large to be stored')
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
                 'Expected created_on to be a datetime, received %s'

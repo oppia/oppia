@@ -101,7 +101,7 @@ def get_exploration_components_from_dir(dir_path):
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
-        dir_path: str. a full path to the exploration root directory.
+        dir_path: str. A full path to the exploration root directory.
 
     Returns:
         *. A 2-tuple, the first element of which is a yaml string, and the
@@ -109,7 +109,7 @@ def get_exploration_components_from_dir(dir_path):
         The filepath does not include the assets/ prefix.
 
     Raises:
-        Exception: if the following condition doesn't hold: "There
+        Exception. If the following condition doesn't hold: "There
             is exactly one file not in assets/, and this file has a
             .yaml suffix".
     """
@@ -199,7 +199,7 @@ def dict_from_yaml(yaml_str):
         dict. Parsed dict representation of the yaml string.
 
     Raises:
-        InavlidInputException: If the yaml string sent as the
+        InavlidInputException. If the yaml string sent as the
             parameter is unable to get parsed, them this error gets
             raised.
     """
@@ -273,7 +273,7 @@ def convert_png_binary_to_data_url(content):
         str. Data url created from the binary content of the PNG.
 
     Raises:
-        Exception: If the given binary string is not of a PNG image.
+        Exception. If the given binary string is not of a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
         return 'data:image/png;base64,%s' % python_utils.url_quote(
@@ -333,7 +333,7 @@ def set_url_query_parameter(url, param_name, param_value):
         str. Formated URL that has query parameter set or replaced.
 
     Raises:
-        Exception: If the query parameter sent is not of string type,
+        Exception. If the query parameter sent is not of string type,
             them this exception is raised.
     """
     if not isinstance(param_name, python_utils.BASESTRING):
@@ -378,7 +378,7 @@ def convert_to_hash(input_string, max_length):
         specified length.
 
     Raises:
-        Exception: If the input string is not the instance of the str,
+        Exception. If the input string is not the instance of the str,
             them this exception is raised.
     """
     if not isinstance(input_string, python_utils.BASESTRING):
@@ -517,12 +517,12 @@ def require_valid_name(name, name_type, allow_empty=False):
         allow_empty: bool. If True, empty strings are allowed.
 
     Raises:
-        Exception: Name isn't a string.
-        Exception: The length of the name_type isn't between
+        Exception. Name isn't a string.
+        Exception. The length of the name_type isn't between
             1 and 50.
-        Exception: Name starts or ends with whitespace.
-        Exception: Adjacent whitespace in name_type isn't collapsed.
-        Exception: Invalid character is present in name.
+        Exception. Name starts or ends with whitespace.
+        Exception. Adjacent whitespace in name_type isn't collapsed.
+        Exception. Invalid character is present in name.
     """
     if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError('%s must be a string.' % name)
@@ -550,6 +550,41 @@ def require_valid_name(name, name_type, allow_empty=False):
             raise ValidationError(
                 'Invalid character %s in %s: %s' %
                 (character, name_type, name))
+
+
+def require_valid_url_fragment(name, name_type, allowed_length):
+    """Generic URL fragment validation.
+
+    Args:
+        name: str. The name to validate.
+        name_type: str. A human-readable string, like 'topic url fragment'.
+            This will be shown in error messages.
+        allowed_length: int. Allowed length for the name.
+
+    Raises:
+        Exception. Name is not a string.
+        Exception. Name is empty.
+        Exception. The length of the name_type is not correct.
+        Exception. Invalid character is present in the name.
+    """
+    if not isinstance(name, python_utils.BASESTRING):
+        raise ValidationError(
+            '%s field must be a string. Received %s.' % (name_type, name))
+
+    if name == '':
+        raise ValidationError(
+            '%s field should not be empty.' % name_type)
+
+    if len(name) > allowed_length:
+        raise ValidationError(
+            '%s field should not exceed %d characters, '
+            'received %s.' % (name_type, allowed_length, name))
+
+    if not re.match(constants.VALID_URL_FRAGMENT_REGEX, name):
+        raise ValidationError(
+            '%s field contains invalid characters. Only lowercase words'
+            ' separated by hyphens are allowed. Received %s.' % (
+                name_type, name))
 
 
 def require_valid_thumbnail_filename(thumbnail_filename):
@@ -670,7 +705,7 @@ def get_supported_audio_language_description(language_code):
         str. The language description for the given language code.
 
     Raises:
-        Exception: If the given language code is unsupported.
+        Exception. If the given language code is unsupported.
     """
     for language in constants.SUPPORTED_AUDIO_LANGUAGES:
         if language['id'] == language_code:
@@ -734,8 +769,8 @@ def get_hashable_value(value):
             each other.
 
     Returns:
-        hashed_value: *. A new object that will always have the same hash for
-        "equivalent" values.
+        *. A new object that will always have the same hash for "equivalent"
+        values.
     """
     if isinstance(value, list):
         return tuple(get_hashable_value(e) for e in value)

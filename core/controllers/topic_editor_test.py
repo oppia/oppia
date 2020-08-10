@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
+from core.domain import config_domain
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -61,6 +62,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='topic-one', url_fragment='topic-one',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
@@ -77,6 +79,26 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [self.topic_id],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
 
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
@@ -98,6 +120,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         self.save_new_topic(
             topic_id, self.admin_id, name='New name',
+            abbreviated_name='topic-two', url_fragment='topic-two',
             description='New description',
             canonical_story_ids=[canonical_story_id],
             additional_story_ids=[additional_story_id],
@@ -200,6 +223,41 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         self.assertEqual(
             json_response['error'], 'Image exceeds file size limit of 100 KB.')
+
+    def test_story_creation_fails_with_duplicate_story_url_fragment(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Story title',
+            'description': 'Story Description',
+            'filename': 'test_svg.svg',
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'original'
+        }
+        self.save_new_story(
+            story_services.get_new_story_id(),
+            self.admin_id,
+            topic_services.get_new_topic_id(),
+            title='title',
+            description='description',
+            notes='note',
+            url_fragment='original'
+        )
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Story url fragment is not unique across the site.')
 
 
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
@@ -450,9 +508,21 @@ class TopicEditorTests(
                     'content_id': 'content'
                 }
             }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-one',
+                'old_value': '',
+                'subtopic_id': 1
+            }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
+            }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-two',
+                'old_value': '',
+                'subtopic_id': 2
             }, {
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
@@ -603,6 +673,7 @@ class TopicEditorTests(
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Name 1',
+            abbreviated_name='topic-three', url_fragment='topic-three',
             description='Description 1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id],
@@ -643,9 +714,21 @@ class TopicEditorTests(
                     'content_id': 'content'
                 }
             }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-one',
+                'old_value': '',
+                'subtopic_id': 1
+            }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
+            }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-two',
+                'old_value': '',
+                'subtopic_id': 2
             }, {
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',

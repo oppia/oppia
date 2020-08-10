@@ -73,6 +73,48 @@
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Number of explorations left to update: <[$ctrl.numberOfExplorationsLeftToUpdate]></h3>
+  <h3>Generate and save SVGs for exploration</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForExplorations()">
+      <div class="form-group row">
+        <input type="submit" value="Start">
+      </div>
+    </form>
+
+  </div>
+  <h3>Stop generating SVGs</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.stopGeneration()">
+      <div class="form-group row">
+        <input type="submit" value="Stop">
+      </div>
+    </form>
+  </div>
+
+</md-card>
+
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Generate SVGs for suggestions</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForSuggestions()">
+      <div class="form-group row">
+        <input type="submit" value="Fetch">
+      </div>
+    </form>
+
+  </div>
+  <h3>Save the SVGs for suggestions</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.saveSuggestionSvgsToBackend()">
+      <div class="form-group row">
+        <input type="submit" value="Save">
+      </div>
+    </form>
+  </div>
+</md-card>
+
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Update username</h3>
   <div class="oppia-query-form">
     <form class="form" ng-submit="$ctrl.updateUsername()">

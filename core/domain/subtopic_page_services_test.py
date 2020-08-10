@@ -94,8 +94,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
         expected_subtopic_pages = [self.subtopic_page.to_dict(), None]
-        self.assertEqual([subtopic_pages[0].to_dict(), subtopic_pages[1]],
-                         expected_subtopic_pages)
+        self.assertEqual(
+            [subtopic_pages[0].to_dict(), subtopic_pages[1]],
+            expected_subtopic_pages)
         subtopic_ids = []
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
@@ -244,21 +245,25 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': html_content,
+                        'data_format': 'html',
+                        'translation': html_content,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': 'Testing!',
+                        'data_format': 'html',
+                        'translation': 'Testing!',
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -268,21 +273,25 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': expected_html_content,
+                        'data_format': 'html',
+                        'translation': expected_html_content,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': 'Testing!',
+                        'data_format': 'html',
+                        'translation': 'Testing!',
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }

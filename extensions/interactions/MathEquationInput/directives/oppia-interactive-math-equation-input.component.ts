@@ -28,27 +28,32 @@ require(
 require('services/contextual/device-info.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/guppy-initialization.service.ts');
+require('services/html-escaper.service.ts');
 require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
   template: require('./math-equation-input-interaction.component.html'),
   controller: [
-    '$scope', 'MathEquationInputRulesService',
+    '$attrs', '$scope', 'MathEquationInputRulesService',
     'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
-    'MathInteractionsService',
+    'HtmlEscaperService', 'MathInteractionsService',
+    'MATH_INTERACTION_PLACEHOLDERS',
     function(
-        $scope, MathEquationInputRulesService,
+        $attrs, $scope, MathEquationInputRulesService,
         CurrentInteractionService, DeviceInfoService,
         GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService) {
+        HtmlEscaperService, MathInteractionsService,
+        MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
       ctrl.warningText = '';
 
       ctrl.isCurrentAnswerValid = function() {
-        if (ctrl.hasBeenTouched) {
+        let activeGuppyObject = (
+          GuppyInitializationService.findActiveGuppyObject());
+        if (ctrl.hasBeenTouched && activeGuppyObject === undefined) {
           // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
           // is not compatible with nerdamer or with the backend validations.
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
@@ -72,12 +77,18 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
 
       ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
+        GuppyInitializationService.interactionType = 'MathEquationInput';
       };
 
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
-        GuppyInitializationService.init('guppy-div-learner');
+        GuppyInitializationService.init(
+          'guppy-div-learner',
+          MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
+        GuppyInitializationService.customOskLetters = (
+          HtmlEscaperService.escapedJsonToObj(
+            $attrs.customOskLettersWithValue));
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

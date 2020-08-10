@@ -558,15 +558,33 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
 
         user_services.update_user_role(
             user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
-        self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_COLLECTION_EDITOR)
 
-    def test_mark_user_for_deletion(self):
+    def test_create_new_user_creates_a_new_user_auth_details_entry(self):
+        new_gae_id = 'new_gae_id'
+        new_email = 'new@example.com'
+
+        self.assertIsNone(
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, new_gae_id)
+        )
+
+        user_services.create_new_user(new_gae_id, new_email)
+        user_settings = user_services.get_user_settings_by_gae_id(
+            new_gae_id)
+        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
+            user_settings.user_id)
+        self.assertEqual(user_auth_details.gae_id, user_settings.gae_id)
+
+    def test_mark_user_for_deletion_deletes_user_settings(self):
         gae_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
@@ -574,10 +592,29 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
+        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+        self.assertFalse(user_settings.deleted)
+
         user_services.mark_user_for_deletion(user_id)
 
         user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertTrue(user_settings.deleted)
+
+    def test_mark_user_for_deletion_deletes_user_auth_details_entry(self):
+        gae_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(user_id)
+        self.assertFalse(user_auth_details.deleted)
+
+        user_services.mark_user_for_deletion(user_id)
+
+        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(user_id)
+        self.assertTrue(user_auth_details.deleted)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [
@@ -694,6 +731,19 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Choice 1</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })], 'commit')
 
         self.assertIsNotNone(user_services.get_user_settings(
@@ -717,6 +767,19 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Choice 1</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })], '')
         self.assertIsNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
@@ -1269,13 +1332,13 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_validate_user_id(self):
-        self.user_settings.user_id = 'uid_' + 'a' * 31 + 'A'
+        self.user_settings.user_id = 'uid_%sA' % ('a' * 31)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
-        self.user_settings.user_id = 'uid_' + 'a' * 31
+        self.user_settings.user_id = 'uid_%s' % ('a' * 31)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
@@ -1333,13 +1396,17 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_guest_has_not_fully_registered(self):
-        self.assertFalse(user_services.has_fully_registered(None))
+        self.assertFalse(user_services.has_fully_registered_account(None))
 
-    def test_cannot_create_new_user_with_existing_user_id(self):
+    def test_create_new_user_with_existing_gae_id_raises_error(self):
+        user_id = self.user_settings.user_id
+        user_gae_id = self.user_settings.gae_id
         with self.assertRaisesRegexp(
-            Exception, 'User %s already exists.' % self.owner_id
+            Exception, 'User %s already exists for gae_id %s.'
+            % (user_id, user_gae_id)
         ):
-            user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+            user_services.create_new_user(
+                user_gae_id, self.OWNER_EMAIL)
 
     def test_cannot_set_existing_username(self):
         with self.assertRaisesRegexp(
@@ -1407,6 +1474,105 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
         self.assertEqual(user_settings_model.created_on, time_of_creation)
+
+
+class UserAuthDetailsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UserAuthDetailsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_id(self.owner_id))
+        self.user_auth_details = user_services.UserAuthDetails(
+            self.user_auth_details_model.id,
+            self.user_auth_details_model.gae_id
+        )
+        self.user_auth_details.validate()
+
+    def test_validate_non_str_user_id(self):
+        self.user_auth_details.user_id = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected user_id to be a string'
+        ):
+            self.user_auth_details.validate()
+
+    def test_validate_user_id(self):
+        self.user_auth_details.user_id = 'uid_%sA' % ('a' * 31)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_auth_details.validate()
+
+        self.user_auth_details.user_id = 'uid_%s' % ('a' * 31)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_auth_details.validate()
+
+        self.user_auth_details.user_id = 'a' * 36
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_auth_details.validate()
+
+    def test_validate_empty_user_id(self):
+        self.user_auth_details.user_id = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'No user id specified.'
+        ):
+            self.user_auth_details.validate()
+
+    def test_validate_parent_user_id(self):
+        self.user_auth_details.parent_user_id = 'uid_%sA' % ('a' * 31)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The parent user ID is in a wrong format.'
+        ):
+            self.user_auth_details.validate()
+
+        self.user_auth_details.parent_user_id = 'uid_%s' % ('a' * 31)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The parent user ID is in a wrong format.'
+        ):
+            self.user_auth_details.validate()
+
+        self.user_auth_details.parent_user_id = 'a' * 36
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The parent user ID is in a wrong format.'
+        ):
+            self.user_auth_details.validate()
+
+    def test_validate_non_str_gae_id(self):
+        self.user_auth_details.gae_id = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected gae_id to be a string'
+        ):
+            self.user_auth_details.validate()
+
+    def test_validate_non_str_pin_id(self):
+        self.user_auth_details.pin = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected PIN to be a string'
+        ):
+            self.user_auth_details.validate()
+
+    def test_parent_user_id_gae_id_together_raises_error(self):
+        self.user_auth_details.parent_user_id = (
+            user_models.UserSettingsModel.get_new_id(''))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The parent user ID and gae_id cannot be '
+            'present together for a user.'
+        ):
+            self.user_auth_details.validate()
+
+    def test_both_parent_user_id_and_gae_id_none_raises_error(self):
+        self.user_auth_details.parent_user_id = None
+        self.user_auth_details.gae_id = None
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The parent user ID and gae_id cannot be '
+            'None together for a user.'
+        ):
+            self.user_auth_details.validate()
 
 
 class UserContributionsTests(test_utils.GenericTestBase):
@@ -1547,18 +1713,18 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     def test_translation_review_assignement_adds_language_in_sorted_order(self):
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
-        user_community_rights = user_services.get_user_community_rights(
+        user_contribution_rights = user_services.get_user_contribution_rights(
             self.translator_id)
         self.assertEqual(
-            user_community_rights.can_review_translation_for_language_codes,
+            user_contribution_rights.can_review_translation_for_language_codes,
             ['hi'])
 
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'en')
-        user_community_rights = user_services.get_user_community_rights(
+        user_contribution_rights = user_services.get_user_contribution_rights(
             self.translator_id)
         self.assertEqual(
-            user_community_rights.can_review_translation_for_language_codes,
+            user_contribution_rights.can_review_translation_for_language_codes,
             ['en', 'hi'])
 
     def test_assign_user_review_voiceover_application_in_language(self):
@@ -1576,18 +1742,18 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     def test_voiceover_review_assignement_adds_language_in_sorted_order(self):
         user_services.allow_user_to_review_voiceover_in_language(
             self.voice_artist_id, 'hi')
-        user_community_rights = user_services.get_user_community_rights(
+        user_contribution_rights = user_services.get_user_contribution_rights(
             self.voice_artist_id)
         self.assertEqual(
-            user_community_rights.can_review_voiceover_for_language_codes,
+            user_contribution_rights.can_review_voiceover_for_language_codes,
             ['hi'])
 
         user_services.allow_user_to_review_voiceover_in_language(
             self.voice_artist_id, 'en')
-        user_community_rights = user_services.get_user_community_rights(
+        user_contribution_rights = user_services.get_user_contribution_rights(
             self.voice_artist_id)
         self.assertEqual(
-            user_community_rights.can_review_voiceover_for_language_codes,
+            user_contribution_rights.can_review_voiceover_for_language_codes,
             ['en', 'hi'])
 
     def test_assign_user_review_question_suggestion(self):
@@ -1599,8 +1765,8 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_services.can_review_question_suggestions(self.voice_artist_id))
 
-    def test_get_all_community_reviewers(self):
-        self.assertEqual(user_services.get_all_community_reviewers(), [])
+    def test_get_all_contribution_reviewers(self):
+        self.assertEqual(user_services.get_all_contribution_reviewers(), [])
 
         user_services.allow_user_to_review_voiceover_in_language(
             self.voice_artist_id, 'hi')
@@ -1608,7 +1774,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
 
-        all_reviewers = user_services.get_all_community_reviewers()
+        all_reviewers = user_services.get_all_contribution_reviewers()
         self.assertItemsEqual(
             [reviewer.id for reviewer in all_reviewers],
             [self.voice_artist_id, self.translator_id])
@@ -1650,7 +1816,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.can_review_question_suggestions(
                 self.question_reviewer_id))
 
-    def test_remove_community_reviewer(self):
+    def test_remove_contribution_reviewer(self):
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
         user_services.allow_user_to_review_voiceover_in_language(
@@ -1666,7 +1832,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.can_review_question_suggestions(
                 self.translator_id))
 
-        user_services.remove_community_reviewer(self.translator_id)
+        user_services.remove_contribution_reviewer(self.translator_id)
 
         self.assertFalse(
             user_services.can_review_translation_suggestions(
@@ -1685,14 +1851,14 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
 
         user_services.remove_question_review_rights(self.translator_id)
 
-        right_model = user_models.UserCommunityRightsModel.get_by_id(
+        right_model = user_models.UserContributionRightsModel.get_by_id(
             self.translator_id)
         self.assertFalse(right_model is None)
 
         user_services.remove_translation_review_rights_in_language(
             self.translator_id, 'hi')
 
-        right_model = user_models.UserCommunityRightsModel.get_by_id(
+        right_model = user_models.UserContributionRightsModel.get_by_id(
             self.translator_id)
         self.assertTrue(right_model is None)
 
@@ -1700,12 +1866,12 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self):
         with self.assertRaisesRegexp(
             Exception, 'Expected language_code to be None'):
-            user_services.get_community_reviewer_usernames(
+            user_services.get_contribution_reviewer_usernames(
                 constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
 
-    def test_get_community_reviewer_usernames_in_invalid_category_raise_error(
+    def test_get_contribution_reviewer_usernames_in_invalid_category_raise_error( # pylint: disable=line-too-long
             self):
         with self.assertRaisesRegexp(
             Exception, 'Invalid review category: invalid_category'):
-            user_services.get_community_reviewer_usernames(
+            user_services.get_contribution_reviewer_usernames(
                 'invalid_category', language_code='hi')

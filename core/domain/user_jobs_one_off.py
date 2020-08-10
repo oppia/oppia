@@ -18,13 +18,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from core import jobs
-from core.domain import draft_upgrade_services
-from core.domain import exp_domain
 from core.domain import exp_fetchers
-from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -69,7 +65,6 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         edited_exploration_ids = set()
 
         edits = [ast.literal_eval(v) for v in version_and_exp_ids]
-
         for edit in edits:
             edited_exploration_ids.add(edit['exploration_id'])
             if edit['version_string'] == '1':
@@ -83,6 +78,49 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_services.create_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
+
+
+# TODO(#10178): Remove the following migration job once we have verified
+# that UserAuthDetailsModels exists for every user.
+class PopulateUserAuthDetailsModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for creating and populating UserAuthDetailsModel for
+    all registered users.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        """Marks a job as queued and adds it to a queue for processing."""
+        super(PopulateUserAuthDetailsModelOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function for this job."""
+
+        # Assumptions:
+        # 1) We are only having full users in the database, and no
+        #    profile users (For profiles we need to do a role check also and
+        #    ensure the gae_id attribute is None for them).
+        # 2) This migration assumes that, once a gae_id is assigned to a user,
+        #    it cannot be updated. Currently, there is no way to do so, but the
+        #    migration job would need modifications if it has to work in such a
+        #    setting in future.
+
+        user_models.UserAuthDetailsModel(
+            id=item.id,
+            gae_id=item.gae_id,
+            deleted=item.deleted
+        ).put()
+        yield ('SUCCESS - Created UserAuthDetails model', 1)
+
+    @staticmethod
+    def reduce(key, user_counter):
+        yield (key, len(user_counter))
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -362,91 +400,6 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_model.last_edited_an_exploration = user_commits[0].created_on
 
         user_model.put()
-
-
-class DraftChangeMathRichTextAuditOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that finds all the valid exploration draft changes with math rich
-    text components having no SVG and outputs the corresponding exploration IDs.
-    """
-
-    _SUCCESS_KEY = 'found_draft_changes_with_math_tags'
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.ExplorationUserDataModel]
-
-    @staticmethod
-    def map(item):
-        exp_id = item.exploration_id
-        exploration = exp_models.ExplorationModel.get_by_id(exp_id)
-        if exploration is None or exploration.deleted:
-            yield (
-                'Invalid Draft change list found.',
-                'Exploration corresponding to Draft change %s does not exist' %
-                (item.id))
-            return
-        if item.draft_change_list is None:
-            return
-        draft_change_list = [
-            exp_domain.ExplorationChange(change)
-            for change in item.draft_change_list]
-        draft_change_list_version = item.draft_change_list_exp_version
-        exploration_version = exploration.version
-        final_draft_change_list = None
-
-        if exploration_version == draft_change_list_version:
-            final_draft_change_list = draft_change_list
-        elif exploration_version > draft_change_list_version:
-            updated_draft_change_list = (
-                draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                    draft_change_list, draft_change_list_version,
-                    exploration_version, exp_id))
-            final_draft_change_list = updated_draft_change_list
-        else:
-            yield (
-                'Invalid Draft change list found.',
-                'Draft change %s version greater than exploration version' % (
-                    item.id))
-            return
-
-
-        if final_draft_change_list is not None:
-            try:
-                html_string = ''.join(
-                    draft_upgrade_services.
-                    extract_html_from_draft_change_list(
-                        final_draft_change_list))
-                latex_strings = (
-                    html_validation_service.
-                    get_latex_strings_without_svg_from_html(
-                        html_string))
-                if len(latex_strings) > 0:
-                    yield (
-                        DraftChangeMathRichTextAuditOneOffJob.
-                        _SUCCESS_KEY, item.exploration_id)
-
-            except Exception as e:
-                logging.error(
-                    'Draft change %s parsing failed: %s' %
-                    (item.id, e))
-                yield (
-                    'failed to parse draft change list.',
-                    'Draft change %s parsing failed: %s' % (item.id, e))
-                return
-
-    @staticmethod
-    def reduce(key, values):
-        if key == (
-                DraftChangeMathRichTextAuditOneOffJob.
-                _SUCCESS_KEY):
-            final_values = list(set(values))
-            yield (
-                ('found %d explorations having draft changes with math-tags '
-                 'having no SVG') % (len(
-                     final_values)),
-                final_values)
-        else:
-            yield (key, values)
 
 
 class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(

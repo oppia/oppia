@@ -441,8 +441,8 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 fetched.
 
         Raises:
-            ValueError. max_age is neither an instance of datetime.timedelta nor
-                None.
+            ValueError. The max_age is neither an instance of datetime.timedelta
+                nor None.
 
         Returns:
             3-tuple of (results, cursor, more). Where:
@@ -590,7 +590,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         at least viewable by the given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with private collection summary models that
@@ -599,9 +599,10 @@ class CollectionSummaryModel(base_models.BaseModel):
         return CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ndb.OR(CollectionSummaryModel.owner_ids == user_id,
-                   CollectionSummaryModel.editor_ids == user_id,
-                   CollectionSummaryModel.viewer_ids == user_id)
+            ndb.OR(
+                CollectionSummaryModel.owner_ids == user_id,
+                CollectionSummaryModel.editor_ids == user_id,
+                CollectionSummaryModel.viewer_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -612,15 +613,16 @@ class CollectionSummaryModel(base_models.BaseModel):
         editable by the given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with collection summary models that are at
             least viewable by the given user.
         """
         return CollectionSummaryModel.query().filter(
-            ndb.OR(CollectionSummaryModel.owner_ids == user_id,
-                   CollectionSummaryModel.editor_ids == user_id)
+            ndb.OR(
+                CollectionSummaryModel.owner_ids == user_id,
+                CollectionSummaryModel.editor_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

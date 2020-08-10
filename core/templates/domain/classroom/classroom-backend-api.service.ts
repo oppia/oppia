@@ -18,66 +18,70 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
 import {
-  TopicSummaryBackendDict,
-  TopicSummary,
-  TopicSummaryObjectFactory
-} from 'domain/topic/TopicSummaryObjectFactory';
+  ClassroomData,
+  ClassroomDataObjectFactory
+} from 'domain/classroom/ClassroomDataObjectFactory';
+import { TopicSummaryBackendDict } from
+  'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface ClassroomTopicSummaryBackendDict {
-  'topic_summary_dicts': TopicSummaryBackendDict[];
-}
-
 interface ClassroomStatusBackendDict {
   'classroom_page_is_shown': boolean;
+}
+
+interface ClassroomDataBackendDict {
+  'name': string,
+  'topic_summary_dicts': TopicSummaryBackendDict[],
+  'course_details': string,
+  'topic_list_intro': string
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClassroomBackendApiService {
-  topicSummaryObjects: TopicSummary[] = null;
+  classroomData: ClassroomData = null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory
+    private classroomDataObjectFactory: ClassroomDataObjectFactory
   ) {}
 
-  _fetchClassroomData(classroomName: string,
-      successCallback: (value?: TopicSummary[]) => void,
-      errorCallback: (reason?: string) => void): void {
+  private _initializeTranslationEventEmitter = new EventEmitter();
+
+  _fetchClassroomData(classroomUrlFragment: string,
+      successCallback: (value: ClassroomData) => void,
+      errorCallback: (reason: string) => void): void {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
-        classroom_name: classroomName
+        classroom_url_fragment: classroomUrlFragment
       });
 
-    this.http.get<ClassroomTopicSummaryBackendDict>(
-      classroomDataUrl).toPromise().then(data => {
-      this.topicSummaryObjects = data.topic_summary_dicts.map(
-        (summaryDict) => {
-          return this.topicSummaryObjectFactory.createFromBackendDict(
-            summaryDict);
-        }
-      );
+    this.http.get<ClassroomDataBackendDict>(
+      classroomDataUrl).toPromise().then(response => {
+      this.classroomData = (
+        this.classroomDataObjectFactory.createFromBackendData(
+          response.name, response.topic_summary_dicts, response.course_details,
+          response.topic_list_intro));
       if (successCallback) {
-        successCallback(this.topicSummaryObjects);
+        successCallback(this.classroomData);
       }
-    }, (error: string) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
   _fetchClassroomPageIsShownStatus(
-      successCallback: (value?: boolean) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: boolean) => void,
+      errorCallback: (reason: string) => void): void {
     const classroomStatusHandlerUrl = '/classroom_page_status_handler';
 
     this.http.get<ClassroomStatusBackendDict>(
@@ -85,23 +89,29 @@ export class ClassroomBackendApiService {
       if (successCallback) {
         successCallback(data.classroom_page_is_shown);
       }
-    }, (error: string) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
-  fetchClassroomData(classroomName: string): Promise<TopicSummary[]> {
+  async fetchClassroomDataAsync(
+      classroomUrlFragment: string
+  ): Promise<ClassroomData> {
     return new Promise((resolve, reject) => {
-      this._fetchClassroomData(classroomName, resolve, reject);
+      this._fetchClassroomData(classroomUrlFragment, resolve, reject);
     });
   }
 
-  fetchClassroomPageIsShownStatus(): Promise<boolean> {
+  async fetchClassroomPageIsShownStatusAsync(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomPageIsShownStatus(resolve, reject);
     });
+  }
+
+  get onInitializeTranslation() {
+    return this._initializeTranslationEventEmitter;
   }
 }
 

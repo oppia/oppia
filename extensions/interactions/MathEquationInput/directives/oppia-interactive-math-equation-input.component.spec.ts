@@ -61,11 +61,13 @@ describe('MathEquationInputInteractive', function() {
     asciimath() {
       return 'Dummy value';
     }
+    configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
-      handler();
+      handler({focused: true});
     }
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
+    static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));
@@ -83,6 +85,9 @@ describe('MathEquationInputInteractive', function() {
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);
+    $provide.value('$attrs', {
+      customOskLettersWithValue: '[&quot;a&quot;, &quot;b&quot;]'
+    });
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $window = $injector.get('$window');
@@ -129,7 +134,7 @@ describe('MathEquationInputInteractive', function() {
     // This should be validated as false if the editor has been touched.
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
+    expect(ctrl.warningText).toBe('Please enter an answer before submitting.');
   });
 
   it('should set the value of showOSK to true', function() {
