@@ -79,7 +79,7 @@ def handle_trainable_states(exploration, state_names):
         job_dicts_list)
 
     # Create mapping for each job. For StateTrainingJobsMapping, we can
-    # append Domain objects to send to the state_training_jobs_mappings dict
+    # append domain objects to send to the state_training_jobs_mappings dict
     # because we know all the attributes required for creating the Domain
     # object unlike ClassifierTrainingJob class where we don't know the job_id.
     state_training_jobs_mappings = []
@@ -156,8 +156,8 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
             continue
         new_state_name = state_names[index]
         algorithm_ids_to_job_ids = {
-            algorithm_id: job_model.id
-            for algorithm_id, job_model in classifier_training_job_map.items()}
+            algorithm_id: job_id
+            for algorithm_id, job_id in classifier_training_job_map.items()}
         state_training_jobs_mapping = (
             classifier_domain.StateTrainingJobsMapping(
                 exp_id, current_exp_version, new_state_name,
@@ -382,7 +382,7 @@ def get_classifier_training_job(exp_id, exp_version, state_name, algorithm_id):
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. The exploration version.
-        state_name: str. The state names for which we retrieve the job.
+        state_name: str. The state name for which we retrieve the job.
         algorithm_id: str. The ID of the algorithm for which classifier training
             job is to be retrieved.
 
@@ -472,6 +472,11 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
     algorithm_id_to_algorithm_version = {
         algorithm_id: algorithm_version
     }
+
+    # Below step is required because as of now we only support single algorithm
+    # id per interaction type. However once the support for multiple algorithm
+    # ids (see issue #10217) is added the list of possible algorithm ids should
+    # be available from feconf.INTERACTION_CLASSIFIER_MAPPING.
     possible_algorithm_ids = [algorithm_id]
 
     algorithm_ids_to_add = set(possible_algorithm_ids).difference(
@@ -558,8 +563,8 @@ def get_classifier_training_job_maps(exp_id, exp_version, state_names):
             mappings.
 
     Returns:
-        list(dict(str: ClassifierTrainingJob)). A list of dicts, each mapping
-        algorithm IDs to the corresponding ClassifierTrainingJobs. Each element
+        list(dict(str: str)). A list of dicts, each mapping
+        algorithm IDs to the corresponding job IDs. Each element
         in the list corresponds to the corresponding state name in the
         state_names input argument.
     """
@@ -573,30 +578,7 @@ def get_classifier_training_job_maps(exp_id, exp_version, state_names):
         state_to_algorithm_id_job_id_map[state_mapping_model.state_name] = (
             state_mapping_model.algorithm_ids_to_job_ids)
 
-    job_ids = [
-        job_id for algorithm_ids_to_job_ids in (
-            state_to_algorithm_id_job_id_map.values())
-        for job_id in algorithm_ids_to_job_ids.values()]
-
-    classifier_training_job_models = (
-        classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
-
-    job_id_to_model = {}
-    for job_model in classifier_training_job_models:
-        job_id_to_model[job_model.id] = job_model
-
-    algorithm_id_to_training_job_maps = []
-    for state_name in state_names:
-        if state_name not in state_to_algorithm_id_job_id_map:
-            algorithm_id_to_training_job_maps.append(None)
-            continue
-        algorithm_ids_to_job_ids = state_to_algorithm_id_job_id_map[state_name]
-        algorithm_id_to_training_job_maps.append({
-            algorithm_id: job_id_to_model[job_id]
-            for algorithm_id, job_id in algorithm_ids_to_job_ids.items()
-        })
-
-    return algorithm_id_to_training_job_maps
+    return state_to_algorithm_id_job_id_map
 
 
 def create_classifier_training_job_for_reverted_exploration(
@@ -611,15 +593,15 @@ def create_classifier_training_job_for_reverted_exploration(
         get_classifier_training_job_maps(
             exploration.id, exploration_to_revert_to.version,
             list(exploration_to_revert_to.states.keys())))
-    state_training_jobs_maps = []
+    state_training_jobs_mappings = []
     state_names = list(exploration_to_revert_to.states.keys())
     for index, classifier_training_job_map in enumerate(
             classifier_training_job_maps_for_old_version):
         if classifier_training_job_map is not None:
             state_name = state_names[index]
             algorithm_ids_to_job_ids = {
-                algorithm_id: job_model.id
-                for algorithm_id, job_model in (
+                algorithm_id: job_id
+                for algorithm_id, job_id in (
                     classifier_training_job_map.items())
             }
             state_training_jobs_mapping = (
@@ -627,7 +609,7 @@ def create_classifier_training_job_for_reverted_exploration(
                     exploration.id, exploration.version + 1, state_name,
                     algorithm_ids_to_job_ids))
             state_training_jobs_mapping.validate()
-            state_training_jobs_maps.append(state_training_jobs_mapping)
+            state_training_jobs_mappings.append(state_training_jobs_mapping)
 
     classifier_models.StateTrainingJobsMappingModel.create_multi(
-        state_training_jobs_maps)
+        state_training_jobs_mappings)

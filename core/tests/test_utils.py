@@ -868,39 +868,6 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def post_blob(self, url, payload, expected_status_int=200):
-        """Post a BLOB object to the server; return the received object.
-
-        Args:
-            url: str. The URL to which BLOB object in payload should be sent
-                through a post request.
-            payload: bytes. Binary data which needs to be sent.
-            expected_status_int: int. The status expected as a response of post
-                request.
-
-        Returns:
-            dict. Parsed JSON response received upon invoking the post request.
-        """
-        data = payload
-
-        expect_errors = False
-        if expected_status_int >= 400:
-            expect_errors = True
-        response = self._send_post_request(
-            self.testapp, url, data,
-            expect_errors, expected_status_int=expected_status_int,
-            headers={b'content-type': b'application/octet-stream'})
-        # Testapp takes in a status parameter which is the expected status of
-        # the response. However this expected status is verified only when
-        # expect_errors=False. For other situations we need to explicitly check
-        # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-
-        self.assertEqual(response.status_int, expected_status_int)
-        return self._parse_json_response(response, expect_errors)
-
     def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""
         if params:
@@ -2723,13 +2690,53 @@ EmailTestBase = GenericEmailTestBase
 
 
 class ClassifierTestBase(GenericEmailTestBase):
-    """Base class for classifier test classes that need common function
-    for reading classifier data from GCS.
+    """Base class for classifier test classes that need common functions
+    for related to reading classifier data and mocking the flow of the
+    storing the trained models through post request.
 
     This class is derived from GenericEmailTestBase because the
     TrainedClassifierHandlerTests test suite requires email services test
-    functions in addition to classifier function defined below.
+    functions in addition to classifier functions defined below.
     """
+
+    def post_blob(self, url, payload, expected_status_int=200):
+        """Post a BLOB object to the server; return the received object.
+
+        Note that this method should only be used for
+        classifier.TrainedClassifierHandler handler and for no one else. The
+        reason being, we don't have any general mechanism for security for
+        transferring binary data. TrainedClassifierHandler implements a
+        specific mechanism which is restricted to the handler.
+
+        Args:
+            url: str. The URL to which BLOB object in payload should be sent
+                through a post request.
+            payload: bytes. Binary data which needs to be sent.
+            expected_status_int: int. The status expected as a response of post
+                request.
+
+        Returns:
+            dict. Parsed JSON response received upon invoking the post request.
+        """
+        data = payload
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
+        response = self._send_post_request(
+            self.testapp, url, data,
+            expect_errors, expected_status_int=expected_status_int,
+            headers={b'content-type': b'application/octet-stream'})
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+
+        self.assertEqual(response.status_int, expected_status_int)
+        return self._parse_json_response(response, expect_errors)
 
     def _get_classifier_data_from_classifier_training_job(
             self, classifier_training_job):

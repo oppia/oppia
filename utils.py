@@ -787,7 +787,7 @@ def compress_to_zlib(data):
     """Compress the data to zlib format for efficient storage and communication.
 
     Args:
-        data: str. Data to be copressed.
+        data: str. Data to be compressed.
 
     Returns:
         str. Compressed data string.
@@ -799,7 +799,7 @@ def decompress_from_zlib(data):
     """Decompress the data to zlib format.
 
     Args:
-        data: str. Data to be decopressed.
+        data: str. Data to be decompressed.
 
     Returns:
         str. Decompressed data string.

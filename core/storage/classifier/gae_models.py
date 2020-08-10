@@ -143,7 +143,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             state_name=state_name, status=status,
             training_data=training_data,
             algorithm_version=algorithm_version
-            )
+        )
 
         training_job_instance.put()
         return instance_id
@@ -216,7 +216,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(required=True, indexed=True)
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True, indexed=True)
-    # The IDs of the training job corresponding to the exploration state. Each
+    # The IDs of the training jobs corresponding to the exploration state. Each
     # algorithm_id corresponding to the interaction of the exploration state is
     # mapped to its unique job_id.
     algorithm_ids_to_job_ids = ndb.JsonProperty(
@@ -286,8 +286,9 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
                 the mapping model.
 
         Returns:
-            ClassifierExplorationMappingModel|None. The model instances
-            for the classifier exploration mapping.
+            ClassifierExplorationMappingModel|None. The model instance
+            for the classifier exploration mapping. It returns None if the no
+            entry for given <exp_id, exp_version, state_name> is found.
         """
         mapping_id = cls._generate_id(exp_id, exp_version, state_name)
         model = cls.get_by_id(mapping_id)
@@ -332,7 +333,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
         Args:
             state_training_jobs_mappings: list(StateTrainingJobsMapping). The
-                list of StateTrainingJobsMapping Domain objects.
+                list of StateTrainingJobsMapping domain objects.
 
         Returns:
             list(int). The list of mapping IDs.

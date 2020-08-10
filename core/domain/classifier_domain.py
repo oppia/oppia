@@ -367,11 +367,11 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
     This object represents a one-to-many relation between a particular state
     of the particular version of the particular exploration and a set of
     classifier training jobs. Each <exp_id, exp_version, state_name> is mapped
-    to a algorithm_id_to_job_id dict which maps all the valid algorithm_ids for
+    to an algorithm_id_to_job_id dict which maps all the valid algorithm_ids for
     the given state to their training jobs. A state may have multiple
     algorithm_ids valid for it: for example, one algorithm would serve Oppia
     web users while another might support Oppia mobile or Android user. The
-    number of algorithm_ids are valid for a given state depends upon the
+    number of algorithm_ids that are valid for a given state depends upon the
     interaction_id of that state.
 
     Attributes:

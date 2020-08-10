@@ -186,7 +186,8 @@ class TrainedClassifierHandler(base.BaseHandler):
             # Since the required training job doesn't exist and old job has to
             # be migrated, a PageNotFound exception is raised.
             # Once jobs are migrated and trained they can be sent to the client
-            # upon further requests.
+            # upon further requests. This exception should be gracefully
+            # handled in the client code and shouldn't break UX.
             raise self.PageNotFoundException
 
         training_job = classifier_services.get_classifier_training_job_by_id(
@@ -202,7 +203,8 @@ class TrainedClassifierHandler(base.BaseHandler):
             # Since the required training job doesn't exist and old job has to
             # be migrated, a PageNotFound exception is raised.
             # Once jobs are migrated and trained they can be sent to the client
-            # upon further requests.
+            # upon further requests. This exception should be gracefully
+            # handled in the client code and shouldn't break UX.
             raise self.PageNotFoundException
 
         return self.render_json({

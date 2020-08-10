@@ -325,8 +325,9 @@ class AbstractFileSystem(python_utils.OBJECT):
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the file.
         """
-        if mimetype != 'application/octet-stream':
-            raw_bytes = python_utils.convert_to_bytes(raw_bytes)
+        raw_bytes = (
+            python_utils.convert_to_bytes(raw_bytes)
+            if mimetype != 'application/octet-stream' else raw_bytes)
         self._check_filepath(filepath)
         self._impl.commit(filepath, raw_bytes, mimetype)
 
