@@ -34,6 +34,7 @@ import string
 from constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
+from core.domain import expression_parser
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
@@ -2971,6 +2972,46 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v37_dict_to_v38_dict(cls, states_dict):
+        """Converts from version 37 to 38. Version 38 adds a customization arg
+        for the Math interactions that allows creators to specify the letters
+        that would be displayed to the learner.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] in (
+                    'AlgebraicExpressionInput', 'MathEquationInput'):
+                variables = set()
+                for group in state_dict['interaction']['answer_groups']:
+                    for rule_spec in group['rule_specs']:
+                        rule_input = rule_spec['inputs']['x']
+                        for variable in expression_parser.get_variables(
+                                rule_input):
+                            # Replacing greek letter names with greek symbols.
+                            if len(variable) > 1:
+                                variable = (
+                                    constants.GREEK_LETTER_NAMES_TO_SYMBOLS[
+                                        variable])
+                            variables.add(variable)
+
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'customOskLetters': {
+                        'value': sorted(variables)
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -3005,7 +3046,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 42
+    CURRENT_EXP_SCHEMA_VERSION = 43
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3952,7 +3993,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v39.
+                with schema version v40.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
@@ -3973,17 +4014,39 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v39.
+                with schema version v41.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v41.
+            following schema version v42.
         """
         exploration_dict['schema_version'] = 42
 
         exploration_dict['states'] = cls._convert_states_v36_dict_to_v37_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 37
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v42_dict_to_v43_dict(cls, exploration_dict):
+        """Converts a v42 exploration dict into a v43 exploration dict.
+        Adds a customization arg for the Math interactions that allows creators
+        to specify the letters that would be displayed to the learner.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v42.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v43.
+        """
+        exploration_dict['schema_version'] = 43
+
+        exploration_dict['states'] = cls._convert_states_v37_dict_to_v38_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 38
 
         return exploration_dict
 
@@ -4229,6 +4292,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v41_dict_to_v42_dict(
                 exploration_dict)
             exploration_schema_version = 42
+
+        if exploration_schema_version == 42:
+            exploration_dict = cls._convert_v42_dict_to_v43_dict(
+                exploration_dict)
+            exploration_schema_version = 43
 
         return (exploration_dict, initial_schema_version)
 

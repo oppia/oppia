@@ -1436,8 +1436,9 @@ tags: []
         )
         exp_summary_model.put()
 
-    def save_new_exp_with_states_schema_v34(self, exp_id, user_id, states_dict):
-        """Saves a new default exploration with a default version 34 states
+    def save_new_exp_with_custom_states_schema_version(
+            self, exp_id, user_id, states_dict, version):
+        """Saves a new default exploration with the given version of states
         dictionary.
 
         This function should only be used for creating explorations in tests
@@ -1453,6 +1454,7 @@ tags: []
             exp_id: str. The exploration ID.
             user_id: str. The user_id of the creator.
             states_dict: dict. The dict representation of all the states.
+            version: int. Custom states schema version.
         """
         exp_model = exp_models.ExplorationModel(
             id=exp_id,
@@ -1463,7 +1465,7 @@ tags: []
             tags=[],
             blurb='',
             author_notes='',
-            states_schema_version=34,
+            states_schema_version=version,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=states_dict,
             param_specs={},
