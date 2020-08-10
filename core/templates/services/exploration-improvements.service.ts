@@ -64,6 +64,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
 
     /** @private */
     let openHbrTasks: HighBounceRateTask[] = [];
+    /** @private */
     let ngrTasksOpenSinceInit: NeedsGuidingResponsesTask[] = [];
 
     /** @private */
