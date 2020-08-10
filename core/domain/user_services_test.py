@@ -198,7 +198,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 r'\[u\'a\', u\'@\', u\'b.com\'\]')]
         for email, error_msg in bad_email_addresses_with_expected_error_message:
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
-                user_services.create_new_user('user_id', email)
+                user_services.create_new_user('gae_id', email)
 
     def test_email_truncation(self):
         email_addresses = [
@@ -260,39 +260,56 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_id_from_username('fakeUsername'))
 
     def test_get_user_settings_by_gae_id(self):
-        gae_id = 'gae_id'
+        GAE_ID = 'gae_id'
+        EMAIL = 'user@example.com'
+        USER_ID = 'user_id'
+        USERNAME = 'username'
         user_models.UserSettingsModel(
-            id='user_id',
-            gae_id=gae_id,
-            email='user@example.com',
-            username='username',
+            id=USER_ID,
+            gae_id=GAE_ID,
+            email=EMAIL,
+            username=USERNAME,
         ).put()
-        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-            gae_id)
-        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+        user_models.UserAuthDetailsModel(
+            id=USER_ID,
+            gae_id=GAE_ID
+        ).put()
+        user_settings_model = user_models.UserSettingsModel.get_by_id(USER_ID)
+        user_settings = user_services.get_user_settings_by_gae_id(GAE_ID)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
+        self.assertEqual(user_settings_model.gae_id, user_settings.gae_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
+
+    def test_get_user_settings_by_gae_id_for_nonexistent_user_id_is_none(self):
         self.assertIsNone(user_services.get_user_settings_by_gae_id('id_x'))
 
     def test_get_user_settings_by_gae_id_strict(self):
-        gae_id = 'gae_id'
+        NON_EXISTENCE_USER_ID = 'id_x'
+        GAE_ID = 'gae_id'
+        EMAIL = 'user@example.com'
+        USER_ID = 'user_id'
+        USERNAME = 'username'
         user_models.UserSettingsModel(
-            id='user_id',
-            gae_id=gae_id,
-            email='user@example.com',
-            username='username',
+            id=USER_ID,
+            gae_id=GAE_ID,
+            email=EMAIL,
+            username=USERNAME,
         ).put()
-        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-            gae_id)
-        user_settings = user_services.get_user_settings_by_gae_id(
-            gae_id, strict=True)
+        user_models.UserAuthDetailsModel(
+            id=USER_ID,
+            gae_id=GAE_ID
+        ).put()
+        user_settings_model = user_models.UserSettingsModel.get_by_id(USER_ID)
+        user_settings = user_services.get_user_settings_by_gae_id(GAE_ID)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
+        self.assertEqual(user_settings_model.gae_id, user_settings.gae_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
         with self.assertRaisesRegexp(Exception, 'User not found.'):
-            user_services.get_user_settings_by_gae_id('id_x', strict=True)
+            user_services.get_user_settings_by_gae_id(NON_EXISTENCE_USER_ID,
+                strict=True)
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'

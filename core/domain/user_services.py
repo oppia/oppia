@@ -607,9 +607,11 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     Raises:
         Exception. The value of strict is True and given gae_id does not exist.
     """
-    user_settings_model = user_models.UserSettingsModel.get_by_gae_id(gae_id)
-    if user_settings_model is not None:
-        user_settings = _transform_user_settings(user_settings_model)
+    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_auth_id(
+        feconf.AUTH_METHOD_GAE, gae_id)
+    if user_auth_details_model is not None:
+        user_settings = _transform_user_settings(
+            user_models.UserSettingsModel.get_by_id(user_auth_details_model.id))
         return user_settings
     elif strict:
         logging.error('Could not find user with id %s' % gae_id)
@@ -943,8 +945,8 @@ def create_new_user(gae_id, email):
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
-    _save_user_auth_details(UserAuthDetails(user_id, gae_id))
     _save_user_settings(user_settings)
+    _save_user_auth_details(UserAuthDetails(user_id, gae_id))
     create_user_contributions(user_id, [], [])
     return user_settings
 
