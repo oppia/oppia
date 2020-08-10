@@ -23,8 +23,8 @@ evaluation of feature flag values.
 For clients, please use 'evaluate_all_feature_flag_values_for_client' from
 request handlers with client context.
 
-For the backend, please directly call 'evaluate_feature_flag_value_for_server'
-with the name of the feature.
+For the backend, please directly call 'is_feature_enabled' with the name of
+the feature.
 
 For more details of the usage of these two methods, please refer their
 docstrings in this file.
@@ -94,9 +94,9 @@ def evaluate_all_feature_flag_values_for_client(context):
         ALL_FEATURES_NAMES_SET, context)
 
 
-def evaluate_feature_flag_value_for_server(feature_name):
-    """Evaluates and returns the values of the feature flag, using context
-    from the server only.
+def is_feature_enabled(feature_name):
+    """A short-form method for server-side usage. This method evaluates and
+    returns the values of the feature flag, using context from the server only.
 
     Args:
         feature_name: str. The name of the feature flag that needs to
@@ -105,10 +105,7 @@ def evaluate_feature_flag_value_for_server(feature_name):
     Returns:
         bool. The value of the feature flag, True if it's enabled.
     """
-    context = _create_evaluation_context_for_server()
-    values_dict = _evaluate_feature_flag_values_for_context(
-        set([feature_name]), context)
-    return values_dict[feature_name]
+    return _evaluate_feature_flag_value_for_server(feature_name)
 
 
 def update_feature_flag_rules(
@@ -195,3 +192,20 @@ def _evaluate_feature_flag_values_for_context(feature_names_set, context):
             feature_name)
         result_dict[feature_name] = param.evaluate(context)
     return result_dict
+
+
+def _evaluate_feature_flag_value_for_server(feature_name):
+    """Evaluates and returns the values of the feature flag, using context
+    from the server only.
+
+    Args:
+        feature_name: str. The name of the feature flag that needs to
+            be evaluated.
+
+    Returns:
+        bool. The value of the feature flag, True if it's enabled.
+    """
+    context = _create_evaluation_context_for_server()
+    values_dict = _evaluate_feature_flag_values_for_context(
+        set([feature_name]), context)
+    return values_dict[feature_name]

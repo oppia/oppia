@@ -179,33 +179,28 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
     def test_evaluate_dev_feature_for_dev_server_returns_true(self):
         with self.swap(constants, 'DEV_MODE', True):
             self.assertTrue(
-                feature_services.evaluate_feature_flag_value_for_server(
-                    self.dev_feature.name))
+                feature_services.is_feature_enabled(self.dev_feature.name))
 
     def test_evaluate_prod_feature_for_dev_server_returns_true(self):
         with self.swap(constants, 'DEV_MODE', True):
             self.assertTrue(
-                feature_services.evaluate_feature_flag_value_for_server(
-                    self.prod_feature.name))
+                feature_services.is_feature_enabled(self.prod_feature.name))
 
     def test_evaluate_dev_feature_for_prod_server_returns_false(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.assertFalse(
-                feature_services.evaluate_feature_flag_value_for_server(
-                    self.dev_feature.name))
+                feature_services.is_feature_enabled(self.dev_feature.name))
 
     def test_evaluate_prod_feature_for_prod_server_returns_true(
             self):
         with self.swap(constants, 'DEV_MODE', False):
             self.assertTrue(
-                feature_services.evaluate_feature_flag_value_for_server(
-                    self.prod_feature.name))
+                feature_services.is_feature_enabled(self.prod_feature.name))
 
     def test_get_feature_flag_values_with_unknown_name_raises_error(self):
         with self.assertRaisesRegexp(
             Exception, 'Unknown feature flag'):
-            feature_services.evaluate_feature_flag_value_for_server(
-                'feature_that_does_not_exist')
+            feature_services.is_feature_enabled('feature_that_does_not_exist')
 
     def test_update_feature_flag_rules_successfully_updates_rules(self):
         feature_services.update_feature_flag_rules(
@@ -230,8 +225,7 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
 
         with self.swap(constants, 'DEV_MODE', True):
             self.assertFalse(
-                feature_services.evaluate_feature_flag_value_for_server(
-                    self.dev_feature.name))
+                feature_services.is_feature_enabled(self.dev_feature.name))
 
     def test_update_feature_flag_rules_with_unknown_name_raises_error(self):
         unknown_name = 'feature_that_does_not_exist'
