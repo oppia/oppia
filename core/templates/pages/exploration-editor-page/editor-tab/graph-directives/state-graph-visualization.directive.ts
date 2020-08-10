@@ -411,17 +411,15 @@ angular.module('oppia').directive('stateGraphVisualization', [
             // loaded, this may change the opacities of the nodes.
             $scope.$watch('opacityMap', redrawGraph);
 
-            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent()
-              .subscribe(evt => {
+            ctrl.directiveSubscriptions.add(
+              WindowDimensionsService.getResizeEvent().subscribe(evt => {
                 redrawGraph();
                 $scope.$applyAsync();
-              });
+              })
+            );
           };
 
           ctrl.$onDestroy = function() {
-            if (ctrl.resizeSubscription) {
-              ctrl.resizeSubscription.unsubscribe();
-            }
             ctrl.directiveSubscriptions.unsubscribe();
           };
         }

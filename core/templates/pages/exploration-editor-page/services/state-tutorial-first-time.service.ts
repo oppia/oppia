@@ -33,9 +33,9 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
     var STARTED_TRANSLATION_TUTORIAL_EVENT_URL = '/createhandler/' +
     'started_translation_tutorial_event';
     /** @private */
-    var enterEditorForTheFirstTime = new EventEmitter();
+    var enterEditorForTheFirstTimeEventEmitter = new EventEmitter();
     /** @private */
-    var enterTranslationForTheFirstTime = new EventEmitter();
+    var enterTranslationForTheFirstTimeEventEmitter = new EventEmitter();
 
     return {
       initEditor: function(firstTime, expId) {
@@ -45,7 +45,7 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
         }
 
         if (_currentlyInEditorFirstVisit) {
-          enterEditorForTheFirstTime.emit();
+          enterEditorForTheFirstTimeEventEmitter.emit();
           EditorFirstTimeEventsService.initRegisterEvents(expId);
           $http.post(STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId).then(
             null, function() {
@@ -73,7 +73,7 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
         }
 
         if (_currentlyInTranslationFirstVisit) {
-          enterTranslationForTheFirstTime.emit();
+          enterTranslationForTheFirstTimeEventEmitter.emit();
           EditorFirstTimeEventsService.initRegisterEvents(expId);
           $http.post(STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId)
             .then(null, function() {
@@ -92,10 +92,10 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
         _currentlyInTranslationFirstVisit = false;
       },
       get onEnterEditorForTheFirstTime() {
-        return enterEditorForTheFirstTime;
+        return enterEditorForTheFirstTimeEventEmitter;
       },
       get onEnterTranslationForTheFirstTime() {
-        return enterTranslationForTheFirstTime;
+        return enterTranslationForTheFirstTimeEventEmitter;
       },
     };
   }

@@ -46,7 +46,7 @@ angular.module('oppia').factory('RouterService', [
       FEEDBACK: {name: 'feedback', path: '/feedback'},
     };
     /** @private */
-    var centerGraph = new EventEmitter();
+    var centerGraphEventEmitter = new EventEmitter();
     var SLUG_GUI = 'gui';
     var SLUG_PREVIEW = 'preview';
     // PREVIEW_TAB_WAIT_TIME_MSEC is the minimum duration to wait
@@ -145,7 +145,7 @@ angular.module('oppia').factory('RouterService', [
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
               // Fire an event to center the Graph in the Editor.
-              centerGraph.emit();
+              centerGraphEventEmitter.emit();
             }
           } else {
             $location.path(pathBase +
@@ -264,7 +264,7 @@ angular.module('oppia').factory('RouterService', [
         $location.path(TABS.FEEDBACK.path);
       },
       get onCenterGraph() {
-        return centerGraph;
+        return centerGraphEventEmitter;
       },
     };
 
