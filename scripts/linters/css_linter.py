@@ -81,7 +81,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         """Prints a list of lint errors in the given list of CSS files.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
@@ -97,7 +97,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         files_to_lint = self.all_filepaths
         num_files_with_errors = 0
         failed = False
-        summary_messages = []
+        error_messages = []
         full_messages = []
         name = 'Stylelint'
 
@@ -124,19 +124,19 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             for result in result_list:
                 full_messages.append(result)
-                summary_messages.append(
+                error_messages.append(
                     self._get_trimmed_error_output(result))
             failed = True
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, full_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, full_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(OutputStream). A list of OutputStream objects to be used for
+            list(TaskResult). A list of TaskResult objects to be used for
             linter status retrieval.
         """
         if not self.all_filepaths:

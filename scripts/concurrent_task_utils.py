@@ -44,23 +44,23 @@ def log(message, show_time=False):
             python_utils.PRINT(message)
 
 
-class OutputStream(python_utils.OBJECT):
+class TaskResult(python_utils.OBJECT):
     """Output stream for concurrent_task_utils."""
 
-    def __init__(self, name, failed, summary_messages, full_messages):
-        """Constructs a OutputStream object.
+    def __init__(self, name, failed, error_messages, full_messages):
+        """Constructs a TaskResult object.
 
         Args:
             name: str. Name of the check running.
             failed: bool. Status of the check currently running.
-            summary_messages: list(str). List of summary messages returned by
+            error_messages: list(str). List of summary messages returned by
                 the objects.
             full_messages: list(str). List of full messages returned by the
                 objects.
         """
         self.name = name
         self.failed = failed
-        self.messages = summary_messages
+        self.messages = error_messages
         self.full_messages = full_messages
 
     @property
@@ -81,6 +81,15 @@ class OutputStream(python_utils.OBJECT):
                         self.name, 'passed')))
             self.full_messages.append(failed_message)
         return self.full_messages
+
+    @property
+    def get_task_report(self):
+        """Returns all_messages as a string separated by newlines.
+
+        Returns:
+            str. All lint messages separated by newlines.
+        """
+        return '\n'.join(self.all_messages)
 
 
 class TaskThread(threading.Thread):
@@ -105,8 +114,7 @@ class TaskThread(threading.Thread):
                     if stdout.name:
                         log('Starting %s check' % stdout.name, show_time=True)
                         log('----------------------------------------')
-                        for message in stdout.all_messages:
-                            log(message)
+                        log(stdout.get_task_report)
                         log(
                             'FINISHED %s: %.1f secs' % (
                                 stdout.name, time.time() - self.start_time),

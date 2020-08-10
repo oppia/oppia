@@ -92,7 +92,7 @@ class CustomLintChecksManager(python_utils.OBJECT):
         name = 'App dev file'
 
         failed = False
-        summary_messages = []
+        error_messages = []
         skip_files_section_found = False
         for line_num, line in enumerate(self.file_cache.readlines(
                 APP_YAML_FILEPATH)):
@@ -111,28 +111,28 @@ class CustomLintChecksManager(python_utils.OBJECT):
             if line_in_concern.endswith('/'):
                 line_in_concern = line_in_concern[:-1]
             if not glob.glob(line_in_concern):
-                summary_message = (
+                error_message = (
                     '%s --> Pattern on line %s doesn\'t match '
                     'any file or directory' % (
                         APP_YAML_FILEPATH, line_num + 1))
-                summary_messages.append(summary_message)
+                error_messages.append(error_message)
                 failed = True
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def check_third_party_libs_type_defs(self):
         """Checks the type definitions for third party libs
         are up to date.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Third party type defs'
 
         failed = False
-        summary_messages = []
+        error_messages = []
 
         manifest = json.load(python_utils.open_file(
             MANIFEST_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
@@ -165,16 +165,16 @@ class CustomLintChecksManager(python_utils.OBJECT):
                 if file_name.startswith(prefix_name)]
 
             if len(files_with_prefix_name) > 1:
-                summary_message = (
+                error_message = (
                     'There are multiple type definitions for %s in the typings '
                     'dir.' % third_party_lib['name'])
-                summary_messages.append(summary_message)
+                error_messages.append(error_message)
                 failed = True
             elif len(files_with_prefix_name) == 0:
-                summary_message = (
+                error_message = (
                     'There are no type definitions for %s in the typings '
                     'dir.' % third_party_lib['name'])
-                summary_messages.append(summary_message)
+                error_messages.append(error_message)
                 failed = True
             else:
                 type_defs_filename = files_with_prefix_name[0]
@@ -183,31 +183,31 @@ class CustomLintChecksManager(python_utils.OBJECT):
                     len(prefix_name): -_TYPE_DEFS_FILE_EXTENSION_LENGTH]
 
                 if lib_version != type_defs_version:
-                    summary_message = (
+                    error_message = (
                         'Type definitions for %s are not up to date. The '
                         'current version of %s is %s and the type definitions '
                         'are for version %s. Please refer typings/README.md '
                         'for more details.' % (
                             third_party_lib['name'], third_party_lib['name'],
                             lib_version, type_defs_version))
-                    summary_messages.append(summary_message)
+                    error_messages.append(error_message)
                     failed = True
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def check_webpack_config_file(self):
         """Check to ensure that the instances of HtmlWebpackPlugin in
         webpack.common.config.ts contains all needed keys.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Webpack config file'
 
         failed = False
-        summary_messages = []
+        error_messages = []
         plugins_section_found = False
         htmlwebpackplugin_section_found = False
         for line_num, line in enumerate(self.file_cache.readlines(
@@ -228,27 +228,27 @@ class CustomLintChecksManager(python_utils.OBJECT):
                     stripped_line.startswith('}),')):
                 htmlwebpackplugin_section_found = False
                 if keys:
-                    summary_message = (
+                    error_message = (
                         'Line %s: The following keys: %s are missing in '
                         'HtmlWebpackPlugin block in %s' % (
                             error_line_num + 1, ', '.join(keys),
                             WEBPACK_CONFIG_FILE_NAME))
-                    summary_messages.append(summary_message)
+                    error_messages.append(error_message)
                     failed = True
             if htmlwebpackplugin_section_found:
                 key = stripped_line.split(':')[0]
                 if key in keys:
                     keys.remove(key)
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(OutputStream). A list of OutputStream objects to be used for
+            list(TaskResult). A list of TaskResult objects to be used for
             linter status retrieval.
         """
         linter_stdout = []

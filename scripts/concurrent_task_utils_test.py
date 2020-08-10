@@ -53,11 +53,11 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
 
-class OutputStreamTests(ConcurrentTaskUtilsTests):
-    """Tests for OutputStream class."""
+class TaskResultTests(ConcurrentTaskUtilsTests):
+    """Tests for TaskResult class."""
 
     def test_all_messages_with_success_message(self):
-        output_object = concurrent_task_utils.OutputStream(
+        output_object = concurrent_task_utils.TaskResult(
             'Test', False, [], [])
         self.assertEqual(output_object.messages, [])
         self.assertEqual(
@@ -66,13 +66,23 @@ class OutputStreamTests(ConcurrentTaskUtilsTests):
         self.assertEqual(output_object.name, 'Test')
 
     def test_all_messages_with_failed_message(self):
-        output_object = concurrent_task_utils.OutputStream(
+        output_object = concurrent_task_utils.TaskResult(
             'Test', True, [], [])
         self.assertEqual(output_object.messages, [])
         self.assertEqual(
             output_object.all_messages, ['FAILED  Test check failed'])
         self.assertTrue(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
+
+    def test_get_task_report_with_failed_message(self):
+        output_object = concurrent_task_utils.TaskResult(
+            'Test', True, [], [])
+        self.assertEqual(
+            output_object.get_task_report, 'FAILED  Test check failed')
+        self.assertTrue(output_object.failed)
+        self.assertEqual(output_object.name, 'Test')
+        self.assertTrue(
+            isinstance(output_object.get_task_report, python_utils.UNICODE))
 
 
 class CreateTaskTests(ConcurrentTaskUtilsTests):
@@ -113,7 +123,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
     def test_task_thread_with_verbose_mode_enabled(self):
         class HelperTests(python_utils.OBJECT):
             def test_show(self):
-                return concurrent_task_utils.OutputStream('name', True, [], [])
+                return concurrent_task_utils.TaskResult('name', True, [], [])
             def test_perform_all_check(self):
                 return [self.test_show()]
 
@@ -134,7 +144,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
     def test_task_thread_with_no_test_name(self):
         class HelperTests(python_utils.OBJECT):
             def test_show(self):
-                return concurrent_task_utils.OutputStream(None, None, None, [])
+                return concurrent_task_utils.TaskResult(None, None, None, [])
             def test_perform_all_check(self):
                 return [self.test_show()]
 

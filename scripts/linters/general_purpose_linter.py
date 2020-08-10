@@ -562,7 +562,7 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
         which set to True if there is bad pattern found else False, whose second
         element is a list of failed messages.
     """
-    summary_messages = []
+    error_messages = []
     failed = False
     regexp = pattern['regexp']
     if not (any(
@@ -580,14 +580,14 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
             if stripped_line.endswith('disable-bad-pattern-check'):
                 continue
             if regexp.search(stripped_line):
-                summary_message = ('%s --> Line %s: %s' % (
+                error_message = ('%s --> Line %s: %s' % (
                     filepath, line_num, pattern['message']))
-                summary_messages.append(summary_message)
+                error_messages.append(error_message)
                 bad_pattern_count += 1
         if bad_pattern_count:
             failed = True
-            return failed, summary_messages
-    return failed, summary_messages
+            return failed, error_messages
+    return failed, error_messages
 
 
 def check_file_type_specific_bad_pattern(filepath, content):
@@ -601,21 +601,21 @@ def check_file_type_specific_bad_pattern(filepath, content):
         bool. True if there is bad pattern else false.
         total_error_count: int. The number of errors.
     """
-    summary_messages = []
+    error_messages = []
     failed = False
     _, extension = os.path.splitext(filepath)
     pattern = BAD_PATTERNS_MAP.get(extension)
     total_error_count = 0
     if pattern:
         for regexp in pattern:
-            failed, summary_message = check_bad_pattern_in_file(
+            failed, error_message = check_bad_pattern_in_file(
                 filepath, content, regexp)
-            summary_messages.extend(summary_message)
+            error_messages.extend(error_message)
             if failed:
                 total_error_count += 1
     if total_error_count:
         failed = True
-    return failed, total_error_count, summary_messages
+    return failed, total_error_count, error_messages
 
 
 class GeneralPurposeLinter(python_utils.OBJECT):
@@ -661,7 +661,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         # This boolean list keeps track of the regex matches
         # found in the file.
         pattern_found_list = []
-        summary_messages = []
+        error_messages = []
         file_content = self.file_cache.readlines(filepath)
         for index, regexp_to_check in enumerate(
                 pattern_list):
@@ -683,37 +683,37 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         if pattern_found_list:
             failed = True
             for pattern_found in pattern_found_list:
-                summary_message = ('%s --> %s' % (
+                error_message = ('%s --> %s' % (
                     filepath,
                     pattern_list[pattern_found]['message']))
-                summary_messages.append(summary_message)
+                error_messages.append(error_message)
 
-        return failed, summary_messages
+        return failed, error_messages
 
     def check_mandatory_patterns(self):
         """This function checks that all files contain the mandatory
         patterns.
         """
         name = 'Mandatory pattern'
-        summary_messages = []
+        error_messages = []
         failed = False
         sets_of_patterns_to_match = [
             MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
         for filepath in self.all_filepaths:
             for pattern_list in sets_of_patterns_to_match:
-                failed, mandatory_summary_messages = (
+                failed, mandatory_error_messages = (
                     self._check_for_mandatory_pattern_in_file(
                         pattern_list, filepath, failed))
-                summary_messages.extend(mandatory_summary_messages)
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+                error_messages.extend(mandatory_error_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
         name = 'Bad pattern'
         total_files_checked = 0
         total_error_count = 0
-        summary_messages = []
+        error_messages = []
         all_filepaths = [
             filepath for filepath in self.all_filepaths if not (
                 filepath.endswith('general_purpose_linter.py') or (
@@ -729,48 +729,48 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 for line_num, line in enumerate(file_content):
                     if pattern in line:
                         failed = True
-                        summary_message = ('%s --> Line %s: %s' % (
+                        error_message = ('%s --> Line %s: %s' % (
                             filepath, line_num + 1,
                             BAD_PATTERNS[pattern]['message']))
-                        summary_messages.append(summary_message)
+                        error_messages.append(error_message)
                         total_error_count += 1
 
             for regexp in BAD_PATTERNS_REGEXP:
-                bad_pattern_check_failed, bad_pattern_summary_messages = (
+                bad_pattern_check_failed, bad_pattern_error_messages = (
                     check_bad_pattern_in_file(
                         filepath, file_content, regexp))
                 if bad_pattern_check_failed:
-                    summary_messages.extend(bad_pattern_summary_messages)
+                    error_messages.extend(bad_pattern_error_messages)
                     total_error_count += 1
 
             (
                 file_type_specific_bad_pattern_failed,
-                temp_count, bad_pattern_summary_messages) = (
+                temp_count, bad_pattern_error_messages) = (
                     check_file_type_specific_bad_pattern(
                         filepath, file_content))
             failed = (
                 failed or file_type_specific_bad_pattern_failed or
                 bad_pattern_check_failed)
             total_error_count += temp_count
-            summary_messages.extend(bad_pattern_summary_messages)
+            error_messages.extend(bad_pattern_error_messages)
 
             if filepath == 'constants.ts':
                 for pattern in REQUIRED_STRINGS_CONSTANTS:
                     if pattern not in file_content:
                         failed = True
-                        summary_message = ('%s --> %s' % (
+                        error_message = ('%s --> %s' % (
                             filepath,
                             REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
-                        summary_messages.append(summary_message)
+                        error_messages.append(error_message)
                         total_error_count += 1
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def check_newline_at_eof(self):
         """This function is used to detect newline at the end of file."""
         name = 'Newline at EOF'
-        summary_messages = []
+        error_messages = []
         files_to_lint = self.all_filepaths
         failed = False
 
@@ -780,21 +780,21 @@ class GeneralPurposeLinter(python_utils.OBJECT):
             if (
                     file_length >= 1 and
                     not re.search(r'[^\n]\n', file_content[-1])):
-                summary_message = (
+                error_message = (
                     '%s --> There should be a single newline at the '
                     'end of file.' % filepath)
-                summary_messages.append(summary_message)
+                error_messages.append(error_message)
                 failed = True
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(OutputStream). A list of OutputStream objects to be used for
+            list(TaskResult). A list of TaskResult objects to be used for
             linter status retrieval.
         """
         if not self.all_filepaths:

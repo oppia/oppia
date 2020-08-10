@@ -183,7 +183,7 @@ class TestingTaskSpec(python_utils.OBJECT):
 
         result = run_shell_cmd(exc_list)
 
-        return [concurrent_task_utils.OutputStream(None, None, None, result)]
+        return [concurrent_task_utils.TaskResult(None, None, None, result)]
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):

@@ -224,7 +224,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         backend-api.service.ts.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         http_client_pattern = r':\n? *HttpClient'
@@ -233,7 +233,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             'core/templates/services/request-interceptor.service.spec.ts'
         ]
 
-        summary_messages = []
+        error_messages = []
         name = 'HTTP request'
 
         failed = False
@@ -249,25 +249,25 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
             if re.findall(http_client_pattern, file_content):
                 failed = True
-                summary_message = (
+                error_message = (
                     '%s --> An instance of HttpClient is found in this '
                     'file. You are not allowed to create http requests '
                     'from files that are not backend api services.' % (
                         file_path))
-                summary_messages.append(summary_message)
+                error_messages.append(error_message)
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def _check_ts_ignore(self):
         """Checks if ts ignore is used.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Ts ignore'
-        summary_messages = []
+        error_messages = []
 
         ts_ignore_pattern = r'@ts-ignore'
         comment_pattern = r'^ *// '
@@ -297,12 +297,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
                     failed = True
                     previous_line_has_ts_ignore = False
-                    summary_message = (
+                    error_message = (
                         '%s --> @ts-ignore found at line %s. '
                         'Please add this exception in %s.' % (
                             file_path, line_number,
                             TS_IGNORE_EXCEPTIONS_FILEPATH))
-                    summary_messages.append(summary_message)
+                    error_messages.append(error_message)
 
                 previous_line_has_ts_ignore = bool(
                     re.findall(ts_ignore_pattern, line))
@@ -311,13 +311,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         previous_line_has_ts_ignore and
                         not previous_line_has_comment_with_ts_error):
                     failed = True
-                    summary_message = (
+                    error_message = (
                         '%s --> Please add a comment above the @ts-ignore '
                         'explaining the @ts-ignore at line %s. The format '
                         'of comment should be -> This throws "...". This '
                         'needs to be suppressed because ...' % (
                             file_path, line_number + 1))
-                    summary_messages.append(summary_message)
+                    error_messages.append(error_message)
 
                 previous_line_has_comment = bool(
                     re.findall(comment_pattern, line))
@@ -330,18 +330,18 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         previous_line_has_comment_with_ts_error and
                         previous_line_has_comment))
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def _check_ts_expect_error(self):
         """Checks if ts expect error is used in non spec file.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Ts expect error'
-        summary_messages = []
+        error_messages = []
 
         ts_expect_error_pattern = r'@ts-expect-error'
         comment_pattern = r'^ *// '
@@ -359,22 +359,22 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             file_path.endswith('.spec.ts') or
                             file_path.endswith('Spec.ts')):
                         failed = True
-                        summary_message = (
+                        error_message = (
                             '%s --> @ts-expect-error found at line %s. '
                             'It can be used only in spec files.' % (
                                 file_path, line_number + 1))
-                        summary_messages.append(summary_message)
+                        error_messages.append(error_message)
 
                     if not previous_line_has_comment_with_ts_error:
                         failed = True
-                        summary_message = (
+                        error_message = (
                             '%s --> Please add a comment above the '
                             '@ts-expect-error explaining the '
                             '@ts-expect-error at line %s. The format '
                             'of comment should be -> This throws "...". '
                             'This needs to be suppressed because ...' % (
                                 file_path, line_number + 1))
-                        summary_messages.append(summary_message)
+                        error_messages.append(error_message)
 
                 previous_line_has_comment = bool(
                     re.findall(comment_pattern, line))
@@ -387,8 +387,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         previous_line_has_comment_with_ts_error and
                         previous_line_has_comment))
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
@@ -396,11 +396,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         build.JS_FILEPATHS_NOT_TO_BUILD.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Extra JS files'
-        summary_messages = []
+        error_messages = []
         failed = False
         js_files_to_check = self.js_filepaths
 
@@ -408,9 +408,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             if filepath.startswith(('core/templates', 'extensions')) and (
                     filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
                         not filepath.endswith('protractor.js')):
-                summary_message = (
+                error_message = (
                     '%s  --> Found extra .js file\n' % filepath)
-                summary_messages.append(summary_message)
+                error_messages.append(error_message)
                 failed = True
 
         if failed:
@@ -418,10 +418,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'If you want the above files to be present as js files, '
                 'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
                 'build.py. Otherwise, rename them to .ts\n')
-            summary_messages.append(err_msg)
+            error_messages.append(err_msg)
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def _check_js_and_ts_component_name_and_count(self):
         """This function ensures that all JS/TS files have exactly
@@ -429,7 +429,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         matches the filename.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         # Select JS files which need to be checked.
@@ -438,7 +438,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             filepath for filepath in self.all_filepaths if not
             filepath.endswith('App.ts')]
         failed = False
-        summary_messages = []
+        error_messages = []
         components_to_check = ['controller', 'directive', 'factory', 'filter']
         for filepath in files_to_check:
             component_num = 0
@@ -453,29 +453,29 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     # Check if the number of components in each file exceeds
                     # one.
                     if component_num > 1:
-                        summary_message = (
+                        error_message = (
                             '%s -> Please ensure that there is exactly one '
                             'component in the file.' % (filepath))
                         failed = True
-                        summary_messages.append(summary_message)
+                        error_messages.append(error_message)
                         break
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def _check_directive_scope(self):
         """This function checks that all directives have an explicit
         scope: {} and it should not be scope: true.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         # Select JS and TS files which need to be checked.
         name = 'Directive scope'
         files_to_check = self.all_filepaths
         failed = False
-        summary_messages = []
+        error_messages = []
         components_to_check = ['directive']
 
         for filepath in files_to_check:
@@ -555,31 +555,31 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                                 and (
                                                     scope_value.value)):
                                             failed = True
-                                            summary_message = (
+                                            error_message = (
                                                 'Please ensure that %s '
                                                 'directive in %s file '
                                                 'does not have scope set '
                                                 'to true.' %
                                                 (directive_name, filepath))
-                                            summary_messages.append(
-                                                summary_message)
+                                            error_messages.append(
+                                                error_message)
                                         elif scope_value.type != (
                                                 'ObjectExpression'):
                                             # Check whether the directive
                                             # has scope: {} else report
                                             # the error message.
                                             failed = True
-                                            summary_message = (
+                                            error_message = (
                                                 'Please ensure that %s '
                                                 'directive in %s file has '
                                                 'a scope: {}.' % (
                                                     directive_name, filepath
                                                     ))
-                                            summary_messages.append(
-                                                summary_message)
+                                            error_messages.append(
+                                                error_message)
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -588,14 +588,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         imports, and constant imports, all in sorted order.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Sorted dependencies'
         files_to_check = self.all_filepaths
         components_to_check = ['controller', 'directive', 'factory']
         failed = False
-        summary_messages = []
+        error_messages = []
 
         for filepath in files_to_check:
             parsed_expressions = self.parsed_expressions_in_files[filepath]
@@ -643,27 +643,27 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 constant_imports))
                         if sorted_imports != function_args:
                             failed = True
-                            summary_message = (
+                            error_message = (
                                 'Please ensure that in %s in file %s, the '
                                 'injected dependencies should be in the '
                                 'following manner: dollar imports, regular '
                                 'imports and constant imports, all in '
                                 'sorted order.'
                                 % (property_value, filepath))
-                            summary_messages.append(summary_message)
+                            error_messages.append(error_message)
                         if sorted_imports != literal_args:
                             failed = True
-                            summary_message = (
+                            error_message = (
                                 'Please ensure that in %s in file %s, the '
                                 'stringfied dependencies should be in the '
                                 'following manner: dollar imports, regular '
                                 'imports and constant imports, all in '
                                 'sorted order.'
                                 % (property_value, filepath))
-                            summary_messages.append(summary_message)
+                            error_messages.append(error_message)
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
@@ -671,13 +671,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         between the arguments of the controller function.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Controller dependency line break'
         files_to_check = self.all_filepaths
         failed = False
-        summary_messages = []
+        error_messages = []
 
         # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
         pattern_to_match = (
@@ -697,7 +697,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     function_parameters.strip().replace(' ', ''))
                 if stringfied_dependencies != function_parameters:
                     failed = True
-                    summary_messages.append(
+                    error_messages.append(
                         'Please ensure that in file %s the line breaks '
                         'pattern between the dependencies mentioned as '
                         'strings:\n[%s]\nand the dependencies mentioned '
@@ -707,8 +707,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             filepath, stringfied_dependencies,
                             function_parameters))
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
@@ -718,11 +718,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         AngularJS) and in *.constants.ts (for Angular 8).
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Constants declaration'
-        summary_messages = []
+        error_messages = []
         failed = False
 
         ts_files_to_check = self.ts_filepaths
@@ -777,7 +777,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             if angularjs_constants_value != (
                                     angularjs_constants_name):
                                 failed = True
-                                summary_messages.append(
+                                error_messages.append(
                                     '%s --> Please ensure that the '
                                     'constant %s is initialized '
                                     'from the value from the '
@@ -795,7 +795,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     if len(angularjs_constants_set) != len(
                             angularjs_constants_list):
                         failed = True
-                        summary_messages.append(
+                        error_messages.append(
                             '%s --> Duplicate constant declaration '
                             'found.' % (
                                 corresponding_angularjs_filepath))
@@ -811,12 +811,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         filepath)):
                     if 'angular.module(\'oppia\').constant(' in line:
                         failed = True
-                        summary_message = (
+                        error_message = (
                             '%s --> Constant declaration found at line '
                             '%s. Please declare the constants in a '
                             'separate constants file.' % (
                                 filepath, line_num))
-                        summary_messages.append(summary_message)
+                        error_messages.append(error_message)
 
             # Check if the constant has multiple declarations which is
             # prohibited.
@@ -833,7 +833,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     constant_name = expression.arguments[0].raw
                     if constant_name in constants_to_source_filepaths_dict:
                         failed = True
-                        summary_message = (
+                        error_message = (
                             '%s --> The constant %s is already declared '
                             'in %s. Please import the file where the '
                             'constant is declared or rename the constant'
@@ -841,7 +841,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 filepath, constant_name,
                                 constants_to_source_filepaths_dict[
                                     constant_name]))
-                        summary_messages.append(summary_message)
+                        error_messages.append(error_message)
                     else:
                         constants_to_source_filepaths_dict[
                             constant_name] = filepath
@@ -870,13 +870,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if len(angular_constants_set) != len(
                         angular_constants_list):
                     failed = True
-                    summary_message = (
+                    error_message = (
                         '%s --> Duplicate constant declaration found.'
                         % filepath)
-                    summary_messages.append(summary_message)
+                    error_messages.append(error_message)
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def _check_comments(self):
         """This function ensures that comments follow correct style. Below are
@@ -888,11 +888,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         in the comment.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Comments'
-        summary_messages = []
+        error_messages = []
         files_to_check = self.all_filepaths
         allowed_terminating_punctuations = [
             '.', '?', ';', ',', '{', '^', ')', '}', '>']
@@ -960,21 +960,21 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         allowed_terminating_punctuations)
                     if last_char_is_invalid:
                         failed = True
-                        summary_message = (
+                        error_message = (
                             '%s --> Line %s: Invalid punctuation used at '
                             'the end of the comment.' % (
                                 filepath, line_num + 1))
-                        summary_messages.append(summary_message)
+                        error_messages.append(error_message)
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, summary_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(OutputStream). A list of OutputStream objects to be used for
+            list(TaskResult). A list of TaskResult objects to be used for
             linter status retrieval.
         """
 
@@ -1077,7 +1077,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         """Prints a list of lint errors in the given list of JavaScript files.
 
         Returns:
-            OutputStream. An OutputStream object to retrieve the status of a
+            TaskResult. An TaskResult object to retrieve the status of a
             lint check.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
@@ -1093,7 +1093,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
 
         files_to_lint = self.all_filepaths
         num_files_with_errors = 0
-        summary_messages = []
+        error_messages = []
         full_messages = []
         failed = False
         name = 'ESLint'
@@ -1121,18 +1121,18 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             failed = True
             for result in result_list:
                 full_messages.append(result)
-                summary_messages.append(
+                error_messages.append(
                     self._get_trimmed_error_output(result))
 
-        return concurrent_task_utils.OutputStream(
-            name, failed, summary_messages, full_messages)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, full_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(OutputStream). A list of OutputStream objects to be used for
+            list(TaskResult). A list of TaskResult objects to be used for
             linter status retrieval.
         """
         if not self.all_filepaths:

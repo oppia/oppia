@@ -76,11 +76,11 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
-            summary_messages = other_files_linter.CustomLintChecksManager(
+            error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_skip_files_in_app_dev_yaml()
-            expected_summary_messages = ['SUCCESS  App dev file check passed']
+            expected_error_messages = ['SUCCESS  App dev file check passed']
             self.assertEqual(
-                summary_messages.all_messages, expected_summary_messages)
+                error_messages.all_messages, expected_error_messages)
 
     def test_check_invalid_pattern_in_app_dev_yaml(self):
         def mock_readlines(unused_self, unused_filepath):
@@ -90,12 +90,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
-            summary_messages = other_files_linter.CustomLintChecksManager(
+            error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_skip_files_in_app_dev_yaml()
-        self.assertEqual(len(summary_messages.all_messages), 2)
+        self.assertEqual(len(error_messages.all_messages), 2)
         self.assertTrue(
             'Pattern on line 2 doesn\'t match any file or directory' in
-            summary_messages.all_messages[0])
+            error_messages.all_messages[0])
 
     def test_check_valid_pattern(self):
         def mock_readlines(unused_self, unused_filepath):
@@ -115,12 +115,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
-            summary_messages = other_files_linter.CustomLintChecksManager(
+            error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
-        expected_summary_messages = [
+        expected_error_messages = [
             'SUCCESS  Webpack config file check passed']
         self.assertEqual(
-            summary_messages.all_messages, expected_summary_messages)
+            error_messages.all_messages, expected_error_messages)
 
     def test_check_invalid_pattern_with_some_keys_missing(self):
         def mock_readlines(unused_self, unused_filepath):
@@ -136,14 +136,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
-            summary_messages = other_files_linter.CustomLintChecksManager(
+            error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
-        expected_summary_messages = [
+        expected_error_messages = [
             'Line 2: The following keys: meta, template are missing in '
             'HtmlWebpackPlugin block in webpack.common.config.ts',
             'FAILED  Webpack config file check failed']
         self.assertEqual(
-            summary_messages.all_messages, expected_summary_messages)
+            error_messages.all_messages, expected_error_messages)
 
     def test_check_invalid_pattern_without_all_keys(self):
         def mock_readlines(unused_self, unused_filepath):
@@ -156,46 +156,46 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
-            summary_messages = other_files_linter.CustomLintChecksManager(
+            error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
-        expected_summary_messages = [
+        expected_error_messages = [
             'Line 2: The following keys: chunks, filename, meta, template,'
             ' minify, inject are missing in HtmlWebpackPlugin block in '
             'webpack.common.config.ts', 'FAILED  Webpack config file check'
             ' failed']
         self.assertEqual(
-            summary_messages.all_messages, expected_summary_messages)
+            error_messages.all_messages, expected_error_messages)
 
     def test_check_third_party_libs_type_defs(self):
-        expected_summary_messages = [
+        expected_error_messages = [
             'SUCCESS  Third party type defs check passed']
         with self.open_file_swap, self.listdir_swap:
-            summary_messages = other_files_linter.CustomLintChecksManager(
+            error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
-                summary_messages.all_messages, expected_summary_messages)
+                error_messages.all_messages, expected_error_messages)
 
     def test_check_third_party_libs_type_defs_verbose(self):
         self.verbose_mode_enabled = True
-        expected_summary_messages = [
+        expected_error_messages = [
             'SUCCESS  Third party type defs check passed']
         with self.open_file_swap, self.listdir_swap:
-            summary_messages = other_files_linter.CustomLintChecksManager(
+            error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
-                summary_messages.all_messages, expected_summary_messages)
+                error_messages.all_messages, expected_error_messages)
 
     def test_check_third_party_libs_type_defs_multiple(self):
         self.files_in_typings_dir.append('guppy-defs-0.2.d.ts')
-        expected_summary_messages = 'FAILED  Third party type defs check failed'
+        expected_error_messages = 'FAILED  Third party type defs check failed'
         with self.open_file_swap, self.listdir_swap, self.print_swap:
-            summary_messages = other_files_linter.CustomLintChecksManager(
+            error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
-                summary_messages.all_messages[1], expected_summary_messages)
+                error_messages.all_messages[1], expected_error_messages)
             self.assert_same_list_elements([
                 'There are multiple type definitions for Guppy in the '
-                'typings dir.'], summary_messages.all_messages)
+                'typings dir.'], error_messages.all_messages)
 
     def test_check_third_party_libs_type_defs_no_type_defs(self):
         self.files_in_typings_dir = [
@@ -204,15 +204,15 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
-        expected_summary_messages = 'FAILED  Third party type defs check failed'
+        expected_error_messages = 'FAILED  Third party type defs check failed'
         with self.open_file_swap, self.listdir_swap:
-            summary_messages = other_files_linter.CustomLintChecksManager(
+            error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
-                summary_messages.all_messages[1], expected_summary_messages)
+                error_messages.all_messages[1], expected_error_messages)
             self.assert_same_list_elements([
                 'There are no type definitions for Guppy in the '
-                'typings dir.'], summary_messages.all_messages)
+                'typings dir.'], error_messages.all_messages)
 
     def test_check_third_party_libs_type_defs_wrong_version(self):
         self.files_in_typings_dir = [
@@ -222,17 +222,17 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
-        expected_summary_messages = 'FAILED  Third party type defs check failed'
+        expected_error_messages = 'FAILED  Third party type defs check failed'
         with self.open_file_swap, self.listdir_swap, self.print_swap:
-            summary_messages = other_files_linter.CustomLintChecksManager(
+            error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
-                summary_messages.all_messages[1], expected_summary_messages)
+                error_messages.all_messages[1], expected_error_messages)
             self.assert_same_list_elements([
                 'Type definitions for Guppy are not up to date. The '
                 'current version of Guppy is 0.1 and the type definitions '
                 'are for version 0.2. Please refer typings/README.md '
-                'for more details.'], summary_messages.all_messages)
+                'for more details.'], error_messages.all_messages)
 
     def test_perform_all_lint_checks(self):
         linter_stdout = other_files_linter.CustomLintChecksManager(
