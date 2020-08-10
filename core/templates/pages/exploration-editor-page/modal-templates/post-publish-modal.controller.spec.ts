@@ -62,9 +62,14 @@ describe('Post Publish Modal Controller', function() {
   it('should add range from a click event', function() {
     var removeAllRanges = jasmine.createSpy('removeAllRanges');
     var addRange = jasmine.createSpy('addRange');
-    // TS ignore is used here because we are faking the getSelection function
-    // for this test.
-    // @ts-ignore
+    // This throws "Argument of type '{ removeAllRanges:
+    // jasmine.Spy<jasmine.Func>; addRange: jasmine.Spy<jasmine.Func>; }'
+    // is not assignable to parameter of type 'Selection'." This is because
+    // the type of the actual 'getSelection' function doesn't match the type
+    // of function we've mocked it to. We need to suppress this error because
+    // we need to mock 'getSelection' function to our function for testing
+    // purposes.
+    // @ts-expect-error
     spyOn(window, 'getSelection').and.returnValue({
       removeAllRanges: removeAllRanges,
       addRange: addRange

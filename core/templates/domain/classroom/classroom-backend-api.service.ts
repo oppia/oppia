@@ -91,6 +91,7 @@ export class ClassroomBackendApiService {
     });
   }
   fetchClassroomData(classroomName: string): Promise<TopicSummary[]> {
+
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomName, resolve, reject);
     });

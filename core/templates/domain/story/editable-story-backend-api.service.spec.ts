@@ -223,7 +223,11 @@ describe('Editable story backend API service', () => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
+<<<<<<< HEAD
     // Send a request to update story.
+=======
+    // send a request to update story
+>>>>>>> 0042aa54d87d52a347c84908e14da01389f5aa46
     editableStoryBackendApiService.changeStoryPublicationStatus(
       'storyId', true).then(successHandler, failHandler);
     var req = httpTestingController.expectOne(
