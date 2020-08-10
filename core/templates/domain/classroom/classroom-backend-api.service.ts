@@ -56,7 +56,7 @@ export class ClassroomBackendApiService {
   private _initializeTranslationEventEmitter = new EventEmitter();
   
   _fetchClassroomData(classroomUrlFragment: string,
-      successCallback: (value: ClassroomData[]) => void,
+      successCallback: (value: ClassroomData) => void,
       errorCallback: (reason: string) => void): void {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
