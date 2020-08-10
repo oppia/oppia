@@ -260,22 +260,22 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_id_from_username('fakeUsername'))
 
     def test_get_user_settings_by_gae_id(self):
-        GAE_ID = 'gae_id'
-        EMAIL = 'user@example.com'
-        USER_ID = 'user_id'
-        USERNAME = 'username'
+        gae_id = 'gae_id'
+        email = 'user@example.com'
+        user_id = 'user_id'
+        username = 'username'
         user_models.UserSettingsModel(
-            id=USER_ID,
-            gae_id=GAE_ID,
-            email=EMAIL,
-            username=USERNAME,
+            id=user_id,
+            gae_id=gae_id,
+            email=email,
+            username=username,
         ).put()
         user_models.UserAuthDetailsModel(
-            id=USER_ID,
-            gae_id=GAE_ID
+            id=user_id,
+            gae_id=gae_id
         ).put()
-        user_settings_model = user_models.UserSettingsModel.get_by_id(USER_ID)
-        user_settings = user_services.get_user_settings_by_gae_id(GAE_ID)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
         self.assertEqual(user_settings_model.gae_id, user_settings.gae_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
@@ -285,31 +285,31 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(user_services.get_user_settings_by_gae_id('id_x'))
 
     def test_get_user_settings_by_gae_id_strict(self):
-        NON_EXISTENCE_USER_ID = 'id_x'
-        GAE_ID = 'gae_id'
-        EMAIL = 'user@example.com'
-        USER_ID = 'user_id'
-        USERNAME = 'username'
+        non_existent_user_id = 'id_x'
+        gae_id = 'gae_id'
+        email = 'user@example.com'
+        user_id = 'user_id'
+        username = 'username'
         user_models.UserSettingsModel(
-            id=USER_ID,
-            gae_id=GAE_ID,
-            email=EMAIL,
-            username=USERNAME,
+            id=user_id,
+            gae_id=gae_id,
+            email=email,
+            username=username,
         ).put()
         user_models.UserAuthDetailsModel(
-            id=USER_ID,
-            gae_id=GAE_ID
+            id=user_id,
+            gae_id=gae_id
         ).put()
-        user_settings_model = user_models.UserSettingsModel.get_by_id(USER_ID)
-        user_settings = user_services.get_user_settings_by_gae_id(GAE_ID)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
         self.assertEqual(user_settings_model.gae_id, user_settings.gae_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
         with self.assertRaisesRegexp(Exception, 'User not found.'):
-            user_services.get_user_settings_by_gae_id(NON_EXISTENCE_USER_ID,
-                strict=True)
+            user_services.get_user_settings_by_gae_id(
+                non_existent_user_id, strict=True)
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
