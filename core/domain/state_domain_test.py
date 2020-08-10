@@ -993,10 +993,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': (
-                    '<p>Value</p><oppia-noninteractive-math math_content-with'
-                    '-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,'
-                    '+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
-                    ';&amp;quot;}"></oppia-noninteractive-math>')
+                    '<oppia-noninteractive-collapsible content-with-value='
+                    '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
+                    'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
+                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>')
             },
         }
 
@@ -1031,10 +1031,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
                 'default_outcome', (
-                    '<p>Value</p><oppia-noninteractive-math math_content-with'
-                    '-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,'
-                    '+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
-                    ';&amp;quot;}"></oppia-noninteractive-math>')),
+                    '<oppia-noninteractive-collapsible content-with-value='
+                    '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
+                    'quot;" heading-with-value="&amp;quot;Sub&amp;quot;">'
+                    '</oppia-noninteractive-collapsible><p>&nbsp;</p>')),
             False, [], None, None
         )
 
@@ -1139,13 +1139,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('TextInput')
         self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('ImageClickInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
 
         # Invalid interactions.
         init_state.update_interaction_id('CodeRepl')
         self.assertFalse(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('GraphInput')
-        self.assertFalse(init_state.interaction.is_supported_on_android_app())
-        init_state.update_interaction_id('ImageClickInput')
         self.assertFalse(init_state.interaction.is_supported_on_android_app())
         init_state.update_interaction_id('InteractiveMap')
         self.assertFalse(init_state.interaction.is_supported_on_android_app())

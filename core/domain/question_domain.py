@@ -26,6 +26,7 @@ from constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
 from core.domain import exp_domain
+from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
@@ -671,6 +672,46 @@ class Question(python_utils.OBJECT):
             for rule_spec_dict in answer_group_dict['rule_specs']:
                 if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
                     rule_spec_dict['rule_type'] = 'Equals'
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v37_dict_to_v38_dict(cls, question_state_dict):
+        """Converts from version 37 to 38. Version 38 adds a customization arg
+        for the Math interactions that allows creators to specify the letters
+        that would be displayed to the learner.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] in (
+                'AlgebraicExpressionInput', 'MathEquationInput'):
+            variables = set()
+            for group in question_state_dict[
+                    'interaction']['answer_groups']:
+                for rule_spec in group['rule_specs']:
+                    rule_input = rule_spec['inputs']['x']
+                    for variable in expression_parser.get_variables(
+                            rule_input):
+                        # Replacing greek letter names with greek symbols.
+                        if len(variable) > 1:
+                            variable = (
+                                constants.GREEK_LETTER_NAMES_TO_SYMBOLS[
+                                    variable])
+                        variables.add(variable)
+
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'customOskLetters': {
+                    'value': sorted(variables)
+                }
+            })
 
         return question_state_dict
 

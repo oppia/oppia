@@ -170,9 +170,9 @@ def extract_html_from_draft_change_list(draft_change_list):
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
-    @classmethod
-    def _convert_states_v37_dict_to_v38_dict(cls, draft_change_list):
-        """Converts draft change list from version 37 to 38.
+     @classmethod
+    def _convert_states_v38_dict_to_v39_dict(cls, draft_change_list):
+        """Converts draft change list from version 38 to 39.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
@@ -198,6 +198,22 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     answer_group_dict['rule_input_translations_mapping'] = {}
                     answer_group_dict['rule_inputs'] = rule_inputs
 
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v37_dict_to_v38_dict(cls, draft_change_list):
+        """Converts draft change list from state version 37 to 38. State
+        version 38 adds a customization arg for the Math interactions that
+        allows creators to specify the letters that would be displayed to the
+        learner, for which there should be no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
         return draft_change_list
 
     @classmethod
