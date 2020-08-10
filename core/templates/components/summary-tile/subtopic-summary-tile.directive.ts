@@ -41,6 +41,9 @@ angular.module('oppia').directive('subtopicSummaryTile', [
             SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.openSubtopicPage = function() {
+            if (!ctrl.classroomUrlFragment || !ctrl.topicUrlFragment) {
+              return;
+            }
             $window.open(
               UrlInterpolationService.interpolateUrl(
                 SUBTOPIC_VIEWER_URL_TEMPLATE, {
