@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import feature_gating_services as feature_services
-from core.domain import platform_parameter_domain as param_domain
+from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.platform import models
 from core.tests import test_utils
@@ -43,16 +43,16 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
         # Parameter names that might be used in following tests.
         param_names = ['feature_a', 'feature_b']
         memcache_keys = [
-            param_domain.PlatformParameter.get_memcache_key(name)
+            platform_parameter_domain.PlatformParameter.get_memcache_key(name)
             for name in param_names]
         memcache_services.delete_multi(memcache_keys)
 
         self.dev_feature = registry.Registry.create_feature_flag(
             'feature_a', 'a feature in dev stage',
-            param_domain.FEATURE_STAGES.dev)
+            platform_parameter_domain.FEATURE_STAGES.dev)
         self.prod_feature = registry.Registry.create_feature_flag(
             'feature_b', 'a feature in prod stage',
-            param_domain.FEATURE_STAGES.prod)
+            platform_parameter_domain.FEATURE_STAGES.prod)
 
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
@@ -61,7 +61,12 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [['=', param_domain.SERVER_MODES.dev]]
+                            'conditions': [
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.dev
+                                ]
+                            ]
                         }
                     ],
                     'value_when_matched': True
@@ -77,9 +82,18 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', param_domain.SERVER_MODES.dev],
-                                ['=', param_domain.SERVER_MODES.test],
-                                ['=', param_domain.SERVER_MODES.prod]
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.dev
+                                ],
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.test
+                                ],
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.prod
+                                ]
                             ]
                         }
                     ],
@@ -112,7 +126,8 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                 }
             )
             self.assertEqual(
-                context.server_mode, param_domain.FEATURE_STAGES.dev)
+                context.server_mode,
+                platform_parameter_domain.FEATURE_STAGES.dev)
             self.assertEqual(context.client_type, 'Android')
             self.assertEqual(context.browser_type, None)
             self.assertEqual(context.app_version, '1.0.0')
@@ -136,7 +151,7 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                 'user_locale': 'en',
             })
             self.assertEqual(
-                feature_services.evaluate_all_feature_flag_value_for_client(
+                feature_services.evaluate_all_feature_flag_values_for_client(
                     context),
                 {
                     self.dev_feature.name: True,
@@ -153,7 +168,7 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                 'user_locale': 'en',
             })
             self.assertEqual(
-                feature_services.evaluate_all_feature_flag_value_for_client(
+                feature_services.evaluate_all_feature_flag_values_for_client(
                     context),
                 {
                     self.dev_feature.name: False,
@@ -167,7 +182,7 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                 feature_services.evaluate_feature_flag_value_for_server(
                     self.dev_feature.name))
 
-    def test_evaluate_prod_feature_for_dev_server_returns_false(self):
+    def test_evaluate_prod_feature_for_dev_server_returns_true(self):
         with self.swap(constants, 'DEV_MODE', True):
             self.assertTrue(
                 feature_services.evaluate_feature_flag_value_for_server(
@@ -201,7 +216,10 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', param_domain.FEATURE_STAGES.dev]
+                                [
+                                    '=',
+                                    platform_parameter_domain.FEATURE_STAGES.dev
+                                ]
                             ]
                         }
                     ],
@@ -216,9 +234,11 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                     self.dev_feature.name))
 
     def test_update_feature_flag_rules_with_unknown_name_raises_error(self):
-        with self.assertRaisesRegexp(Exception, 'not exist'):
+        unknown_name = 'feature_that_does_not_exist'
+        with self.assertRaisesRegexp(
+            Exception, 'Unknown feature flag: %s' % unknown_name):
             feature_services.update_feature_flag_rules(
-                'feature_that_does_not_exist', self.user_id, 'test update',
+                unknown_name, self.user_id, 'test update',
                 [
                     {'filters': [], 'value_when_matched': False},
                 ]

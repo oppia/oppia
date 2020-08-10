@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 
 from core import platform_feature_list
-from core.domain import platform_parameter_domain as param_domain
+from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
@@ -100,7 +100,8 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         invalid_feature_names = []
         for name in platform_feature_list.DEV_FEATURES_LIST:
             feature_flag = registry.Registry.get_platform_parameter(name)
-            if feature_flag.feature_stage != param_domain.FEATURE_STAGES.dev:
+            if (feature_flag.feature_stage !=
+                    platform_parameter_domain.FEATURE_STAGES.dev):
                 invalid_feature_names.append(name)
         self.assertTrue(
             len(invalid_feature_names) == 0,
@@ -112,7 +113,8 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         invalid_feature_names = []
         for name in platform_feature_list.TEST_FEATURES_LIST:
             feature_flag = registry.Registry.get_platform_parameter(name)
-            if feature_flag.feature_stage != param_domain.FEATURE_STAGES.test:
+            if (feature_flag.feature_stage !=
+                    platform_parameter_domain.FEATURE_STAGES.test):
                 invalid_feature_names.append(name)
         self.assertTrue(
             len(invalid_feature_names) == 0,
@@ -124,7 +126,8 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         invalid_feature_names = []
         for name in platform_feature_list.PROD_FEATURES_LIST:
             feature_flag = registry.Registry.get_platform_parameter(name)
-            if feature_flag.feature_stage != param_domain.FEATURE_STAGES.prod:
+            if (feature_flag.feature_stage !=
+                    platform_parameter_domain.FEATURE_STAGES.prod):
                 invalid_feature_names.append(name)
         self.assertTrue(
             len(invalid_feature_names) == 0,
