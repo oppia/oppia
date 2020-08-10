@@ -17,8 +17,9 @@
  * statistics for a particular state.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
@@ -120,7 +121,8 @@ describe('StateTopAnswersStatsService', () => {
   };
 
   const makeStates = (statesBackendDict = {Hola: stateBackendDict}): States => {
-    return statesObjectFactory.createFromBackendDict(statesBackendDict);
+    return statesObjectFactory.createFromBackendDict(
+      cloneDeep(statesBackendDict));
   };
 
   const spyOnBackendApiFetchStatsAsync = (
