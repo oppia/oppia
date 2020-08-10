@@ -122,7 +122,9 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
       },
 
       async flushUpdatedTasksToBackend(): Promise<void> {
-        await initPromise;
+        if (!await this.isImprovementsTabEnabledAsync()) {
+          return;
+        }
         const hbrTasksStillOpen = (
           ExplorationImprovementsTaskRegistryService
             .getOpenHighBounceRateTasks());

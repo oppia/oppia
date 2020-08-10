@@ -297,13 +297,29 @@ describe('ExplorationImprovementsService', function() {
     beforeEach(() => {
       this.eibasPostTasksAsyncSpy = (
         spyOn(explorationImprovementsBackendApiService, 'postTasksAsync'));
+      this.eibasGetConfigAsyncSpy = (
+        spyOn(explorationImprovementsBackendApiService, 'getConfigAsync'));
 
       spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve(newExpPermissions(true)));
-      spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
-        .and.returnValue(Promise.resolve(newExpImprovementsConfig(true)));
+      this.eibasGetConfigAsyncSpy.and.returnValue(Promise.resolve(
+        newExpImprovementsConfig(true)));
     });
+
+    it('does nothing when flush is attempted while the improvements tab is ' +
+      'disabled', fakeAsync(() => {
+      this.eibasGetConfigAsyncSpy.and.returnValue(Promise.resolve(
+        newExpImprovementsConfig(false)));
+
+      explorationImprovementsService.initAsync();
+      expect(
+        async() => (
+          await explorationImprovementsService.flushUpdatedTasksToBackend()))
+        .not.toThrow();
+
+      flushMicrotasks();
+    }));
 
     it('posts new high bounce rate tasks', fakeAsync(async() => {
       // Set-up the conditions to generate an HBR task:
