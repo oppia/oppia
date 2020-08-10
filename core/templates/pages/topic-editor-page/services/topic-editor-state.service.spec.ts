@@ -44,6 +44,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { Subscription } from 'rxjs';
 
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-update.service.ts');
@@ -64,6 +65,9 @@ describe('Topic editor state service', function() {
   var $rootScope = null;
   var $scope = null;
   var $q = null;
+
+  var testSubscriptions = null;
+  var subtopicPageLoadedSpy = null;
 
   var FakeEditableTopicBackendApiService = function() {
     var self = {
@@ -347,6 +351,18 @@ describe('Topic editor state service', function() {
     };
   }));
 
+  beforeEach(() => {
+    subtopicPageLoadedSpy = jasmine.createSpy('subtopicPageLoaded');
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      TopicEditorStateService.onSubtopicPageLoaded.subscribe(
+        subtopicPageLoadedSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   it('should request to load the topic from the backend', function() {
     spyOn(
       fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
@@ -435,7 +451,7 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
     $rootScope.$apply();
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+    expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     expect(TopicEditorStateService.getCachedSubtopicPages().length).toBe(2);
     TopicEditorStateService.deleteSubtopicPage('validTopicId', 1);
 
@@ -460,7 +476,7 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
     $rootScope.$apply();
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+    expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     expect(TopicEditorStateService.getCachedSubtopicPages().length).toBe(2);
     TopicEditorStateService.deleteSubtopicPage('validTopicId', 0);
 
@@ -500,12 +516,9 @@ describe('Topic editor state service', function() {
 
   it('should fire a loaded event after loading a new subtopic page',
     function() {
-      spyOn($rootScope, '$broadcast').and.callThrough();
-
       TopicEditorStateService.loadSubtopicPage('validTopicId', 1);
       $rootScope.$apply();
-
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+      expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     }
   );
 
