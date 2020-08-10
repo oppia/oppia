@@ -431,7 +431,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
         for line in lines:
             # Checks that the customization args interfaces are being used
-            # to typecast the customization args. Groupes patterns
+            # to typecast the customization args. Matches patterns
             # <XCustomizationArgs> or <XCustomizationArgsBackendDict> where
             # X is a interaction id.
             # Group 1: The character '<'.
