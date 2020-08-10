@@ -1155,13 +1155,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         files_to_check = self.all_filepaths
         inline_array_pattern_to_match = (
             r'directive.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
-            r'function\((?P<function_parameters>[\S\s]*?)\)')
+            r'function\([\S\s]*\)')
         controller_pattern_to_match = (
             r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
-            r'function\((?P<function_parameters>[\S\s]*?)\)')
+            r'function\([\S\s]*\)')
         factory_pattern_to_match = (
             r'factory.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
-            r'function\((?P<function_parameters>[\S\s]*?)\)')
+            r'function\([\S\s]*\)')
         failed = False
         for filepath in files_to_check:
             dependencies = []
@@ -1174,8 +1174,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     inline_array_pattern_to_match, content)
                 if matched_patterns:
                     for matched_pattern in matched_patterns:
-                        stringfied_dependencies, function_parameters = (
-                            matched_pattern)
+                        stringfied_dependencies = matched_pattern
                         stringfied_dependencies = (
                             stringfied_dependencies.strip().replace(
                                 '\'', '').replace(' ', '').replace(
@@ -1221,7 +1220,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if dep:
                     if re.findall(r'\$', dep):
                         dep = '\\%s' % dep
-                        python_utils.PRINT('what is dependency:', dep)
                     cnt = len(re.findall(r'' + dep + '[^\']', content))
                     if cnt < 2:
                         if start_point == 0:
