@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { EventEmitter } from '@angular/core';
+
 /**
  * @fileoverview Service to maintain the state of a single topic shared
  * throughout the topic editor. This service provides functionality for
@@ -38,7 +40,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
   'RubricObjectFactory', 'StorySummaryObjectFactory',
   'SubtopicPageObjectFactory', 'TopicObjectFactory',
   'TopicRightsBackendApiService', 'TopicRightsObjectFactory', 'UndoRedoService',
-  'EVENT_STORY_SUMMARIES_INITIALIZED',
   'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
   'EVENT_TOPIC_REINITIALIZED', function(
       $rootScope, AlertsService,
@@ -46,7 +47,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
       RubricObjectFactory, StorySummaryObjectFactory,
       SubtopicPageObjectFactory, TopicObjectFactory,
       TopicRightsBackendApiService, TopicRightsObjectFactory, UndoRedoService,
-      EVENT_STORY_SUMMARIES_INITIALIZED,
       EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
       EVENT_TOPIC_REINITIALIZED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
@@ -72,6 +72,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
       others: []
     };
     var _classroomUrlFragment = 'staging';
+    var _storySummariesInitializedEventEmitter = new EventEmitter();
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -158,7 +159,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           return StorySummaryObjectFactory.createFromBackendDict(
             storySummaryDict);
         });
-      $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
+      _storySummariesInitializedEventEmitter.emit();
     };
 
     var _setTopicWithNameExists = function(topicWithNameExists) {
@@ -517,6 +518,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
               'There was an error when checking if the topic url fragment ' +
               'exists for another topic.');
           });
+      },
+
+      get onStorySummariesInitialized() {
+        return _storySummariesInitializedEventEmitter;
       }
     };
   }
