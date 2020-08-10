@@ -259,7 +259,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
-    def test_get_user_settings_by_gae_id(self):
+    def test_get_user_settings_by_gae_id_for_exisitng_user_is_correct(self):
         gae_id = 'gae_id'
         email = 'user@example.com'
         user_id = 'user_id'
@@ -284,7 +284,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_user_settings_by_gae_id_for_nonexistent_user_id_is_none(self):
         self.assertIsNone(user_services.get_user_settings_by_gae_id('id_x'))
 
-    def test_get_user_settings_by_gae_id_strict(self):
+    def test_get_user_settings_by_gae_id_strict_exisitng_user_is_correct(self):
         non_existent_user_id = 'id_x'
         gae_id = 'gae_id'
         email = 'user@example.com'
