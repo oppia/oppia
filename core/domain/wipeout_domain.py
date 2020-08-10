@@ -74,7 +74,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
         """Checks that the domain object is valid.
 
         Raises:
-            ValidationError: activity_mappings contain wrong key.
+            ValidationError. The field activity_mappings contains wrong key.
         """
         for key in self.activity_mappings.keys():
             if key not in [name for name in models.NAMES.__dict__]:

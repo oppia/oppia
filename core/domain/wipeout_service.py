@@ -290,6 +290,8 @@ def _delete_activity_models(
             list(commit_log_ids - activity_ids))
 
     activity_ids |= commit_log_ids
+    # The activity_mappings field might have only been partially generated, so
+    # we fill in the missing part for this activity category.
     if activity_category not in pending_deletion_request.activity_mappings:
         pending_deletion_request.activity_mappings[activity_category] = (
             _generate_activity_to_pseudonymized_ids_mapping(activity_ids))

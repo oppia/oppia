@@ -2157,7 +2157,9 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # is grouped under different key (story, skill, question), the keys need to
     # be from the core.platform.models.NAMES enum. For each activity, we use
     # a different pseudonymous user ID. Note that all these pseudonymous
-    # user IDs originate from the same about-to-be-deleted user.
+    # user IDs originate from the same about-to-be-deleted user. If a key is
+    # absent from the activity_mappings dict, this means that for this activity
+    # type the mappings are not yet generated.
     # Example structure: {
     #     'skill': {'skill_id': 'pseudo_user_id_1'},
     #     'story': {
