@@ -325,7 +325,14 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
                 'git@github.com:oppia/release-scripts.git'])
 
     with CD(release_scripts_dirpath):
+        ask_user_to_confirm(
+            'Please make sure that the release-scripts folder is clean and '
+            'you are on master branch in release-scripts folder.')
+        python_utils.PRINT('Verifying that release-scripts folder is clean...')
         verify_local_repo_is_clean()
+        python_utils.PRINT(
+            'Verifying that user is on master branch in '
+            'release-scripts folder...')
         verify_current_branch_name('master')
 
         # Update the local repo.
