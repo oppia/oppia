@@ -16,6 +16,8 @@
  * @fileoverview Service to handle the updating of a question.
  */
 
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -72,7 +74,9 @@ angular.module('oppia').factory('QuestionUpdateService', [
         allContentIdsSet.add(
           state.interaction.solution.explanation.getContentId());
       }
-
+      const custArgs = state.interaction.customizationArgs;
+      Interaction.getCustomizationArgContentIds(custArgs)
+        .forEach(allContentIdsSet.add, allContentIdsSet);
       return allContentIdsSet;
     };
 

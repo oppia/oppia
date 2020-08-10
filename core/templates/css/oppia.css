@@ -2119,7 +2119,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-response-button,
 .oppia-add-fallback-button,
 .oppia-add-hint-button {
-  background-color: rgba(5,140,166,0.9);
+  background-color: rgba(5, 140, 166, 0.9);
   border: 0;
   border-radius: 0;
   color: white;
@@ -2511,6 +2511,10 @@ oppia-parameter {
 
 .oppia-disabled-link {
   opacity: 0.6;
+  pointer-events: none;
+}
+
+.oppia-disabled-image-link {
   pointer-events: none;
 }
 

@@ -129,10 +129,13 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Enter an option for the learner to drag and drop."
+            "type": "custom",
+            "obj_type": "SubtitledHtml",
+            "replacement_ui_config": {
+              "html": {
+                "hide_complex_extensions": true,
+                "placeholder": "Enter an option for the learner to drag and drop."
+              }
             }
           },
           "type": "list",
@@ -147,7 +150,10 @@
           }
         },
         "default_value": [
-          ""
+          {
+            "content_id": null,
+            "html": ""
+          }
         ]
       },
       {
@@ -215,10 +221,13 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Sample item answer"
+            "type": "custom",
+            "obj_type": "SubtitledHtml",
+            "replacement_ui_config": {
+              "html": {
+                "hide_complex_extensions": true,
+                "placeholder": "Sample item answer"
+              }
             }
           },
           "type": "list",
@@ -226,9 +235,7 @@
             "add_element_text": "Add item for selection"
           }
         },
-        "default_value": [
-          ""
-        ]
+        "default_value": [{"content_id": null, "html": ""}]
       }
     ],
     "is_terminal": false,
@@ -258,9 +265,13 @@
         "description": "Button label",
         "name": "buttonText",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": "Continue"
+        "default_value": {
+          "content_id": null,
+          "unicode_str": "Continue"
+        }
       }
     ],
     "is_terminal": false,
@@ -437,9 +448,13 @@
         "description": "Label for the 'Add Item' button",
         "name": "buttonText",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": "Add item"
+        "default_value": {
+          "content_id": null,
+          "unicode_str": "Add Item"
+        }
       }
     ],
     "is_terminal": false,
@@ -588,7 +603,17 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "MathEquationInput",
-    "customization_arg_specs": [],
+    "customization_arg_specs": [
+      {
+        "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
+        "name": "customOskLetters",
+        "schema": {
+          "obj_type": "CustomOskLetters",
+          "type": "custom"
+        },
+        "default_value": []
+      }
+    ],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
@@ -615,10 +640,13 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Enter an option for the learner to select"
+            "type": "custom",
+            "obj_type": "SubtitledHtml",
+            "replacement_ui_config": {
+              "html": {
+                "hide_complex_extensions": true,
+                "placeholder": "Enter an option for the learner to select"
+              }
             }
           },
           "type": "list",
@@ -632,9 +660,10 @@
             "add_element_text": "Add multiple choice option"
           }
         },
-        "default_value": [
-          ""
-        ]
+        "default_value": [{
+          "content_id": null,
+          "html": ""
+        }]
       }, {
         "name": "showChoicesInShuffledOrder",
         "description": "Shuffle answer choices",
@@ -666,7 +695,7 @@
     "customization_arg_specs": [
       {
         "description": "The initial code",
-        "name": "initial_code",
+        "name": "initialCode",
         "schema": {
           "type": "unicode",
           "ui_config": {
@@ -706,9 +735,13 @@
         "description": "Placeholder text (optional)",
         "name": "placeholder",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": ""
+        "default_value": {
+          "content_id": null,
+          "unicode_str": ""
+        }
       },
       {
         "description": "Height (in rows)",
@@ -734,8 +767,7 @@
     "rule_descriptions": {
       "StartsWith": "starts with {{x|NormalizedString}}",
       "Contains": "contains {{x|NormalizedString}}",
-      "Equals": "is equal to {{x|NormalizedString}}",
-      "CaseSensitiveEquals": "is equal to {{x|NormalizedString}}, taking case into account",
+      "Equals": "is equal to {{x|NormalizedString}}, without taking case into account",
       "FuzzyEquals": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
     }
   },
@@ -882,7 +914,17 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "AlgebraicExpressionInput",
-    "customization_arg_specs": [],
+    "customization_arg_specs": [
+      {
+        "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
+        "name": "customOskLetters",
+        "schema": {
+          "obj_type": "CustomOskLetters",
+          "type": "custom"
+        },
+        "default_value": []
+      }
+    ],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
@@ -932,9 +974,13 @@
         "description": "Custom placeholder text (optional)",
         "name": "customPlaceholder",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": ""
+        "default_value": {
+          "content_id": null,
+          "unicode_str": ""
+        }
       }
     ],
     "is_terminal": false,
