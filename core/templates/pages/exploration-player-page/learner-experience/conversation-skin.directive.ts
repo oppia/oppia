@@ -876,7 +876,7 @@ angular.module('oppia').directive('conversationSkin', [
               FatigueDetectionService.recordSubmissionTimestamp();
               if (FatigueDetectionService.isSubmittingTooFast()) {
                 FatigueDetectionService.displayTakeBreakMessage();
-                ExplorationPlayerStateService.onOppiaFeedbackAvailable();
+                ExplorationPlayerStateService.onOppiaFeedbackAvailable.emit();
                 return;
               }
             }
@@ -962,7 +962,7 @@ angular.module('oppia').directive('conversationSkin', [
                   1.0));
 
                 $timeout(function() {
-                  ExplorationPlayerStateService.onOppiaFeedbackAvailable();
+                  ExplorationPlayerStateService.onOppiaFeedbackAvailable.emit();
                   var pairs = (
                     PlayerTranscriptService.getLastCard().
                       getInputResponsePairs());
@@ -1411,6 +1411,9 @@ angular.module('oppia').directive('conversationSkin', [
                 }
               );
             }
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
