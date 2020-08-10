@@ -1187,8 +1187,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     controller_pattern_to_match, content)
                 if matched_patterns:
                     for matched_pattern in matched_patterns:
-                        stringfied_dependencies, function_parameters = (
-                            matched_pattern)
+                        stringfied_dependencies = matched_pattern
                         stringfied_dependencies = (
                             stringfied_dependencies.strip().replace(
                                 '\'', '').replace(' ', '').replace(
@@ -1202,8 +1201,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 matched_patterns = re.findall(factory_pattern_to_match, content)
                 if matched_patterns:
                     for matched_pattern in matched_patterns:
-                        stringfied_dependencies, function_parameters = (
-                            matched_pattern)
+                        stringfied_dependencies = matched_pattern
                         stringfied_dependencies = (
                             stringfied_dependencies.strip().replace(
                                 '\'', '').replace(' ', '').replace(
