@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the question player state service.
  */
 
-import { Subscription } from 'rxjs';
+import { EventEmitter } from '@angular/core';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-player-state.service.ts is upgraded to Angular 8.
@@ -55,9 +55,6 @@ describe('Question player state service', function() {
   var QuestionObjectFactory;
   var questionId = 'question_1';
   var question;
-  var testSubscriptions: Subscription;
-  const questionSessionCompletedSpy = jasmine.createSpy(
-    'questionSessionCompletedSpy');
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -273,11 +270,8 @@ describe('Question player state service', function() {
     });
 
   it('should emit the question session completed event correctly', () => {
-    testSubscriptions = new Subscription();
-    testSubscriptions.add(
-      qpservice.onQuestionSessionCompleted.subscribe(
-        questionSessionCompletedSpy));
-    qpservice.onQuestionSessionCompleted.emit();
-    expect(questionSessionCompletedSpy).toHaveBeenCalled();
+    let mockquestionSessionEventEmitter = new EventEmitter();
+    expect(qpservice.onQuestionSessionCompleted).toEqual(
+      mockquestionSessionEventEmitter);
   });
 });
