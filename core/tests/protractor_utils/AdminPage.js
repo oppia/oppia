@@ -340,19 +340,16 @@ var AdminPage = function() {
 
     var reviewCategorySelectField = assignReviewerForm.element(
       reviewCategorySelectCss);
-
     await action.select(
       'Review category selector', reviewCategorySelectField, reviewCategory);
 
     if (languageDescription !== null) {
       var languageSelectField = assignReviewerForm.element(languageSelectCss);
-
       await action.select(
         'Language selector', languageSelectField, languageDescription);
     }
 
     var submitButton = assignReviewerForm.element(reviewerFormSubmitButtonCss);
-
     await action.click('Submit assign reviewer button', submitButton);
 
     await waitFor.textToBePresentInElement(

@@ -1862,6 +1862,13 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self.translator_id)
         self.assertTrue(right_model is None)
 
+    def test_get_question_reviewer_usernames_with_lanaguge_code_raise_error(
+            self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected language_code to be None'):
+            user_services.get_contribution_reviewer_usernames(
+                constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
+
     def test_get_contribution_reviewer_usernames_in_invalid_category_raise_error( # pylint: disable=line-too-long
             self):
         with self.assertRaisesRegexp(

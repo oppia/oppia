@@ -2152,6 +2152,9 @@ def get_contribution_reviewer_usernames(review_category, language_code=None):
             user_models.UserContributionRightsModel
             .get_voiceover_reviewer_user_ids(language_code))
     elif review_category == constants.REVIEW_CATEGORY_QUESTION:
+        if language_code is not None:
+            raise Exception('Expected language_code to be None, found: %s' % (
+                language_code))
         reviewer_ids = (
             user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
