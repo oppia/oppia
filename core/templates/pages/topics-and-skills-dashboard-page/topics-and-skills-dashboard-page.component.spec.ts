@@ -51,6 +51,8 @@ describe('Topics and Skills Dashboard Page', function() {
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
   var AlertsService = null;
 
+  var mocktasdReinitalizedEventEmitter = null;
+
   describe('when backend dict contains topics', function() {
     var sampleDataResults = {
       topic_summary_dicts: [{
@@ -97,7 +99,7 @@ describe('Topics and Skills Dashboard Page', function() {
       SkillSummaryObjectFactory = $injector.get(
         'SkillSummaryObjectFactory');
 
-      var sampleEmitter = new EventEmitter();
+      mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
@@ -126,7 +128,7 @@ describe('Topics and Skills Dashboard Page', function() {
           return deferred.promise;
         },
         get onTopicsAndSkillsDashboardReinitialized() {
-          return sampleEmitter;
+          return mocktasdReinitalizedEventEmitter;
         }
       };
       var MockWindowDimensionsService = {
@@ -144,6 +146,10 @@ describe('Topics and Skills Dashboard Page', function() {
       ctrl.$onInit();
       $rootScope.$apply();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should init the dashboard and fetch data', function() {
       const filterObject =
@@ -355,7 +361,7 @@ describe('Topics and Skills Dashboard Page', function() {
 
     it('should call initDashboard on reinitialized event', function() {
       var initDashboardSpy = spyOn(ctrl, '_initDashboard');
-      $rootScope.$broadcast('topicsAndSkillsDashboardReinitialized');
+      mocktasdReinitalizedEventEmitter.emit();
       expect(initDashboardSpy).toHaveBeenCalled();
     });
   });
@@ -386,7 +392,7 @@ describe('Topics and Skills Dashboard Page', function() {
         can_create_skill: true
       };
 
-      var sampleEmitter = new EventEmitter();
+      mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
@@ -415,7 +421,7 @@ describe('Topics and Skills Dashboard Page', function() {
           return deferred.promise;
         },
         get onTopicsAndSkillsDashboardReinitialized() {
-          return sampleEmitter;
+          return mocktasdReinitalizedEventEmitter;
         }
       };
 
@@ -430,6 +436,10 @@ describe('Topics and Skills Dashboard Page', function() {
       ctrl.displayedSkillSummaries = [];
       $rootScope.$apply();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should change active tab to skills if topic summaries are null',
       function() {
@@ -517,7 +527,7 @@ describe('Topics and Skills Dashboard Page', function() {
         addWarning: function() {}
       };
 
-      var sampleEmitter = new EventEmitter();
+      mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
@@ -529,7 +539,7 @@ describe('Topics and Skills Dashboard Page', function() {
           return deferred.promise;
         },
         get onTopicsAndSkillsDashboardReinitialized() {
-          return sampleEmitter;
+          return mocktasdReinitalizedEventEmitter;
         }
       };
 
@@ -543,6 +553,10 @@ describe('Topics and Skills Dashboard Page', function() {
 
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should show warning if fetch dashboard data failed with fatal error',
       function() {
@@ -566,7 +580,7 @@ describe('Topics and Skills Dashboard Page', function() {
       TopicsAndSkillsDashboardBackendApiService = $injector.get(
         'TopicsAndSkillsDashboardBackendApiService');
 
-      var sampleEmitter = new EventEmitter();
+      mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
@@ -578,7 +592,7 @@ describe('Topics and Skills Dashboard Page', function() {
           return deferred.promise;
         },
         get onTopicsAndSkillsDashboardReinitialized() {
-          return sampleEmitter;
+          return mocktasdReinitalizedEventEmitter;
         }
       };
 
@@ -593,6 +607,10 @@ describe('Topics and Skills Dashboard Page', function() {
 
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should show warning if fetch dashboard data failed',
       function() {

@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for the topics and skills dashboard directive.
  */
 
+
+
+import { Subscription } from 'rxjs';
 import { EventEmitter } from '@angular/core';
 
 
-fdescribe('Topics List Directive', function() {
+describe('Topics List Directive', function() {
   var $uibModal = null;
   var $scope = null;
   var ctrl = null;
@@ -28,7 +31,16 @@ fdescribe('Topics List Directive', function() {
   var $rootScope = null;
   var directive = null;
   var AlertsService = null;
-  var TopicsAndSkillsDashboardBackendApiService = null;
+
+  var mockTasdReinitializedEventEmitter;
+  var tasdReinitializedSpy = null;
+  var testSubscription = null;
+
+  var MockTopicsAndSkillsDashboardBackendApiService = {
+    get onTopicsAndSkillsDashboardReinitialized() {
+      return mockTasdReinitializedEventEmitter;
+    }
+  };
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -41,13 +53,7 @@ fdescribe('Topics List Directive', function() {
     $q = $injector.get('$q');
     AlertsService = $injector.get('AlertsService');
 
-    var sampleEmitter = new EventEmitter();
 
-    var MockTopicsAndSkillsDashboardBackendApiService = {
-      get onTopicsAndSkillsDashboardReinitialized() {
-        return sampleEmitter;
-      }
-    };
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
       $scope: $scope,
@@ -57,6 +63,20 @@ fdescribe('Topics List Directive', function() {
     });
   }));
 
+  beforeEach(() => {
+    mockTasdReinitializedEventEmitter = new EventEmitter();
+    tasdReinitializedSpy = jasmine.createSpy('tasdReinitialized');
+    testSubscription = new Subscription();
+    testSubscription.add(
+      MockTopicsAndSkillsDashboardBackendApiService.
+        onTopicsAndSkillsDashboardReinitialized.subscribe(tasdReinitializedSpy)
+    );
+  });
+
+  afterEach(() => {
+    testSubscription.unsubscribe();
+  });
+
   it('should init the controller', function() {
     ctrl.$onInit();
     const topicHeadings = [
@@ -65,6 +85,7 @@ fdescribe('Topics List Directive', function() {
     ];
     expect(ctrl.selectedIndex).toEqual(null);
     expect(ctrl.TOPIC_HEADINGS).toEqual(topicHeadings);
+    ctrl.$onDestroy();
   });
 
   it('should return topic editor url', function() {
@@ -127,7 +148,6 @@ fdescribe('Topics List Directive', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
-      spyOn($rootScope, '$broadcast');
 
       var topicId = 'CdjnJUE332dd';
       var url = `/topic_editor_handler/data/${topicId}`;
@@ -135,8 +155,7 @@ fdescribe('Topics List Directive', function() {
       ctrl.deleteTopic(topicId);
 
       $httpBackend.flush();
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'topicsAndSkillsDashboardReinitialized');
+      expect(tasdReinitializedSpy).toHaveBeenCalled();
     });
 
   it('should show the warning if deleting a topic failed', function() {
