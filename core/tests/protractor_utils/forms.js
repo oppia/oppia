@@ -624,7 +624,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       '().scrollTop(' + String(scrollTo) + ');');
     var lineHeight = await elem.element(
       by.css('.CodeMirror-linenumber')).getAttribute(
-        'clientHeight');
+      'clientHeight');
     var lineNumbers = await elem.all(by.xpath('./div')).map(
       async function(lineElement) {
         var lineNumber = await lineElement.element(
@@ -688,7 +688,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     var text = await elem.getText();
     var lineHeight = await elem.element(
       by.css('.CodeMirror-linenumber')).getAttribute(
-        'clientHeight');
+      'clientHeight');
     // The 'text' arg is a string 2n lines long representing n lines of text
     // codemirror has loaded. The (2i)th line contains a line number and the
     // (2i+1)th line contains the text on that line.
