@@ -899,7 +899,7 @@ angular.module('oppia').directive('conversationSkin', [
                 PlayerTranscriptService.addNewResponse(
                   LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion());
                 $scope.answerIsBeingProcessed = false;
-                $scope.$broadcast('helpCardAvailable', {
+                PlayerPositionService.onHelpCardAvailable.emit({
                   helpCardHtml: (
                     LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion()),
                   hasContinueButton: false
@@ -981,7 +981,7 @@ angular.module('oppia').directive('conversationSkin', [
                     }
 
                     if (helpCardAvailable) {
-                      $scope.$broadcast('helpCardAvailable', {
+                      PlayerPositionService.onHelpCardAvailable.emit({
                         helpCardHtml: feedbackHtml,
                         hasContinueButton: false
                       });
@@ -993,7 +993,7 @@ angular.module('oppia').directive('conversationSkin', [
                       ).then(function(conceptCardObject) {
                         $scope.conceptCard = conceptCardObject;
                         if (helpCardAvailable) {
-                          $scope.$broadcast('helpCardAvailable', {
+                          PlayerPositionService.onHelpCardAvailable.emit({
                             helpCardHtml: feedbackHtml,
                             hasContinueButton: true
                           });
@@ -1054,7 +1054,7 @@ angular.module('oppia').directive('conversationSkin', [
                         PlayerTranscriptService.addNewResponse(feedbackHtml);
                         if (
                           !$scope.displayedCard.isInteractionInline()) {
-                          $scope.$broadcast('helpCardAvailable', {
+                          PlayerPositionService.onHelpCardAvailable.emit({
                             helpCardHtml: feedbackHtml,
                             hasContinueButton: true
                           });
@@ -1084,7 +1084,7 @@ angular.module('oppia').directive('conversationSkin', [
                       }
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
                       if (!$scope.displayedCard.isInteractionInline()) {
-                        $scope.$broadcast('helpCardAvailable', {
+                        PlayerPositionService.onHelpCardAvailable.emit({
                           helpCardHtml: feedbackHtml,
                           hasContinueButton: true
                         });
