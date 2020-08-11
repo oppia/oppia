@@ -31,7 +31,7 @@
 
 
 # Android team
-/core/domain/android_validation_constants*.py @seanlip  # Until 16 August 2020
+/core/domain/android_validation_constants*.py @seanlip  # After 16 August 2020, restore @BenHenning
 
 
 # Angular Migration team
@@ -128,7 +128,7 @@
 
 
 # Dev workflow team.
-/.circleci/ @BenHenning @vinitamurthi @U8NWXD @kevintab95
+/.circleci/ @vinitamurthi @U8NWXD @kevintab95  # After 16 August 2020, restore @BenHenning
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -138,7 +138,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
+/.travis.yml @vinitamurthi @U8NWXD @kevintab95  # After 16 August 2020, restore @BenHenning
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -570,8 +570,8 @@
 
 
 # Dynamic Feature Gating project
-/core/storage/config/ @BenHenning @vinitamurthi
-/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+/core/storage/config/ @vinitamurthi  # After 16 August 2020, restore @BenHenning
+/core/domain/platform_parameter*.py @vinitamurthi  # After 16 August 2020, restore @BenHenning
 
 
 # Frontend unit tests
@@ -624,4 +624,4 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
-/.github/workflows/ @BenHenning @vinitamurthi
+/.github/workflows/ @vinitamurthi  # After 16 August 2020, restore @BenHenning
