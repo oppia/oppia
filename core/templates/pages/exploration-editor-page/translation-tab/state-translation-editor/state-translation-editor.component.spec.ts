@@ -29,8 +29,9 @@ import { StateRecordedVoiceoversService } from
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { EventEmitter } from '@angular/core';
 
-fdescribe('State Translation Editor Component', function() {
+describe('State Translation Editor Component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
@@ -43,6 +44,9 @@ fdescribe('State Translation Editor Component', function() {
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
   var writtenTranslationObjectFactory = null;
+
+  var mockActiveContentIdChangedEventEmitter = new EventEmitter();
+  var mockActiveLanguageChangedEventEmitter = new EventEmitter();
 
   var stateName = 'State1';
   var state = {
@@ -149,6 +153,13 @@ fdescribe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'getState').and.returnValue(stateObj);
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
+
+      spyOnProperty(translationLanguageService,
+        'onActiveLanguageChanged').and.returnValue(
+        mockActiveLanguageChangedEventEmitter);
+      spyOnProperty(translationTabActiveContentIdService,
+        'onActiveContentIdChanged').and.returnValue(
+        mockActiveLanguageChangedEventEmitter);
 
       stateWrittenTranslationsService.init(stateName, {
         hasWrittenTranslation: () => true,
@@ -314,7 +325,7 @@ fdescribe('State Translation Editor Component', function() {
 
     it('should init editor when changing active content id language',
       function() {
-        $rootScope.$broadcast('activeContentIdChanged');
+        mockActiveContentIdChangedEventEmitter.emit();
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
           writtenTranslationObjectFactory.createFromBackendDict({
@@ -325,7 +336,7 @@ fdescribe('State Translation Editor Component', function() {
       });
 
     it('should init editor when changing active language', function() {
-      $rootScope.$broadcast('activeLanguageChanged');
+      mockActiveLanguageChangedEventEmitter.emit();
       expect($scope.translationEditorIsOpen).toBe(false);
       expect($scope.activeWrittenTranslation).toEqual(
         writtenTranslationObjectFactory.createFromBackendDict({
