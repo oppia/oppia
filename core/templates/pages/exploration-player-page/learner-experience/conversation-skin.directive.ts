@@ -18,6 +18,7 @@
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { Subscription } from 'rxjs';
 
 require(
   'components/question-directives/question-player/services/' +
@@ -411,6 +412,7 @@ angular.module('oppia').directive('conversationSkin', [
             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
           // The minimum width, in pixels, needed to be able to show two cards
@@ -1304,10 +1306,14 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.lastRequestedHeight = 0;
             $scope.lastRequestedScroll = false;
             if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
-              $rootScope.$on('hintConsumed', function(evt) {
-                QuestionPlayerStateService.hintUsed(
-                  QuestionPlayerEngineService.getCurrentQuestion());
-              });
+              ctrl.directiveSubscriptions.add(
+                HintsAndSolutionManagerService.onHintConsumed.subscribe(
+                  () => {
+                    QuestionPlayerStateService.hintUsed(
+                      QuestionPlayerEngineService.getCurrentQuestion());
+                  }
+                )
+              );
 
               $rootScope.$on('solutionViewed', function(evt, timestamp) {
                 QuestionPlayerStateService.solutionViewed(
@@ -1407,6 +1413,10 @@ angular.module('oppia').directive('conversationSkin', [
                 }
               );
             }
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
