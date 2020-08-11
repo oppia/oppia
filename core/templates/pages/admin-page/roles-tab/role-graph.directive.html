@@ -96,33 +96,38 @@
       </md-card>
 
       <md-card class="oppia-page-card oppia-long-text protractor-test-view-reviewer-form">
-        <form class="form-horizontal" ng-submit="$ctrl.submitViewCommunityReviewersForm($ctrl.formData.viewCommunityReviewers)">
-          <legend class="text-center">View Community Reviewers</legend>
+        <form class="form-horizontal" ng-submit="$ctrl.submitViewContributionReviewersForm($ctrl.formData.viewContributionReviewers)">
+          <legend class="text-center">View Contribution Reviewers</legend>
           <div class="d-xl-inline-flex form-group">
-            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label" for="$ctrl.formData.viewCommunityReviewers.filterCriterion">
+            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label" for="$ctrl.formData.viewContributionReviewers.filterCriterion">
               Select Method
             </label>
             <div class="col-md-8 ml-auto">
-              <select id="$ctrl.formData.viewCommunityReviewers.filterCriterion" ng-model="$ctrl.formData.viewCommunityReviewers.filterCriterion" class="form-control protractor-test-view-reviewer-method">
+              <select id="$ctrl.formData.viewContributionReviewers.filterCriterion"
+                      ng-model="$ctrl.formData.viewContributionReviewers.filterCriterion"
+                      class="form-control protractor-test-view-reviewer-method">
                 <option value="<[$ctrl.USER_FILTER_CRITERION_ROLE]>">By Role</option>
                 <option value="<[$ctrl.USER_FILTER_CRITERION_USERNAME]>">By Username</option>
               </select>
             </div>
           </div>
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
+               ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
             <label for="review-categories-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select id="review-categories-input" ng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.viewCommunityReviewers.category" class="form-control protractor-test-form-review-category-select">
+              <select id="review-categories-input"
+                      class="form-control protractor-test-form-review-category-select"
+                      ng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEW_CATEGORIES"
+                      ng-model="$ctrl.formData.viewContributionReviewers.category">
               </select>
             </div>
           </div>
 
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.viewCommunityReviewers.category) && $ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
+               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.viewContributionReviewers.category) && $ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-model="$ctrl.formData.viewCommunityReviewers.languageCode"
+              <select ng-model="$ctrl.formData.viewContributionReviewers.languageCode"
                       class="form-control protractor-test-form-language-select"
                       ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
               </select>
@@ -130,22 +135,22 @@
           </div>
 
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_USERNAME">
+               ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_USERNAME">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.formData.viewCommunityReviewers.username" class="form-control protractor-test-form-reviewer-username">
+              <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.formData.viewContributionReviewers.username" class="form-control protractor-test-form-reviewer-username">
             </div>
           </div>
 
           <button type="submit" class="btn btn-success protractor-test-reviewer-form-submit-button"
-                  ng-disabled="!$ctrl.formData.viewCommunityReviewers.isValid()"
+                  ng-disabled="!$ctrl.formData.viewContributionReviewers.isValid()"
                   value="view role">
             View Role
           </button>
         </form>
 
-        <div ng-show="$ctrl.communityReviewersDataFetched">
-          <div ng-if="$ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_USERNAME">
+        <div ng-show="$ctrl.contributionReviewersDataFetched">
+          <div ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_USERNAME">
             <table class="table text-center view-results-table protractor-test-user-review-rights-table">
               <thead>
                 <tr>
@@ -179,35 +184,38 @@
               </tbody>
             </table>
           </div>
-          <div ng-if="$ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE" class="protractor-test-reviewer-roles-result">
+          <div ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE" class="protractor-test-reviewer-roles-result">
             <strong>Usernames:</strong> <[$ctrl.result.usernames]>
           </div>
         </div>
       </md-card>
 
       <md-card class="oppia-page-card oppia-long-text protractor-test-assign-reviewer-form">
-        <form class="form-horizontal" ng-submit="$ctrl.submitAddCommunityReviewerForm($ctrl.formData.addCommunityReviewer)">
+        <form class="form-horizontal" ng-submit="$ctrl.submitAddContributionReviewerForm($ctrl.formData.addContributionReviewer)">
           <legend class="text-center">Add Reviewer For Community</legend>
           <div class="d-xl-inline-flex form-group">
             <label for="add-reviewer-username-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" id="add-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control protractor-test-form-reviewer-username">
+              <input type="text" id="add-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.addContributionReviewer.username" class="form-control protractor-test-form-reviewer-username">
             </div>
           </div>
 
           <div class="d-xl-inline-flex form-group">
-            <label for="add-community-reviewer" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Allow reviewing</label>
+            <label for="add-contribution-reviewer" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Allow reviewing</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select id="add-community-reviewer" ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.addCommunityReviewer.category" class="form-control protractor-test-form-review-category-select">
+              <select id="add-contribution-reviewer"
+                      class="form-control protractor-test-form-review-category-select"
+                      ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES"
+                      ng-model="$ctrl.formData.addContributionReviewer.category">
               </select>
             </div>
           </div>
 
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.addCommunityReviewer.category)">
+               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.addContributionReviewer.category)">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-model="$ctrl.formData.addCommunityReviewer.languageCode"
+              <select ng-model="$ctrl.formData.addContributionReviewer.languageCode"
                       class="form-control protractor-test-form-language-select"
                       ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
               </select>
@@ -215,23 +223,27 @@
           </div>
           <button type="submit"
                   class="btn btn-success protractor-test-reviewer-form-submit-button"
-                  ng-disabled="!$ctrl.formData.addCommunityReviewer.isValid()"
+                  ng-disabled="!$ctrl.formData.addContributionReviewer.isValid()"
                   value="update role">Add Reviewer
           </button>
         </form>
       </md-card>
 
       <md-card class="oppia-page-card oppia-long-text protractor-test-remove-reviewer-form">
-        <form class="form-horizontal" ng-submit="$ctrl.submitRemoveCommunityReviewerForm($ctrl.formData.removeCommunityReviewer)">
+        <form class="form-horizontal" ng-submit="$ctrl.submitRemoveContributionReviewerForm($ctrl.formData.removeContributionReviewer)">
           <legend class="text-center">Remove Reviewer From Community</legend>
           <div class="d-xl-inline-flex form-group">
             <label for="remove-reviewer-username-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-4 col-lg-4 col-sm-4 ml-auto">
-              <input type="text" id="remove-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.removeCommunityReviewer.username" class="form-control protractor-test-form-reviewer-username">
+              <input type="text"
+                     id="remove-reviewer-username-input"
+                     class="form-control protractor-test-form-reviewer-username"
+                     placeholder="Enter username"
+                     ng-model="$ctrl.formData.removeContributionReviewer.username">
             </div>
             <label for="remove-reviewer-form-control" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Rights</label>
             <div class="col-md-4 ml-auto">
-              <select id="remove-reviewer-form-control" ng-model="$ctrl.formData.removeCommunityReviewer.method" class="form-control">
+              <select id="remove-reviewer-form-control" ng-model="$ctrl.formData.removeContributionReviewer.method" class="form-control">
                 <option value="<[$ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS]>">Remove all review rights</option>
                 <option value="<[$ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS]>">Remove specific review rights</option>
               </select>
@@ -239,19 +251,19 @@
           </div>
 
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.formData.removeCommunityReviewer.method===$ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS">
+               ng-if="$ctrl.formData.removeContributionReviewer.method===$ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Remove from</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.removeCommunityReviewer.category" class="form-control">
+              <select ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.removeContributionReviewer.category" class="form-control">
               </select>
             </div>
           </div>
 
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.removeCommunityReviewer.category)">
+               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.removeContributionReviewer.category)">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-model="$ctrl.formData.removeCommunityReviewer.languageCode"
+              <select ng-model="$ctrl.formData.removeContributionReviewer.languageCode"
                       class="form-control protractor-test-form-language-select"
                       ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
               </select>
@@ -259,7 +271,7 @@
           </div>
           <button type="submit"
                   class="btn btn-success protractor-test-reviewer-form-submit-button"
-                  ng-disabled="!$ctrl.formData.removeCommunityReviewer.isValid()" value="update role">Remove Reviewer
+                  ng-disabled="!$ctrl.formData.removeContributionReviewer.isValid()" value="update role">Remove Reviewer
           </button>
         </form>
       </md-card>

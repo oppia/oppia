@@ -20,6 +20,12 @@ export class TopicDomainConstants {
   public static
     TOPIC_EDITOR_STORY_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
 
+  public static TOPIC_NAME_HANDLER_URL_TEMPLATE = (
+    '/topic_name_handler/<topic_name>');
+
+  public static TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE = (
+  '/topic_url_fragment_handler/<topic_url_fragment>');
+
   public static
     TOPIC_EDITOR_QUESTION_URL_TEMPLATE =
     '/topic_editor_question_handler/<topic_id>?cursor=<cursor>';
@@ -55,6 +61,7 @@ export class TopicDomainConstants {
   public static TOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
   public static TOPIC_PROPERTY_DESCRIPTION = 'description';
   public static TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code';
+  public static TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment';
 
   public static SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
   public static SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
