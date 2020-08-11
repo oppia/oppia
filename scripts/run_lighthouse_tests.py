@@ -52,9 +52,6 @@ def cleanup():
     for p in SUBPROCESSES:
         p.send_signal(signal.SIGINT)
 
-    while common.is_port_open(GOOGLE_APP_ENGINE_PORT):
-        time.sleep(1)
-
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
     build.set_constants_to_default()
@@ -93,8 +90,7 @@ def start_google_app_engine_server():
 
     app_yaml_filepath = 'app.yaml'
     p = subprocess.Popen(
-        '%s %s/dev_appserver.py --admin_host 0.0.0.0 '
-        '--admin_port 8000 --host 0.0.0.0 --port %s '
+        '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=true --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' %
         (

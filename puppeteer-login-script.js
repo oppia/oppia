@@ -40,7 +40,7 @@ const login = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
     // eslint-disable-next-line dot-notation
-    await page.goto(context.url, { waitUntil: "networkidle0" });
+    await page.goto(context.url, { waitUntil: 'networkidle0' });
     await page.click('#admin');
     await Promise.all([
       page.waitForNavigation(),
@@ -55,7 +55,6 @@ const login = async function(context, page) {
 
     await Promise.all([
       page.waitForNavigation(),
-      console.log("clicking on signup"),
       await page.click('#signup-submit')
     ]);
     // eslint-disable-next-line no-console
