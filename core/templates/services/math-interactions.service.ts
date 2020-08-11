@@ -84,7 +84,9 @@ export class MathInteractionsService {
     return errorMessage;
   }
 
-  validateExpression(expressionString: string, algebraic = true): boolean {
+  validateExpression(
+      expressionString: string, algebraic = true,
+      validVariablesList = []): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     let expressionObject;
     if (expressionString.length === 0) {
@@ -107,16 +109,30 @@ export class MathInteractionsService {
       return false;
     }
     try {
+      expressionString = this.insertMultiplicationSigns(expressionString);
       expressionObject = nerdamer(expressionString);
     } catch (err) {
       this.warningText = this.cleanErrorMessage(err.message, expressionString);
       return false;
     }
-    if (algebraic && expressionObject.variables().length === 0) {
-      this.warningText = 'It looks like you have entered only ' +
+    if (algebraic) {
+      let variablesList = expressionObject.variables();
+      if (variablesList.length === 0) {
+        this.warningText = 'It looks like you have entered only ' +
         'numbers. Make sure to include the necessary variables' +
         ' mentioned in the question.';
-      return false;
+        return false;
+      } else if (validVariablesList.length !== 0) {
+        for (let variable of variablesList) {
+          if (validVariablesList.indexOf(variable) === -1) {
+            this.warningText = (
+              'You have entered an invalid character: ' + variable +
+              '. Please use only the characters ' + validVariablesList.join() +
+              ' in your answer.');
+            return false;
+          }
+        }
+      }
     }
     if (!algebraic) {
       for (let functionName of this.mathFunctionNames) {
@@ -133,7 +149,7 @@ export class MathInteractionsService {
     return true;
   }
 
-  validateEquation(equationString: string): boolean {
+  validateEquation(equationString: string, validVariablesList = []): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -156,8 +172,10 @@ export class MathInteractionsService {
     }
     let splitString = equationString.split('=');
     let lhsString = splitString[0], rhsString = splitString[1];
-    let lhsIsAlgebraicallyValid = this.validateExpression(lhsString);
-    let rhsIsAlgebraicallyValid = this.validateExpression(rhsString);
+    let lhsIsAlgebraicallyValid = this.validateExpression(
+      lhsString, true, validVariablesList);
+    let rhsIsAlgebraicallyValid = this.validateExpression(
+      rhsString, true, validVariablesList);
     let lhsIsNumericallyValid = this.validateExpression(lhsString, false);
     let rhsIsNumericallyValid = this.validateExpression(rhsString, false);
 
@@ -175,7 +193,10 @@ export class MathInteractionsService {
     }
     // Neither side is algebraically valid. Calling validation functions again
     // to appropriately update the warningText.
-    this.validateExpression(lhsString);
+    this.validateExpression(lhsString, true, validVariablesList);
+    if (this.getWarningText().length === 0) {
+      this.validateExpression(rhsString, true, validVariablesList);
+    }
     return false;
   }
 

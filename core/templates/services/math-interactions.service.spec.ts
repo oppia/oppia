@@ -96,6 +96,18 @@ describe('MathInteractionsService', () => {
       'Your answer seems to be missing a variable/number after the "-".');
 
     expect(mathInteractionsService.validateExpression(
+      'xy+c/2', true, ['x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid character: c. Please use only the ' +
+      'characters x,y,z in your answer.');
+
+    expect(mathInteractionsService.validateExpression(
+      'aalpha/2beta', true, ['alpha', 'beta', 'gamma'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid character: a. Please use only the ' +
+      'characters alpha,beta,gamma in your answer.');
+
+    expect(mathInteractionsService.validateExpression(
       '(x^3.5)^/2')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer has two symbols next to each other: "^" and "/".');
@@ -248,6 +260,18 @@ describe('MathInteractionsService', () => {
       '3.4.5 = 45/a')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer contains an invalid term: 3.4.5');
+
+    expect(mathInteractionsService.validateEquation(
+      'y=mx+b', ['x', 'y', 'm', 'c'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid character: b. Please use only the ' +
+      'characters x,y,m,c in your answer.');
+
+    expect(mathInteractionsService.validateEquation(
+      'alpha(x^2)=beta/2', ['alpha', 'beta', 'gamma'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid character: x. Please use only the ' +
+      'characters alpha,beta,gamma in your answer.');
   });
 
   it('should insert missing multiplication signs', function() {
