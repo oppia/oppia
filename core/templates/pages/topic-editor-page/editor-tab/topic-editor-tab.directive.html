@@ -179,9 +179,9 @@
                dnd-draggable="subtopic">
             <div class="subtopics-list-item">
               <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
-                <span class="clickable-item protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
+                <span class="clickable-item" ng-click="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
                   <span class="material-icons draggable-icon-indicator">drag_indicator</span>
-                  <[subtopic.getTitle()]>
+                  <span class="protractor-test-subtopic"><[subtopic.getTitle()]></span>
                 </span>
                 <div class="subtopic-edit-options-container edit-options-container">
                   <span><[subtopicQuestionCountDict[subtopic.getId()] ]></span>
