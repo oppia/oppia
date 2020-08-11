@@ -23,7 +23,7 @@ interface ImageUploaderCustomScope extends ng.IScope {
   errorMessage?: string;
   onFileChanged?: (file: File, fileName?: string) => void;
   fileInputClassName?: string;
-  allowedImageType?: Array<string>;
+  allowedImageType?: string;
 }
 
 angular.module('oppia').directive('imageUploader', [
@@ -36,7 +36,7 @@ angular.module('oppia').directive('imageUploader', [
         onFileChanged: '=',
         errorMessage: '@',
         width: '@',
-        allowedImageType: '='
+        allowedImageType: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
@@ -78,9 +78,9 @@ angular.module('oppia').directive('imageUploader', [
 
           var imageFormatCheck = true;
           var imageExtensionCheck = false;
-
-          for (var i = 0; i < scope.allowedImageType.length; i++) {
-            var fileType = scope.allowedImageType[i];
+          var allowedImageType = JSON.parse(scope.allowedImageType);
+          for (var i = 0; i < allowedImageType.length; i++) {
+            var fileType = allowedImageType[i];
             imageFormatCheck = (
               imageFormatCheck &&
               !file.type.match(imageTypeMapping[fileType].format));
