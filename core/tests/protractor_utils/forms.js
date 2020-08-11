@@ -636,7 +636,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       var lineHeight = await elem.element(
         by.css('.CodeMirror-linenumber')).getAttribute('clientHeight');
       var currentScrollTop = await browser.executeScript(
-        'return arguments[0].scrollTop;', scrollBarWebElement)
+        'return arguments[0].scrollTop;', scrollBarWebElement);
       if (currentScrollTop === prevScrollTop) {
         break;
       } else {
@@ -652,9 +652,6 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
-        // if (actualDiffDict[lineNumber]) {
-        //   continue;
-        // }
         var lineDivElement = await lineDivElements.get(i);
         var lineElement = await lineContentElements.get(i);
         var isHighlighted = await lineDivElement.element(
@@ -663,7 +660,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         actualDiffDict[lineNumber] = {
           text: text,
           highlighted: isHighlighted
-        }
+        };
       }
       scrollTo = scrollTo + lineHeight * NUMBER_OF_LINES_TO_SCROLL;
     }
