@@ -253,15 +253,18 @@
     </md-card>
     <md-card class="entity-count">
       <div class="subtopic-count">
-        <span class="subtopic-count-value"><[topic.getSubtopics().length]></span>
+        <span class="subtopic-count-value" ng-if="!topicDataHasLoaded"><loading-dots></loading-dots></span>
+        <span class="subtopic-count-value" ng-if="topicDataHasLoaded"><[topic.getSubtopics().length]></span>
         <span class="subtopic-count-text">Subtopics</span>
       </div>
       <div class="skill-count">
-        <span class="skill-count-value"><[topic.getSkillIds().length]></span>
+        <span class="skill-count-value" ng-if="!topicDataHasLoaded"><loading-dots></loading-dots></span>
+        <span class="skill-count-value" ng-if="topicDataHasLoaded"><[topic.getSkillIds().length]></span>
         <span class="skill-count-text">Skills</span>
       </div>
       <div class="story-count">
-        <span class="story-count-value"><[topic.getCanonicalStoryIds().length]></span>
+        <span class="story-count-value" ng-if="!topicDataHasLoaded"><loading-dots></loading-dots></span>
+        <span class="story-count-value" ng-if="topicDataHasLoaded"><[topic.getCanonicalStoryIds().length]></span>
         <span class="story-count-text">Stories</span>
       </div>
     </md-card>
