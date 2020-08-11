@@ -473,10 +473,10 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
         algorithm_id: algorithm_version
     }
 
-    # Below step is required because as of now we only support single algorithm
-    # id per interaction type. However once the support for multiple algorithm
-    # ids (see issue #10217) is added the list of possible algorithm ids should
-    # be available from feconf.INTERACTION_CLASSIFIER_MAPPING.
+    # The line below contains only one element as of now we only support a
+    # single algorithm id per interaction type. However once the support for
+    # multiple algorithm ids (see issue #10217) is added, the list of possible
+    # algorithm ids can be retrieved from feconf.INTERACTION_CLASSIFIER_MAPPING.
     possible_algorithm_ids = [algorithm_id]
 
     algorithm_ids_to_add = set(possible_algorithm_ids).difference(
@@ -571,14 +571,12 @@ def get_classifier_training_job_maps(exp_id, exp_version, state_names):
     state_training_jobs_mapping_models = (
         classifier_models.StateTrainingJobsMappingModel.get_models(
             exp_id, exp_version, state_names))
-    state_to_algorithm_id_job_id_map = {}
+    state_to_algorithm_id_job_id_maps = []
     for state_mapping_model in state_training_jobs_mapping_models:
-        if state_mapping_model is None:
-            continue
-        state_to_algorithm_id_job_id_map[state_mapping_model.state_name] = (
-            state_mapping_model.algorithm_ids_to_job_ids)
-
-    return state_to_algorithm_id_job_id_map
+        state_to_algorithm_id_job_id_maps.append(
+            None if state_mapping_model is None
+            else state_mapping_model.algorithm_ids_to_job_ids)
+    return state_to_algorithm_id_job_id_maps
 
 
 def create_classifier_training_job_for_reverted_exploration(

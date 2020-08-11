@@ -2696,7 +2696,7 @@ class ClassifierTestBase(GenericEmailTestBase):
 
     This class is derived from GenericEmailTestBase because the
     TrainedClassifierHandlerTests test suite requires email services test
-    functions in addition to classifier functions defined below.
+    functions in addition to the classifier functions defined below.
     """
 
     def post_blob(self, url, payload, expected_status_int=200):

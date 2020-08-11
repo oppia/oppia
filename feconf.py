@@ -97,8 +97,8 @@ HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
     'html_field_types_to_rule_specs.json')
 
 # A mapping of interaction ids to classifier properties.
-# TODO(#10217): As of now we support only one interaction per interaction
-# however, we do have necessary storage infrastructure to support multiple
+# TODO(#10217): As of now we support only one interaction per interaction.
+# However, we do have the necessary storage infrastructure to support multiple
 # algorithms per interaction. Hence, whenever we find a secondary algorithm
 # candidate for any of the supported interactions, the logical functions to
 # support multiple algorithms need to be implemented.

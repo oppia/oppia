@@ -73,7 +73,8 @@ class ClassifierTrainingJob(python_utils.OBJECT):
             trained. The algorithm version determines the training algorithm,
             format in which trained parameters are stored along with the
             prediction algorithm to be used. We expect this to change only when
-            classifier algorithm is updated. This depends on the algorithm ID.
+            the classifier algorithm is updated. This depends on the
+            algorithm ID.
     """
 
     def __init__(

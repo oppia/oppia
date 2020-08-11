@@ -17,7 +17,7 @@
 """Domain objects representing a file system and a file stream."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf
@@ -323,13 +323,20 @@ class AbstractFileSystem(python_utils.OBJECT):
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in the file.
-            mimetype: str. The content-type of the file.
+            mimetype: str. The content-type of the file. If mimetype is set to
+                'application/octet-stream' then raw_bytes is expected to
+                contain binary data. In all other cases, raw_bytes is expected
+                to be textual data.
         """
-        raw_bytes = (
+        # Note that textual data needs to be converted to bytes so that it can
+        # be stored in a file opened in binary mode. However, it is not
+        # required for binary data (i.e. mimetype is set to
+        # 'application/octet-stream').
+        file_content = (
             python_utils.convert_to_bytes(raw_bytes)
             if mimetype != 'application/octet-stream' else raw_bytes)
         self._check_filepath(filepath)
-        self._impl.commit(filepath, raw_bytes, mimetype)
+        self._impl.commit(filepath, file_content, mimetype)
 
     def delete(self, filepath):
         """Deletes a file and the metadata associated with it.
