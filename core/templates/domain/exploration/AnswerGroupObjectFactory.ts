@@ -89,6 +89,11 @@ export class AnswerGroup {
     rules.forEach(this.addRule.bind(this));
   }
 
+  /**
+   * This method should be used to iterate through all rules encoded by the
+   * ruleTypesToInputs field. To update the ruleTypesToInputs, the
+   * updateRuleTypesToInputs() methods takes in a list of Rules.
+   */
   getRulesAsList(): Rule[] {
     const rules = [];
 
