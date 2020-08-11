@@ -187,31 +187,36 @@ def get_all_stale_suggestions():
             .get_all_stale_suggestions()]
 
 
-def _update_suggestion(suggestion):
-    """Updates the given suggestion.
+def _update_suggestion(suggestion_id):
+    """Updates the suggestion with the given id.
 
     Args:
-        suggestion: Suggestion. The suggestion to be updated.
+        suggestion_id: str. The id of the suggestion to be updated.
     """
 
-    _update_suggestions([suggestion])
+    _update_suggestions([suggestion_id])
 
 
-def _update_suggestions(suggestions):
-    """Updates the given suggestions.
+def _update_suggestions(suggestion_ids):
+    """Updates the suggestions with the given ids.
 
     Args:
-        suggestions: list(Suggestion). The suggestions to be updated.
+        suggestion_ids: list(str). The ids of the suggestions to be updated.
     """
-    suggestion_ids = []
-
-    for suggestion in suggestions:
-        suggestion.validate()
-        suggestion_ids.append(suggestion.suggestion_id)
 
     suggestion_models_to_update = (
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
     )
+
+    # Get the corresponding suggestion domain objects in order to validate the
+    # suggestions.
+    suggestions = [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in
+        suggestion_models_to_update
+    ]
+    for suggestion in suggestions:
+
+        suggestion.validate()
 
     for index, suggestion_model in enumerate(suggestion_models_to_update):
         suggestion = suggestions[index]
@@ -224,24 +229,24 @@ def _update_suggestions(suggestions):
         suggestion_models_to_update)
 
 
-def mark_review_completed(suggestion, status, reviewer_id):
+def mark_review_completed(suggestion_id, status, reviewer_id):
     """Marks that a review has been completed.
 
     Args:
-        suggestion: Suggestion. The suggestion to be updated.
+        suggestion_id: str. The id of the suggestion to be updated.
         status: str. The status of the suggestion post review. Possible values
             are STATUS_ACCEPTED or STATUS_REJECTED.
         reviewer_id: str. The ID of the user who completed the review.
     """
-    mark_multiple_reviews_completed([suggestion], status, reviewer_id)
+    mark_multiple_reviews_completed([suggestion_id], status, reviewer_id)
 
 
 def mark_multiple_reviews_completed(
-        suggestions, status, reviewer_id):
+        suggestion_ids, status, reviewer_id):
     """Marks that multiple reviews have been completed.
 
     Args:
-        suggestions: list(Suggestion). The suggestions to be updated.
+        suggestion_ids: list(str). The ids of the suggestions to be updated.
         status: str. The status of the suggestions post review. Possible values
             are STATUS_ACCEPTED or STATUS_REJECTED.
         reviewer_id: str. The ID of the user who completed the reviews.
@@ -251,11 +256,16 @@ def mark_multiple_reviews_completed(
             suggestion_models.STATUS_REJECTED]:
         raise Exception('Invalid status after review.')
 
-    for suggestion in suggestions:
-        suggestion.status = status
-        suggestion.final_reviewer_id = reviewer_id
+    suggestion_models_to_update = (
+        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
+    )
 
-    _update_suggestions(suggestions)
+    for suggestion_model in suggestion_models_to_update:
+        suggestion_model.status = status
+        suggestion_model.final_reviewer_id = reviewer_id
+
+    suggestion_models.GeneralSuggestionModel.put_multi(
+        suggestion_models_to_update)
 
 
 def get_commit_message_for_suggestion(author_username, commit_message):
@@ -275,11 +285,11 @@ def get_commit_message_for_suggestion(author_username, commit_message):
         author_username, commit_message)
 
 
-def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
-    """Accepts the given suggestion after validating it.
+def accept_suggestion(suggestion_id, reviewer_id, commit_message, review_message):
+    """Accepts the suggestion with the given suggestion_id after validating it.
 
     Args:
-        suggestion: Suggestion. The suggestion to be accepted.
+        suggestion_id: str. The id of the suggestion to be accepted.
         reviewer_id: str. The ID of the reviewer accepting the suggestion.
         commit_message: str. The commit message.
         review_message: str. The message provided by the reviewer while
@@ -290,10 +300,11 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
         Exception. The suggestion is not valid.
         Exception. The commit message is empty.
     """
+    suggestion = get_suggestion_by_id(suggestion_id)
     if suggestion.is_handled:
         raise Exception(
             'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id)
+                suggestion_id)
         )
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
@@ -313,7 +324,7 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
     commit_message = get_commit_message_for_suggestion(
         author_name, commit_message)
     mark_review_completed(
-        suggestion, suggestion_models.STATUS_ACCEPTED, reviewer_id)
+        suggestion_id, suggestion_models.STATUS_ACCEPTED, reviewer_id)
     suggestion.accept(commit_message)
     thread_id = suggestion.suggestion_id
     feedback_services.create_message(
@@ -338,11 +349,11 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
                         suggestion.author_id, suggestion.score_category)
 
 
-def reject_suggestion(suggestion, reviewer_id, review_message):
-    """Rejects the suggestion.
+def reject_suggestion(suggestion_id, reviewer_id, review_message):
+    """Rejects the suggestion with the given suggestion id.
 
     Args:
-        suggestion: Suggestion. The suggestion to be rejected.
+        suggestion_id: str. The id of the suggestion to be rejected.
         reviewer_id: str. The ID of the reviewer rejecting the suggestion.
         review_message: str. The message provided by the reviewer while
             rejecting the suggestion.
@@ -351,14 +362,14 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
         Exception. The suggestion is already handled.
     """
 
-    reject_suggestions([suggestion], reviewer_id, review_message)
+    reject_suggestions([suggestion_id], reviewer_id, review_message)
 
 
-def reject_suggestions(suggestions, reviewer_id, review_message):
-    """Rejects the suggestions.
+def reject_suggestions(suggestion_ids, reviewer_id, review_message):
+    """Rejects the suggestions with the given suggestion_ids.
 
     Args:
-        suggestions: list(Suggestion). The suggestions to be rejected.
+        suggestion_ids: list(str). The ids of the suggestions to be rejected.
         reviewer_id: str. The ID of the reviewer rejecting the suggestions.
         review_message: str. The message provided by the reviewer while
             rejecting the suggestions.
@@ -366,7 +377,15 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
     Raises:
         Exception. One or more of the suggestions has already been handled.
     """
-
+    suggestion_models_to_update = (
+        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
+    )
+    # Get the corresponding suggestion domain objects in order to validate the
+    # suggestions.
+    suggestions = [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in
+        suggestion_models_to_update
+    ]
     for suggestion in suggestions:
         if suggestion.is_handled:
             raise Exception(
@@ -377,12 +396,12 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
         raise Exception('Review message cannot be empty.')
 
     mark_multiple_reviews_completed(
-        suggestions, suggestion_models.STATUS_REJECTED, reviewer_id
+        suggestion_ids, suggestion_models.STATUS_REJECTED, reviewer_id
     )
 
-    thread_ids = [suggestion.suggestion_id for suggestion in suggestions]
+    #thread_ids = [suggestion.suggestion_id for suggestion in suggestions]
     feedback_services.create_messages(
-        thread_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
+        suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message
     )
 
@@ -403,8 +422,10 @@ def auto_reject_question_suggestions_for_skill_id(skill_id):
             ('target_id', skill_id)
         ]
     )
+
+    suggestion_ids = [suggestion.suggestion_id for suggestion in suggestions]
     reject_suggestions(
-        suggestions, feconf.SUGGESTION_BOT_USER_ID,
+        suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
         suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
 
 
@@ -419,17 +440,18 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids):
             of the translation suggestions.
     """
     suggestions = get_translation_suggestions_with_exp_ids(exp_ids)
+    suggestion_ids = [suggestion.suggestion_id for suggestion in suggestions]
 
     reject_suggestions(
-        suggestions, feconf.SUGGESTION_BOT_USER_ID,
+        suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
 
 
-def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
-    """Resubmit a rejected suggestion.
+def resubmit_rejected_suggestion(suggestion_id, summary_message, author_id):
+    """Resubmit a rejected suggestion with the given suggestion_id.
 
     Args:
-        suggestion: Suggestion. The rejected suggestion.
+        suggestion_id: str. The id of the rejected suggestion.
         summary_message: str. The message provided by the author to
             summarize new suggestion.
         author_id: str. The ID of the author creating the suggestion.
@@ -439,26 +461,27 @@ def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
         Exception. The suggestion has not been handled yet.
         Exception. The suggestion has already been accepted.
     """
+    suggestion = get_suggestion_by_id(suggestion_id)
     if not summary_message:
         raise Exception('Summary message cannot be empty.')
     if not suggestion.is_handled:
         raise Exception(
-            'The suggestion with id %s is not yet handled.' % (
-                suggestion.suggestion_id)
+            'The suggestion with id %s is not yet handled.' % (suggestion_id)
         )
     if suggestion.status == suggestion_models.STATUS_ACCEPTED:
         raise Exception(
             'The suggestion with id %s was accepted. '
-            'Only rejected suggestions can be resubmitted.' % (
-                suggestion.suggestion_id)
+            'Only rejected suggestions can be resubmitted.' % (suggestion_id)
         )
 
-    suggestion.status = suggestion_models.STATUS_IN_REVIEW
-    _update_suggestion(suggestion)
+    suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+        suggestion_id)
+    suggestion_model.status = suggestion_models.STATUS_IN_REVIEW
+    suggestion_model.put()
 
-    thread_id = suggestion.suggestion_id
+    #thread_id = suggestion.suggestion_id
     feedback_services.create_message(
-        thread_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
+        suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
         None, summary_message)
 
 
