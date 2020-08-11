@@ -330,7 +330,7 @@ class AbstractFileSystem(python_utils.OBJECT):
         """
         # Note that textual data needs to be converted to bytes so that it can
         # be stored in a file opened in binary mode. However, it is not
-        # required for binary data (i.e. mimetype is set to
+        # required for binary data (i.e. when mimetype is set to
         # 'application/octet-stream').
         file_content = (
             python_utils.convert_to_bytes(raw_bytes)

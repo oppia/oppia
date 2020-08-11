@@ -473,10 +473,11 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
         algorithm_id: algorithm_version
     }
 
-    # The line below contains only one element as of now we only support a
-    # single algorithm id per interaction type. However once the support for
-    # multiple algorithm ids (see issue #10217) is added, the list of possible
-    # algorithm ids can be retrieved from feconf.INTERACTION_CLASSIFIER_MAPPING.
+    # The list below contains only one element because as of now we only
+    # support a single algorithm id per interaction type. However once the
+    # support for multiple algorithm ids (see issue #10217) is added, the list
+    # of possible algorithm ids can be retrieved from
+    # feconf.INTERACTION_CLASSIFIER_MAPPING.
     possible_algorithm_ids = [algorithm_id]
 
     algorithm_ids_to_add = set(possible_algorithm_ids).difference(
