@@ -19,8 +19,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import atexit
 import os
 import re
+import signal
 import subprocess
 import sys
+import time
 
 import python_utils
 from scripts import build
@@ -43,12 +45,15 @@ def cleanup():
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
     common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
 
-    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
+    google_app_engine_path = '%s/' % common.GOOGLE_CLOUD_SDK_BIN
     processes_to_kill = [
         '.*%s.*' % re.escape(google_app_engine_path),
     ]
     for p in SUBPROCESSES:
-        p.kill()
+        os.killpg(os.getpgid(p.pid), signal.SIGTERM)
+
+    while common.is_port_open(GOOGLE_APP_ENGINE_PORT):
+        time.sleep(1)
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
@@ -93,11 +98,11 @@ def start_google_app_engine_server():
         '--log_level=critical --skip_sdk_update_check=true %s' %
         (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_CLOUD_SDK_BIN,
-            GOOGLE_APP_ENGINE_PORT, app_yaml_filepath
-        ),
-        shell=True)
-
+            GOOGLE_APP_ENGINE_PORT,
+            app_yaml_filepath
+        ), shell=True, preexec_fn=os.setsid)
     SUBPROCESSES.append(p)
+
 
 
 def main():
