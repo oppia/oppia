@@ -26,6 +26,10 @@ export interface ClientContextBackendDict {
   'user_locale': string;
 }
 
+/**
+ * Represents the client side information that is used to evaluate the
+ * value of feature flags.
+ */
 export class ClientContext {
   readonly clientType: string;
   readonly browserType: string;
