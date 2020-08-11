@@ -17,22 +17,39 @@
  * of data related to exploration improvement tasks.
  */
 
+import { merge } from 'd3-array';
+
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
+import { HighBounceRateTask } from
+  'domain/improvements/HighBounceRateTaskObjectFactory';
+import { NeedsGuidingResponsesTask } from
+  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('services/context.service.ts');
 require('services/exploration-improvements-backend-api.service.ts');
+require('services/exploration-improvements-task-registry.service.ts');
+require('services/exploration-stats.service.ts');
+require('services/playthrough-issues.service.ts');
+require('services/state-top-answers-stats.service.ts');
 
 angular.module('oppia').factory('ExplorationImprovementsService', [
   'ContextService', 'ExplorationImprovementsBackendApiService',
-  'ExplorationRightsService', 'UserExplorationPermissionsService',
+  'ExplorationImprovementsTaskRegistryService', 'ExplorationRightsService',
+  'ExplorationStatesService', 'ExplorationStatsService',
+  'PlaythroughIssuesService', 'StateTopAnswersStatsService',
+  'UserExplorationPermissionsService',
   function(
       ContextService, ExplorationImprovementsBackendApiService,
-      ExplorationRightsService, UserExplorationPermissionsService) {
+      ExplorationImprovementsTaskRegistryService, ExplorationRightsService,
+      ExplorationStatesService, ExplorationStatsService,
+      PlaythroughIssuesService, StateTopAnswersStatsService,
+      UserExplorationPermissionsService) {
     /** @private */
     let initializationHasStarted: boolean;
     /** @private */
@@ -44,32 +61,83 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
       resolveInitPromise = resolve;
       rejectInitPromise = reject;
     });
+
+    /** @private */
+    let openHbrTasks: HighBounceRateTask[] = [];
+    /** @private */
+    let ngrTasksOpenSinceInit: NeedsGuidingResponsesTask[] = [];
+
     /** @private */
     let config: ExplorationImprovementsConfig;
     /** @private */
     let improvementsTabIsAccessible: boolean;
+    /** @private */
+    const doInitAsync = async() => {
+      const userPermissions = (
+        await UserExplorationPermissionsService.getPermissionsAsync());
+
+      improvementsTabIsAccessible = (
+        ExplorationRightsService.isPublic() && userPermissions.canEdit);
+
+      if (!improvementsTabIsAccessible) {
+        return;
+      }
+
+      const expId = ContextService.getExplorationId();
+      config = (
+        await ExplorationImprovementsBackendApiService.getConfigAsync(expId));
+
+      if (!config.improvementsTabIsEnabled) {
+        return;
+      }
+
+      PlaythroughIssuesService.initSession(expId, config.explorationVersion);
+
+      const states = ExplorationStatesService.getStates();
+      const expStats = (
+        await ExplorationStatsService.getExplorationStats(expId));
+      const {openTasks, resolvedTaskTypesByStateName} = (
+        await ExplorationImprovementsBackendApiService.getTasksAsync(expId));
+      const topAnswersByStateName = (
+        await StateTopAnswersStatsService.getTopAnswersByStateNameAsync());
+      const playthroughIssues = await PlaythroughIssuesService.getIssues();
+
+      openHbrTasks = openTasks.filter(t => t.taskType === 'high_bounce_rate');
+
+      ExplorationImprovementsTaskRegistryService.initialize(
+        config, states, expStats, openTasks, resolvedTaskTypesByStateName,
+        topAnswersByStateName, playthroughIssues);
+
+      ngrTasksOpenSinceInit = (
+        ExplorationImprovementsTaskRegistryService
+          .getOpenNeedsGuidingResponsesTasks());
+    };
 
     return {
-      async initAsync(): Promise<void> {
+      initAsync(): Promise<void> {
         if (!initializationHasStarted) {
           initializationHasStarted = true;
-          try {
-            const expId = ContextService.getExplorationId();
-            const userPermissions = (
-              await UserExplorationPermissionsService.getPermissionsAsync());
-            improvementsTabIsAccessible = (
-              ExplorationRightsService.isPublic() && userPermissions.canEdit);
-            if (improvementsTabIsAccessible) {
-              config = (
-                await ExplorationImprovementsBackendApiService.getConfigAsync(
-                  expId));
-            }
-            resolveInitPromise();
-          } catch (error) {
-            rejectInitPromise(error);
-          }
+          doInitAsync().then(resolveInitPromise, rejectInitPromise);
         }
         return initPromise;
+      },
+
+      async flushUpdatedTasksToBackend(): Promise<void> {
+        if (!await this.isImprovementsTabEnabledAsync()) {
+          return;
+        }
+        const hbrTasksStillOpen = (
+          ExplorationImprovementsTaskRegistryService
+            .getOpenHighBounceRateTasks());
+        await ExplorationImprovementsBackendApiService.postTasksAsync(
+          config.explorationId,
+          merge([
+            openHbrTasks.filter(t => t.isObsolete()),
+            hbrTasksStillOpen.filter(t => !openHbrTasks.includes(t)),
+            ngrTasksOpenSinceInit.filter(t => t.isResolved()),
+          ]));
+        openHbrTasks = hbrTasksStillOpen;
+        ngrTasksOpenSinceInit = ngrTasksOpenSinceInit.filter(t => t.isOpen());
       },
 
       async isImprovementsTabEnabledAsync(): Promise<boolean> {

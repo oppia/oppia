@@ -109,6 +109,13 @@ export class StateTopAnswersStatsService {
     return this.getStateStats(stateName).filter(a => !a.isAddressed);
   }
 
+  async getTopAnswersByStateNameAsync(): Promise<
+      Map<string, readonly AnswerStats[]>> {
+    await this.initPromise;
+    return new Map([...this.topAnswersStatsByStateName].map(
+      ([stateName, cachedStats]) => [stateName, cachedStats.answers]));
+  }
+
   onStateAdded(stateName: string): void {
     this.topAnswersStatsByStateName.set(
       stateName, new AnswerStatsEntry([], null));

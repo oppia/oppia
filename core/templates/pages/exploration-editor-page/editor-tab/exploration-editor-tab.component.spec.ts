@@ -67,6 +67,8 @@ import { SolutionObjectFactory } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -86,7 +88,12 @@ describe('Exploration editor tab component', function() {
   var stateEditorService = null;
   var subtitledHtmlObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(function() {
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
