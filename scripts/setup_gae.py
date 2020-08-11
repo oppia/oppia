@@ -101,10 +101,18 @@ def main(args=None):
             path=os.path.join(
                 common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))
         tar.close()
+
+        # This command installs specific google cloud components for the google
+        # cloud sdk to prevent the need for developers to install it themselves
+        # when the app engine development server starts up. The --quiet
+        # parameter specifically tells the gcloud program to auto fill all
+        # prompts with default values. In this case, that means accepting all
+        # installations of gcloud packages.
         subprocess.call([
             os.path.join(common.GOOGLE_CLOUD_SDK_BIN, 'gcloud'),
             'components', 'install', 'cloud-datastore-emulator',
             'app-engine-python', 'app-engine-python-extras', '--quiet'])
+
         os.remove('gcloud-sdk.tar.gz')
 
 

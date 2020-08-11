@@ -27,13 +27,15 @@ import re
 import subprocess
 import time
 
-import python_utils
-
-from . import build
-from . import common
 from . import install_third_party_libs
 # Install third party libraries before importing other files.
 install_third_party_libs.main()
+
+from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
 
 _PARSER = argparse.ArgumentParser(
     description="""
