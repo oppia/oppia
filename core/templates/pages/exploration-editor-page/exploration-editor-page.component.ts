@@ -393,6 +393,7 @@ angular.module('oppia').component('explorationEditorPage', {
           }
 
           await ExplorationImprovementsService.initAsync();
+          await ExplorationImprovementsService.flushUpdatedTasksToBackend();
 
           ExplorationWarningsService.updateWarnings();
           $scope.$broadcast('refreshStateEditor');
