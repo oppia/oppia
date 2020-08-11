@@ -122,7 +122,7 @@ describe('State Interaction controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
               outcome: {
                 dest: 'default',
@@ -172,7 +172,7 @@ describe('State Interaction controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
               outcome: {
                 dest: 'default',

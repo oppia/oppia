@@ -94,7 +94,7 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Equals: [
                 {
@@ -114,7 +114,7 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Equals: [
                 {
@@ -224,7 +224,7 @@ describe('Answer Classification Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_input_translations_mapping: {},
+          rule_types_to_inputs_translations: {},
           rule_inputs: {
             Equals: [
               {
@@ -286,7 +286,7 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Equals: [
                 {
@@ -306,7 +306,7 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Equals: [
                 {
@@ -413,7 +413,7 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             training_data: ['abc', 'input'],
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Equals: [
                 {
@@ -434,7 +434,7 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             training_data: ['xyz'],
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Contains: [
                 {

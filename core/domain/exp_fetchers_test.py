@@ -654,7 +654,7 @@ title: Old Title
             exploration.states['Introduction'].interaction.id,
             'MathEquationInput')
         self.assertEqual(
-            answer_groups[0].rule_inputs, {
+            answer_groups[0].rule_types_to_inputs, {
                 'MatchesExactlyWith': [{'x': 'x=y', 'y': 'both'}]
             })
 
@@ -767,7 +767,7 @@ title: Old Title
             exploration.states['Introduction'].interaction.id,
             'AlgebraicExpressionInput')
         self.assertEqual(
-            answer_groups[0].rule_inputs, {
+            answer_groups[0].rule_types_to_inputs, {
                 'MatchesExactlyWith': [{'x': 'x+y'}]
             })
 
@@ -865,7 +865,7 @@ title: Old Title
             exploration.states['Introduction'].interaction.id,
             'NumericExpressionInput')
         self.assertEqual(
-            answer_groups[0].rule_inputs, {
+            answer_groups[0].rule_types_to_inputs, {
                 'MatchesExactlyWith': [{'x': '1.2 + 3'}]
             })
 
@@ -976,7 +976,7 @@ title: Old Title
             exploration.states['Introduction'].interaction.id,
             'AlgebraicExpressionInput')
         self.assertEqual(
-            answer_groups[0].rule_inputs, {
+            answer_groups[0].rule_types_to_inputs, {
                 'MatchesExactlyWith': [{'x': 'x+y'}]
             })
         self.assertEqual(sorted(exploration.states[

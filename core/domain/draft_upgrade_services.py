@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import logging
 
 from core.domain import exp_domain
@@ -32,7 +33,13 @@ import utils
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
 
-CANNOT_CONVERT_DRAFT_EXCEPTION_MESSAGE = 'Conversion cannot be completed.'
+class InvalidDraftConversion(Exception):
+    """Error class for invalid draft conversion. Should be raised in a draft
+    conversion function if it is not possible to upgrade a draft, and indicates
+    that try_upgrading_draft_to_exp_version should return None.
+    """
+
+    pass
 
 
 def try_upgrading_draft_to_exp_version(
@@ -86,13 +93,8 @@ def try_upgrading_draft_to_exp_version(
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
         try:
             draft_change_list = conversion_fn(draft_change_list)
-        except Exception as error:
-            if (
-                    python_utils.UNICODE(error) ==
-                    CANNOT_CONVERT_DRAFT_EXCEPTION_MESSAGE):
-                return
-            # A blank raise will raise the last exception.
-            raise
+        except InvalidDraftConversion:
+            return
         upgrade_times += 1
     return draft_change_list
 
@@ -189,18 +191,28 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 for answer_group_dict in change.new_value:
-                    # Convert the list of rule specs into the new rule_inputs
-                    # dict format.
-                    rule_inputs = {}
+                    # Convert the list of rule specs into the new rule_types_to_inputs
+                    # dict format. Instead of a list of dictionaries that have
+                    # properties rule type and rule inputs, the new format
+                    # groups rule inputs of the same rule type together by
+                    # mapping rule type to a list of rule inputs that share the
+                    # same rule type.
+                    # I.e. Old format: rule_specs = [
+                    #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
+                    #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}
+                    # ]
+                    # New format: rule_types_to_inputs = {
+                    #   'Equals': [
+                    #       {x: 'Yes'}, {x: 'Y'}
+                    #   ]
+                    # }
+                    rule_types_to_inputs = collections.defaultdict(list)
                     for rule_spec_dict in answer_group_dict['rule_specs']:
                         rule_type = rule_spec_dict['rule_type']
-                        if rule_type not in rule_inputs:
-                            rule_inputs[rule_type] = []
-                        rule_inputs[rule_type].append(
-                            rule_spec_dict['inputs'])
+                        rule_types_to_inputs[rule_type].append(rule_spec_dict['inputs'])
                     del answer_group_dict['rule_specs']
-                    answer_group_dict['rule_input_translations_mapping'] = {}
-                    answer_group_dict['rule_inputs'] = rule_inputs
+                    answer_group_dict['rule_types_to_inputs_translations'] = {}
+                    answer_group_dict['rule_types_to_inputs'] = dict(rule_types_to_inputs)
 
         return draft_change_list
 
@@ -255,7 +267,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
 
         Raises:
-            Exception. Conversion cannot be completed.
+            InvalidDraftConversion. Conversion cannot be completed.
         """
         for change in draft_change_list:
             if (change.property_name ==
@@ -267,7 +279,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.
-                raise Exception(CANNOT_CONVERT_DRAFT_EXCEPTION_MESSAGE)
+                raise InvalidDraftConversion('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
@@ -286,7 +298,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
 
         Raises:
-            Exception. Conversion cannot be completed.
+            InvalidDraftConversion. Conversion cannot be completed.
         """
         for change in draft_change_list:
             # We don't want to migrate any changes that involve the
@@ -302,7 +314,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         'IsMathematicallyEquivalentTo')))
             if interaction_id_change_condition or (
                     answer_groups_change_condition):
-                raise Exception(CANNOT_CONVERT_DRAFT_EXCEPTION_MESSAGE)
+                raise InvalidDraftConversion('Conversion cannot be completed.')
 
         return draft_change_list
 

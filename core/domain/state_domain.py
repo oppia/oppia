@@ -46,17 +46,24 @@ class AnswerGroup(python_utils.OBJECT):
     """
 
     def __init__(
-            self, outcome, rule_inputs, rule_input_translations_mapping,
-            training_data, tagged_skill_misconception_id):
+            self, outcome, rule_types_to_inputs,
+            rule_types_to_inputs_translations, training_data,
+            tagged_skill_misconception_id):
         """Initializes a AnswerGroup domain object.
 
         Args:
             outcome: Outcome. The outcome corresponding to the answer group.
-            rule_inputs: dict. A dictionary mapping rule type to a list of rule
-                inputs.
-            rule_input_translations_mapping: dict. A dictionary mapping
-                rule_type to a dictionary that maps abbreviated language code
-                to the translated rule inputs.
+            rule_types_to_inputs: dict. A dictionary mapping rule type (str) to
+                a list of rule inputs. Each rule input is a dictionary mapping
+                the rule input name (str) to the rule input value. The rule
+                input names can be deduced from the relevant description field
+                in extensions/interactions/rule_templates.json -- they are
+                enclosed in {{...}} braces.
+            rule_types_to_inputs_translations: dict. A dictionary mapping
+                rule_type (str) to a dictionary that maps abbreviated
+                language code (str) to a list of translated rule inputs.
+                Each rule input is a dictionary mapping the rule input name
+                (str) to the rule input value.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
             tagged_skill_misconception_id: str or None. The format is
@@ -66,9 +73,9 @@ class AnswerGroup(python_utils.OBJECT):
                 only when a state is part of a Question object that
                 tests a particular skill.
         """
-        self.rule_inputs = rule_inputs
-        self.rule_input_translations_mapping = rule_input_translations_mapping
-
+        self.rule_types_to_inputs = rule_types_to_inputs
+        self.rule_types_to_inputs_translations = (
+            rule_types_to_inputs_translations)
         self.outcome = outcome
         self.training_data = training_data
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
@@ -80,9 +87,9 @@ class AnswerGroup(python_utils.OBJECT):
             dict. A dict, mapping all fields of AnswerGroup instance.
         """
         return {
-            'rule_inputs': self.rule_inputs,
-            'rule_input_translations_mapping':
-                self.rule_input_translations_mapping,
+            'rule_types_to_inputs': self.rule_types_to_inputs,
+            'rule_types_to_inputs_translations':
+                self.rule_types_to_inputs_translations,
             'outcome': self.outcome.to_dict(),
             'training_data': self.training_data,
             'tagged_skill_misconception_id': self.tagged_skill_misconception_id
@@ -101,8 +108,8 @@ class AnswerGroup(python_utils.OBJECT):
         """
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
-            answer_group_dict['rule_inputs'],
-            answer_group_dict['rule_input_translations_mapping'],
+            answer_group_dict['rule_types_to_inputs'],
+            answer_group_dict['rule_types_to_inputs_translations'],
             answer_group_dict['training_data'],
             answer_group_dict['tagged_skill_misconception_id']
         )
@@ -123,15 +130,15 @@ class AnswerGroup(python_utils.OBJECT):
             ValidationError. The AnswerGroup contains more than one classifier
                 rule.
         """
-        if not isinstance(self.rule_inputs, dict):
+        if not isinstance(self.rule_types_to_inputs, dict):
             raise utils.ValidationError(
-                'Expected answer group rule_inputs to be a dict, received %s'
-                % self.rule_inputs)
+                'Expected answer group rule_types_to_inputs to be a dict, '
+                'received %s' % self.rule_types_to_inputs)
 
-        if not isinstance(self.rule_input_translations_mapping, dict):
+        if not isinstance(self.rule_types_to_inputs_translations, dict):
             raise utils.ValidationError(
-                'Expected answer group rule_input_translations_mapping to be a '
-                'dict, received %s' % self.rule_input_translations_mapping)
+                'Expected answer group rule_types_to_inputs_translations to be '
+                'a dict, received %s' % self.rule_types_to_inputs_translations)
 
         if self.tagged_skill_misconception_id is not None:
             if not isinstance(
@@ -147,16 +154,16 @@ class AnswerGroup(python_utils.OBJECT):
                     % self.tagged_skill_misconception_id)
 
         number_of_rules = 0
-        for rule_type in self.rule_inputs:
-            number_of_rules += len(self.rule_inputs[rule_type])
+        for rule_type in self.rule_types_to_inputs:
+            number_of_rules += len(self.rule_types_to_inputs[rule_type])
 
             if rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_type)
 
             rule_params_list = interaction.get_rule_param_list(rule_type)
-            for rule_input in self.rule_inputs[rule_type]:
-                self.validate_rule_input(
+            for rule_input in self.rule_types_to_inputs[rule_type]:
+                self._validate_rule_input(
                     rule_input,
                     rule_type,
                     rule_params_list,
@@ -170,7 +177,7 @@ class AnswerGroup(python_utils.OBJECT):
 
         self.outcome.validate()
 
-    def validate_rule_input(
+    def _validate_rule_input(
             self, rule_input, rule_type, rule_params_list,
             exp_param_specs_dict):
         """Validates a rule input value. It ensures the rule input dict does
@@ -179,7 +186,10 @@ class AnswerGroup(python_utils.OBJECT):
 
         Args:
             rule_input: dict. The values of the parameters needed in order to
-                fully specify the rule.
+                fully specify the rule. The keys and the value type for this
+                dict can be deduced from,the relevant description field in
+                extensions/interactions/rule_templates.json where the keys
+                and value schema are enclosed in {{...}} braces.
             rule_type: str. The rule type, e.g. "CodeContains" or "Equals".
             rule_params_list: list(str, object(*)). A list of parameters used by
                 the rule represented by this RuleSpec instance, to be used to
@@ -256,71 +266,19 @@ class AnswerGroup(python_utils.OBJECT):
 
         outcome_html = self.outcome.feedback.html
         html_list = html_list + [outcome_html]
-        # TODO(#9413): Find a way to include a reference to the interaction
-        # type in the Draft change lists.
-        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
-        # the interaction-id from the rules_index_dict until issue-9413 has
-        # been fixed, because this method has no reference to the interaction
-        # type and draft changes use this method. The rules_index_dict below
-        # is used to figure out the assembly of the html in the rulespecs.
+        
+        def collect_html_conversion_fn(html):
+            """A mock conversion function that collects the html in the rules,
+            but does not apply any conversion onto the html.
+            """
+            html_list.append(html)
+            return html
+        
+        for rule_type in self.rule_types_to_inputs:
+            for rule_input in self.rule_types_to_inputs[rule_type]:
+                AnswerGroup._convert_html_in_rule_input(
+                    rule_input, rule_type, collect_html_conversion_fn)
 
-        html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
-
-        for rule_type in self.rule_inputs:
-            for rule_input in self.rule_inputs[rule_type]:
-                for interaction_and_rule_details in (
-                        html_field_types_to_rule_specs_dict.values()):
-                    rule_type_has_html = (
-                        rule_type in
-                        interaction_and_rule_details['ruleTypes'].keys())
-                    if rule_type_has_html:
-                        html_type_format = interaction_and_rule_details[
-                            'format']
-                        input_variables_from_html_mapping = (
-                            interaction_and_rule_details['ruleTypes'][
-                                rule_type]['htmlInputVariables'])
-                        input_variable_match_found = False
-                        for input_variable in rule_input.keys():
-                            if (
-                                    input_variable in
-                                    input_variables_from_html_mapping
-                            ):
-                                input_variable_match_found = True
-                                rule_input_variable = (
-                                    rule_input[input_variable])
-                                if (html_type_format ==
-                                        feconf
-                                        .HTML_RULE_VARIABLE_FORMAT_STRING):
-                                    html_list = html_list + [
-                                        rule_input_variable]
-                                elif (html_type_format ==
-                                      feconf.HTML_RULE_VARIABLE_FORMAT_SET):
-                                    # Here we are checking the type of the
-                                    # rule_input because the rule type
-                                    # 'Equals' is used by other interactions as
-                                    # well which don't have HTML and we don't
-                                    # have a reference to the interaction ID.
-                                    if isinstance(rule_input_variable, list):
-                                        for value in rule_input_variable:
-                                            if isinstance(
-                                                    value,
-                                                    python_utils.BASESTRING):
-                                                html_list = html_list + [value]
-                                elif (html_type_format ==
-                                      feconf.
-                                      HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
-                                    for rule_spec_html in rule_input_variable:
-                                        html_list = html_list + rule_spec_html
-                                else:
-                                    raise Exception(
-                                        'The rule spec does not belong to a '
-                                        'valid format.')
-                        if not input_variable_match_found:
-                            raise Exception(
-                                'Rule spec should have at least one valid '
-                                'input variable with Html in it.')
         return html_list
 
     @staticmethod
@@ -335,7 +293,7 @@ class AnswerGroup(python_utils.OBJECT):
             conversion_fn: function. The function to be used for converting the
                 HTML.
             state_uses_old_rule_spec_schema: bool. Whether the
-                state_dict's AnswerGroup contain the deprecated RuleSpec domain
+                state_dict's AnswerGroups contain the deprecated RuleSpec domain
                 object dicts.
 
         Returns:
@@ -348,31 +306,34 @@ class AnswerGroup(python_utils.OBJECT):
             rule_specs = answer_group_dict['rule_specs']
             for rule_spec_index, rule_spec in enumerate(rule_specs):
                 answer_group_dict['rule_specs'][rule_spec_index]['inputs'] = (
-                    AnswerGroup.convert_html_in_rule_input(
+                    AnswerGroup._convert_html_in_rule_input(
                         rule_spec['inputs'],
                         rule_spec['rule_type'],
                         conversion_fn)
                 )
         else:
-            for rule_type in answer_group_dict['rule_inputs']:
+            for rule_type in answer_group_dict['rule_types_to_inputs']:
                 for rule_input_index, rule_input in enumerate(
-                        answer_group_dict['rule_inputs'][rule_type]):
-                    answer_group_dict['rule_inputs'][
+                        answer_group_dict['rule_types_to_inputs'][rule_type]):
+                    answer_group_dict['rule_types_to_inputs'][
                         rule_type][rule_input_index] = (
-                            AnswerGroup.convert_html_in_rule_input(
+                            AnswerGroup._convert_html_in_rule_input(
                                 rule_input, rule_type, conversion_fn)
                         )
 
         return answer_group_dict
 
     @staticmethod
-    def convert_html_in_rule_input(rule_input, rule_type, conversion_fn):
+    def _convert_html_in_rule_input(rule_input, rule_type, conversion_fn):
         """Checks for HTML fields in a Rule Spec and converts it according
         to the conversion function.
 
         Args:
             rule_input: dict. The values of the parameters needed in order to
-                fully specify the rule.
+                fully specify the rule. The keys and the value type for this
+                dict can be deduced from the relevant description field in
+                extensions/interactions/rule_templates.json where the keys
+                and value schema are enclosed in {{...}} braces.
             rule_type: str. The rule type, e.g. "CodeContains" or "Equals".
             conversion_fn: function. The function to be used for converting the
                 HTML.
@@ -396,55 +357,49 @@ class AnswerGroup(python_utils.OBJECT):
             rule_type_has_html = (
                 rule_type in
                 interaction_and_rule_details['ruleTypes'].keys())
-            if rule_type_has_html:
-                html_type_format = interaction_and_rule_details['format']
-                input_variables_from_html_mapping = (
-                    interaction_and_rule_details['ruleTypes'][
-                        rule_type][
-                            'htmlInputVariables'])
-                input_variable_match_found = False
-                for input_variable in rule_input.keys():
-                    if input_variable in input_variables_from_html_mapping:
-                        input_variable_match_found = True
-                        rule_input_variable = (
-                            rule_input[input_variable])
-                        if (html_type_format ==
-                                feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
-                            rule_input[input_variable] = (
-                                conversion_fn(
-                                    rule_input[input_variable]))
-                        elif (html_type_format ==
-                              feconf.HTML_RULE_VARIABLE_FORMAT_SET):
-                            # Here we are checking the type of the
-                            # rule_specs.inputs because the rule type
-                            # 'Equals' is used by other interactions as
-                            # well which don't have HTML and we don't have
-                            # a reference to the interaction ID.
-                            if isinstance(rule_input_variable, list):
-                                for value_index, value in enumerate(
-                                        rule_input_variable):
-                                    if isinstance(
-                                            value, python_utils.BASESTRING):
-                                        rule_input[
-                                            input_variable][value_index] = (
-                                                conversion_fn(value))
-                        elif (html_type_format ==
-                              feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
-                            for list_index, html_list in enumerate(
-                                    rule_input[input_variable]):
-                                for rule_html_index, rule_html in enumerate(
-                                        html_list):
-                                    rule_input[input_variable][
-                                        list_index][rule_html_index] = (
-                                            conversion_fn(rule_html))
-                        else:
-                            raise Exception(
-                                'The rule spec does not belong to a valid'
-                                ' format.')
-                if not input_variable_match_found:
+            
+            if not rule_type_has_html:
+                continue
+
+            html_type_format = interaction_and_rule_details['format']
+            input_variables_from_html_mapping = (
+                interaction_and_rule_details['ruleTypes'][rule_type][
+                    'htmlInputVariables']
+            )
+            input_variable_match_found = False
+            for input_variable in rule_input.keys():
+                if input_variable not in input_variables_from_html_mapping:
+                    continue
+
+                input_variable_match_found = True
+                rule_input_variable = rule_input[input_variable]
+                if html_type_format == feconf.HTML_RULE_VARIABLE_FORMAT_STRING:
+                    rule_input[input_variable] = (
+                        conversion_fn(rule_input[input_variable]))
+                elif html_type_format == feconf.HTML_RULE_VARIABLE_FORMAT_SET:
+                    # Here we are checking the type of the rule_specs.inputs
+                    # because the rule type 'Equals' is used by other
+                    # interactions as well which don't have HTML and we don't
+                    # have a reference to the interaction ID.
+                    if isinstance(rule_input_variable, list):
+                        for value_index, value in enumerate(
+                                rule_input_variable):
+                            if isinstance(value, python_utils.BASESTRING):
+                                rule_input[input_variable][value_index] = (
+                                        conversion_fn(value))
+                elif (html_type_format ==
+                        feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                    for list_index, html_list in enumerate(rule_input_variable):
+                        for rule_html_index, rule_html in enumerate(html_list):
+                            rule_input_variable[list_index][rule_html_index] = (
+                                conversion_fn(rule_html))
+                else:
                     raise Exception(
-                        'Rule spec should have at least one valid input '
-                        'variable with Html in it.')
+                        'The rule spec does not belong to a valid format.')
+            if not input_variable_match_found:
+                raise Exception(
+                    'Rule spec should have at least one valid input variable '
+                    'with Html in it.')
         return rule_input
 
 
@@ -2689,7 +2644,7 @@ class State(python_utils.OBJECT):
             old_content_id_list, new_content_id_list)
 
     def update_interaction_answer_groups(self, answer_groups_list):
-        """Update the list of AnswerGroup in IteractionInstance domain object.
+        """Update the list of AnswerGroup in InteractionInstance domain object.
 
         Args:
             answer_groups_list: list(dict). List of dicts that represent
@@ -2708,9 +2663,9 @@ class State(python_utils.OBJECT):
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
             # Normalize the rule params.
-            for rule_type in answer_group_dict['rule_inputs']:
-                rule_inputs = answer_group_dict['rule_inputs'][rule_type]
-                for rule_input_index, rule_input in enumerate(rule_inputs):
+            for rule_type in answer_group_dict['rule_types_to_inputs']:
+                rule_types_to_inputs = answer_group_dict['rule_types_to_inputs'][rule_type]
+                for rule_input_index, rule_input in enumerate(rule_types_to_inputs):
                     if not isinstance(rule_input, dict):
                         raise Exception(
                             'Expected rule_input to be a dict, received %s'
@@ -2734,13 +2689,13 @@ class State(python_utils.OBJECT):
                                 raise Exception(
                                     '%s has the wrong type. It should '
                                     'be a %s.' % (value, param_type.__name__))
-                        answer_group_dict['rule_inputs'][rule_type][
+                        answer_group_dict['rule_types_to_inputs'][rule_type][
                             rule_input_index][param_name] = normalized_param
 
             answer_group = AnswerGroup(
                 Outcome.from_dict(answer_group_dict['outcome']),
-                answer_group_dict['rule_inputs'],
-                answer_group_dict['rule_input_translations_mapping'],
+                answer_group_dict['rule_types_to_inputs'],
+                answer_group_dict['rule_types_to_inputs_translations'],
                 answer_group_dict['training_data'],
                 answer_group_dict['tagged_skill_misconception_id'])
             interaction_answer_groups.append(answer_group)
@@ -3020,7 +2975,7 @@ class State(python_utils.OBJECT):
                 and SubtitledUnicode dicts (should be True if prior to state
                 schema v40).
             state_uses_old_rule_spec_schema: bool. Whether the
-                state_dict's AnswerGroup contain the deprecated RuleSpec domain
+                state_dict's AnswerGroups contain the deprecated RuleSpec domain
                 object dicts.
 
         Returns:

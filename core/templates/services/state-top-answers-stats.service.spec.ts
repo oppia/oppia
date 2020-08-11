@@ -65,7 +65,7 @@ describe('StateTopAnswersStatsService', () => {
     param_changes: [],
     interaction: {
       answer_groups: [{
-        rule_input_translations_mapping: {},
+        rule_types_to_inputs_translations: {},
         rule_inputs: {
           Contains: [{x: 'hola'}]
         },
@@ -314,7 +314,7 @@ describe('StateTopAnswersStatsService', () => {
       .not.toContain(joC({answer: 'hola'}));
 
     const updatedState = states.getState('Hola');
-    updatedState.interaction.answerGroups[0].updateRuleInputs([
+    updatedState.interaction.answerGroups[0].updateRuleTypesToInputs([
       ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
     ]);
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);

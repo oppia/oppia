@@ -53,9 +53,9 @@ class DragAndDropSortInputInteractionOneOffJob(
             if state.interaction.id == 'DragAndDropSortInput':
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
-                    for rule_type in answer_group.rule_inputs:
+                    for rule_type in answer_group.rule_types_to_inputs:
                         for rule_input_index, rule_input in enumerate(
-                                answer_group.rule_inputs[rule_type]):
+                                answer_group.rule_types_to_inputs[rule_type]):
                             for rule_input_name in rule_input:
                                 value = rule_input[rule_input_name]
                                 if value == '' or value == []:
@@ -101,9 +101,9 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     state.interaction.customization_args['choices'].value)
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
-                    for rule_type in answer_group.rule_inputs:
+                    for rule_type in answer_group.rule_types_to_inputs:
                         for rule_input_index, rule_input in enumerate(
-                                answer_group.rule_inputs[rule_type]):
+                                answer_group.rule_types_to_inputs[rule_type]):
                             if rule_input['x'] >= choices_length:
                                 yield (
                                     item.id,
@@ -146,8 +146,8 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 ]
 
                 for group in state.interaction.answer_groups:
-                    for rule_type in group.rule_inputs:
-                        for rule_input in group.rule_inputs[rule_type]:
+                    for rule_type in group.rule_types_to_inputs:
+                        for rule_input in group.rule_types_to_inputs[rule_type]:
                             for rule_item in rule_input['x']:
                                 if rule_item not in choices:
                                     yield (

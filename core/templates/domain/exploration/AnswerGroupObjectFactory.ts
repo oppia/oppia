@@ -30,45 +30,47 @@ export interface RuleInputs {
   [ruleType: string]: InteractionRuleInputs[];
 }
 
-interface RuleInputTranslations {
+interface ruleTypesToInputsTranslations {
   [ruleType: string]: {
     [languageCode: string]: InteractionRuleInputs[]
   }
 }
 
 export interface AnswerGroupBackendDict {
-  'rule_inputs': RuleInputs;
-  'rule_input_translations_mapping': RuleInputTranslations,
+  'rule_types_to_inputs': RuleInputs;
+  'rule_types_to_inputs_translations': ruleTypesToInputsTranslations,
   'outcome': OutcomeBackendDict;
   'training_data': InteractionAnswer;
   'tagged_skill_misconception_id': string;
 }
 
 export class AnswerGroup {
-  private ruleObjectFactory;
+  private _ruleObjectFactory;
 
-  ruleInputs: RuleInputs;
-  ruleInputTranslations: RuleInputTranslations;
+  ruleTypesToInputs: RuleInputs;
+  ruleTypesToInputsTranslations: ruleTypesToInputsTranslations;
   outcome: Outcome;
   trainingData: InteractionAnswer;
   taggedSkillMisconceptionId: string;
   constructor(
-      ruleInputs: RuleInputs, ruleInputTranslations: RuleInputTranslations,
+      ruleTypesToInputs: RuleInputs,
+      ruleTypesToInputsTranslations: ruleTypesToInputsTranslations,
       outcome: Outcome, trainingData: InteractionAnswer,
       taggedSkillMisconceptionId: string,
-      ruleObjectFactory: RuleObjectFactory) {
-    this.ruleInputs = ruleInputs;
-    this.ruleInputTranslations = ruleInputTranslations;
+      _ruleObjectFactory: RuleObjectFactory) {
+    this.ruleTypesToInputs = ruleTypesToInputs;
+    this.ruleTypesToInputsTranslations = ruleTypesToInputsTranslations;
     this.outcome = outcome;
     this.trainingData = trainingData;
     this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
-    this.ruleObjectFactory = ruleObjectFactory;
+    this._ruleObjectFactory = _ruleObjectFactory;
   }
 
   toBackendDict(): AnswerGroupBackendDict {
     return {
-      rule_inputs: this.ruleInputs,
-      rule_input_translations_mapping: this.ruleInputTranslations,
+      rule_types_to_inputs: this.ruleTypesToInputs,
+      rule_types_to_inputs_translations:
+        this.ruleTypesToInputsTranslations,
       outcome: this.outcome.toBackendDict(),
       training_data: this.trainingData,
       tagged_skill_misconception_id: this.taggedSkillMisconceptionId
@@ -76,14 +78,14 @@ export class AnswerGroup {
   }
 
   addRule(rule: Rule) {
-    if (!this.ruleInputs.hasOwnProperty(rule.type)) {
-      this.ruleInputs[rule.type] = [];
+    if (!this.ruleTypesToInputs.hasOwnProperty(rule.type)) {
+      this.ruleTypesToInputs[rule.type] = [];
     }
-    this.ruleInputs[rule.type].push(rule.inputs);
+    this.ruleTypesToInputs[rule.type].push(rule.inputs);
   }
 
-  updateRuleInputs(rules: Rule[]) {
-    this.ruleInputs = {};
+  updateRuleTypesToInputs(rules: Rule[]) {
+    this.ruleTypesToInputs = {};
     rules.forEach(this.addRule.bind(this));
   }
 
@@ -92,7 +94,7 @@ export class AnswerGroup {
 
     // Sort rule types so that Equals always is first, followed by all other
     // rule types sorted alphabetically.
-    const sortedRuleTypes = Object.keys(this.ruleInputs).sort(
+    const sortedRuleTypes = Object.keys(this.ruleTypesToInputs).sort(
       (x, y) => {
         if (x === 'Equals') {
           return -1;
@@ -103,8 +105,8 @@ export class AnswerGroup {
       }
     );
     sortedRuleTypes.forEach(ruleType => {
-      this.ruleInputs[ruleType].forEach(ruleInput => {
-        rules.push(this.ruleObjectFactory.createNew(ruleType, ruleInput));
+      this.ruleTypesToInputs[ruleType].forEach(ruleInput => {
+        rules.push(this._ruleObjectFactory.createNew(ruleType, ruleInput));
       });
     });
 
@@ -119,20 +121,27 @@ export class AnswerGroupObjectFactory {
   constructor(
     private outcomeObjectFactory: OutcomeObjectFactory,
     private ruleObjectFactory: RuleObjectFactory) {}
-
+  /**
+   * Creates a AnswerGroup object, with empty ruleTypesToInputs. The
+   * updateRuleTypesToInputs() should be used to populate the rules.
+   * @param outcome The AnswerGroup outcome.
+   * @param trainingData The AnswerGroup training data.
+   * @param taggedSkillMisconceptionId The AnswerGroup tagged skill
+   *  misconception id.
+   */
   createNew(
-      ruleInputs: RuleInputs, outcome: Outcome, trainingData: InteractionAnswer,
+      outcome: Outcome, trainingData: InteractionAnswer,
       taggedSkillMisconceptionId: string): AnswerGroup {
     return new AnswerGroup(
-      ruleInputs, {}, outcome, trainingData, taggedSkillMisconceptionId,
+      {}, {}, outcome, trainingData, taggedSkillMisconceptionId,
       this.ruleObjectFactory);
   }
 
   createFromBackendDict(
       answerGroupBackendDict: AnswerGroupBackendDict): AnswerGroup {
     return new AnswerGroup(
-      answerGroupBackendDict.rule_inputs,
-      answerGroupBackendDict.rule_input_translations_mapping,
+      answerGroupBackendDict.rule_types_to_inputs,
+      answerGroupBackendDict.rule_types_to_inputs_translations,
       this.outcomeObjectFactory.createFromBackendDict(
         answerGroupBackendDict.outcome),
       answerGroupBackendDict.training_data,

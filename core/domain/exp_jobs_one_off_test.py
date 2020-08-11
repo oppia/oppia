@@ -122,8 +122,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'IsMathematicallyEquivalentTo': [{
                     'x': 'x+y'
                 }, {
@@ -228,8 +228,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('MathExpressionInput')
 
         answer_group_list = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'IsMathematicallyEquivalentTo': [{
                     'x': u'[\'y=mx+c\']'
                 }]
@@ -1554,8 +1554,8 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': invalid_html_content2,
                     'y': 2
@@ -1843,8 +1843,8 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': valid_html_content,
                     'y': 2
@@ -2033,8 +2033,8 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': valid_html_content,
                     'y': 2
@@ -2178,8 +2178,8 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': valid_html_content1,
                     'y': 2
@@ -2207,8 +2207,8 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             'tagged_skill_misconception_id': None
         }
         item_selection_answer_group = {
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'ContainsAtLeastOneOf': [{
                     'x': [valid_html_content1]
                 }],

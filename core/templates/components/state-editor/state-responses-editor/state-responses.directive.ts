@@ -320,7 +320,7 @@ angular.module('oppia').directive('stateResponses', [
             }).result.then(function(result) {
               // Create a new answer group.
               const newAnswerGroup = AnswerGroupObjectFactory.createNew(
-                {}, result.tmpOutcome, [],
+                result.tmpOutcome, [],
                 result.tmpTaggedSkillMisconceptionId);
               newAnswerGroup.addRule(result.tmpRule);
               $scope.answerGroups.push(newAnswerGroup);
@@ -458,7 +458,7 @@ angular.module('oppia').directive('stateResponses', [
             var outcome = answerGroup.outcome;
             var hasFeedback = outcome.hasNonemptyFeedback();
 
-            if (answerGroup.ruleInputs) {
+            if (answerGroup.ruleTypesToInputs) {
               var firstRule = $filter('convertToPlainText')(
                 $filter('parameterizeRuleDescription')(
                   answerGroup.getRulesAsList()[0],

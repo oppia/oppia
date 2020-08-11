@@ -63,7 +63,7 @@ describe('ContinueValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew({}, goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
     customizationArguments = {
       buttonText: {
         value: new SubtitledUnicode('Some Button Text', 'ca_buttonText')

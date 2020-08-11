@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import copy
 import datetime
 
@@ -718,11 +719,11 @@ class Question(python_utils.OBJECT):
     @classmethod
     def _convert_state_v38_dict_to_v39_dict(cls, question_state_dict):
         """Converts from version 38 to 39. Version 39 removes the fields
-        rule_specs in AnswerGroups, and adds new fields rule_inputs and
-        rule_input_translations_mapping. rule_inputs is a dictionary that maps
+        rule_specs in AnswerGroups, and adds new fields rule_types_to_inputs and
+        rule_types_to_inputs_translations. rule_types_to_inputs is a dictionary that maps
         rule type to a list of rule inputs that share the rule type.
-        rule_input_translations_mapping is a dict mapping abbreviated language
-        codes to a mapping of rule_type to rule_inputs.
+        rule_types_to_inputs_translations is a dict mapping abbreviated language
+        codes to a mapping of rule_type to rule_types_to_inputs.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
@@ -734,19 +735,28 @@ class Question(python_utils.OBJECT):
         """
         answer_group_dicts = question_state_dict['interaction']['answer_groups']
         for i, answer_group_dict in enumerate(answer_group_dicts):
-            rule_inputs = {}
-
-            # Convert the list of rule specs into the new rule_inputs dict
-            # format.
+            # Convert the list of rule specs into the new rule_types_to_inputs
+            # dict format. Instead of a list of dictionaries that have
+            # properties rule type and rule inputs, the new format
+            # groups rule inputs of the same rule type together by
+            # mapping rule type to a list of rule inputs that share the
+            # same rule type.
+            # I.e. Old format: rule_specs = [
+            #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
+            #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}
+            # ]
+            # New format: rule_types_to_inputs = {
+            #   'Equals': [
+            #       {x: 'Yes'}, {x: 'Y'}
+            #   ]
+            # }
+            rule_types_to_inputs = collections.defaultdict(list)
             for rule_spec_dict in answer_group_dict['rule_specs']:
                 rule_type = rule_spec_dict['rule_type']
-                if rule_type not in rule_inputs:
-                    rule_inputs[rule_type] = []
-                rule_inputs[rule_type].append(
-                    rule_spec_dict['inputs'])
+                rule_types_to_inputs[rule_type].append(rule_spec_dict['inputs'])
             del answer_group_dicts[i]['rule_specs']
-            answer_group_dicts[i]['rule_input_translations_mapping'] = {}
-            answer_group_dicts[i]['rule_inputs'] = rule_inputs
+            answer_group_dicts[i]['rule_types_to_inputs_translations'] = {}
+            answer_group_dicts[i]['rule_types_to_inputs'] = dict(rule_types_to_inputs)
         return question_state_dict
 
     @classmethod

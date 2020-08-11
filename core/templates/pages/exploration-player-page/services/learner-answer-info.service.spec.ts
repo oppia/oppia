@@ -79,7 +79,7 @@ describe('Learner answer info service', function() {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_input_translations_mapping: {},
+          rule_types_to_inputs_translations: {},
           rule_inputs: {
             Equals: [
               {
@@ -99,7 +99,7 @@ describe('Learner answer info service', function() {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_input_translations_mapping: {},
+          rule_types_to_inputs_translations: {},
           rule_inputs: {
             Equals: [
               {

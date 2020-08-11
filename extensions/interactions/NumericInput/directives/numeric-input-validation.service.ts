@@ -94,8 +94,8 @@ export class NumericInputValidationService {
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
           lb: null,
           ub: null,
           lbi: false,
@@ -142,14 +142,14 @@ export class NumericInputValidationService {
           // check for redundant rules in both directions if rules are in the
           // same AnswerGroup.
           const redundantWithinAnswerGroup = (
-            ranges[k].answerGroupIndex - 1 === i &&
+            ranges[k].answerGroupIndex === i &&
             (isEnclosedBy(range, ranges[k]) || isEnclosedBy(ranges[k], range))
           );
 
           // AnswerGroups do have a set order. If rules are not in the same
           // AnswerGroup we only check in one direction.
           const redundantBetweenAnswerGroups = (
-            ranges[k].answerGroupIndex - 1 !== i &&
+            ranges[k].answerGroupIndex !== i &&
             isEnclosedBy(range, ranges[k])
           );
 
@@ -159,8 +159,8 @@ export class NumericInputValidationService {
               message: (
                 'Rule ' + (j + 1) + ' from answer group ' +
                 (i + 1) + ' will never be matched because it ' +
-                'is made redundant by rule ' + ranges[k].ruleIndex +
-                ' from answer group ' + ranges[k].answerGroupIndex + '.')
+                'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                ' from answer group ' + (ranges[k].answerGroupIndex + 1) + '.')
             });
           }
         }

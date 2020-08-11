@@ -311,7 +311,7 @@ describe('Image preloader service', function() {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   Equals: [
                     {
@@ -332,7 +332,7 @@ describe('Image preloader service', function() {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   Equals: [
                     {
@@ -396,7 +396,7 @@ describe('Image preloader service', function() {
               }
             },
             answer_groups: [{
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {
                 Contains: [
                   {
@@ -416,7 +416,7 @@ describe('Image preloader service', function() {
                 missing_prerequisite_skill_id: null
               }
             }, {
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {
                 Contains: [
                   {

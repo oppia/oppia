@@ -77,7 +77,7 @@ describe('Question Suggestion Review Modal Controller', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
             }],
             confirmed_unclassified_answers: [],
@@ -224,7 +224,7 @@ describe('Question Suggestion Review Modal Controller', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
             }],
             confirmed_unclassified_answers: [],

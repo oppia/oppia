@@ -73,13 +73,8 @@ describe('InteractiveMapValidationService', () => {
         value: 0
       }
     };
-    const goodAnswerGroup = agof.createNew(
-      {},
-      goodDefaultOutcome,
-      null,
-      null
-    );
-    goodAnswerGroup.updateRuleInputs([rof.createFromBackendDict({
+    const goodAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    goodAnswerGroup.updateRuleTypesToInputs([rof.createFromBackendDict({
       rule_type: 'Within',
       inputs: {
         d: 100
@@ -144,9 +139,9 @@ describe('InteractiveMapValidationService', () => {
   it('should expect all rule types to refer to positive distances',
     () => {
       (<InteractiveMapRuleInputs>
-        goodAnswerGroups[0].ruleInputs.Within[0]).d = -90;
+        goodAnswerGroups[0].ruleTypesToInputs.Within[0]).d = -90;
       (<InteractiveMapRuleInputs>
-        goodAnswerGroups[0].ruleInputs.NotWithin[0]).d = -180;
+        goodAnswerGroups[0].ruleTypesToInputs.NotWithin[0]).d = -180;
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);

@@ -72,7 +72,7 @@ describe('State Interaction Stats Service', () => {
       interaction: {
         answer_groups: [
           {
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Equals: [{x: 'hola!'}]
             },
@@ -88,7 +88,7 @@ describe('State Interaction Stats Service', () => {
             tagged_skill_misconception_id: null,
           },
           {
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Contains: [{x: 'hola'}]
             },
@@ -104,7 +104,7 @@ describe('State Interaction Stats Service', () => {
             tagged_skill_misconception_id: null,
           },
           {
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               FuzzyEquals: [{x: 'hola'}]
             },

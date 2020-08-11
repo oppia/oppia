@@ -519,8 +519,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
                 }]
@@ -547,20 +547,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Validate RuleSpec.
-        answer_group.rule_inputs['Contains'][0] = {}
+        answer_group.rule_types_to_inputs['Contains'][0] = {}
         self._assert_validation_error(
             exploration, 'RuleSpec \'Contains\' is missing inputs')
 
-        answer_group.rule_inputs['Contains'][0] = 'Inputs string'
+        answer_group.rule_types_to_inputs['Contains'][0] = 'Inputs string'
         self._assert_validation_error(
             exploration, 'Expected inputs to be a dict')
 
-        answer_group.rule_inputs = {
+        answer_group.rule_types_to_inputs = {
             'FakeRuleType': [{'x': 'Test'}]
         }
         self._assert_validation_error(exploration, 'Unrecognized rule type')
 
-        answer_group.rule_inputs = {
+        answer_group.rule_types_to_inputs = {
             'Contains': [{'x': 15}]
         }
         with self.assertRaisesRegexp(
@@ -568,7 +568,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ):
             exploration.validate()
 
-        answer_group.rule_inputs['Contains'][0] = {'x': '{{ExampleParam}}'}
+        answer_group.rule_types_to_inputs['Contains'][0] = {'x': '{{ExampleParam}}'}
         self._assert_validation_error(
             exploration,
             'RuleSpec \'Contains\' has an input with name \'x\' which refers '
@@ -766,8 +766,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
                 }]
@@ -793,8 +793,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
                 }]
@@ -811,21 +811,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'to be <skill_id>-<misconception_id>, received '
             'invalid_tagged_skill_misconception_id')
 
-        init_state.interaction.answer_groups[0].rule_inputs = []
+        init_state.interaction.answer_groups[0].rule_types_to_inputs = []
         self._assert_validation_error(
-            exploration, 'Expected answer group rule_inputs to be a dict')
-        init_state.interaction.answer_groups[0].rule_inputs = {}
+            exploration, 'Expected answer group rule_types_to_inputs to be a dict')
+        init_state.interaction.answer_groups[0].rule_types_to_inputs = {}
 
         init_state.interaction.answer_groups[
-            0].rule_input_translations_mapping = []
+            0].rule_types_to_inputs_translations = []
         self._assert_validation_error(
             exploration,
             (
-                'Expected answer group rule_input_translations_mapping '
+                'Expected answer group rule_types_to_inputs_translations '
                 'to be a dict')
         )
         init_state.interaction.answer_groups[
-            0].rule_input_translations_mapping = {}
+            0].rule_types_to_inputs_translations = {}
 
         first_answer_group = init_state.interaction.answer_groups[0]
         first_answer_group.tagged_skill_misconception_id = None
@@ -1237,8 +1237,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
                 }]
@@ -1614,8 +1614,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
                 }]
@@ -6406,8 +6406,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: InputString
         tagged_skill_misconception_id: null
@@ -6974,8 +6974,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: InputString
         tagged_skill_misconception_id: null
@@ -7130,8 +7130,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: InputString
         tagged_skill_misconception_id: null
@@ -7309,8 +7309,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: InputString
         tagged_skill_misconception_id: null
@@ -7477,8 +7477,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: InputString
         tagged_skill_misconception_id: null
@@ -7667,8 +7667,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: InputString
         tagged_skill_misconception_id: null
@@ -7963,8 +7963,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: InputString
         tagged_skill_misconception_id: null
@@ -8240,8 +8240,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: InputString
         tagged_skill_misconception_id: null
@@ -8896,8 +8896,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: 0
           - x: 1
@@ -8912,8 +8912,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: 0
         tagged_skill_misconception_id: null
@@ -8992,8 +8992,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x:
             - <p>This is value1 for ItemSelectionInput</p>
@@ -9328,8 +9328,8 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_input_translations_mapping: {}
-        rule_inputs:
+        rule_types_to_inputs_translations: {}
+        rule_types_to_inputs:
           Equals:
           - x: InputString
         tagged_skill_misconception_id: null
@@ -9756,8 +9756,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state1.update_interaction_solution(solution)
 
         answer_group_list2 = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Equals': [{
                     'x': 0
                 }, {
@@ -9778,8 +9778,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Equals': [{
                     'x': 0
                 }]
@@ -9799,8 +9799,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Equals': [{
                     'x': ['<p>This is value1 for ItemSelectionInput</p>']
                 }, {

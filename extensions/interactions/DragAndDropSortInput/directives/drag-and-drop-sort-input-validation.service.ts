@@ -98,7 +98,7 @@ export class DragAndDropSortInputValidationService {
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 
-    const shouldCheckForRedudancy = function(earlierRule, laterRule) {
+    const shouldCheckForRedundancy = function(earlierRule, laterRule) {
       return (
         earlierRule.type ===
         'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
@@ -143,8 +143,8 @@ export class DragAndDropSortInputValidationService {
           }
         }
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1
+          answerGroupIndex: i,
+          ruleIndex: j
         };
         seenItems = [];
         areAnyItemsEmpty = false;
@@ -259,20 +259,20 @@ export class DragAndDropSortInputValidationService {
         }
 
         for (var k = 0; k < ranges.length; k++) {
-          var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
-            getRulesAsList()[ranges[k].ruleIndex - 1];
+          var earlierRule = answerGroups[ranges[k].answerGroupIndex].
+            getRulesAsList()[ranges[k].ruleIndex];
 
           // Rules inside an AnswerGroup do not have a set order. We should
           // check for redundant rules in both directions if rules are in the
           // same AnswerGroup.
           const redundantWithinAnswerGroup = (
-            ranges[k].answerGroupIndex - 1 === i &&
+            ranges[k].answerGroupIndex === i &&
             (
               (
-                shouldCheckForRedudancy(earlierRule, rule) &&
+                shouldCheckForRedundancy(earlierRule, rule) &&
                 checkRedundancy(earlierRule, rule)
               ) || (
-                shouldCheckForRedudancy(rule, earlierRule) &&
+                shouldCheckForRedundancy(rule, earlierRule) &&
                 checkRedundancy(rule, earlierRule)
               )
             )
@@ -281,9 +281,9 @@ export class DragAndDropSortInputValidationService {
           // AnswerGroups do have a set order. If rules are not in the same
           // AnswerGroup we only check in one direction.
           const redundantBetweenAnswerGroups = (
-            ranges[k].answerGroupIndex - 1 !== i &&
+            ranges[k].answerGroupIndex !== i &&
             (
-              shouldCheckForRedudancy(earlierRule, rule) &&
+              shouldCheckForRedundancy(earlierRule, rule) &&
               checkRedundancy(earlierRule, rule)
             )
           );
@@ -294,8 +294,8 @@ export class DragAndDropSortInputValidationService {
               message: (
                 `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
                 'will never be matched because it is made redundant by ' +
-                `rule ${ranges[k].ruleIndex} from answer group ` +
-                `${ranges[k].answerGroupIndex}.`)
+                `rule ${ranges[k].ruleIndex + 1} from answer group ` +
+                `${ranges[k].answerGroupIndex + 1}.`)
             });
           }
         }

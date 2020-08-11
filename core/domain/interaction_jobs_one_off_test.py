@@ -123,8 +123,8 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'IsEqualToOrdering': [{
                     'x': [
                         ['a'],
@@ -159,8 +159,8 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'HasElementXBeforeElementY': [{
                     'x': '',
                     'y': ''
@@ -190,8 +190,8 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': '',
                     'y': 1
@@ -310,8 +310,8 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'IsEqualToOrdering': [{
                     'x': []
                 }, {
@@ -387,8 +387,8 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Equals': [{
                     'x': '1'
                 }]
@@ -445,8 +445,8 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Equals': [{
                     'x': '0'
                 }, {
@@ -516,8 +516,8 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Equals': [{
                     'x': '0'
                 }, {
@@ -593,8 +593,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Equals': [{
                     'x': ['<p>This is value1 for ItemSelection</p>']
                 }, {
@@ -648,8 +648,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Equals': [{
                     'x': ['<p>This is value1 for ItemSelection</p>']
                 }, {
@@ -720,8 +720,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
+            'rule_types_to_inputs_translations': {},
+            'rule_types_to_inputs': {
                 'Equals': [{
                     'x': ['<p>This is value1 for ItemSelection</p>']
                 }, {

@@ -217,7 +217,7 @@ export class ItemSelectionInputValidationService {
             }
           }
         });
-        if (ruleInputs.length === 0) {
+        if (ruleTypesToInputs.length === 0) {
           if (rule.type === 'ContainsAtLeastOneOf') {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,

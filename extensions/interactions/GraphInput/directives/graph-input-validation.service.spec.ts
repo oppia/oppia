@@ -99,13 +99,8 @@ describe('GraphInputValidationService', () => {
       }
     };
 
-    var answerGroup = agof.createNew(
-      {},
-      goodDefaultOutcome,
-      null,
-      null
-    );
-    answerGroup.updateRuleInputs(
+    var answerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    answerGroup.updateRuleTypesToInputs(
       [rof.createFromBackendDict({
         inputs: {
           g: {
@@ -164,11 +159,11 @@ describe('GraphInputValidationService', () => {
     'number of vertices of 10 for isomorphism check.',
   () => {
     (<GraphIsomorphicRuleInputs>
-      answerGroups[0].ruleInputs.IsIsomorphicTo[0]).g.vertices = new Array(11);
+      answerGroups[0].ruleTypesToInputs.IsIsomorphicTo[0]).g.vertices = new Array(11);
     (<GraphIsomorphicRuleInputs>
-      answerGroups[0].ruleInputs.IsIsomorphicTo[1]).g.vertices = new Array(11);
+      answerGroups[0].ruleTypesToInputs.IsIsomorphicTo[1]).g.vertices = new Array(11);
     (<GraphIsomorphicRuleInputs>
-      answerGroups[1].ruleInputs.IsIsomorphicTo[0]).g.vertices = new Array(11);
+      answerGroups[1].ruleTypesToInputs.IsIsomorphicTo[0]).g.vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);

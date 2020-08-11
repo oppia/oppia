@@ -111,7 +111,7 @@ describe('Solution Verification Service', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Contains: [
                 {
@@ -178,7 +178,7 @@ describe('Solution Verification Service', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {},
             outcome: {
               dest: 'default',

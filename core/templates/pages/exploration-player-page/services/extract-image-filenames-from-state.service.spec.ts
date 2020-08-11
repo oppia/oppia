@@ -192,7 +192,7 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   Equals: [
                     {
@@ -212,7 +212,7 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   Equals: [
                     {
@@ -303,7 +303,7 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   Equals: [
                     {
@@ -327,7 +327,7 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   Equals: [
                     {
@@ -395,7 +395,7 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   IsInRegion: [
                     {
@@ -416,7 +416,7 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   IsInRegion: [
                     {
@@ -436,7 +436,7 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   IsInRegion: [
                     {
@@ -457,7 +457,7 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   IsInRegion: [
                     {
@@ -478,7 +478,7 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {
                   IsInRegion: [
                     {
@@ -605,7 +605,7 @@ describe('Extracting Image file names in the state service', () => {
               }
             },
             answer_groups: [{
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {
                 Contains: [
                   {
@@ -624,7 +624,7 @@ describe('Extracting Image file names in the state service', () => {
                 refresher_exploration_id: null
               }
             }, {
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {
                 Contains: [
                   {

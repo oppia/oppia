@@ -70,7 +70,7 @@ describe('Responses Service', function() {
             html: ''
           },
         },
-        rule_input_translations_mapping: {},
+        rule_types_to_inputs_translations: {},
         rule_inputs: {},
       }],
       default_outcome: {
@@ -101,7 +101,7 @@ describe('Responses Service', function() {
             html: ''
           },
         },
-        rule_input_translations_mapping: {},
+        rule_types_to_inputs_translations: {},
         rule_inputs: {
           '': [
             {
@@ -204,7 +204,7 @@ describe('Responses Service', function() {
 
     // Reassign only updated properties.
     var expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0].updateRuleInputs(updatedAnswerGroup.rules);
+    expectedAnswerGroup[0].updateRuleTypesToInputs(updatedAnswerGroup.rules);
     expectedAnswerGroup[0].taggedSkillMisconceptionId =
       updatedAnswerGroup.taggedSkillMisconceptionId;
     expectedAnswerGroup[0].outcome.feedback = updatedAnswerGroup.feedback;
@@ -251,7 +251,7 @@ describe('Responses Service', function() {
 
     // Reassign only updated properties.
     var expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0].updateRuleInputs(updatedAnswerGroup.rules);
+    expectedAnswerGroup[0].updateRuleTypesToInputs(updatedAnswerGroup.rules);
     expectedAnswerGroup[0].taggedSkillMisconceptionId =
       updatedAnswerGroup.taggedSkillMisconceptionId;
     expectedAnswerGroup[0].outcome.feedback = updatedAnswerGroup.feedback;
@@ -349,7 +349,7 @@ describe('Responses Service', function() {
 
     var expectedRules = ['c'];
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleInputs[''][0].x = expectedRules;
+    expectedAnswerGroup[0].ruleTypesToInputs[''][0].x = expectedRules;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerGroup(0)).toEqual(
@@ -382,8 +382,8 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleInputs[''][0].x = ['f', 'd', 'e'];
-    expectedAnswerGroup[0].ruleInputs[''][0].y = ['d', 'e', 'f'];
+    expectedAnswerGroup[0].ruleTypesToInputs[''][0].x = ['f', 'd', 'e'];
+    expectedAnswerGroup[0].ruleTypesToInputs[''][0].y = ['d', 'e', 'f'];
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerGroup(0)).toEqual(
@@ -395,8 +395,8 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and rule type is' +
     ' HasElementXAtPositionY', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
-    delete interactionDataWithRules.answerGroups[0].ruleInputs[''];
-    interactionDataWithRules.answerGroups[0].ruleInputs = {
+    delete interactionDataWithRules.answerGroups[0].ruleTypesToInputs[''];
+    interactionDataWithRules.answerGroups[0].ruleTypesToInputs = {
       HasElementXAtPositionY: [{
         x: 'b', y: 3
       }]
@@ -423,8 +423,8 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleInputs.HasElementXAtPositionY[0].x = 'c';
-    expectedAnswerGroup[0].ruleInputs.HasElementXAtPositionY[0].y = 1;
+    expectedAnswerGroup[0].ruleTypesToInputs.HasElementXAtPositionY[0].x = 'c';
+    expectedAnswerGroup[0].ruleTypesToInputs.HasElementXAtPositionY[0].y = 1;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -434,8 +434,8 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and rule type is' +
     ' HasElementXBeforeElementY', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
-    delete interactionDataWithRules.answerGroups[0].ruleInputs[''];
-    interactionDataWithRules.answerGroups[0].ruleInputs = {
+    delete interactionDataWithRules.answerGroups[0].ruleTypesToInputs[''];
+    interactionDataWithRules.answerGroups[0].ruleTypesToInputs = {
       HasElementXBeforeElementY: [{
         x: 'a', y: 'b'
       }]
@@ -465,8 +465,9 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleInputs.HasElementXBeforeElementY[0].x = 'a';
-    expectedAnswerGroup[0].ruleInputs.HasElementXBeforeElementY[0].y = 'd';
+    const ruleTypesToInputs = expectedAnswerGroup[0].ruleTypesToInputs;
+    ruleTypesToInputs.HasElementXBeforeElementY[0].x = 'a';
+    ruleTypesToInputs.HasElementXBeforeElementY[0].y = 'd';
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -476,8 +477,8 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and choices had changed', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
     // Any other method from DragAndDropSortInputRulesService.
-    delete interactionDataWithRules.answerGroups[0].ruleInputs[''];
-    interactionDataWithRules.answerGroups[0].ruleInputs = {
+    delete interactionDataWithRules.answerGroups[0].ruleTypesToInputs[''];
+    interactionDataWithRules.answerGroups[0].ruleTypesToInputs = {
       IsEqualToOrderingWithOneItemAtIncorrectPosition: [{
         x: [['a'], ['b'], ['c']]
       }]
@@ -504,10 +505,9 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    (expectedAnswerGroup[0]
-      .ruleInputs.IsEqualToOrderingWithOneItemAtIncorrectPosition[0].x = (
-        [['d'], ['e'], ['f']])
-    );
+    const ruleTypesToInputs = expectedAnswerGroup[0].ruleTypesToInputs;
+    ruleTypesToInputs.IsEqualToOrderingWithOneItemAtIncorrectPosition[0].x = (
+      [['d'], ['e'], ['f']]);
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -643,7 +643,7 @@ describe('Responses Service', function() {
 
     var updatedAnswerGroups = [
       AnswerGroupObjectFactory.createNew(
-        [], OutcomeObjectFactory.createNew('Hola', '1', 'Feedback text'),
+        OutcomeObjectFactory.createNew('Hola', '1', 'Feedback text'),
         'Training data text', '0'
       )
     ];
@@ -675,7 +675,7 @@ describe('Responses Service', function() {
 
     var updatedAnswerGroups = [
       AnswerGroupObjectFactory.createNew(
-        [], OutcomeObjectFactory.createNew('Hola', '1', 'Feedback text'),
+        OutcomeObjectFactory.createNew('Hola', '1', 'Feedback text'),
         'Training data text', '0'
       )
     ];

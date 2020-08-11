@@ -207,7 +207,7 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
               training_data: []
             }],
@@ -290,7 +290,7 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
               training_data: []
             }, {
@@ -301,7 +301,7 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
               training_data: []
             }],
@@ -389,7 +389,7 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
               training_data: []
             }],
@@ -470,7 +470,7 @@ describe('Exploration Warnings Service', function() {
                     html: ''
                   },
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {},
                 training_data: []
               }],
@@ -563,7 +563,7 @@ describe('Exploration Warnings Service', function() {
                     html: ''
                   },
                 },
-                rule_input_translations_mapping: {},
+                rule_types_to_inputs_translations: {},
                 rule_inputs: {},
                 training_data: []
               }],
@@ -666,7 +666,7 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
               training_data: []
             }],
@@ -755,7 +755,7 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
               training_data: []
             }],
@@ -809,7 +809,7 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {},
               training_data: []
             }],
@@ -919,7 +919,7 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_input_translations_mapping: {},
+              rule_types_to_inputs_translations: {},
               rule_inputs: {
                 Equals: [
                   {

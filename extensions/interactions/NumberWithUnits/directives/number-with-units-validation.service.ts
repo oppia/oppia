@@ -110,13 +110,13 @@ export class NumberWithUnitsValidationService {
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
         };
 
         for (var k = 0; k < ranges.length; k++) {
-          var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
-            getRulesAsList()[ranges[k].ruleIndex - 1];
+          var earlierRule = answerGroups[ranges[k].answerGroupIndex].
+            getRulesAsList()[ranges[k].ruleIndex];
           if (earlierRule.type === 'IsEqualTo' &&
             rule.type === 'IsEqualTo') {
             if (checkEquality.call(this, earlierRule, rule)) {
@@ -125,8 +125,8 @@ export class NumberWithUnitsValidationService {
                 message: (
                   'Rule ' + (j + 1) + ' from answer group ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + ranges[k].ruleIndex +
-                  ' from answer group ' + ranges[k].answerGroupIndex +
+                  'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                  ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
                   '.')
               });
             }
@@ -141,8 +141,8 @@ export class NumberWithUnitsValidationService {
                 message: (
                   'Rule ' + (j + 1) + ' from answer group ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + ranges[k].ruleIndex +
-                  ' from answer group ' + ranges[k].answerGroupIndex +
+                  'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                  ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
                   '.')
               });
             }

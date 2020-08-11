@@ -241,7 +241,7 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Equals: [
                 {
@@ -297,7 +297,7 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Equals: [
                 {
@@ -410,7 +410,7 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Equals: [
                 {
@@ -589,7 +589,7 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations_mapping: {},
+            rule_types_to_inputs_translations: {},
             rule_inputs: {
               Equals: [
                 {

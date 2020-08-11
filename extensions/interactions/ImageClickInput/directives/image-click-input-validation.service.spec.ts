@@ -100,8 +100,8 @@ describe('ImageClickInputValidationService', () => {
       }
     };
 
-    const goodAnswerGroup = agof.createNew({}, goodDefaultOutcome, null, null);
-    goodAnswerGroup.updateRuleInputs([rof.createFromBackendDict({
+    const goodAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    goodAnswerGroup.updateRuleTypesToInputs([rof.createFromBackendDict({
       rule_type: 'IsInRegion',
       inputs: {
         x: 'SecondLabel'
@@ -112,7 +112,7 @@ describe('ImageClickInputValidationService', () => {
 
   it('should expect a customization argument for image and regions',
     () => {
-      goodAnswerGroups[0].updateRuleInputs([]);
+      goodAnswerGroups[0].updateRuleTypesToInputs([]);
       expect(() => {
         validatorService.getAllWarnings(
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
@@ -168,7 +168,7 @@ describe('ImageClickInputValidationService', () => {
     }]);
 
     customizationArguments.imageAndRegions.value.labeledRegions = [];
-    goodAnswerGroups[0].updateRuleInputs([]);
+    goodAnswerGroups[0].updateRuleTypesToInputs([]);
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -180,7 +180,7 @@ describe('ImageClickInputValidationService', () => {
 
   it('should expect rule types to reference valid region labels', () => {
     (<ImageClickRuleInputs>
-      goodAnswerGroups[0].ruleInputs.IsInRegion[0]).x = 'FakeLabel';
+      goodAnswerGroups[0].ruleTypesToInputs.IsInRegion[0]).x = 'FakeLabel';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

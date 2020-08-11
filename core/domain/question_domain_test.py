@@ -354,8 +354,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None
                 },
-                'rule_input_translations_mapping': {},
-                'rule_inputs': {
+                'rule_types_to_inputs_translations': {},
+                'rule_types_to_inputs': {
                     'Contains': [{'x': 'Test'}]
                 },
                 'training_data': [],
