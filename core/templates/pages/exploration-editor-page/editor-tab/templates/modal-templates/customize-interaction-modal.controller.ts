@@ -126,7 +126,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         }
       }
 
-      $scope.$broadcast('schemaBasedFormsShown');
+      StateCustomizationArgsService.onSchemaBasedFormsShown.emit();
       $scope.form = {};
       $scope.hasCustomizationArgs = (
         StateCustomizationArgsService.displayed &&
@@ -195,7 +195,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         $scope.hasCustomizationArgs = true;
       }
 
-      $scope.$broadcast('schemaBasedFormsShown');
+      StateCustomizationArgsService.onSchemaBasedFormsShown.emit();
       $scope.form = {};
     };
 
