@@ -9,7 +9,7 @@
           There are no questions in this skill.
         </span>
       </div>
-      <div  ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill() track by $index" class="question-list-item" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
+      <div  ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill() track by $index" class="question-list-item protractor-test-question-list-item" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
         <div ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDifficulty())">
           <div class="question-data">
             <angular-html-bind class="question-text" html-data="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()"></angular-html-bind>
