@@ -176,7 +176,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 10, this.rules)
       ).toEqual(
         this.acrof.createNew(
-          this.oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
+          this.oof.createNew('outcome 1', 'feedback_1', '', []), 0,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
       expect(
@@ -184,7 +184,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 5, this.rules)
       ).toEqual(
         this.acrof.createNew(
-          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
+          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
       expect(
@@ -192,7 +192,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 6, this.rules)
       ).toEqual(
         this.acrof.createNew(
-          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
+          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
     });
 
@@ -204,7 +204,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 7, this.rules)
       ).toEqual(
         this.acrof.createNew(
-          this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
+          this.oof.createNew('default', 'default_outcome', '', []), 2,
           ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
     });
 
@@ -357,7 +357,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 0, this.rules)
         ).toEqual(
           this.acrof.createNew(
-            state.interaction.answerGroups[1].outcome, 1, null,
+            state.interaction.answerGroups[1].outcome, 1,
             ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
       });
 
@@ -374,7 +374,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 0, this.rules)
         ).toEqual(
           this.acrof.createNew(
-            this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
+            this.oof.createNew('default', 'default_outcome', '', []), 2,
             ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
       });
   });
@@ -480,7 +480,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 'abc', this.rules)
         ).toEqual(
           this.acrof.createNew(
-            state.interaction.answerGroups[0].outcome, 0, null,
+            state.interaction.answerGroups[0].outcome, 0,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
 
         expect(
@@ -488,7 +488,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 'xyz', this.rules)
         ).toEqual(
           this.acrof.createNew(
-            state.interaction.answerGroups[1].outcome, 1, null,
+            state.interaction.answerGroups[1].outcome, 1,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
       });
 
@@ -503,7 +503,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 'input', this.rules)
         ).toEqual(
           this.acrof.createNew(
-            state.interaction.answerGroups[1].outcome, 1, 0,
+            state.interaction.answerGroups[1].outcome, 1,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });
   });

@@ -155,7 +155,7 @@ describe('Learner answer info service', function() {
     thirdState = sof.createFromBackendDict('demo state', stateDict);
     spyOn(AnswerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(acrof.createNew(
-        oof.createNew('default', 'default_outcome', '', []), 2, 0,
+        oof.createNew('default', 'default_outcome', '', []), 2,
         DEFAULT_OUTCOME_CLASSIFICATION));
     mockAnswer = 'This is my answer';
     mockInteractionRulesService = {

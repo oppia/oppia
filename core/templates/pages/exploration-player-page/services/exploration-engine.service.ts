@@ -370,7 +370,6 @@ angular.module('oppia').factory('ExplorationEngineService', [
             LearnerParamsService.getAllParams(),
             answer,
             classificationResult.answerGroupIndex,
-            classificationResult.ruleIndex,
             classificationResult.classificationCategorization,
             feedbackIsUseful);
 
