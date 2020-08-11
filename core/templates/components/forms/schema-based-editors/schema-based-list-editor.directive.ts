@@ -191,7 +191,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               $scope.isAddItemButtonPresent = false;
             };
 
-            $scope._onChildFormSubmit = function(evt) {
+            $scope._onChildFormSubmit = function() {
               if (!$scope.isAddItemButtonPresent) {
                 /**
                  * If form submission happens on last element of the set (i.e
@@ -210,11 +210,10 @@ angular.module('oppia').directive('schemaBasedListEditor', [
                  */
                 (<HTMLElement>document.activeElement).blur();
               }
-              evt.stopPropagation();
             };
             ctrl.directiveSubscriptions.add(
               SchemaFormSubmittedService.onSubmittedSchemaBasedForm.subscribe(
-                () => $scope._onChildFormSubmit
+                () => $scope._onChildFormSubmit()
               )
             );
 
