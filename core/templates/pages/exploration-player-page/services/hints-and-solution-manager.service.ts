@@ -19,6 +19,8 @@
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('HintsAndSolutionManagerService', [
   '$rootScope', '$timeout', 'EVENT_NEW_CARD_AVAILABLE',
   'WAIT_FOR_FIRST_HINT_MSEC', 'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
@@ -28,6 +30,7 @@ angular.module('oppia').factory('HintsAndSolutionManagerService', [
     var timeout = null;
     var ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
     var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 60000;
+    var _solutionViewedEventEmitter = new EventEmitter();
 
     var numHintsReleased = 0;
     var numHintsConsumed = 0;
@@ -149,7 +152,7 @@ angular.module('oppia').factory('HintsAndSolutionManagerService', [
       displaySolution: function() {
         hintsDiscovered = true;
         solutionConsumed = true;
-        $rootScope.$broadcast('solutionViewed');
+        _solutionViewedEventEmitter.emit();
         if (tooltipTimeout) {
           $timeout.cancel(tooltipTimeout);
         }
@@ -188,6 +191,9 @@ angular.module('oppia').factory('HintsAndSolutionManagerService', [
             accelerateHintRelease();
           }
         }
+      },
+      get onSolutionViewedEventEmitter() {
+        return _solutionViewedEventEmitter;
       }
     };
   }

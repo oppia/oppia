@@ -103,6 +103,8 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
 var TIME_FADEOUT_MSEC = 100;
@@ -411,6 +413,7 @@ angular.module('oppia').directive('conversationSkin', [
             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
           // The minimum width, in pixels, needed to be able to show two cards
@@ -1309,10 +1312,13 @@ angular.module('oppia').directive('conversationSkin', [
                   QuestionPlayerEngineService.getCurrentQuestion());
               });
 
-              $rootScope.$on('solutionViewed', function(evt, timestamp) {
-                QuestionPlayerStateService.solutionViewed(
-                  QuestionPlayerEngineService.getCurrentQuestion());
-              });
+              ctrl.directiveSubscriptions.add(
+                HintsAndSolutionManagerService.onSolutionViewedEventEmitter
+                  .subscribe(() => {
+                    QuestionPlayerStateService.solutionViewed(
+                      QuestionPlayerEngineService.getCurrentQuestion());
+                  })
+              );
             }
             $rootScope.$on('playerStateChange', function(evt, newStateName) {
               if (!newStateName) {
