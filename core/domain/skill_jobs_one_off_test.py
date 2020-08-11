@@ -411,7 +411,7 @@ class SkillMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         expected_skill1_info = {
             'skill_id': 'skill_id1',
             'latex_strings_with_svg': [
-                '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
+                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)', '+,+,+,+']
         }
         skill_latex_info = overall_result[1]
         self.assertEqual(skill_latex_info[0], expected_skill1_info)

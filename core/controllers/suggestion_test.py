@@ -471,6 +471,30 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_suggestion_to_exploration_handler_with_long_commit_mesage(self):
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        suggestion_to_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id))['suggestions'][0]
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json('%s/exploration/%s/%s' % (
+            feconf.SUGGESTION_ACTION_URL_PREFIX,
+            suggestion_to_accept['target_id'],
+            suggestion_to_accept['suggestion_id']), {
+                'action': u'accept',
+                'commit_message':
+                    u'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                'review_message': u'Accepted'
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Commit messages must be at most 1000 characters long.'
+        )
+
     def test_accept_suggestion(self):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
@@ -1238,7 +1262,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-a')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -1410,7 +1434,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-b')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
