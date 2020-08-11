@@ -88,7 +88,7 @@ def start_google_app_engine_server():
 
     app_yaml_filepath = 'app.yaml'
     p = subprocess.Popen(
-        'yes | %s %s/dev_appserver.py --host 0.0.0.0 --port %s '
+        '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' %
         (

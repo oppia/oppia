@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import subprocess
 import sys
 import tarfile
 import zipfile
@@ -100,6 +101,10 @@ def main(args=None):
             path=os.path.join(
                 common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))
         tar.close()
+        subprocess.call([
+            os.path.join(common.GOOGLE_CLOUD_SDK_BIN, 'gcloud'),
+            'components', 'install', 'cloud-datastore-emulator',
+            'app-engine-python', 'app-engine-python-extras', '--quiet'])
         os.remove('gcloud-sdk.tar.gz')
 
 
