@@ -679,6 +679,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         interaction.customization_args = {15: ''}
         self._assert_validation_error(
+            exploration,
+            (
+                'Expected customization arg value to be a '
+                'InteractionCustomizationArg'
+            )
+        )
+
+        interaction.customization_args = {
+            15: state_domain.InteractionCustomizationArg('', {
+                'type': 'unicode'
+            })
+        }
+        self._assert_validation_error(
             exploration, 'Invalid customization arg name')
 
         interaction.customization_args = valid_text_input_cust_args
@@ -6212,7 +6225,146 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V42
+    YAML_CONTENT_V43 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 43
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 38
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V43
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -6652,7 +6804,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 42
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -6775,7 +6927,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 37
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -6808,7 +6960,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 42
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -6936,7 +7088,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 37
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -6987,7 +7139,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 42
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -7122,7 +7274,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 37
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -7155,7 +7307,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 42
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -7282,7 +7434,7 @@ states:
         ca_customPlaceholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 37
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -7345,7 +7497,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 42
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -7465,7 +7617,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 37
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -7641,7 +7793,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 42
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -7768,7 +7920,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 37
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -7918,7 +8070,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 42
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -8045,7 +8197,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 37
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -8482,7 +8634,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long, single-line-pragma
-    YAML_CONTENT_V42_IMAGE_DIMENSIONS = (
+    YAML_CONTENT_V43_IMAGE_DIMENSIONS = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -8493,7 +8645,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 42
+schema_version: 43
 states:
   Introduction:
     classifier_model_id: null
@@ -8746,7 +8898,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 37
+states_schema_version: 38
 tags: []
 title: title
 """)
@@ -8995,7 +9147,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V42_WITH_IMAGE_CAPTION = (
+    YAML_CONTENT_V43_WITH_IMAGE_CAPTION = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -9006,7 +9158,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 42
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -9133,7 +9285,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 37
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -9150,7 +9302,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V42_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V43_IMAGE_DIMENSIONS)
 
 
     def test_load_from_v27_without_image_caption(self):
@@ -9163,7 +9315,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V42_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V43_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
