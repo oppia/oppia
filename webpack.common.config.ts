@@ -714,6 +714,13 @@ module.exports = {
       ]
     },
     {
+      test: /(directive|component)\.css$/,
+      include: [
+        path.resolve(__dirname, 'core/templates/'),
+      ],
+      use: ['cache-loader', 'style-loader', 'css-loader']
+    },
+    {
       test: /\.css$/,
       include: [
         path.resolve(__dirname, 'extensions'),

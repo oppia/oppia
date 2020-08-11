@@ -87,6 +87,13 @@
       Options
     </a>
     <ul class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
+      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-if="isImprovementsTabEnabled()">
+        <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
+           class="oppia-exploration-editor-tabs-dropdown-element">
+          <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
+          <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
+        </a>
+      </li>
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
         <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
            class="oppia-exploration-editor-tabs-dropdown-element">
@@ -139,13 +146,6 @@
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
         </a>
       </li>
-      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-if="isImprovementsTabEnabled()">
-        <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
-           class="oppia-exploration-editor-tabs-dropdown-element">
-          <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
-          <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
-        </a>
-      </li>
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'history'}">
         <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
            disabled="ExplorationRightsService.isCloned()"
@@ -170,6 +170,14 @@
   </li>
 </ul>
 <ul class="nav navbar-nav oppia-navbar-nav ng-cloak">
+  <li ng-if="isScreenLarge() && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}"
+      class="nav-item d-none d-lg-block">
+    <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
+       class="nav-link oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
+      <i class="material-icons">trending_up</i>
+    </a>
+  </li>
+
   <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>" class="nav-item d-none d-lg-block">
     <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
        class="oppia-editor-navbar-tab-anchor nav-link protractor-test-main-tab">
@@ -223,14 +231,6 @@
     <a  href="#" uib-tooltip="Statistics" aria-label="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-stats-tab">
       <i class="material-icons">&#xE24B;</i>
-    </a>
-  </li>
-
-  <li ng-if="isScreenLarge() && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}"
-      class="nav-item d-none d-lg-block">
-    <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
-       class="nav-link oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
-      <i class="material-icons">trending_up</i>
     </a>
   </li>
 

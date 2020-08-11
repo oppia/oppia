@@ -193,6 +193,19 @@ describe('Exploration stats backend api service', () => {
     expect(onFailure).not.toHaveBeenCalled();
   }));
 
+  it('should not make http call when posting empty list', fakeAsync(async() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    const onFailure = jasmine.createSpy('onFailure');
+    explorationImprovementsBackendApiService.postTasksAsync('eid', [])
+      .then(onSuccess, onFailure);
+
+    httpTestingController.expectNone('/improvements/exploration/eid');
+    flushMicrotasks();
+
+    expect(onSuccess).toHaveBeenCalled();
+    expect(onFailure).not.toHaveBeenCalled();
+  }));
+
   it('should return an ExplorationImprovementsConfig', fakeAsync(async() => {
     const response = (
       explorationImprovementsBackendApiService.getConfigAsync('eid'));
