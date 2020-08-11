@@ -310,7 +310,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
               ctrl.collectionId).then(
               function(collection) {
                 ctrl.collection = collection;
-                $rootScope.$broadcast('collectionLoaded');
 
                 PageTitleService.setPageTitle(
                   ctrl.collection.getTitle() + ' - Oppia');
