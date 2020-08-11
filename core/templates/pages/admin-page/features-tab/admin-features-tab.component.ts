@@ -31,6 +31,15 @@ import { PlatformParameter } from
 import { FeatureGatingAdminBackendApiService } from
   'domain/feature_gating/feature-gating-admin-backend-api.service';
 
+
+import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
+  'domain/feature_gating/PlatformParameterRuleObjectFactory';
+import {
+  PlatformParameterFilterType,
+  PlatformParameterFilterObjectFactory,
+  PlatformParameterFilter
+} from 'domain/feature_gating/PlatformParameterFilterObjectFactory';
+
 @Component({
   selector: 'admin-features-tab',
   templateUrl: './admin-features-tab.directive.html'
@@ -38,44 +47,75 @@ import { FeatureGatingAdminBackendApiService } from
 export class AdminFeaturesTabComponent implements OnInit {
   @Input() setStatusMessage: (msg: string) => void;
 
-  configProperties: {[k: string]: any};
-  featureFlags: PlatformParameter[];
+  featureFlags: PlatformParameter[] = [];
 
   constructor(
     private windowRef: WindowRef,
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
     private apiService: FeatureGatingAdminBackendApiService,
+    // for debug
+    private ruleFactory: PlatformParameterRuleObjectFactory,
+    private filterFactory: PlatformParameterFilterObjectFactory,
   ) {}
 
-  isNonemptyObject(object) {
-    console.log(AdminFeaturesTabConstants.FEATURE_STUB_CONSTANT);
-    var hasAtLeastOneElement = false;
-    for (var property in object) {
-      hasAtLeastOneElement = true;
-    }
-    return hasAtLeastOneElement;
-  }
-
-  async reloadConfigProperties() {
+  async reloadFeatureFlagsAsync() {
     const data = await this.adminDataService.getDataAsync();
 
-    this.configProperties = Object.entries(
-      data.configProperties).map(([k, v]) => ({name: k, value: v}));
-    this.featureFlags = data.featureFlags;
+    data.featureFlags[0].rules = [
+      this.ruleFactory.createFromBackendDict({
+        value_when_matched: true,
+        filters: [
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
+          },
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
+          },
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
+          },
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
+          },
+        ]
+      }),
+      this.ruleFactory.createFromBackendDict({
+        value_when_matched: false,
+        filters: [
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
+          },
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
+          },
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
+          },
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
+          },
+        ]
+      })
+    ];
 
+    // For debug, make it two.
+    this.featureFlags = [
+      ...data.featureFlags,
+      // ...data.featureFlags
+    ];
     console.log(this.featureFlags);
-    console.log(this.configProperties);
   }
 
-  revertToDefaultConfigPropertyValue(configPropertyId) {
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
-      return;
-    }
-  }
-
-  saveConfigProperties() {
+  async saveConfigPropertiesAsync() {
     if (this.adminTaskManager.isTaskRunning()) {
       return;
     }
@@ -84,23 +124,57 @@ export class AdminFeaturesTabComponent implements OnInit {
       return;
     }
 
-    console.log(this.setStatusMessage);
-    this.setStatusMessage('Saving...');
+    // console.log(this.setStatusMessage);
+    // this.setStatusMessage('Saving...');
 
-    this.adminTaskManager.startTask();
-    var newConfigPropertyValues = {};
-    for (var property in this.configProperties) {
-      newConfigPropertyValues[property] = (
-        this.configProperties[property].value);
-    }
+    // this.adminTaskManager.startTask();
+    // var newConfigPropertyValues = {};
+    // for (var property in this.configProperties) {
+    //   newConfigPropertyValues[property] = (
+    //     this.configProperties[property].value);
+    // }
 
     this.setStatusMessage('Data saved successfully.');
     this.adminTaskManager.finishTask();
   }
 
+  addNewRule(feature: PlatformParameter): void {
+    feature.rules.push(
+      this.ruleFactory.createFromBackendDict({
+        filters: [],
+        value_when_matched: false
+      })
+    );
+  }
+
+  addNewFilter(rule: PlatformParameterRule): void {
+    rule.filters.push(
+      this.filterFactory.createFromBackendDict({
+        type: PlatformParameterFilterType.ServerMode,
+        conditions: []
+      })
+    );
+  }
+
+  addNewCondition(filter: PlatformParameterFilter): void {
+    filter.conditions.push(['=', '']);
+  }
+
+  removeRule(feature: PlatformParameter, ruleIndex: number): void {
+    feature.rules.splice(ruleIndex, 1);
+  }
+
+  removeFilter(rule: PlatformParameterRule, filterIndex: number): void {
+    rule.filters.splice(filterIndex, 1);
+  }
+
+  removeCondition(
+      filter: PlatformParameterFilter, conditionIndex: number): void {
+    filter.conditions.splice(conditionIndex, 1);
+  }
+
   ngOnInit() {
-    this.configProperties = {};
-    this.reloadConfigProperties();
+    this.reloadFeatureFlagsAsync();
   }
 }
 

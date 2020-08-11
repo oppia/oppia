@@ -1,28 +1,118 @@
-<div class="oppia-page-card oppia-long-text" style="max-width: 1050px">
-  <h3>Configuration properties</h3>
-  <div class="container" *ngIf="isNonemptyObject(configProperties)" style="margin-left: 0;">
-    <div *ngFor="let o of configProperties">
-      <div class="row protractor-test-config-property" style="padding-bottom: 10px;">
-        <span class="col-lg-2 col-md-2 col-sm-2">
-          <em class="protractor-test-config-title">{{o.value.description}}></em>
-        </span>
-        <span class="col-lg-6 col-md-6 col-sm-6">
-          <!-- <schema-based-editor schema="configPropertyData.schema" local-value="configPropertyData.value">
-          </schema-based-editor> -->
-        </span>
-        <span class="col-lg-2 col-md-2 col-sm-2">
-          <button type="button" class="btn btn-secondary oppia-revert-button" (click)="revertToDefaultConfigPropertyValue(o.key)">
-            Revert to default
-          </button>
-        </span>
+<div *ngFor="let featureFlag of featureFlags; index as featureIndex;" class="container oppia-page-card oppia-long-text">
+  <h2 style="border-bottom: 1px solid #e5e5e5;">{{featureFlag.name}}</h2>
+  <div class="row" style="margin-top: 5px">
+    <div class="col-2"><b>Description:</b></div>
+    <div class="col-10" style="overflow-wrap: anywhere;">{{featureFlag.description}}dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</div>
+  </div>
+  <div class="row" style="margin-top: 5px">
+    <div class="col-2"><b>Feature Stage:</b></div>
+    <div class="col-10">{{featureFlag.featureStage}}</div>
+  </div>
+  <div class="row" style="margin-top: 5px">
+    <div class="col-2"><b>Default:</b></div>
+    <div class="col-10">{{featureFlag.defaultValue ? 'Enabled' : 'Disabled'}}</div>
+  </div>
+  <div class="row" style="margin-top: 5px">
+    <div class="col-2">
+      <div class="row">
+        <div class="col"><b>Rules:</b></div>
+      </div>
+      <div class="row oppia-feature-tab-horizon-center">
+        <div class="col"><button class="btn btn-secondary" (click)="addNewRule(featureFlag)">Add Rule</button></div>
       </div>
     </div>
-
-    <button (click)="saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
-    <button (click)="reloadConfigProperties()">Undo changes</button>
-  </div>
-
-  <div *ngIf="!isNonemptyObject(configProperties)">
-    No configuration properties are available.
+    <div class="col-10">
+      <div *ngIf="featureFlag.rules.length === 0">
+        No rule.
+      </div>
+      <!-- Rules -->
+      <div *ngFor="let rule of featureFlag.rules; index as ruleIndex" class="container" style="margin-bottom: 15px;">
+        <div class="row">
+          <div class="col-10" style="border: 1px solid #e5e5e5;">
+            <div class="row">
+              <div class="col-2"><b>If Matched:</b></div>
+              <div class="col-10">{{rule.valueWhenMatched ? 'Enabled' : 'Disabled'}}</div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+              <div class="col-2">
+                <div class="row"><div class="col"><b>Filters:</b></div></div>
+                <div class="row">
+                  <div class="col oppia-feature-tab-horizon-center">
+                    <button class="btn btn-secondary" (click)="addNewFilter(rule)">Add Filter</button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-10">
+                <div *ngIf="rule.filters.length === 0">No filter.</div>
+                <!-- Filters -->
+                <div *ngFor="let filter of rule.filters; index as filterIndex" class="container" style="margin-bottom: 5px;">
+                  <div class="row">
+                    <div class="col-9" style="border: 1px solid #e5e5e5;">
+                      <div class="row">
+                        <div class="col-2"><b>Type:</b></div>
+                        <div class="col-10">{{filter.type}}</div>
+                      </div>
+                      <div class="row">
+                        <div class="col-4">
+                          <div class="row"><div class="col"><b>Conditions:</b></div></div>
+                          <div class="row">
+                            <div class="col oppia-feature-tab-horizon-center">
+                              <button class="btn btn-secondary" (click)="addNewCondition(filter)">Add</button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-8">
+                          <!-- Conditions -->
+                          <div *ngFor="let condition of filter.conditions; index as conditionIndex"
+                              class="row"
+                              style="border: 1px dotted #e5e5e5; margin-bottom: 5px;">
+                            <div class="col-4">{{condition[0]}}</div>
+                            <div class="col-4">{{condition[1]}}</div>
+                            <div class="col-3 col-offset-1 oppia-feature-tab-center">
+                              <button class="btn btn-secondary" (click)="removeCondition(filter, conditionIndex)">x</button>
+                            </div>
+                          </div>
+                          <div *ngIf="filter.conditions.length === 0" class="row">
+                            <div class="col">No condition specified.</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-3 oppia-feature-tab-center">
+                      <button class="btn btn-secondary" (click)="removeFilter(rule, ruleFilter)">Remove</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-2 oppia-feature-tab-center">
+            <button class="btn btn-secondary" (click)="removeRule(featureFlag, ruleIndex)">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<div *ngIf="featureFlags.length === 0" class="oppia-page-card oppia-long-text" style="max-width: 1050px">
+  No platform features are available.
+</div>
+
+<style>
+  .oppia-feature-tab-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .oppia-feature-tab-horizon-center {
+    display: flex;
+    justify-content: center;
+  }
+
+  .oppia-feature-tab-vertical-center {
+    display: flex;
+    align-items: center;
+  }
+</style>
