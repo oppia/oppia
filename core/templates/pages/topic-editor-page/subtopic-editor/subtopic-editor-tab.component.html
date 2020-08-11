@@ -34,9 +34,9 @@
                      maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>"
                      ng-change="$ctrl.resetErrorMsg()">
               <span class="oppia-input-box-subtitle">
-                <i>
+                <em>
                   Subtopic title should be at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
-                </i>
+                </em>
               </span>
             </form>
             <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
@@ -46,6 +46,27 @@
               <em>The maximum length of subtopic title is 80 characters.</em>
             </span>
           </div>
+          <div class="subtopic-url-fragment">
+            <p>
+              <strong>Url Fragment*</strong>
+            </p>
+            <form class="form-horizontal" role="form">
+              <input class="form-control protractor-test-subtopic-url-fragment-field"
+                     ng-class="{'is-invalid': $ctrl.subtopicUrlFragmentExists || !$ctrl.subtopicUrlFragmentIsValid}"
+                     type="text"
+                     ng-blur="$ctrl.updateSubtopicUrlFragment($ctrl.editableUrlFragment)"
+                     ng-model="$ctrl.editableUrlFragment"
+                     maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]>">
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                </em>
+              </span>
+            </form>
+            <div class="oppia-input-box-subtitle text-danger" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicUrlFragmentExists">
+              <em>The subtopic url fragment is not unique.</em>
+            </div>
+          </div>
           <div class="subtopic-html">
             <div  ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">
               <p>
@@ -54,9 +75,9 @@
               </p>
             </div>
             <span class="oppia-input-box-subtitle">
-              <i>
+              <em>
                 Gives learner an overview of how to perform a skill. Go to the preview tab to preview.
-              </i>
+              </em>
             </span>
             <div class="text-right" ng-if="$ctrl.schemaEditorIsShown">
               <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
@@ -259,7 +280,8 @@
     margin-right: 3%;
     width: 50%;
   }
-  .subtopic-content .subtopic-thumbnail {
+  .subtopic-content .subtopic-thumbnail,
+  .subtopic-content, .subtopic-url-fragment {
     margin: 20px 0;
   }
   .subtopic-content .subtopic-html {

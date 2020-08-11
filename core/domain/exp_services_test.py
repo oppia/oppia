@@ -4948,18 +4948,14 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         self.set_config_property((
             config_domain
             .MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH), 6)
+        self.set_config_property((
+            config_domain
+            .MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH), 4)
+
         self.assertEqual(
             exp_services.get_batch_of_exps_for_latex_svg_generation(),
             expected_output)
 
-        expected_output_when_batch_is_limited = {
-            'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
-            'exp_id2': ['+,-,-,+', '\\sqrt{x}'],
-        }
-        with self.swap(feconf, 'MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH', 2):
-            self.assertEqual(
-                exp_services.get_batch_of_exps_for_latex_svg_generation(),
-                expected_output_when_batch_is_limited)
         expected_output_when_number_of_svgs_is_limited = {
             'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
             'exp_id2': ['+,-,-,+', '\\sqrt{x}'],

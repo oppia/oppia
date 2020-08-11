@@ -90,6 +90,16 @@ class EditableStoryDataHandler(base.BaseHandler):
         self._require_valid_version(version, story.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if commit_message is None:
+            raise self.InvalidInputException(
+                'Expected a commit message but received none.')
+
+        if len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH:
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+
         change_dicts = self.payload.get('change_dicts')
         change_list = [
             story_domain.StoryChange(change_dict)
@@ -160,5 +170,24 @@ class ValidateExplorationsHandler(base.BaseHandler):
             story_services.validate_explorations_for_story(exp_ids, False))
         self.values.update({
             'validation_error_messages': validation_error_messages
+        })
+        self.render_json(self.values)
+
+
+class StoryUrlFragmentHandler(base.BaseHandler):
+    """A data handler for checking if a story with given url fragment exists.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, story_url_fragment):
+        """Handler that receives a story url fragment and checks whether
+        a story with the same url fragment exists or not.
+        """
+        self.values.update({
+            'story_url_fragment_exists': (
+                story_services.does_story_exist_with_url_fragment(
+                    story_url_fragment))
         })
         self.render_json(self.values)

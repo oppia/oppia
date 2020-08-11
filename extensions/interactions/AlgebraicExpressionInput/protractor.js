@@ -17,10 +17,23 @@
  * interaction
  */
 
+var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = function() {
-  // There are no customizations.
+var customizeInteraction = async function(elem, customLetters) {
+  await waitFor.presenceOf(elem.element(by.css(
+    '.protractor-test-custom-letters-div')),
+  'The custom letters div took too long to load.');
+  for (let letter of customLetters) {
+    if (letter.match(/[a-z]/)) {
+      await action.click('Math OSK Tab', elem.element(by.buttonText('abc')));
+    } else {
+      await action.click('Math OSK Tab', elem.element(by.buttonText('αβγ')));
+    }
+    await action.click('Math OSK Letter', elem.element(by.buttonText(letter)));
+  }
 };
 
 var expectInteractionDetailsToMatch = async function(elem) {
@@ -44,25 +57,25 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'AlgebraicExpression';
 
 var testSuite = [{
-  interactionArguments: [],
+  interactionArguments: [['a', 'b']],
   ruleArguments: ['MatchesExactlyWith', '((a+b))^(2)'],
   expectedInteractionDetails: [],
   wrongAnswers: ['(a-b)^2', '(a-b)^3', 'a^2+2*a*b+b^2'],
   correctAnswers: ['(a+b)^2', '(b+a)^2', '(a+b)*(a+b)']
 }, {
-  interactionArguments: [],
+  interactionArguments: [['x', 'z']],
   ruleArguments: ['MatchesExactlyWith', '((x^2)-x)/z'],
   expectedInteractionDetails: [],
   wrongAnswers: ['((x^3)-x)/z', 'x(x-1)/z', '((x^2)/z)-x/z'],
   correctAnswers: ['((x^2)-x)/z', '((x*x)-x)*z^(-1)']
 }, {
-  interactionArguments: [],
+  interactionArguments: [['π', 'r']],
   ruleArguments: ['IsEquivalentTo', 'pi*r^2'],
   expectedInteractionDetails: [],
   wrongAnswers: ['pi*r', 'pi*r*2', 'pi', 'pi/r^2'],
   correctAnswers: ['pi*r^2', 'pi*r*r', '(pi*r^3)/(2*r-r)']
 }, {
-  interactionArguments: [],
+  interactionArguments: [['x']],
   ruleArguments: ['IsEquivalentTo', '(9*x^2)-6*x+1'],
   expectedInteractionDetails: [],
   wrongAnswers: ['sqrt((3x-1)^(2))', '9*(x)^(2)-6*x-1', '((3*x-1))^(4)'],
