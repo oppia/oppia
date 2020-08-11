@@ -2527,6 +2527,10 @@ oppia-parameter {
   pointer-events: none;
 }
 
+.oppia-disabled-image-link {
+  pointer-events: none;
+}
+
 /* CSS3 Animations */
 @-ms-keyframes spin {
   from { -ms-transform: rotate(0deg); }

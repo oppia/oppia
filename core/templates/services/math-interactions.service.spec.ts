@@ -279,6 +279,10 @@ describe('MathInteractionsService', () => {
       'sqrt(4)abs(5)')).toBe('sqrt(4)*abs(5)');
     expect(mathInteractionsService.insertMultiplicationSigns(
       '(3+alpha)(3-alpha)4')).toBe('(3+alpha)*(3-alpha)*4');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'alphabeta gamma')).toBe('alpha*beta*gamma');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'xalphayzgamma')).toBe('x*alpha*y*z*gamma');
   });
 
   it('should replace abs symbol with text', function() {
