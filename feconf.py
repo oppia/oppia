@@ -461,7 +461,7 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 ENABLE_MAINTENANCE_MODE = False
 
 # Whether contributor dashboard is ready to use for contributors.
-CONTRIBUTOR_DASHBOARD_ENABLED = True
+CONTRIBUTOR_DASHBOARD_ENABLED = False
 
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
