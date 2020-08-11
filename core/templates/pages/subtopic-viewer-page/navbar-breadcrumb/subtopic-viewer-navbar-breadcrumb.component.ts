@@ -35,25 +35,37 @@ import { UrlService } from 'services/contextual/url.service';
   styleUrls: []
 })
 export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
-  topicName: string;
+  topicUrlFragment: string;
+  classroomUrlFragment: string;
   subtopicTitle: string;
+  topicName: string;
+  subtopicUrlFragment: string;
   constructor(
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
   ) {}
   ngOnInit(): void {
-    this.topicName = this.urlService.getTopicNameFromLearnerUrl();
-    this.subtopicViewerBackendApiService.fetchSubtopicData(this.topicName,
-      this.urlService.getSubtopicIdFromUrl()).then(
+    this.topicUrlFragment = (
+      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    this.classroomUrlFragment = (
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    this.subtopicUrlFragment = (
+      this.urlService.getSubtopicUrlFragmentFromLearnerUrl());
+    this.subtopicViewerBackendApiService.fetchSubtopicData(
+      this.topicUrlFragment,
+      this.classroomUrlFragment,
+      this.subtopicUrlFragment).then(
       (subtopicDataObject: ReadOnlySubtopicPageData) => {
         this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+        this.topicName = subtopicDataObject.getParentTopicName();
       });
   }
   getTopicUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
-        topic_name: this.topicName
+      ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
+        topic_url_fragment: this.topicUrlFragment,
+        classroom_url_fragment: this.classroomUrlFragment
       });
   }
 }

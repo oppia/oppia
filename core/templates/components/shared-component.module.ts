@@ -20,6 +20,7 @@ import 'zone.js';
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
@@ -34,10 +35,14 @@ import { TranslatePipe } from 'filters/translate.pipe';
 import { SafePipe } from 'filters/safe-pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
-import { SharingLinksComponent } from
-  './common-layout-directives/common-elements/sharing-links.component';
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
+import { SharingLinksComponent } from
+  './common-layout-directives/common-elements/sharing-links.component';
+import { StorySummaryTileDirective } from
+  './summary-tile/story-summary-tile.directive';
+import { SubtopicSummaryTileDirective } from
+  './summary-tile/subtopic-summary-tile.directive';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
@@ -50,23 +55,50 @@ import { ProfileLinkTextComponent } from
 
 
 @NgModule({
-  imports: [CommonModule, MaterialModule, NgbModalModule],
-  declarations: [BackgroundBannerComponent, TranslatePipe,
-    SafePipe, SharingLinksComponent, ExplorationEmbedButtonModalComponent,
-    SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent,
-    ExplorationSummaryTileDirective],
-  entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
+  imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
+
+  declarations: [
+    AttributionGuideComponent,
+    BackgroundBannerComponent,
+    ExplorationEmbedButtonModalComponent,
+    ExplorationSummaryTileDirective,
+    LazyLoadingComponent,
+    LoadingDotsComponent,
+    ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
+    SafePipe,
+    SharingLinksComponent,
+    SkillMasteryViewerComponent,
+    StorySummaryTileDirective,
+    SocialButtonsComponent,
+    SubtopicSummaryTileDirective,
+    TranslatePipe
+  ],
+
+  entryComponents: [
+    BackgroundBannerComponent,
+    SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
+    SkillMasteryViewerComponent,
+    SocialButtonsComponent
   ],
+
   exports: [
-    BackgroundBannerComponent, TranslatePipe, SafePipe,
-    SharingLinksComponent, MaterialModule, ExplorationSummaryTileDirective
+    // Modules.
+    FormsModule,
+    MaterialModule,
+    // Components, directives, and pipes.
+    BackgroundBannerComponent,
+    ExplorationSummaryTileDirective,
+    SafePipe,
+    SharingLinksComponent,
+    StorySummaryTileDirective,
+    SubtopicSummaryTileDirective,
+    TranslatePipe
   ],
 })
 

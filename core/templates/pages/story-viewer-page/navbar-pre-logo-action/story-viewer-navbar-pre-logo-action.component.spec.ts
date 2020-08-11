@@ -29,8 +29,10 @@ describe('story viewer pre logo action', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     urlService = TestBed.get(UrlService);
-    spyOn(urlService, 'getTopicNameFromLearnerUrl')
-      .and.returnValue('Topic Name');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
+      .and.returnValue('abbrev');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('math');
   });
   beforeEach(angular.mock.inject(function($componentController, $rootScope) {
     ctrl = $componentController(
@@ -46,6 +48,6 @@ describe('story viewer pre logo action', function() {
     });
     rootScope.$digest();
     expect(ctrl.topicName).toEqual('Topic Name');
-    expect(ctrl.getTopicUrl()).toEqual('/topic/Topic%20Name');
+    expect(ctrl.getTopicUrl()).toEqual('/learn/math/abbrev/story');
   });
 });
