@@ -166,7 +166,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 error_message = (
                     'Exploration %s failed migration to states v%s: %s' %
                     (item.id, states_schema_version + 1, e))
-                logging.error(error_message)
+                logging.exception(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
                 break
 
