@@ -359,7 +359,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'story-update.service.ts',
     'story-viewer-backend-api.service.ts',
     'story-viewer-navbar-breadcrumb.directive.ts',
-    'story-viewer-page.directive.ts',
     'StoryContentsObjectFactory.ts',
     'StoryNodeObjectFactory.ts',
     'student.ts',
