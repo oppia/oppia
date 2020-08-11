@@ -9485,7 +9485,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'Topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -9783,7 +9783,7 @@ class TopicSnapshotMetadataModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -9979,7 +9979,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -10142,7 +10142,7 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -10320,7 +10320,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -10527,7 +10527,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -10688,7 +10688,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -10974,7 +10974,7 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -11200,7 +11200,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -11414,7 +11414,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -11623,7 +11623,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -11793,7 +11793,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -13088,29 +13088,29 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
-class UserAuthModelValidatorTests(test_utils.GenericTestBase):
+class UserAuthDetailsModelValidatorTests(test_utils.GenericTestBase):
 
     USER_PIN = '123'
 
     def setUp(self):
-        super(UserAuthModelValidatorTests, self).setUp()
+        super(UserAuthDetailsModelValidatorTests, self).setUp()
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
-        user_models.UserAuthModel(
-            id=self.user_id,
-            gae_id=self.gae_id,
-            pin=self.USER_PIN
-        ).put()
-        self.model_instance = user_models.UserAuthModel.get_by_id(
+
+        # Note: There will be a total of 2 UserSettingsModels (hence 2
+        # UserAuthDetailsModels too) even though only one user signs up in the
+        # test since superadmin signup is also done in
+        # test_utils.GenericTestBase.
+        self.model_instance = user_models.UserAuthDetailsModel.get_by_id(
             self.user_id)
         self.job_class = (
-            prod_validation_jobs_one_off.UserAuthModelAuditOneOffJob)
+            prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob)
 
     def test_audit_standard_operation_passes(self):
         expected_output = [
-            u'[u\'fully-validated UserAuthModel\', 1]']
+            u'[u\'fully-validated UserAuthDetailsModel\', 2]']
         run_job_and_check_output(self, expected_output)
 
     def test_audit_with_created_on_greater_than_last_updated_fails(self):
@@ -13119,19 +13119,21 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
-            'of UserAuthModel\', '
+            'of UserAuthDetailsModel\', '
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
-            )]
-        run_job_and_check_output(self, expected_output)
+            ), u'[u\'fully-validated UserAuthDetailsModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
     def test_audit_with_last_updated_greater_than_current_time_fails(self):
+        user_models.UserAuthDetailsModel.get_by_id(
+            self.get_user_id_from_email('tmpsuperadmin@example.com')).delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'UserAuthModel\', '
+            'UserAuthDetailsModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
@@ -13146,13 +13148,14 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
-                'field check of UserAuthModel\', '
+                'field check of UserAuthDetailsModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
-                    self.user_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+                    self.user_id, self.user_id, self.user_id),
+            u'[u\'fully-validated UserAuthDetailsModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
 
 class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
@@ -14856,6 +14859,17 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 'of PendingDeletionRequestModel\', '
                 '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
                 'not marked as deleted"]]') % self.user_id]
+        run_job_and_check_output(self, expected_output)
+
+    def test_incorrect_keys_in_activity_mappings(self):
+        self.model_instance.activity_mappings = {'wrong_key': {'some_id': 'id'}}
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for correct activity_mappings '
+                'check of PendingDeletionRequestModel\', '
+                '[u"Entity id %s: activity_mappings contains keys '
+                '[u\'wrong_key\'] that are not allowed"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
 
