@@ -147,8 +147,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           var _updateAnswerChoices = function() {
-            $rootScope.$broadcast(
-              'updateAnswerChoices',
+            StateEditorService.onUpdateAnswerChoices.emit(
               StateEditorService.getAnswerChoices(
                 $scope.interactionId,
                 StateCustomizationArgsService.savedMemento));
