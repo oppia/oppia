@@ -41,6 +41,9 @@ describe('Newly Created Topic Object Factory', () => {
     expect(topic.isValid()).toBe(false);
 
     topic.name = 'TopicName1';
+    expect(topic.isValid()).toBe(false);
+
+    topic.urlFragment = 'url-fragment';
     expect(topic.isValid()).toBe(true);
 
     topic.description = '';

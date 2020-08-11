@@ -44,6 +44,7 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
         self.save_new_story(self.story_id, self.admin_id, self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name', url_fragment='name',
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -216,6 +217,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.save_new_topic(
             'topic_id_new', self.admin_id, name='Name 2',
+            abbreviated_name='name-two', url_fragment='name-two',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -288,6 +290,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # associated with the new topic.
         self.save_new_topic(
             'topic_id_new', self.admin_id, name='Name 2',
+            abbreviated_name='name-new', url_fragment='name-new',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -318,11 +321,38 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         json_response = self.put_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
-            change_cmd, csrf_token=csrf_token, expected_status_int=500)
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             json_response['error'],
             'Expected a commit message but received none.')
+
+        self.logout()
+
+    def test_put_fails_with_long_commit_message(self):
+        self.login(self.ADMIN_EMAIL)
+
+        change_cmd = {
+            'version': 1,
+            'commit_message': 'a' * 1001,
+            'change_dicts': [{
+                'cmd': 'update_story_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            }]
+        }
+
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Commit messages must be at most 1000 characters long.')
 
         self.logout()
 
