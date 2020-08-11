@@ -1,28 +1,40 @@
-<div class="oppia-subtopics-list-container">
-  <md-card class="oppia-page-card oppia-long-text">
-    <h2 class="tab-title">
-      <span translate="I18N_TOPIC_VIEWER_STUDY_SKILLS"></span>
-    </h2>
-    <span class="subtopic-subheading">
-      <span translate="I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE"></span>
-    </span>
-    <div class="subtopics-container">
-      <subtopic-summary-tile ng-repeat="subtopic in $ctrl.getSubtopics()"
-                             subtopic="subtopic"
-                             topic-id="$ctrl.getTopicId()"
-                             topic-name="$ctrl.getTopicName()">
-      </subtopic-summary-tile>
-    </div>
-  </md-card>
+<div class="subtopics-list">
+  <div class="oppia-subtopics-list-container">
+    <mat-card class="oppia-page-card oppia-long-text">
+      <h2 class="tab-title">
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate"></span>
+      </h2>
+      <div class="subtopic-subheading">
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate"></span>
+      </div>
+      <div class="subtopics-container">
+        <div *ngFor="let subtopic of subtopicsList">
+          <subtopic-summary-tile [classroomUrlFragment]="classroomUrlFragment"
+                                 [subtopic]="subtopic"
+                                 [topicId]="topicId"
+                                 [topicUrlFragment]="topicUrlFragment">
+          </subtopic-summary-tile>
+        </div>
+      </div>
+    </mat-card>
+  </div>
 </div>
 <style>
-  subtopics-list .subtopic-subheading {
+  .subtopics-list .oppia-page-card.oppia-long-text {
+    padding: 30px 55px 30px 45px;
+  }
+
+  .subtopics-list .tab-title {
+    margin: .83em 0;
+  }
+
+  .subtopics-list .subtopic-subheading {
     font-family: Roboto, Arial, sans-serif;
     font-size: 1.2em;
     margin-bottom: 2.5vh;
   }
 
-  subtopics-list .subtopics-container {
+  .subtopics-list .subtopics-container {
     display: grid;
     grid-row-gap: 2vh;
     grid-template-columns: 170px 170px 170px;
@@ -30,26 +42,26 @@
     margin-left: 20px;
   }
 
-  subtopics-list subtopic-summary-tile {
+  .subtopics-list subtopic-summary-tile {
     margin-right: 2vw;
   }
 
   @media(max-width: 1024px) {
-    subtopics-list .subtopics-container {
+    .subtopics-list .subtopics-container {
       grid-template-columns: 150px 150px 150px;
       margin-left: 2vw;
     }
   }
 
   @media(max-width: 680px) {
-    subtopics-list .subtopics-container {
+    .subtopics-list .subtopics-container {
       grid-template-columns: 130px 130px 130px;
       margin-left: 0;
     }
   }
 
   @media(max-width: 500px) {
-    subtopics-list .subtopics-container {
+    .subtopics-list .subtopics-container {
       display: grid;
       grid-template-columns: 140px 140px;
       justify-content: space-between;
