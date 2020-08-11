@@ -36,6 +36,8 @@ class GuppyObject {
 export class GuppyInitializationService {
   private guppyInstances: Array<GuppyObject> = [];
   private onScreenKeyboardShown = false;
+  static interactionType: string;
+  static customOskLetters: Array<string> = [];
 
   init(guppyDivClassName: string, placeholderText: string, initialValue = ''):
       void {
