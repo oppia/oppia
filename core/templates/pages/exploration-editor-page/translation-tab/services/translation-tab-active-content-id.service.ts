@@ -16,6 +16,8 @@
  * @fileoverview Service to get and set active content id in translation tab.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
@@ -24,9 +26,10 @@ require(
   'state-recorded-voiceovers.service.ts');
 
 angular.module('oppia').factory('TranslationTabActiveContentIdService', [
-  '$rootScope', 'StateRecordedVoiceoversService',
-  function($rootScope, StateRecordedVoiceoversService) {
+  'StateRecordedVoiceoversService',
+  function(StateRecordedVoiceoversService) {
     var activeContentId = null;
+    var _activeContentIdChangedEventEmitter = new EventEmitter();
     return {
       getActiveContentId: function() {
         return activeContentId;
@@ -38,7 +41,10 @@ angular.module('oppia').factory('TranslationTabActiveContentIdService', [
           throw new Error('Invalid active content id: ' + contentId);
         }
         activeContentId = contentId;
-        $rootScope.$broadcast('activeContentIdChanged');
+        _activeContentIdChangedEventEmitter.emit();
+      },
+      get onActiveContentIdChange() {
+        return _activeContentIdChangedEventEmitter;
       }
     };
   }]);

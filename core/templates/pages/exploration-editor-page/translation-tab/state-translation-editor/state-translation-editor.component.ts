@@ -19,6 +19,8 @@
 import { WRITTEN_TRANSLATION_TYPE_HTML } from
   'domain/exploration/WrittenTranslationObjectFactory';
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -38,6 +40,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         TranslationTabActiveContentIdService, UrlInterpolationService,
         WrittenTranslationObjectFactory) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var showMarkAudioAsNeedingUpdateModalIfRequired = function(
           contentId, languageCode) {
         var stateName = StateEditorService.getActiveStateName();
@@ -157,9 +160,12 @@ angular.module('oppia').component('stateTranslationEditor', {
         $scope.HTML_SCHEMA = {
           type: 'html'
         };
-        $scope.$on('activeContentIdChanged', function() {
-          initEditor();
-        });
+        ctrl.directiveSubscriptions.add(
+          TranslationTabActiveContentIdService.onActiveContentIdChanged.
+            subscribe(
+              () => initEditor()
+            )
+        );
         $scope.$on('activeLanguageChanged', function() {
           initEditor();
         });
@@ -169,6 +175,9 @@ angular.module('oppia').component('stateTranslationEditor', {
             saveTranslation();
           }
         });
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
