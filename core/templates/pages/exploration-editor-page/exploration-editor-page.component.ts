@@ -19,6 +19,8 @@
 
 import { State } from 'domain/state/StateObjectFactory';
 
+import { Subscription } from 'rxjs';
+
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
@@ -112,6 +114,7 @@ require(
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -161,6 +164,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationRightsService',
+    'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
@@ -180,6 +184,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationRightsService,
+        ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         PageTitleService, LoaderService, ParamChangesObjectFactory,
@@ -190,6 +195,7 @@ angular.module('oppia').component('explorationEditorPage', {
         UserEmailPreferencesService, UserExplorationPermissionsService,
         EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
       var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
       var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
@@ -454,6 +460,13 @@ angular.module('oppia').component('explorationEditorPage', {
           GraphDataService.recompute();
           ExplorationWarningsService.updateWarnings();
         });
+        ctrl.directiveSubscriptions.add(
+          ExplorationSaveService.onInitExplorationPage.subscribe(
+            (successCallback) => {
+              ctrl.initExplorationPage().then(successCallback);
+            }
+          )
+        );
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
@@ -622,6 +635,9 @@ angular.module('oppia').component('explorationEditorPage', {
         $templateCache.put(
           'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
         ctrl.tutorialInProgress = false;
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
