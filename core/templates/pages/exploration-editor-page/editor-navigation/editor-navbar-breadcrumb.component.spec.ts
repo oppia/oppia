@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for editorNavbarBreadcrumb.
  */
 
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+
 describe('Editor Navbar Breadcrumb directive', function() {
   var $rootScope = null;
   var $scope = null;
@@ -23,7 +26,12 @@ describe('Editor Navbar Breadcrumb directive', function() {
   var FocusManagerService = null;
   var RouterService = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     ExplorationTitleService = $injector.get('ExplorationTitleService');

@@ -161,7 +161,33 @@ export class AdminBackendApiService {
     }
     body.append(
       'payload', JSON.stringify({latexMapping: latexToSvgMapping}));
-    return this.http.post('/adminmathsvghandler', body).toPromise();
+    return this.http.post('/explorationslatexsvghandler', body).toPromise();
+  }
+
+  // TODO(#10045): Remove this function once all the math-rich text
+  // components in suggestions have a valid math SVG stored in the
+  // datastore.
+  sendSuggestionMathSvgsToBackend(
+      suggestionLatexToSvgMapping): Promise<Object> {
+    let body = new FormData();
+    for (var suggestionId in suggestionLatexToSvgMapping) {
+      for (var latexString in suggestionLatexToSvgMapping[suggestionId]) {
+        // LaTeX strings cannot be appended in the request body as keys for
+        // files because of encoding issues (multiple backslash in the LaTeX
+        // string is processed improperly, e.g 3 backslashes in an
+        // expressions becomes 2 backslashes). As a workaround, we use a
+        // temporary latexId as keys for adding and retrieving raw images from
+        // the request body. Images can be extracted based on the latexId in the
+        // backend.
+        body.set(
+          suggestionLatexToSvgMapping[suggestionId][latexString].latexId,
+          suggestionLatexToSvgMapping[suggestionId][latexString].file);
+        delete suggestionLatexToSvgMapping[suggestionId][latexString].file;
+      }
+    }
+    body.append(
+      'payload', JSON.stringify({latexMapping: suggestionLatexToSvgMapping}));
+    return this.http.post('/suggestionslatexsvghandler', body).toPromise();
   }
 }
 

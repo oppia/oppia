@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { Subscription } from 'rxjs';
 // ^^^ This block is to be removed.
 
 require('pages/classroom-page/classroom-page.component.ts');
@@ -37,6 +38,9 @@ describe('Classroom page', () => {
 
   var loadingMessage = null;
   var subscriptions = [];
+  var testSubscriptions = null;
+
+  const translationInitializedSpy = jasmine.createSpy('topicInitialized');
   var classroomData = {};
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -77,6 +81,17 @@ describe('Classroom page', () => {
     });
   }));
 
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      ClassroomBackendApiService.onInitializeTranslation.subscribe(
+        translationInitializedSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   afterEach(function() {
     for (let subscription of subscriptions) {
       subscription.unsubscribe();
@@ -96,11 +111,12 @@ describe('Classroom page', () => {
       classroomData = ClassroomDataObjectFactory.createFromBackendData(
         'Math', [], 'Course details', 'Topics covered'
       );
-      spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
-        $q.resolve(classroomData));
+      spyOn(
+        ClassroomBackendApiService,
+        'fetchClassroomDataAsync').and.returnValue($q.resolve(classroomData));
       spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-      spyOn(UrlService, 'getClassroomNameFromUrl').and.returnValue(
+      spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
         'mock');
     });
 
@@ -113,14 +129,13 @@ describe('Classroom page', () => {
 
       expect(loadingMessage).toBe('');
       expect(ctrl.bannerImageFileUrl).toBe('/assets/images/splash/books.svg');
-      expect(ctrl.classroomDisplayName).toBe('Mock');
+      expect(ctrl.classroomDisplayName).toBe('Math');
 
       expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-        'Mock Classroom | Oppia');
+        'Math Classroom | Oppia');
 
+      expect(translationInitializedSpy).toHaveBeenCalled();
       expect(ctrl.classroomData.getName()).toEqual('Math');
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'initializeTranslation');
     });
   });
 
@@ -128,12 +143,14 @@ describe('Classroom page', () => {
     beforeEach(function() {
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         ClassroomBackendApiService);
-      spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
+      spyOn(
+        ClassroomBackendApiService,
+        'fetchClassroomDataAsync').and.returnValue(
         $q.reject({
           status: 404
         }));
       spyOn(AlertsService, 'addWarning').and.callThrough();
-      spyOn(UrlService, 'getClassroomNameFromUrl').and.returnValue(
+      spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
         'mock');
     });
 
