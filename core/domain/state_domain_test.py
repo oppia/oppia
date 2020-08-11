@@ -3587,13 +3587,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
         exploration.init_state.update_interaction_answer_groups(answer_groups)
-
-        with logging_swap, self.assertRaisesRegexp(KeyError, 'u\'x\''):
-            (
-                exploration.init_state.interaction.answer_groups[0]
-                .validate(
-                    exploration.init_state.interaction, {})
-            )
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'TextInput'))
+        
+        rule_params_swap = self.swap(
+            interaction, 'get_rule_param_list', lambda unused_rule_type: [])
+        with logging_swap, rule_params_swap, self.assertRaisesRegexp(
+                KeyError, 'u\'x\''):
+            exploration.init_state.interaction.answer_groups[
+                0].validate(interaction, {})
 
         self.assertEqual(
             observed_log_messages,

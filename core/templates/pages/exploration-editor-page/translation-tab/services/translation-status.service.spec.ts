@@ -233,7 +233,7 @@ describe('Translation status service', function() {
                 dest: 'Second'
               },
               rule_types_to_inputs_translations: {},
-              rule_inputs: {
+              rule_types_to_inputs: {
                 Equals: [
                   {
                     x: 0
@@ -256,7 +256,7 @@ describe('Translation status service', function() {
                 dest: 'First'
               },
               rule_types_to_inputs_translations: {},
-              rule_inputs: {
+              rule_types_to_inputs: {
                 Equals: [
                   {
                     x: 1
@@ -325,7 +325,7 @@ describe('Translation status service', function() {
                 dest: 'Third'
               },
               rule_types_to_inputs_translations: {},
-              rule_inputs: {
+              rule_types_to_inputs: {
                 Equals: [
                   {
                     x: 0

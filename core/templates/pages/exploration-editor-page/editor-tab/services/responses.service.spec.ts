@@ -71,7 +71,7 @@ describe('Responses Service', function() {
           },
         },
         rule_types_to_inputs_translations: {},
-        rule_inputs: {},
+        rule_types_to_inputs: {},
       }],
       default_outcome: {
         dest: 'Hola',
@@ -102,7 +102,7 @@ describe('Responses Service', function() {
           },
         },
         rule_types_to_inputs_translations: {},
-        rule_inputs: {
+        rule_types_to_inputs: {
           '': [
             {
               x: ['c', 'd', 'e'],

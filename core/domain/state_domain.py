@@ -119,7 +119,7 @@ class AnswerGroup(python_utils.OBJECT):
         only has one classifier rule.
 
         Args:
-            interaction: InteractionInstance. The interaction object.
+            interaction: BaseInteraction. The interaction object.
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).

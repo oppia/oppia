@@ -152,19 +152,19 @@ describe('Exploration history', function() {
         highlighted: true
       },
       16: {
-        text: '    rule_specs:',
+        text: '    rule_types_to_inputs:',
         highlighted: true
       },
       17: {
-        text: '    - inputs:',
+        text: '      Equals:',
         highlighted: true
       },
       18: {
-        text: '        x: 6',
+        text: '      - x: 6',
         highlighted: true
       },
       19: {
-        text: '      rule_type: Equals',
+        text: '    rule_types_to_inputs_translations: {}',
         highlighted: true
       },
       20: {

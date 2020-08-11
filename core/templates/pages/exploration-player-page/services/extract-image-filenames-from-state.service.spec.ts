@@ -193,7 +193,7 @@ describe('Extracting Image file names in the state service', () => {
                   refresher_exploration_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   Equals: [
                     {
                       x: 0
@@ -213,7 +213,7 @@ describe('Extracting Image file names in the state service', () => {
                   refresher_exploration_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   Equals: [
                     {
                       x: 1
@@ -304,7 +304,7 @@ describe('Extracting Image file names in the state service', () => {
                   refresher_exploration_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   Equals: [
                     {
                       x: [
@@ -328,7 +328,7 @@ describe('Extracting Image file names in the state service', () => {
                   refresher_exploration_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   Equals: [
                     {
                       x: [
@@ -396,7 +396,7 @@ describe('Extracting Image file names in the state service', () => {
                   refresher_exploration_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   IsInRegion: [
                     {
                       x: 'classdef'
@@ -417,7 +417,7 @@ describe('Extracting Image file names in the state service', () => {
                   refresher_exploration_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   IsInRegion: [
                     {
                       x: 'instancefunc'
@@ -437,7 +437,7 @@ describe('Extracting Image file names in the state service', () => {
                   refresher_exploration_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   IsInRegion: [
                     {
                       x: 'docstring'
@@ -458,7 +458,7 @@ describe('Extracting Image file names in the state service', () => {
                   refresher_exploration_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   IsInRegion: [
                     {
                       x: 'classfunc'
@@ -479,7 +479,7 @@ describe('Extracting Image file names in the state service', () => {
                   refresher_exploration_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   IsInRegion: [
                     {
                       x: 'ctor'
@@ -606,7 +606,7 @@ describe('Extracting Image file names in the state service', () => {
             },
             answer_groups: [{
               rule_types_to_inputs_translations: {},
-              rule_inputs: {
+              rule_types_to_inputs: {
                 Contains: [
                   {
                     x: '1'
@@ -625,7 +625,7 @@ describe('Extracting Image file names in the state service', () => {
               }
             }, {
               rule_types_to_inputs_translations: {},
-              rule_inputs: {
+              rule_types_to_inputs: {
                 Contains: [
                   {
                     x: '2'

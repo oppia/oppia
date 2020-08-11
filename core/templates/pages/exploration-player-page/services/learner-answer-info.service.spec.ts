@@ -80,7 +80,7 @@ describe('Learner answer info service', function() {
             missing_prerequisite_skill_id: null
           },
           rule_types_to_inputs_translations: {},
-          rule_inputs: {
+          rule_types_to_inputs: {
             Equals: [
               {
                 x: 10
@@ -100,7 +100,7 @@ describe('Learner answer info service', function() {
             missing_prerequisite_skill_id: null
           },
           rule_types_to_inputs_translations: {},
-          rule_inputs: {
+          rule_types_to_inputs: {
             Equals: [
               {
                 x: 5

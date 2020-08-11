@@ -76,7 +76,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           interaction: {
             answer_groups: [{
               rule_types_to_inputs_translations: {},
-              rule_inputs: {},
+              rule_types_to_inputs: {},
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -125,7 +125,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             },
           },
           rule_types_to_inputs_translations: {},
-          rule_inputs: {
+          rule_types_to_inputs: {
             '': [
               {
                 x: ['c', 'd', 'e'],
@@ -280,7 +280,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           interaction: {
             answer_groups: [{
               rule_types_to_inputs_translations: {},
-              rule_inputs: {},
+              rule_types_to_inputs: {},
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -329,7 +329,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             },
           },
           rule_types_to_inputs_translations: {},
-          rule_inputs: {},
+          rule_types_to_inputs: {},
           training_data: ['Answer1', 'Answer2']
         }],
         default_outcome: {
@@ -412,7 +412,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           interaction: {
             answer_groups: [{
               rule_types_to_inputs_translations: {},
-              rule_inputs: {},
+              rule_types_to_inputs: {},
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -461,7 +461,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             },
           },
           rule_types_to_inputs_translations: {},
-          rule_inputs: {},
+          rule_types_to_inputs: {},
           training_data: ['Answer1']
         }],
         default_outcome: {

@@ -74,7 +74,7 @@ describe('Training Modal Controller', function() {
               id: 'TextInput',
               answer_groups: [{
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {},
+                rule_types_to_inputs: {},
                 outcome: {
                   dest: '',
                   feedback: {
@@ -85,7 +85,7 @@ describe('Training Modal Controller', function() {
                 training_data: ['Not the answer']
               }, {
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {},
+                rule_types_to_inputs: {},
                 outcome: {
                   dest: '',
                   feedback: {
@@ -132,7 +132,7 @@ describe('Training Modal Controller', function() {
             },
             training_data: ['This is the answer'],
             rule_types_to_inputs_translations: {},
-            rule_inputs: {},
+            rule_types_to_inputs: {},
           }],
           customization_args: {
             placeholder: {
@@ -241,7 +241,7 @@ describe('Training Modal Controller', function() {
               },
               training_data: ['Not the answer'],
               rule_types_to_inputs_translations: {},
-              rule_inputs: {},
+              rule_types_to_inputs: {},
             }, {
               outcome: {
                 dest: '',
@@ -252,7 +252,7 @@ describe('Training Modal Controller', function() {
               },
               training_data: ['Answer'],
               rule_types_to_inputs_translations: {},
-              rule_inputs: {},
+              rule_types_to_inputs: {},
             }, {
               outcome: {
                 dest: '',
@@ -263,7 +263,7 @@ describe('Training Modal Controller', function() {
               },
               training_data: ['This is the answer'],
               rule_types_to_inputs_translations: {},
-              rule_inputs: {},
+              rule_types_to_inputs: {},
             }],
             customization_args: {
               placeholder: {
@@ -303,7 +303,7 @@ describe('Training Modal Controller', function() {
           },
           training_data: ['This is the answer'],
           rule_types_to_inputs_translations: {},
-          rule_inputs: {},
+          rule_types_to_inputs: {},
         }],
         customization_args: {
           placeholder: {
@@ -382,7 +382,7 @@ describe('Training Modal Controller', function() {
             interaction: {
               answer_groups: [{
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {},
+                rule_types_to_inputs: {},
                 outcome: {
                   dest: '',
                   feedback: {
@@ -429,7 +429,7 @@ describe('Training Modal Controller', function() {
               },
             },
             rule_types_to_inputs_translations: {},
-            rule_inputs: {},
+            rule_types_to_inputs: {},
             training_data: []
           }, {
             outcome: {
@@ -440,7 +440,7 @@ describe('Training Modal Controller', function() {
               },
             },
             rule_types_to_inputs_translations: {},
-            rule_inputs: {},
+            rule_types_to_inputs: {},
             training_data: []
           }],
           default_outcome: {

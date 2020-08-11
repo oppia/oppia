@@ -25,7 +25,7 @@ describe('Answer Groups Cache Service', () => {
   describe('AnswerGroupsCache', () => {
     var answerGroup = {
       rule_types_to_inputs_translations: {},
-      rule_inputs: {},
+      rule_types_to_inputs: {},
       outcome: {
         dest: 'default',
         feedback: {

@@ -141,7 +141,7 @@ describe('Question Creation Service', function() {
                 refresher_exploration_id: null
               },
               rule_types_to_inputs_translations: {},
-              rule_inputs: {
+              rule_types_to_inputs: {
                 Equals: [
                   {
                     x: 10
@@ -340,7 +340,7 @@ describe('Question Creation Service', function() {
                 refresher_exploration_id: null
               },
               rule_types_to_inputs_translations: {},
-              rule_inputs: {
+              rule_types_to_inputs: {
                 Equals: [
                   {
                     x: 10
@@ -513,7 +513,7 @@ describe('Question Creation Service', function() {
                 refresher_exploration_id: null
               },
               rule_types_to_inputs_translations: {},
-              rule_inputs: {
+              rule_types_to_inputs: {
                 Equals: [
                   {
                     x: 10

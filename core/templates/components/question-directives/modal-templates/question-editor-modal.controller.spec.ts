@@ -103,7 +103,7 @@ describe('Question Editor Modal Controller', function() {
                 refresher_exploration_id: null
               },
               rule_types_to_inputs_translations: {},
-              rule_inputs: {}
+              rule_types_to_inputs: {}
             }],
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -451,7 +451,7 @@ describe('Question Editor Modal Controller', function() {
                 refresher_exploration_id: null
               },
               rule_types_to_inputs_translations: {},
-              rule_inputs: {}
+              rule_types_to_inputs: {}
             }],
             confirmed_unclassified_answers: [],
             customization_args: {

@@ -112,7 +112,7 @@ describe('Solution Verification Service', function() {
               refresher_exploration_id: null
             },
             rule_types_to_inputs_translations: {},
-            rule_inputs: {
+            rule_types_to_inputs: {
               Contains: [
                 {
                   x: 'abc'
@@ -179,7 +179,7 @@ describe('Solution Verification Service', function() {
           id: 'TextInput',
           answer_groups: [{
             rule_types_to_inputs_translations: {},
-            rule_inputs: {},
+            rule_types_to_inputs: {},
             outcome: {
               dest: 'default',
               feedback: {

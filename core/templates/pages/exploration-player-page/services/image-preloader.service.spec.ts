@@ -312,7 +312,7 @@ describe('Image preloader service', function() {
                   missing_prerequisite_skill_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   Equals: [
                     {
                       x: 0
@@ -333,7 +333,7 @@ describe('Image preloader service', function() {
                   missing_prerequisite_skill_id: null
                 },
                 rule_types_to_inputs_translations: {},
-                rule_inputs: {
+                rule_types_to_inputs: {
                   Equals: [
                     {
                       x: 1
@@ -397,7 +397,7 @@ describe('Image preloader service', function() {
             },
             answer_groups: [{
               rule_types_to_inputs_translations: {},
-              rule_inputs: {
+              rule_types_to_inputs: {
                 Contains: [
                   {
                     x: '1'
@@ -417,7 +417,7 @@ describe('Image preloader service', function() {
               }
             }, {
               rule_types_to_inputs_translations: {},
-              rule_inputs: {
+              rule_types_to_inputs: {
                 Contains: [
                   {
                     x: '2'

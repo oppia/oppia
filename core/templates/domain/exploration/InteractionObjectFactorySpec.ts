@@ -69,7 +69,7 @@ describe('Interaction object factory', () => {
     };
     answerGroupsDict = [{
       rule_types_to_inputs_translations: {},
-      rule_inputs: {},
+      rule_types_to_inputs: {},
       outcome: {
         dest: 'dest_1',
         feedback: {
@@ -460,7 +460,7 @@ describe('Interaction object factory', () => {
 
     let newAnswerGroup = {
       rule_types_to_inputs_translations: {},
-      rule_inputs: {},
+      rule_types_to_inputs: {},
       outcome: {
         dest: 'dest_3',
         feedback: {
@@ -477,7 +477,7 @@ describe('Interaction object factory', () => {
     };
     expect(testInteraction.answerGroups).toEqual([agof.createFromBackendDict({
       rule_types_to_inputs_translations: {},
-      rule_inputs: {},
+      rule_types_to_inputs: {},
       outcome: {
         dest: 'dest_1',
         feedback: {
@@ -594,7 +594,7 @@ describe('Interaction object factory', () => {
 
     const newAnswerGroups = [{
       rule_types_to_inputs_translations: {},
-      rule_inputs: {},
+      rule_types_to_inputs: {},
       outcome: {
         dest: 'dest_1_new',
         feedback: {

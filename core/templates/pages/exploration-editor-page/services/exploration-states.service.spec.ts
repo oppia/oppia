@@ -158,7 +158,7 @@ describe('ExplorationStatesService', function() {
         interaction: {
           answer_groups: [{
             rule_types_to_inputs_translations: {},
-            rule_inputs: {
+            rule_types_to_inputs: {
               Contains: [
                 {
                   x: 'hola'
