@@ -57,7 +57,7 @@ import $ from 'jquery';
 require('pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
 
-describe('State Graph Visualization directive', function() {
+describe('Audio translation bar directive', function() {
   var ctrl = null;
   var $interval = null;
   var $q = null;

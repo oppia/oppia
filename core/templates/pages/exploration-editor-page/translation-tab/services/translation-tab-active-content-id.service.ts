@@ -43,7 +43,7 @@ angular.module('oppia').factory('TranslationTabActiveContentIdService', [
         activeContentId = contentId;
         _activeContentIdChangedEventEmitter.emit();
       },
-      get onActiveContentIdChange() {
+      get onActiveContentIdChanged() {
         return _activeContentIdChangedEventEmitter;
       }
     };
