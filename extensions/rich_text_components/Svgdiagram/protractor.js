@@ -135,6 +135,8 @@ var customizeComponent = async function(modal, shapes, altText) {
         var imageUploadInput = element(
           by.css('.protractor-test-photo-upload-input'));
         absPath = path.resolve(__dirname, './circle.svg');
+        await waitFor.presenceOf(
+          imageUploadInput, 'Element took too long to load');
         await imageUploadInput.sendKeys(absPath);
       }
     }
