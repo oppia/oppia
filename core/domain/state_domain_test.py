@@ -3590,11 +3590,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(
                 'TextInput'))
-        
+
         rule_params_swap = self.swap(
             interaction, 'get_rule_param_list', lambda unused_rule_type: [])
         with logging_swap, rule_params_swap, self.assertRaisesRegexp(
-                KeyError, 'u\'x\''):
+            KeyError, 'u\'x\''
+        ):
             exploration.init_state.interaction.answer_groups[
                 0].validate(interaction, {})
 
