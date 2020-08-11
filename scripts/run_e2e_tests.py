@@ -178,7 +178,7 @@ def cleanup():
         '.*%s.*' % re.escape(webdriver_download_path)
     ]
     for p in SUBPROCESSES:
-        p.kill()
+        p.send_signal(signal.SIGINT)
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)

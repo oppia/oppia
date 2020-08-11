@@ -39,21 +39,23 @@ module.exports = async(browser, context) => {
 const login = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
-    console.log('Logging into Oppia...');
     // eslint-disable-next-line dot-notation
-    await page.goto(context.url);
+    await page.goto(context.url, { waitUntil: "networkidle0" });
     await page.click('#admin');
     await Promise.all([
       page.waitForNavigation(),
       page.click('#submit-login'),
     ]);
 
-    await page.type('#username', 'username1');
-    await page.click('#terms-checkbox');
     await page.waitFor(5000);
+    await page.type('#username', 'username1');
+
+    await page.click('#terms-checkbox');
+
 
     await Promise.all([
       page.waitForNavigation(),
+      console.log("clicking on signup"),
       await page.click('#signup-submit')
     ]);
     // eslint-disable-next-line no-console

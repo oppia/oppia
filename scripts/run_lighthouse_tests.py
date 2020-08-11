@@ -50,7 +50,7 @@ def cleanup():
         '.*%s.*' % re.escape(google_app_engine_path),
     ]
     for p in SUBPROCESSES:
-        os.killpg(os.getpgid(p.pid), signal.SIGTERM)
+        p.send_signal(signal.SIGINT)
 
     while common.is_port_open(GOOGLE_APP_ENGINE_PORT):
         time.sleep(1)
@@ -93,14 +93,14 @@ def start_google_app_engine_server():
 
     app_yaml_filepath = 'app.yaml'
     p = subprocess.Popen(
-        '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
-        '--clear_datastore=yes --dev_appserver_log_level=critical '
+        '%s %s/dev_appserver.py --admin_host 0.0.0.0 '
+        '--admin_port 8000 --host 0.0.0.0 --port %s '
+        '--clear_datastore=true --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' %
         (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_CLOUD_SDK_BIN,
-            GOOGLE_APP_ENGINE_PORT,
-            app_yaml_filepath
-        ), shell=True, preexec_fn=os.setsid)
+            GOOGLE_APP_ENGINE_PORT, app_yaml_filepath
+        ), shell=True)
     SUBPROCESSES.append(p)
 
 
