@@ -16,8 +16,6 @@
  * @fileoverview File to import necessary scripts for get_started page.
  */
 
-// Jquery needs to be loaded before anything else to make angular js work.
-require('third-party-imports/jquery.import');
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/pending-account-deletion-page/' +

@@ -654,11 +654,6 @@
   resolved "https://registry.yarnpkg.com/@types/google.visualization/-/google.visualization-0.0.53.tgz#ab108ed74714e7f84536e39fd8829f60a8753a5c"
   integrity sha512-K+eWwmePB7HiRgyh1VFfV4Bq/q4Nm7Ip9WMdK7NdNtvsq5amKRmRXF/j9Wvo2Ks0Px/HVn6fxL28gAsxWaQ7Eg==
 
-"@types/headroom@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@types/headroom/-/headroom-0.11.0.tgz#5dbb9c679997a4f7dde5072e4cae031cd6925550"
-  integrity sha512-Ic2Dxd1nvhQfXn9MpPwLronsL5cqakfqutvS442eX3zjqGeTYLmz03Y2KmTvo8+W+fgfBS3L7VVj7icwpo9p8Q==
-
 "@types/html-minifier-terser@^5.0.0":
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/@types/html-minifier-terser/-/html-minifier-terser-5.1.0.tgz#551a4589b6ee2cc9c1dff08056128aec29b94880"

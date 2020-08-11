@@ -142,7 +142,13 @@
           "angular-sanitize.min.js", "angular-sanitize.min.js.map", "angular-aria.js",
           "angular-aria.min.js", "angular-aria.min.js.map", "angular-touch.js",
           "angular-touch.min.js", "angular-touch.min.js.map"
-        ]
+        ],
+        "bundle": {
+          "js": [
+            "angular-animate.js", "angular-sanitize.js",
+            "angular-touch.js", "angular-aria.js"
+          ]
+        }
       },
       "angularAudio": {
         "version": "1.7.4",
@@ -171,7 +177,10 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1",
         "rootDirPrefix": "bower-angular-translate-",
         "targetDirPrefix": "bower-angular-translate-",
-        "files": ["angular-translate.min.js"]
+        "files": ["angular-translate.min.js"],
+        "bundle": {
+          "js": ["angular-translate.min.js"]
+        }
       },
       "angularTranslateLoader": {
         "version": "2.18.1",
@@ -179,7 +188,10 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-static-files",
         "rootDirPrefix": "bower-angular-translate-loader-static-files-",
         "targetDirPrefix": "bower-angular-translate-loader-static-files-",
-        "files": ["angular-translate-loader-static-files.min.js"]
+        "files": ["angular-translate-loader-static-files.min.js"],
+        "bundle": {
+          "js": ["angular-translate-loader-static-files.min.js"]
+        }
       },
       "angularDragAndDrop": {
         "version": "2.1.0",
@@ -194,14 +206,20 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-storage-cookie",
         "rootDirPrefix": "bower-angular-translate-storage-cookie-",
         "targetDirPrefix": "bower-angular-translate-storage-cookie-",
-        "files": ["angular-translate-storage-cookie.min.js"]
+        "files": ["angular-translate-storage-cookie.min.js"],
+        "bundle": {
+          "js": ["angular-translate-storage-cookie.min.js"]
+        }
       },
       "messageFormat": {
         "version": "2.0.5",
         "downloadFormat": "zip",
         "url": "https://github.com/messageformat/messageformat/archive/v2.0.5.zip",
         "targetDirPrefix": "messageformat-",
-        "rootDirPrefix": "messageformat-"
+        "rootDirPrefix": "messageformat-",
+        "bundle": {
+          "js": ["messageformat.js"]
+        }
       },
       "angularTranslateInterpolationMessageFormat": {
         "version": "2.18.1",
@@ -209,7 +227,10 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-interpolation-messageformat",
         "rootDirPrefix": "bower-angular-translate-interpolation-messageformat-",
         "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
-        "files": ["angular-translate-interpolation-messageformat.min.js"]
+        "files": ["angular-translate-interpolation-messageformat.min.js"],
+        "bundle": {
+          "js": ["angular-translate-interpolation-messageformat.min.js"]
+        }
       },
       "angularToastr": {
         "version": "1.7.0",
@@ -218,7 +239,8 @@
         "rootDirPrefix": "angular-toastr-",
         "targetDirPrefix": "angular-toastr-",
         "bundle": {
-          "css": ["dist/angular-toastr.min.css"]
+          "css": ["dist/angular-toastr.min.css"],
+          "js": ["dist/angular-toastr.tpls.min.js"]
         }
       },
       "popperJs": {
@@ -226,7 +248,10 @@
         "downloadFormat": "zip",
         "url": "https://github.com/popperjs/popper-core/archive/v1.15.0.zip",
         "rootDirPrefix": "popper-core-",
-        "targetDirPrefix": "popperJs-"
+        "targetDirPrefix": "popperJs-",
+        "bundle": {
+          "js": ["dist/umd/popper.js"]
+        }
       },
       "bootstrap": {
         "version": "4.3.1",
@@ -235,7 +260,8 @@
         "rootDir": "bootstrap-4.3.1-dist",
         "targetDirPrefix": "bootstrap-",
         "bundle": {
-          "css": ["css/bootstrap.css"]
+          "css": ["css/bootstrap.css"],
+          "js": ["js/bootstrap.js"]
         }
       },
       "bowerAngularTranslateLoaderPartial": {
@@ -244,7 +270,10 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-partial",
         "rootDirPrefix": "bower-angular-translate-loader-partial-",
         "targetDirPrefix": "bower-angular-translate-loader-partial-",
-        "files": ["angular-translate-loader-partial.min.js"]
+        "files": ["angular-translate-loader-partial.min.js"],
+        "bundle": {
+          "js": ["angular-translate-loader-partial.min.js"]
+        }
       },
       "bowerMaterial": {
         "version": "1.1.19",
@@ -254,7 +283,8 @@
         "targetDirPrefix": "bower-material-",
         "files": ["angular-material.css", "angular-material.js"],
         "bundle": {
-          "css": ["angular-material.css"]
+          "css": ["angular-material.css"],
+          "js": ["angular-material.js"]
         }
       },
       "codemirror": {
@@ -327,7 +357,10 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4",
         "rootDirPrefix": "headroom-js-",
         "targetDirPrefix": "headroom-js-",
-        "files": ["angular.headroom.min.js", "headroom.min.js"]
+        "files": ["angular.headroom.min.js", "headroom.min.js"],
+        "bundle": {
+          "js": ["headroom.min.js", "angular.headroom.min.js"]
+        }
       },
       "jquery": {
         "version": "3.5.1",
@@ -413,7 +446,10 @@
         "url": "https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages",
         "rootDirPrefix": "ui-bootstrap-",
         "targetDirPrefix": "ui-bootstrap-",
-        "files": ["ui-bootstrap-tpls-2.5.0.js", "ui-bootstrap-tpls-2.5.0.min.js"]
+        "files": ["ui-bootstrap-tpls-2.5.0.js", "ui-bootstrap-tpls-2.5.0.min.js"],
+        "bundle": {
+          "js": ["ui-bootstrap-tpls-2.5.0.js"]
+        }
       },
       "skulpt-dist": {
         "version": "1.1.0",

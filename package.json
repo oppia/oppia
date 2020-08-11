@@ -29,7 +29,6 @@
     "@types/d3-hexbin": "^0.2.3",
     "@types/d3-scale": "^2.2.0",
     "@types/google.visualization": "^0.0.53",
-    "@types/headroom": "^0.11.0",
     "@types/jasmine": "^3.3.12",
     "@types/jasminewd2": "^2.0.8",
     "@types/jquery": "^3.3.29",

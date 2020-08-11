@@ -15,8 +15,7 @@ module.exports = function(config) {
       // Since jquery, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.5.1/jquery.min.js',
-      // The module needs to be loaded directly after jquery because
-      // it imports angular js.
+      'third_party/static/angularjs-1.7.9/angular.js',
       'core/templates/karma.module.ts',
       'third_party/static/angularjs-1.7.9/angular-mocks.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
@@ -151,11 +150,7 @@ module.exports = function(config) {
           'node_modules',
           'third_party',
         ],
-        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
-        alias: {
-          messageformat: 'static/messageformat-2.0.5/messageformat.js',
-          'popper.js': 'static/popperJs-1.15.0/dist/umd/popper.js'
-        }
+        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
       devtool: 'inline-cheap-source-map',
       module: {
