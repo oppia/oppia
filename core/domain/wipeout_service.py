@@ -25,6 +25,7 @@ from core.domain import exp_services
 from core.domain import user_services
 from core.domain import wipeout_domain
 from core.platform import models
+import feconf
 import python_utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -106,40 +107,59 @@ def pre_delete_user(user_id):
         4. Create PendingDeletionRequestModel for the user.
 
     Args:
-        user_id: str. The id of the user to be deleted.
+        user_id: str. The id of the user to be deleted. If the user_id
+            corresponds to a profile user then only that profile is deleted.
+            For a full user, all its associated profile users are deleted too.
     """
-    subscribed_exploration_summaries = (
-        exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
-    explorations_to_be_deleted_ids = [
-        exp_summary.id for exp_summary in subscribed_exploration_summaries
-        if exp_summary.is_private() and
-        exp_summary.is_solely_owned_by_user(user_id)]
-    exp_services.delete_explorations(user_id, explorations_to_be_deleted_ids)
-
-    subscribed_collection_summaries = (
-        collection_services.get_collection_summaries_subscribed_to(user_id))
-    collections_to_be_deleted_ids = [
-        col_summary.id for col_summary in subscribed_collection_summaries
-        if col_summary.is_private() and
-        col_summary.is_solely_owned_by_user(user_id)]
-    collection_services.delete_collections(
-        user_id, collections_to_be_deleted_ids)
-
-    # Set all the user's email preferences to False in order to disable all
-    # ordinary emails that could be sent to the users.
-    user_services.update_email_preferences(user_id, False, False, False, False)
-
-    email = user_services.get_user_settings(user_id, strict=True).email
-    user_services.mark_user_for_deletion(user_id)
-
-    save_pending_deletion_request(
-        wipeout_domain.PendingDeletionRequest.create_default(
-            user_id,
-            email,
-            explorations_to_be_deleted_ids,
-            collections_to_be_deleted_ids
+    all_linked_user_ids = [
+        user.user_id for user in
+        user_services.get_all_profiles_auth_details_by_parent_user_id(user_id)
+    ]
+    all_linked_user_ids.append(user_id)
+    for linked_user_id in all_linked_user_ids:
+        subscribed_exploration_summaries = (
+            exp_fetchers.get_exploration_summaries_subscribed_to(
+                linked_user_id)
         )
-    )
+        explorations_to_be_deleted_ids = [
+            exp_summary.id for exp_summary in subscribed_exploration_summaries
+            if exp_summary.is_private() and
+            exp_summary.is_solely_owned_by_user(linked_user_id)]
+        exp_services.delete_explorations(
+            linked_user_id, explorations_to_be_deleted_ids)
+
+        subscribed_collection_summaries = (
+            collection_services.get_collection_summaries_subscribed_to(
+                linked_user_id)
+        )
+        collections_to_be_deleted_ids = [
+            col_summary.id for col_summary in subscribed_collection_summaries
+            if col_summary.is_private() and
+            col_summary.is_solely_owned_by_user(linked_user_id)]
+        collection_services.delete_collections(
+            linked_user_id, collections_to_be_deleted_ids)
+
+        # Set all the user's email preferences to False in order to disable all
+        # ordinary emails that could be sent to the users.
+        if feconf.ROLE_ID_LEARNER != (
+                user_services.get_user_settings(
+                    linked_user_id, strict=True).role
+            ):
+            user_services.update_email_preferences(
+                linked_user_id, False, False, False, False)
+
+        email = user_services.get_user_settings(
+            linked_user_id, strict=True).email
+        user_services.mark_user_for_deletion(linked_user_id)
+
+        save_pending_deletion_request(
+            wipeout_domain.PendingDeletionRequest.create_default(
+                linked_user_id,
+                email,
+                explorations_to_be_deleted_ids,
+                collections_to_be_deleted_ids
+            )
+        )
 
 
 def delete_user(pending_deletion_request):

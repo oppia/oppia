@@ -165,6 +165,11 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
+        user_services.set_user_pin(self.user_1_id, '12345')
+        user_services.create_new_profile(
+            self.user_1_gae_id, self.USER_1_EMAIL, profile_pin='123',
+            profile_display_alias='name'
+        )
 
     def test_pre_delete_user_email_subscriptions(self):
         email_preferences = user_services.get_email_preferences(self.user_1_id)

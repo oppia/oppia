@@ -2387,3 +2387,14 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             user_models.UserAuthDetailsModel.get_by_auth_id(
                 feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
         )
+
+    def test_get_all_profiles_for_parent_user_id_returns_all_profiles(self):
+        user_auth_details_models = [
+            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
+            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_2_ID)
+        ]
+        fetched_output = (
+            user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
+                self.USER_ID)
+        )
+        self.assertItemsEqual(user_auth_details_models, fetched_output)

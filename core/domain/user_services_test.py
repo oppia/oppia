@@ -185,6 +185,28 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
+    def test_set_invalid_user_display_alias_raises_exception(self):
+        gae_id = 'someUser'
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
+        bad_display_aliases_with_expected_error = [
+            ('', 'Expected display alias to be a string, received '),
+            (None, 'Expected display alias to be a string, received None')]
+        for display_alias, error_msg in bad_display_aliases_with_expected_error:
+            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+                user_services.set_user_display_alias(user_id, display_alias)
+
+    def test_set_invalid_user_pin_raises_exception(self):
+        gae_id = 'someUser'
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
+        bad_pins_with_expected_error = [
+            ('', 'Expected PIN to be a string, received '),
+            (None, 'Expected PIN to be a string, received None')]
+        for pin, error_msg in bad_pins_with_expected_error:
+            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+                user_services.set_user_pin(user_id, pin)
+
     def test_create_new_user_with_invalid_emails_raises_exception(self):
         bad_email_addresses_with_expected_error_message = [
             ('@', 'Invalid email address: @'),
@@ -200,7 +222,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.create_new_user('gae_id', email)
 
-    def test_create_new_user_with_invalid_email_creates_no_user_model(self):
+    def test_create_new_user_with_invalid_email_creates_no_user_models(self):
         bad_email = '@'
         error_msg = 'Invalid email address: @'
         with self.assertRaisesRegexp(utils.ValidationError, error_msg):
@@ -601,7 +623,44 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_role_from_id(user_id),
             feconf.ROLE_ID_COLLECTION_EDITOR)
 
-    def test_create_new_user_creates_a_new_user_auth_details_entry(self):
+    def test_update_user_role_from_learner_to_other_role_raises_exception(self):
+        gae_id = 'test_id'
+        user_email = 'test@email.com'
+        user_pin = '12345'
+        profile_pin = '123'
+        display_alias = 'display_alias'
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_services.set_user_pin(user_id, user_pin)
+        user_services.create_new_profile(
+            gae_id, user_email, profile_pin=profile_pin,
+            profile_display_alias=display_alias
+        )
+        profile_user_id = (
+            user_services.get_all_profiles_auth_details_by_parent_user_id(
+                user_id)[0].user_id
+        )
+        self.assertEqual(
+            user_services.get_user_role_from_id(profile_user_id),
+            feconf.ROLE_ID_LEARNER)
+        error_msg = 'Role update of a Learner is not allowed.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.update_user_role(
+                profile_user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+    def test_update_user_role_from_other_role_to_learner_raises_exception(self):
+        gae_id = 'test_id'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
+        error_msg = 'Updating to a Learner is not allowed.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.update_user_role(
+                user_id, feconf.ROLE_ID_LEARNER)
+
+    def test_create_new_user_also_creates_a_new_user_auth_details_entry(self):
         new_gae_id = 'new_gae_id'
         new_email = 'new@example.com'
 
@@ -616,6 +675,92 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
             user_settings.user_id)
         self.assertEqual(user_auth_details.gae_id, user_settings.gae_id)
+
+    def test_get_auth_details_by_user_id_for_existing_user_works_fine(self):
+        gae_id = 'new_gae_id'
+        email = 'new@example.com'
+        user_services.create_new_user(gae_id, email)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id)
+        )
+        user_auth_details = user_services.get_auth_details_by_user_id(
+            user_auth_details_model.id)
+        self.assertEqual(
+            user_auth_details.user_id, user_auth_details_model.id)
+        self.assertEqual(
+            user_auth_details.gae_id, user_auth_details_model.gae_id)
+        self.assertEqual(
+            user_auth_details.pin, user_auth_details_model.pin)
+        self.assertEqual(
+            user_auth_details.parent_user_id,
+            user_auth_details_model.parent_user_id
+        )
+
+    def test_get_auth_details_by_user_id_non_existing_user_returns_none(self):
+        non_existent_user_id = 'id_x'
+        self.assertIsNone(
+            user_services.get_auth_details_by_user_id(non_existent_user_id))
+
+    def test_get_auth_details_by_user_id_strict_non_existing_user_error(self):
+        non_existent_user_id = 'id_x'
+        error_msg = 'User not found'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.get_auth_details_by_user_id(
+                non_existent_user_id, strict=True)
+
+    def test_create_new_profile_with_parent_user_pin_set_is_success(self):
+        gae_id = 'gae_id'
+        email = 'new@example.com'
+        display_alias = 'display_alias'
+        user_pin = '12345'
+        profile_pin = '123'
+        user_services.create_new_user(gae_id, email)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id)
+        )
+        user_id = user_auth_details_model.id
+        user_services.set_user_pin(user_id, user_pin)
+        user_services.create_new_profile(
+            gae_id, email, profile_pin=profile_pin,
+            profile_display_alias=display_alias
+        )
+
+        user_auth_details_models = (
+            user_services.get_all_profiles_auth_details_by_parent_user_id(
+                user_id)
+        )
+        self.assertEqual(len(user_auth_details_models), 1)
+        self.assertEqual(user_auth_details_models[0].pin, profile_pin)
+        self.assertEqual(user_auth_details_models[0].parent_user_id, user_id)
+        self.assertIsNone(user_auth_details_models[0].gae_id)
+
+    def test_create_new_profile_with_parent_user_pin_not_set_raises_error(self):
+        gae_id = 'gae_id'
+        email = 'new@example.com'
+        display_alias = 'display_alias'
+        profile_pin = '123'
+        user_services.create_new_user(gae_id, email)
+        error_msg = 'Pin must be set for a full user before creating a profile.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.create_new_profile(
+                gae_id, email, profile_pin=profile_pin,
+                profile_display_alias=display_alias
+            )
+
+    def test_create_new_profile_with_nonexistent_user_raises_error(self):
+        non_existent_gae_id = 'gae_id_x'
+        non_existent_email = 'x@example.com'
+        profile_pin = '123'
+        display_alias = 'display_alias'
+        error_msg = 'User not found.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.create_new_profile(
+                non_existent_gae_id, non_existent_email,
+                profile_pin=profile_pin,
+                profile_display_alias=display_alias
+            )
 
     def test_mark_user_for_deletion_deletes_user_settings(self):
         gae_id = 'test_id'
@@ -1357,14 +1502,14 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
-    def test_validate_non_str_user_id(self):
+    def test_validate_non_str_user_id_raises_exception(self):
         self.user_settings.user_id = 0
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected user_id to be a string'
         ):
             self.user_settings.validate()
 
-    def test_validate_user_id(self):
+    def test_validate_wrong_format_user_id_raises_exception(self):
         self.user_settings.user_id = 'uid_%sA' % ('a' * 31)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'The user ID is in a wrong format.'
@@ -1383,34 +1528,41 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_gae_id(self):
+    def test_validate_non_str_gae_id_raises_exception(self):
         self.user_settings.gae_id = 0
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected gae_id to be a string'
         ):
             self.user_settings.validate()
 
-    def test_validate_empty_user_id(self):
+    def test_validate_non_str_display_alias_raises_exception(self):
+        self.user_settings.display_alias = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected display alias to be a string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_empty_user_id_raises_exception(self):
         self.user_settings.user_id = ''
         with self.assertRaisesRegexp(
             utils.ValidationError, 'No user id specified.'
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_role(self):
+    def test_validate_non_str_role_raises_exception(self):
         self.user_settings.role = 0
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected role to be a string'
         ):
             self.user_settings.validate()
 
-    def test_validate_role(self):
+    def test_validate_invalid_role_name_raises_exception(self):
         self.user_settings.role = 'invalid_role'
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
 
-    def test_validate_non_str_creator_dashboard_display_pref(self):
+    def test_validate_non_str_creator_dashboard_display_pref_raises_error(self):
         self.user_settings.creator_dashboard_display_pref = 0
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -1418,7 +1570,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_creator_dashboard_display_pref(self):
+    def test_validate_invalid_creator_dashboard_display_pref_raises_error(self):
         self.user_settings.creator_dashboard_display_pref = (
             'invalid_creator_dashboard_display_pref')
         with self.assertRaisesRegexp(
@@ -1428,7 +1580,16 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_guest_has_not_fully_registered(self):
+    def test_validate_empty_display_alias_for_profiles_raises_error(self):
+        user_services.set_user_pin(self.owner_id, '12345')
+        gae_id = self.get_gae_id_from_email(self.OWNER_EMAIL)
+        profile_pin = '123'
+        error_msg = 'Profile user must have a display alias'
+        with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+            user_services.create_new_profile(
+                gae_id, self.OWNER_EMAIL, profile_pin=profile_pin)
+
+    def test_has_not_fully_registered_for_guest_user_is_false(self):
         self.assertFalse(user_services.has_fully_registered_account(None))
 
     def test_create_new_user_with_existing_gae_id_raises_error(self):

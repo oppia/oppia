@@ -2298,3 +2298,17 @@ class UserAuthDetailsModel(base_models.BaseModel):
         if auth_service == feconf.AUTH_METHOD_GAE:
             return cls.query(cls.gae_id == auth_id).get()
         return None
+
+    @classmethod
+    def get_all_profiles_by_parent_user_id(cls, parent_user_id):
+        """Fetch all user entries with the given parent_user_id.
+
+        Args:
+            parent_user_id: str. User id of the parent_user whose associated
+                profiles we are querying for.
+
+        Returns:
+            UserAuthDetailsModels. List of UserAuthDetailsModel instances mapped
+            to the queried parent_user_id.
+        """
+        return cls.query(cls.parent_user_id == parent_user_id).fetch()
