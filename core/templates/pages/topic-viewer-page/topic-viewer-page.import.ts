@@ -16,7 +16,9 @@
  * @fileoverview Directive scripts for the topic viewer.
  */
 
-// The module needs to be loaded before everything else since it defines the
+// Jquery needs to be loaded before anything else to make angular js work.
+require('third-party-imports/jquery.import');
+// The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/topic-viewer-page/topic-viewer-page.module.ts');
 require('App.ts');
@@ -24,5 +26,5 @@ require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/topic-viewer-page/navbar-breadcrumb/' +
-  'topic-viewer-navbar-breadcrumb.directive.ts');
+  'topic-viewer-navbar-breadcrumb.component.ts');
 require('pages/topic-viewer-page/topic-viewer-page.component.ts');

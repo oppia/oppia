@@ -32,3 +32,7 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'SUBTOPIC_VIEWER_URL_TEMPLATE',
   TopicViewerDomainConstants.SUBTOPIC_VIEWER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'REVIEW_TESTS_URL_TEMPLATE',
+  TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE);

@@ -47,7 +47,8 @@ describe('Classroom backend API service', function() {
     version: 2,
     additional_story_count: 0,
     topic_model_created_on: 231241343,
-    topic_model_last_updated: 3454354354
+    topic_model_last_updated: 3454354354,
+    url_fragment: 'topic-name-one'
   };
   let secondTopicSummaryDict: TopicSummaryBackendDict = {
     id: 'topic2',
@@ -63,7 +64,8 @@ describe('Classroom backend API service', function() {
     version: 2,
     additional_story_count: 0,
     topic_model_created_on: 231241343,
-    topic_model_last_updated: 3454354354
+    topic_model_last_updated: 3454354354,
+    url_fragment: 'topic-name-two'
   };
 
   let responseDictionaries = {
@@ -100,7 +102,7 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomData('math').then(
+      classroomBackendApiService.fetchClassroomDataAsync('math').then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -120,7 +122,7 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomData('0').then(
+      classroomBackendApiService.fetchClassroomDataAsync('0').then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/classroom_data_handler/0');
@@ -142,7 +144,7 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomData('0').then(
+      classroomBackendApiService.fetchClassroomDataAsync('0').then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -160,7 +162,7 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomPageIsShownStatus().then(
+      classroomBackendApiService.fetchClassroomPageIsShownStatusAsync().then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -180,7 +182,7 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomPageIsShownStatus().then(
+      classroomBackendApiService.fetchClassroomPageIsShownStatusAsync().then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
