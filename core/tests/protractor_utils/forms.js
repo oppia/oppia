@@ -597,10 +597,9 @@ var toRichText = async function(text) {
  * loads more divs.
  */
 var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
-  // The number of pixels to scroll between reading different sections of
-  // CodeMirror's text. 400 pixels is about 15 lines, which will work if
-  // codemirror's buffer (viewportMargin) is set to at least 10 (the default).
-  var CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS = 400;
+  // The number of lines to scroll between reading different sections of
+  // CodeMirror's text.
+  var NUMBER_OF_LINE_TO_SCROLL = 15;
 
   /**
    * This recursive function is used by expectTextWithHighlightingToBe().
@@ -623,6 +622,9 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     await browser.executeScript(
       '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
       '().scrollTop(' + String(scrollTo) + ');');
+    var lineHeight = await elem.element(
+      by.css('.CodeMirror-linenumber')).getAttribute(
+        'clientHeight');
     var lineNumbers = await elem.all(by.xpath('./div')).map(
       async function(lineElement) {
         var lineNumber = await lineElement.element(
@@ -649,7 +651,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     if (largestLineNumber !== currentLineNumber) {
       await _compareTextAndHighlightingFromLine(
         largestLineNumber,
-        scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
+        scrollTo + lineHeight * NUMBER_OF_LINE_TO_SCROLL,
         compareDict);
     } else {
       for (var lineNumber in compareDict) {
@@ -684,6 +686,9 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
       '().scrollTop(' + String(scrollTo) + ');');
     var text = await elem.getText();
+    var lineHeight = await elem.element(
+      by.css('.CodeMirror-linenumber')).getAttribute(
+        'clientHeight');
     // The 'text' arg is a string 2n lines long representing n lines of text
     // codemirror has loaded. The (2i)th line contains a line number and the
     // (2i+1)th line contains the text on that line.
@@ -706,7 +711,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     if (largestLineNumber !== currentLineNumber) {
       await _compareTextFromLine(
         largestLineNumber,
-        scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
+        scrollTo + lineHeight * NUMBER_OF_LINE_TO_SCROLL,
         compareDict);
     } else {
       for (var dictLineNumber in compareDict) {
