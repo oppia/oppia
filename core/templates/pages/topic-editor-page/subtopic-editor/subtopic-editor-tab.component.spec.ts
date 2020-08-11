@@ -346,6 +346,7 @@ describe('Subtopic editor tab', function() {
   it('should call initEditor when topic is initialized', function() {
     spyOn(ctrl, 'initEditor').and.callThrough();
     topicInitializedEventEmitter.emit();
+    expect(ctrl.initEditor).toHaveBeenCalledTimes(1);
     topicReinitializedEventEmitter.emit();
     expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
   });

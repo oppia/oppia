@@ -140,7 +140,9 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
         });
       spyOn(ctrl, 'initEditor').and.callThrough();
       ctrl.init();
+      expect(ctrl.initEditor).toHaveBeenCalledTimes(1);
       topicInitializedEventEmitter.emit();
+      expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
       topicReinitializedEventEmitter.emit();
       expect(ctrl.initEditor).toHaveBeenCalledTimes(3);
     });
