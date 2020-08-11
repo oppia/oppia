@@ -31,5 +31,5 @@ export class SchemaFormSubmittedService {
   }
 }
 
-angular.module('oppia').factory(
-  'SchemaFormSubmittedService', downgradeInjectable(SchemaFormSubmittedService));
+angular.module('oppia').factory('SchemaFormSubmittedService',
+  downgradeInjectable(SchemaFormSubmittedService));

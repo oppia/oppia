@@ -837,7 +837,8 @@ export class UpgradedServices {
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
-    upgradedServices['SchemaFormSubmittedService'] = new SchemaFormSubmittedService();
+    upgradedServices['SchemaFormSubmittedService'] =
+      new SchemaFormSubmittedService();
     upgradedServices['SchemaUndefinedLastElementService'] =
       new SchemaUndefinedLastElementService();
     upgradedServices['SetInputRulesService'] = new SetInputRulesService();
