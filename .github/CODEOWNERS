@@ -31,7 +31,7 @@
 
 
 # Android team
-/core/domain/android_validation_constants*.py @BenHenning
+/core/domain/android_validation_constants*.py @seanlip  # Until 16 August 2020
 
 
 # Angular Migration team
