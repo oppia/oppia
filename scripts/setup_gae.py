@@ -105,7 +105,7 @@ def main(args=None):
         # This command installs specific google cloud components for the google
         # cloud sdk to prevent the need for developers to install it themselves
         # when the app engine development server starts up. The --quiet
-        # parameter specifically tells the gcloud program to auto fill all
+        # parameter specifically tells the gcloud program to autofill all
         # prompts with default values. In this case, that means accepting all
         # installations of gcloud packages.
         subprocess.call([
