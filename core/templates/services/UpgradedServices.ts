@@ -225,8 +225,8 @@ import { ExtractImageFilenamesFromStateService } from
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
-import { FeatureFlagResultsObjectFactory } from
-  'domain/feature_gating/feature-flag-results-object.factory';
+import { FeatureStatusSummaryObjectFactory } from
+  'domain/feature_gating/feature-status-summary-object.factory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -762,8 +762,8 @@ export class UpgradedServices {
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['FeaturedTranslationLanguageObjectFactory'] =
       new FeaturedTranslationLanguageObjectFactory();
-    upgradedServices['FeatureFlagResultsObjectFactory'] =
-      new FeatureFlagResultsObjectFactory();
+    upgradedServices['FeatureStatusSummaryObjectFactory'] =
+      new FeatureStatusSummaryObjectFactory();
     upgradedServices['FeedbackMessageSummaryObjectFactory'] =
       new FeedbackMessageSummaryObjectFactory();
     upgradedServices['FeedbackThreadSummaryObjectFactory'] =

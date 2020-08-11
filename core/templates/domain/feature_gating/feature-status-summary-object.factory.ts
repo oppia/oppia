@@ -13,36 +13,36 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating FeatureFlagResults domain objects.
+ * @fileoverview Factory for creating FeatureStatusSummary domain objects.
  */
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface FeatureFlagResultsBackendDict {
+export interface FeatureStatusSummaryBackendDict {
   [featureName: string]: boolean;
 }
 
 /**
- * Represents the evaluation result of all feature flags received from the
+ * Represents the evaluation summary of all feature flags received from the
  * server.
  */
-export class FeatureFlagResults {
-  data: Map<string, boolean>;
+export class FeatureStatusSummary {
+  featureNameToFlag: Map<string, boolean>;
 
-  constructor(data: FeatureFlagResultsBackendDict) {
-    this.data = new Map(Object.entries(data));
+  constructor(backendDict: FeatureStatusSummaryBackendDict) {
+    this.featureNameToFlag = new Map(Object.entries(backendDict));
   }
 
   /**
    * Creates a dict representation of the instance.
    *
-   * @returns {FeatureFlagResultsBackendDict} - The dict representation
+   * @returns {FeatureStatusSummaryBackendDict} - The dict representation
    * of the instance.
    */
-  toBackendDict(): FeatureFlagResultsBackendDict {
+  toBackendDict(): FeatureStatusSummaryBackendDict {
     const backendDict = {};
-    for (const [key, value] of this.data.entries()) {
+    for (const [key, value] of this.featureNameToFlag.entries()) {
       backendDict[key] = value;
     }
     return backendDict;
@@ -57,24 +57,23 @@ export class FeatureFlagResults {
    * @throws {Error} - If the feature with the specified name doesn't exist.
    */
   isFeatureEnabled(featureName: string): boolean {
-    if (this.data.has(featureName)) {
-      return this.data.get(featureName);
-    } else {
+    if (!this.featureNameToFlag.has(featureName)) {
       throw new Error(`Feature '${featureName}' does not exist.`);
     }
+    return this.featureNameToFlag.get(featureName);
   }
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class FeatureFlagResultsObjectFactory {
+export class FeatureStatusSummaryObjectFactory {
   createFromBackendDict(
-      backendDict: FeatureFlagResultsBackendDict): FeatureFlagResults {
-    return new FeatureFlagResults(backendDict);
+      backendDict: FeatureStatusSummaryBackendDict): FeatureStatusSummary {
+    return new FeatureStatusSummary(backendDict);
   }
 }
 
 angular.module('oppia').factory(
-  'FeatureFlagResultsObjectFactory',
-  downgradeInjectable(FeatureFlagResultsObjectFactory));
+  'FeatureStatusSummaryObjectFactory',
+  downgradeInjectable(FeatureStatusSummaryObjectFactory));
