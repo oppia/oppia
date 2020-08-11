@@ -555,8 +555,7 @@
 
 
 # User Data Takeout.
-/core/domain/takeout_domain.py @vojtechjelinek @seanlip
-/core/domain/takeout_service*.py @vojtechjelinek @seanlip
+/core/domain/takeout_*.py @vojtechjelinek @seanlip
 /core/domain/wipeout_*.py @vojtechjelinek @seanlip
 
 
