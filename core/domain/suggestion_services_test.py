@@ -94,6 +94,27 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.status, status)
 
+    def accept_suggestion_for_testing(
+            self, suggestion_id, reviewer_id, commit_message, review_message):
+        """Uses the appropriate mocks to successfully call accept_suggestion.
+        """
+        with self.swap(
+            exp_services, 'update_exploration', self.mock_update_exploration):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    suggestion_registry.SuggestionEditStateContent,
+                    'pre_accept_validate',
+                    self.mock_pre_accept_validate_does_nothing):
+                    with self.swap(
+                        suggestion_registry.SuggestionEditStateContent,
+                        'get_change_list_for_accepting_suggestion',
+                        self.mock_get_change_list_does_nothing):
+                        suggestion_services.accept_suggestion(
+                            suggestion_id, reviewer_id,
+                            commit_message, review_message)
+
     def mock_generate_new_thread_id(self, unused_entity_type, unused_entity_id):
         return self.THREAD_ID
 
@@ -350,33 +371,19 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
-        with self.swap(
-            exp_services, 'update_exploration', self.mock_update_exploration):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                with self.swap(
-                    suggestion_registry.SuggestionEditStateContent,
-                    'pre_accept_validate',
-                    self.mock_pre_accept_validate_does_nothing):
-                    with self.swap(
-                        suggestion_registry.SuggestionEditStateContent,
-                        'get_change_list_for_accepting_suggestion',
-                        self.mock_get_change_list_does_nothing):
-                        suggestion_services.accept_suggestion(
-                            self.suggestion_id, self.reviewer_id,
-                            self.COMMIT_MESSAGE, 'review message')
+        self.accept_suggestion_for_testing(self.suggestion_id,
+            self.reviewer_id, self.COMMIT_MESSAGE, 'review message')
 
-            self.assert_suggestion_status(
-                self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
-            suggestion = suggestion_services.get_suggestion_by_id(
-                self.suggestion_id)
-            self.assertEqual(
-                suggestion.final_reviewer_id, self.reviewer_id)
-            thread_messages = feedback_services.get_messages(self.THREAD_ID)
-            last_message = thread_messages[len(thread_messages) - 1]
-            self.assertEqual(
-                last_message.text, 'review message')
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
+        self.assertEqual(
+            suggestion.final_reviewer_id, self.reviewer_id)
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
+        last_message = thread_messages[len(thread_messages) - 1]
+        self.assertEqual(
+            last_message.text, 'review message')
 
     def test_accept_suggestion_with_invalid_math_fails(self):
         """Test that the method for accepting suggestions raises error when
@@ -412,24 +419,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'Invalid math tags found in the suggestion with id %s.' % (
                 self.suggestion_id)
         )
-        with self.swap(
-            exp_services, 'update_exploration', self.mock_update_exploration):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                with self.swap(
-                    suggestion_registry.SuggestionEditStateContent,
-                    'pre_accept_validate',
-                    self.mock_pre_accept_validate_does_nothing):
-                    with self.swap(
-                        suggestion_registry.SuggestionEditStateContent,
-                        'get_change_list_for_accepting_suggestion',
-                        self.mock_get_change_list_does_nothing):
-                        with self.assertRaisesRegexp(
-                            Exception, expected_exception_regexp):
-                            suggestion_services.accept_suggestion(
-                                self.suggestion_id, self.reviewer_id,
-                                self.COMMIT_MESSAGE, 'review message')
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+            self.accept_suggestion_for_testing(
+                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
+                'review message'
+            )
 
         # Assert that the status of the suggestion hasn't changed.
         self.assert_suggestion_status(
@@ -449,8 +443,22 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
         # Accept the suggestion.
-        suggestion_services.accept_suggestion(
-                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
+        with self.swap(
+            exp_services, 'update_exploration', self.mock_update_exploration):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    suggestion_registry.SuggestionEditStateContent,
+                    'pre_accept_validate',
+                    self.mock_pre_accept_validate_does_nothing):
+                    with self.swap(
+                        suggestion_registry.SuggestionEditStateContent,
+                        'get_change_list_for_accepting_suggestion',
+                        self.mock_get_change_list_does_nothing):
+                        suggestion_services.accept_suggestion(
+                            self.suggestion_id, self.reviewer_id,
+                            self.COMMIT_MESSAGE, None)
         # Verify that the suggestion has been accepted.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
@@ -589,8 +597,22 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
         # Accept the suggestion.
-        suggestion_services.accept_suggestion(
-                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
+        with self.swap(
+            exp_services, 'update_exploration', self.mock_update_exploration):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    suggestion_registry.SuggestionEditStateContent,
+                    'pre_accept_validate',
+                    self.mock_pre_accept_validate_does_nothing):
+                    with self.swap(
+                        suggestion_registry.SuggestionEditStateContent,
+                        'get_change_list_for_accepting_suggestion',
+                        self.mock_get_change_list_does_nothing):
+                        suggestion_services.accept_suggestion(
+                        self.suggestion_id, self.reviewer_id,
+                        self.COMMIT_MESSAGE, None)
         # Verify that the suggestion has been accepted.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
