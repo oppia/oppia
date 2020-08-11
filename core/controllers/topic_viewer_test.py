@@ -336,7 +336,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'new_topic'))
             expected_dict = {
                 'topic_name': 'new_topic',
                 'topic_id': self.topic_id,
@@ -386,7 +386,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'new_topic'))
             expected_dict = {
                 'topic_name': 'new_topic',
                 'topic_id': self.topic_id,
@@ -429,7 +429,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'new_topic'))
             expected_dict = {
                 'topic_name': 'new_topic',
                 'topic_id': self.topic_id,
@@ -474,7 +474,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'new_topic'))
             expected_dict = {
                 'topic_name': 'new_topic',
                 'topic_id': self.topic_id,
