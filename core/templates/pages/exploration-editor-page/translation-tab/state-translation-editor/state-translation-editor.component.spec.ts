@@ -30,7 +30,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
-describe('State Translation Editor Component', function() {
+fdescribe('State Translation Editor Component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
@@ -111,6 +111,7 @@ describe('State Translation Editor Component', function() {
     },
   };
   var stateObj = null;
+  var ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -162,7 +163,7 @@ describe('State Translation Editor Component', function() {
       });
 
       $scope = $rootScope.$new();
-      var ctrl = $componentController('stateTranslationEditor', {
+      ctrl = $componentController('stateTranslationEditor', {
         $scope: $scope,
         StateEditorService: stateEditorService,
         StateWrittenTranslationsService: stateWrittenTranslationsService,
@@ -170,6 +171,10 @@ describe('State Translation Editor Component', function() {
       });
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should evaluate $scope properties after controller initialization',
       function() {
@@ -363,7 +368,7 @@ describe('State Translation Editor Component', function() {
       });
 
       $scope = $rootScope.$new();
-      var ctrl = $componentController('stateTranslationEditor', {
+      ctrl = $componentController('stateTranslationEditor', {
         $scope: $scope,
         StateEditorService: stateEditorService,
         StateWrittenTranslationsService: stateWrittenTranslationsService,
@@ -371,6 +376,11 @@ describe('State Translation Editor Component', function() {
       });
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
 
     it('should evaluate $scope properties after controller initialization',
       function() {

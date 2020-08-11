@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for Audio Translation Bar directive.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
@@ -84,6 +85,10 @@ describe('Audio translation bar directive', function() {
   var explorationId = 'exp1';
   var isTranslatableSpy = null;
 
+  var mockActiveContentIdChangedEventEmitter = new EventEmitter();
+  var mockActiveLanguageChangedEventEmitter = new EventEmitter();
+  var mockShowTranslationTabBusyModalEventEmitter = new EventEmitter();
+
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
@@ -147,6 +152,18 @@ describe('Audio translation bar directive', function() {
     // recordedvoiceovers and not all the exploration.
     spyOn(explorationStatesService, 'saveRecordedVoiceovers').and
       .callFake(function() {});
+
+    spyOnProperty(translationTabActiveContentIdService,
+      'onActiveContentIdChanged').and.returnValue(
+      mockActiveContentIdChangedEventEmitter);
+
+    spyOnProperty(translationLanguageService,
+      'onActiveLanguageChanged').and.returnValue(
+      mockActiveLanguageChangedEventEmitter);
+
+    spyOnProperty(stateEditorService,
+      'onShowTranslationTabBusyModal').and.returnValue(
+      mockShowTranslationTabBusyModalEventEmitter);
 
     stateRecordedVoiceoversService.init(stateName,
       recordedVoiceoversObjectFactory.createFromBackendDict({
@@ -249,7 +266,7 @@ describe('Audio translation bar directive', function() {
     $scope.checkAndStartRecording();
     $scope.$apply();
 
-    $rootScope.$broadcast('activeContentIdChanged');
+    mockActiveContentIdChangedEventEmitter.emit();
 
     expect(voiceoverRecordingService.stopRecord).toHaveBeenCalled();
     expect(voiceoverRecordingService.closeRecorder).toHaveBeenCalled();
@@ -272,10 +289,16 @@ describe('Audio translation bar directive', function() {
     $scope.checkAndStartRecording();
     $scope.$apply();
 
-    $rootScope.$broadcast('activeLanguageChanged');
+    mockActiveLanguageChangedEventEmitter.emit();
 
     expect(voiceoverRecordingService.stopRecord).toHaveBeenCalled();
     expect(voiceoverRecordingService.closeRecorder).toHaveBeenCalled();
+  });
+
+  it('should open translation busy modal on event', () => {
+    spyOn($uibModal, 'open').and.callThrough();
+    mockShowTranslationTabBusyModalEventEmitter.emit();
+    expect($uibModal.open).toHaveBeenCalled();
   });
 
   it('should stop record when externalSave flag is broadcasted', function() {

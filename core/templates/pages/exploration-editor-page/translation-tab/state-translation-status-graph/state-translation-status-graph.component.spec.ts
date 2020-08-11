@@ -28,6 +28,7 @@ import { StateWrittenTranslationsService } from
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
+import { Subscription } from 'rxjs';
 
 describe('State Translation Status Graph Component', function() {
   var $rootScope = null;
@@ -144,13 +145,28 @@ describe('State Translation Status Graph Component', function() {
       });
     }));
 
+    var showTranslationTabBusyModalspy = null;
+    var testSubscriptions = null;
+
+    beforeEach(() => {
+      showTranslationTabBusyModalspy = jasmine.createSpy(
+        'showTranslationTabBusyModal');
+      testSubscriptions = new Subscription();
+      testSubscriptions.add(
+        stateEditorService.onShowTranslationTabBusyModal.subscribe(
+          showTranslationTabBusyModalspy));
+    });
+
+    afterEach(() => {
+      testSubscriptions.unsubscribe();
+    });
+
     it('should show translation tab busy modal', function() {
-      var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(stateEditorService, 'setActiveStateName');
       $scope.onClickStateInMap('State2');
 
       expect(stateEditorService.setActiveStateName).not.toHaveBeenCalled();
-      expect(broadcastSpy).toHaveBeenCalledWith('showTranslationTabBusyModal');
+      expect(showTranslationTabBusyModalspy).toHaveBeenCalled();
     });
   });
 });
