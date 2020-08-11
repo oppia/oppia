@@ -64,6 +64,7 @@ GOOGLE_APP_ENGINE_HOME = os.path.join(
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
+GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
 PYCODESTYLE_PATH = os.path.join(

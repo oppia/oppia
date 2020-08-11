@@ -17,14 +17,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from scripts import common
 import json
 import os
 import subprocess
 import sys
-
-GCLOUD_PATH = os.path.join(
-    '..', 'oppia_tools', 'google-cloud-sdk-304.0.0', 'google-cloud-sdk',
-    'bin', 'gcloud')
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
@@ -39,7 +36,7 @@ sys.path.insert(0, GAE_DIR)
 def require_gcloud_to_be_available():
     """Check whether gcloud is installed while undergoing deployment process."""
     try:
-        subprocess.check_output([GCLOUD_PATH, '--version'])
+        subprocess.check_output([common.GCLOUD_PATH, '--version'])
     except Exception:
         raise Exception(
             'gcloud required, but could not be found. Please run python -m '
@@ -55,8 +52,8 @@ def update_indexes(index_yaml_path, app_name):
     """
     assert os.path.isfile(index_yaml_path), 'Missing indexes file.'
     subprocess.check_output([
-        GCLOUD_PATH, '--quiet', 'datastore', 'indexes', 'create',
-        index_yaml_path, '--project=%s' % app_name])
+        common.GCLOUD_PATH, '--quiet', 'datastore', 'indexes',
+        'create', index_yaml_path, '--project=%s' % app_name])
 
 
 def get_all_index_descriptions(app_name):
@@ -69,7 +66,7 @@ def get_all_index_descriptions(app_name):
         list. A list of dict of uploaded indexes.
     """
     listed_indexes = subprocess.check_output([
-        GCLOUD_PATH, 'datastore', 'indexes', 'list',
+        common.GCLOUD_PATH, 'datastore', 'indexes', 'list',
         '--project=%s' % app_name, '--format=json'])
     return json.loads(listed_indexes)
 
@@ -117,8 +114,8 @@ def get_currently_served_version(app_name):
         str. The current serving version.
     """
     listed_versions = subprocess.check_output([
-        GCLOUD_PATH, 'app', 'versions', 'list', '--hide-no-traffic',
-        '--service=default', '--project=%s' % app_name])
+        common.GCLOUD_PATH, 'app', 'versions', 'list',
+        '--hide-no-traffic', '--service=default', '--project=%s' % app_name])
     default_version_line_start_str = 'default  '
     listed_versions = listed_versions[
         listed_versions.index(default_version_line_start_str) + len(
@@ -134,8 +131,9 @@ def switch_version(app_name, version_to_switch_to):
         version_to_switch_to: str. The version to switch to.
     """
     subprocess.check_output([
-        GCLOUD_PATH, 'app', 'services', 'set-traffic', 'default',
-        '--splits', '%s=1' % version_to_switch_to, '--project=%s' % app_name])
+        common.GCLOUD_PATH, 'app', 'services', 'set-traffic',
+        'default', '--splits', '%s=1' % version_to_switch_to,
+        '--project=%s' % app_name])
 
 
 def deploy_application(app_yaml_path, app_name, version=None):
@@ -147,8 +145,8 @@ def deploy_application(app_yaml_path, app_name, version=None):
         version: str or None. If provided, the version to use.
     """
     args = [
-        GCLOUD_PATH, '--quiet', 'app', 'deploy', app_yaml_path,
-        '--no-promote', '--no-stop-previous-version',
+        common.GCLOUD_PATH, '--quiet', 'app', 'deploy',
+        app_yaml_path, '--no-promote', '--no-stop-previous-version',
         '--project=%s' % app_name]
     if version is not None:
         args.append('--version=%s' % version)

@@ -42,9 +42,6 @@ import python_utils
 import release_constants
 from scripts import common
 
-GCLOUD_PATH = os.path.join(
-    '..', 'oppia_tools', 'google-cloud-sdk-304.0.0', 'google-cloud-sdk',
-    'bin', 'gcloud')
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
@@ -69,7 +66,9 @@ def set_project(project_name):
     Args:
         project_name: str. The name of the project.
     """
-    common.run_cmd([GCLOUD_PATH, 'config', 'set', 'project', project_name])
+    common.run_cmd([
+        common.GCLOUD_PATH, 'config', 'set', 'project',
+        project_name])
 
 
 def initiate_backup_restoration_process():
@@ -90,14 +89,15 @@ def initiate_backup_restoration_process():
         raise Exception('Invalid export metadata filepath: %s' % (
             export_metadata_filepath))
     common.run_cmd([
-        GCLOUD_PATH, 'datastore', 'import',
+        common.GCLOUD_PATH, 'datastore', 'import',
         'gs://%s' % export_metadata_filepath, '--async'])
 
 
 def check_backup_restoration_status():
     """Checks the status of backup restoration process."""
     python_utils.PRINT(
-        common.run_cmd([GCLOUD_PATH, 'datastore', 'operations', 'list']))
+        common.run_cmd([
+            common.GCLOUD_PATH, 'datastore', 'operations', 'list']))
 
 
 def cancel_operation():
@@ -121,7 +121,8 @@ def cancel_operation():
         'details.\n')
     operation_name = python_utils.INPUT().strip()
     common.run_cmd([
-        GCLOUD_PATH, 'datastore', 'operations', 'cancel', operation_name])
+        common.GCLOUD_PATH, 'datastore', 'operations', 'cancel',
+        operation_name])
 
 
 def main(args=None):

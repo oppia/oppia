@@ -26,7 +26,6 @@ import python_utils
 from scripts import common
 from scripts.release_scripts import restore_backup
 
-
 class RestoreBackupTests(test_utils.GenericTestBase):
     """Test the methods for restoring backup."""
 
@@ -84,7 +83,7 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.all_cmd_tokens,
             [
-                restore_backup.GCLOUD_PATH, 'config', 'set', 'project',
+                common.GCLOUD_PATH, 'config', 'set', 'project',
                 'sample_project_name'])
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -115,9 +114,9 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.all_cmd_tokens,
             [
-                restore_backup.GCLOUD_PATH, 'config', 'set', 'project',
+                common.GCLOUD_PATH, 'config', 'set', 'project',
                 'sample_project_name',
-                restore_backup.GCLOUD_PATH, 'datastore', 'import',
+                common.GCLOUD_PATH, 'datastore', 'import',
                 'gs://%s' % valid_export_metadata_filepath, '--async'])
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -127,7 +126,7 @@ class RestoreBackupTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             self.all_cmd_tokens,
-            [restore_backup.GCLOUD_PATH, 'datastore', 'operations', 'list'])
+            [common.GCLOUD_PATH, 'datastore', 'operations', 'list'])
 
     def test_cancel_operation_when_user_allows_cancellation_after_warning(self):
         print_arr = []
@@ -144,9 +143,9 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.all_cmd_tokens,
             [
-                restore_backup.GCLOUD_PATH, 'datastore', 'operations', 'list',
-                restore_backup.GCLOUD_PATH, 'datastore', 'operations', 'cancel',
-                'Sample operation'])
+                common.GCLOUD_PATH, 'datastore', 'operations', 'list',
+                common.GCLOUD_PATH, 'datastore', 'operations',
+                'cancel', 'Sample operation'])
 
     def test_cancel_operation_when_user_aborts_cancellation_after_warning(self):
         print_arr = []
