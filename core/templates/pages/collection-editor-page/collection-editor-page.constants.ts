@@ -26,7 +26,4 @@ export class CollectionEditorPageConstants {
 
   public static COLLECTION_TITLE_INPUT_FOCUS_LABEL =
     'collectionTitleInputFocusLabel';
-
-  public static EVENT_COLLECTION_INITIALIZED = 'collectionInitialized';
-  public static EVENT_COLLECTION_REINITIALIZED = 'collectionReinitialized';
 }

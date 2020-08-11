@@ -47,8 +47,13 @@
     </div>
     <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName !== 'myContributionTab'">
       <div class="oppia-mascot-avatar-container">
-        <img class="oppia-mascot-avatar"
-             ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>" alt="">
+        <a ng-class="{'oppia-disabled-image-link': ($ctrl.OPPIA_AVATAR_LINK_URL === null)}"
+           ng-href="<[$ctrl.OPPIA_AVATAR_LINK_URL]>"
+           rel="noopener"
+           target="_blank">
+          <img class="oppia-mascot-avatar"
+               ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>" alt="">
+        </a>
       </div>
       <div class="oppia-opportunities-tabs-explanation" data-tab-name="<[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]>">
         <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
