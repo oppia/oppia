@@ -127,7 +127,8 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.clickOpportunityActionButton(
       'Question 1', SKILL_DESCRIPTIONS[0]);
-    await contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear();
+    await (
+      contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear());
     await contributorDashboardPage.clickAcceptQuestionSuggestionButton();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectEmptyOpportunityAvailabilityMessage();
@@ -184,7 +185,8 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.clickOpportunityActionButton(
       'Question 1', SKILL_DESCRIPTIONS[0]);
-    await contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear();
+    await (
+      contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear());
     await contributorDashboardPage.setQuestionSuggestionReviewMessage(
       'review message');
     await contributorDashboardPage.clickRejectQuestionSuggestionButton();
