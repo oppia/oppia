@@ -2362,7 +2362,7 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
-                html_validation_service.add_dimensions_to_image_tags, # pylint: disable=line-too-long
+                html_validation_service.add_dimensions_to_image_tags,
                 exp_id)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
@@ -3143,10 +3143,10 @@ class Exploration(python_utils.OBJECT):
     def _convert_states_v38_dict_to_v39_dict(cls, states_dict):
         """Converts from version 38 to 39. Version 39 removes the fields
         rule_specs in AnswerGroups, and adds new fields rule_types_to_inputs and
-        rule_types_to_inputs_translations. rule_types_to_inputs is a dictionary that maps
-        rule type to a list of rule inputs that share the rule type.
+        rule_types_to_inputs_translations. rule_types_to_inputs is a dictionary
+        that maps rule type to a list of rule inputs that share the rule type.
         rule_types_to_inputs_translations is a dict mapping abbreviated language
-        codes to a mapping of rule_type to rule_types_to_inputs.
+        codes to a mapping of rule type to rule inputs.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,

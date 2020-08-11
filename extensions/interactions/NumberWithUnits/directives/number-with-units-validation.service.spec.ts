@@ -147,7 +147,8 @@ describe('NumberWithUnitsValidationService', () => {
 
   it('should not catch equals followed by equals with unequal values',
     () => {
-      answerGroups[0].updateRuleTypesToInputs([equalsTwoRule, equalsTwoByThreeRule]);
+      answerGroups[0].updateRuleTypesToInputs(
+        [equalsTwoRule, equalsTwoByThreeRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([]);

@@ -3496,7 +3496,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_answer_groups(
                 'invalid_answer_groups')
 
-    def test_cannot_update_answer_groups_with_non_dict_rule_types_to_inputs(self):
+    def test_cannot_update_answer_groups_with_non_dict_rule_types_to_inputs(
+            self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         answer_groups_list = [{
             'outcome': {
@@ -3590,11 +3591,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with logging_swap, self.assertRaisesRegexp(KeyError, 'u\'x\''):
             (
                 exploration.init_state.interaction.answer_groups[0]
-                ._validate_rule_input(
-                    {'x': 'Test'},
-                    'Contains',
-                    [],
-                    {})
+                .validate(
+                    exploration.init_state.interaction, {})
             )
 
         self.assertEqual(

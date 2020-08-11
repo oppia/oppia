@@ -136,7 +136,8 @@ describe('NumericInputValidationService', () => {
 
   it('should catch redundant rules caused by greater/less than range',
     () => {
-      answerGroups[0].updateRuleTypesToInputs([lessThanOneRule, equalsZeroRule]);
+      answerGroups[0].updateRuleTypesToInputs(
+        [lessThanOneRule, equalsZeroRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{

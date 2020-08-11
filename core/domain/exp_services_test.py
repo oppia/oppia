@@ -2773,7 +2773,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         init_state = exploration.init_state
         init_interaction = init_state.interaction
-        rule_types_to_inputs = init_interaction.answer_groups[0].rule_types_to_inputs
+        rule_types_to_inputs = init_interaction.answer_groups[
+            0].rule_types_to_inputs
         outcome = init_interaction.answer_groups[0].outcome
         self.assertEqual(rule_types_to_inputs, {
             'Equals': [{'x': 0}]

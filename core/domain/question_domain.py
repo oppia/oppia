@@ -720,10 +720,10 @@ class Question(python_utils.OBJECT):
     def _convert_state_v38_dict_to_v39_dict(cls, question_state_dict):
         """Converts from version 38 to 39. Version 39 removes the fields
         rule_specs in AnswerGroups, and adds new fields rule_types_to_inputs and
-        rule_types_to_inputs_translations. rule_types_to_inputs is a dictionary that maps
-        rule type to a list of rule inputs that share the rule type.
+        rule_types_to_inputs_translations. rule_types_to_inputs is a dictionary
+        that maps rule type to a list of rule inputs that share the rule type.
         rule_types_to_inputs_translations is a dict mapping abbreviated language
-        codes to a mapping of rule_type to rule_types_to_inputs.
+        codes to a mapping of rule type to rule inputs.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
@@ -756,7 +756,8 @@ class Question(python_utils.OBJECT):
                 rule_types_to_inputs[rule_type].append(rule_spec_dict['inputs'])
             del answer_group_dicts[i]['rule_specs']
             answer_group_dicts[i]['rule_types_to_inputs_translations'] = {}
-            answer_group_dicts[i]['rule_types_to_inputs'] = dict(rule_types_to_inputs)
+            answer_group_dicts[i]['rule_types_to_inputs'] = dict(
+                rule_types_to_inputs)
         return question_state_dict
 
     @classmethod

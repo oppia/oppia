@@ -266,14 +266,14 @@ class AnswerGroup(python_utils.OBJECT):
 
         outcome_html = self.outcome.feedback.html
         html_list = html_list + [outcome_html]
-        
+
         def collect_html_conversion_fn(html):
             """A mock conversion function that collects the html in the rules,
             but does not apply any conversion onto the html.
             """
             html_list.append(html)
             return html
-        
+
         for rule_type in self.rule_types_to_inputs:
             for rule_input in self.rule_types_to_inputs[rule_type]:
                 AnswerGroup._convert_html_in_rule_input(
@@ -357,7 +357,7 @@ class AnswerGroup(python_utils.OBJECT):
             rule_type_has_html = (
                 rule_type in
                 interaction_and_rule_details['ruleTypes'].keys())
-            
+
             if not rule_type_has_html:
                 continue
 
@@ -386,9 +386,9 @@ class AnswerGroup(python_utils.OBJECT):
                                 rule_input_variable):
                             if isinstance(value, python_utils.BASESTRING):
                                 rule_input[input_variable][value_index] = (
-                                        conversion_fn(value))
+                                    conversion_fn(value))
                 elif (html_type_format ==
-                        feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                      feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
                     for list_index, html_list in enumerate(rule_input_variable):
                         for rule_html_index, rule_html in enumerate(html_list):
                             rule_input_variable[list_index][rule_html_index] = (
@@ -2664,8 +2664,10 @@ class State(python_utils.OBJECT):
         for answer_group_dict in answer_groups_list:
             # Normalize the rule params.
             for rule_type in answer_group_dict['rule_types_to_inputs']:
-                rule_types_to_inputs = answer_group_dict['rule_types_to_inputs'][rule_type]
-                for rule_input_index, rule_input in enumerate(rule_types_to_inputs):
+                rule_types_to_inputs = answer_group_dict[
+                    'rule_types_to_inputs'][rule_type]
+                for rule_input_index, rule_input in enumerate(
+                        rule_types_to_inputs):
                     if not isinstance(rule_input, dict):
                         raise Exception(
                             'Expected rule_input to be a dict, received %s'

@@ -568,7 +568,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ):
             exploration.validate()
 
-        answer_group.rule_types_to_inputs['Contains'][0] = {'x': '{{ExampleParam}}'}
+        answer_group.rule_types_to_inputs['Contains'][0] = {
+            'x': '{{ExampleParam}}'
+        }
         self._assert_validation_error(
             exploration,
             'RuleSpec \'Contains\' has an input with name \'x\' which refers '
@@ -813,7 +815,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.interaction.answer_groups[0].rule_types_to_inputs = []
         self._assert_validation_error(
-            exploration, 'Expected answer group rule_types_to_inputs to be a dict')
+            exploration,
+            'Expected answer group rule_types_to_inputs to be a dict')
         init_state.interaction.answer_groups[0].rule_types_to_inputs = {}
 
         init_state.interaction.answer_groups[

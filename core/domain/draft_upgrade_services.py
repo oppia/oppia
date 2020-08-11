@@ -33,6 +33,7 @@ import utils
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
 
+
 class InvalidDraftConversion(Exception):
     """Error class for invalid draft conversion. Should be raised in a draft
     conversion function if it is not possible to upgrade a draft, and indicates
@@ -191,12 +192,12 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 for answer_group_dict in change.new_value:
-                    # Convert the list of rule specs into the new rule_types_to_inputs
-                    # dict format. Instead of a list of dictionaries that have
-                    # properties rule type and rule inputs, the new format
-                    # groups rule inputs of the same rule type together by
-                    # mapping rule type to a list of rule inputs that share the
-                    # same rule type.
+                    # Convert the list of rule specs into the new
+                    # rule_types_to_inputs dict format. Instead of a list of
+                    # dictionaries that have properties rule type and rule
+                    # inputs, the new format groups rule inputs of the same
+                    # rule type together by mapping rule type to a list of rule
+                    # inputs that share the same rule type.
                     # I.e. Old format: rule_specs = [
                     #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
                     #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}
@@ -209,10 +210,12 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     rule_types_to_inputs = collections.defaultdict(list)
                     for rule_spec_dict in answer_group_dict['rule_specs']:
                         rule_type = rule_spec_dict['rule_type']
-                        rule_types_to_inputs[rule_type].append(rule_spec_dict['inputs'])
+                        rule_types_to_inputs[rule_type].append(
+                            rule_spec_dict['inputs'])
                     del answer_group_dict['rule_specs']
                     answer_group_dict['rule_types_to_inputs_translations'] = {}
-                    answer_group_dict['rule_types_to_inputs'] = dict(rule_types_to_inputs)
+                    answer_group_dict['rule_types_to_inputs'] = dict(
+                        rule_types_to_inputs)
 
         return draft_change_list
 

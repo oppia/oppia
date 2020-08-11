@@ -181,7 +181,8 @@ describe('MathEquationInputValidationService', () => {
       }
     });
 
-    answerGroups[0].updateRuleTypesToInputs([isEquivalentTo, matchesExactlyWith]);
+    answerGroups[0].updateRuleTypesToInputs(
+      [isEquivalentTo, matchesExactlyWith]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
