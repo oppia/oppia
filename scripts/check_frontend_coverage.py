@@ -267,7 +267,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'python-program.tokenizer.ts',
     'question-difficulty-selector.directive.ts',
     'question-editor.directive.ts',
-    'question-opportunities.directive.ts',
     'question-player-engine.service.ts',
     'question-player.directive.ts',
     'question-update.service.ts',
