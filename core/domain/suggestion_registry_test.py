@@ -18,10 +18,12 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import question_domain
 from core.domain import skill_services
@@ -30,6 +32,7 @@ from core.domain import suggestion_registry
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
@@ -1850,6 +1853,56 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.change.question_dict['question_state_data']['content'][
                 'html'], expected_html_content)
+
+    def test_accept_suggestion_with_images(self):
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;img.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>')
+        question_state_dict = self._create_valid_question_data(
+            'default_state').to_dict()
+        question_state_dict['content']['html'] = html_content
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs_services.save_original_and_compressed_versions_of_image(
+            'img.svg', feconf.ENTITY_TYPE_SUGGESTION, 'skill1.thread1',
+            raw_image, 'image', False)
+        self.save_new_skill('skill1', self.author_id, description='description')
+
+        suggestion_dict = {
+            'suggestion_id': 'skill1.thread1',
+            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'target_id': 'skill1',
+            'target_version_at_submission': 1,
+            'status': suggestion_models.STATUS_ACCEPTED,
+            'author_name': 'author',
+            'final_reviewer_id': self.reviewer_id,
+            'change': {
+                'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+                'question_dict': {
+                    'question_state_data': question_state_dict,
+                    'language_code': 'en',
+                    'question_state_data_schema_version': (
+                        feconf.CURRENT_STATE_SCHEMA_VERSION),
+                    'linked_skill_ids': ['skill_1']
+                },
+                'skill_id': 'skill1',
+                'skill_difficulty': 0.3,
+            },
+            'score_category': 'question.skill1',
+            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+        }
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
+            suggestion_dict['target_version_at_submission'],
+            suggestion_dict['status'], self.author_id, self.reviewer_id,
+            suggestion_dict['change'], suggestion_dict['score_category'],
+            self.fake_date)
+        suggestion.accept('commit_message')
 
 
 class MockInvalidVoiceoverApplication(
