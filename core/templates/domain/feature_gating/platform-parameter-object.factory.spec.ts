@@ -21,11 +21,11 @@ import { TestBed } from '@angular/core/testing';
 import {
   PlatformParameterBackendDict,
   PlatformParameterObjectFactory
-} from './PlatformParameterObjectFactory';
+} from 'domain/feature_gating/platform-parameter-object.factory';
 import {
   PlatformParameterFilterType,
   ServerMode
-} from './PlatformParameterFilterObjectFactory';
+} from './platform-parameter-filter-object.factory';
 
 describe('PlatformParameterObjectFactory', () => {
   let factory: PlatformParameterObjectFactory;

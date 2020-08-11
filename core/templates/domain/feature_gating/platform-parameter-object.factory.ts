@@ -24,7 +24,7 @@ import {
   PlatformParameterRuleBackendDict,
   PlatformParameterRuleObjectFactory,
   PlatformParameterValue
-} from 'domain/feature_gating/PlatformParameterRuleObjectFactory';
+} from 'domain/feature_gating/platform-parameter-rule-object.factory';
 
 export enum FeatureStage {
   DEV = 'dev',

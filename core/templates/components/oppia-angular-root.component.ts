@@ -131,7 +131,7 @@ import { ClassroomBackendApiService } from
 import { ClassroomDataObjectFactory } from
   'domain/classroom/ClassroomDataObjectFactory';
 import { ClientContextObjectFactory } from
-  'domain/feature_gating/ClientContextObjectFactory';
+  'domain/feature_gating/client-context-object.factory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
@@ -260,7 +260,7 @@ import { ExtractImageFilenamesFromStateService } from
 import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 import { FeatureFlagResultsObjectFactory } from
-  'domain/feature_gating/FeatureFlagResultsObjectFactory';
+  'domain/feature_gating/feature-flag-results-object.factory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -447,11 +447,11 @@ import { PencilCodeEditorRulesService } from
 import { PencilCodeEditorValidationService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
 import { PlatformParameterFilterObjectFactory } from
-  'domain/feature_gating/PlatformParameterFilterObjectFactory';
+  'domain/feature_gating/platform-parameter-filter-object.factory';
 import { PlatformParameterObjectFactory } from
-  'domain/feature_gating/PlatformParameterObjectFactory';
+  'domain/feature_gating/platform-parameter-object.factory';
 import { PlatformParameterRuleObjectFactory } from
-  'domain/feature_gating/PlatformParameterRuleObjectFactory';
+  'domain/feature_gating/platform-parameter-rule-object.factory';
 import { PlayerCorrectnessFeedbackEnabledService } from
   'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from

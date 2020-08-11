@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { FeatureFlagResultsObjectFactory } from
-  './FeatureFlagResultsObjectFactory';
+  './feature-flag-results-object.factory';
 
 describe('FeatureFlagResultsObjectFactory', () => {
   let factory: FeatureFlagResultsObjectFactory;

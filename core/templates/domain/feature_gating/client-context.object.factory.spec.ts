@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { ClientContextObjectFactory } from
-  'domain/feature_gating/ClientContextObjectFactory';
+  'domain/feature_gating/client-context-object.factory';
 
 describe('PlatformParameterMetadataObjectFactory', () => {
   let factory: ClientContextObjectFactory;
