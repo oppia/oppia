@@ -560,9 +560,11 @@ angular.module('oppia').directive('audioTranslationBar', [
               )
             );
 
-            $scope.$on('showTranslationTabBusyModal', function() {
-              $scope.openTranslationTabBusyModal();
-            });
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onShowTranslationTabBusyModal.subscribe(
+                () => $scope.openTranslationTabBusyModal()
+              )
+            );
             $scope.track = {
               progress: function(progressPercentage) {
                 if (angular.isDefined(progressPercentage)) {
