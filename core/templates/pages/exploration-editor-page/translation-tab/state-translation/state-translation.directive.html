@@ -11,6 +11,20 @@
           </span>Content
         </a>
       </li>
+      <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_CUSTOMIZATION_ARGS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_CUSTOMIZATION_ARGS)}" class="" aria-label="Feedback responses for answer groups" role="button">
+        <a ng-click="onTabClick(TAB_ID_CUSTOMIZATION_ARGS)" ng-style="tabStatusColorStyle(TAB_ID_CUSTOMIZATION_ARGS)" href="" class="oppia-translation-tabs-text">
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_CUSTOMIZATION_ARGS)" style="color: red"
+                uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
+          </span>Interaction
+        </a>
+      </li>
+      <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_RULES), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_RULES)}" class="" aria-label="Feedback responses for answer groups" role="button">
+        <a ng-click="onTabClick(TAB_ID_RULES)" ng-style="tabStatusColorStyle(TAB_ID_RULES)" href="" class="oppia-translation-tabs-text">
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_RULES)" style="color: red"
+                uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
+          </span>Rules
+        </a>
+      </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}" class="protractor-test-accessibility-translation-feedback" aria-label="Feedback responses for answer groups" role="button">
         <a ng-click="onTabClick(TAB_ID_FEEDBACK)" ng-style="tabStatusColorStyle(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text protractor-test-translation-feedback-tab">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" style="color: red"

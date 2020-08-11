@@ -71,7 +71,9 @@ angular.module('oppia').directive('stateTranslation', [
         'TranslationLanguageService', 'TranslationStatusService',
         'TranslationTabActiveContentIdService',
         'TranslationTabActiveModeService', 'COMPONENT_NAME_CONTENT',
-        'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
+        'COMPONENT_NAME_FEEDBACK',
+        'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
+        'COMPONENT_NAME_INTERACTION_RULES', 'COMPONENT_NAME_HINT',
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
@@ -82,7 +84,9 @@ angular.module('oppia').directive('stateTranslation', [
             TranslationLanguageService, TranslationStatusService,
             TranslationTabActiveContentIdService,
             TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
-            COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
+            COMPONENT_NAME_FEEDBACK,
+            COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS,
+            COMPONENT_NAME_INTERACTION_RULES, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
             RULE_SUMMARY_WRAP_CHARACTER_COUNT
         ) {
@@ -169,7 +173,12 @@ angular.module('oppia').directive('stateTranslation', [
                 $scope.stateHints[0].hintContent.getContentId());
             } else if (tabId === $scope.TAB_ID_SOLUTION) {
               activeContentId = $scope.stateSolution.explanation.getContentId();
+            } else if (tabId === $scope.TAB_ID_CUSTOMIZATION_ARGS) {
+              console.log($scope.stateInteractionCustomizationArgs);
+            } else if (tabId === $scope.TAB_ID_RULES) {
+              
             }
+
             TranslationTabActiveContentIdService.setActiveContentId(
               activeContentId);
             $scope.activatedTabId = tabId;
@@ -348,6 +357,8 @@ angular.module('oppia').directive('stateTranslation', [
               .getInteractionDefaultOutcomeMemento($scope.stateName);
             $scope.stateInteractionId = ExplorationStatesService
               .getInteractionIdMemento($scope.stateName);
+            $scope.stateInteractionCustomizationArgs = ExplorationStatesService
+              .getInteractionCustomizationArgsMemento($scope.stateName);
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
             var currentCustomizationArgs = ExplorationStatesService
@@ -370,6 +381,9 @@ angular.module('oppia').directive('stateTranslation', [
             $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
             $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
             $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
+            $scope.TAB_ID_CUSTOMIZATION_ARGS = (
+              COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
+            $scope.TAB_ID_RULES = COMPONENT_NAME_INTERACTION_RULES;
 
             $scope.ExplorationCorrectnessFeedbackService =
               ExplorationCorrectnessFeedbackService;

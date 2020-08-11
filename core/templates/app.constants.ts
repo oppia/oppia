@@ -110,6 +110,9 @@ export class AppConstants {
 
   // Do not modify these, for backwards-compatibility reasons.
   public static COMPONENT_NAME_CONTENT = 'content';
+  public static COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS = (
+    'interaction_customization_args');
+  public static COMPONENT_NAME_INTERACTION_RULES = 'interaction_rules';
   public static COMPONENT_NAME_HINT = 'hint';
   public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_FEEDBACK = 'feedback';
