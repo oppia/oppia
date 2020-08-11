@@ -135,6 +135,26 @@ def get_suggestion_by_id(suggestion_id):
     return get_suggestion_from_model(model) if model else None
 
 
+def get_suggestions_by_ids(suggestion_ids):
+    """Finds suggestions by the suggestion IDs.
+
+    Args:
+        suggestion_ids: list(str). The IDs of the suggestions.
+
+    Returns:
+        list(Suggestion|None). A list of the corresponding suggestions. The
+        list will contain None elements if no suggestion is found.
+    """
+    general_suggestion_models = (
+        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
+    )
+
+    return [
+        get_suggestion_from_model(suggestion_model) if suggestion_model else None
+        for suggestion_model in general_suggestion_models
+    ]
+
+
 def query_suggestions(query_fields_and_values):
     """Queries for suggestions.
 
@@ -187,36 +207,31 @@ def get_all_stale_suggestions():
             .get_all_stale_suggestions()]
 
 
-def _update_suggestion(suggestion_id):
-    """Updates the suggestion with the given id.
+def _update_suggestion(suggestion):
+    """Updates the given suggestion.
 
     Args:
-        suggestion_id: str. The id of the suggestion to be updated.
+        suggestion: Suggestion. The suggestion to be updated.
     """
 
-    _update_suggestions([suggestion_id])
+    _update_suggestions([suggestion])
 
 
-def _update_suggestions(suggestion_ids):
-    """Updates the suggestions with the given ids.
+def _update_suggestions(suggestions):
+    """Updates the given suggestions.
 
     Args:
-        suggestion_ids: list(str). The ids of the suggestions to be updated.
+        suggestions: list(Suggestions). The suggestions to be updated.
     """
+    suggestion_ids = []
+
+    for suggestion in suggestions:
+        suggestion.validate()
+        suggestion_ids.append(suggestion.suggestion_id)
 
     suggestion_models_to_update = (
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
     )
-
-    # Get the corresponding suggestion domain objects in order to validate the
-    # suggestions.
-    suggestions = [
-        get_suggestion_from_model(suggestion_model) for suggestion_model in
-        suggestion_models_to_update
-    ]
-    for suggestion in suggestions:
-
-        suggestion.validate()
 
     for index, suggestion_model in enumerate(suggestion_models_to_update):
         suggestion = suggestions[index]
@@ -226,46 +241,8 @@ def _update_suggestions(suggestion_ids):
         suggestion_model.score_category = suggestion.score_category
 
     suggestion_models.GeneralSuggestionModel.put_multi(
-        suggestion_models_to_update)
-
-
-def mark_review_completed(suggestion_id, status, reviewer_id):
-    """Marks that a review has been completed.
-
-    Args:
-        suggestion_id: str. The id of the suggestion to be updated.
-        status: str. The status of the suggestion post review. Possible values
-            are STATUS_ACCEPTED or STATUS_REJECTED.
-        reviewer_id: str. The ID of the user who completed the review.
-    """
-    mark_multiple_reviews_completed([suggestion_id], status, reviewer_id)
-
-
-def mark_multiple_reviews_completed(
-        suggestion_ids, status, reviewer_id):
-    """Marks that multiple reviews have been completed.
-
-    Args:
-        suggestion_ids: list(str). The ids of the suggestions to be updated.
-        status: str. The status of the suggestions post review. Possible values
-            are STATUS_ACCEPTED or STATUS_REJECTED.
-        reviewer_id: str. The ID of the user who completed the reviews.
-    """
-    if status not in [
-            suggestion_models.STATUS_ACCEPTED,
-            suggestion_models.STATUS_REJECTED]:
-        raise Exception('Invalid status after review.')
-
-    suggestion_models_to_update = (
-        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
-    )
-
-    for suggestion_model in suggestion_models_to_update:
-        suggestion_model.status = status
-        suggestion_model.final_reviewer_id = reviewer_id
-
-    suggestion_models.GeneralSuggestionModel.put_multi(
-        suggestion_models_to_update)
+        suggestion_models_to_update,
+        update_last_updated_time=update_last_updated_time)
 
 
 def get_commit_message_for_suggestion(author_username, commit_message):
@@ -323,9 +300,11 @@ def accept_suggestion(suggestion_id, reviewer_id, commit_message, review_message
     author_name = user_services.get_username(suggestion.author_id)
     commit_message = get_commit_message_for_suggestion(
         author_name, commit_message)
-    mark_review_completed(
-        suggestion_id, suggestion_models.STATUS_ACCEPTED, reviewer_id)
+    suggestion.set_suggestion_status_to_accepted()
+    suggestion.set_final_reviewer_id(reviewer_id)
     suggestion.accept(commit_message)
+    _update_suggestion(suggestion)
+
     thread_id = suggestion.suggestion_id
     feedback_services.create_message(
         thread_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
@@ -377,15 +356,8 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
     Raises:
         Exception. One or more of the suggestions has already been handled.
     """
-    suggestion_models_to_update = (
-        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
-    )
-    # Get the corresponding suggestion domain objects in order to validate the
-    # suggestions.
-    suggestions = [
-        get_suggestion_from_model(suggestion_model) for suggestion_model in
-        suggestion_models_to_update
-    ]
+    suggestions = get_suggestions_by_ids(suggestion_ids)
+
     for suggestion in suggestions:
         if suggestion.is_handled:
             raise Exception(
@@ -395,11 +367,12 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
     if not review_message:
         raise Exception('Review message cannot be empty.')
 
-    mark_multiple_reviews_completed(
-        suggestion_ids, suggestion_models.STATUS_REJECTED, reviewer_id
-    )
+    for suggestion in suggestions:
+        suggestion.set_suggestion_status_to_rejected()
+        suggestion.set_final_reviewer_id(reviewer_id)
 
-    #thread_ids = [suggestion.suggestion_id for suggestion in suggestions]
+    _update_suggestions(suggestions)
+
     feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message

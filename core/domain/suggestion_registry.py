@@ -114,6 +114,22 @@ class BaseSuggestion(python_utils.OBJECT):
         return self.score_category.split(
             suggestion_models.SCORE_CATEGORY_DELIMITER)[1]
 
+    def set_suggestion_status_to_accepted(self):
+        """Sets the status of the suggestion to be accepted."""
+        self.status = suggestion_models.STATUS_ACCEPTED
+
+    def set_suggestion_status_to_rejected(self):
+        """Sets the status of the suggestion to be rejected."""
+        self.status = suggestion_models.STATUS_REJECTED
+
+    def set_final_reviewer_id(self, reviewer_id):
+        """Sets the final reviewer id of the suggestion to be reviewer_id.
+
+        Args:
+        reviewer_id: str. The ID of the user who completed the review.
+        """
+        self.final_reviewer_id = reviewer_id
+
     def validate(self):
         """Validates the BaseSuggestion object. Each subclass must implement
         this function.

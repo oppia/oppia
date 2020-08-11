@@ -213,27 +213,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 len(suggestion_services.get_all_stale_suggestions()), 0)
 
-    def test_cannot_mark_review_completed_with_invalid_status(self):
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description')
-
-        suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), (
-                'target_id', self.target_id)])[0]
-        self.assert_suggestion_status(
-            suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
-
-        with self.assertRaisesRegexp(Exception, 'Invalid status after review.'):
-            suggestion_services.mark_review_completed(
-                suggestion.suggestion_id, 'invalid_status', self.reviewer_id)
-
-        # Assert that the status of the sugguestion hasn't changed.
-        self.assert_suggestion_status(
-            suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
-
     def mock_update_exploration(
             self, unused_user_id, unused_exploration_id, unused_change_list,
             commit_message, is_suggestion):
@@ -465,11 +444,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
-        # Mark the suggestion as accepted.
-        suggestion_services.mark_review_completed(
-            self.suggestion_id, suggestion_models.STATUS_ACCEPTED,
-            self.reviewer_id
-        )
+        # Accept the suggestion.
+        suggestion_services.accept_suggestion(
+                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
         # Verify that the suggestion has been accepted.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
@@ -495,10 +472,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
-        # Mark the suggestion as rejected.
-        suggestion_services.mark_review_completed(
-            self.suggestion_id, suggestion_models.STATUS_REJECTED,
-            self.reviewer_id
+        # Reject the suggestion.
+        suggestion_services.reject_suggestion(
+            self.suggestion_id, self.reviewer_id, 'reject review message'
         )
         # Verify that the suggestion has been rejected.
         self.assert_suggestion_status(
@@ -539,8 +515,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                                    'invalid_score_category'):
             suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
 
     def test_accept_suggestion_no_commit_message_failure(self):
         with self.swap(
@@ -610,11 +584,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
-        # Mark the suggestion as accepted.
-        suggestion_services.mark_review_completed(
-            self.suggestion_id, suggestion_models.STATUS_ACCEPTED,
-            self.reviewer_id
-        )
+        # Accept the suggestion.
+        suggestion_services.accept_suggestion(
+                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
         # Verify that the suggestion has been accepted.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
@@ -648,10 +620,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
         # Mark the suggestion as rejected.
-        suggestion_services.mark_review_completed(
-            self.suggestion_id, suggestion_models.STATUS_REJECTED,
-            self.reviewer_id
-        )
+        suggestion_services.reject_suggestion(
+                self.suggestion_id, self.reviewer_id, 'reject review message')
         # Verify that the suggestion has been rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_REJECTED)
