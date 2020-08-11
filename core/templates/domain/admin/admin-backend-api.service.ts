@@ -141,7 +141,9 @@ export class AdminBackendApiService {
           topicSummaries: response.topic_summaries.map(
             this.topicSummaryObjectFactory.createFromBackendDict),
           featureFlags: Object.values(response.feature_flags).map(
-            this.platformParameterObjectFactory.createFromBackendDict)
+            dict => this.platformParameterObjectFactory.createFromBackendDict(
+              dict)
+          )
         });
       }, errorResponse => {
         reject(errorResponse.error.error);

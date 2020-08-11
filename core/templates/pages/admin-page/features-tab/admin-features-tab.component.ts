@@ -26,10 +26,12 @@ import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
-import { PlatformParameter } from
+import { PlatformParameter, FeatureStage } from
   'domain/feature_gating/PlatformParameterObjectFactory';
 import { FeatureGatingAdminBackendApiService } from
   'domain/feature_gating/feature-gating-admin-backend-api.service';
+
+import cloneDeep from 'lodash/cloneDeep';
 
 
 import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
@@ -37,7 +39,8 @@ import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
 import {
   PlatformParameterFilterType,
   PlatformParameterFilterObjectFactory,
-  PlatformParameterFilter
+  PlatformParameterFilter,
+  ServerMode,
 } from 'domain/feature_gating/PlatformParameterFilterObjectFactory';
 
 @Component({
@@ -47,14 +50,68 @@ import {
 export class AdminFeaturesTabComponent implements OnInit {
   @Input() setStatusMessage: (msg: string) => void;
 
+  availableFilterTypes: PlatformParameterFilterType[] = Object
+    .keys(PlatformParameterFilterType)
+    .map(key => PlatformParameterFilterType[key]);
+
+  filterTypeToContext: {
+    [key in PlatformParameterFilterType]: {
+      displayName: string,
+      operators: string[],
+      options?: string[],
+      optionFilter?: (feature: PlatformParameter, option: string) => boolean;
+    }
+  } = {
+    [PlatformParameterFilterType.ServerMode]: {
+      displayName: 'Server Mode',
+      options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
+      operators: ['='],
+      optionFilter: (feature, option) => {
+        switch (feature.featureStage) {
+          case FeatureStage.DEV:
+            return option === 'dev';
+          case FeatureStage.TEST:
+            return option !== 'prod';
+          case FeatureStage.PROD:
+            return true;
+        }
+      }
+    },
+    [PlatformParameterFilterType.UserLocale]: {
+      displayName: 'User Locale',
+      options: AdminFeaturesTabConstants.ALLOWED_SITE_LANGUAGE_IDS,
+      operators: ['=']
+    },
+    [PlatformParameterFilterType.ClientType]: {
+      displayName: 'Client Type',
+      options: AdminFeaturesTabConstants.ALLOWED_CLIENT_TYPES,
+      operators: ['=']
+    },
+    [PlatformParameterFilterType.BrowserType]: {
+      displayName: 'Browser Type',
+      options: AdminFeaturesTabConstants.ALLOWED_BROWSER_TYPES,
+      operators: ['=']
+    },
+    [PlatformParameterFilterType.AppVersion]: {
+      displayName: 'App Version',
+      operators: ['=', '<', '>', '<=', '>=']
+    },
+    [PlatformParameterFilterType.AppVersionFlavor]: {
+      displayName: 'App Version Flavor',
+      options: AdminFeaturesTabConstants.ALLOWED_APP_VERSION_FLAVORS,
+      operators: ['=', '<', '>', '<=', '>=']
+    }
+
+  };
+
   featureFlags: PlatformParameter[] = [];
+  featureFlagNameToBackupMap: Map<string, PlatformParameter>;
 
   constructor(
     private windowRef: WindowRef,
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
     private apiService: FeatureGatingAdminBackendApiService,
-    // for debug
     private ruleFactory: PlatformParameterRuleObjectFactory,
     private filterFactory: PlatformParameterFilterObjectFactory,
   ) {}
@@ -62,86 +119,19 @@ export class AdminFeaturesTabComponent implements OnInit {
   async reloadFeatureFlagsAsync() {
     const data = await this.adminDataService.getDataAsync();
 
-    data.featureFlags[0].rules = [
-      this.ruleFactory.createFromBackendDict({
-        value_when_matched: true,
-        filters: [
-          {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
-          },
-          {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
-          },
-          {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
-          },
-          {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
-          },
-        ]
-      }),
-      this.ruleFactory.createFromBackendDict({
-        value_when_matched: false,
-        filters: [
-          {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
-          },
-          {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
-          },
-          {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
-          },
-          {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', 'dev'], ['=', 'prod'], ['=', 'test']]
-          },
-        ]
-      })
-    ];
+    this.featureFlags = data.featureFlags;
 
-    // For debug, make it two.
-    this.featureFlags = [
-      ...data.featureFlags,
-      // ...data.featureFlags
-    ];
-    console.log(this.featureFlags);
-  }
-
-  async saveConfigPropertiesAsync() {
-    if (this.adminTaskManager.isTaskRunning()) {
-      return;
-    }
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
-      return;
-    }
-
-    // console.log(this.setStatusMessage);
-    // this.setStatusMessage('Saving...');
-
-    // this.adminTaskManager.startTask();
-    // var newConfigPropertyValues = {};
-    // for (var property in this.configProperties) {
-    //   newConfigPropertyValues[property] = (
-    //     this.configProperties[property].value);
-    // }
-
-    this.setStatusMessage('Data saved successfully.');
-    this.adminTaskManager.finishTask();
+    this.featureFlagNameToBackupMap = new Map(
+      this.featureFlags.map(feature => [feature.name, cloneDeep(feature)]));
   }
 
   addNewRule(feature: PlatformParameter): void {
     feature.rules.push(
       this.ruleFactory.createFromBackendDict({
-        filters: [],
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [['=', ServerMode.Dev.toString()]]
+        }],
         value_when_matched: false
       })
     );
@@ -157,7 +147,11 @@ export class AdminFeaturesTabComponent implements OnInit {
   }
 
   addNewCondition(filter: PlatformParameterFilter): void {
-    filter.conditions.push(['=', '']);
+    const context = this.filterTypeToContext[filter.type];
+    filter.conditions.push([
+      context.operators[0],
+      context.options ? context.options[0] : ''
+    ]);
   }
 
   removeRule(feature: PlatformParameter, ruleIndex: number): void {
@@ -171,6 +165,47 @@ export class AdminFeaturesTabComponent implements OnInit {
   removeCondition(
       filter: PlatformParameterFilter, conditionIndex: number): void {
     filter.conditions.splice(conditionIndex, 1);
+  }
+
+  async saveFeatureAsync(feature: PlatformParameter): Promise<void> {
+    if (this.adminTaskManager.isTaskRunning()) {
+      return;
+    }
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible. Are you sure?')) {
+      return;
+    }
+    const updateMessage = this.windowRef.nativeWindow.prompt(
+      'Please enter message for the update',
+      `Update feature '${feature.name}'.`
+    );
+    if (!updateMessage) {
+      return;
+    }
+
+    try {
+      this.adminTaskManager.startTask();
+      console.log(feature);
+      await this.apiService.updateFeatureFlag(
+        feature.name, updateMessage, feature.rules);
+
+      this.setStatusMessage('Saved successfully.');
+    } finally {
+      this.adminTaskManager.finishTask();
+    }
+  }
+
+  clearChanges(featureFlag: PlatformParameter) {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This will revert all changes you made. Are you sure?')) {
+      return;
+    }
+    const backup = this.featureFlagNameToBackupMap.get(featureFlag.name);
+    featureFlag.rules = backup.rules;
+  }
+
+  onFilterTypeSelectionChanged(filter: PlatformParameterFilter): void {
+    filter.conditions.splice(0);
   }
 
   ngOnInit() {

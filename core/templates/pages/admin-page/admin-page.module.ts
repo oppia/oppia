@@ -27,6 +27,7 @@ angular.module('oppia', [
 ]);
 
 import { NgModule, StaticProvider } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -49,6 +50,7 @@ import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 @NgModule({
   imports: [
     BrowserModule,
+    FormsModule,
     HttpClientModule,
     SharedComponentsModule
   ],

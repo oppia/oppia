@@ -12,10 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ServerMode } from
+  'domain/feature_gating/PlatformParameterFilterObjectFactory';
+
+const constants = require('constants.ts');
+
 /**
  * @fileoverview Constants for the admin features tab.
  */
 
 export class AdminFeaturesTabConstants {
-  public static FEATURE_STUB_CONSTANT = '/adminhandler';
+  public static ALLOWED_SERVER_MODES = [
+    ServerMode.Dev, ServerMode.Test, ServerMode.Prod
+  ].map(val => val.toString());
+
+  public static ALLOWED_CLIENT_TYPES = ['Android', 'Web'];
+
+  public static ALLOWED_BROWSER_TYPES = [
+    'Chrome', 'Edge', 'Safari', 'Firefox', 'Others'];
+
+  public static APP_VERSION_REGEXP = /^\d+(?:\.\d+)*$/;
+
+  public static ALLOWED_SITE_LANGUAGE_IDS = constants.SUPPORTED_SITE_LANGUAGES
+    .map((lang: {id: string}) => lang.id);
+
+  public static ALLOWED_APP_VERSION_FLAVORS = [
+    'test', 'alpha', 'beta', 'release'];
 }
