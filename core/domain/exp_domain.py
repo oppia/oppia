@@ -3038,10 +3038,9 @@ class Exploration(python_utils.OBJECT):
             for i, answer_group_dict in enumerate(answer_group_dicts):
                 # Convert the list of rule specs into the new
                 # rule_types_to_inputs dict format. Instead of a list of
-                # dictionaries that have properties rule type and rule inputs,
-                # the new format groups rule inputs of the same rule type
-                # together by mapping rule type to a list of rule inputs that
-                # share the same rule type.
+                # dictionaries that have properties 'rule_type' and
+                # 'inputs', the new format groups rule inputs of the same
+                # rule type by mapping rule type to a list of rule inputs.
                 # I.e. Old format: rule_specs = [
                 #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
                 #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}

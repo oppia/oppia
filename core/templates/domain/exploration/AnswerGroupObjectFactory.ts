@@ -30,7 +30,7 @@ export interface RuleInputs {
   [ruleType: string]: InteractionRuleInputs[];
 }
 
-interface ruleTypesToInputsTranslations {
+interface RuleTypesToInputsTranslations {
   [ruleType: string]: {
     [languageCode: string]: InteractionRuleInputs[]
   }
@@ -38,7 +38,7 @@ interface ruleTypesToInputsTranslations {
 
 export interface AnswerGroupBackendDict {
   'rule_types_to_inputs': RuleInputs;
-  'rule_types_to_inputs_translations': ruleTypesToInputsTranslations,
+  'rule_types_to_inputs_translations': RuleTypesToInputsTranslations,
   'outcome': OutcomeBackendDict;
   'training_data': InteractionAnswer;
   'tagged_skill_misconception_id': string;
@@ -48,13 +48,13 @@ export class AnswerGroup {
   private _ruleObjectFactory;
 
   ruleTypesToInputs: RuleInputs;
-  ruleTypesToInputsTranslations: ruleTypesToInputsTranslations;
+  ruleTypesToInputsTranslations: RuleTypesToInputsTranslations;
   outcome: Outcome;
   trainingData: InteractionAnswer;
   taggedSkillMisconceptionId: string;
   constructor(
       ruleTypesToInputs: RuleInputs,
-      ruleTypesToInputsTranslations: ruleTypesToInputsTranslations,
+      ruleTypesToInputsTranslations: RuleTypesToInputsTranslations,
       outcome: Outcome, trainingData: InteractionAnswer,
       taggedSkillMisconceptionId: string,
       _ruleObjectFactory: RuleObjectFactory) {
