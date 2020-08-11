@@ -18,7 +18,7 @@
 
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
-require('services/schema-submitted.service.ts');
+require('services/schema-form-submitted.service.ts');
 
 angular.module('oppia').directive('schemaBasedIntEditor', [
   function() {
@@ -36,12 +36,12 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
       template: require('./schema-based-int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'SchemaSubmittedService',
-        function($scope, SchemaSubmittedService) {
+        '$scope', 'SchemaFormSubmittedService',
+        function($scope, SchemaFormSubmittedService) {
           var ctrl = this;
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
-              SchemaSubmittedService.onSubmittedSchemaBasedForm.emit();
+              SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
             }
           };
           ctrl.$onInit = function() {

@@ -13,25 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for SchemaSubmittedService
+ * @fileoverview Unit tests for SchemaFormSubmittedService
 */
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { SchemaSubmittedService } from
-  'services/schema-submitted.service';
+import { SchemaFormSubmittedService } from
+  'services/schema-form-submitted.service';
 
 describe('Schema Submitted Service', () => {
-  let schemaSubmittedService = null;
+  let schemaFormSubmittedService = null;
 
   beforeEach(() => {
-    schemaSubmittedService = TestBed.get(SchemaSubmittedService);
+    schemaFormSubmittedService = TestBed.get(SchemaFormSubmittedService);
   });
 
   it('should fetch submittedSchemaBasedForm event emitter', () => {
     let sampleSubmittedSchemaBasedFormEventEmitter = new EventEmitter();
-    expect(schemaSubmittedService.onSubmittedSchemaBasedForm).toEqual(
+    expect(schemaFormSubmittedService.onSubmittedSchemaBasedForm).toEqual(
       sampleSubmittedSchemaBasedFormEventEmitter);
   });
 });

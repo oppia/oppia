@@ -23,7 +23,7 @@ require('services/id-generation.service.ts');
 require('services/nested-directives-recursion-timeout-prevention.service.ts');
 require('services/schema-default-value.service.ts');
 require('services/schema-undefined-last-element.service.ts');
-require('services/schema-submitted.service.ts');
+require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 import { Subscription } from 'rxjs';
@@ -32,12 +32,12 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
   'NestedDirectivesRecursionTimeoutPreventionService',
-  'SchemaDefaultValueService', 'SchemaSubmittedService',
+  'SchemaDefaultValueService', 'SchemaFormSubmittedService',
   'SchemaUndefinedLastElementService',
   function(
       FocusManagerService, IdGenerationService,
       NestedDirectivesRecursionTimeoutPreventionService,
-      SchemaDefaultValueService, SchemaSubmittedService,
+      SchemaDefaultValueService, SchemaFormSubmittedService,
       SchemaUndefinedLastElementService) {
     return {
       scope: {
@@ -213,7 +213,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               evt.stopPropagation();
             };
             ctrl.directiveSubscriptions.add(
-              SchemaSubmittedService.onSubmittedSchemaBasedForm.subscribe(
+              SchemaFormSubmittedService.onSubmittedSchemaBasedForm.subscribe(
                 () => $scope._onChildFormSubmit
               )
             );
