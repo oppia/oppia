@@ -104,7 +104,6 @@ def start_google_app_engine_server():
     SUBPROCESSES.append(p)
 
 
-
 def main():
     """Runs lighthouse checks and deletes reports."""
 
