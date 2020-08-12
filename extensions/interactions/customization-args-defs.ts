@@ -194,13 +194,6 @@ export interface TextInputCustomizationArgs {
   };
 }
 
-
-export interface RatioExpressionInputCustomizationArgs {
-  placeholder?: {
-    value: string;
-  };
-}
-
 export interface MathExpressionCustomizationArgs { }
 
 export interface NumericExpressionInputCustomizationArgs { }
@@ -233,6 +226,5 @@ export type InteractionCustomizationArgs = (
   NumericExpressionInputCustomizationArgs |
   NumericInputCustomizationArgs |
   PencilCodeCustomizationArgs |
-  RatioExpressionInputCustomizationArgs |
   SetInputCustomizationArgs |
   TextInputCustomizationArgs);

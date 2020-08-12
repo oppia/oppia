@@ -72,9 +72,6 @@ import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
-import { RatioExpressionInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from
@@ -118,8 +115,6 @@ describe('Interaction Rules Registry Service', () => {
     this.numericInputRulesService = TestBed.get(NumericInputRulesService);
     this.pencilCodeEditorRulesService = (
       TestBed.get(PencilCodeEditorRulesService));
-    this.ratioExpressionInputRulesService = (
-      TestBed.get(RatioExpressionInputRulesService));
     this.setInputRulesService = TestBed.get(SetInputRulesService);
     this.textInputRulesService = TestBed.get(TextInputRulesService);
   });
@@ -247,14 +242,6 @@ describe('Interaction Rules Registry Service', () => {
     expect(this.registry.getRulesServiceByInteractionId('PencilCodeEditor'))
       .toBe(this.pencilCodeEditorRulesService);
   });
-
-  it('should return the correct rules service for RatioExpressionInput',
-    () => {
-      expect(this.registry.getRulesServiceByInteractionId(
-        'RatioExpressionInput')).toBe(
-        this.ratioExpressionInputRulesService);
-    }
-  );
 
   it('should return the correct rules service for SetInput', () => {
     expect(this.registry.getRulesServiceByInteractionId('SetInput'))

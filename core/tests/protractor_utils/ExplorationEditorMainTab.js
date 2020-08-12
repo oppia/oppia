@@ -643,7 +643,6 @@ var ExplorationEditorMainTab = function() {
       NumberWithUnits: 'Math',
       CodeRepl: 'Programming',
       PencilCodeEditor: 'Programming',
-      RatioExpressionInput: 'Math',
       MusicNotesInput: 'Music',
       InteractiveMap: 'Geography'
     };

@@ -116,8 +116,6 @@ export interface PencilCodeEditorAnswer {
   error: string;
 }
 
-export type RatioInputAnswer = string;
-
 export type SetInputAnswer = string[];
 
 export type TextInputAnswer = string;
@@ -140,7 +138,6 @@ export type InteractionAnswer = (
   NumberWithUnitsAnswer |
   NumericInputAnswer |
   PencilCodeEditorAnswer |
-  RatioInputAnswer |
   SetInputAnswer |
   TextInputAnswer |
   MathEquationAnswer);

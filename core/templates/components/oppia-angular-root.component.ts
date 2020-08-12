@@ -472,10 +472,6 @@ import { QuestionSummaryForOneSkillObjectFactory }
   from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
-import { RatioExpressionInputRulesService } from
-  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
-import { RatioExpressionInputValidationService } from
-  'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { RatingComputationService } from
@@ -903,8 +899,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static questionBackendApiService: QuestionBackendApiService;
   static questionSummaryForOneSkillObjectFactory: QuestionSummaryForOneSkillObjectFactory;
   static questionSummaryObjectFactory: QuestionSummaryObjectFactory;
-  static ratioExpressionInputRulesService: RatioExpressionInputRulesService;
-  static ratioExpressionInputValidationService: RatioExpressionInputValidationService;
   static readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
   static ratingComputationService: RatingComputationService;
   static readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory;
@@ -1224,8 +1218,6 @@ private pythonProgramTokenizer: PythonProgramTokenizer,
 private questionBackendApiService: QuestionBackendApiService,
 private questionSummaryForOneSkillObjectFactory: QuestionSummaryForOneSkillObjectFactory,
 private questionSummaryObjectFactory: QuestionSummaryObjectFactory,
-private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
-private ratioExpressionInputValidationService: RatioExpressionInputValidationService,
 private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
 private ratingComputationService: RatingComputationService,
 private readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory,
@@ -1546,8 +1538,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.questionBackendApiService = this.questionBackendApiService;
     OppiaAngularRootComponent.questionSummaryForOneSkillObjectFactory = this.questionSummaryForOneSkillObjectFactory;
     OppiaAngularRootComponent.questionSummaryObjectFactory = this.questionSummaryObjectFactory;
-    OppiaAngularRootComponent.ratioExpressionInputRulesService = this.ratioExpressionInputRulesService;
-    OppiaAngularRootComponent.ratioExpressionInputValidationService = this.ratioExpressionInputValidationService;
     OppiaAngularRootComponent.readOnlyCollectionBackendApiService = this.readOnlyCollectionBackendApiService;
     OppiaAngularRootComponent.ratingComputationService = this.ratingComputationService;
     OppiaAngularRootComponent.readOnlyStoryNodeObjectFactory = this.readOnlyStoryNodeObjectFactory;

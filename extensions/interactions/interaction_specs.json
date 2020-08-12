@@ -979,7 +979,7 @@
     "default_outcome_heading": null,
     "rule_descriptions": {
       "Equals": "is equals to {{x|RatioExpression}}",
-      "HasNumberOfTermsEqualTo": "is equal to length {{x|RatioExpression}}"
+      "HasNumberOfTermsEqualTo": "is equal to length {{x|NonnegativeInt}}"
     }
   }
 }

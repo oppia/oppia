@@ -196,10 +196,6 @@ export interface PencilCodeEditorRuleInputs {
   x: string;
 }
 
-export interface RatioInputRulesInputs {
-  x: string;
-}
-
 export interface SetInputRuleInputs {
   x: string[];
 }
@@ -228,6 +224,5 @@ export type InteractionRuleInputs = (
   NumberWithUnitsRuleInputs |
   NumericInputRuleInputs |
   PencilCodeEditorRuleInputs |
-  RatioInputRulesInputs|
   SetInputRuleInputs |
   TextInputRuleInputs);
