@@ -110,6 +110,8 @@ describe('screenreader and keyboard user accessibility features', function() {
         await (await elementToFocus.getAttribute('class')));
 
       // Should move the focus away from the elementToFocus.
+      // Tab must be pressed twice to move focus away from categoryBar.
+      // The categoryBar shares the same class as the next element in DOM order.
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
       expect(await browser.driver.switchTo().activeElement()
@@ -129,7 +131,6 @@ describe('screenreader and keyboard user accessibility features', function() {
           .getAttribute('id'));
 
       // Should move the focus away from the elementToFocus.
-      await browser.actions().sendKeys(protractor.Key.TAB).perform();
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
       expect(await elementToFocus.getAttribute('id')).not.toEqual(
         await (await browser.driver.switchTo().activeElement())
