@@ -282,7 +282,7 @@ angular.module('oppia').directive('libraryPage', [
 
                   ctrl.groupHeaderI18nId = response.data.header_i18n_id;
 
-                  I18nLanguageCodeService.onPreferredLanguageCodesLodaded.emit(
+                  I18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
                     response.data.preferred_language_codes);
 
                   LoaderService.hideLoadingScreen();
