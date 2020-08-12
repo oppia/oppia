@@ -73,7 +73,7 @@ describe('Early Quit Issue Component', function() {
       expect($scope.currentIssueIdentifier).toBe(2);
       expect($scope.issueStatement).toBe(
         'Several learners exited the exploration in less than a minute.');
-      expect($scope.suggestions).toEqual( [
+      expect($scope.suggestions).toEqual([
         ('Review the cards up to and including "State1" for errors, ' +
           'ambiguities, or insufficient motivation.'),
       ]);

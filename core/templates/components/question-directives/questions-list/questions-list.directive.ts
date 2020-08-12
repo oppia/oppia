@@ -66,6 +66,8 @@ require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -99,7 +101,7 @@ angular.module('oppia').directive('questionsList', [
         'SkillDifficultyObjectFactory', 'ShortSkillSummaryObjectFactory',
         'StateEditorService', 'UndoRedoService',
         'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'MODE_SELECT_DIFFICULTY',
+        'MODE_SELECT_DIFFICULTY',
         'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
@@ -111,9 +113,10 @@ angular.module('oppia').directive('questionsList', [
             SkillDifficultyObjectFactory, ShortSkillSummaryObjectFactory,
             StateEditorService, UndoRedoService,
             UrlService, DEFAULT_SKILL_DIFFICULTY,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, MODE_SELECT_DIFFICULTY,
+            MODE_SELECT_DIFFICULTY,
             MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             if (ctrl.selectedSkillId !== null) {
@@ -549,17 +552,21 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
-              _initTab(false);
-            });
+            ctrl.directiveSubscriptions.add(
+              QuestionsListService.onQuestionSummariesInitialized.subscribe(
+                () => _initTab(false)));
             ctrl.skillIds = [];
             ctrl.selectedSkillIds = [];
             ctrl.associatedSkillSummaries = [];
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             ctrl.editorIsOpen = false;
             // The _initTab function is written separately since it is also
-            // called in $scope.$on when some external events are triggered.
+            // called in subscription when some external events are triggered.
             _initTab(true);
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

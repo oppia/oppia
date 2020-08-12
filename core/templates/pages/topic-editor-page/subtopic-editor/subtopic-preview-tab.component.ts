@@ -42,13 +42,13 @@ angular.module('oppia').component('subtopicPreviewTab', {
     'EntityCreationService', 'TopicEditorStateService',
     'TopicEditorRoutingService', 'TopicUpdateService',
     'UndoRedoService', 'UrlInterpolationService', 'UrlService',
-    'WindowDimensionsService', 'EVENT_SUBTOPIC_PAGE_LOADED',
+    'WindowDimensionsService',
     function(
         $location, $scope, $uibModal, SubtopicPageObjectFactory,
         EntityCreationService, TopicEditorStateService,
         TopicEditorRoutingService, TopicUpdateService,
         UndoRedoService, UrlInterpolationService, UrlService,
-        WindowDimensionsService, EVENT_SUBTOPIC_PAGE_LOADED) {
+        WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var _initEditor = function() {
@@ -80,11 +80,15 @@ angular.module('oppia').component('subtopicPreviewTab', {
           $scope.subtopicId);
       };
 
-      $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
-        $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
-        $scope.pageContents = $scope.subtopicPage.getPageContents();
-        $scope.htmlData = $scope.pageContents.getHtml();
-      });
+      ctrl.directiveSubscriptions.add(
+        TopicEditorStateService.onSubtopicPageLoaded.subscribe(
+          () => {
+            $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
+            $scope.pageContents = $scope.subtopicPage.getPageContents();
+            $scope.htmlData = $scope.pageContents.getHtml();
+          }
+        )
+      );
 
       $scope.changeContent = function(itemToDisplay) {
         if (itemToDisplay === $scope.THUMBNAIL) {

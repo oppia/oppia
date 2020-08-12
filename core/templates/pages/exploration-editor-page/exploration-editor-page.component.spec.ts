@@ -64,7 +64,9 @@ describe('Exploration editor page component', function() {
   var eis = null;
   var ers = null;
   var es = null;
+  var eps = null;
   var ess = null;
+  var esaves = null;
   var ets = null;
   var ews = null;
   var gds = null;
@@ -79,6 +81,8 @@ describe('Exploration editor page component', function() {
   var refreshGraphEmitter = new EventEmitter();
 
   var mockOpenEditorTutorialEmitter = new EventEmitter();
+
+  var mockInitExplorationPageEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -212,7 +216,9 @@ describe('Exploration editor page component', function() {
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
+    eps = $injector.get('ExplorationPropertyService');
     ess = $injector.get('ExplorationStatesService');
+    esaves = $injector.get('ExplorationSaveService');
     ets = $injector.get('ExplorationTitleService');
     ews = $injector.get('ExplorationWarningsService');
     gds = $injector.get('GraphDataService');
@@ -309,6 +315,8 @@ describe('Exploration editor page component', function() {
   });
 
   describe('when user permission is false and draft changes are true', () => {
+    var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
+
     beforeEach(() => {
       spyOnAllFunctions(sas);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
@@ -316,6 +324,8 @@ describe('Exploration editor page component', function() {
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
+      spyOnProperty(eps, 'onExplorationPropertyChanged').and.returnValue(
+        mockExplorationPropertyChangedEventEmitter);
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
       spyOn(pts, 'setPageTitle').and.callThrough();
@@ -324,6 +334,9 @@ describe('Exploration editor page component', function() {
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
       spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
+      spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
+        mockInitExplorationPageEmitter);
+
 
       explorationData.is_version_of_draft_valid = true;
 
@@ -370,7 +383,7 @@ describe('Exploration editor page component', function() {
 
     it('should react when exploration property changes', () => {
       ets.init('Exploration Title');
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setPageTitle).toHaveBeenCalledWith(
         'Exploration Title - Oppia Editor');
@@ -378,7 +391,7 @@ describe('Exploration editor page component', function() {
 
     it('should react when untitled exploration property changes', () => {
       ets.init('');
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setPageTitle).toHaveBeenCalledWith(
         'Untitled Exploration - Oppia Editor');
@@ -395,6 +408,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
 
       var successCallback = jasmine.createSpy('success');
+      mockInitExplorationPageEmitter.emit(successCallback);
       $rootScope.$broadcast('initExplorationPage', successCallback);
 
       // Need to flush and $apply twice to fire the callback. In practice, this
@@ -760,6 +774,10 @@ describe('Exploration editor page component', function() {
 
       ctrl.$onInit();
     });
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     afterEach(() => {
       ctrl.$onDestroy();
     });
