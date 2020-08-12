@@ -66,21 +66,21 @@
       <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
         <li class="oppia-rule-block oppia-prevent-selection"
             ng-repeat="caContent in interactionCustomizationArgTranslatableContent track by $index"
-            ng-class="{'active': activeHintIndex === $index}"
+            ng-class="{'active': activeCustomizationArgContentIndex === $index}"
             style="margin-top: 0;">
           <a ng-click="changeActiveCustomizationArgContentIndex($index)"
              class="oppia-rule-tab"
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(caContent.content.getContentId())">
             <response-header index="$index"
-                             summary="caContent.name + ': ' + getHtmlSummary(caContent.content)"
-                             short-summary="caContent.name + ': ' + getHtmlSummary(caContent.content)"
+                             summary="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
+                             short-summary="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
                              is-active="$index === activeCustomizationArgContentIndex"
                              show-warning="contentIdNeedUpdates(caContent.content.getContentId())">
             </response-header>
           </a>
           <div ng-if="activeCustomizationArgContentIndex === $index">
-            <div class="oppia-editor-card-section">
+            <div class="oppia-editor-card-section" ng-if="caContent.content._html">
               <span ng-if="!getRequiredHtml(caContent.content)" class="oppia-placeholder">
                 <[getEmptyContentMessage()]>
               </span>
@@ -90,6 +90,14 @@
                                    html-data="getRequiredHtml(caContent.content)"
                                    class="oppia-rte-editor">
                 </angular-html-bind>
+              </span>
+            </div>
+            <div class="oppia-editor-card-section" ng-if="caContent.content._unicode">
+              <span ng-if="!caContent.content.getUnicode()" class="oppia-placeholder">
+                <[getEmptyContentMessage()]>
+              </span>
+              <span>
+                <p><[caContent.content.getUnicode()]></p>
               </span>
             </div>
           </div>
@@ -186,8 +194,8 @@
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(hint.hintContent.getContentId())">
             <response-header index="$index"
-                             summary="getHtmlSummary(hint.hintContent)"
-                             short-summary="getHtmlSummary(hint.hintContent)"
+                             summary="getSubtitledContentSummary(hint.hintContent)"
+                             short-summary="getSubtitledContentSummary(hint.hintContent)"
                              is-active="$index === activeHintIndex"
                              show-warning="contentIdNeedUpdates(hint.hintContent.getContentId())">
             </response-header>

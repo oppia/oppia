@@ -16,13 +16,17 @@
       <div class="oppia-translated-content-display oppia-transition-200"
            ng-class="{'oppia-prevent-selection': isEditable()}"
            title="Translated Content">
-        <span  class="oppia-placeholder" ng-if="!activeWrittenTranslation || activeWrittenTranslation.getHtml() === ''">
+        <span  class="oppia-placeholder" ng-if="!activeWrittenTranslation || activeWrittenTranslation.translation === ''">
           This section has not been translated yet. <span ng-if="isEditable()">Click to add a translation!</span>
         </span>
         <span ng-if="activeWrittenTranslation">
-          <angular-html-bind html-data="activeWrittenTranslation.getHtml()"
+          <angular-html-bind ng-if="activeWrittenTranslation.isHtml()"
+                             html-data="activeWrittenTranslation.getHtml()"
                              class="oppia-rte-editor protractor-test-translation-display">
           </angular-html-bind>
+          <p ng-if="activeWrittenTranslation.isUnicode()">
+            {{activeWrittenTranslation.getUnicode()}}
+          </p>
         </span>
       </div>
       <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
@@ -32,8 +36,19 @@
   </div>
 
   <div ng-if="translationEditorIsOpen" class="protractor-test-state-translation-editor">
-    <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
-    <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.translation"></schema-based-editor>
+    <[activeWrittenTranslation]>
+    <div ng-if="activeWrittenTranslation.isHtml()">
+      <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
+      <schema-based-editor schema="HTML_SCHEMA"
+                           local-value="activeWrittenTranslation.translation">
+      </schema-based-editor>
+    </div>
+    <div ng-if="activeWrittenTranslation.isUnicode()">
+      <schema-based-editor schema="UNICODE_SCHEMA"
+                           local-value="activeWrittenTranslation.translation">
+      </schema-based-editor>
+    </div>
+    
     <div style="margin-top: 2px;">
       <button type="button"
               class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-translation"

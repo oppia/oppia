@@ -17,6 +17,8 @@
  */
 
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 require(
   'components/state-directives/response-header/response-header.directive.ts');
@@ -359,10 +361,12 @@ angular.module('oppia').directive('stateTranslation', [
             return {'border-left': '3px solid ' + color};
           };
 
-          $scope.getHtmlSummary = function(subtitledHtml) {
-            var htmlAsPlainText = $filter(
-              'formatRtePreview')(subtitledHtml.getHtml());
-            return htmlAsPlainText;
+          $scope.getSubtitledContentSummary = function(subtitledContent) {
+            if (subtitledContent instanceof SubtitledHtml) {
+              return $filter('formatRtePreview')(subtitledContent.getHtml());
+            } else if (subtitledContent instanceof SubtitledUnicode) {
+              return subtitledContent.getUnicode();
+            }
           };
 
           $scope.initStateTranslation = function() {
@@ -396,6 +400,8 @@ angular.module('oppia').directive('stateTranslation', [
               Interaction.getCustomizationArgTranslatableContent(
                 $scope.stateInteractionCustomizationArgs)
             );
+            console.log($scope.stateInteractionCustomizationArgs)
+            console.log($scope.interactionCustomizationArgTranslatableContent)
 
             if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
               $scope.needsUpdateTooltipMessage = 'Audio needs update to ' +

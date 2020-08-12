@@ -59,7 +59,7 @@ describe('WrittenTranslation object factory', () => {
     });
     expect(
       () => writtenTranslation.getHtml()
-    ).toThrowError('This translation is not of type html');
+    ).toThrowError('This translation is not of data format html');
   });
 
   it('should throw error if the wrong setter is used', () => {
@@ -70,7 +70,7 @@ describe('WrittenTranslation object factory', () => {
     });
     expect(
       () => writtenTranslation.setHtml('')
-    ).toThrowError('This translation is not of type html');
+    ).toThrowError('This translation is not of data format html');
   });
 
   it('should correctly mark written translation as needing update',

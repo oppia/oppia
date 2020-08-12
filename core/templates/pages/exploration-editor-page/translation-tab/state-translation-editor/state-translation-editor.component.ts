@@ -127,7 +127,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           if (!$scope.activeWrittenTranslation) {
             $scope.activeWrittenTranslation = (
               WrittenTranslationObjectFactory
-                .createNew(WRITTEN_TRANSLATION_TYPE_HTML, ''));
+                .createNew('unicode', ''));
           }
         }
       };
@@ -156,6 +156,9 @@ angular.module('oppia').component('stateTranslationEditor', {
       ctrl.$onInit = function() {
         $scope.HTML_SCHEMA = {
           type: 'html'
+        };
+        $scope.UNICODE_SCHEMA = {
+          type: 'unicode'
         };
         $scope.$on('activeContentIdChanged', function() {
           initEditor();
