@@ -2282,8 +2282,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
                 '/mock_story_page/staging/topic/story/Story-frag',
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic/story/%s'
-                % self.story_url_fragment,
+                'http://localhost/learn/staging/topic/story/story-frag',
                 response.headers['location'])
 
 
