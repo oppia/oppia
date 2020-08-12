@@ -151,7 +151,7 @@ export class MathInteractionsService {
   }
 
   validateEquation(
-    equationString: string, validVariablesList: Array<string>): boolean {
+      equationString: string, validVariablesList: Array<string>): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
