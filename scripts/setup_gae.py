@@ -46,9 +46,9 @@ def main(args=None):
     # PUT requests from the frontend fail.
     sys.path.append('.')
     sys.path.append(coverage_home)
-    sys.path.append(common.GOOGLE_APP_ENGINE_HOME)
+    sys.path.append(common.GOOGLE_CLOUD_SDK_HOME)
     sys.path.append(
-        os.path.join(common.GOOGLE_APP_ENGINE_HOME, 'lib', 'webob_0_9'))
+        os.path.join(common.GOOGLE_CLOUD_SDK_HOME, 'lib', 'webob_0_9'))
     sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
 
     # Delete old *.pyc files.
@@ -57,28 +57,6 @@ def main(args=None):
             if file_name.endswith('.pyc'):
                 filepath = os.path.join(directory, file_name)
                 os.remove(filepath)
-
-    python_utils.PRINT(
-        'Checking whether Google App Engine is installed in %s'
-        % common.GOOGLE_APP_ENGINE_HOME)
-    if not os.path.exists(common.GOOGLE_APP_ENGINE_HOME):
-        python_utils.PRINT(
-            'Downloading Google App Engine (this may take a little while)...')
-        os.makedirs(common.GOOGLE_APP_ENGINE_HOME)
-        try:
-            python_utils.url_retrieve(
-                'https://storage.googleapis.com/appengine-sdks/featured/'
-                'google_appengine_1.9.67.zip', filename='gae-download.zip')
-        except Exception:
-            python_utils.PRINT('Error downloading Google App Engine. Exiting.')
-            raise Exception('Error downloading Google App Engine.')
-        python_utils.PRINT('Download complete. Installing Google App Engine...')
-        with zipfile.ZipFile(GAE_DOWNLOAD_ZIP_PATH, 'r') as zip_ref:
-            zip_ref.extractall(
-                path=os.path.join(
-                    common.OPPIA_TOOLS_DIR, 'google_appengine_1.9.67/'))
-        os.remove(GAE_DOWNLOAD_ZIP_PATH)
-
 
     python_utils.PRINT(
         'Checking whether google-cloud-sdk is installed in %s'

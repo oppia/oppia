@@ -41,7 +41,8 @@ class GcloudAdapterImportTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         gae_dir = os.path.join(
             os.path.abspath(os.getcwd()), '..', 'oppia_tools',
-            'google_appengine_1.9.67', 'google_appengine')
+            'google-cloud-sdk-304.0.0', 'google-cloud-sdk', 'platform',
+            'google_appengine')
         with exists_swap, self.assertRaisesRegexp(
             Exception, 'Directory %s does not exist.' % gae_dir):
             from scripts.release_scripts import gcloud_adapter # pylint: disable=unused-variable

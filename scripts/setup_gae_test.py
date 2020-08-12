@@ -97,51 +97,6 @@ class SetupGaeTests(test_utils.GenericTestBase):
             setup_gae.main(args=[])
         self.assertEqual(check_file_removals, expected_check_file_removals)
 
-    def test_gae_install_without_errors(self):
-        self.check_function_calls['extractall_is_called'] = False
-        self.expected_check_function_calls['extractall_is_called'] = True
-        def mock_exists(path):
-            if path == common.GOOGLE_APP_ENGINE_HOME:
-                return False
-            return True
-        def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
-            self.check_function_calls['extractall_is_called'] = True
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        zipfile_swap = self.swap(
-            setup_gae, 'GAE_DOWNLOAD_ZIP_PATH', MOCK_TMP_UNZIP_PATH)
-        extractall_swap = self.swap(
-            zipfile.ZipFile, 'extractall', mock_extractall)
-
-        with self.walk_swap, self.remove_swap, self.makedirs_swap:
-            with self.print_swap, self.url_retrieve_swap, exists_swap:
-                with zipfile_swap, extractall_swap:
-                    setup_gae.main(args=[])
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls)
-        self.assertTrue(
-            'Download complete. Installing Google App Engine...'
-            in self.print_arr)
-
-    def test_gae_install_with_errors(self):
-        self.expected_check_function_calls['remove_is_called'] = False
-        self.raise_error = True
-        def mock_exists(path):
-            if path == common.GOOGLE_APP_ENGINE_HOME:
-                return False
-            return True
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-
-        with self.walk_swap, self.remove_swap, self.makedirs_swap:
-            with self.print_swap, self.url_retrieve_swap, exists_swap:
-                with self.assertRaisesRegexp(
-                    Exception, 'Error downloading Google App Engine.'):
-                    setup_gae.main(args=[])
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls)
-        self.assertTrue(
-            'Error downloading Google App Engine. Exiting.'
-            in self.print_arr)
-
     def test_gcloud_install_without_errors(self):
         self.check_function_calls['open_is_called'] = False
         self.check_function_calls['extractall_is_called'] = False

@@ -75,6 +75,7 @@ from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
 
+
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
 _PARSER.add_argument(
@@ -103,17 +104,13 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PATHS_TO_INSERT = [
     os.getcwd(),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
-        'google_appengine', 'lib', 'webapp2-2.3'),
+        common.GOOGLE_CLOUD_SDK_HOME, 'lib', 'webapp2-2.3'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
-        'google_appengine', 'lib', 'yaml-3.10'),
+        common.GOOGLE_CLOUD_SDK_HOME, 'lib', 'yaml-3.10'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
-        'google_appengine', 'lib', 'jinja2-2.6'),
+        common.GOOGLE_CLOUD_SDK_HOME, 'lib', 'jinja2-2.6'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
-        'google_appengine'),
+        common.GOOGLE_CLOUD_SDK_HOME),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'webtest-%s' % common.WEBTEST_VERSION),
     os.path.join(

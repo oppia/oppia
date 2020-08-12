@@ -45,8 +45,6 @@ from scripts import common
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
-GAE_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
 LIST_OF_BUCKETS_URL = (
     'https://console.cloud.google.com/storage/browser/'
     'oppia-export-backups?project=oppiaserver')
@@ -130,9 +128,10 @@ def main(args=None):
     backup restoration.
     """
     common.require_cwd_to_be_oppia()
-    if not os.path.exists(os.path.dirname(GAE_DIR)):
-        raise Exception('Directory %s does not exist.' % GAE_DIR)
-    sys.path.insert(0, GAE_DIR)
+    if not os.path.exists(os.path.dirname(common.GOOGLE_CLOUD_SDK_HOME)):
+        raise Exception(
+            'Directory %s does not exist.' % common.GOOGLE_CLOUD_SDK_HOME)
+    sys.path.insert(0, common.GOOGLE_CLOUD_SDK_HOME)
 
     options = _PARSER.parse_args(args=args)
 
