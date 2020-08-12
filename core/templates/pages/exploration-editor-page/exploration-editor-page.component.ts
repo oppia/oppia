@@ -452,7 +452,6 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.$onInit = function() {
-<<<<<<< HEAD
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
@@ -464,14 +463,11 @@ angular.module('oppia').component('explorationEditorPage', {
           GraphDataService.recompute();
           ExplorationWarningsService.updateWarnings();
         });
-=======
-        $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
         ctrl.directiveSubscriptions.add(
           ExplorationStatesService.onRefreshGraph.subscribe(() => {
             GraphDataService.recompute();
             ExplorationWarningsService.updateWarnings();
           }));
->>>>>>> upstream/develop
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
