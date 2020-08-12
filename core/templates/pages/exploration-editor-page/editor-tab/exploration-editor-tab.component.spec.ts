@@ -488,7 +488,7 @@ describe('Exploration editor tab component', function() {
 
     var displayedValue = {
       placeholder: {
-        value: 'Placeholder value'
+        value: new SubtitledUnicode('Placeholder value', 'ca_placeholder')
       },
       rows: {
         value: 2

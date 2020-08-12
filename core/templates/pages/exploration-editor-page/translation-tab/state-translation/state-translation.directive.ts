@@ -394,8 +394,7 @@ angular.module('oppia').directive('stateTranslation', [
             );
             $scope.interactionCustomizationArgTranslatableContent = (
               Interaction.getCustomizationArgTranslatableContent(
-                $scope.stateInteractionCustomizationArgs
-              )
+                $scope.stateInteractionCustomizationArgs)
             );
 
             if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
@@ -416,6 +415,7 @@ angular.module('oppia').directive('stateTranslation', [
             $scope.TAB_ID_CUSTOMIZATION_ARGS = (
               COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
 
+            $scope.INTERACTION_SPECS = INTERACTION_SPECS;
             $scope.ExplorationCorrectnessFeedbackService =
               ExplorationCorrectnessFeedbackService;
 
