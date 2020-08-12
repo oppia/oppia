@@ -208,9 +208,8 @@ describe('Router Service', () => {
 
         expect(broadcastSpy).toHaveBeenCalled();
 
-        done();
-
         expect(applyAsyncSpy).toHaveBeenCalled();
+        done();
       }, 20);
       $timeout.flush(150);
     }, 400);
@@ -246,8 +245,6 @@ describe('Router Service', () => {
 
         expect(broadcastSpy).toHaveBeenCalled();
 
-        done();
-
         expect(applyAsyncSpy).toHaveBeenCalled();
 
         RouterService.navigateToMainTab('newState');
@@ -255,6 +252,7 @@ describe('Router Service', () => {
         $rootScope.$apply();
 
         expect(RouterService.getActiveTabName()).toBe('main');
+        done();
       }, 20);
       $timeout.flush(150);
     }, 400);

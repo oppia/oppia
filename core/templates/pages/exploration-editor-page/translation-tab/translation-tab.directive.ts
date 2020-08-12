@@ -56,6 +56,8 @@ require('pages/admin-page/services/admin-router.service.ts');
 
 import { Subscription } from 'rxjs';
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('translationTab', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -81,8 +83,9 @@ angular.module('oppia').directive('translationTab', [
             TranslationTabActiveModeService,
             UserExplorationPermissionsService) {
           var ctrl = this;
-          var _ID_TUTORIAL_TRANSLATION_LANGUAGE = (
-            '#tutorialTranslationLanguage');
+          ctrl.directiveSubscriptions = new Subscription();
+          var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
+            '#tutorialTranslationLanguage';
           var _ID_TUTORIAL_TRANSLATION_STATE = '#tutorialTranslationState';
           var _ID_TUTORIAL_TRANSLATION_OVERVIEW = (
             '#tutorialTranslationOverview');
@@ -330,7 +333,16 @@ angular.module('oppia').directive('translationTab', [
             $scope.$on('enterTranslationForTheFirstTime',
               $scope.showWelcomeTranslationModal
             );
-            $scope.$on('openTranslationTutorial', $scope.onStartTutorial);
+            ctrl.directiveSubscriptions.add(
+              StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
+                () => {
+                  $scope.onStartTutorial();
+                }
+              )
+            );
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();
