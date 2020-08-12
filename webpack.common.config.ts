@@ -720,6 +720,10 @@ module.exports = {
         path.resolve(__dirname, 'node_modules'),
       ],
       use: ['cache-loader', 'style-loader', 'css-loader']
+    },
+    {
+      test: /\.png$/,
+      use: ['cache-loader', 'file-loader']
     }]
   },
   externals: {
