@@ -24,6 +24,7 @@ import os
 import re
 import signal
 import subprocess
+import stat
 import sys
 import time
 
@@ -258,9 +259,6 @@ def setup_and_install_dependencies(skip_install):
     """Run the setup and installation scripts."""
     if not skip_install:
         install_third_party_libs.main()
-        subprocess.call(['chmod', '-R', 'ugo+or',
-            os.path.join(common.GOOGLE_CLOUD_SDK_HOME, 'platform',
-            'google_appengine', 'lib'])
     if os.getenv('TRAVIS'):
         install_chrome_on_travis.main(args=[])
 

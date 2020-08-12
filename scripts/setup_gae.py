@@ -115,6 +115,15 @@ def main(args=None):
 
         os.remove('gcloud-sdk.tar.gz')
 
+    grpc_path = os.path.join(
+            common.GOOGLE_CLOUD_SDK_HOME, 'platform',
+            'google_appengine', 'lib', 'grpcio-1.20.0', 'grpc')
+    print("#################")
+    print(grpc_path)
+    subprocess.call([
+        'chmod', '-R', 'ugo+rox', grpc_path])
+    print("######## Done")
+
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when setup_gae.py is used as a script.
