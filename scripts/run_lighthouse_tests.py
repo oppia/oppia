@@ -50,7 +50,7 @@ def cleanup():
         '.*%s.*' % re.escape(google_app_engine_path),
     ]
     for p in SUBPROCESSES:
-        p.send_signal(signal.SIGINT)
+        p.kill()
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
@@ -91,7 +91,7 @@ def start_google_app_engine_server():
     app_yaml_filepath = 'app.yaml'
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
-        '--clear_datastore=true --dev_appserver_log_level=critical '
+        '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' %
         (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,

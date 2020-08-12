@@ -513,7 +513,6 @@ def kill_processes_based_on_regex(pattern):
     for process in psutil.process_iter():
         try:
             cmdline = ' '.join(process.cmdline())
-            # print(cmdline)
             if regex.match(cmdline) and process.is_running():
                 python_utils.PRINT('Killing %s ...' % cmdline)
                 process.kill()

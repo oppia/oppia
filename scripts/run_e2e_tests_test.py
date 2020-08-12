@@ -195,7 +195,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
         google_app_engine_path = '%s/' % (
-            common.GOOGLE_CLOUD_SDK_BIN)
+            common.GOOGLE_APP_ENGINE_SDK_HOME)
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [
@@ -248,8 +248,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
-        google_app_engine_path = '%s/' % (
-            common.GOOGLE_CLOUD_SDK_BIN)
+        google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [

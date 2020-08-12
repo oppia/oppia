@@ -101,6 +101,16 @@ jobs:
       - run:
           name: Check that all e2e test files are captured in protractor.conf.js
           command: python -m scripts.check_e2e_tests_are_captured_in_ci
+      - run:
+          name: Run typescript tests
+          command: |
+            python -m scripts.typescript_checks
+      - persist_to_workspace:
+          root: /home/circleci/
+          paths:
+            - oppia/node_modules/
+            - oppia/third_party/
+            - oppia_tools/
 
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files

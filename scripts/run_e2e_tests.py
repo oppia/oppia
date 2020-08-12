@@ -175,9 +175,10 @@ def cleanup():
         # In windows system, the java command line will use absolute path.
         webdriver_download_path = os.path.abspath(webdriver_download_path)
     processes_to_kill = [
-        '.*%s.*' % re.escape(google_app_engine_path)
+        '.*%s.*' % re.escape(google_app_engine_path),
+        '.*%s.*' % re.escape(webdriver_download_path)
     ]
-    #'.*%s.*' % re.escape(webdriver_download_path)
+
     for p in SUBPROCESSES:
         p.kill()
 
