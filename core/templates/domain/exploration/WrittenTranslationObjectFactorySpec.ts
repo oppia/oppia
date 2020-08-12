@@ -42,6 +42,9 @@ describe('WrittenTranslation object factory', () => {
       needs_update: false
     }));
     expect(writtenTranslation.getHtml()).toEqual('<p>HTML</p>');
+    expect(writtenTranslation.isHtml()).toBe(true);
+    expect(writtenTranslation.isUnicode()).toBe(false);
+
     writtenTranslation.setHtml('<p>New HTML</p>');
     expect(writtenTranslation.getHtml()).toEqual('<p>New HTML</p>');
     expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
@@ -49,6 +52,15 @@ describe('WrittenTranslation object factory', () => {
       translation: '<p>New HTML</p>',
       needs_update: false
     }));
+
+    const unicodeWrittenTranslation = wtof.createFromBackendDict({
+      data_format: 'unicode',
+      translation: 'unicode',
+      needs_update: false
+    });
+    expect(unicodeWrittenTranslation.getUnicode()).toEqual('unicode');
+    expect(unicodeWrittenTranslation.isHtml()).toBe(false);
+    expect(unicodeWrittenTranslation.isUnicode()).toBe(true);
   });
 
   it('should throw error if the wrong getter is used', () => {
@@ -60,6 +72,15 @@ describe('WrittenTranslation object factory', () => {
     expect(
       () => writtenTranslation.getHtml()
     ).toThrowError('This translation is not of data format html');
+
+    writtenTranslation = wtof.createFromBackendDict({
+      data_format: 'html',
+      translation: 'html',
+      needs_update: false
+    });
+    expect(
+      () => writtenTranslation.getUnicode()
+    ).toThrowError('This translation is not of data format unicode');
   });
 
   it('should throw error if the wrong setter is used', () => {
