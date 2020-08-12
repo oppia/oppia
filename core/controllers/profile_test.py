@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import os
 import re
+import time
 import zipfile
 
 from constants import constants
@@ -857,6 +858,9 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         constants_swap = self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True)
         time_swap = self.swap(
             user_services, 'record_user_logged_in', lambda *args: None)
+        
+        os.environ['TZ'] = 'UTC'
+        time.tzset()
 
         with constants_swap, time_swap:
             data = self.get_custom_response(
