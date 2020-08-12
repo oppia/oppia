@@ -559,7 +559,7 @@ def main(args=None):
     subprocess.call(['ls', '-l', grpc_path])
     subprocess.call(['ls', '-l', grpc_contents_path])
     subprocess.call([
-        'chmod', '-R', 'ugo+rox', grpc_contents_path])
+        'chmod', '-R', '777', grpc_contents_path])
     start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
 
     common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
