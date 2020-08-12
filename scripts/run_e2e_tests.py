@@ -258,6 +258,9 @@ def setup_and_install_dependencies(skip_install):
     """Run the setup and installation scripts."""
     if not skip_install:
         install_third_party_libs.main()
+        subprocess.call(['chmod', '-R', 'ugo+or',
+            os.path.join(common.GOOGLE_CLOUD_SDK_HOME, 'platform',
+            'google_appengine', 'lib'])
     if os.getenv('TRAVIS'):
         install_chrome_on_travis.main(args=[])
 
@@ -417,7 +420,6 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
         log_level: str. The log level for the google app engine server.
     """
     app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode_setting else '')
-
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=%s '
