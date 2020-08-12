@@ -310,6 +310,8 @@ describe('Exploration editor page component', function() {
   });
 
   describe('when user permission is false and draft changes are true', () => {
+    var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
+
     beforeEach(() => {
       spyOnAllFunctions(sas);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
@@ -317,6 +319,8 @@ describe('Exploration editor page component', function() {
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
+      spyOnProperty(eps, 'onExplorationPropertyChanged').and.returnValue(
+        mockExplorationPropertyChangedEventEmitter);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
@@ -324,6 +328,7 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
+
 
       explorationData.is_version_of_draft_valid = true;
 
@@ -370,7 +375,7 @@ describe('Exploration editor page component', function() {
 
     it('should react when exploration property changes', () => {
       ets.init('Exploration Title');
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setPageTitle).toHaveBeenCalledWith(
         'Exploration Title - Oppia Editor');
@@ -378,7 +383,7 @@ describe('Exploration editor page component', function() {
 
     it('should react when untitled exploration property changes', () => {
       ets.init('');
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setPageTitle).toHaveBeenCalledWith(
         'Untitled Exploration - Oppia Editor');
