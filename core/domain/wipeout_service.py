@@ -118,52 +118,65 @@ def pre_delete_user(user_id):
             For a full user, all of its associated profile users are deleted
             too.
     """
-    all_linked_user_ids = [
-        user.user_id for user in
-        user_services.get_all_profiles_auth_details_by_parent_user_id(user_id)
-    ]
-    all_linked_user_ids.append(user_id)
-    for linked_user_id in all_linked_user_ids:
+    pending_deletion_requests = []
+    user_settings = user_services.get_user_settings(
+        user_id, strict=True)
+    explorations_to_be_deleted_ids = []
+    collections_to_be_deleted_ids = []
+    if user_settings.role != feconf.ROLE_ID_LEARNER:
         subscribed_exploration_summaries = (
             exp_fetchers.get_exploration_summaries_subscribed_to(
-                linked_user_id)
+                user_id)
         )
         explorations_to_be_deleted_ids = [
             exp_summary.id for exp_summary in subscribed_exploration_summaries
             if exp_summary.is_private() and
-            exp_summary.is_solely_owned_by_user(linked_user_id)]
+            exp_summary.is_solely_owned_by_user(user_id)]
         exp_services.delete_explorations(
-            linked_user_id, explorations_to_be_deleted_ids)
+            user_id, explorations_to_be_deleted_ids)
 
         subscribed_collection_summaries = (
             collection_services.get_collection_summaries_subscribed_to(
-                linked_user_id)
+                user_id)
         )
         collections_to_be_deleted_ids = [
             col_summary.id for col_summary in subscribed_collection_summaries
             if col_summary.is_private() and
-            col_summary.is_solely_owned_by_user(linked_user_id)]
+            col_summary.is_solely_owned_by_user(user_id)]
         collection_services.delete_collections(
-            linked_user_id, collections_to_be_deleted_ids)
+            user_id, collections_to_be_deleted_ids)
 
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
-        user_settings = user_services.get_user_settings(
-            linked_user_id, strict=True)
+        user_services.update_email_preferences(
+            user_id, False, False, False, False)
 
-        if feconf.ROLE_ID_LEARNER != user_settings.role:
-            user_services.update_email_preferences(
-                linked_user_id, False, False, False, False)
+    user_services.mark_user_for_deletion(user_id)
+    save_pending_deletion_request(
+        wipeout_domain.PendingDeletionRequest.create_default(
+            user_id,
+            user_settings.email,
+            explorations_to_be_deleted_ids,
+            collections_to_be_deleted_ids
+        )
+    )
 
-        email = user_settings.email
-        user_services.mark_user_for_deletion(linked_user_id)
-
+    linked_profile_user_ids = [
+        user.user_id for user in
+        user_services.get_all_profiles_auth_details_by_parent_user_id(user_id)
+    ]
+    profile_users_settings_list = user_services.get_users_settings(
+        linked_profile_user_ids)
+    for profile_user_settings in profile_users_settings_list:
+        email = profile_user_settings.email
+        profile_id = profile_user_settings.user_id
+        user_services.mark_user_for_deletion(profile_id)
         save_pending_deletion_request(
             wipeout_domain.PendingDeletionRequest.create_default(
-                linked_user_id,
+                profile_id,
                 email,
-                explorations_to_be_deleted_ids,
-                collections_to_be_deleted_ids
+                [],
+                []
             )
         )
 
