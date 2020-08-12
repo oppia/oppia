@@ -95,9 +95,7 @@ angular.module('oppia').directive('translationTab', [
             $templateCache.get('ng-joyride-title-tplv1.html'));
           ngJoyrideTemplate = ngJoyrideTemplate.replace(
             /\{\{/g, '<[').replace(/\}\}/g, ']>');
-
-          ctrl.directiveSubscriptions = new Subscription();
-
+          
           var initTranslationTab = function() {
             StateTutorialFirstTimeService.initTranslation(
               ContextService.getExplorationId());
