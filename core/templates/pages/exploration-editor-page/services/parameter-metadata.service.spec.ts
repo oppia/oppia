@@ -83,7 +83,7 @@ describe('Parameter Metadata Service', function() {
             interaction: {
               id: null,
               answer_groups: [{
-                rule_types_to_inputs_translations: {},
+                rule_input_translations: {},
                 rule_types_to_inputs: {},
                 outcome: {
                   dest: '',
@@ -124,7 +124,7 @@ describe('Parameter Metadata Service', function() {
             interaction: {
               id: null,
               answer_groups: [{
-                rule_types_to_inputs_translations: {},
+                rule_input_translations: {},
                 rule_types_to_inputs: {},
                 outcome: {
                   dest: '',
@@ -165,7 +165,7 @@ describe('Parameter Metadata Service', function() {
             interaction: {
               id: null,
               answer_groups: [{
-                rule_types_to_inputs_translations: {},
+                rule_input_translations: {},
                 rule_types_to_inputs: {},
                 outcome: {
                   dest: '',
@@ -206,7 +206,7 @@ describe('Parameter Metadata Service', function() {
             interaction: {
               id: null,
               answer_groups: [{
-                rule_types_to_inputs_translations: {},
+                rule_input_translations: {},
                 rule_types_to_inputs: {},
                 outcome: {
                   dest: '',

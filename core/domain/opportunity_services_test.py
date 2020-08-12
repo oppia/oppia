@@ -327,7 +327,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{'x': 'Test'}]
             },

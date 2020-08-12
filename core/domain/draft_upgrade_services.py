@@ -70,7 +70,7 @@ def try_upgrading_draft_to_exp_version(
         raise utils.InvalidInputException(
             'Current draft version is greater than the exploration version.')
     if current_draft_version == to_exp_version:
-        return
+        return None
 
     exp_versions = list(
         python_utils.RANGE(current_draft_version + 1, to_exp_version + 1))
@@ -84,18 +84,18 @@ def try_upgrading_draft_to_exp_version(
                 len(commit.commit_cmds) != 1 or
                 commit.commit_cmds[0]['cmd'] !=
                 exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
-            return
+            return None
         conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
             commit.commit_cmds[0]['from_version'],
             commit.commit_cmds[0]['to_version'])
         if not hasattr(DraftUpgradeUtil, conversion_fn_name):
             logging.warning('%s is not implemented' % conversion_fn_name)
-            return
+            return None
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
         try:
             draft_change_list = conversion_fn(draft_change_list)
         except InvalidDraftConversion:
-            return
+            return None
         upgrade_times += 1
     return draft_change_list
 
@@ -197,7 +197,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     # dictionaries that have properties 'rule_type' and
                     # 'inputs', the new format groups rule inputs of the same
                     # rule type by mapping rule type to a list of rule inputs.
-                    # I.e. Old format: rule_specs = [
+                    # E.g. Old format: rule_specs = [
                     #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
                     #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}
                     # ]
@@ -212,7 +212,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         rule_types_to_inputs[rule_type].append(
                             rule_spec_dict['inputs'])
                     del answer_group_dict['rule_specs']
-                    answer_group_dict['rule_types_to_inputs_translations'] = {}
+                    answer_group_dict['rule_input_translations'] = {}
                     answer_group_dict['rule_types_to_inputs'] = dict(
                         rule_types_to_inputs)
 

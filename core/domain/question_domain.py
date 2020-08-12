@@ -720,9 +720,9 @@ class Question(python_utils.OBJECT):
     def _convert_state_v38_dict_to_v39_dict(cls, question_state_dict):
         """Converts from version 38 to 39. Version 39 removes the fields
         rule_specs in AnswerGroups, and adds new fields rule_types_to_inputs and
-        rule_types_to_inputs_translations. rule_types_to_inputs is a dictionary
-        that maps rule type to a list of rule inputs that share the rule type.
-        rule_types_to_inputs_translations is a dict mapping abbreviated language
+        rule_input_translations. rule_types_to_inputs is a dictionary that maps
+        rule type to a list of rule inputs that share the rule type.
+        rule_input_translations is a dict mapping abbreviated language
         codes to a mapping of rule type to rule inputs.
 
         Args:
@@ -740,7 +740,7 @@ class Question(python_utils.OBJECT):
             # dictionaries that have properties 'rule_type' and
             # 'inputs', the new format groups rule inputs of the same
             # rule type by mapping rule type to a list of rule inputs.
-            # I.e. Old format: rule_specs = [
+            # E.g. Old format: rule_specs = [
             #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
             #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}
             # ]
@@ -754,7 +754,7 @@ class Question(python_utils.OBJECT):
                 rule_type = rule_spec_dict['rule_type']
                 rule_types_to_inputs[rule_type].append(rule_spec_dict['inputs'])
             del answer_group_dicts[i]['rule_specs']
-            answer_group_dicts[i]['rule_types_to_inputs_translations'] = {}
+            answer_group_dicts[i]['rule_input_translations'] = {}
             answer_group_dicts[i]['rule_types_to_inputs'] = dict(
                 rule_types_to_inputs)
         return question_state_dict

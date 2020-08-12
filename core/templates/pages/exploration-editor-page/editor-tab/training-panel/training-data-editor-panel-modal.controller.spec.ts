@@ -75,7 +75,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_types_to_inputs_translations: {},
+              rule_input_translations: {},
               rule_types_to_inputs: {},
               outcome: {
                 dest: 'Hola',
@@ -124,7 +124,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_types_to_inputs_translations: {},
+          rule_input_translations: {},
           rule_types_to_inputs: {
             '': [
               {
@@ -279,7 +279,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_types_to_inputs_translations: {},
+              rule_input_translations: {},
               rule_types_to_inputs: {},
               outcome: {
                 dest: 'Hola',
@@ -328,7 +328,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_types_to_inputs_translations: {},
+          rule_input_translations: {},
           rule_types_to_inputs: {},
           training_data: ['Answer1', 'Answer2']
         }],
@@ -411,7 +411,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_types_to_inputs_translations: {},
+              rule_input_translations: {},
               rule_types_to_inputs: {},
               outcome: {
                 dest: 'Hola',
@@ -460,7 +460,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_types_to_inputs_translations: {},
+          rule_input_translations: {},
           rule_types_to_inputs: {},
           training_data: ['Answer1']
         }],

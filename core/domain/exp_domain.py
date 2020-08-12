@@ -3020,9 +3020,9 @@ class Exploration(python_utils.OBJECT):
     def _convert_states_v38_dict_to_v39_dict(cls, states_dict):
         """Converts from version 38 to 39. Version 39 removes the fields
         rule_specs in AnswerGroups, and adds new fields rule_types_to_inputs and
-        rule_types_to_inputs_translations. rule_types_to_inputs is a dictionary
-        that maps rule type to a list of rule inputs that share the rule type.
-        rule_types_to_inputs_translations is a dict mapping abbreviated language
+        rule_input_translations. rule_types_to_inputs is a dictionary that maps
+        rule type to a list of rule inputs that share the rule type.
+        rule_input_translations is a dict mapping abbreviated language
         codes to a mapping of rule type to rule inputs.
 
         Args:
@@ -3041,7 +3041,7 @@ class Exploration(python_utils.OBJECT):
                 # dictionaries that have properties 'rule_type' and
                 # 'inputs', the new format groups rule inputs of the same
                 # rule type by mapping rule type to a list of rule inputs.
-                # I.e. Old format: rule_specs = [
+                # E.g. Old format: rule_specs = [
                 #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
                 #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}
                 # ]
@@ -3056,7 +3056,7 @@ class Exploration(python_utils.OBJECT):
                     rule_types_to_inputs[rule_type].append(
                         rule_spec_dict['inputs'])
                 del answer_group_dicts[i]['rule_specs']
-                answer_group_dicts[i]['rule_types_to_inputs_translations'] = {}
+                answer_group_dicts[i]['rule_input_translations'] = {}
                 answer_group_dicts[i]['rule_types_to_inputs'] = dict(
                     rule_types_to_inputs)
 
@@ -4105,10 +4105,10 @@ class Exploration(python_utils.OBJECT):
     def _convert_v43_dict_to_v44_dict(cls, exploration_dict):
         """Converts a v43 exploration dict into a v44 exploration dict.
         Removes the fields rule_specs in AnswerGroups, and adds new fields
-        rule_types_to_inputs and rule_types_to_inputs_translations.
+        rule_types_to_inputs and rule_input_translations.
         rule_types_to_inputs is a dict mapping rule type to a list of
-        rule inputs that share the type. rule_types_to_inputs_translations is a
-        dict mapping abbreviated language codes to a mapping of rule_type to
+        rule inputs that share the type. rule_input_translations is a dict
+        mapping abbreviated language codes to a mapping of rule_type to
         rule_types_to_inputs.
 
         Args:

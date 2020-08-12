@@ -129,7 +129,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
                 'new_value': [{
-                    'rule_types_to_inputs_translations': {},
+                    'rule_input_translations': {},
                     'rule_types_to_inputs': {
                         'ContainsAtLeastOneOf': [{
                             'x': [html_content]
@@ -398,7 +398,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'answer_groups',
                 'new_value': [{
-                    'rule_types_to_inputs_translations': {},
+                    'rule_input_translations': {},
                     'rule_types_to_inputs': {
                         'CaseSensitiveEquals': [{
                             'x': 'test'

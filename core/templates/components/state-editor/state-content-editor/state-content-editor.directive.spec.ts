@@ -102,7 +102,7 @@ describe('State content editor directive', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_types_to_inputs_translations: {},
+              rule_input_translations: {},
               rule_types_to_inputs: {},
               outcome: {
                 dest: 'unused',
@@ -152,7 +152,7 @@ describe('State content editor directive', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_types_to_inputs_translations: {},
+              rule_input_translations: {},
               rule_types_to_inputs: {},
               outcome: {
                 dest: 'unused',
@@ -202,7 +202,7 @@ describe('State content editor directive', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_types_to_inputs_translations: {},
+              rule_input_translations: {},
               rule_types_to_inputs: {},
               outcome: {
                 dest: 'unused',

@@ -110,7 +110,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'ule_spec htmls</p>')]]
                 }]
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -395,7 +395,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'x': 'Test'
                 }]
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -513,7 +513,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
                 }]
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -599,7 +599,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_answer_groups = [{
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'ContainsAtLeastOneOf': [{
                     'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
@@ -694,7 +694,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_answer_groups = [{
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': ['<p>init_state customization arg html 1</p>']
@@ -1062,7 +1062,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
@@ -1207,7 +1207,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
@@ -1662,7 +1662,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': html_with_old_math_schema,
@@ -1702,7 +1702,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': html_with_new_math_schema,
@@ -1909,7 +1909,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
         answer_group_with_old_math_schema = [{
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'ContainsAtLeastOneOf': [{
                     'x': [html_with_old_math_schema]
@@ -1940,7 +1940,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         answer_group_with_new_math_schema = [{
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'ContainsAtLeastOneOf': [{
                     'x': [html_with_new_math_schema]
@@ -2143,7 +2143,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': 'Test'
@@ -2164,7 +2164,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': 'Test'
@@ -2306,7 +2306,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group_with_old_math_schema = [{
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'ContainsAtLeastOneOf': [{
                     'x': [html_with_old_math_schema]
@@ -2407,7 +2407,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group_with_old_math_schema = [{
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'ContainsAtLeastOneOf': [{
                     'x': [html_with_old_math_schema]
@@ -3101,7 +3101,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
@@ -3464,7 +3464,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
@@ -3511,7 +3511,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [[]]
             },
@@ -3538,7 +3538,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': []
@@ -3577,7 +3577,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'

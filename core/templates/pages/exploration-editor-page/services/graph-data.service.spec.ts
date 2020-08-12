@@ -54,7 +54,7 @@ describe('Graph Data Service', function() {
         param_changes: [],
         interaction: {
           answer_groups: [{
-            rule_types_to_inputs_translations: {},
+            rule_input_translations: {},
             rule_types_to_inputs: {
               Contains: [
                 {

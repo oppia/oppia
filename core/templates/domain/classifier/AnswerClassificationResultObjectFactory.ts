@@ -27,15 +27,6 @@ export class AnswerClassificationResult {
   answerGroupIndex: number;
   classificationCategorization: string;
 
-  // Note: rules used to be stored in a list of Rules, but have been moved to a
-  // dictionary mapping rule type to a list of rule inputs that share the
-  // same rule type. The AnswerClassificationResult domain object contained
-  // a field named ruleIndex that tracked the index of the rule that was
-  // triggered.
-  // However, now that the structure has changed as a result of PR10246,
-  // (https://github.com/oppia/oppia/pull/10246), ruleIndex has been
-  // deprecated and will eventually be deleted in a future PR.
-
   constructor(
       outcome: Outcome, answerGroupIndex: number,
       classificationCategorization: string) {

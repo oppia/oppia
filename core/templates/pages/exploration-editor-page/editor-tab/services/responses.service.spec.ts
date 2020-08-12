@@ -70,7 +70,7 @@ describe('Responses Service', function() {
             html: ''
           },
         },
-        rule_types_to_inputs_translations: {},
+        rule_input_translations: {},
         rule_types_to_inputs: {},
       }],
       default_outcome: {
@@ -101,7 +101,7 @@ describe('Responses Service', function() {
             html: ''
           },
         },
-        rule_types_to_inputs_translations: {},
+        rule_input_translations: {},
         rule_types_to_inputs: {
           '': [
             {

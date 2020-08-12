@@ -138,7 +138,7 @@ describe('Question object factory', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_types_to_inputs_translations: {},
+            rule_input_translations: {},
             rule_types_to_inputs: {
               Equals: [
                 {

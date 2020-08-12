@@ -64,9 +64,9 @@ angular.module('oppia').directive('answerGroupEditor', [
         onSaveTaggedMisconception: '=',
         outcome: '=',
         // Answer group editor takes in a list of rules. Note that the actual
-        // stored rules are not in this format- see the AnswerGroup domain
+        // stored rules are not in this format -- see the AnswerGroup domain
         // object for the actual format of how rules are stored. AnswerGroup
-        // contains a method updateRuleTypesToInputs() which accpets a list of
+        // contains a method updateRuleTypesToInputs() which accepts a list of
         // rules. This method should be used to update the rule structure.
         getRules: '&rules',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',

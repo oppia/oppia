@@ -519,7 +519,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
@@ -768,7 +768,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
@@ -795,7 +795,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
@@ -819,16 +819,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Expected answer group rule_types_to_inputs to be a dict')
         init_state.interaction.answer_groups[0].rule_types_to_inputs = {}
 
-        init_state.interaction.answer_groups[
-            0].rule_types_to_inputs_translations = []
+        init_state.interaction.answer_groups[0].rule_input_translations = []
         self._assert_validation_error(
             exploration,
             (
-                'Expected answer group rule_types_to_inputs_translations '
+                'Expected answer group rule_input_translations '
                 'to be a dict')
         )
-        init_state.interaction.answer_groups[
-            0].rule_types_to_inputs_translations = {}
+        init_state.interaction.answer_groups[0].rule_input_translations = {}
 
         first_answer_group = init_state.interaction.answer_groups[0]
         first_answer_group.tagged_skill_misconception_id = None
@@ -1240,7 +1238,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
@@ -1617,7 +1615,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Contains': [{
                     'x': 'Test'
@@ -6412,7 +6410,7 @@ states:
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -6980,7 +6978,7 @@ states:
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7136,7 +7134,7 @@ states:
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7315,7 +7313,7 @@ states:
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7483,7 +7481,7 @@ states:
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7673,7 +7671,7 @@ states:
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7969,7 +7967,7 @@ states:
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -8246,7 +8244,7 @@ states:
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -8903,7 +8901,7 @@ states:
           Equals:
           - x: 0
           - x: 1
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
@@ -8918,7 +8916,7 @@ states:
         rule_types_to_inputs:
           Equals:
           - x: 0
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -9001,7 +8999,7 @@ states:
             - <p>This is value1 for ItemSelectionInput</p>
           - x:
             - <p>This is value3 for ItemSelectionInput</p>
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -9334,7 +9332,7 @@ states:
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_types_to_inputs_translations: {}
+        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -9759,7 +9757,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state1.update_interaction_solution(solution)
 
         answer_group_list2 = [{
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': 0
@@ -9781,7 +9779,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': 0
@@ -9802,7 +9800,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_types_to_inputs_translations': {},
+            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': ['<p>This is value1 for ItemSelectionInput</p>']

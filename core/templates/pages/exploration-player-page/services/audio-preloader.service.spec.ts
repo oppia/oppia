@@ -348,7 +348,7 @@ describe('Audio preloader service', function() {
             },
             solution: null,
             answer_groups: [{
-              rule_types_to_inputs_translations: {},
+              rule_input_translations: {},
               rule_types_to_inputs: {
                 Contains: [
                   {
@@ -367,7 +367,7 @@ describe('Audio preloader service', function() {
                 refresher_exploration_id: null
               }
             }, {
-              rule_types_to_inputs_translations: {},
+              rule_input_translations: {},
               rule_types_to_inputs: {
                 Contains: [
                   {

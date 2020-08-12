@@ -46,9 +46,8 @@ class AnswerGroup(python_utils.OBJECT):
     """
 
     def __init__(
-            self, outcome, rule_types_to_inputs,
-            rule_types_to_inputs_translations, training_data,
-            tagged_skill_misconception_id):
+            self, outcome, rule_types_to_inputs, rule_input_translations,
+            training_data, tagged_skill_misconception_id):
         """Initializes a AnswerGroup domain object.
 
         Args:
@@ -59,11 +58,25 @@ class AnswerGroup(python_utils.OBJECT):
                 input names can be deduced from the relevant description field
                 in extensions/interactions/rule_templates.json -- they are
                 enclosed in {{...}} braces.
-            rule_types_to_inputs_translations: dict. A dictionary mapping
-                rule_type (str) to a dictionary that maps abbreviated
-                language code (str) to a list of translated rule inputs.
-                Each rule input is a dictionary mapping the rule input name
-                (str) to the rule input value.
+                E.g. For 2 TextInput rules of type 'Equals' and with the inputs
+                {'x': 'Yes'} and {'x': 'Y'}, rule_types_to_inputs will be
+                {
+                    'Equals': [{'x': 'Yes'}, {'x': 'Y'}]
+                }
+            rule_input_translations: dict. A dictionary mapping rule_type (str)
+                to a dictionary that maps abbreviated language code (str) to a
+                list of translated rule inputs. Each rule input is a dictionary
+                mapping the rule input name (str) to the rule input value. Note
+                that the number of rule inputs for each rule type can differ for
+                different languages. However, there will always be at least one
+                rule input for each rule type found in rule_types_to_inputs.
+                E.g. For a rule input translation in French (fr) of the rules
+                found in the example above, rule_input_translations will be
+                {
+                    'fr': {
+                        'Equals': [{'x': 'Oui'}]
+                    }
+                }
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
             tagged_skill_misconception_id: str or None. The format is
@@ -74,8 +87,7 @@ class AnswerGroup(python_utils.OBJECT):
                 tests a particular skill.
         """
         self.rule_types_to_inputs = rule_types_to_inputs
-        self.rule_types_to_inputs_translations = (
-            rule_types_to_inputs_translations)
+        self.rule_input_translations = rule_input_translations
         self.outcome = outcome
         self.training_data = training_data
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
@@ -88,8 +100,7 @@ class AnswerGroup(python_utils.OBJECT):
         """
         return {
             'rule_types_to_inputs': self.rule_types_to_inputs,
-            'rule_types_to_inputs_translations':
-                self.rule_types_to_inputs_translations,
+            'rule_input_translations': self.rule_input_translations,
             'outcome': self.outcome.to_dict(),
             'training_data': self.training_data,
             'tagged_skill_misconception_id': self.tagged_skill_misconception_id
@@ -109,7 +120,7 @@ class AnswerGroup(python_utils.OBJECT):
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             answer_group_dict['rule_types_to_inputs'],
-            answer_group_dict['rule_types_to_inputs_translations'],
+            answer_group_dict['rule_input_translations'],
             answer_group_dict['training_data'],
             answer_group_dict['tagged_skill_misconception_id']
         )
@@ -135,10 +146,10 @@ class AnswerGroup(python_utils.OBJECT):
                 'Expected answer group rule_types_to_inputs to be a dict, '
                 'received %s' % self.rule_types_to_inputs)
 
-        if not isinstance(self.rule_types_to_inputs_translations, dict):
+        if not isinstance(self.rule_input_translations, dict):
             raise utils.ValidationError(
-                'Expected answer group rule_types_to_inputs_translations to be '
-                'a dict, received %s' % self.rule_types_to_inputs_translations)
+                'Expected answer group rule_input_translations to be '
+                'a dict, received %s' % self.rule_input_translations)
 
         if self.tagged_skill_misconception_id is not None:
             if not isinstance(
@@ -187,7 +198,7 @@ class AnswerGroup(python_utils.OBJECT):
         Args:
             rule_input: dict. The values of the parameters needed in order to
                 fully specify the rule. The keys and the value type for this
-                dict can be deduced from,the relevant description field in
+                dict can be deduced from the relevant description field in
                 extensions/interactions/rule_templates.json where the keys
                 and value schema are enclosed in {{...}} braces.
             rule_type: str. The rule type, e.g. "CodeContains" or "Equals".
@@ -2697,7 +2708,7 @@ class State(python_utils.OBJECT):
             answer_group = AnswerGroup(
                 Outcome.from_dict(answer_group_dict['outcome']),
                 answer_group_dict['rule_types_to_inputs'],
-                answer_group_dict['rule_types_to_inputs_translations'],
+                answer_group_dict['rule_input_translations'],
                 answer_group_dict['training_data'],
                 answer_group_dict['tagged_skill_misconception_id'])
             interaction_answer_groups.append(answer_group)

@@ -231,7 +231,8 @@ export class StatsReportingBackendApiService {
       // triggered, and that result was posted to the backend here.
       // However, now that the structure has changed as a result of PR10246,
       // (https://github.com/oppia/oppia/pull/10246), rule_spec_index has been
-      // deprecated and will eventually be deleted in a future PR.
+      // deprecated and will eventually be deleted from the backend in a future
+      // PR.
       rule_spec_index: null,
       classification_categorization: classificationCategorization
     }).toPromise();

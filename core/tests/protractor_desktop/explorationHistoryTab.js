@@ -164,7 +164,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       19: {
-        text: '    rule_types_to_inputs_translations: {}',
+        text: '    rule_input_translations: {}',
         highlighted: true
       },
       20: {
