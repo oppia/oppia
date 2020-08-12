@@ -150,8 +150,8 @@ export class MathInteractionsService {
     return true;
   }
 
-  validateEquation(equationString: string,
-    validVariablesList: Array<string>): boolean {
+  validateEquation(
+    equationString: string, validVariablesList: Array<string>): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
