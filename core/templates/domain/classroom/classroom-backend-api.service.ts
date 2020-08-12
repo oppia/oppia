@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
@@ -36,7 +36,7 @@ interface ClassroomStatusBackendDict {
 }
 
 interface ClassroomDataBackendDict {
-  name: string,
+  'name': string,
   'topic_summary_dicts': TopicSummaryBackendDict[],
   'course_details': string,
   'topic_list_intro': string
@@ -53,12 +53,14 @@ export class ClassroomBackendApiService {
     private classroomDataObjectFactory: ClassroomDataObjectFactory
   ) {}
 
-  _fetchClassroomData(classroomName: string,
+  private _initializeTranslationEventEmitter = new EventEmitter();
+
+  _fetchClassroomData(classroomUrlFragment: string,
       successCallback: (value: ClassroomData) => void,
       errorCallback: (reason: string) => void): void {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
-        classroom_name: classroomName
+        classroom_url_fragment: classroomUrlFragment
       });
 
     this.http.get<ClassroomDataBackendDict>(
@@ -94,16 +96,22 @@ export class ClassroomBackendApiService {
     });
   }
 
-  fetchClassroomData(classroomName: string): Promise<ClassroomData> {
+  async fetchClassroomDataAsync(
+      classroomUrlFragment: string
+  ): Promise<ClassroomData> {
     return new Promise((resolve, reject) => {
-      this._fetchClassroomData(classroomName, resolve, reject);
+      this._fetchClassroomData(classroomUrlFragment, resolve, reject);
     });
   }
 
-  fetchClassroomPageIsShownStatus(): Promise<boolean> {
+  async fetchClassroomPageIsShownStatusAsync(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomPageIsShownStatus(resolve, reject);
     });
+  }
+
+  get onInitializeTranslation() {
+    return this._initializeTranslationEventEmitter;
   }
 }
 

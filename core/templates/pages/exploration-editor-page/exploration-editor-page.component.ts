@@ -149,6 +149,8 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
@@ -190,6 +192,7 @@ angular.module('oppia').component('explorationEditorPage', {
         UserEmailPreferencesService, UserExplorationPermissionsService,
         EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
       var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
       var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
@@ -390,6 +393,7 @@ angular.module('oppia').component('explorationEditorPage', {
           }
 
           await ExplorationImprovementsService.initAsync();
+          await ExplorationImprovementsService.flushUpdatedTasksToBackend();
 
           ExplorationWarningsService.updateWarnings();
           $scope.$broadcast('refreshStateEditor');
@@ -459,7 +463,11 @@ angular.module('oppia').component('explorationEditorPage', {
         });
         $scope.$on(
           'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
-        $scope.$on('openEditorTutorial', ctrl.startTutorial);
+        ctrl.directiveSubscriptions.add(
+          StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
+            () => {
+              ctrl.startTutorial();
+            }));
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
 
@@ -622,6 +630,9 @@ angular.module('oppia').component('explorationEditorPage', {
         $templateCache.put(
           'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
         ctrl.tutorialInProgress = false;
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

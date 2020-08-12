@@ -45,6 +45,8 @@ angular.module('oppia').factory('StoryEditorStateService', [
 
     var _storyInitializedEventEmitter = new EventEmitter();
     var _storyReinitializedEventEmitter = new EventEmitter();
+    var _viewStoryNodeEditorEventEmitter = new EventEmitter();
+    var _recalculateAvailableNodesEventEmitter = new EventEmitter();
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
@@ -240,11 +242,29 @@ angular.module('oppia').factory('StoryEditorStateService', [
         return _storyReinitializedEventEmitter;
       },
 
+      get onViewStoryNodeEditor() {
+        return _viewStoryNodeEditorEventEmitter;
+      },
+
+      get onRecalculateAvailableNodes() {
+        return _recalculateAvailableNodesEventEmitter;
+      },
+      /**
+       * Returns whether the story URL fragment already exists on the server.
+       */
       getStoryWithUrlFragmentExists: function() {
         return _storyWithUrlFragmentExists;
       },
 
-      changeStoryWithUrlFragmentExists: function(
+      /**
+       * Attempts to set the boolean variable _storyWithUrlFragmentExists based
+       * on the value returned by doesStoryWithUrlFragmentExistAsync and
+       * executes the success callback provided. No arguments are passed to the
+       * success callback. Execution of the success callback indicates that the
+       * async backend call was successful and that _storyWithUrlFragmentExists
+       * has been successfully updated.
+       */
+      updateExistenceOfStoryUrlFragment: function(
           storyUrlFragment, successCallback) {
         EditableStoryBackendApiService.doesStoryWithUrlFragmentExistAsync(
           storyUrlFragment).then(

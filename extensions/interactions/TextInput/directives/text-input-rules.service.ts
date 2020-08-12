@@ -63,12 +63,6 @@ export class TextInputRulesService {
     }
     return editDistance[inputString.length][answerString.length] === 1;
   }
-  CaseSensitiveEquals(
-      answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
-    var normalizedAnswer = this.nws.transform(answer);
-    var normalizedInput = this.nws.transform(inputs.x);
-    return normalizedAnswer === normalizedInput;
-  }
   StartsWith(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var normalizedInput = this.nws.transform(inputs.x);
