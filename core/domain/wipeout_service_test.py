@@ -192,7 +192,51 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
-    def test_pre_delete_user_without_activities(self):
+    def test_pre_delete_profile_users_works_correctly(self):
+        user_settings = user_services.get_user_settings(self.profile_user_id)
+        self.assertFalse(user_settings.deleted)
+        user_auth_details = user_services.get_auth_details_by_user_id(
+            self.profile_user_id)
+        self.assertFalse(user_settings.deleted)
+        self.assertFalse(user_auth_details.deleted)
+
+        wipeout_service.pre_delete_user(self.profile_user_id)
+        user_settings = user_models.UserSettingsModel.get_by_id(
+            self.profile_user_id)
+        self.assertTrue(user_settings.deleted)
+        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
+            self.profile_user_id)
+        self.assertTrue(user_auth_details.deleted)
+
+    def test_pre_delete_user_for_full_user_also_deletes_all_profiles(self):
+        user_settings = user_services.get_user_settings(self.user_1_id)
+        self.assertFalse(user_settings.deleted)
+        user_auth_details = user_services.get_auth_details_by_user_id(
+            self.user_1_id)
+        self.assertFalse(user_auth_details.deleted)
+        profile_user_settings = user_services.get_user_settings(
+            self.profile_user_id)
+        self.assertFalse(user_settings.deleted)
+        profile_auth_details = user_services.get_user_settings(
+            self.profile_user_id)
+        self.assertFalse(profile_auth_details.deleted)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+
+        user_settings = user_services.get_user_settings_by_gae_id(
+            self.user_1_gae_id)
+        self.assertTrue(user_settings.deleted)
+        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
+            self.user_1_id)
+        self.assertTrue(user_auth_details.deleted)
+        profile_user_settings = user_models.UserSettingsModel.get_by_id(
+            self.profile_user_id)
+        self.assertTrue(profile_user_settings.deleted)
+        profile_auth_details = user_models.UserAuthDetailsModel.get_by_id(
+            self.profile_user_id)
+        self.assertTrue(profile_user_settings.deleted)
+
+    def test_pre_delete_user_without_activities_works_correctly(self):
         user_models.UserSubscriptionsModel(
             id=self.user_1_id,
             activity_ids=[],
@@ -201,12 +245,23 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
         user_settings = user_services.get_user_settings(self.user_1_id)
         self.assertFalse(user_settings.deleted)
+        user_auth_details = user_services.get_auth_details_by_user_id(
+            self.user_1_id)
+        self.assertFalse(user_auth_details.deleted)
 
         wipeout_service.pre_delete_user(self.user_1_id)
 
         user_settings = user_services.get_user_settings_by_gae_id(
             self.user_1_gae_id)
         self.assertTrue(user_settings.deleted)
+        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
+            self.user_1_id)
+        self.assertTrue(user_auth_details.deleted)
+
+        pending_deletion_model = (
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+        self.assertEqual(pending_deletion_model.exploration_ids, [])
+        self.assertEqual(pending_deletion_model.collection_ids, [])
 
     def test_pre_delete_user_with_activities(self):
         self.save_new_valid_exploration('exp_id', self.user_1_id)

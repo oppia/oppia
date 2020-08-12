@@ -115,7 +115,8 @@ def pre_delete_user(user_id):
     Args:
         user_id: str. The id of the user to be deleted. If the user_id
             corresponds to a profile user then only that profile is deleted.
-            For a full user, all its associated profile users are deleted too.
+            For a full user, all of its associated profile users are deleted
+            too.
     """
     all_linked_user_ids = [
         user.user_id for user in
@@ -147,15 +148,14 @@ def pre_delete_user(user_id):
 
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
-        if feconf.ROLE_ID_LEARNER != (
-                user_services.get_user_settings(
-                    linked_user_id, strict=True).role
-            ):
+        user_settings = user_services.get_user_settings(
+            linked_user_id, strict=True)
+
+        if feconf.ROLE_ID_LEARNER != user_settings.role:
             user_services.update_email_preferences(
                 linked_user_id, False, False, False, False)
 
-        email = user_services.get_user_settings(
-            linked_user_id, strict=True).email
+        email = user_settings.email
         user_services.mark_user_for_deletion(linked_user_id)
 
         save_pending_deletion_request(

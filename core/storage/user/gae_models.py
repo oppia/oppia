@@ -2323,7 +2323,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
                 profiles we are querying for.
 
         Returns:
-            UserAuthDetailsModels. List of UserAuthDetailsModel instances mapped
-            to the queried parent_user_id.
+            list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
+            mapped to the queried parent_user_id.
         """
         return cls.query(cls.parent_user_id == parent_user_id).fetch()

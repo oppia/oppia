@@ -642,7 +642,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_user_role_from_id(profile_user_id),
             feconf.ROLE_ID_LEARNER)
-        error_msg = 'Role update of a Learner is not allowed.'
+        error_msg = 'The role of a Learner cannot be changed.'
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.update_user_role(
                 profile_user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
@@ -655,7 +655,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_user_role_from_id(user_id),
             feconf.ROLE_ID_EXPLORATION_EDITOR)
-        error_msg = 'Updating to a Learner is not allowed.'
+        error_msg = 'Updating to a Learner role is not allowed.'
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.update_user_role(
                 user_id, feconf.ROLE_ID_LEARNER)

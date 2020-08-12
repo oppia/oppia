@@ -135,7 +135,9 @@ class UserSettings(python_utils.OBJECT):
                 preference.
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
-            display_alias: str or None. Name of a user display in Android UI.
+            display_alias: str or None. Display name of a user who is logged
+                into the Android app. None when the request in coming from
+                web because we don't use it there.
             deleted: bool. Whether the user has requested removal of their
                 account.
         """
@@ -167,8 +169,8 @@ class UserSettings(python_utils.OBJECT):
         self.deleted = deleted
 
     def validate(self):
-        """Checks that user_id, gae_id, email, role, display_alias fields
-        of this UserSettings domain object are valid.
+        """Checks that the user_id, gae_id, email, role and display_alias
+        fields of this UserSettings domain object are valid.
 
         Raises:
             ValidationError. The user_id is not str.
@@ -942,7 +944,7 @@ def has_fully_registered_account(user_id):
 
 def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
     """Gets domain objects representing the auth details for all profiles
-    associated with the user having given parent_user_id.
+    associated with the user having the given parent_user_id.
 
     Args:
         parent_user_id: str. User id of the parent_user whose associated
@@ -961,12 +963,13 @@ def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
     ]
 
 
-def is_display_alias_unique_within_the_account(parent_user_id, display_alias):
-    """Checks whether a given display alias is unique within the account.
+def does_profile_with_display_alias_exist(parent_user_id, display_alias):
+    """Checks whether a given display alias value already exists for some
+        user within the account identified by the given parent_user_id.
 
     Args:
-        parent_user_id: str. User id of the parent(full) user in the account.
-        display_alias: str. The queried display alias to be checked.
+        parent_user_id: str. User id of the parent (full) user in the account.
+        display_alias: str. The queried display alias value to be checked.
 
     Returns:
         bool. Whether the display alias is unique within the account among all
@@ -1054,7 +1057,7 @@ def create_new_profile(
             'Pin must be set for a full user before creating a profile.')
     parent_user_id = parent_user_auth_details.user_id
 
-    if is_display_alias_unique_within_the_account(
+    if does_profile_with_display_alias_exist(
             parent_user_id, profile_display_alias):
         raise Exception(
             'Display alias %s already exists in the account.'
@@ -1450,9 +1453,9 @@ def update_user_role(user_id, role):
         raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
     if user_settings.role == feconf.ROLE_ID_LEARNER:
-        raise Exception('Role update of a Learner is not allowed.')
+        raise Exception('The role of a Learner cannot be changed.')
     if role == feconf.ROLE_ID_LEARNER:
-        raise Exception('Updating to a Learner is not allowed.')
+        raise Exception('Updating to a Learner role is not allowed.')
     user_settings.role = role
     _save_user_settings(user_settings)
 
