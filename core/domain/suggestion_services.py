@@ -145,14 +145,15 @@ def get_suggestion_by_id(suggestion_id):
 
 
 def get_suggestions_by_ids(suggestion_ids):
-    """Finds suggestions by the suggestion IDs.
+    """Finds suggestions using the given suggestion IDs.
 
     Args:
         suggestion_ids: list(str). The IDs of the suggestions.
 
     Returns:
         list(Suggestion|None). A list of the corresponding suggestions. The
-        list will contain None elements if no suggestion is found.
+        list will contain None elements if no suggestion is found with the
+        corresponding suggestion id.
     """
     general_suggestion_models = (
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
@@ -346,7 +347,7 @@ def accept_suggestion(
 
 
 def reject_suggestion(suggestion_id, reviewer_id, review_message):
-    """Rejects the suggestion with the given suggestion id.
+    """Rejects the suggestion with the given suggestion_id.
 
     Args:
         suggestion_id: str. The id of the suggestion to be rejected.

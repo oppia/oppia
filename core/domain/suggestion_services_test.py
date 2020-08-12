@@ -91,8 +91,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def assert_suggestion_status(self, suggestion_id, status):
         """Assert the status of the suggestion with suggestion_id."""
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        self.assertEqual(
-            suggestion.status, status)
+        self.assertEqual(suggestion.status, status)
 
     def accept_suggestion_setup_with_mocks(
             self, suggestion_id, reviewer_id, commit_message, review_message):
