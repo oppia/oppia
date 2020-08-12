@@ -2273,19 +2273,6 @@ class StoryViewerTests(test_utils.GenericTestBase):
                 % self.story_url_fragment,
                 response.headers['location'])
 
-    def test_redirect_lowercase_story_url_fragment(self):
-        topic_services.publish_topic(self.topic_id, self.admin_id)
-        topic_services.publish_story(
-            self.topic_id, self.story_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_html_response(
-                '/mock_story_page/staging/topic/story/Story-frag',
-                expected_status_int=302)
-            self.assertEqual(
-                'http://localhost/learn/staging/topic/story/%s'
-                % self.story_url_fragment,
-                response.headers['location'])
-
 
 class SubtopicViewerTests(test_utils.GenericTestBase):
     """Tests for decorator can_access_subtopic_viewer_page."""
@@ -2412,17 +2399,6 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 '/sub-one-frag',
                 response.headers['location'])
 
-    def test_redirect_with_lowercase_subtopic_url_fragment(self):
-        topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/Sub-One-Frag',
-                expected_status_int=302)
-            self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision'
-                '/sub-one-frag',
-                response.headers['location'])
-
 
 class TopicViewerTests(test_utils.GenericTestBase):
     """Tests for decorator can_access_topic_viewer_page."""
@@ -2511,16 +2487,6 @@ class TopicViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_topic_page/math/topic',
-                expected_status_int=302)
-            self.assertEqual(
-                'http://localhost/learn/staging/topic',
-                response.headers['location'])
-
-    def test_redirect_with_lowercase_topic_url_fragment(self):
-        topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_html_response(
-                '/mock_topic_page/staging/TOPIC',
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic',
