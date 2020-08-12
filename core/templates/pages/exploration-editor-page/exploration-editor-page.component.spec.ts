@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateEditorService } from
@@ -72,8 +73,11 @@ describe('Exploration editor page component', function() {
   var sas = null;
   var ses = null;
   var stass = null;
+  var stfts = null;
   var tds = null;
   var ueps = null;
+
+  var mockOpenEditorTutorialEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -216,6 +220,7 @@ describe('Exploration editor page component', function() {
     sas = $injector.get('SiteAnalyticsService');
     ses = $injector.get('StateEditorService');
     stass = $injector.get('StateTopAnswersStatsService');
+    stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataService');
     ueps = $injector.get('UserExplorationPermissionsService');
 
@@ -238,10 +243,22 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
+        mockOpenEditorTutorialEmitter);
 
       explorationData.is_version_of_draft_valid = false;
 
       ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    it('should start tutorial on event of opening tutorial', () => {
+      spyOn(ctrl, 'startTutorial');
+      mockOpenEditorTutorialEmitter.emit();
+      expect(ctrl.startTutorial).toHaveBeenCalled();
     });
 
     it('should mark exploration as editable and translatable', () => {
