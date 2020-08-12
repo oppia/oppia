@@ -26,10 +26,10 @@ import sys
 
 import python_utils
 
-from scripts.linters.warranted_safe_pipe_usages import warranted_usages
-
 from . import linter_utils
 from .. import common
+
+from scripts.linters.warranted_safe_pipe_usages import WARRANTED_USAGES  # isort:skip pylint: disable=import-only-modules
 
 
 class TagMismatchException(Exception):
@@ -268,7 +268,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         return self.html_filepaths
 
     def _check_safe_pipe_usage(self):
-        """ This function checks if the usage of safe is warranted or not"""
+        """This function checks if the usage of safe is warranted or not."""
 
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting Safe Pipe checks')
@@ -284,17 +284,18 @@ class HTMLLintChecksManager(python_utils.OBJECT):
             for filepath in html_files_to_lint:
                 file_content = self.file_cache.read(filepath)
                 if '| safe' in file_content or '|safe' in file_content:
-                    occurances = (len(file_content.split('| safe')) + 
-                        len(file_content.split('|safe')) - 2)
+                    occurances = (
+                        len(file_content.split('| safe')) + len(
+                            file_content.split('|safe')) - 2)
                     filename = filepath.split('/')[-1]
-                    if filename not in warranted_usages.keys():
+                    if filename not in list(WARRANTED_USAGES.keys()):
                         error_message = (
                             'The safe pipe used in %s is unwarranted, '
                             'please remove it!' % (filepath.split('/')[-1]))
                         summary_messages.append(error_message)
                         python_utils.PRINT(error_message)
                         failed = True
-                    elif warranted_usages[filename] < occurances:
+                    elif WARRANTED_USAGES[filename] < occurances:
                         error_message = (
                             'There are some unaccounted instances of safe pipe'
                             ' usage in the file %s. Please remove them!' % (
@@ -302,7 +303,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
                         summary_messages.append(error_message)
                         python_utils.PRINT(error_message)
                         failed = True
-                    elif warranted_usages[filename] > occurances:
+                    elif WARRANTED_USAGES[filename] > occurances:
                         error_message = (
                             'There are number of instances of safe pipe in %s '
                             'doesn\'t match the ammount specified in warranted'
@@ -310,8 +311,6 @@ class HTMLLintChecksManager(python_utils.OBJECT):
                         summary_messages.append(error_message)
                         python_utils.PRINT(error_message)
                         failed = True
-                    
-                    
             if failed:
                 summary_message = (
                     '%s HTML tag and attribute check failed, fix the HTML '
@@ -387,7 +386,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
         all_messages = (
-            self._check_html_tags_and_attributes() + 
+            self._check_html_tags_and_attributes() +
             self._check_safe_pipe_usage()
         )
         return all_messages

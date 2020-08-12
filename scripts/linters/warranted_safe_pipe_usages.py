@@ -16,6 +16,9 @@
 
 """List of warranted usages of safe pipe in the code."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # isort:skip pylint: disable=import-only-modules
+
 # Contains the dict of all files that use safe pipe along with the usage count.
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
@@ -23,8 +26,8 @@
 # Format: {
 #   file name: list of occurrences of safe pipe in the file.
 # }
-warranted_usages = {
+WARRANTED_USAGES = {
     'extra-reported-safe-pipe-usage.html': 3,
     'profile-link-image.component.html': 2,
     'unaccounted-safe-pipe-usage.html': 1
-};
+}
