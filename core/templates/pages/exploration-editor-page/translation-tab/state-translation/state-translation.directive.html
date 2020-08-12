@@ -59,18 +59,16 @@
       </span>
     </div>
     <div ng-if="isActive(TAB_ID_CUSTOMIZATION_ARGS)" class="translation-state-content">
-        <h3>Preview</h3>
-        <angular-html-bind html-data="interactionPreviewHtml" style="pointer-events: none;">
-        </angular-html-bind>
-        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-        
-        <h3>Content</h3>
+      <h3>Preview</h3>
+      <angular-html-bind html-data="interactionPreviewHtml" style="pointer-events: none;">
+      </angular-html-bind>
+      <h3>Content</h3>
+      <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
         <li class="oppia-rule-block oppia-prevent-selection"
             ng-repeat="caContent in interactionCustomizationArgTranslatableContent track by $index"
             ng-class="{'active': activeHintIndex === $index}"
             style="margin-top: 0;">
-          <a 
-             ng-click="changeActiveCustomizationArgContentIndex($index)"
+          <a ng-click="changeActiveCustomizationArgContentIndex($index)"
              class="oppia-rule-tab"
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(caContent.content.getContentId())">
