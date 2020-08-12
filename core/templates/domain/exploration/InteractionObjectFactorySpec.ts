@@ -797,4 +797,30 @@ describe('Interaction object factory', () => {
       }).not.toThrowError();
     });
   });
+
+  it('should properly extract translatable content from customization ' +
+     'args for complex nested values', () => {
+    const ca = {
+      testCustArgs: {
+        value: [{
+          content: new SubtitledUnicode('first', 'ca_dummyCustArg_content_0'),
+          show: true
+        },
+        {
+          content: new SubtitledUnicode('second', 'ca_dummyCustArg_content_1'),
+          show: true
+        }]
+      }
+    };
+    const content = Interaction.getCustomizationArgTranslatableContent(ca);
+    expect(content).toEqual([
+      {
+        name: 'Test Cust Args (0) > Content',
+        content: new SubtitledUnicode('first', 'ca_dummyCustArg_content_0')
+      }, {
+        name: 'Test Cust Args (1) > Content',
+        content: new SubtitledUnicode('second', 'ca_dummyCustArg_content_1')
+      }
+    ]);
+  });
 });

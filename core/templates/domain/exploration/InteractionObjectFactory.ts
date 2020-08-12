@@ -177,6 +177,14 @@ export class Interaction {
   ): {name: string, content: SubtitledUnicode|SubtitledHtml}[] {
     const translatableContent = [];
 
+    const camelCaseToSentenceCase = (s) => {
+      // Add a space in front of capital letters.
+      s = s.replace(/([A-Z])/g, ' $1');
+      // Captialize first letter.
+      s = s.charAt(0).toUpperCase() + s.slice(1);
+      return s;
+    };
+
     const traverseValueAndRetrieveSubtitled = (
         name: string,
         value: Object[] | Object,
@@ -194,19 +202,16 @@ export class Interaction {
       } else if (value instanceof Object) {
         Object.keys(value).forEach(key =>
           traverseValueAndRetrieveSubtitled(
-            `${name} > ${key}`,
+            `${name} > ${camelCaseToSentenceCase(key)}`,
             value[key]
           )
         );
       }
     };
 
-    const capitalize = (s) => {
-      return s.charAt(0).toUpperCase() + s.slice(1);
-    };
     Object.keys(customizationArgs).forEach(caName =>
       traverseValueAndRetrieveSubtitled(
-        capitalize(caName),
+        camelCaseToSentenceCase(caName),
         customizationArgs[caName].value));
 
     return translatableContent;
