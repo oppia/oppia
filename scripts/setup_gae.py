@@ -109,7 +109,7 @@ def main(args=None):
         # prompts with default values. In this case, that means accepting all
         # installations of gcloud packages.
         subprocess.call([
-            os.path.join(common.GOOGLE_CLOUD_SDK_BIN, 'gcloud'),
+            common.GCLOUD_PATH,
             'components', 'install', 'cloud-datastore-emulator',
             'app-engine-python', 'app-engine-python-extras', '--quiet'])
 

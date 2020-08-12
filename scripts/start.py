@@ -37,7 +37,6 @@ from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-
 
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-
 _PARSER = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
