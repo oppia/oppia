@@ -56,6 +56,7 @@ describe('Customize Interaction Modal Controller', function() {
   var stateEditorService = null;
   var stateInteractionIdService = null;
   var stateNextContentIdIndexService = null;
+  const showMarkAllAudioAsNeedingUpdateModalIfRequiredProvider = () => {};
 
   var stateName = 'Introduction';
 
@@ -107,7 +108,8 @@ describe('Customize Interaction Modal Controller', function() {
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
-        StateNextContentIdIndexService: stateNextContentIdIndexService
+        StateNextContentIdIndexService: stateNextContentIdIndexService,
+        showMarkAllAudioAsNeedingUpdateModalIfRequiredProvider: () => {}
       });
     }));
 
@@ -325,7 +327,8 @@ describe('Customize Interaction Modal Controller', function() {
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
-        StateNextContentIdIndexService: stateNextContentIdIndexService
+        StateNextContentIdIndexService: stateNextContentIdIndexService,
+        showMarkAllAudioAsNeedingUpdateModalIfRequiredProvider: () => {}
       });
     }));
 
@@ -415,7 +418,8 @@ describe('Customize Interaction Modal Controller', function() {
           StateCustomizationArgsService: stateCustomizationArgsService,
           StateEditorService: stateEditorService,
           StateInteractionIdService: stateInteractionIdService,
-          StateNextContentIdIndexService: stateNextContentIdIndexService
+          StateNextContentIdIndexService: stateNextContentIdIndexService,
+          showMarkAllAudioAsNeedingUpdateModalIfRequiredProvider: () => {}
         });
       }).toThrowError(
         'Interaction is missing customization argument highlightRegionsOnHover'
@@ -489,7 +493,8 @@ describe('Customize Interaction Modal Controller', function() {
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
         StateNextContentIdIndexService: stateNextContentIdIndexService,
-        INTERACTION_SPECS: INTERACTION_SPECS
+        INTERACTION_SPECS: INTERACTION_SPECS,
+        showMarkAllAudioAsNeedingUpdateModalIfRequiredProvider: () => {}
       });
     });
     stateNextContentIdIndexService.displayed = 0;
