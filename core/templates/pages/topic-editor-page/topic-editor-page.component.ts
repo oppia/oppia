@@ -41,6 +41,7 @@ require('services/page-title.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require('pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -94,27 +95,19 @@ angular.module('oppia').directive('topicEditorPage', [
             var activeTab = TopicEditorRoutingService.getActiveTabName();
             var lastSubtopicIdVisited = (
               TopicEditorRoutingService.getLastSubtopicIdVisited());
-            if (activeTab !== 'subtopic_editor' && !lastSubtopicIdVisited) {
-              if (ctrl.getChangeListLength() > 0) {
-                AlertsService.addInfoMessage(
-                  'Please save all pending changes to preview the topic ' +
-                    'with the changes', 2000);
-                return;
-              }
-              var topicUrlFragment = ctrl.topic.getUrlFragment();
-              var classroomUrlFragment = (
-                TopicEditorStateService.getClassroomUrlFragment());
-              var newTab = $window.open();
-              newTab.location.href = UrlInterpolationService.interpolateUrl(
-                TOPIC_VIEWER_URL_TEMPLATE, {
-                  topic_url_fragment: topicUrlFragment,
-                  classroom_url_fragment: classroomUrlFragment
-                });
+            if (!activeTab.startsWith('subtopic') && !lastSubtopicIdVisited) {
+              TopicEditorRoutingService.navigateToTopicPreviewTab();
             } else {
               var subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
               TopicEditorRoutingService.navigateToSubtopicPreviewTab(
                 subtopicId);
             }
+          };
+          ctrl.isInPreviewTab = function() {
+            var activeTab = TopicEditorRoutingService.getActiveTabName();
+            return (
+              activeTab === 'subtopic_preview' ||
+                activeTab === 'topic_preview');
           };
           ctrl.selectMainTab = function() {
             const activeTab = ctrl.getActiveTabName();
@@ -149,6 +142,8 @@ angular.module('oppia').directive('topicEditorPage', [
                 return 'Subtopic Preview';
               } else if (activeTab === 'questions') {
                 return 'Question Editor';
+              } else if (activeTab === 'topic_preview') {
+                return 'Topic Preview';
               }
             }
           };
