@@ -345,6 +345,17 @@ export interface PencilCodeEditorCustomizationArgs {
   };
 }
 
+interface RationExpressionInputCustomizationArgsBackendDict {
+  placeholder?: {
+    value: string;
+  };
+}
+export interface RationExpressionInputCustomizationArgs {
+  placeholder?: {
+    value: string;
+  };
+}
+
 
 export interface SetInputCustomizationArgsBackendDict {
   buttonText?: {
@@ -412,6 +423,7 @@ export type InteractionCustomizationArgsBackendDict = (
   NumericExpressionInputCustomizationArgsBackendDict |
   NumericInputCustomizationArgsBackendDict |
   PencilCodeEditorCustomizationArgsBackendDict |
+  RationExpressionInputCustomizationArgsBackendDict |
   SetInputCustomizationArgsBackendDict |
   TextInputCustomizationArgsBackendDict);
 
@@ -435,5 +447,6 @@ export type InteractionCustomizationArgs = (
   NumericExpressionInputCustomizationArgs |
   NumericInputCustomizationArgs |
   PencilCodeEditorCustomizationArgs |
+  RationExpressionInputCustomizationArgs |
   SetInputCustomizationArgs |
   TextInputCustomizationArgs);

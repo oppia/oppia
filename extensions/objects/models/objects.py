@@ -1209,6 +1209,7 @@ class RatioExpression(BaseObject):
         'validators': [{
             'id': 'is_valid_ratio'
         }]
+    }
 
 
 class CustomOskLetters(BaseObject):

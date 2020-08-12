@@ -119,7 +119,7 @@ export class InteractionRulesRegistryService {
       NumericExpressionInputRulesService:
         this.numericExpressionInputRulesService,
       NumericInputRulesService: this.numericInputRulesService,
-      PencilCodeEditorRulesService: this.pencilCodeEditorRulesService
+      PencilCodeEditorRulesService: this.pencilCodeEditorRulesService,
       SetInputRulesService: this.setInputRulesService,
       TextInputRulesService: this.textInputRulesService,
     }));
