@@ -69,6 +69,11 @@ describe('Topic editor routing service', function() {
     TopicEditorRoutingService.navigateToMainTab();
     $rootScope.$apply();
     expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
+
+    TopicEditorRoutingService.navigateToTopicPreviewTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getActiveTabName()).toEqual(
+      'topic_preview');
   });
 
   it('should handle calls with unexpect paths', function() {

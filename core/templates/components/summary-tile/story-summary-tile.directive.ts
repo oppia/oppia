@@ -41,6 +41,11 @@ angular.module('oppia').directive('storySummaryTile', [
             ENTITY_TYPE, STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getStoryLink = function() {
+            // This component is being used in the topic editor as well and
+            // we want to disable the linking in this case.
+            if (!ctrl.classroomUrlFragment || !ctrl.topicUrlFragment) {
+              return '#';
+            }
             return UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_URL_TEMPLATE, {
                 classroom_url_fragment: ctrl.classroomUrlFragment,

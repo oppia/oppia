@@ -28,6 +28,7 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
     var MAIN_TAB = 'main';
     var SUBTOPIC_EDITOR_TAB = 'subtopic_editor';
     var SUBTOPIC_PREVIEW_TAB = 'subtopic_preview';
+    var TOPIC_PREVIEW_TAB = 'topic_preview';
     var QUESTIONS_TAB = 'questions';
     var lastTabVisited = 'main';
     var lastSubtopicId = null;
@@ -56,6 +57,8 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
         activeTabName = SUBTOPIC_EDITOR_TAB;
       } else if (newPath.startsWith('/subtopic_preview')) {
         activeTabName = SUBTOPIC_PREVIEW_TAB;
+      } else if (newPath.startsWith('/topic_preview')) {
+        activeTabName = TOPIC_PREVIEW_TAB;
       }
     });
 
@@ -78,6 +81,11 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
         lastTabVisited = 'subtopic';
         PageTitleService.setPageTitleForMobileView('Subtopic Preview');
         $location.path('/subtopic_preview/' + subtopicId);
+      },
+      navigateToTopicPreviewTab: function() {
+        lastTabVisited = 'topic';
+        PageTitleService.setPageTitleForMobileView('Topic Preview');
+        $location.path('/topic_preview/');
       },
       navigateToSubtopicEditorWithId: function(subtopicId) {
         lastTabVisited = 'subtopic';
