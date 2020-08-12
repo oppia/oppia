@@ -215,14 +215,12 @@ def run_webpack_compilation(source_maps=False):
     webpack_bundles_dir_name = 'webpack_bundles'
     for _ in python_utils.RANGE(max_tries):
         try:
-            if source_maps:
-                subprocess.check_call([
-                    common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-                    'webpack.dev.config.sourcemap.ts'])
-            else:
-                subprocess.check_call([
-                    common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-                    'webpack.dev.config.ts'])
+            webpack_config_file = (
+                build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if source_maps
+                else build.WEBPACK_DEV_CONFIG)
+            subprocess.check_call([
+                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                webpack_config_file])
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
@@ -290,7 +288,6 @@ def build_js_files(
 
         if deparallelize_terser:
             build_args.append('--deparallelize_terser')
-
         if source_maps:
             build_args.append('--source_maps')
 

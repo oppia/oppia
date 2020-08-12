@@ -139,18 +139,14 @@ def main(args=None):
     if not parsed_args.prod_env:
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
-        if parsed_args.source_maps:
-            background_processes.append(subprocess.Popen([
-                common.NODE_BIN_PATH,
-                os.path.join(
-                    common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
-                '--config', 'webpack.dev.sourcemap.config.ts', '--watch']))
-        else:
-            background_processes.append(subprocess.Popen([
-                common.NODE_BIN_PATH,
-                os.path.join(
-                    common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
-                '--config', 'webpack.dev.config.ts', '--watch']))
+        webpack_config_file = (
+            build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if parsed_args.source_maps
+            else build.WEBPACK_DEV_CONFIG)
+        background_processes.append(subprocess.Popen([
+            common.NODE_BIN_PATH,
+            os.path.join(
+                common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
+            '--config', webpack_config_file, '--watch']))
 
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)

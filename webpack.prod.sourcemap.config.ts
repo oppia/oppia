@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Production environment config file for Webpack.
+ * @fileoverview Production environment config file for Webpack with
+ * proper source maps.
  */
 
 const { merge } = require('webpack-merge');
