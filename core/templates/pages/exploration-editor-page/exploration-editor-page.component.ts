@@ -165,11 +165,10 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
-    'StateClassifierMappingService', 'StateEditorService',
-    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-    'ThreadDataService', 'UrlInterpolationService',
-    'UserEmailPreferencesService', 'UserExplorationPermissionsService',
-    'EVENT_EXPLORATION_PROPERTY_CHANGED',
+    'StateEditorService', 'StateTopAnswersStatsService',
+    'StateTutorialFirstTimeService', 'ThreadDataService',
+    'UrlInterpolationService', 'UserEmailPreferencesService',
+    'UserExplorationPermissionsService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
     function(
         $q, $scope, $templateCache, $timeout, $uibModal,
         AutosaveInfoModalsService, ChangeListService, ContextService,
@@ -184,11 +183,10 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         PageTitleService, LoaderService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
-        StateClassifierMappingService, StateEditorService,
-        StateTopAnswersStatsService, StateTutorialFirstTimeService,
-        ThreadDataService, UrlInterpolationService,
-        UserEmailPreferencesService, UserExplorationPermissionsService,
-        EVENT_EXPLORATION_PROPERTY_CHANGED) {
+        StateEditorService, StateTopAnswersStatsService,
+        StateTutorialFirstTimeService, ThreadDataService,
+        UrlInterpolationService, UserEmailPreferencesService,
+        UserExplorationPermissionsService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
       var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
