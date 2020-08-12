@@ -22,8 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 
 @Component({
   selector: 'side-navigation-bar',
@@ -33,18 +31,11 @@ import { TranslateService } from 'services/translate.service';
 export class SideNavigationBarComponent implements OnInit {
   currentUrl: string = '';
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private translateService: TranslateService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef) {
-    this.translateService.use('en');
   }
 
   ngOnInit(): void {
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => this.translateService.use(code));
     this.currentUrl = this.windowRef.nativeWindow.location.pathname;
   }
 
