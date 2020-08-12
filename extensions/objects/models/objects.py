@@ -132,6 +132,54 @@ class Html(BaseObject):
     }
 
 
+class SubtitledUnicode(BaseObject):
+    """SubtitledUnicode class."""
+
+    description = 'A dictionary with properties "content_id" and "unicode".'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'content_id',
+            'schema': {
+                # The default content id is none. However, it should be
+                # populated before being saved (SubtitledUnicode in state_domain
+                # has validation checks for this).
+                'type': 'unicode_or_none'
+            }
+        }, {
+            'name': 'unicode_str',
+            'schema': {
+                'type': 'unicode'
+            }
+        }]
+    }
+
+
+class SubtitledHtml(BaseObject):
+    """SubtitledHtml class."""
+
+    description = 'A dictionary with properties "content_id" and "html".'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'content_id',
+            'schema': {
+                # The default content id is none. However, it should be
+                # populated before being saved (SubtitledHtml in state_domain
+                # has validation checks for this).
+                'type': 'unicode_or_none'
+            }
+        }, {
+            'name': 'html',
+            'schema': {
+                'type': 'html'
+            }
+        }]
+    }
+
+
 class NonnegativeInt(BaseObject):
     """Nonnegative integer class."""
 
@@ -1160,5 +1208,25 @@ class RatioExpression(BaseObject):
         'type': 'unicode',
         'validators': [{
             'id': 'is_valid_ratio'
+            
+
+class CustomOskLetters(BaseObject):
+    """Class for custom OSK letters. These are the letters that will be
+    displayed to the learner for AlgebraicExpressionInput and MathEquationInput
+    interactions when the on-screen keyboard is being used. This includes Latin
+    and Greek alphabets.
+    """
+
+    description = (
+        'Shortcut variables that the learner can access in the '
+        'on-screen keyboard. (The order of these variables will be reflected '
+        'in the learner\'s keyboard)')
+    default_value = []
+
+    SCHEMA = {
+        'type': 'list',
+        'items': AlgebraicIdentifier.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
         }]
     }

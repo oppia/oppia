@@ -18,113 +18,56 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
-import os
-import sys
 from constants import constants
 
-ROOT_PATH = os.path.dirname(__file__)
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-OPPIA_TOOLS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools')
+from core.controllers import acl_decorators
+from core.controllers import admin
+from core.controllers import base
+from core.controllers import classifier
+from core.controllers import classroom
+from core.controllers import collection_editor
+from core.controllers import collection_viewer
+from core.controllers import concept_card_viewer
+from core.controllers import contributor_dashboard
+from core.controllers import creator_dashboard
+from core.controllers import custom_landing_pages
+from core.controllers import editor
+from core.controllers import email_dashboard
+from core.controllers import features
+from core.controllers import feedback
+from core.controllers import improvements
+from core.controllers import learner_dashboard
+from core.controllers import learner_playlist
+from core.controllers import library
+from core.controllers import moderator
+from core.controllers import pages
+from core.controllers import practice_sessions
+from core.controllers import profile
+from core.controllers import question_editor
+from core.controllers import questions_list
+from core.controllers import reader
+from core.controllers import recent_commits
+from core.controllers import resources
+from core.controllers import review_tests
+from core.controllers import skill_editor
+from core.controllers import skill_mastery
+from core.controllers import story_editor
+from core.controllers import story_viewer
+from core.controllers import subscriptions
+from core.controllers import subtopic_viewer
+from core.controllers import suggestion
+from core.controllers import topic_editor
+from core.controllers import topic_viewer
+from core.controllers import topics_and_skills_dashboard
+from core.controllers import voice_artist
+from core.domain import user_services
+from core.platform import models
+import feconf
 
-# oppia_tools/ is available locally (in both dev and prod mode). However,
-# on the GAE production server, oppia_tools/ is not available, and the default
-# PIL third-party library is used instead.
-#
-# We cannot special-case this using DEV_MODE because it is possible to run
-# Oppia in production mode locally, where a built-in PIL won't be available.
-# Hence the check for oppia_tools instead.
-if os.path.isdir(OPPIA_TOOLS_PATH):
-    PIL_PATH = os.path.join(
-        OPPIA_TOOLS_PATH, 'Pillow-6.2.2')
-    if not os.path.isdir(PIL_PATH):
-        raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
-    sys.path.insert(0, PIL_PATH)
-
-THIRD_PARTY_LIBS = [
-    os.path.join(
-        ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.6.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.9.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'bleach-3.1.5'),
-    os.path.join(ROOT_PATH, 'third_party', 'callbacks-0.3.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'future-0.17.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.22.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.22.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.22.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.43.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'packaging-20.4'),
-    os.path.join(ROOT_PATH, 'third_party', 'pylatexenc-2.6'),
-    os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.17.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'six-1.15.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.5'),
-    os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
-]
-
-for lib_path in THIRD_PARTY_LIBS:
-    if not os.path.isdir(lib_path):
-        raise Exception('Invalid path for third_party library: %s' % lib_path)
-    sys.path.insert(0, lib_path)
-
-# The system path insertions above MUST be run before the imports below because
-# each of the imports below uses various third_party libraries in their
-# execution. During the import of a python module, the python interpreter also
-# loads imports specific to that module. For example, the acl_decorators module
-# imports backports.functools_lru_cache so importing acl_decorators will
-# automatically force the python interpreter to import backports as part of the
-# acl_decorators import execution. The system path setup above lets the python
-# compiler know where to look when these third_party imports occur.
-# As such, any imports of non system-standard modules should occur after the
-# third_party libraries are added to the system path.
-
-from core.controllers import acl_decorators # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import admin # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import base # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import classifier # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import classroom # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import collection_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import collection_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import community_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import concept_card_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import creator_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import custom_landing_pages # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import email_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import features # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import feedback # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import improvements # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import learner_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import learner_playlist # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import library # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import moderator # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import pages # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import practice_sessions # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import profile # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import question_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import questions_list # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import reader # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import recent_commits # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import resources # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import review_tests # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import skill_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import skill_mastery # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import story_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import story_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import subscriptions # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import subtopic_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import suggestion # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import topic_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import topic_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import topics_and_skills_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.controllers import voice_artist # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.domain import user_services # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from core.platform import models # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-import feconf # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-
-from mapreduce import main as mapreduce_main # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from mapreduce import parameters as mapreduce_parameters # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-import webapp2 # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from webapp2_extras import routes # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from mapreduce import main as mapreduce_main
+from mapreduce import parameters as mapreduce_parameters
+import webapp2
+from webapp2_extras import routes
 
 
 current_user_services = models.Registry.import_current_user_services()
@@ -272,31 +215,35 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
-        r'/adminmathsvghandler', admin.ExplorationsLatexSvgHandler),
+        r'/explorationslatexsvghandler', admin.ExplorationsLatexSvgHandler),
+    get_redirect_route(
+        r'/suggestionslatexsvghandler', admin.SuggestionsLatexSvgHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcommunityreviewerhandler', admin.AddCommunityReviewerHandler),
+        r'/addcontributionreviewerhandler',
+        admin.AddContributionReviewerHandler),
     get_redirect_route(
-        r'/removecommunityreviewerhandler',
-        admin.RemoveCommunityReviewerHandler),
+        r'/removecontributionreviewerhandler',
+        admin.RemoveContributionReviewerHandler),
     get_redirect_route(
-        r'/getcommunityreviewershandler', admin.CommunityReviewersListHandler),
+        r'/getcontributionreviewershandler',
+        admin.ContributionReviewersListHandler),
     get_redirect_route(
-        r'/communityreviewerrightsdatahandler',
-        admin.CommunityReviewerRightsDataHandler),
+        r'/contributionreviewerrightsdatahandler',
+        admin.ContributionReviewerRightsDataHandler),
     get_redirect_route(
-        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
-        community_dashboard.CommunityDashboardPage),
+        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
+        contributor_dashboard.ContributorDashboardPage),
 
     get_redirect_route(
         '/notifications_dashboard',
         creator_dashboard.OldNotificationsDashboardRedirectPage),
     get_redirect_route(
-        '/community_dashboard',
-        creator_dashboard.OldCommunityDashboardRedirectPage),
+        '/contributor_dashboard',
+        creator_dashboard.OldContributorDashboardRedirectPage),
     get_redirect_route(
         feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
@@ -321,17 +268,22 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_COLLECTION_URL,
         creator_dashboard.NewCollectionHandler),
     get_redirect_route(
-        r'%s/<opportunity_type>' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
-        community_dashboard.ContributionOpportunitiesHandler),
+        r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
+        custom_landing_pages.FractionLandingRedirectPage),
+    get_redirect_route(
+        r'/learn/maths/<topic>', custom_landing_pages.TopicLandingRedirectPage),
+    get_redirect_route(
+        r'%s/<opportunity_type>' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+        contributor_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
         r'/gettranslatabletexthandler',
-        community_dashboard.TranslatableTextHandler),
+        contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(
-        r'/usercommunityrightsdatahandler',
-        community_dashboard.UserCommunityRightsDataHandler),
+        r'/usercontributionrightsdatahandler',
+        contributor_dashboard.UserContributionRightsDataHandler),
     get_redirect_route(
         r'/retrivefeaturedtranslationlanguages',
-        community_dashboard.FeaturedTranslationLanguagesHandler),
+        contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
@@ -345,44 +297,68 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<comma_separated_skill_ids>' % feconf.QUESTION_COUNT_URL_PREFIX,
         questions_list.QuestionCountDataHandler),
     get_redirect_route(
-        r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
+        r'%s/practice/session' % feconf.TOPIC_VIEWER_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
     get_redirect_route(
-        r'%s/<topic_name>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>' %
+        feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler),
     get_redirect_route(
-        r'%s/<story_id>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        r'/<story_url_fragment>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
         review_tests.ReviewTestsPageDataHandler),
     get_redirect_route(
-        r'%s/<story_id>' % feconf.REVIEW_TEST_URL_PREFIX,
+        r'%s/review-test/<story_url_fragment>'
+        % feconf.TOPIC_VIEWER_URL_PREFIX,
         review_tests.ReviewTestsPage),
     get_redirect_route(
-        r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        r'/<story_url_fragment>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
     get_redirect_route(
-        r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
+        r'%s/<story_url_fragment>' % feconf.STORY_URL_FRAGMENT_HANDLER,
+        story_editor.StoryUrlFragmentHandler),
+    get_redirect_route(
+        r'%s/<topic_name>' % feconf.TOPIC_NAME_HANDLER,
+        topic_editor.TopicNameHandler),
+    get_redirect_route(
+        r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
+        topic_editor.TopicUrlFragmentHandler),
+    get_redirect_route(
+        r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        topic_viewer.TopicViewerPage),
+    get_redirect_route(
+        r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
     get_redirect_route(
-        r'%s/<story_id>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        r'/<story_url_fragment>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
         story_viewer.StoryProgressHandler),
     get_redirect_route(
-        r'%s/<topic_name>/<subtopic_id>' %
-        feconf.SUBTOPIC_DATA_HANDLER,
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        r'/<subtopic_url_fragment>' % feconf.SUBTOPIC_DATA_HANDLER,
         subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
-        r'%s/<topic_name>/<subtopic_id>' %
-        feconf.SUBTOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
+        r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        topic_viewer.TopicViewerPage),
+    get_redirect_route(
+        r'%s/revision/<subtopic_url_fragment>' %
+        feconf.TOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
     get_redirect_route(
-        r'%s/<topic_name>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        r'%s' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
-        r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
+        r'%s/practice' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        topic_viewer.TopicViewerPage),
+    get_redirect_route(
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
     get_redirect_route(
-        r'%s/<classroom_name>' % feconf.CLASSROOM_DATA_HANDLER,
+        r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_DATA_HANDLER,
         classroom.ClassroomDataHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
@@ -439,12 +415,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
     get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
-
-    get_redirect_route(
-        r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-        custom_landing_pages.FractionLandingRedirectPage),
-    get_redirect_route(
-        r'/learn/maths/<topic>', custom_landing_pages.TopicLandingRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),
@@ -852,12 +822,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
-]
 
-# Adding redirects for classroom pages.
-for classroom_name in feconf.CLASSROOM_PAGES:
-    URLS.append(
-        get_redirect_route(r'/%s' % classroom_name, classroom.ClassroomPage))
+    get_redirect_route(
+        r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
+]
 
 # Adding redirects for topic landing pages.
 for subject in feconf.AVAILABLE_LANDING_PAGES:

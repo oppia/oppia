@@ -17,6 +17,8 @@
  * @fileoverview Unit tests for the subtopic editor tab component.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Subtopic editor tab', function() {
@@ -50,6 +52,9 @@ describe('Subtopic editor tab', function() {
     isWindowNarrow: () => false
   };
 
+  var topicInitializedEventEmitter = null;
+  var topicReinitializedEventEmitter = null;
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -75,11 +80,25 @@ describe('Subtopic editor tab', function() {
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
+    subtopic.setUrlFragment('dummy-url');
     skillSummary = ShortSkillSummaryObjectFactory.create(
       'skill_1', 'Description 1');
     topic._uncategorizedSkillSummaries = [skillSummary];
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
     topic._id = 'sndsjfn42';
+
+    topicInitializedEventEmitter = new EventEmitter();
+    topicReinitializedEventEmitter = new EventEmitter();
+
+    spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
+      function() {
+        return topicInitializedEventEmitter;
+      });
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicReinitialized').and.callFake(
+      function() {
+        return topicReinitializedEventEmitter;
+      });
 
     topic.getSubtopicById = function() {
       return subtopic;
@@ -95,6 +114,10 @@ describe('Subtopic editor tab', function() {
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should initialize the variables', function() {
     expect(ctrl.editableTitle).toEqual('Subtopic1');
@@ -112,6 +135,35 @@ describe('Subtopic editor tab', function() {
       var titleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
       ctrl.updateSubtopicTitle('New title');
       expect(titleSpy).not.toHaveBeenCalled();
+    });
+
+  it('should call TopicUpdateService if subtopic url fragment is updated',
+    function() {
+      var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
+      ctrl.updateSubtopicUrlFragment('new-url');
+      expect(urlFragmentSpy).toHaveBeenCalled();
+    });
+
+  it('should not call TopicUpdateService when url fragment has not changed',
+    function() {
+      ctrl.updateSubtopicUrlFragment('subtopic-url');
+      ctrl.initialSubtopicUrlFragment = 'subtopic-url';
+      var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
+      ctrl.updateSubtopicUrlFragment('subtopic-url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+    });
+
+  it('should not call TopicUpdateService if subtopic url fragment is invalid',
+    function() {
+      var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
+      ctrl.updateSubtopicUrlFragment('new url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+      ctrl.updateSubtopicUrlFragment('New-Url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+      ctrl.updateSubtopicUrlFragment('new-url-');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+      ctrl.updateSubtopicUrlFragment('new123url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
     });
 
   it('should call TopicUpdateService if subtopic thumbnail updates',
@@ -290,6 +342,14 @@ describe('Subtopic editor tab', function() {
       ctrl.navigateToTopicEditor();
       expect(navigateSpy).toHaveBeenCalled();
     });
+
+  it('should call initEditor when topic is initialized', function() {
+    spyOn(ctrl, 'initEditor').and.callThrough();
+    topicInitializedEventEmitter.emit();
+    expect(ctrl.initEditor).toHaveBeenCalledTimes(1);
+    topicReinitializedEventEmitter.emit();
+    expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
+  });
 
   it('should hide the html data input on canceling', function() {
     ctrl.schemaEditorIsShown = true;

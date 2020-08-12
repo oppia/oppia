@@ -347,7 +347,8 @@ angular.module('oppia').component('explorationEditorPage', {
               ChangeListService.getChangeList());
             return;
           }
-          RouterService.onRefreshStatisticsTab.emit();
+
+          $scope.$broadcast('refreshStatisticsTab');
           $scope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
           });
@@ -392,6 +393,7 @@ angular.module('oppia').component('explorationEditorPage', {
           }
 
           await ExplorationImprovementsService.initAsync();
+          await ExplorationImprovementsService.flushUpdatedTasksToBackend();
 
           ExplorationWarningsService.updateWarnings();
           $scope.$broadcast('refreshStateEditor');
@@ -452,17 +454,20 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.$onInit = function() {
         $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
-        ctrl.directiveSubscriptions.add(
-          ExplorationStatesService.onRefreshGraph.subscribe(() => {
-            GraphDataService.recompute();
-            ExplorationWarningsService.updateWarnings();
-          }));
+        $scope.$on('refreshGraph', function() {
+          GraphDataService.recompute();
+          ExplorationWarningsService.updateWarnings();
+        });
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
         $scope.$on(
           'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
-        $scope.$on('openEditorTutorial', ctrl.startTutorial);
+        ctrl.directiveSubscriptions.add(
+          StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
+            () => {
+              ctrl.startTutorial();
+            }));
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
 

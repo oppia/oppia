@@ -189,13 +189,15 @@ describe('Translation status service', function() {
               default_outcome: {},
               feedback_2: {
                 hi: {
-                  html: '<p>This is feedback 1.</p>',
+                  data_format: 'html',
+                  translation: '<p>This is feedback 1.</p>',
                   needs_update: false
                 }
               },
               feedback_1: {
                 hi: {
-                  html: '<p>This is first card.</p>',
+                  data_format: 'html',
+                  translation: '<p>This is first card.</p>',
                   needs_update: false
                 }
               }
@@ -265,7 +267,8 @@ describe('Translation status service', function() {
             customization_args: {
               choices: {
                 value: ['<p>1</p>', '<p>2</p>']
-              }
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             default_outcome: {
               refresher_exploration_id: null,
@@ -330,8 +333,9 @@ describe('Translation status service', function() {
             id: 'MultipleChoiceInput',
             customization_args: {
               choices: {
-                value: ['<p>1</p>']
-              }
+                value: ['<p>1</p>'],
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             default_outcome: {
               refresher_exploration_id: null,

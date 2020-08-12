@@ -73,6 +73,7 @@ angular.module('oppia').component('numericExpressionEditor', {
 
       ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
+        GuppyInitializationService.interactionType = 'NumericExpressionInput';
       };
 
       ctrl.$onInit = function() {

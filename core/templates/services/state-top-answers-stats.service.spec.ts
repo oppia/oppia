@@ -60,6 +60,7 @@ describe('StateTopAnswersStatsService', () => {
 
   const stateBackendDict: StateBackendDict = {
     content: {content_id: 'content', html: 'Say "hello" in Spanish!'},
+    next_content_id_index: 0,
     param_changes: [],
     interaction: {
       answer_groups: [{
@@ -88,7 +89,15 @@ describe('StateTopAnswersStatsService', () => {
       hints: [],
       id: 'TextInput',
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: 'ca_placeholder_0',
+            unicode_str: ''
+          }
+        },
+        rows: { value: 1 }
+      },
       solution: null,
     },
     classifier_model_id: null,
