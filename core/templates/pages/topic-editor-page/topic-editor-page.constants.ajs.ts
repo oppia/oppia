@@ -26,12 +26,6 @@ angular.module('oppia').constant(
   TopicEditorPageConstants.TOPIC_NAME_INPUT_FOCUS_LABEL);
 
 angular.module('oppia').constant(
-  'EVENT_TOPIC_INITIALIZED',
-  TopicEditorPageConstants.EVENT_TOPIC_INITIALIZED);
-angular.module('oppia').constant(
-  'EVENT_TOPIC_REINITIALIZED',
-  TopicEditorPageConstants.EVENT_TOPIC_REINITIALIZED);
-angular.module('oppia').constant(
   'EVENT_SUBTOPIC_PAGE_LOADED',
   TopicEditorPageConstants.EVENT_SUBTOPIC_PAGE_LOADED);
 angular.module('oppia').constant(
