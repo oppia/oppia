@@ -177,7 +177,6 @@ def cleanup():
         '.*%s.*' % re.escape(google_app_engine_path),
         '.*%s.*' % re.escape(webdriver_download_path)
     ]
-
     for p in SUBPROCESSES:
         p.kill()
 
@@ -418,6 +417,7 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
         log_level: str. The log level for the google app engine server.
     """
     app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode_setting else '')
+
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=%s '

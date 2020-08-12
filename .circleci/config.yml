@@ -215,6 +215,7 @@ jobs:
           name: Run e2e profileFeatures test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
+
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
   # All other e2e tests should be run in prod mode.
