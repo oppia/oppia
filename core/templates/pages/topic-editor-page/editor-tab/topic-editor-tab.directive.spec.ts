@@ -22,7 +22,6 @@ import { EventEmitter } from '@angular/core';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
-import { EventEmitter } from '@angular/core';
 // ^^^ This block is to be removed.
 
 describe('Topic editor tab directive', function() {

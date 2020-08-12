@@ -178,6 +178,7 @@ angular.module('oppia').directive('topicEditorPage', [
             return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
+
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicInitialized.subscribe(
