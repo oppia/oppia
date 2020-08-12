@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import {
   PlatformParameterBackendDict,
   PlatformParameterObjectFactory
-} from 'domain/feature_gating/platform-parameter-object.factory';
+} from 'domain/platform_feature/platform-parameter-object.factory';
 import {
   PlatformParameterFilterType,
   ServerMode

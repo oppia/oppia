@@ -572,7 +572,7 @@
 # Dynamic Feature Gating project
 /core/storage/config/ @BenHenning @vinitamurthi
 /core/domain/platform_parameter*.py @BenHenning @vinitamurthi
-/core/templates/domain/feature_gating/ @BenHenning @vinitamurthi
+/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
 
 
 # Frontend unit tests

@@ -23,7 +23,7 @@ import {
   PlatformParameterFilterObjectFactory,
   PlatformParameterFilterType,
   ServerMode,
-} from 'domain/feature_gating/platform-parameter-filter-object.factory';
+} from 'domain/platform_feature/platform-parameter-filter-object.factory';
 
 describe('PlatformParameterFilterObjectFactory', () => {
   let factory: PlatformParameterFilterObjectFactory;

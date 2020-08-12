@@ -24,7 +24,7 @@ import {
   PlatformParameterFilterBackendDict,
   PlatformParameterFilterObjectFactory,
   PlatformParameterFilterType
-} from 'domain/feature_gating/platform-parameter-filter-object.factory';
+} from 'domain/platform_feature/platform-parameter-filter-object.factory';
 
 
 export type PlatformParameterValue = boolean | number | string;
