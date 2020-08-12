@@ -19,8 +19,6 @@
 
 import { State } from 'domain/state/StateObjectFactory';
 
-import { Subscription } from 'rxjs';
-
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
@@ -151,6 +149,8 @@ require('services/state-top-answers-stats.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
@@ -350,8 +350,7 @@ angular.module('oppia').component('explorationEditorPage', {
               ChangeListService.getChangeList());
             return;
           }
-
-          $scope.$broadcast('refreshStatisticsTab');
+          RouterService.onRefreshStatisticsTab.emit();
           $scope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
           });
@@ -396,6 +395,7 @@ angular.module('oppia').component('explorationEditorPage', {
           }
 
           await ExplorationImprovementsService.initAsync();
+          await ExplorationImprovementsService.flushUpdatedTasksToBackend();
 
           ExplorationWarningsService.updateWarnings();
           $scope.$broadcast('refreshStateEditor');
@@ -456,10 +456,6 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.$onInit = function() {
         $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
-        $scope.$on('refreshGraph', function() {
-          GraphDataService.recompute();
-          ExplorationWarningsService.updateWarnings();
-        });
         ctrl.directiveSubscriptions.add(
           ExplorationSaveService.onInitExplorationPage.subscribe(
             (successCallback) => {
@@ -467,12 +463,21 @@ angular.module('oppia').component('explorationEditorPage', {
             }
           )
         );
+        ctrl.directiveSubscriptions.add(
+          ExplorationStatesService.onRefreshGraph.subscribe(() => {
+            GraphDataService.recompute();
+            ExplorationWarningsService.updateWarnings();
+          }));
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
         $scope.$on(
           'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
-        $scope.$on('openEditorTutorial', ctrl.startTutorial);
+        ctrl.directiveSubscriptions.add(
+          StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
+            () => {
+              ctrl.startTutorial();
+            }));
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
 

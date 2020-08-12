@@ -16,13 +16,12 @@
  * @fileoverview Service for keeping track of the learner's position.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ContextService } from 'services/context.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +29,8 @@ import { PlayerTranscriptService } from
 export class PlayerPositionService {
   constructor(private contextService: ContextService,
               private playerTranscriptService: PlayerTranscriptService) {}
+
+  private _activeCardChangedEventEmitter = new EventEmitter();
 
   displayedCardIndex = null;
   onChangeCallback = null;
@@ -99,6 +100,10 @@ export class PlayerPositionService {
 
   get onHelpCardAvailable() {
     return this._helpCardAvailableEventEmitter;
+  },
+  
+  get onActiveCardChanged() {
+    return this._activeCardChangedEventEmitter;
   }
 }
 

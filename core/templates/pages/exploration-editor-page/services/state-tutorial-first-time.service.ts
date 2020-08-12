@@ -16,6 +16,8 @@
  * @fileoverview Service for all tutorials to be run only for the first time.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 
@@ -30,6 +32,10 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
     var _translationTutorialNotSeenBefore = false;
     var STARTED_TRANSLATION_TUTORIAL_EVENT_URL = '/createhandler/' +
     'started_translation_tutorial_event';
+
+    var _openEditorTutorialEventEmitter = new EventEmitter();
+    var _openPostTutorialHelpPopoverEventEmitter = new EventEmitter();
+    var _openTranslationTutorialEventEmitter = new EventEmitter();
 
     return {
       initEditor: function(firstTime, expId) {
@@ -50,7 +56,7 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
       },
       markEditorTutorialFinished: function() {
         if (_currentlyInEditorFirstVisit) {
-          $rootScope.$broadcast('openPostTutorialHelpPopover');
+          _openPostTutorialHelpPopoverEventEmitter.emit();
           EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
         }
 
@@ -79,12 +85,21 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
       },
       markTranslationTutorialFinished: function() {
         if (_currentlyInTranslationFirstVisit) {
-          $rootScope.$broadcast('openPostTutorialHelpPopover');
+          _openPostTutorialHelpPopoverEventEmitter.emit();
           EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
         }
 
         _currentlyInTranslationFirstVisit = false;
       },
+      get onOpenEditorTutorial() {
+        return _openEditorTutorialEventEmitter;
+      },
+      get onOpenPostTutorialHelpPopover() {
+        return _openPostTutorialHelpPopoverEventEmitter;
+      },
+      get onOpenTranslationTutorial() {
+        return _openTranslationTutorialEventEmitter;
+      }
     };
   }
 ]);
