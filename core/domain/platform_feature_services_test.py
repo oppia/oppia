@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for feature_gating_services.py."""
+"""Unit tests for platform_feature_services.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.domain import feature_gating_services as feature_services
-from core.domain import platform_parameter_domain as param_domain
+from core.domain import platform_feature_services as feature_services
+from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.platform import models
 from core.tests import test_utils
@@ -41,27 +41,59 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
 
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
-        param_names = ['parameter_a', 'parameter_b']
+        param_names = ['feature_a', 'feature_b']
         memcache_keys = [
-            param_domain.PlatformParameter.get_memcache_key(name)
+            platform_parameter_domain.PlatformParameter.get_memcache_key(name)
             for name in param_names]
         memcache_services.delete_multi(memcache_keys)
 
-        self.param_1 = registry.Registry.create_platform_parameter(
-            'parameter_a', 'parameter for test', 'bool',
-            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.dev)
-        self.param_2 = registry.Registry.create_platform_parameter(
-            'parameter_b', 'parameter for test', 'bool',
-            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.prod)
+        self.dev_feature = registry.Registry.create_feature_flag(
+            'feature_a', 'a feature in dev stage',
+            platform_parameter_domain.FEATURE_STAGES.dev)
+        self.prod_feature = registry.Registry.create_feature_flag(
+            'feature_b', 'a feature in prod stage',
+            platform_parameter_domain.FEATURE_STAGES.prod)
+
         registry.Registry.update_platform_parameter(
-            self.param_2.name, self.user_id, 'edit rules',
+            self.dev_feature.name, self.user_id, 'edit rules',
             [
                 {
                     'filters': [
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', param_domain.FEATURE_STAGES.dev]
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.dev
+                                ]
+                            ]
+                        }
+                    ],
+                    'value_when_matched': True
+                }
+            ]
+        )
+
+        registry.Registry.update_platform_parameter(
+            self.prod_feature.name, self.user_id, 'edit rules',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.dev
+                                ],
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.test
+                                ],
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.prod
+                                ]
                             ]
                         }
                     ],
@@ -94,19 +126,20 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                 }
             )
             self.assertEqual(
-                context.server_mode, param_domain.FEATURE_STAGES.dev)
+                context.server_mode,
+                platform_parameter_domain.FEATURE_STAGES.dev)
             self.assertEqual(context.client_type, 'Android')
             self.assertEqual(context.browser_type, None)
             self.assertEqual(context.app_version, '1.0.0')
             self.assertEqual(context.user_locale, 'en')
 
-    def test_get_all_feature_flag_setting_dicts_returns_correct_dicts(self):
-        expected_dicts = {
-            self.param_1.name: self.param_1.to_dict(),
-            self.param_2.name: self.param_2.to_dict(),
-        }
+    def test_get_all_feature_flag_dicts_returns_correct_dicts(self):
+        expected_dicts = [
+            self.dev_feature.to_dict(),
+            self.prod_feature.to_dict(),
+        ]
         self.assertEqual(
-            feature_services.get_all_feature_flag_setting_dicts(),
+            feature_services.get_all_feature_flag_dicts(),
             expected_dicts)
 
     def test_get_all_feature_flag_values_in_dev_returns_correct_values(self):
@@ -118,11 +151,11 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                 'user_locale': 'en',
             })
             self.assertEqual(
-                feature_services.get_all_feature_flag_values_for_context(
+                feature_services.evaluate_all_feature_flag_values_for_client(
                     context),
                 {
-                    self.param_1.name: False,
-                    self.param_2.name: True,
+                    self.dev_feature.name: True,
+                    self.prod_feature.name: True,
                 }
             )
 
@@ -135,71 +168,81 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                 'user_locale': 'en',
             })
             self.assertEqual(
-                feature_services.get_all_feature_flag_values_for_context(
+                feature_services.evaluate_all_feature_flag_values_for_client(
                     context),
                 {
-                    self.param_1.name: False,
-                    self.param_2.name: False,
+                    self.dev_feature.name: False,
+                    self.prod_feature.name: True,
                 }
             )
 
-    def test_get_feature_flag_value_in_dev_env_returns_correct_values(self):
+    def test_evaluate_dev_feature_for_dev_server_returns_true(self):
         with self.swap(constants, 'DEV_MODE', True):
-            self.assertFalse(
-                feature_services.get_feature_flag_value(self.param_1.name))
             self.assertTrue(
-                feature_services.get_feature_flag_value(self.param_2.name))
+                feature_services.is_feature_enabled(self.dev_feature.name))
 
-    def test_get_feature_flag_value_in_prod_env_returns_correct_values(self):
+    def test_evaluate_prod_feature_for_dev_server_returns_true(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            self.assertTrue(
+                feature_services.is_feature_enabled(self.prod_feature.name))
+
+    def test_evaluate_dev_feature_for_prod_server_returns_false(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.assertFalse(
-                feature_services.get_feature_flag_value(self.param_1.name))
-            self.assertFalse(
-                feature_services.get_feature_flag_value(self.param_2.name))
+                feature_services.is_feature_enabled(self.dev_feature.name))
 
-    def test_get_feature_flag_values_with_invalid_name_failure(self):
-        with self.assertRaisesRegexp(Exception, 'not exist'):
-            feature_services.get_feature_flag_value(
-                'feature_that_does_not_exist')
+    def test_evaluate_prod_feature_for_prod_server_returns_true(
+            self):
+        with self.swap(constants, 'DEV_MODE', False):
+            self.assertTrue(
+                feature_services.is_feature_enabled(self.prod_feature.name))
+
+    def test_get_feature_flag_values_with_unknown_name_raises_error(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Unknown feature flag'):
+            feature_services.is_feature_enabled('feature_that_does_not_exist')
 
     def test_update_feature_flag_rules_successfully_updates_rules(self):
         feature_services.update_feature_flag_rules(
-            self.param_1.name, self.user_id, 'test update',
+            self.dev_feature.name, self.user_id, 'test update',
             [
                 {
                     'filters': [
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', param_domain.FEATURE_STAGES.dev]
+                                [
+                                    '=',
+                                    platform_parameter_domain.FEATURE_STAGES.dev
+                                ]
                             ]
                         }
                     ],
-                    'value_when_matched': True
+                    'value_when_matched': False
                 },
             ]
         )
 
         with self.swap(constants, 'DEV_MODE', True):
-            self.assertTrue(
-                feature_services.get_feature_flag_value(self.param_1.name))
-            self.assertTrue(
-                feature_services.get_feature_flag_value(self.param_2.name))
+            self.assertFalse(
+                feature_services.is_feature_enabled(self.dev_feature.name))
 
-    def test_update_feature_flag_rules_with_invalid_name_failure(self):
-        with self.assertRaisesRegexp(Exception, 'not exist'):
+    def test_update_feature_flag_rules_with_unknown_name_raises_error(self):
+        unknown_name = 'feature_that_does_not_exist'
+        with self.assertRaisesRegexp(
+            Exception, 'Unknown feature flag: %s' % unknown_name):
             feature_services.update_feature_flag_rules(
-                'feature_that_does_not_exist', self.user_id, 'test update',
+                unknown_name, self.user_id, 'test update',
                 [
                     {'filters': [], 'value_when_matched': False},
                 ]
             )
 
-    def test_update_feature_flag_rules_with_invalid_rules_failure(self):
+    def test_update_feature_flag_rules_with_invalid_rules_raises_error(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'must have a server_mode filter'):
             feature_services.update_feature_flag_rules(
-                self.param_1.name, self.user_id, 'test update',
+                self.dev_feature.name, self.user_id, 'test update',
                 [
                     {
                         'filters': [
