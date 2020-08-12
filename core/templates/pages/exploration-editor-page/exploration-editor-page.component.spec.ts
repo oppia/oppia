@@ -76,6 +76,7 @@ describe('Exploration editor page component', function() {
   var stfts = null;
   var tds = null;
   var ueps = null;
+  var refreshGraphEmitter = new EventEmitter();
 
   var mockOpenEditorTutorialEmitter = new EventEmitter();
 
@@ -400,17 +401,22 @@ describe('Exploration editor page component', function() {
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
-      spyOn(ews, 'updateWarnings').and.callThrough();
-      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(ews, 'updateWarnings');
+      spyOn(gds, 'recompute');
       spyOn(pts, 'setPageTitle').and.callThrough();
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
+      spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
 
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
     });
 
     it('should link exploration to story when initing exploration page', () => {
@@ -464,7 +470,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should react when refreshing graph', () => {
-      $rootScope.$broadcast('refreshGraph');
+      refreshGraphEmitter.emit();
 
       expect(gds.recompute).toHaveBeenCalled();
       expect(ews.updateWarnings).toHaveBeenCalled();
@@ -790,6 +796,10 @@ describe('Exploration editor page component', function() {
       explorationData.is_version_of_draft_valid = true;
     });
 
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(true));
@@ -834,6 +844,9 @@ describe('Exploration editor page component', function() {
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
+    });
+    afterEach(() => {
+      ctrl.$onDestroy();
     });
 
     it('should callback state-added method for stats', fakeAsync(() => {
