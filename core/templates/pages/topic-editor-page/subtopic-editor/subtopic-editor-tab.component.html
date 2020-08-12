@@ -161,6 +161,7 @@
                  class="skill-list-item">
               <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
                  ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+                <span class="material-icons draggable-icon-indicator">drag_indicator</span>
                 <[skillSummary.getDescription()]>
               </a>
               <div class="skill-options-box">
@@ -397,8 +398,11 @@
     .subtopic-content .subtopic-header-text {
       display: none;
     }
-    .subtopic-content {
+    .subtopic-content .subtopic-content {
       margin-top: 25px;
+    }
+    .subtopic-content .draggable-icon-indicator {
+      display: none;
     }
     .subtopic-content .subtopic-left-box,
     .subtopic-content .subtopic-right-box {
