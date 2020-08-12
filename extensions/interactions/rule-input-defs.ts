@@ -103,18 +103,18 @@ export interface LogicProofRuleInputs {
 
 // MathEquation interaction has multiple types of inputs based on
 // rule type.
-export interface MathEquationMatchesExactlyWithRuleInputs {
+export interface MathEquationRuleInputsWithSide {
   x: string;
   y: string;
 }
 
-export interface MathEquationIsEquivalentToRuleInputs {
+export interface MathEquationRuleInputsWithoutSide {
   x: string;
 }
 
 export type MathEquationRuleInputs = (
-  MathEquationMatchesExactlyWithRuleInputs |
-  MathEquationIsEquivalentToRuleInputs);
+  MathEquationRuleInputsWithSide |
+  MathEquationRuleInputsWithoutSide);
 
 export interface MathExpressionRuleInputs {
   x: string;

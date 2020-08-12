@@ -58,6 +58,58 @@ export class AlgebraicExpressionInputRulesService {
 
     return nerdamer(simplifiedLearnerAnswer).eq(simplifiedCreatorAnswer);
   }
+
+  ContainsSomeOf(
+      answer: AlgebraicExpressionAnswer,
+      inputs: AlgebraicExpressionRuleInputs): boolean {
+    // At least one term should match between answer and input.
+    let mis = new MathInteractionsService();
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
+    // The expression is first split into terms by addition and subtraction.
+    let answerTerms = mis.getTerms(answer);
+    let inputTerms = mis.getTerms(inputs.x);
+
+    for (let answerTerm of answerTerms) {
+      for (let inputTerm of inputTerms) {
+        if (mis.termsMatch(answerTerm, inputTerm)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  OmitsSomeOf(
+      answer: AlgebraicExpressionAnswer,
+      inputs: AlgebraicExpressionRuleInputs): boolean {
+    // There must be at least one term in the input that is not present in the
+    // answer.
+    let mis = new MathInteractionsService();
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
+    // The expression is first split into terms by addition and subtraction.
+    let answerTerms = mis.getTerms(answer);
+    let inputTerms = mis.getTerms(inputs.x);
+
+    for (let inputTerm of inputTerms) {
+      let matched = false;
+      for (let answerTerm of answerTerms) {
+        if (mis.termsMatch(answerTerm, inputTerm)) {
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 angular.module('oppia').factory(
