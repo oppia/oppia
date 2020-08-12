@@ -550,6 +550,16 @@ def main(args=None):
 
     portserver_process = start_portserver()
     atexit.register(cleanup_portserver, portserver_process)
+    grpc_path = os.path.join(
+            common.GOOGLE_CLOUD_SDK_HOME, 'platform',
+            'google_appengine', 'lib', 'grpcio-1.20.0')
+    grpc_contents_path = os.path.join(
+            common.GOOGLE_CLOUD_SDK_HOME, 'platform',
+            'google_appengine', 'lib', 'grpcio-1.20.0', 'grpc')
+    subprocess.call(['ls', '-l', grpc_path])
+    subprocess.call(['ls', '-l', grpc_contents_path])
+    subprocess.call([
+        'chmod', '-R', 'ugo+rox', grpc_contents_path])
     start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
 
     common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
