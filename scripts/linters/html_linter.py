@@ -284,7 +284,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
             for filepath in html_files_to_lint:
                 file_content = self.file_cache.read(filepath)
                 if '| safe' in file_content or '|safe' in file_content:
-                    occurances = (
+                    occurrences = (
                         len(file_content.split('| safe')) + len(
                             file_content.split('|safe')) - 2)
                     filename = filepath.split('/')[-1]
@@ -295,7 +295,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
                         summary_messages.append(error_message)
                         python_utils.PRINT(error_message)
                         failed = True
-                    elif WARRANTED_USAGES[filename] < occurances:
+                    elif WARRANTED_USAGES[filename] < occurrences:
                         error_message = (
                             'There are some unaccounted instances of safe pipe'
                             ' usage in the file %s. Please remove them!' % (
@@ -303,7 +303,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
                         summary_messages.append(error_message)
                         python_utils.PRINT(error_message)
                         failed = True
-                    elif WARRANTED_USAGES[filename] > occurances:
+                    elif WARRANTED_USAGES[filename] > occurrences:
                         error_message = (
                             'There are number of instances of safe pipe in %s '
                             'doesn\'t match the ammount specified in warranted'
