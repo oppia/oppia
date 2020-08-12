@@ -376,12 +376,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
             'review message')
 
+        # Assert that the suggestion is now accepted.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
         self.assertEqual(
             suggestion.final_reviewer_id, self.reviewer_id)
+
         thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(
@@ -446,7 +448,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Accept the suggestion.
         self.accept_suggestion_setup_with_mocks(
             self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
-        # Verify that the suggestion has been accepted.
+        # Assert that the suggestion has been accepted.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
 
@@ -475,7 +477,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services.reject_suggestion(
             self.suggestion_id, self.reviewer_id, 'reject review message'
         )
-        # Verify that the suggestion has been rejected.
+        # Assert that the suggestion has been rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_REJECTED)
 
@@ -487,7 +489,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.accept_suggestion(
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
 
-        # Verify that the suggestion is still rejected.
+        # Assert that the suggestion is still rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_REJECTED)
 
@@ -558,6 +560,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services.reject_suggestion(
             self.suggestion_id, self.reviewer_id, 'reject review message')
 
+        # Assert that the suggestion has been rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_REJECTED)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -571,7 +574,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     def test_reject_suggestion_raises_exception_if_suggestion_already_accepted(
             self):
-        # Create suggestion.
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
@@ -586,7 +588,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Accept the suggestion.
         self.accept_suggestion_setup_with_mocks(
             self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
-        # Verify that the suggestion has been accepted.
+        # Assert that the suggestion has been accepted.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
 
@@ -600,7 +602,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.reject_suggestion(
                 self.suggestion_id, self.reviewer_id, 'reject review message')
 
-        # Verify that the suggestion's status did not change.
+        # Assert that the suggestion's status did not change.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
 
@@ -620,7 +622,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Reject the suggestion.
         suggestion_services.reject_suggestion(
             self.suggestion_id, self.reviewer_id, 'reject review message')
-        # Verify that the suggestion has been rejected.
+        # Assert that the suggestion has been rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_REJECTED)
 
@@ -649,7 +651,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Reject the suggestion.
         suggestion_services.reject_suggestion(
             self.suggestion_id, self.reviewer_id, 'reject review message')
-        # Verify that the suggestion has been rejected.
+        # Assert that the suggestion has been rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_REJECTED)
 

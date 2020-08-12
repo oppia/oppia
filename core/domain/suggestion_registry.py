@@ -62,6 +62,9 @@ class BaseSuggestion(python_utils.OBJECT):
         """Initializes a Suggestion object."""
         # These fields are initialized to suppress the 'attributes defined
         # outside __init__' warning that's raised because of the setters below.
+        # The subclasses define the __init__ function where the attributes are
+        # initialized, however these setters apply to all of the subclasses so
+        # it makes sense to include them in the base class.
         self.status = None
         self.final_reviewer_id = None
         raise NotImplementedError(
