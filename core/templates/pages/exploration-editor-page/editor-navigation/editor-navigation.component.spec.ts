@@ -17,11 +17,12 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
-
-import { UpgradedServices } from 'services/UpgradedServices';
+import { of, Subscription } from 'rxjs';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Editor Navigation Component', function() {
   var ctrl = null;
@@ -35,9 +36,19 @@ describe('Editor Navigation Component', function() {
   var explorationFeaturesService = null;
   var explorationImprovementsService = null;
   var explorationWarningsService = null;
+  var stateTutorialFirstTimeService = null;
   var threadDataService = null;
   var userService = null;
   var windowDimensionsService = null;
+
+  var mockOpenPostTutorialHelpPopover = new EventEmitter();
+
+  var testSubscriptions: Subscription;
+
+  const openEditorTutorialSpy = jasmine.createSpy('openEditorTutorial');
+  const openTranslationTutorialSpy = (
+    jasmine.createSpy('openTranslationTutorial'));
+
   var explorationRightsService = null;
   var editabilityService = null;
   var explorationSaveService = null;
@@ -48,13 +59,13 @@ describe('Editor Navigation Component', function() {
   };
   var isImprovementsTabEnabledAsyncSpy = null;
 
-  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    let ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
@@ -77,6 +88,8 @@ describe('Editor Navigation Component', function() {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userService = $injector.get('UserService');
       threadDataService = $injector.get('ThreadDataService');
+      stateTutorialFirstTimeService = (
+        $injector.get('StateTutorialFirstTimeService'));
 
       spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
         of(new Event('resize')));
@@ -98,6 +111,10 @@ describe('Editor Navigation Component', function() {
           return deferred.promise;
         }
       };
+
+      spyOnProperty(stateTutorialFirstTimeService,
+        'onOpenPostTutorialHelpPopover').and.returnValue(
+        mockOpenPostTutorialHelpPopover);
       $scope = $rootScope.$new();
       ctrl = $componentController('editorNavigation', {
         $scope: $scope,
@@ -108,7 +125,18 @@ describe('Editor Navigation Component', function() {
       $scope.$apply();
     }));
 
+    beforeEach(() => {
+      testSubscriptions = new Subscription();
+      testSubscriptions.add(
+        stateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
+          openTranslationTutorialSpy));
+      testSubscriptions.add(
+        stateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
+          openEditorTutorialSpy));
+    });
+
     afterEach(function() {
+      testSubscriptions.unsubscribe();
       ctrl.$onDestroy();
     });
 
@@ -150,28 +178,24 @@ describe('Editor Navigation Component', function() {
 
     it('should open editor tutorial after closing user help modal with mode' +
       'editor', function() {
-      spyOn($rootScope, '$broadcast');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('editor')
       });
       $scope.showUserHelpModal();
       $scope.$apply();
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'openEditorTutorial');
+      expect(openEditorTutorialSpy).toHaveBeenCalled();
     });
 
     it('should open editor tutorial after closing user help modal with mode' +
       'translation', function() {
-      spyOn($rootScope, '$broadcast');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('translation')
       });
       $scope.showUserHelpModal();
       $scope.$apply();
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'openTranslationTutorial');
+      expect(openTranslationTutorialSpy).toHaveBeenCalled();
     });
 
     it('should not open any tutorial after dismissing user help modal',
@@ -322,7 +346,7 @@ describe('Editor Navigation Component', function() {
     it('should toggle post tutorial help popover when resizing page',
       function() {
         angular.element(window).triggerHandler('resize');
-        $rootScope.$broadcast('openPostTutorialHelpPopover');
+        mockOpenPostTutorialHelpPopover.emit();
 
         expect(ctrl.postTutorialHelpPopoverIsShown).toBe(true);
 
@@ -346,6 +370,8 @@ describe('Editor Navigation Component', function() {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userService = $injector.get('UserService');
       threadDataService = $injector.get('ThreadDataService');
+      stateTutorialFirstTimeService = (
+        $injector.get('StateTutorialFirstTimeService'));
 
       spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
         of(new Event('resize')));
@@ -353,6 +379,10 @@ describe('Editor Navigation Component', function() {
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
+
+      spyOnProperty(stateTutorialFirstTimeService,
+        'onOpenPostTutorialHelpPopover').and.returnValue(
+        mockOpenPostTutorialHelpPopover);
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
         explorationImprovementsService, 'isImprovementsTabEnabledAsync');
@@ -374,8 +404,7 @@ describe('Editor Navigation Component', function() {
 
     it('should hide post tutorial help popover when resizing page', function() {
       angular.element(window).triggerHandler('resize');
-      $rootScope.$broadcast('openPostTutorialHelpPopover');
-
+      mockOpenPostTutorialHelpPopover.emit();
       expect(ctrl.postTutorialHelpPopoverIsShown).toBe(false);
     });
   });
