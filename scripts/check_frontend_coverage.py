@@ -305,7 +305,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'schema-based-unicode-viewer.directive.ts',
     'schema-based-viewer.directive.ts',
     'score-ring.directive.ts',
-    'search-bar.directive.ts',
     'search-results.directive.ts',
     'select2-dropdown.directive.ts',
     'set-of-html-string-editor.directive.ts',
