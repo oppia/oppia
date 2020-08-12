@@ -72,7 +72,7 @@ angular.module('oppia').component('explorationGraph', {
               return ctrl.isEditable;
             }
           },
-          windowClass: 'oppia-large-modal-window',
+          windowClass: 'oppia-large-modal-window exploration-graph-modal',
           controller: 'ExplorationGraphModalController'
         }).result.then(function(closeDict) {
           if (closeDict.action === 'delete') {
