@@ -123,7 +123,7 @@ class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # The old models have the following pattern:
         # <entity_type>.<entity_id>.<date-time>.<random-string>
         # The new models will have the following pattern:
-        # <entity_type>.<entity_id>.<random-string>
+        # <entity_type>.<entity_id>.<random-string>.
         if len(thread_model.id.split('.')) < 4:
             return
 
@@ -178,7 +178,7 @@ class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         for feedback_message_model in feedback_message_models:
             # The id of the GeneralFeedbackMessageModel follows the following
-            # pattern: <thread_id>.<message_id>
+            # pattern: <thread_id>.<message_id>.
             new_model = feedback_models.GeneralFeedbackMessageModel.create(
                 new_thread_id, feedback_message_model.message_id)
             new_model.thread_id = new_thread_id
@@ -201,12 +201,29 @@ class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             models_to_delete.extend(feedback_email_reply_to_id_models)
             for model in feedback_email_reply_to_id_models:
                 # The id of the GeneralFeedbackEmailReplyToIdModel follows the
-                # following pattern: <user_id>.<thread_id>
+                # following pattern: <user_id>.<thread_id>.
                 new_model = email_models.GeneralFeedbackEmailReplyToIdModel(
                     id=('.'.join([model.user_id, new_thread_id])),
                     user_id=model.user_id,
                     thread_id=new_thread_id,
                     reply_to_id=model.reply_to_id,
+                    last_updated=model.last_updated,
+                    created_on=model.created_on)
+                models_to_put.append(new_model)
+
+        feedback_thread_user_models = (
+            email_models.GeneralFeedbackThreadUserModel.get_by_thread_id(
+                old_thread_id))
+        if feedback_thread_user_models:
+            models_to_delete.extend(feedback_thread_user_models)
+            for model in feedback_thread_user_models:
+                # The id of the GeneralFeedbackThreadUserModel follows the
+                # following pattern: <user_id>.<thread_id>.
+                new_model = email_models.GeneralFeedbackThreadUserModel(
+                    id=('.'.join([model.user_id, new_thread_id])),
+                    user_id=model.user_id,
+                    thread_id=new_thread_id,
+                    message_ids_read_by_user=model.message_ids_read_by_user,
                     last_updated=model.last_updated,
                     created_on=model.created_on)
                 models_to_put.append(new_model)

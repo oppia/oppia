@@ -584,6 +584,20 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             instance_id, strict=False)
 
     @classmethod
+    def get_by_thread_id(cls, thread_id):
+        """Gets the FeedbackThreadUserModel corresponding to the given
+        thread_id.
+
+        Args:
+            thread_id: str. The ID of the thread.
+
+        Returns:
+            list(FeedbackThreadUserModel). The FeedbackThreadUserModel instances
+            which corresponds to the given thread_id.
+        """
+        return cls.query(cls.thread_id == thread_id).fetch()
+
+    @classmethod
     def create(cls, user_id, thread_id):
         """Creates a new FeedbackThreadUserModel instance and returns it.
 
