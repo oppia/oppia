@@ -20,12 +20,14 @@
           <div class="oppia-editable-section" title="<['I18N_PREFERENCES_CHANGE_PICTURE' | translate]>"
                style="height: 150px; width: 150px">
             <div class="oppia-click-to-start-editing protractor-test-photo-clickable"
-                 ng-click="$ctrl.showEditProfilePictureModal()">
+                 ng-click="$ctrl.showEditProfilePictureModal()"
+                 aria-label="Edit profile picture button">
             </div>
             <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
             <img ng-if="$ctrl.profilePictureDataUrl"
                  ng-src="<[$ctrl.profilePictureDataUrl]>"
-                 class="img-thumbnail protractor-test-custom-photo">
+                 class="img-thumbnail protractor-test-custom-photo"
+                 alt="Profile photo picture">
             <picture ng-if="!$ctrl.profilePictureDataUrl">
               <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.webp')]>">
               <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>">
@@ -38,9 +40,9 @@
       </div>
 
       <div class="form-group row">
-        <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_BIO"></label>
+        <label for="preferencesBioId" class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_BIO"></label>
         <div class="col-lg-10 col-md-10 col-sm-10">
-          <textarea class="oppia-bio-border protractor-test-user-bio" ng-model="$ctrl.userBio" ng-blur="$ctrl.saveUserBio($ctrl.userBio)" rows="5" maxlength="2000"></textarea>
+          <textarea id="preferencesBioId" class="oppia-bio-border protractor-test-user-bio" ng-model="$ctrl.userBio" ng-blur="$ctrl.saveUserBio($ctrl.userBio)" rows="5" maxlength="2000"></textarea>
           <span class="form-text" style="font-size: smaller" translate="I18N_PREFERENCES_BIO_EXPLAIN_TEXT"></span>
         </div>
       </div>
@@ -51,13 +53,15 @@
       <div class="col-lg-10 col-md-10 col-sm-10">
         <div class="checkbox" style="padding-top: 0;">
           <label>
-            <input type="radio" ng-model="$ctrl.defaultDashboard" value="<[$ctrl.DASHBOARD_TYPE_CREATOR]>" ng-change="$ctrl.saveDefaultDashboard($ctrl.defaultDashboard)" class="protractor-test-creator-dashboard-radio">
+            <input type="radio" ng-model="$ctrl.defaultDashboard" value="<[$ctrl.DASHBOARD_TYPE_CREATOR]>" ng-change="$ctrl.saveDefaultDashboard($ctrl.defaultDashboard)" class="protractor-test-creator-dashboard-radio"
+                   aria-label="<['I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate]>, <['I18N_TOPNAV_CREATOR_DASHBOARD' | translate]>">
             <span translate="I18N_TOPNAV_CREATOR_DASHBOARD"></span>
           </label>
         </div>
         <div class="checkbox" style="padding-top: 0;">
           <label>
-            <input type="radio" ng-model="$ctrl.defaultDashboard" value="<[$ctrl.DASHBOARD_TYPE_LEARNER]>" ng-change="$ctrl.saveDefaultDashboard($ctrl.defaultDashboard)" class="protractor-test-learner-dashboard-radio">
+            <input type="radio" ng-model="$ctrl.defaultDashboard" value="<[$ctrl.DASHBOARD_TYPE_LEARNER]>" ng-change="$ctrl.saveDefaultDashboard($ctrl.defaultDashboard)" class="protractor-test-learner-dashboard-radio"
+                   aria-label="<['I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate]>, <['I18N_TOPNAV_LEARNER_DASHBOARD' | translate]>"">
             <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
           </label>
         </div>
@@ -65,10 +69,11 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
+      <label for="subjectInterestsId" class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
       <div class="col-lg-10 col-md-10 col-sm-10">
         <div ng-if="$ctrl.hasPageLoaded && $ctrl.select2DropdownIsShown">
-          <select2-dropdown item="$ctrl.subjectInterests"
+          <select2-dropdown id="subjectInterestsId"
+                            item="$ctrl.subjectInterests"
                             class="protractor-test-interests-dropdown"
                             choices="$ctrl.subjectInterests"
                             allow-multiple-choices="true"
