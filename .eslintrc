@@ -10,7 +10,8 @@
     "angular",
     "html",
     "unused-imports",
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "import"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
@@ -233,6 +234,14 @@
       {
         "after": true,
         "before": false
+      }
+    ],
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "external", "builtin", "parent", "sibling", "index"
+        ]
       }
     ],
     "unused-imports/no-unused-imports-ts": "error",
