@@ -11,6 +11,7 @@
       </div>
       <input type="text" class="form-control protractor-test-new-skill-description-field"
              placeholder="eg: Adding Fractions" ng-change="updateSkillDescription()" ng-model="newSkillDescription"
+             ng-blur="validateDescription()"
              autofocus maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>">
       <span class="oppia-input-box-subtitle">
         <i>
@@ -46,7 +47,7 @@
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-skill-creation-button"
             type="submit"
-            ng-disabled="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0">
+            ng-disabled="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0 || !isSkillDescriptionValid()">
             Save
     </button>
   </div>
