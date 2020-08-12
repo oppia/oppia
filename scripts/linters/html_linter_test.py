@@ -33,6 +33,8 @@ NAME_SPACE.files = pre_commit_linter.FileCache()
 FILE_CACHE = NAME_SPACE.files
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
+EXTRA_REPORTED_SAFE_PIPE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'extra-reported-safe-pipe-usage.html')
 VALID_HTML_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.html')
 INVALID_STYLE_INDENTATION_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_style_indentation.html')
@@ -50,6 +52,10 @@ INVALID_MISMATCH_INDENTATION_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_mismatch_indentation.html')
 INVALID_MISMATCHED_TAGS_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_mismatched_tags.html')
+INVALID_SAFE_PIPE_USAGE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid-safe-pipe-usage.html')
+UNACCOUNTED_SAFE_PIPE_USAGE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'unaccounted-safe-pipe-usage.html')
 
 
 class CustomHTMLParserTests(test_utils.LinterTestBase):
@@ -149,6 +155,39 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['There are no HTML files to lint.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 0)
+    
+    def test_invalid_safe_pipe_usage(self):
+        with self.print_swap:
+            html_linter.HTMLLintChecksManager(
+                [INVALID_SAFE_PIPE_USAGE_FILEPATH], FILE_CACHE, True,
+                debug=True).perform_all_lint_checks()
+        self.assert_same_list_elements([(
+            'The safe pipe used in %s is unwarranted, please remove it!'
+            % (INVALID_SAFE_PIPE_USAGE_FILEPATH.split('/')[-1]))],
+            self.linter_stdout)
+    
+    def test_unaccounted_safe_pipe_usage(self):
+        with self.print_swap:
+            html_linter.HTMLLintChecksManager(
+                [UNACCOUNTED_SAFE_PIPE_USAGE_FILEPATH], FILE_CACHE, True,
+                debug=True).perform_all_lint_checks()
+        self.assert_same_list_elements([(
+            'There are some unaccounted instances of safe pipe'
+            ' usage in the file %s. Please remove them!'
+            % (UNACCOUNTED_SAFE_PIPE_USAGE_FILEPATH.split('/')[-1]))],
+            self.linter_stdout)
+        
+    def test_extra_reported_safe_pipe_usage(self):
+        with self.print_swap:
+            html_linter.HTMLLintChecksManager(
+                [EXTRA_REPORTED_SAFE_PIPE_FILEPATH], FILE_CACHE, True,
+                debug=True).perform_all_lint_checks()
+        self.assert_same_list_elements([(
+            'There are number of instances of safe pipe in %s '
+            'doesn\'t match the ammount specified in warranted'
+            '_safe_pipe_usages.py!'
+            % (EXTRA_REPORTED_SAFE_PIPE_FILEPATH.split('/')[-1]))],
+            self.linter_stdout)
 
     def test_third_party_linter_with_no_files(self):
         with self.print_swap:

@@ -1,0 +1,13 @@
+<!-- This file uses safe pipe that is not accounted properly for in warranted_safe_pipe_usages.py. -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  </head>
+  <body>
+    <div [innerHTML]="someUnsafeContent | safe:'html'"></div>
+    <div [innerHTML]="someMoreUnsafeContent | safe:'html'"></div>
+  </body>
+</html>

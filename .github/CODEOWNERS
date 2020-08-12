@@ -51,6 +51,7 @@
 /core/templates/services/translate.service.ts @bansalnitish @srijanreddy98
 /core/templates/services/translations-backend-api.service.ts @bansalnitish @srijanreddy98
 /core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
+/scripts/linters/warranted_safe_pipe_usages.py @bansalnitish @srijanreddy98
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 

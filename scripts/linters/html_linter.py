@@ -26,6 +26,8 @@ import sys
 
 import python_utils
 
+from scripts.linters.warranted_safe_pipe_usages import warranted_usages
+
 from . import linter_utils
 from .. import common
 
@@ -265,6 +267,65 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.html_filepaths
 
+    def _check_safe_pipe_usage(self):
+        """ This function checks if the usage of safe is warranted or not"""
+
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting Safe Pipe checks')
+            python_utils.PRINT('----------------------------------------')
+
+        html_files_to_lint = self.html_filepaths
+        stdout = sys.stdout
+
+        failed = False
+        summary_messages = []
+
+        with linter_utils.redirect_stdout(stdout):
+            for filepath in html_files_to_lint:
+                file_content = self.file_cache.read(filepath)
+                if '| safe' in file_content or '|safe' in file_content:
+                    occurances = (len(file_content.split('| safe')) + 
+                        len(file_content.split('|safe')) - 2)
+                    filename = filepath.split('/')[-1]
+                    if filename not in warranted_usages.keys():
+                        error_message = (
+                            'The safe pipe used in %s is unwarranted, '
+                            'please remove it!' % (filepath.split('/')[-1]))
+                        summary_messages.append(error_message)
+                        python_utils.PRINT(error_message)
+                        failed = True
+                    elif warranted_usages[filename] < occurances:
+                        error_message = (
+                            'There are some unaccounted instances of safe pipe'
+                            ' usage in the file %s. Please remove them!' % (
+                                filename))
+                        summary_messages.append(error_message)
+                        python_utils.PRINT(error_message)
+                        failed = True
+                    elif warranted_usages[filename] > occurances:
+                        error_message = (
+                            'There are number of instances of safe pipe in %s '
+                            'doesn\'t match the ammount specified in warranted'
+                            '_safe_pipe_usages.py!' % (filename))
+                        summary_messages.append(error_message)
+                        python_utils.PRINT(error_message)
+                        failed = True
+                    
+                    
+            if failed:
+                summary_message = (
+                    '%s HTML tag and attribute check failed, fix the HTML '
+                    'files listed above.' % linter_utils.FAILED_MESSAGE_PREFIX)
+            else:
+                summary_message = (
+                    '%s HTML tag and attribute check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+            python_utils.PRINT('')
+
+        return summary_messages
+
     def _check_html_tags_and_attributes(self):
         """This function checks the indentation of lines in HTML files."""
 
@@ -325,7 +386,11 @@ class HTMLLintChecksManager(python_utils.OBJECT):
 
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
-        return self._check_html_tags_and_attributes()
+        all_messages = (
+            self._check_html_tags_and_attributes() + 
+            self._check_safe_pipe_usage()
+        )
+        return all_messages
 
 
 class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
