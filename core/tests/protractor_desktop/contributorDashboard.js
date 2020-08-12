@@ -69,10 +69,10 @@ describe('Contributor dashboard page', function() {
     // Create 2 topics and 2 skills. Link 1 skill to 1 topic.
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAMES[0], 'abbrev-one', 'Topic description 1', false);
+      TOPIC_NAMES[0], 'topic-for-community-one', 'Topic description 1', false);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAMES[1], 'abbrev-two', 'Topic description 2', false);
+      TOPIC_NAMES[1], 'topic-for-community-two', 'Topic description 2', false);
     await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
     await topicsAndSkillsDashboardPage.get();
@@ -99,7 +99,7 @@ describe('Contributor dashboard page', function() {
 
     await contributorDashboardPage.navigateToSubmitQuestionTab();
 
-    await contributorDashboardPage.expectOpportunityPropertiesToBe(
+    await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(0.00%)');
 
     // Submit suggestion as user0.
@@ -138,7 +138,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     // After acceptance, progress percentage should be 1/50 = 2%.
-    await contributorDashboardPage.expectOpportunityPropertiesToBe(
+    await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(2.00%)');
     await users.logout();
 
@@ -147,7 +147,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.get();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectNumberOfOpportunitiesToBe(1);
-    await contributorDashboardPage.expectOpportunityPropertiesToBe(
+    await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       'Question 1', SKILL_DESCRIPTIONS[0], 'Accepted', null);
   });
 
@@ -157,7 +157,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.get();
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
-    await contributorDashboardPage.expectOpportunityPropertiesToBe(
+    await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(2.00%)');
 
     // Submit suggestion as user0.
@@ -197,7 +197,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.get();
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
-    await contributorDashboardPage.expectOpportunityPropertiesToBe(
+    await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(2.00%)');
     await users.logout();
 
@@ -206,7 +206,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.get();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectNumberOfOpportunitiesToBe(2);
-    await contributorDashboardPage.expectOpportunityPropertiesToBe(
+    await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       'Question 1', SKILL_DESCRIPTIONS[0], 'Rejected', null);
   });
 

@@ -157,7 +157,7 @@ var ContributorDashboardPage = function() {
     return null;
   };
 
-  this.expectOpportunityPropertiesToBe = async function(
+  this.expectOpportunityWithPropertiesToExist = async function(
       expectedHeading, expectedSubheading, expectedLabel, expectedPercentage) {
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
       expectedHeading, expectedSubheading);
