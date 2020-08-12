@@ -22,6 +22,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WRITTEN_TRANSLATION_TYPE_HTML, WRITTEN_TRANSLATION_TYPE_UNICODE } from
   'domain/exploration/WrittenTranslationObjectFactory';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 require(
   'components/state-directives/response-header/response-header.directive.ts');
@@ -386,6 +387,53 @@ angular.module('oppia').directive('stateTranslation', [
             }
           };
 
+          $scope.getInteractionCustomizationArgTranslatableContent = function(
+              customizationArgs: InteractionCustomizationArgs
+          ): {name: string, content: SubtitledUnicode|SubtitledHtml}[] {
+            const translatableContent = [];
+
+            const camelCaseToSentenceCase = (s) => {
+              // Add a space in front of capital letters.
+              s = s.replace(/([A-Z])/g, ' $1');
+              // Captialize first letter.
+              s = s.charAt(0).toUpperCase() + s.slice(1);
+              return s;
+            };
+
+            const traverseValueAndRetrieveSubtitled = (
+                name: string,
+                value: Object[] | Object,
+            ): void => {
+              if (value instanceof SubtitledUnicode ||
+                  value instanceof SubtitledHtml
+              ) {
+                translatableContent.push({
+                  name, content: value
+                });
+              } else if (value instanceof Array) {
+                value.forEach((element, index) =>
+                  traverseValueAndRetrieveSubtitled(
+                    `${name} (${index})`,
+                    element)
+                );
+              } else if (value instanceof Object) {
+                Object.keys(value).forEach(key =>
+                  traverseValueAndRetrieveSubtitled(
+                    `${name} > ${camelCaseToSentenceCase(key)}`,
+                    value[key]
+                  )
+                );
+              }
+            };
+
+            Object.keys(customizationArgs).forEach(caName =>
+              traverseValueAndRetrieveSubtitled(
+                camelCaseToSentenceCase(caName),
+                customizationArgs[caName].value));
+
+            return translatableContent;
+          };
+
           $scope.initStateTranslation = function() {
             $scope.stateName = StateEditorService.getActiveStateName();
             $scope.stateContent = ExplorationStatesService
@@ -414,7 +462,7 @@ angular.module('oppia').directive('stateTranslation', [
                 $scope.stateInteractionCustomizationArgs, false)
             );
             $scope.interactionCustomizationArgTranslatableContent = (
-              Interaction.getCustomizationArgTranslatableContent(
+              $scope.getInteractionCustomizationArgTranslatableContent(
                 $scope.stateInteractionCustomizationArgs)
             );
 

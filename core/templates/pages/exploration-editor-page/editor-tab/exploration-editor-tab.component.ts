@@ -216,14 +216,17 @@ angular.module('oppia').component('explorationEditorTab', {
       };
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
-          contentId) {
+          contentIds) {
         var stateName = StateEditorService.getActiveStateName();
         var state = ExplorationStatesService.getState(stateName);
         var recordedVoiceovers = state.recordedVoiceovers;
         var writtenTranslations = state.writtenTranslations;
-        if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
-            writtenTranslations.hasUnflaggedWrittenTranslations(
-              contentId)) {
+        const shouldPrompt = contentIds.some(contentId => {
+          return (
+            recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
+            writtenTranslations.hasUnflaggedWrittenTranslations(contentId))
+        });
+        if (shouldPrompt) {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/components/forms/forms-templates/mark-all-audio-and-' +
@@ -231,19 +234,21 @@ angular.module('oppia').component('explorationEditorTab', {
             backdrop: true,
             controller: 'ConfirmOrCancelModalController'
           }).result.then(function() {
-            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-              recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                contentId);
-              ExplorationStatesService.saveRecordedVoiceovers(
-                stateName, recordedVoiceovers);
-            }
-            if (writtenTranslations.hasUnflaggedWrittenTranslations(
-              contentId)) {
-              writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                contentId);
-              ExplorationStatesService.saveWrittenTranslations(
-                stateName, writtenTranslations);
-            }
+            contentIds.forEach(contentId => {
+              if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+                recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+                  contentId);
+                ExplorationStatesService.saveRecordedVoiceovers(
+                  stateName, recordedVoiceovers);
+              }
+              if (writtenTranslations.hasUnflaggedWrittenTranslations(
+                contentId)) {
+                writtenTranslations.markAllTranslationsAsNeedingUpdate(
+                  contentId);
+                ExplorationStatesService.saveWrittenTranslations(
+                  stateName, writtenTranslations);
+              }
+            });
           }, function() {
             // This callback is triggered when the Cancel button is
             // clicked. No further action is needed.

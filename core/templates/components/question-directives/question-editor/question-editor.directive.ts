@@ -184,12 +184,15 @@ angular.module('oppia').directive('questionEditor', [
           };
 
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
-              contentId) {
+              contentIds) {
             var state = ctrl.question.getStateData();
             var recordedVoiceovers = state.recordedVoiceovers;
             var writtenTranslations = state.writtenTranslations;
             var updateQuestion = _updateQuestion;
-            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+
+            const shouldPrompt = contentIds.some(contentId =>
+              recordedVoiceovers.hasUnflaggedVoiceovers(contentId));
+            if (shouldPrompt) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/components/forms/forms-templates/mark-all-audio-and-' +
@@ -198,10 +201,12 @@ angular.module('oppia').directive('questionEditor', [
                 controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {
                 updateQuestion(function() {
-                  recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                    contentId);
-                  writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                    contentId);
+                  contentIds.forEach(contentId => {
+                    recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+                      contentId);
+                    writtenTranslations.markAllTranslationsAsNeedingUpdate(
+                      contentId);
+                  });
                 });
               }, function() {
                 // This callback is triggered when the Cancel button is

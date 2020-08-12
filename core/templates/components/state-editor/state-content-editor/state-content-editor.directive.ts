@@ -92,7 +92,8 @@ angular.module('oppia').directive('stateContentEditor', [
               StateContentService.displayed.getHtml());
             if (contentHasChanged) {
               var contentId = StateContentService.displayed.getContentId();
-              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
+              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+                [contentId]);
             }
             saveContent();
           };

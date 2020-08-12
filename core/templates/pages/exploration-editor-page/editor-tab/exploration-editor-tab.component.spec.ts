@@ -573,7 +573,7 @@ describe('Exploration editor tab component', function() {
       .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate).toBe(
       false);
 
-    ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired('feedback_1');
+    ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
     $scope.$apply();
 
     expect(explorationStatesService.getState('First State')
@@ -598,7 +598,7 @@ describe('Exploration editor tab component', function() {
         .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
         .toBe(false);
 
-      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired('feedback_1');
+      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
       $scope.$apply();
 
       expect(explorationStatesService.getState('First State')

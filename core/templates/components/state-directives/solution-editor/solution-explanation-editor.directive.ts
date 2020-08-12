@@ -58,7 +58,7 @@ angular.module('oppia').directive('solutionExplanationEditor', [
               var solutionContentId = StateSolutionService.displayed.explanation
                 .getContentId();
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                solutionContentId);
+                [solutionContentId]);
             }
             StateSolutionService.saveDisplayedValue();
             ctrl.onSaveSolution(StateSolutionService.displayed);

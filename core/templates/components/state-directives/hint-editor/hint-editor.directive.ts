@@ -62,7 +62,7 @@ angular.module('oppia').directive('hintEditor', [
             if (contentHasChanged) {
               var hintContentId = ctrl.hint.hintContent.getContentId();
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                hintContentId);
+                [hintContentId]);
             }
             ctrl.getOnSaveFn()();
           };

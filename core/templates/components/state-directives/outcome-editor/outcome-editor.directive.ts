@@ -170,7 +170,7 @@ angular.module('oppia').directive('outcomeEditor', [
             var feedbackContentId = ctrl.savedOutcome.feedback.getContentId();
             if (fromClickSaveFeedbackButton && contentHasChanged) {
               var contentId = ctrl.savedOutcome.feedback.getContentId();
-              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
+              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
             }
             ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);
           };
