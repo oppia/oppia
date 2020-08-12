@@ -59,10 +59,8 @@ class AnswerGroup(python_utils.OBJECT):
                 in extensions/interactions/rule_templates.json -- they are
                 enclosed in {{...}} braces.
                 E.g. For 2 TextInput rules of type 'Equals' and with the inputs
-                {'x': 'Yes'} and {'x': 'Y'}, rule_types_to_inputs will be
-                {
-                    'Equals': [{'x': 'Yes'}, {'x': 'Y'}]
-                }
+                {'x': 'Yes'} and {'x': 'Y'}, rule_types_to_inputs will equal
+                { 'Equals': [{'x': 'Yes'}, {'x': 'Y'}] }.
             rule_input_translations: dict. A dictionary mapping rule_type (str)
                 to a dictionary that maps abbreviated language code (str) to a
                 list of translated rule inputs. Each rule input is a dictionary
@@ -71,12 +69,8 @@ class AnswerGroup(python_utils.OBJECT):
                 different languages. However, there will always be at least one
                 rule input for each rule type found in rule_types_to_inputs.
                 E.g. For a rule input translation in French (fr) of the rules
-                found in the example above, rule_input_translations will be
-                {
-                    'fr': {
-                        'Equals': [{'x': 'Oui'}]
-                    }
-                }
+                found in the example above, rule_input_translations will equal
+                { 'fr': { 'Equals': [{'x': 'Oui'}] } }.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
             tagged_skill_misconception_id: str or None. The format is
