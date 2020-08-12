@@ -53,7 +53,6 @@ commands:
             sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
             sudo dpkg -i google-chrome.deb
             google-chrome --version
-
   merge_target_branch:
     description: "Merge to target branch"
     steps:
@@ -62,22 +61,16 @@ commands:
           command: |
             if [[ -n ${CIRCLE_PULL_REQUEST} ]]
             then
-
               git config --global user.email "$( git log --format='%ae' $CIRCLE_SHA1^! )"
               git config --global user.name "$( git log --format='%an' $CIRCLE_SHA1^! )"
-
               regexp="[[:digit:]]\+$"
               PR_NUMBER=`echo $CIRCLE_PULL_REQUEST | grep -o $regexp`
-
               curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" -o jq
               chmod +x jq
-
               url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$PR_NUMBER?access_token=$GITHUB_TOKEN"
-
               target_branch=$(
                 curl "$url" | ./jq '.base.ref' | tr -d '"'
               )
-
               rm jq
               if [[ "$target_branch" == null ]]
               then
@@ -86,7 +79,6 @@ commands:
                 git pull origin $target_branch --no-edit
               fi
             fi
-
   check_release_chaneglog_update_branch:
     description: "Skip job for release changelog update PRs"
     steps:
@@ -97,7 +89,6 @@ commands:
             if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ "$PR_BRANCH" == update-changelog-for-release* ]]; then
               circleci-agent step halt
             fi
-
 jobs:
   setup_and_typescript_tests:
     <<: *job_defaults
@@ -175,7 +166,6 @@ jobs:
           name: Run e2e accessibility page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
-
   e2e_users:
     <<: *job_defaults
     steps:
@@ -205,7 +195,6 @@ jobs:
           name: Run e2e profileFeatures test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
-
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
   # All other e2e tests should be run in prod mode.
@@ -246,7 +235,6 @@ jobs:
           name: Run e2e file upload extensions test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
-
 notify:
   webhooks:
     # A list of hook hashes, containing the url field
