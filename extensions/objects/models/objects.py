@@ -1208,7 +1208,8 @@ class RatioExpression(BaseObject):
         'type': 'unicode',
         'validators': [{
             'id': 'is_valid_ratio'
-            
+        }]
+
 
 class CustomOskLetters(BaseObject):
     """Class for custom OSK letters. These are the letters that will be
