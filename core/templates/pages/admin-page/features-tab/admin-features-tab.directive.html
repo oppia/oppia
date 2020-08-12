@@ -13,9 +13,10 @@
     <div class="col-10">{{featureFlag.defaultValue ? 'Enabled' : 'Disabled'}}</div>
   </div>
   <div class="row" style="margin-top: 5px">
-    <div class="col-2">
+    <div class="col-2" style="display: flex; flex-direction: column;">
       <b>Rules:</b>
-      <button class="btn btn-secondary" style="margin-left: 10px;" (click)="addNewRule(featureFlag)">+</button>
+      <button class="btn btn-secondary" style="margin-top: 5;" (click)="addNewRuleToTop(featureFlag)">Add To Top</button>
+      <button class="btn btn-secondary" style="margin-top: 5;" (click)="addNewRuleToBottom(featureFlag)">Add To Bottom</button>
     </div>
     <div class="col-10">
       <div *ngIf="featureFlag.rules.length === 0">
@@ -24,10 +25,24 @@
       <!-- Rules -->
       <div *ngFor="let rule of featureFlag.rules; index as ruleIndex" class="container" style="margin-bottom: 15px;">
         <div class="row">
-          <div class="col-1 oppia-feature-tab-center">
-            <button class="btn btn-secondary" (click)="removeRule(featureFlag, ruleIndex)">x</button>
+          <div class="col-2 oppia-feature-tab-center">
+            <div class="row">
+              <div class="col-6 oppia-feature-tab-vertical-center">
+                <button class="btn btn-secondary" (click)="removeRule(featureFlag, ruleIndex)">x</button>
+              </div>
+              <div class="col-6" style="display: flex; flex-direction: column; justify-content: space-around; min-height: 100px;">
+                <button
+                    class="btn btn-secondary"
+                    *ngIf="ruleIndex > 0"
+                    (click)="moveRuleUp(featureFlag, ruleIndex)">↑</button>
+                <button
+                    class="btn btn-secondary"
+                    *ngIf="ruleIndex + 1 < featureFlag.rules.length"
+                    (click)="moveRuleDown(featureFlag, ruleIndex)">↓</button>
+              </div>
+            </div>
           </div>
-          <div class="col-11" style="border: 1px solid #e5e5e5; padding-top: 10px; padding-bottom: 10px;">
+          <div class="col-10" style="border: 1px solid #e5e5e5; padding-top: 10px; padding-bottom: 10px;">
             <div class="row">
               <div class="col-2"><b>If Matched:</b></div>
               <div class="col-10">
@@ -108,11 +123,23 @@
                                         [value]="option">{{option}}</option>
                                   </ng-container>
                                 </select>
-                                <input
-                                    *ngIf="!filterTypeToContext[filter.type].options"
-                                    [(ngModel)]="filter.conditions[conditionIndex][1]"
-                                    placeholder="e.g. 1.0.0" 
-                                    style="max-width: 100px;"/>
+                                <ng-container
+                                    *ngIf="!filterTypeToContext[filter.type].options">
+                                  <input
+                                      [(ngModel)]="filter.conditions[conditionIndex][1]"
+                                      [placeholder]="filterTypeToContext[filter.type].placeholder"
+                                      style="max-width: 100px;"/>
+                                  <ng-container *ngIf="filterTypeToContext[filter.type].inputRegex">
+                                    <span
+                                        class="oppia-feature-tab-input-error"
+                                        *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">
+                                      <span>!</span>
+                                      <div class="tooltip">
+                                        Expected to match {{filterTypeToContext[filter.type].inputRegex}}
+                                      </div>
+                                    </span>
+                                  </ng-container>
+                                </ng-container>
                               </div>
                             </div>
                           </div>
@@ -187,5 +214,31 @@
     border-bottom: 1px dotted #e5e5e5;
     height: 0;
     flex-grow: 1;
+  }
+
+  .oppia-feature-tab-input-error {
+    position: relative;
+    margin-left: 15px;
+  }
+
+  .oppia-feature-tab-input-error span {
+    color: #ff6347;
+    font-weight: bold;
+  }
+
+  .oppia-feature-tab-input-error .tooltip {
+    opacity: 0;
+    position: absolute;
+    left: -50%;
+    background-color: #f5f5f5;
+    border: 1px solid #ff6347;
+    font-size: 14px;
+    border-radius: 3px;
+    padding: 5px;
+    width: 200px;
+  }
+
+  .oppia-feature-tab-input-error:hover .tooltip {
+    opacity: 1;
   }
 </style>

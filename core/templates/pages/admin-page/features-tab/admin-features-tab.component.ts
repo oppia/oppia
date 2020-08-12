@@ -50,16 +50,18 @@ import {
 export class AdminFeaturesTabComponent implements OnInit {
   @Input() setStatusMessage: (msg: string) => void;
 
-  availableFilterTypes: PlatformParameterFilterType[] = Object
+  readonly availableFilterTypes: PlatformParameterFilterType[] = Object
     .keys(PlatformParameterFilterType)
     .map(key => PlatformParameterFilterType[key]);
 
-  filterTypeToContext: {
+  readonly filterTypeToContext: {
     [key in PlatformParameterFilterType]: {
       displayName: string,
       operators: string[],
       options?: string[],
       optionFilter?: (feature: PlatformParameter, option: string) => boolean;
+      placeholder?: string;
+      inputRegex?: RegExp;
     }
   } = {
     [PlatformParameterFilterType.ServerMode]: {
@@ -94,7 +96,9 @@ export class AdminFeaturesTabComponent implements OnInit {
     },
     [PlatformParameterFilterType.AppVersion]: {
       displayName: 'App Version',
-      operators: ['=', '<', '>', '<=', '>=']
+      operators: ['=', '<', '>', '<=', '>='],
+      placeholder: 'e.g. 1.0.0',
+      inputRegex: AdminFeaturesTabConstants.APP_VERSION_REGEXP
     },
     [PlatformParameterFilterType.AppVersionFlavor]: {
       displayName: 'App Version Flavor',
@@ -116,7 +120,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     private filterFactory: PlatformParameterFilterObjectFactory,
   ) {}
 
-  async reloadFeatureFlagsAsync() {
+  async reloadFeatureFlagsAsync(): Promise<void> {
     const data = await this.adminDataService.getDataAsync();
 
     this.featureFlags = data.featureFlags;
@@ -125,7 +129,19 @@ export class AdminFeaturesTabComponent implements OnInit {
       this.featureFlags.map(feature => [feature.name, cloneDeep(feature)]));
   }
 
-  addNewRule(feature: PlatformParameter): void {
+  addNewRuleToTop(feature: PlatformParameter): void {
+    feature.rules.unshift(
+      this.ruleFactory.createFromBackendDict({
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [['=', ServerMode.Dev.toString()]]
+        }],
+        value_when_matched: false
+      })
+    );
+  }
+
+  addNewRuleToBottom(feature: PlatformParameter): void {
     feature.rules.push(
       this.ruleFactory.createFromBackendDict({
         filters: [{
@@ -167,6 +183,18 @@ export class AdminFeaturesTabComponent implements OnInit {
     filter.conditions.splice(conditionIndex, 1);
   }
 
+  moveRuleUp(feature: PlatformParameter, ruleIndex: number): void {
+    const rule = feature.rules[ruleIndex];
+    this.removeRule(feature, ruleIndex);
+    feature.rules.splice(ruleIndex - 1, 0, rule);
+  }
+
+  moveRuleDown(feature: PlatformParameter, ruleIndex: number): void {
+    const rule = feature.rules[ruleIndex];
+    this.removeRule(feature, ruleIndex);
+    feature.rules.splice(ruleIndex + 1, 0, rule);
+  }
+
   async saveFeatureAsync(feature: PlatformParameter): Promise<void> {
     if (this.adminTaskManager.isTaskRunning()) {
       return;
@@ -185,17 +213,23 @@ export class AdminFeaturesTabComponent implements OnInit {
 
     try {
       this.adminTaskManager.startTask();
-      console.log(feature);
+
       await this.apiService.updateFeatureFlag(
         feature.name, updateMessage, feature.rules);
 
       this.setStatusMessage('Saved successfully.');
+    } catch (e) {
+      if (e.error && e.error.error) {
+        this.setStatusMessage(`Update failed: ${e.error.error}`);
+      } else {
+        this.setStatusMessage('Update failed.');
+      }
     } finally {
       this.adminTaskManager.finishTask();
     }
   }
 
-  clearChanges(featureFlag: PlatformParameter) {
+  clearChanges(featureFlag: PlatformParameter): void {
     if (!this.windowRef.nativeWindow.confirm(
       'This will revert all changes you made. Are you sure?')) {
       return;
