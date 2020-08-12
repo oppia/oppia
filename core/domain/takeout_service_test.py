@@ -774,7 +774,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(observed_data, expected_profile_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_profile_data)
-        self.assertItemsEqual(json.loads(expected_json), json.loads(observed_json))
+        self.assertItemsEqual(
+            json.loads(expected_json), json.loads(observed_json))
 
     def test_export_data_for_user_nontrivial_is_correct(self):
         """Nontrivial test of export_data functionality."""
@@ -1242,7 +1243,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(observed_data, expected_profile_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_profile_data)
-        self.assertItemsEqual(json.loads(observed_json), json.loads(expected_json))
+        self.assertItemsEqual(
+            json.loads(observed_json), json.loads(expected_json))
 
     def test_export_all_profiles_data_for_user_with_profiles_is_correct(self):
         pass

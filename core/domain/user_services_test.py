@@ -205,7 +205,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(user_settings.display_alias)
         user_services.set_user_display_alias(user_id, display_alias)
         user_settings = user_services.get_user_settings(user_id)
-        self.assertEquals(user_settings.display_alias, display_alias)
+        self.assertEqual(user_settings.display_alias, display_alias)
 
     def test_create_new_profile_duplicate_display_alias_raises_error(self):
         gae_id = 'test_id'
@@ -800,13 +800,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         profile_2_id = user_services.create_new_profile(
             gae_id, email, display_alias_2).user_id
 
-        user_auth_details_models = [ 
+        user_auth_details_models = [
             {
                 'id': model.id,
                 'gae_id': model.gae_id,
                 'pin': model.pin,
                 'parent_user_id': model.parent_user_id
-            } for model in 
+            } for model in
             user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
                 user_id)
         ]

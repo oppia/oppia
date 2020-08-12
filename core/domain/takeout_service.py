@@ -21,8 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
-from core.domain import user_services
 from core.domain import takeout_domain
+from core.domain import user_services
 from core.platform import models
 
 (
@@ -32,6 +32,7 @@ from core.platform import models
         [models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
          models.NAMES.exploration, models.NAMES.feedback, models.NAMES.topic,
          models.NAMES.suggestion, models.NAMES.user])
+
 
 def get_models_which_should_be_exported():
     """Returns list of models to export.
@@ -48,7 +49,7 @@ def get_models_which_should_be_exported():
 
 def export_all_profiles_data_by_parent_user(parent_user_id):
     """Exports selected models according to model defined export_data functions
-    for all profile users linked to the parent_user of the given id.
+        for all profile users linked to the parent_user of the given id.
 
     Args:
         parent_user_id: str. The user_id of the user whose associated profile
@@ -56,19 +57,20 @@ def export_all_profiles_data_by_parent_user(parent_user_id):
 
     Returns:
         list. List of dictionaries containing all user data in the following
-            format:
-            {
-                <MODEL_NAME>_data: <dict of data in format as specified by
-                                    model export policy>
-            }. List might be empty if no profiles are associated with the user
-            corresponding to the given parent_user_id
+        format:
+        {
+            <MODEL_NAME>_data: <dict of data in format as specified by
+                                model export policy>
+        }. List might be empty if no profiles are associated with the user
+        corresponding to the given parent_user_id.
     """
-    all_profiles_user_ids = (user.user_id for user in
+    all_profiles_user_ids = (
+        user.user_id for user in
         user_services.get_all_profiles_auth_details_by_parent_user_id(
             parent_user_id)
     )
     return [export_data_for_user(user_id) for user_id in
-        all_profiles_user_ids]
+            all_profiles_user_ids]
 
 
 def export_data_for_user(user_id):
