@@ -2250,7 +2250,7 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
-        
+
         # Set the timezone to be UTC.
         # Retrieve the current timezone, accounting for daylight savings
         # as necessary.
