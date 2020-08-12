@@ -858,7 +858,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         constants_swap = self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True)
         time_swap = self.swap(
             user_services, 'record_user_logged_in', lambda *args: None)
-        
+
         os.environ['TZ'] = 'UTC'
         time.tzset()
 
