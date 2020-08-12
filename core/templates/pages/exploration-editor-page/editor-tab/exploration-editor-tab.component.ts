@@ -224,7 +224,7 @@ angular.module('oppia').component('explorationEditorTab', {
         const shouldPrompt = contentIds.some(contentId => {
           return (
             recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
-            writtenTranslations.hasUnflaggedWrittenTranslations(contentId))
+            writtenTranslations.hasUnflaggedWrittenTranslations(contentId));
         });
         if (shouldPrompt) {
           $uibModal.open({
