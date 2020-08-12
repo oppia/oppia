@@ -23,7 +23,6 @@ import { SubtitledUnicode } from
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema-constants';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -326,7 +325,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           const subtitledUnicodeValue = <SubtitledUnicode> value;
           contentIdToContent[
             subtitledUnicodeValue.getContentId()
-          ] = subtitledUnicodeValue.getUnicode()
+          ] = subtitledUnicodeValue.getUnicode();
         } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
           for (let i = 0; i < (<Object[]> value).length; i++) {
             traverseSchemaAndCollectContent(value[i], <Schema> schema.items);

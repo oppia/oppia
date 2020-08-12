@@ -16,13 +16,13 @@
  * @fileoverview Directive containing the exploration material to be translated.
  */
 
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WRITTEN_TRANSLATION_TYPE_HTML, WRITTEN_TRANSLATION_TYPE_UNICODE } from
   'domain/exploration/WrittenTranslationObjectFactory';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 require(
   'components/state-directives/response-header/response-header.directive.ts');
