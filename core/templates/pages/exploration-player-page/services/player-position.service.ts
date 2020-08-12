@@ -100,8 +100,8 @@ export class PlayerPositionService {
 
   get onHelpCardAvailable() {
     return this._helpCardAvailableEventEmitter;
-  },
-  
+  }
+
   get onActiveCardChanged() {
     return this._activeCardChangedEventEmitter;
   }
