@@ -20,6 +20,7 @@ import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import $ from 'jquery';
 
 import { UpgradedServices } from 'services/UpgradedServices';
+import { Subscription } from 'rxjs';
 
 describe('Router Service', () => {
   var RouterService = null;
@@ -29,6 +30,10 @@ describe('Router Service', () => {
   var $rootScope = null;
   var $location = null;
   var $timeout = null, $interval = null;
+  var testSubscriptions = null;
+  var refreshStatisticsTabSpy = null;
+  var refreshSettingsTabSpy = null;
+  var refreshTranslationTabSpy = null;
 
   beforeEach(angular.mock.module('oppia', $provide => {
     var ugs = new UpgradedServices();
@@ -157,6 +162,24 @@ describe('Router Service', () => {
     });
   }));
 
+  beforeEach(() => {
+    refreshStatisticsTabSpy = jasmine.createSpy('refreshStatisticsTab');
+    refreshSettingsTabSpy = jasmine.createSpy('refreshSettingsTab');
+    refreshTranslationTabSpy = jasmine.createSpy('refreshTranslationTab');
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      RouterService.onRefreshStatisticsTab.subscribe(refreshStatisticsTabSpy));
+    testSubscriptions.add(
+      RouterService.onRefreshSettingsTab.subscribe(refreshSettingsTabSpy));
+    testSubscriptions.add(
+      RouterService.onRefreshTranslationTab.subscribe(
+        refreshTranslationTabSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   it('should navigate to main tab when tab is already on main', done => {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
@@ -187,9 +210,8 @@ describe('Router Service', () => {
 
         expect(broadcastSpy).toHaveBeenCalled();
 
-        done();
-
         expect(applyAsyncSpy).toHaveBeenCalled();
+        done();
       }, 20);
       $timeout.flush(150);
     }, 400);
@@ -225,8 +247,6 @@ describe('Router Service', () => {
 
         expect(broadcastSpy).toHaveBeenCalled();
 
-        done();
-
         expect(applyAsyncSpy).toHaveBeenCalled();
 
         RouterService.navigateToMainTab('newState');
@@ -234,6 +254,7 @@ describe('Router Service', () => {
         $rootScope.$apply();
 
         expect(RouterService.getActiveTabName()).toBe('main');
+        done();
       }, 20);
       $timeout.flush(150);
     }, 400);
@@ -249,7 +270,7 @@ describe('Router Service', () => {
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
     expect(RouterService.getActiveTabName()).toBe('stats');
-    expect(broadcastSpy).toHaveBeenCalledWith('refreshStatisticsTab');
+    expect(refreshStatisticsTabSpy).toHaveBeenCalled();
 
     expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
     $rootScope.$apply();
@@ -280,7 +301,7 @@ describe('Router Service', () => {
     expect(RouterService.getActiveTabName()).toBe('translation');
     $interval.flush(300);
 
-    expect(broadcastSpy).toHaveBeenCalledWith('refreshTranslationTab');
+    expect(refreshTranslationTabSpy).toHaveBeenCalled();
 
     expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
     $rootScope.$apply();
@@ -317,7 +338,7 @@ describe('Router Service', () => {
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
     expect(RouterService.getActiveTabName()).toBe('stats');
-    expect(broadcastSpy).toHaveBeenCalledWith('refreshStatisticsTab');
+    expect(refreshStatisticsTabSpy).toHaveBeenCalled();
 
     expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
     $rootScope.$apply();
@@ -446,7 +467,7 @@ describe('Router Service', () => {
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
     expect(RouterService.getActiveTabName()).toBe('settings');
-    expect(broadcastSpy).toHaveBeenCalledWith('refreshSettingsTab');
+    expect(refreshSettingsTabSpy).toHaveBeenCalled();
 
     expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
     $rootScope.$apply();

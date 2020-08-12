@@ -16,6 +16,8 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
@@ -58,7 +60,7 @@ require('pages/interaction-specs.constants.ajs.ts');
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
 angular.module('oppia').factory('ExplorationEngineService', [
-  '$rootScope', 'AlertsService', 'AnswerClassificationService',
+  'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
   'ExplorationFeaturesBackendApiService', 'ExplorationHtmlFormatterService',
   'ExplorationObjectFactory', 'ExpressionInterpolationService',
@@ -66,7 +68,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
   'PlayerTranscriptService', 'ReadOnlyExplorationBackendApiService',
   'StateCardObjectFactory', 'StatsReportingService', 'UrlService',
   function(
-      $rootScope, AlertsService, AnswerClassificationService,
+      AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
       ExplorationFeaturesBackendApiService, ExplorationHtmlFormatterService,
       ExplorationObjectFactory, ExpressionInterpolationService,
@@ -82,6 +84,8 @@ angular.module('oppia').factory('ExplorationEngineService', [
     var alwaysAskLearnersForAnswerDetails = false;
 
     var exploration = null;
+
+    var _updateActiveStateIfInEditorEventEmitter = new EventEmitter();
 
     // This list may contain duplicates. A state name is added to it each time
     // the learner moves to a new card.
@@ -428,7 +432,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
         nextStateName = newStateName;
         var onSameCard = (oldStateName === newStateName);
 
-        $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
+        _updateActiveStateIfInEditorEventEmitter.emit(newStateName);
 
         var _nextFocusLabel = FocusManagerService.generateFocusLabel();
         var nextInteractionHtml = null;
@@ -460,6 +464,9 @@ angular.module('oppia').factory('ExplorationEngineService', [
       },
       getAlwaysAskLearnerForAnswerDetails: function() {
         return alwaysAskLearnersForAnswerDetails;
+      },
+      get onUpdateActiveStateIfInEditor() {
+        return _updateActiveStateIfInEditorEventEmitter;
       }
     };
   }
