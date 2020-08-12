@@ -956,6 +956,7 @@ def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
         parent user does not have any profiles linked to it, the
         returned list will be empty.
     """
+    get_auth_details_by_user_id(parent_user_id, strict=True)
     return [
         _get_user_auth_details_from_model(model) for model in
         user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
@@ -977,27 +978,13 @@ def does_profile_with_display_alias_exist(parent_user_id, display_alias):
     """
     all_profiles_auth_details = get_all_profiles_auth_details_by_parent_user_id(
         parent_user_id)
-    all_user_ids = [model.id for model in all_profiles_auth_details]
+    all_user_ids = [model.user_id for model in all_profiles_auth_details]
     all_user_ids.append(parent_user_id)
     existing_display_aliases = [
         user.display_alias for user in get_users_settings(all_user_ids)
         if user.display_alias is not None
     ]
     return display_alias in existing_display_aliases
-
-
-def _save_new_user_details(user_settings, user_auth_details):
-    """Save user models for new users.
-
-    Args:
-        user_settings: UserSettings. The user settings domain object
-            corresponding to the newly created user.
-        user_auth_details: UserAuthDetails. The user auth details domain
-            object corresponding to the newly created user.
-    """
-    _save_user_auth_details(user_auth_details)
-    _save_user_settings(user_settings)
-    create_user_contributions(user_settings.user_id, [], [])
 
 
 def create_new_user(gae_id, email):
@@ -1013,6 +1000,19 @@ def create_new_user(gae_id, email):
     Raises:
         Exception. If a user with the given gae_id already exists.
     """
+    def _create_new_user_transactional(user_settings, user_auth_details):
+        """Save user models for new users.
+
+        Args:
+            user_settings: UserSettings. The user settings domain object
+                corresponding to the newly created user.
+            user_auth_details: UserAuthDetails. The user auth details domain
+                object corresponding to the newly created user.
+        """
+        _save_user_auth_details(user_auth_details)
+        _save_user_settings(user_settings)
+        create_user_contributions(user_settings.user_id, [], [])
+
     user_settings = get_user_settings_by_gae_id(gae_id, strict=False)
     if user_settings is not None:
         raise Exception(
@@ -1024,7 +1024,7 @@ def create_new_user(gae_id, email):
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     user_auth_details = UserAuthDetails(user_id, gae_id)
     transaction_services.run_in_transaction(
-        _save_new_user_details, user_settings, user_auth_details)
+        _create_new_user_transactional, user_settings, user_auth_details)
     return user_settings
 
 
@@ -1049,6 +1049,17 @@ def create_new_profile(
             the given parent_user_id.
         Exception. If the given parent user does not have its PIN set.
     """
+    def _create_new_profile_transactional(user_settings, user_auth_details):
+        """Save user models for new users.
+
+        Args:
+            user_settings: UserSettings. The user settings domain object
+                corresponding to the newly created user.
+            user_auth_details: UserAuthDetails. The user auth details domain
+                object corresponding to the newly created user.
+        """
+        _save_user_auth_details(user_auth_details)
+        _save_user_settings(user_settings)
 
     # New profile creation is done by full (parent) user of the account.
     parent_user_auth_details = get_auth_details_by_gae_id(gae_id, strict=True)
@@ -1072,7 +1083,7 @@ def create_new_profile(
     user_auth_details = UserAuthDetails(
         user_id, None, profile_pin, parent_user_id)
     transaction_services.run_in_transaction(
-        _save_new_user_details, user_settings, user_auth_details)
+        _create_new_profile_transactional, user_settings, user_auth_details)
     return user_settings
 
 

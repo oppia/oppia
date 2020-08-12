@@ -196,6 +196,32 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.set_user_display_alias(user_id, display_alias)
 
+    def test_set_user_valid_display_alias_is_set_successfully(self):
+        gae_id = 'someUser'
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
+        display_alias = 'Name'
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertIsNone(user_settings.display_alias)
+        user_services.set_user_display_alias(user_id, display_alias)
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertEquals(user_settings.display_alias, display_alias)
+
+    def test_create_new_profile_duplicate_display_alias_raises_error(self):
+        gae_id = 'test_id'
+        user_email = 'test@email.com'
+        user_pin = '12345'
+        profile_pin = '123'
+        display_alias = 'display_alias'
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_services.set_user_pin(user_id, user_pin)
+        user_services.create_new_profile(
+            gae_id, user_email, display_alias, profile_pin=profile_pin)
+        error_msg = 'Display alias display_alias already exists in the account.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.create_new_profile(
+                gae_id, user_email, display_alias, profile_pin=profile_pin)
+
     def test_set_invalid_user_pin_raises_exception(self):
         gae_id = 'someUser'
         user_id = user_services.create_new_user(
@@ -623,6 +649,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_role_from_id(user_id),
             feconf.ROLE_ID_COLLECTION_EDITOR)
 
+    def test_get_all_profiles_auth_details_non_existent_id_raises_error(self):
+        non_existent_user_id = 'id_x'
+        error_msg = 'User not found.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.get_all_profiles_auth_details_by_parent_user_id(
+                non_existent_user_id)
+
     def test_update_user_role_from_learner_to_other_role_raises_exception(self):
         gae_id = 'test_id'
         user_email = 'test@email.com'
@@ -707,6 +740,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_auth_details_by_user_id(
                 non_existent_user_id, strict=True)
 
+    def test_get_auth_details_by_gae_id_non_existing_user_returns_none(self):
+        non_existent_user_id = 'id_x'
+        self.assertIsNone(
+            user_services.get_auth_details_by_user_id(non_existent_user_id))
+
     def test_create_new_profile_with_parent_user_pin_set_is_success(self):
         gae_id = 'gae_id'
         email = 'new@example.com'
@@ -742,6 +780,52 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.create_new_profile(
                 gae_id, email, display_alias, profile_pin=profile_pin)
+
+    def test_create_multiple_new_profiles_for_same_user_works_correctly(self):
+        gae_id = 'gae_id'
+        email = 'new@example.com'
+        display_alias = 'display_alias'
+        display_alias_2 = 'display_alias2'
+        user_pin = '12345'
+        profile_pin = '123'
+        user_services.create_new_user(gae_id, email)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id)
+        )
+        user_id = user_auth_details_model.id
+        user_services.set_user_pin(user_id, user_pin)
+        profile_1_id = user_services.create_new_profile(
+            gae_id, email, display_alias, profile_pin=profile_pin).user_id
+        profile_2_id = user_services.create_new_profile(
+            gae_id, email, display_alias_2).user_id
+
+        user_auth_details_models = [ 
+            {
+                'id': model.id,
+                'gae_id': model.gae_id,
+                'pin': model.pin,
+                'parent_user_id': model.parent_user_id
+            } for model in 
+            user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
+                user_id)
+        ]
+
+        expected_output = [
+            {
+                'id': profile_1_id,
+                'gae_id': None,
+                'pin': profile_pin,
+                'parent_user_id': user_id
+            },
+            {
+                'id': profile_2_id,
+                'gae_id': None,
+                'pin': None,
+                'parent_user_id': user_id
+            }
+        ]
+        self.assertItemsEqual(user_auth_details_models, expected_output)
 
     def test_create_new_profile_with_nonexistent_user_raises_error(self):
         non_existent_gae_id = 'gae_id_x'
