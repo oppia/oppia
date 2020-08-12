@@ -47,7 +47,7 @@ def main(args=None):
     sys.path.append(coverage_home)
     sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
     sys.path.append(
-        os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'))
+       os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'))
     sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
 
     # Delete old *.pyc files.
