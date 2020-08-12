@@ -122,7 +122,7 @@ class AdminHandler(base.BaseHandler):
                         computation['last_finished_msec']))
 
         feature_flag_settings = (
-            platform_feature_services.get_all_feature_flag_setting_dicts())
+            platform_feature_services.get_all_feature_flag_dicts())
 
         self.render_json({
             'config_properties': (

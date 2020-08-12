@@ -47,6 +47,6 @@ class PlatformFeatureHandler(base.BaseHandler):
 
         result_dict = (
             platform_feature_services
-            .get_all_feature_flag_values_for_context(context))
+            .evaluate_all_feature_flag_values_for_client(context))
 
         self.render_json(result_dict)

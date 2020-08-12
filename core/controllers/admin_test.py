@@ -731,8 +731,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with feature_list_ctx, feature_set_ctx:
             response_dict = self.get_json('/adminhandler')
             self.assertEqual(
-                response_dict['feature_flags'],
-                {feature.name: feature.to_dict()})
+                response_dict['feature_flags'], [feature.to_dict()])
 
             self.post_json(
                 '/adminhandler', {
@@ -743,7 +742,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
 
             response_dict = self.get_json('/adminhandler')
-            rules = response_dict['feature_flags'][feature.name]['rules']
+            rules = response_dict['feature_flags'][0]['rules']
             self.assertEqual(rules, new_rule_dicts)
 
         platform_parameter_registry.Registry.parameter_registry.pop(
