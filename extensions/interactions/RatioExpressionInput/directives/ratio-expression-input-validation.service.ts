@@ -31,6 +31,7 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,13 +40,21 @@ export class RatioExpressionInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
+  getCustomizationArgsWarnings(
+      customizationArgs: RatioExpressionInputCustomizationArgs): Warning[] {
+    return [];
+  }
+
   getAllWarnings(
       stateName: string,
       customizationArgs: RatioExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     let warningsList = [];
-    let algebraicRulesService = (
+    let ratioRulesService = (
       new RatioExpressionInputRulesService());
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
@@ -71,7 +80,7 @@ export class RatioExpressionInputValidationService {
           let seenRuleType = <string> seenRule.type;
 
           if (seenRuleType === 'Equals' && (
-            algebraicRulesService.Equals(
+            ratioRulesService.Equals(
               seenInput, {x: currentInput}))) {
             // This rule will make all of the following matching
             // inputs obsolete.
@@ -83,7 +92,7 @@ export class RatioExpressionInputValidationService {
                 'by an \'Equals\' rule with a matching input.')
             });
           } else if (currentRuleType === 'HasNumberOfTermsEqualTo' && (
-            algebraicRulesService.HasNumberOfTermsEqualTo(
+            ratioRulesService.HasNumberOfTermsEqualTo(
               seenInput, {x: currentInput}))) {
             // This rule will make the following inputs with
             // HasNumberOfTermsEqualTo rule obsolete.

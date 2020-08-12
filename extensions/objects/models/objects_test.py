@@ -762,6 +762,16 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.AlgebraicIdentifier, mappings,
             invalid_values_with_error_messages)
 
+    def test_ratio__validation(self):
+        """Tests objects of type RatioExpression."""
+
+        mappings = [('a', 'a'), ('alpha', 'alpha'), ('Z', 'Z')]
+
+        invalid_values = [None, 2, 'string', 'item']
+
+        self.check_normalization(
+            objects.AlgebraicIdentifier, mappings, invalid_values)        
+
 
 class SchemaValidityTests(test_utils.GenericTestBase):
 
@@ -773,7 +783,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEqual(count, 48)
+        self.assertEqual(count, 49)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):

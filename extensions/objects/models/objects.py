@@ -1197,8 +1197,8 @@ class PositionOfTerms(BaseObject):
 
 
 class RatioExpression(BaseObject):
-    """Class for position of terms. Denotes the position of terms relative to
-    the equals sign in a math equation.
+    """Class for ratio expression. Stores a unicode string representing a
+    valid ratio expression.
     """
 
     description = 'A string for ratio expression.'

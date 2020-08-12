@@ -190,7 +190,8 @@ VALIDATOR_SPECS = {
             'max_value': {
                 'type': SCHEMA_TYPE_INT
             }
-        }
+        },
+        'is_valid_ratio': {}
     },
 }
 

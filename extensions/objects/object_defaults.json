@@ -47,5 +47,6 @@
       "units": []
     },
     "NumericExpression": "",
+    "PositionOfTerms": "both",
     "RatioExpression": "1:1"
 }

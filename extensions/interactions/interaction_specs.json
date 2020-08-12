@@ -1004,7 +1004,7 @@
     "instructions": null,
     "is_trainable": false,
     "narrow_instructions": null,
-    "description": "Allows learners to enter ratio's.",
+    "description": "Allows learners to enter ratios.",
     "needs_summary": false,
     "name": "Ratio Expression Input",
     "answer_type": "RatioExpression",
