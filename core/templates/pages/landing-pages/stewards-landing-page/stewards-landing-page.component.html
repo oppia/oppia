@@ -1,19 +1,19 @@
 <div>
-  <div class="oppia-stewards-landing-section" style="background-color: #afd2eb">
+  <div class="oppia-stewards-landing-section oppia-stewards-landing-section-color">
     <div class="oppia-stewards-landing-section-inner">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-sm-6 col-sm-push-6" style="height: auto; z-index: 20;">
+          <div class="col-sm-6 col-sm-push-6 oppia-stewards-landing-image-container">
             <picture>
               <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/partner.webp')]>">
               <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/partner.png')]>">
               <img ng-src="<[$ctrl.getStaticImageUrl('/general/partner.png')]>" class="oppia-stewards-landing-image" alt="oppia stewards landing image">
             </picture>
           </div>
-          <div class="col-sm-6 col-sm-pull-6" style="z-index: 20">
+          <div class="col-sm-6 col-sm-pull-6 oppia-stewards-landing-top-section-container">
             <div class="oppia-stewards-landing-top-section">
               <h1 class="oppia-stewards-landing-h1">Get involved.</h1>
-              <h2 class="oppia-stewards-landing-h2" style="padding-right: 15px;">Support from educators, NGOs and student volunteers makes Oppia possible. Help increase student access to Oppia.</h2>
+              <h2 class="oppia-stewards-landing-h2 oppia-support-text">Support from educators, NGOs and student volunteers makes Oppia possible. Help increase student access to Oppia.</h2>
               <div>
                 <span ng-repeat="buttonDefinition in $ctrl.buttonDefinitions track by $index">
                   <button class="btn oppia-stewards-button" ng-class="{'oppia-stewards-button-primary': $index === 0, 'oppia-stewards-button-secondary': $index > 0}" ng-click="$ctrl.onClickButton(buttonDefinition)"><[buttonDefinition.text]></button>
@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="oppia-stewards-landing-background-icon-row-container">
-        <div class="oppia-stewards-landing-background-icon-row" style="margin-top: 20px">
+        <div class="oppia-stewards-landing-background-icon-row oppia-stewards-landing-background-icons-container">
           <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Humor')]>" class="oppia-stewards-landing-background-icon" alt="">
           <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-stewards-landing-background-icon" alt="">
           <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Cooking')]>" class="oppia-stewards-landing-background-icon" alt="">
@@ -123,10 +123,10 @@
     </div>
   </div>
 
-  <div class="oppia-stewards-landing-section" style="background-color: #e8e7e3; max-width: 90%; padding-bottom: 50px;">
-    <section style="padding: 30px;">
+  <div class="oppia-stewards-landing-section oppia-stewards-landing-section-div">
+    <section class="oppia-landing-section">
       <!--A container to make a grid with a fixed column-->
-      <main class="row" style="display: flex;">
+      <main class="row" class="d-flex">
         <div class="column oppia-stewards-sidebar" ng-if="!$ctrl.windowIsNarrow">
           <ul class="primary">
             <li ng-class="{active: $ctrl.isActiveTab($ctrl.TAB_NAME_PARENTS)}"><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_PARENTS)">Parents</a></li>
@@ -143,7 +143,7 @@
               <button uib-dropdown-toggle class="btn btn-secondary selection dropdown-toggle" type="button" aria-expanded="false" data-toggle="dropdown">
                 <[$ctrl.getActiveTabNameInSingularForm()]>
               </button>
-              <ul uib-dropdown-menu style="width: inherit;">
+              <ul uib-dropdown-menu class="oppia-dropdown-menu">
                 <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_PARENTS)">Parent</a></li>
                 <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_TEACHERS)">Teacher</a></li>
                 <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_NONPROFITS)">Nonprofit</a></li>
@@ -514,6 +514,33 @@
     margin: -1px;
     max-width: 96px;
     width: 10%;
+  }
+  .oppia-stewards-landing-section-color {
+    background-color: #afd2eb;
+  }
+  .oppia-stewards-landing-image-container {
+    height: auto;
+    z-index: 20;
+  }
+  .oppia-stewards-landing-top-section-container {
+    z-index: 20;
+  }
+  .oppia-support-text {
+    padding-right: 15px;
+  }
+  .oppia-stewards-landing-background-icons-container {
+    margin-top: 20px;
+  }
+  .oppia-stewards-landing-section-div {
+    background-color: #e8e7e3;
+    max-width: 90%;
+    padding-bottom: 50px;
+  }
+  .oppia-landing-section {
+    padding: 30px;
+  }
+  .oppia-dropdown-menu {
+    width: inherit;
   }
 
   /* Note: This should be kept in sync with the CSS media query on

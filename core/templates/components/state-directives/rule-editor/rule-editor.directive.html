@@ -1,38 +1,35 @@
-<div style="position: relative;">
+<div class="position-relative">
   <form class="form-inline protractor-test-rule-details" role="form" name="$ctrl.ruleEditForm.form">
     <div ng-if="$ctrl.rule.type != 'FuzzyMatches'" class="rule-parent">
       <rule-type-selector class="protractor-test-answer-description" local-value="<[$ctrl.rule.type]>" on-selection-change="$ctrl.onSelectNewRuleType">
       </rule-type-selector>
 
       <span ng-repeat="item in $ctrl.ruleDescriptionFragments track by $index" class="form-group oppia-rule-editor-span protractor-test-answer-description-fragment">
-        <span ng-if="item.type == 'select'" style="color: black;">
+        <span ng-if="item.type == 'select'" class="text-dark">
           <span ng-if="$ctrl.ruleDescriptionChoices.length === 1">
             "<[$ctrl.ruleDescriptionChoices[0].val|convertToPlainText|truncate]>"
           </span>
           <span ng-if="$ctrl.ruleDescriptionChoices.length !== 1">
-            <html-select style="width: 250px;" options="$ctrl.ruleDescriptionChoices" selection="$ctrl.rule.inputs[item.varName]">
+            <html-select class="oppia-rule-description-choice" options="$ctrl.ruleDescriptionChoices" selection="$ctrl.rule.inputs[item.varName]">
             </html-select>
           </span>
         </span>
 
-        <div style="max-height: 320px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        text-overflow: ellipsis;">
-          <span ng-if="item.type == 'checkboxes'" style="color: black;">
+        <div class="oppia-items-container">
+          <span ng-if="item.type == 'checkboxes'" class="text-dark">
             <object-editor obj-type="SetOfHtmlString" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
-          <span ng-if="item.type == 'dropdown'" style="color: black;">
+          <span ng-if="item.type == 'dropdown'" class="text-dark">
             <object-editor obj-type="ListOfSetsOfHtmlStrings" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
-          <span ng-if="item.type == 'dragAndDropHtmlStringSelect'" style="color: black;">
+          <span ng-if="item.type == 'dragAndDropHtmlStringSelect'" class="text-dark">
             <object-editor obj-type="DragAndDropHtmlString" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
-          <span ng-if="item.type == 'dragAndDropPositiveIntSelect'" style="color: black;">
+          <span ng-if="item.type == 'dragAndDropPositiveIntSelect'" class="text-dark">
             <object-editor obj-type="DragAndDropPositiveInt" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
           <span ng-if="item.type != 'select' && item.type != 'noneditable'">
-            <object-editor obj-type="<[item.type]>" is-editable="$ctrl.isEditable" always-editable="true" value="$ctrl.rule.inputs[item.varName]" style="color: black;"></object-editor>
+            <object-editor obj-type="<[item.type]>" is-editable="$ctrl.isEditable" always-editable="true" value="$ctrl.rule.inputs[item.varName]" class="text-dark"></object-editor>
           </span>
           <span ng-if="item.type == 'noneditable'">
             <[item.text]>
@@ -48,7 +45,7 @@
       <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="$ctrl.ruleEditForm.form.$invalid" ng-click="$ctrl.saveThisRule()">Save Answer</button>
     </div>
 
-    <div style="clear: both;"></div>
+    <div class="oppia-clear"></div>
   </div>
 </div>
 <style>
@@ -56,5 +53,14 @@
     display: inline-block;
     margin-right: 5px;
     width: 100%;
+  }
+  .oppia-rule-description-choice {
+    width: 250px;
+  }
+  .oppia-items-container {
+    max-height: 320px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    text-overflow: ellipsis;
   }
 </style>

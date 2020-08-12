@@ -59,14 +59,14 @@
   }
 </style>
 
-<div style="height: 100%;">
+<div class="h-100">
   <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
   <div ng-if="$ctrl.rules">
     <strong>
       If the learner's answer...
     </strong>
     <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist" ng-model="$ctrl.rules">
-      <li ng-repeat="rule in $ctrl.rules" ng-class="{'active': $ctrl.activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block" style="margin-top: 0;" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
+      <li ng-repeat="rule in $ctrl.rules" ng-class="{'active': $ctrl.activeRuleIndex === $index}" class="mt-0 oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
         <a ng-click="$ctrl.openRuleEditor($index)" ng-hide="$ctrl.activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !$ctrl.isEditable}">
           <div class="oppia-rule-header">
             <span ng-if="$index > 0">or</span>

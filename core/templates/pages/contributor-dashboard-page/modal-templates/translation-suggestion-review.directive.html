@@ -4,14 +4,14 @@
 
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-suggestion-review-panel-container" style="float: left;">
+    <div class="oppia-suggestion-review-panel-container float-left">
       <strong>Content to translate:</strong>
       <div class="oppia-suggestion-review-panel">
         <angular-html-bind html-data="contentHtml">
         </angular-html-bind>
       </div>
     </div>
-    <div class="oppia-suggestion-review-panel-container" style="float: right;">
+    <div class="oppia-suggestion-review-panel-container float-right">
       <strong> Translation:</strong>
       <div class="oppia-suggestion-review-panel">
         <angular-html-bind html-data="translationHtml">
@@ -21,11 +21,11 @@
   </section>
   <div ng-show="reviewable" class="oppia-suggestion-review-message">
     Review message (required if rejecting):
-    <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
+    <input class="protractor-test-suggestion-review-message w-100" type="text" ng-model="reviewMessage">
   </div>
   <div ng-show="reviewable" class="oppia-suggestion-review-message">
     Brief Description of Changes (required if accepting):
-    <input class="protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" maxlength="1000" style="width: 100%">
+    <input class="protractor-test-suggestion-commit-message w-100" type="text" ng-model="commitMessage" maxlength="1000">
   </div>
 </div>
 
