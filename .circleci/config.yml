@@ -107,10 +107,12 @@ jobs:
       - run:
           name: Install dependencies
           command: python -m scripts.install_third_party_libs
-      - run:
-          name: Check that all e2e test files are captured in protractor.conf.js
-          command: python -m scripts.check_e2e_tests_are_captured_in_ci
-
+      - persist_to_workspace:
+          root: /home/circleci/
+          paths:
+            - oppia/node_modules/
+            - oppia/third_party/
+            - oppia_tools/
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files
   # should be run in the non-prod environment.
