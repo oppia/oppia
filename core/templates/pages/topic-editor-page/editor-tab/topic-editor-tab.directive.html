@@ -244,10 +244,10 @@
           + ADD STORY
         </button>
         <div class="canonical-stories">
-          <stories-list ng-if="topic.getCanonicalStoryIds().length > 0"
-                        story-summaries="canonicalStorySummaries"
-                        topic="topic">
-          </stories-list>
+          <topic-editor-stories-list ng-if="topic.getCanonicalStoryIds().length > 0"
+                                     story-summaries="canonicalStorySummaries"
+                                     topic="topic">
+          </topic-editor-stories-list>
         </div>
       </div>
     </md-card>
