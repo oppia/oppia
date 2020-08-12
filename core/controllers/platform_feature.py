@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the feature gating handlers."""
+"""Controllers for the platform feature handlers."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import feature_gating_services
+from core.domain import platform_feature_services
 import utils
 
 
-class FeatureGatingHandler(base.BaseHandler):
+class PlatformFeatureHandler(base.BaseHandler):
     """The handler for retriving feature flag values."""
 
     @acl_decorators.open_access
@@ -38,7 +38,7 @@ class FeatureGatingHandler(base.BaseHandler):
             'user_locale': self.payload.get('user_locale'),
         }
         context = (
-            feature_gating_services.create_evaluation_context_for_client(
+            platform_feature_services.create_evaluation_context_for_client(
                 context_dict))
         try:
             context.validate()
@@ -46,7 +46,7 @@ class FeatureGatingHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         result_dict = (
-            feature_gating_services
+            platform_feature_services
             .get_all_feature_flag_values_for_context(context))
 
         self.render_json(result_dict)

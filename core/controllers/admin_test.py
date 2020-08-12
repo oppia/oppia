@@ -28,8 +28,8 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import feature_gating_services
 from core.domain import opportunity_services
+from core.domain import platform_feature_services
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
 from core.domain import recommendations_services
@@ -724,9 +724,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            feature_gating_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
         feature_set_ctx = self.swap(
-            feature_gating_services, 'ALL_FEATURES_NAMES_SET',
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
             response_dict = self.get_json('/adminhandler')
