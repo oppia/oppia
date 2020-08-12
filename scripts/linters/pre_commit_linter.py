@@ -104,13 +104,13 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PATHS_TO_INSERT = [
     os.getcwd(),
     os.path.join(
-        common.GOOGLE_CLOUD_SDK_HOME, 'lib', 'webapp2-2.3'),
+        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webapp2-2.3'),
     os.path.join(
-        common.GOOGLE_CLOUD_SDK_HOME, 'lib', 'yaml-3.10'),
+        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'yaml-3.10'),
     os.path.join(
-        common.GOOGLE_CLOUD_SDK_HOME, 'lib', 'jinja2-2.6'),
+        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'jinja2-2.6'),
     os.path.join(
-        common.GOOGLE_CLOUD_SDK_HOME),
+        common.GOOGLE_APP_ENGINE_SDK_HOME),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'webtest-%s' % common.WEBTEST_VERSION),
     os.path.join(

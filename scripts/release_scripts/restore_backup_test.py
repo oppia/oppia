@@ -46,7 +46,7 @@ class RestoreBackupTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         with exists_swap, self.assertRaisesRegexp(
             Exception,
-            'Directory %s does not exist.' % common.GOOGLE_CLOUD_SDK_HOME):
+            'Directory %s does not exist.' % common.GOOGLE_APP_ENGINE_SDK_HOME):
             restore_backup.main(args=[])
 
     def test_missing_project_name(self):

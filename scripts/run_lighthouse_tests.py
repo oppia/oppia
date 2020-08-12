@@ -19,10 +19,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import atexit
 import os
 import re
-import signal
 import subprocess
 import sys
-import time
 
 import python_utils
 from scripts import build

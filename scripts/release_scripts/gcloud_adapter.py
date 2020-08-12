@@ -17,19 +17,20 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from scripts import common
 import json
 import os
 import subprocess
 import sys
 
+from scripts import common
+
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 
-if not os.path.exists(os.path.dirname(common.GOOGLE_CLOUD_SDK_HOME)):
+if not os.path.exists(os.path.dirname(common.GOOGLE_APP_ENGINE_SDK_HOME)):
     raise Exception(
-        'Directory %s does not exist.' % common.GOOGLE_CLOUD_SDK_HOME)
-sys.path.insert(0, common.GOOGLE_CLOUD_SDK_HOME)
+        'Directory %s does not exist.' % common.GOOGLE_APP_ENGINE_SDK_HOME)
+sys.path.insert(0, common.GOOGLE_APP_ENGINE_SDK_HOME)
 
 
 def require_gcloud_to_be_available():

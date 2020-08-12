@@ -128,10 +128,10 @@ def main(args=None):
     backup restoration.
     """
     common.require_cwd_to_be_oppia()
-    if not os.path.exists(os.path.dirname(common.GOOGLE_CLOUD_SDK_HOME)):
+    if not os.path.exists(os.path.dirname(common.GOOGLE_APP_ENGINE_SDK_HOME)):
         raise Exception(
-            'Directory %s does not exist.' % common.GOOGLE_CLOUD_SDK_HOME)
-    sys.path.insert(0, common.GOOGLE_CLOUD_SDK_HOME)
+            'Directory %s does not exist.' % common.GOOGLE_APP_ENGINE_SDK_HOME)
+    sys.path.insert(0, common.GOOGLE_APP_ENGINE_SDK_HOME)
 
     options = _PARSER.parse_args(args=args)
 

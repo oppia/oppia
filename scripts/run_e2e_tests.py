@@ -24,7 +24,6 @@ import os
 import re
 import signal
 import subprocess
-import stat
 import sys
 import time
 
