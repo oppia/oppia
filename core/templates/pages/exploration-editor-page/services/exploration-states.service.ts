@@ -159,6 +159,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
           contentIds.add(solution.explanation.getContentId());
         }
         return contentIds;
+      },
+      widget_customization_args: function(customizationArgs) {
+        return new Set(
+          Interaction.getCustomizationArgContentIds(customizationArgs));
       }
     };
 

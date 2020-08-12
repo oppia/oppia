@@ -56,7 +56,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   'UrlInterpolationService',
   'ALLOWED_INTERACTION_CATEGORIES',
   'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
-  'CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS',
+  'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
   'INTERACTION_SPECS',
   function(
       $controller, $injector, $scope, $uibModalInstance,
@@ -67,7 +67,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       UrlInterpolationService,
       ALLOWED_INTERACTION_CATEGORIES,
       ALLOWED_QUESTION_INTERACTION_CATEGORIES,
-      CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS,
+      COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS,
       INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -299,7 +299,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           traverseSchemaAndAssignContentIds(
             caValues[name].value,
             caSpec.schema,
-            `${CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS}_${name}`);
+            `${COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS}_${name}`);
         }
       }
     };

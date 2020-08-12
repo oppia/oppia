@@ -172,6 +172,46 @@ export class Interaction {
     return customizationArgsBackendDict;
   }
 
+  static getCustomizationArgTranslatableContent(
+      customizationArgs: InteractionCustomizationArgs
+  ): {name: string, content: SubtitledUnicode|SubtitledHtml}[] {
+    const translatableContent = [];
+
+    const traverseValueAndRetrieveSubtitled = (
+        name: string,
+        value: Object[] | Object,
+    ): void => {
+      if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
+        translatableContent.push({
+          name, content: value
+        });
+      } else if (value instanceof Array) {
+        value.forEach((element, index) =>
+          traverseValueAndRetrieveSubtitled(
+            `${name} (${index})`,
+            element)
+        );
+      } else if (value instanceof Object) {
+        Object.keys(value).forEach(key =>
+          traverseValueAndRetrieveSubtitled(
+            `${name} > ${key}`,
+            value[key]
+          )
+        );
+      }
+    };
+
+    const capitalize = (s) => {
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    };
+    Object.keys(customizationArgs).forEach(caName =>
+      traverseValueAndRetrieveSubtitled(
+        capitalize(caName),
+        customizationArgs[caName].value));
+
+    return translatableContent;
+  }
+
   /**
    * This function is used to properly set state in Questions. The state in
    * Questions must handle its own WrittenTranslations and RecordedVoiceovers,

@@ -16,6 +16,8 @@
  * @fileoverview Directive containing the exploration material to be translated.
  */
 
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+
 require(
   'components/state-directives/response-header/response-header.directive.ts');
 require(
@@ -66,6 +68,7 @@ angular.module('oppia').directive('stateTranslation', [
       controller: [
         '$filter', '$rootScope', '$scope', 'CkEditorCopyContentService',
         'ExplorationCorrectnessFeedbackService',
+        'ExplorationHtmlFormatterService',
         'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
         'ExplorationStatesService', 'RouterService', 'StateEditorService',
         'TranslationLanguageService', 'TranslationStatusService',
@@ -79,6 +82,7 @@ angular.module('oppia').directive('stateTranslation', [
         function(
             $filter, $rootScope, $scope, CkEditorCopyContentService,
             ExplorationCorrectnessFeedbackService,
+            ExplorationHtmlFormatterService,
             ExplorationInitStateNameService, ExplorationLanguageCodeService,
             ExplorationStatesService, RouterService, StateEditorService,
             TranslationLanguageService, TranslationStatusService,
@@ -174,9 +178,11 @@ angular.module('oppia').directive('stateTranslation', [
             } else if (tabId === $scope.TAB_ID_SOLUTION) {
               activeContentId = $scope.stateSolution.explanation.getContentId();
             } else if (tabId === $scope.TAB_ID_CUSTOMIZATION_ARGS) {
-              console.log($scope.stateInteractionCustomizationArgs);
+              $scope.activeCustomizationArgContentIndex = 0;
+              activeContentId = (
+                $scope.interactionCustomizationArgTranslatableContent[
+                  0].content.getContentId());
             } else if (tabId === $scope.TAB_ID_RULES) {
-              
             }
 
             TranslationTabActiveContentIdService.setActiveContentId(
@@ -275,6 +281,9 @@ angular.module('oppia').directive('stateTranslation', [
               } else {
                 return false;
               }
+            } else if (tabId === $scope.TAB_ID_CUSTOMIZATION_ARGS) {
+              return ($scope.interactionCustomizationArgTranslatableContent
+                .length === 0);
             }
           };
 
@@ -289,6 +298,22 @@ angular.module('oppia').directive('stateTranslation', [
             $scope.activeHintIndex = newIndex;
             var activeContentId = (
               $scope.stateHints[newIndex].hintContent.getContentId());
+            TranslationTabActiveContentIdService.setActiveContentId(
+              activeContentId);
+          };
+
+          $scope.changeActiveCustomizationArgContentIndex = function(newIndex) {
+            if ($scope.isTranslationTabBusy) {
+              $rootScope.$broadcast('showTranslationTabBusyModal');
+              return;
+            }
+            if ($scope.activeHintIndex === newIndex) {
+              return;
+            }
+            $scope.activeCustomizationArgContentIndex = newIndex;
+            const activeContentId = (
+              $scope.interactionCustomizationArgTranslatableContent[
+                newIndex].content.getContentId());
             TranslationTabActiveContentIdService.setActiveContentId(
               activeContentId);
           };
@@ -365,6 +390,17 @@ angular.module('oppia').directive('stateTranslation', [
               .getInteractionCustomizationArgsMemento($scope.stateName);
             $scope.answerChoices = StateEditorService.getAnswerChoices(
               $scope.stateInteractionId, currentCustomizationArgs);
+            $scope.interactionPreviewHtml = (
+              ExplorationHtmlFormatterService.getInteractionHtml(
+                $scope.stateInteractionId,
+                $scope.stateInteractionCustomizationArgs, false)
+            );
+            $scope.interactionCustomizationArgTranslatableContent = (
+              Interaction.getCustomizationArgTranslatableContent(
+                $scope.stateInteractionCustomizationArgs
+              )
+            );
+            console.log($scope.interactionCustomizationArgTranslatableContent)
 
             if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
               $scope.needsUpdateTooltipMessage = 'Audio needs update to ' +
@@ -393,6 +429,7 @@ angular.module('oppia').directive('stateTranslation', [
 
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
+            $scope.activeCustomizationArgContentIndex = null;
             $scope.stateContent = null;
             $scope.stateInteractionId = null;
             $scope.stateAnswerGroups = [];
