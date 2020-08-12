@@ -859,9 +859,6 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         time_swap = self.swap(
             user_services, 'record_user_logged_in', lambda *args: None)
 
-        os.environ['TZ'] = 'UTC'
-        time.tzset()
-
         with constants_swap, time_swap:
             data = self.get_custom_response(
                 '/export-account-handler', 'text/plain')
