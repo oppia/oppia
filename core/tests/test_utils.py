@@ -2697,7 +2697,7 @@ class ClassifierTestBase(GenericEmailTestBase):
         Returns:
             FrozenModel. Protobuf object containing classifier data.
         """
-        filename = classifier_training_job.classifier_data_file_name
+        filename = classifier_training_job.classifier_data_filename
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))

@@ -202,8 +202,8 @@ def main():
         ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
         ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
-        ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
         ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
+        ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in pip_dependencies:

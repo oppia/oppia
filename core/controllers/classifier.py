@@ -208,7 +208,7 @@ class TrainedClassifierHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         return self.render_json({
-            'gcs_file_name': training_job.classifier_data_file_name
+            'gcs_file_name': training_job.classifier_data_filename
         })
 
 

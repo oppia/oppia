@@ -230,7 +230,7 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         return self._training_data
 
     @property
-    def classifier_data_file_name(self):
+    def classifier_data_filename(self):
         """Returns file name of the GCS file which stores classifier data
         for this training job.
 
@@ -384,7 +384,7 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
             classifier's training job was created.
         state_name: str. The name of the state to which the classifier
             belongs.
-        algorithm_ids_to_job_ids. dict. Mapping of algorithm IDs to
+        algorithm_ids_to_job_ids: dict(str, str). Mapping of algorithm IDs to
             corresponding unique training job IDs.
     """
 

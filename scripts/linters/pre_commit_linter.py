@@ -68,7 +68,6 @@ from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
 from . import linter_utils
-from . import proto_linter
 from . import python_linter
 from . import third_party_typings_linter
 from . import webpack_config_linter
@@ -94,7 +93,7 @@ _EXCLUSIVE_GROUP.add_argument(
 _PARSER.add_argument(
     '--only-check-file-extensions',
     nargs='+',
-    choices=['html', 'css', 'js', 'ts', 'py', 'proto', 'other'],
+    choices=['html', 'css', 'js', 'ts', 'py', 'other'],
     help='specific file extensions to be linted. Space separated list. '
     'If either of js or ts used then both js and ts files will be linted.',
     action='store')
@@ -264,11 +263,6 @@ def _get_linters_for_file_extension(
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
 
-    elif file_extension_to_lint == 'proto':
-        custom_linter, third_party_linter = proto_linter.get_linters(
-            _FILES['.proto'], verbose_mode_enabled=verbose_mode_enabled)
-        third_party_linters.append(third_party_linter)
-
     elif file_extension_to_lint == 'py':
         custom_linter, third_party_linter = python_linter.get_linters(
             _FILES['.py'], FILE_CACHE,
@@ -332,7 +326,7 @@ def _get_file_extensions(file_extensions_to_lint):
         list(str). The list of all file extensions
         to be linted and checked.
     """
-    all_file_extensions_type = ['js', 'py', 'html', 'css', 'proto', 'other']
+    all_file_extensions_type = ['js', 'py', 'html', 'css', 'other']
 
     if file_extensions_to_lint:
         # Check if 'js' and 'ts' both are present in file_extensions_to_lint.
@@ -418,8 +412,7 @@ def read_files(file_paths):
 def categorize_files(file_paths):
     """Categorize all the files and store them in shared variable _FILES."""
     all_filepaths_dict = {
-        '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': [],
-        '.proto': []
+        '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []
     }
     for file_path in file_paths:
         _, extension = os.path.splitext(file_path)
@@ -484,7 +477,7 @@ def _print_errors_stacktrace(errors_stacktrace):
 
 def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
-    Proto, HTML, and CSS files.
+    HTML, and CSS files.
     """
     parsed_args = _PARSER.parse_args(args=args)
     # File extension to be linted.
