@@ -40,8 +40,8 @@ export class EditabilityService {
   }
 
   /**
-  * @return {boolean} whether the service is translatable.
-  */
+   * @return {boolean} whether the service is translatable.
+   */
   isTranslatable(): boolean {
     return (
       EditabilityService.isTranslatable && !EditabilityService.inTutorialMode);
