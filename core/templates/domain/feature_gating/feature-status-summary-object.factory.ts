@@ -24,8 +24,8 @@ export interface FeatureStatusSummaryBackendDict {
 }
 
 /**
- * Represents the evaluation summary of all feature flags received from the
- * server.
+ * Represents the evaluation result summary of all feature flags received from
+ * the server. This is used only in the frontend feature value retrieval.
  */
 export class FeatureStatusSummary {
   featureNameToFlag: Map<string, boolean>;

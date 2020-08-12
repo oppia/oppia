@@ -27,8 +27,8 @@ export interface ClientContextBackendDict {
 }
 
 /**
- * Represents the client side information that is used to evaluate the
- * value of feature flags.
+ * Represents the client side information that is used to evaluate the value
+ * of feature flags. This is used only in the frontend feature value retrieval.
  */
 export class ClientContext {
   readonly clientType: string;

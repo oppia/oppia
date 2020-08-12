@@ -44,8 +44,8 @@ export enum ServerMode {
  * platform parameter filters in the admin page.
  */
 export interface PlatformParameterFilterBackendDict {
-    'type': PlatformParameterFilterType;
-    'conditions': Array<[string, string]>;
+  'type': PlatformParameterFilterType;
+  'conditions': Array<[string, string]>;
 }
 
 export class PlatformParameterFilter {
