@@ -18,7 +18,10 @@
 
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { WRITTEN_TRANSLATION_TYPE_HTML, WRITTEN_TRANSLATION_TYPE_UNICODE } from
+  'domain/exploration/WrittenTranslationObjectFactory';
 
 require(
   'components/state-directives/response-header/response-header.directive.ts');
@@ -158,7 +161,8 @@ angular.module('oppia').directive('stateTranslation', [
               $rootScope.$broadcast('showTranslationTabBusyModal');
               return;
             }
-            var activeContentId = null;
+            let activeContentId = null;
+            let activeDataFormat = WRITTEN_TRANSLATION_TYPE_HTML;
 
             if (tabId === $scope.TAB_ID_CONTENT) {
               activeContentId = $scope.stateContent.getContentId();
@@ -179,13 +183,18 @@ angular.module('oppia').directive('stateTranslation', [
               activeContentId = $scope.stateSolution.explanation.getContentId();
             } else if (tabId === $scope.TAB_ID_CUSTOMIZATION_ARGS) {
               $scope.activeCustomizationArgContentIndex = 0;
-              activeContentId = (
-                $scope.interactionCustomizationArgTranslatableContent[
-                  0].content.getContentId());
+              const activeContent = (
+                $scope.interactionCustomizationArgTranslatableContent[0].content
+              );
+              activeContentId = activeContent.getContentId();
+              if (activeContent instanceof SubtitledUnicode) {
+                activeDataFormat = WRITTEN_TRANSLATION_TYPE_UNICODE;
+              }
             }
 
             TranslationTabActiveContentIdService.setActiveContentId(
-              activeContentId);
+              activeContentId,
+              activeDataFormat);
             $scope.activatedTabId = tabId;
           };
 
@@ -298,7 +307,7 @@ angular.module('oppia').directive('stateTranslation', [
             var activeContentId = (
               $scope.stateHints[newIndex].hintContent.getContentId());
             TranslationTabActiveContentIdService.setActiveContentId(
-              activeContentId);
+              activeContentId, WRITTEN_TRANSLATION_TYPE_HTML);
           };
 
           $scope.changeActiveCustomizationArgContentIndex = function(newIndex) {
@@ -310,11 +319,19 @@ angular.module('oppia').directive('stateTranslation', [
               return;
             }
             $scope.activeCustomizationArgContentIndex = newIndex;
-            const activeContentId = (
+            const activeContent = (
               $scope.interactionCustomizationArgTranslatableContent[
-                newIndex].content.getContentId());
+                newIndex].content
+            );
+            const activeContentId = activeContent.getContentId();
+            let activeDataFormat = null;
+            if (activeContent instanceof SubtitledUnicode) {
+              activeDataFormat = WRITTEN_TRANSLATION_TYPE_UNICODE;
+            } else if (activeContent instanceof SubtitledHtml) {
+              activeDataFormat = WRITTEN_TRANSLATION_TYPE_HTML;
+            }
             TranslationTabActiveContentIdService.setActiveContentId(
-              activeContentId);
+              activeContentId, activeDataFormat);
           };
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -333,7 +350,7 @@ angular.module('oppia').directive('stateTranslation', [
                   .outcome.feedback.getContentId());
               }
               TranslationTabActiveContentIdService.setActiveContentId(
-                activeContentId);
+                activeContentId, WRITTEN_TRANSLATION_TYPE_HTML);
             }
           };
 
@@ -400,8 +417,6 @@ angular.module('oppia').directive('stateTranslation', [
               Interaction.getCustomizationArgTranslatableContent(
                 $scope.stateInteractionCustomizationArgs)
             );
-            console.log($scope.stateInteractionCustomizationArgs)
-            console.log($scope.interactionCustomizationArgTranslatableContent)
 
             if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
               $scope.needsUpdateTooltipMessage = 'Audio needs update to ' +

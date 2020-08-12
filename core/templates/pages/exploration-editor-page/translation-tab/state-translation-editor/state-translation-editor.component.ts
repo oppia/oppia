@@ -127,7 +127,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           if (!$scope.activeWrittenTranslation) {
             $scope.activeWrittenTranslation = (
               WrittenTranslationObjectFactory
-                .createNew('unicode', ''));
+                .createNew($scope.dataFormat, ''));
           }
         }
       };
@@ -154,13 +154,15 @@ angular.module('oppia').component('stateTranslationEditor', {
         initEditor();
       };
       ctrl.$onInit = function() {
+        $scope.dataFormat = WRITTEN_TRANSLATION_TYPE_HTML;
         $scope.HTML_SCHEMA = {
           type: 'html'
         };
         $scope.UNICODE_SCHEMA = {
           type: 'unicode'
         };
-        $scope.$on('activeContentIdChanged', function() {
+        $scope.$on('activeContentIdChanged', function(unusedEvent, dataFormat) {
+          $scope.dataFormat = dataFormat;
           initEditor();
         });
         $scope.$on('activeLanguageChanged', function() {

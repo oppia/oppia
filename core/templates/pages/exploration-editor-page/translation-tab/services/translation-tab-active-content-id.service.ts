@@ -31,14 +31,14 @@ angular.module('oppia').factory('TranslationTabActiveContentIdService', [
       getActiveContentId: function() {
         return activeContentId;
       },
-      setActiveContentId: function(contentId) {
+      setActiveContentId: function(contentId, dataFormat) {
         var allContentIds = (
           StateRecordedVoiceoversService.displayed.getAllContentId());
         if (allContentIds.indexOf(contentId) === -1) {
           throw new Error('Invalid active content id: ' + contentId);
         }
         activeContentId = contentId;
-        $rootScope.$broadcast('activeContentIdChanged');
+        $rootScope.$broadcast('activeContentIdChanged', dataFormat);
       }
     };
   }]);
