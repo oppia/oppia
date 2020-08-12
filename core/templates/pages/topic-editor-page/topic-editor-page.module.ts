@@ -19,6 +19,10 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/angular-js.import';
+import 'third-party-imports/headroom.import';
+import 'interactions/codemirrorRequires.ts';
+
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
@@ -53,6 +57,12 @@ import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { TopicEditorPageConstants } from
   'pages/topic-editor-page/topic-editor-page.constants';
+import { PracticeTabComponent } from
+  'pages/topic-viewer-page/practice-tab/practice-tab.component';
+import { StoriesListComponent } from
+  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
+import { SubtopicsListComponent } from
+  'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 
 @NgModule({
   imports: [
@@ -61,10 +71,16 @@ import { TopicEditorPageConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    PracticeTabComponent,
+    StoriesListComponent,
+    SubtopicsListComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    PracticeTabComponent,
+    StoriesListComponent,
+    SubtopicsListComponent,
   ],
   providers: [
     AppConstants,

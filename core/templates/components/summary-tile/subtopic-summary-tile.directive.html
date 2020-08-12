@@ -1,13 +1,13 @@
-<div class="subtopic-card" ng-click="$ctrl.openSubtopicPage()">
+<div class="subtopic-card" ng-click="$ctrl.openSubtopicPage()" ng-class="{'disabled-link': !ctrl.classroomUrlFragment}">
   <div class="subtopic-thumbnail"
-       ng-style="{background: $ctrl.getSubtopic().getThumbnailBgColor()}">
+       ng-style="{background: $ctrl.subtopic.getThumbnailBgColor()}">
     <img ng-src="<[$ctrl.thumbnailUrl]>"
          class="img-thumbnail"
          alt=""
-         ng-style="{background: $ctrl.getSubtopic().getThumbnailBgColor()}">
+         ng-style="{background: $ctrl.subtopic.getThumbnailBgColor()}">
   </div>
   <div class="subtopic-title">
-    <[$ctrl.getSubtopic().getTitle()]>
+    <[$ctrl.subtopic.getTitle()]>
   </div>
 </div>
 <style>
@@ -46,6 +46,13 @@
     height: 100px;
     letter-spacing: 0.5px;
     padding: 10px 5px 5px 15px;
+  }
+
+  subtopic-summary-tile .disabled-link,
+  subtopic-summary-tile .disabled-link:hover,
+  subtopic-summary-tile .disabled-link:active {
+    color: #000;
+    cursor: default;
   }
 
   @media(max-width: 1024px) {
