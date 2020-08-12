@@ -19,17 +19,17 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { NumericExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
-import { NumericExpressionInputRulesService } from
-  './numeric-expression-input-rules.service';
+import { AppConstants } from 'app.constants';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-import { AppConstants } from 'app.constants';
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { NumericExpressionInputRulesService } from
+  './numeric-expression-input-rules.service';
 
 @Injectable({
   providedIn: 'root'

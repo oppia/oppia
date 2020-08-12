@@ -20,10 +20,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { createUnit, unit } from 'mathjs';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
 import { Unit } from
   'interactions/answer-defs';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
 
 interface UnitsBackendDict {
   units: Unit[];

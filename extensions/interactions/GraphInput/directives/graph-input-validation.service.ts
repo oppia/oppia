@@ -19,17 +19,17 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { GraphInputCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
 
 @Injectable({
   providedIn: 'root'

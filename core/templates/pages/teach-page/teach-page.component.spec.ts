@@ -20,13 +20,13 @@ import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed, async, fakeAsync, tick } from
   '@angular/core/testing';
 
-import { TeachPageComponent } from './teach-page.component';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateService } from 'services/translate.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { TeachPageComponent } from './teach-page.component';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {

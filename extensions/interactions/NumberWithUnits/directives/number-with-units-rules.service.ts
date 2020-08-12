@@ -21,11 +21,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { unit } from 'mathjs';
 
-import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 import { NumberWithUnitsRuleInputs } from 'interactions/rule-input-defs';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
 
 // Rules service for number with units interaction.
 @Injectable({

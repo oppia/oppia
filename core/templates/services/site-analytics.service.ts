@@ -20,8 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-const constants = require('constants.ts');
 import { WindowRef } from 'services/contextual/window-ref.service';
+const constants = require('constants.ts');
 
 // Service for sending events to Google Analytics.
 //

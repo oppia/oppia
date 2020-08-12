@@ -15,18 +15,18 @@
 /**
  * @fileoverview Component for the Social Sharing Links.
  */
-const constants = require('constants.ts');
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ExplorationEmbedButtonModalComponent } from
   'components/button-directives/exploration-embed-button-modal.component';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+const constants = require('constants.ts');
 
 @Component({
   selector: 'sharing-links',

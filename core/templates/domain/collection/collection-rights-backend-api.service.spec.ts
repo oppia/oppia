@@ -20,13 +20,13 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { CollectionRightsBackendApiService } from
-  './collection-rights-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
 import { CollectionRightsBackendDict } from
   'domain/collection/CollectionRightsObjectFactory';
+import { CollectionRightsBackendApiService } from
+  './collection-rights-backend-api.service';
 
 describe('Collection rights backend API service', function() {
   let collectionRightsBackendApiService: CollectionRightsBackendApiService;

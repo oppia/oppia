@@ -18,11 +18,11 @@
 
 import { TestBed } from '@angular/core/testing';
 
+import { MusicNotesInputValidationService } from
+  'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 /* eslint-disable max-len*/
-import { MusicNotesInputValidationService } from
-  'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 /* eslint-enable max-len*/
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';

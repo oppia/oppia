@@ -20,10 +20,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
 import { FractionAnswer } from
   'interactions/answer-defs';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
 
 export class Fraction {
   isNegative: boolean;

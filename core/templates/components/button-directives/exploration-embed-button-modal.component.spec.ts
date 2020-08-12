@@ -21,9 +21,9 @@ import { ComponentFixture, fakeAsync, TestBed, async } from
 import { By } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ExplorationEmbedButtonModalComponent } from
   './exploration-embed-button-modal.component';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 class MockActiveModal {
   dismiss(): void {

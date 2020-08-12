@@ -17,10 +17,10 @@
  * carrying out end-to-end testing with protractor.
  */
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
 var login = async function(email, isSuperAdmin = false) {

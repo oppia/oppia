@@ -18,9 +18,9 @@
 
 
 import { AlertsService } from 'services/alerts.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
-import { LoggerService } from 'services/contextual/logger.service';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';

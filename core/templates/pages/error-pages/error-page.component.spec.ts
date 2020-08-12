@@ -18,12 +18,12 @@
 import { Pipe, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 
-import { ErrorPageComponent } from './error-page.component';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
 import { TranslateService } from 'services/translate.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { ErrorPageComponent } from './error-page.component';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {

@@ -19,13 +19,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { FractionAnswer } from 'interactions/answer-defs';
 import { UtilsService } from 'services/utils.service';
 import {
   FractionEquivalentRuleInputs,
   FractionIntegerPartRuleInputs
 } from 'interactions/rule-input-defs';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 
 @Injectable({
   providedIn: 'root'

@@ -24,8 +24,6 @@ import { AnswerGroupsCacheService } from
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
@@ -46,6 +44,8 @@ import { StateWrittenTranslationsService } from
 
 import * as d3 from 'd3';
 import { of } from 'rxjs';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
 
 require('pages/exploration-editor-page/editor-tab/graph-directives/' +
   'state-graph-visualization.directive.ts');

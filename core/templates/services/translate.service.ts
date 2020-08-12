@@ -17,10 +17,10 @@
  */
 
 import { Injectable, EventEmitter } from '@angular/core';
-import { UtilsService } from './utils.service';
-
 import { TranslationsDict, TranslationsBackendApiService } from
   'services/translations-backend-api.service';
+import { UtilsService } from './utils.service';
+
 
 /**
  * Commonly used terms in this file.

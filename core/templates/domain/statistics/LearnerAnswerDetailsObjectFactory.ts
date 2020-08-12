@@ -20,10 +20,10 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { LearnerAnswerInfo } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+import { LearnerAnswerInfo } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
 
 export class LearnerAnswerDetails {
   expId: string;

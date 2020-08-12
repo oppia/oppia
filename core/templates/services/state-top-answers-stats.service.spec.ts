@@ -20,6 +20,10 @@
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
+import { StateTopAnswersStatsService } from
+  'services/state-top-answers-stats.service';
+import { StateTopAnswersStatsBackendApiService } from
+  'services/state-top-answers-stats-backend-api.service';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AnswerStatsBackendDict } from
@@ -28,10 +32,6 @@ import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
-import { StateTopAnswersStatsService } from
-  'services/state-top-answers-stats.service';
-import { StateTopAnswersStatsBackendApiService } from
-  'services/state-top-answers-stats-backend-api.service';
 import { States, StatesObjectFactory } from
   'domain/exploration/StatesObjectFactory';
 

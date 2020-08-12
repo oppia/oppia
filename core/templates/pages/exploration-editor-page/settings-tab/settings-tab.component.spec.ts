@@ -23,7 +23,6 @@ import { AnswerGroupsCacheService } from
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
@@ -40,6 +39,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;

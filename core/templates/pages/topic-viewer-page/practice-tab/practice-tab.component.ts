@@ -19,12 +19,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants.ts';
 import { UrlService } from 'services/contextual/url.service';
+import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'practice-tab',

@@ -22,10 +22,10 @@ import { Injectable } from '@angular/core';
 
 import { cloneDeep } from 'lodash';
 
-import { SkillRightsBackendDict, SkillRightsObjectFactory, SkillRights } from
-  'domain/skill/SkillRightsObjectFactory.ts';
 import { SkillEditorPageConstants } from
   'pages/skill-editor-page/skill-editor-page.constants.ts';
+import { SkillRightsBackendDict, SkillRightsObjectFactory, SkillRights } from
+  'domain/skill/SkillRightsObjectFactory.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 

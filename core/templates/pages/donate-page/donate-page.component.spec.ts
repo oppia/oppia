@@ -17,13 +17,13 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { DonatePageComponent } from './donate-page.component';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { DonatePageComponent } from './donate-page.component';
 
 describe('Donate page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(

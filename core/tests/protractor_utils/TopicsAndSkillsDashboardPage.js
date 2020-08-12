@@ -18,10 +18,10 @@
  */
 
 var action = require('../protractor_utils/action.js');
+var general = require('../protractor_utils/general.js');
 var waitFor = require('./waitFor.js');
 var SkillEditorPage = require('./SkillEditorPage.js');
 var workflow = require('./workflow.js');
-var general = require('../protractor_utils/general.js');
 
 var TopicsAndSkillsDashboardPage = function() {
   var DASHBOARD_URL = '/topics-and-skills-dashboard';

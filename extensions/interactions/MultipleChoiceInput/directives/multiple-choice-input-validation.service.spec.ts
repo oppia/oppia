@@ -18,13 +18,15 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { MultipleChoiceInputCustomizationArgs } from
   'interactions/customization-args-defs';
-/* eslint-disable max-len */
 import { MultipleChoiceInputValidationService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
+import { AppConstants } from 'app.constants';
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+/* eslint-disable max-len */
 /* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -32,8 +34,6 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
-import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 describe('MultipleChoiceInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;

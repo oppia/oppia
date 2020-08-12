@@ -19,9 +19,9 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-rights.service.ts is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');

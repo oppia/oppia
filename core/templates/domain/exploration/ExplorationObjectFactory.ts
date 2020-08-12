@@ -24,14 +24,14 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
 import { LoggerService } from 'services/contextual/logger.service';
+import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { ParamChangeBackendDict, ParamChange } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { ParamSpecsBackendDict, ParamSpecs, ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
-import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
 import { Interaction } from
   'domain/exploration/InteractionObjectFactory';
 import { BindableVoiceovers } from

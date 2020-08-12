@@ -18,6 +18,9 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // collection-editor-state.service.ts is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+import { TranslatorProviderForTests } from 'tests/test.extras';
+import { Subscription } from 'rxjs';
 import { CollectionNodeObjectFactory } from
   'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
@@ -28,17 +31,14 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('domain/collection/CollectionRightsObjectFactory.ts');
 require('domain/collection/collection-update.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 
-import { Subscription } from 'rxjs';
 
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;

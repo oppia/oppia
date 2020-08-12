@@ -17,8 +17,8 @@
  * carrrying out end-to-end testing with protractor.
  */
 
-var forms = require('./forms.js');
 var path = require('path');
+var forms = require('./forms.js');
 var users = require('./users.js');
 var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');

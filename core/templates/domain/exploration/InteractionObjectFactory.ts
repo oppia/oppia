@@ -21,14 +21,6 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AnswerGroup, AnswerGroupBackendDict, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { HintBackendDict, Hint, HintObjectFactory } from
-  'domain/exploration/HintObjectFactory';
-import { OutcomeBackendDict, Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { SolutionBackendDict, Solution, SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import {
   AlgebraicExpressionInputCustomizationArgs,
@@ -62,6 +54,14 @@ import {
   TextInputCustomizationArgs,
   TextInputCustomizationArgsBackendDict
 } from 'interactions/customization-args-defs';
+import { AnswerGroup, AnswerGroupBackendDict, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { HintBackendDict, Hint, HintObjectFactory } from
+  'domain/exploration/HintObjectFactory';
+import { OutcomeBackendDict, Outcome, OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { SolutionBackendDict, Solution, SolutionObjectFactory } from
+  'domain/exploration/SolutionObjectFactory';
 import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';

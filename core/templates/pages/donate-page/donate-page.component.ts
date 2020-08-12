@@ -20,11 +20,11 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { SiteAnalyticsService } from 'services/site-analytics.service.ts';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
 
 require('base-components/base-content.directive.ts');
 

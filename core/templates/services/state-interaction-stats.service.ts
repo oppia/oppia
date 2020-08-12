@@ -21,14 +21,14 @@ import { Injectable } from '@angular/core';
 
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
-import { FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
 import { InteractionAnswer, FractionAnswer, MultipleChoiceAnswer } from
   'interactions/answer-defs';
 import { MultipleChoiceInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
+import { FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateInteractionStatsBackendApiService } from
   'domain/exploration/state-interaction-stats-backend-api.service';

@@ -20,12 +20,12 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { ServicesConstants } from 'services/services.constants.ts';
 import {
   PlaythroughIssueBackendDict,
   PlaythroughIssue,
   PlaythroughIssueObjectFactory
 } from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 

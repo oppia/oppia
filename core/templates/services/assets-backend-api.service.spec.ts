@@ -18,17 +18,17 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // AssetsBackendApiService.ts is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+import $ from 'jquery';
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 // Jquery is needed in this file because some tests will spyOn Jquery methods.
 // The spies won't actually spy Jquery methods without the import.
-import $ from 'jquery';
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/assets-backend-api.service.ts');

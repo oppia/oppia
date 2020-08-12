@@ -17,15 +17,15 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { PlayerPositionService } from '../services/player-position.service';
-import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
-import { SuggestionModalService } from 'services/suggestion-modal.service';
+import { PlayerPositionService } from '../services/player-position.service';
+import { PlayerTranscriptService } from '../services/player-transcript.service';
 
 describe('Exploration Player Suggestion Modal Controller', function() {
   var $scope = null;

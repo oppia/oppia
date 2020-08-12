@@ -16,9 +16,15 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
+import { EditabilityService } from 'services/editability.service';
+import { VersionTreeService } from
+  'pages/exploration-editor-page/history-tab/services/version-tree.service';
+import { TestBed } from '@angular/core/testing';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { EditabilityService } from 'services/editability.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -35,20 +41,14 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VersionTreeService } from
-  'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { TestBed } from '@angular/core/testing';
-import { ExplorationDiffService } from '../services/exploration-diff.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import { ExplorationDiffService } from '../services/exploration-diff.service';
 
 describe('History tab component', function() {
   var ctrl = null;

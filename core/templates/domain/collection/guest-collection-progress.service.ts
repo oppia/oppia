@@ -28,11 +28,11 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { Collection } from
   'domain/collection/CollectionObjectFactory';
 import { GuestCollectionProgress, GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'

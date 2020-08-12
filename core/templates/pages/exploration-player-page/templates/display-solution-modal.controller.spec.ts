@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { Subscription } from 'rxjs';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
@@ -24,7 +25,6 @@ import { RecordedVoiceoversObjectFactory } from
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 
-import { Subscription } from 'rxjs';
 
 describe('Display Solution Modal Controller', function() {
   var $rootScope = null;

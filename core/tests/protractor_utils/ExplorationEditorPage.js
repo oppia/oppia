@@ -16,7 +16,6 @@
  * @fileoverview Page object for the exploration editor, for use in Protractor
  * tests.
  */
-var waitFor = require('./waitFor.js');
 var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
 var ExplorationEditorHistoryTab = require(
@@ -31,6 +30,7 @@ var ExplorationEditorTranslationTab = require(
   '../protractor_utils/ExplorationEditorTranslationTab.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
+var waitFor = require('./waitFor.js');
 
 var ExplorationEditorPage = function() {
   /*

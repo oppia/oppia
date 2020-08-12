@@ -20,6 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { UpgradedServices } from 'services/UpgradedServices';
 import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { ShortSkillSummaryObjectFactory } from
@@ -27,7 +28,6 @@ import { ShortSkillSummaryObjectFactory } from
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Topic viewer backend API service', () => {
   let topicViewerBackendApiService:

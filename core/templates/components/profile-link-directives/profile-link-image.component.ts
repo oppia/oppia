@@ -18,10 +18,10 @@
 
 import { Component, OnInit, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { ProfileLinkImageBackendApiService } from
   'components/profile-link-directives/profile-link-image-backend-api.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 interface ProfileDict {
   'profile_picture_data_url_for_username': string;

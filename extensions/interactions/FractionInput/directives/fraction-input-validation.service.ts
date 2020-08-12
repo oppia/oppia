@@ -20,11 +20,11 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { FractionAnswer } from 'interactions/answer-defs';
-import { Fraction, FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { AppConstants } from 'app.constants';
+import { Fraction, FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory';
 
 @Injectable({
   providedIn: 'root'

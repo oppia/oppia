@@ -18,8 +18,6 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AppService } from 'services/app.service';
@@ -28,12 +26,14 @@ import { CamelCaseToHyphensPipe } from
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 describe('Answer Classification Service', () => {

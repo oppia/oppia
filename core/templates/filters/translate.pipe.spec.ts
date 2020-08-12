@@ -21,8 +21,8 @@ import { async, TestBed, ComponentFixture, fakeAsync }
 import { EventEmitter, ChangeDetectorRef, Component } from '@angular/core';
 
 import { TranslateService } from 'services/translate.service';
-import { TranslatePipe } from './translate.pipe';
 import { UtilsService } from 'services/utils.service';
+import { TranslatePipe } from './translate.pipe';
 
 
 class MockChangeDetectorRef {

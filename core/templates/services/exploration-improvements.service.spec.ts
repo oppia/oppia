@@ -15,6 +15,20 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { ContextService } from 'services/context.service';
+import {
+  ExplorationImprovementsBackendApiService, ExplorationImprovementsResponse
+} from 'services/exploration-improvements-backend-api.service';
+import { ExplorationImprovementsTaskRegistryService } from
+  'services/exploration-improvements-task-registry.service';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { PlaythroughIssuesBackendApiService } from
+  'services/playthrough-issues-backend-api.service';
+import { StateTopAnswersStatsService } from
+  'services/state-top-answers-stats.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { StateObjectsBackendDict } from
   'domain/exploration/StatesObjectFactory';
@@ -29,22 +43,8 @@ import { ExplorationStats } from
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { ContextService } from 'services/context.service';
-import {
-  ExplorationImprovementsBackendApiService, ExplorationImprovementsResponse
-} from 'services/exploration-improvements-backend-api.service';
-import { ExplorationImprovementsTaskRegistryService } from
-  'services/exploration-improvements-task-registry.service';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { PlaythroughIssuesBackendApiService } from
-  'services/playthrough-issues-backend-api.service';
-import { StateTopAnswersStatsService } from
-  'services/state-top-answers-stats.service';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
 
 /**
  * @fileoverview Tests for ExplorationImprovementsService.

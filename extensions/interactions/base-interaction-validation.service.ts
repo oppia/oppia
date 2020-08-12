@@ -19,12 +19,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AppConstants } from 'app.constants';
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
 
 export interface Warning {
   type: string;

@@ -18,14 +18,14 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
+import { TestBed } from '@angular/core/testing';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { TestBed } from '@angular/core/testing';
 
 describe('FractionInputValidationService', () => {
   var validatorService, WARNING_TYPES;

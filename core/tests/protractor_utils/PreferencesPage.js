@@ -17,10 +17,10 @@
  * tests.
  */
 
-var action = require('../protractor_utils/action.js');
-var waitFor = require('./waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
 var path = require('path');
+var action = require('../protractor_utils/action.js');
+var workflow = require('../protractor_utils/workflow.js');
+var waitFor = require('./waitFor.js');
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';

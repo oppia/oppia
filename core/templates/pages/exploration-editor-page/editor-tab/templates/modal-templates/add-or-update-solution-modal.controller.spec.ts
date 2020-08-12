@@ -24,14 +24,14 @@ import { StateSolutionService } from
   'components/state-editor/state-editor-properties-services/state-solution.service';
 import { CurrentInteractionService } from
   'pages/exploration-player-page/services/current-interaction.service';
-import { SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
 import { StateCustomizationArgsService }
   // eslint-disable-next-line max-len
   from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService }
   // eslint-disable-next-line max-len
   from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { SolutionObjectFactory } from
+  'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 

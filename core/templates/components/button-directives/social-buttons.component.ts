@@ -18,10 +18,10 @@
 
 import { Component, OnInit } from '@angular/core';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'social-buttons',

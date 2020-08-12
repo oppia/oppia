@@ -18,9 +18,9 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AlertsService } from 'services/alerts.service';
+import { UrlService } from 'services/contextual/url.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
 
 const Constants = require('constants.ts');
 

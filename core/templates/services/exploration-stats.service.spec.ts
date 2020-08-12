@@ -21,9 +21,9 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationStatsObjectFactory } from
   'domain/statistics/ExplorationStatsObjectFactory';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
 
 describe('Exploration stats service', function() {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;

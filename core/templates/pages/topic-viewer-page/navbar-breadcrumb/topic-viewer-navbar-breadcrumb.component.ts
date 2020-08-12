@@ -19,11 +19,11 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { UrlService } from 'services/contextual/url.service';
 import { ReadOnlyTopic } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'topic-viewer-navbar-breadcrumb',

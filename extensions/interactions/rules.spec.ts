@@ -21,8 +21,6 @@
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { NumericInputRulesService } from
@@ -46,8 +44,6 @@ import { MathEquationInputRulesService } from
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
-import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory.ts';
 import { NumericExpressionInputRulesService } from
   'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { FractionInputRulesService } from
@@ -56,6 +52,10 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { ImageClickAnswer, MathExpressionAnswer } from './answer-defs';
 import { ImageClickRuleInputs, MathExpressionRuleInputs } from './rule-input-defs';
 /* eslint-enable max-len */

@@ -17,10 +17,10 @@
  * use in Protractor tests.
  */
 
+var path = require('path');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
-var path = require('path');
 
 var ExplorationEditorTranslationTab = function() {
   var dismissWelcomeModalButton = element(

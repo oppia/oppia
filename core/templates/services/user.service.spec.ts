@@ -18,8 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // UserService.ts is upgraded to Angular 8.
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/utilities/url-interpolation.service.ts');

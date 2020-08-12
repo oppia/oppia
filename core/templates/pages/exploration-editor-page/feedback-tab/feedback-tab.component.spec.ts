@@ -17,12 +17,12 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { AlertsService } from 'services/alerts.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
-import { DateTimeFormatService } from 'services/date-time-format.service';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;

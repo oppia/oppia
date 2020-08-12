@@ -16,10 +16,10 @@
  * @fileoverview Page object for the contributor dashboard, for use in
  * Protractor tests.
  */
-var waitFor = require('./waitFor.js');
-
 var ContributorDashboardTranslateTextTab = require(
   '../protractor_utils/ContributorDashboardTranslateTextTab.js');
+var waitFor = require('./waitFor.js');
+
 var ContributorDashboardPage = function() {
   var navigateToTranslateTextTabButton = element(
     by.css('.protractor-test-translateTextTab'));

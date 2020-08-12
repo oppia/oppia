@@ -22,6 +22,7 @@ import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
+import { ServicesConstants } from 'services/services.constants';
 import {
   CyclicStateTransitionsCustomizationArgs,
   EarlyQuitCustomizationArgs,
@@ -33,7 +34,6 @@ import { Playthrough, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
-import { ServicesConstants } from 'services/services.constants';
 import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 

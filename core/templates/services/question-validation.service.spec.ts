@@ -19,12 +19,12 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-misconception-editor.component.ts is upgraded to Angular 8.
 /* eslint-disable max-len */
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { MisconceptionObjectFactory } from
+  'domain/skill/MisconceptionObjectFactory';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 

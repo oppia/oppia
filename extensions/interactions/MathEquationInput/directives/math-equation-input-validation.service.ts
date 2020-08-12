@@ -21,17 +21,17 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { MathEquationInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
-import { MathEquationInputRulesService } from
-  './math-equation-input-rules.service';
+import { AppConstants } from 'app.constants';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-import { AppConstants } from 'app.constants';
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { MathEquationInputRulesService } from
+  './math-equation-input-rules.service';
 
 @Injectable({
   providedIn: 'root'

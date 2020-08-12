@@ -18,9 +18,9 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // parameterize-rule-description.filter.ts is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('filters/parameterize-rule-description.filter.ts');

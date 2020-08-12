@@ -21,6 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { LoggerService } from 'services/contextual/logger.service';
+import { SuggestionsService } from
+  'services/suggestions.service';
 import {
   CollectionSummary,
   CollectionSummaryBackendDict,
@@ -60,9 +63,6 @@ import {
   TopicSummaryBackendDict,
   TopicSummaryObjectFactory
 } from 'domain/topic/TopicSummaryObjectFactory';
-import { LoggerService } from 'services/contextual/logger.service';
-import { SuggestionsService } from
-  'services/suggestions.service';
 
 interface CreatorDashboardDataBackendDict {
   'dashboard_stats': CreatorDashboardStatsBackendDict;

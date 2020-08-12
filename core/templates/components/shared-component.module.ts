@@ -22,6 +22,15 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { TranslatePipe } from 'filters/translate.pipe';
+import { SafePipe } from 'filters/safe-pipe';
+import { SocialButtonsComponent } from
+  'components/button-directives/social-buttons.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { ProfileLinkImageComponent } from
+  'components/profile-link-directives/profile-link-image.component';
+import { ProfileLinkTextComponent } from
+  'components/profile-link-directives/profile-link-text.component';
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from
@@ -31,8 +40,6 @@ import { LazyLoadingComponent } from
 import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
-import { TranslatePipe } from 'filters/translate.pipe';
-import { SafePipe } from 'filters/safe-pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
 import { ExplorationEmbedButtonModalComponent } from
@@ -43,15 +50,8 @@ import { StorySummaryTileDirective } from
   './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
-import { SocialButtonsComponent } from
-  'components/button-directives/social-buttons.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
-import { ProfileLinkImageComponent } from
-  'components/profile-link-directives/profile-link-image.component';
-import { ProfileLinkTextComponent } from
-  'components/profile-link-directives/profile-link-text.component';
 
 
 @NgModule({

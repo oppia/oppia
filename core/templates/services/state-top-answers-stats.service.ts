@@ -20,15 +20,15 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AnswerStats } from
-  'domain/exploration/AnswerStatsObjectFactory';
-import { States } from 'domain/exploration/StatesObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
+import { States } from 'domain/exploration/StatesObjectFactory';
+import { AnswerStats } from
+  'domain/exploration/AnswerStatsObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 
 export class AnswerStatsEntry {

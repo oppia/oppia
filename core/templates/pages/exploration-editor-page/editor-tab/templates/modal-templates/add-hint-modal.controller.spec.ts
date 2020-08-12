@@ -17,11 +17,11 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 
 describe('Add Hint Modal Controller', function() {
   var $scope = null;

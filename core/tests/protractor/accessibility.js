@@ -17,6 +17,7 @@
  * and check for any console errors
  */
 
+const { browser } = require('protractor');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var users = require('../protractor_utils/users.js');
@@ -32,7 +33,6 @@ var ExplorationPlayerPage = require(
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-const { browser } = require('protractor');
 
 var backButton = element(by.css('#backButtonId'));
 var categoryBar = element(by.css(

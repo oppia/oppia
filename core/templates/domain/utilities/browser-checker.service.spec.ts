@@ -17,9 +17,9 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Browser Checker Service', function() {
   let bcs, wrs;

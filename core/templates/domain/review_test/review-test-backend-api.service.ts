@@ -21,13 +21,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { UrlService } from 'services/contextual/url.service';
 import { ReviewTestDomainConstants } from
   'domain/review_test/review-test-domain.constants';
 import { ReviewTestBackendDict, ReviewTest, ReviewTestObjectFactory } from
   'domain/review_test/review-test-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
 
 @Injectable({
   providedIn: 'root'

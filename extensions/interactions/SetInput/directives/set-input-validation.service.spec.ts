@@ -18,20 +18,20 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { SetInputValidationService } from
   'interactions/SetInput/directives/set-input-validation.service';
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { AppConstants } from 'app.constants';
+import { SetInputCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
-import { AppConstants } from 'app.constants';
-import { SetInputCustomizationArgs } from
-  'interactions/customization-args-defs';
 
 describe('SetInputValidationService', () => {
   let validatorService: SetInputValidationService;

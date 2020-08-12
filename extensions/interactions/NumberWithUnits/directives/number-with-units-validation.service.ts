@@ -22,16 +22,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { unit } from 'mathjs';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service.ts';
+import { NumberWithUnitsCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { NumberWithUnitsCustomizationArgs } from
-  'interactions/customization-args-defs';
 
 @Injectable({
   providedIn: 'root'

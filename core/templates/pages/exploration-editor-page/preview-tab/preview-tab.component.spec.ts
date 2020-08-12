@@ -17,12 +17,12 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
 import { EventEmitter } from '@angular/core';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory';
 
 describe('Preview Tab Component', function() {
   var ctrl = null;

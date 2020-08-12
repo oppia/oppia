@@ -18,6 +18,9 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // story-editor-state.service.ts is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+import { TranslatorProviderForTests } from 'tests/test.extras';
+import { Subscription } from 'rxjs';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { StoryContentsObjectFactory } from
@@ -25,11 +28,8 @@ import { StoryContentsObjectFactory } from
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
-import { Subscription } from 'rxjs';
 
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');

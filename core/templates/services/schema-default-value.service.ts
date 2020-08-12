@@ -20,12 +20,12 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { LoggerService } from 'services/contextual/logger.service';
+import { SchemaConstants } from
+  'components/forms/schema-based-editors/schema-constants';
 import { SubtitledHtmlObjectFactory, SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SchemaConstants } from
-  'components/forms/schema-based-editors/schema-constants';
 
 
 interface BoolSchema {

@@ -23,9 +23,9 @@ import { Injectable } from '@angular/core';
 
 import { ProfilePageDomainConstants } from
   'pages/profile-page/profile-page-domain.constants';
+import { UrlService } from 'services/contextual/url.service.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service.ts';
 import { UserProfile, UserProfileBackendDict, UserProfileObjectFactory } from
   'domain/user/user-profile-object.factory';
 

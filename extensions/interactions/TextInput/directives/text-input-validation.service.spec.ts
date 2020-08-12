@@ -18,16 +18,16 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { TextInputValidationService } from
+  'interactions/TextInput/directives/text-input-validation.service';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { TextInputValidationService } from
-  'interactions/TextInput/directives/text-input-validation.service';
 
 describe('TextInputValidationService', () => {
   var validatorService, WARNING_TYPES;

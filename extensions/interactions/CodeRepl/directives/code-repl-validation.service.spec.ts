@@ -18,17 +18,17 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { CodeReplValidationService } from
   'interactions/CodeRepl/directives/code-repl-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { CodeReplCustomizationArgs } from
   'interactions/customization-args-defs';
+import { Outcome, OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
 
 describe('CodeReplValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;

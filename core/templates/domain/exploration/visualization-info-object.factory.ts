@@ -19,10 +19,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AnswerStats } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { InteractionAnswer } from
   'interactions/answer-defs';
+import { AnswerStats } from
+  'domain/exploration/AnswerStatsObjectFactory';
 
 export interface AnswerStatsBackendDict {
   'answer': InteractionAnswer;

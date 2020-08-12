@@ -19,6 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { UrlService } from 'services/contextual/url.service';
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants.ts';
 import { ReadOnlySubtopicPageData } from
@@ -27,7 +28,6 @@ import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'subtopic-viewer-navbar-breadcrumb',

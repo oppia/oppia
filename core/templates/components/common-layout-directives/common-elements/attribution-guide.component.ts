@@ -19,9 +19,9 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { UrlService } from 'services/contextual/url.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
-import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'attribution-guide',

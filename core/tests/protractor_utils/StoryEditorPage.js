@@ -18,10 +18,10 @@
  */
 
 var action = require('../protractor_utils/action.js');
+var workflow = require('../protractor_utils/workflow.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
 
 var StoryEditorPage = function() {
   var EDITOR_URL_PREFIX = '/story_editor/';

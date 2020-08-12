@@ -22,12 +22,6 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { StateClassifierMappingService } from
@@ -46,6 +40,12 @@ import { StateTopAnswersStatsBackendApiService } from
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 

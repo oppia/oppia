@@ -19,8 +19,8 @@
 import { ComponentFixture, TestBed, async } from
   '@angular/core/testing';
 
-import { ProfilePageNavbarComponent } from './profile-page-navbar.component';
 import { UrlService } from 'services/contextual/url.service';
+import { ProfilePageNavbarComponent } from './profile-page-navbar.component';
 
 class MockUrlService {
   getUsernameFromProfileUrl() {

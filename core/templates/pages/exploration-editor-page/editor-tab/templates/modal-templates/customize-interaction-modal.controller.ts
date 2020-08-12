@@ -16,13 +16,13 @@
  * @fileoverview Controller for customize interaction modal.
  */
 
+import { Schema } from 'services/schema-default-value.service';
+import { SchemaConstants } from
+  'components/forms/schema-based-editors/schema-constants';
 import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { Schema } from 'services/schema-default-value.service';
-import { SchemaConstants } from
-  'components/forms/schema-based-editors/schema-constants';
 
 require(
   'components/common-layout-directives/common-elements/' +

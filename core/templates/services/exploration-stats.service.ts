@@ -19,10 +19,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
+import { ExplorationStats } from
+  'domain/statistics/ExplorationStatsObjectFactory';
 
 @Injectable({
   providedIn: 'root'

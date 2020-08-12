@@ -25,11 +25,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
+import { InteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { BindableVoiceovers, RecordedVoiceovers } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { InteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 

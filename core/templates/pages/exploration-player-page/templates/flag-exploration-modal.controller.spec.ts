@@ -17,9 +17,9 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { PlayerPositionService } from '../services/player-position.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { IdGenerationService } from 'services/id-generation.service';
+import { PlayerPositionService } from '../services/player-position.service';
 
 describe('Flag Exploration Modal Controller', function() {
   var $scope = null;

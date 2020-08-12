@@ -20,9 +20,9 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { UrlService } from 'services/contextual/url.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'collection-footer',

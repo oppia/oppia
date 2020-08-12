@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for LostChangesModalController.
  */
 
-import { LostChangeObjectFactory } from
-  'domain/exploration/LostChangeObjectFactory';
 import { TestBed } from '@angular/core/testing';
 import { UtilsService } from 'services/utils.service';
+import { LostChangeObjectFactory } from
+  'domain/exploration/LostChangeObjectFactory';
 
 describe('Lost Changes Modal Controller', () => {
   let $scope = null;

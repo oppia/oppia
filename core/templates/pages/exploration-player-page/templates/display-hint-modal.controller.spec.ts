@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { Subscription } from 'rxjs';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
@@ -26,7 +27,6 @@ import { StateCardObjectFactory } from
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
-import { Subscription } from 'rxjs';
 
 describe('Display Hint Modal Controller', function() {
   var $rootScope = null;
