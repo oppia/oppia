@@ -30,7 +30,7 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-
+from scripts import common
 
 class GcloudAdapterImportTests(test_utils.GenericTestBase):
     """Tests import of gcloud adapter."""
@@ -39,10 +39,8 @@ class GcloudAdapterImportTests(test_utils.GenericTestBase):
         def mock_exists(unused_path):
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-        gae_dir = os.path.join(
-            os.path.abspath(os.getcwd()), '..', 'oppia_tools',
-            'google-cloud-sdk-304.0.0', 'google-cloud-sdk', 'platform',
-            'google_appengine')
+        gae_dir = os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME)
+        print(gae_dir)
         with exists_swap, self.assertRaisesRegexp(
             Exception, 'Directory %s does not exist.' % gae_dir):
             from scripts.release_scripts import gcloud_adapter # pylint: disable=unused-variable
