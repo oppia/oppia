@@ -35,7 +35,7 @@ var customizeInteraction = async function(
   await objects.IntEditor(
     elem.all(by.repeater(
       'customizationArgSpec in customizationArgSpecs track by $index'))
-      .filter(async function(elem, index) {
+      .filter(async function(elem) {
         var text = await elem.getText();
         return text === 'Maximum number of selections permitted';
       }).first()

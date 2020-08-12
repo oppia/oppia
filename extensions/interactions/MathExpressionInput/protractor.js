@@ -22,7 +22,7 @@ var mathExpressionInputTag = function(parentElement) {
     'oppia-interactive-math-expression-input'));
 };
 
-var customizeInteraction = function(elem) {
+var customizeInteraction = function() {
   // There is no customization option.
 };
 
