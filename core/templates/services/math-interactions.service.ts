@@ -85,8 +85,8 @@ export class MathInteractionsService {
   }
 
   validateExpression(
-      expressionString: string, algebraic = true,
-      validVariablesList = []): boolean {
+      expressionString: string, validVariablesList: Array<string>,
+      algebraic = true): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     let expressionObject;
     if (expressionString.length === 0) {
@@ -122,7 +122,8 @@ export class MathInteractionsService {
         'numbers. Make sure to include the necessary variables' +
         ' mentioned in the question.';
         return false;
-      } else if (validVariablesList.length !== 0) {
+      } else if (validVariablesList !== undefined &&
+        validVariablesList.length !== 0) {
         for (let variable of variablesList) {
           if (validVariablesList.indexOf(variable) === -1) {
             this.warningText = (
@@ -149,7 +150,8 @@ export class MathInteractionsService {
     return true;
   }
 
-  validateEquation(equationString: string, validVariablesList = []): boolean {
+  validateEquation(equationString: string,
+    validVariablesList: Array<string>): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -173,11 +175,11 @@ export class MathInteractionsService {
     let splitString = equationString.split('=');
     let lhsString = splitString[0], rhsString = splitString[1];
     let lhsIsAlgebraicallyValid = this.validateExpression(
-      lhsString, true, validVariablesList);
+      lhsString, validVariablesList);
     let rhsIsAlgebraicallyValid = this.validateExpression(
-      rhsString, true, validVariablesList);
-    let lhsIsNumericallyValid = this.validateExpression(lhsString, false);
-    let rhsIsNumericallyValid = this.validateExpression(rhsString, false);
+      rhsString, validVariablesList);
+    let lhsIsNumericallyValid = this.validateExpression(lhsString, [], false);
+    let rhsIsNumericallyValid = this.validateExpression(rhsString, [], false);
 
     // At least one side must be algebraic. Purely numeric equations are
     // considered as invalid.
@@ -193,9 +195,9 @@ export class MathInteractionsService {
     }
     // Neither side is algebraically valid. Calling validation functions again
     // to appropriately update the warningText.
-    this.validateExpression(lhsString, true, validVariablesList);
+    this.validateExpression(lhsString, validVariablesList);
     if (this.getWarningText().length === 0) {
-      this.validateExpression(rhsString, true, validVariablesList);
+      this.validateExpression(rhsString, validVariablesList);
     }
     return false;
   }

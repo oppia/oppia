@@ -56,7 +56,7 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
             ctrl.value);
           let answerIsValid = MathInteractionsService.validateExpression(
-            ctrl.value, false);
+            ctrl.value, [], false);
           if (answerIsValid) {
             // Explicitly inserting '*' signs wherever necessary.
             ctrl.value = MathInteractionsService.insertMultiplicationSigns(
