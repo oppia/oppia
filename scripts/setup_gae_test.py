@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import tarfile
-import zipfile
 
 from core.tests import test_utils
 

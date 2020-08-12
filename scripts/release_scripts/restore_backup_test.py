@@ -26,6 +26,7 @@ import python_utils
 from scripts import common
 from scripts.release_scripts import restore_backup
 
+
 class RestoreBackupTests(test_utils.GenericTestBase):
     """Test the methods for restoring backup."""
 
