@@ -71,7 +71,7 @@ export class WrittenTranslation {
 
   setHtml(html: string): void {
     if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
-      throw new Error('This translation is not of type html');
+      throw new Error('This translation is not of data format html');
     }
     this.translation = html;
   }

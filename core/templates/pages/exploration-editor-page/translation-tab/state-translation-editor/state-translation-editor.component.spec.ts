@@ -309,7 +309,7 @@ describe('State Translation Editor Component', function() {
 
     it('should init editor when changing active content id language',
       function() {
-        $rootScope.$broadcast('activeContentIdChanged');
+        $rootScope.$broadcast('activeContentIdChanged', 'html');
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
           writtenTranslationObjectFactory.createFromBackendDict({
