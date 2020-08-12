@@ -6407,10 +6407,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -6975,10 +6975,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7131,10 +7131,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7310,10 +7310,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7478,10 +7478,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7668,10 +7668,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -7964,10 +7964,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -8241,10 +8241,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -8897,11 +8897,11 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: 0
           - x: 1
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       - outcome:
@@ -8913,10 +8913,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: 0
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -8993,13 +8993,13 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x:
             - <p>This is value1 for ItemSelectionInput</p>
           - x:
             - <p>This is value3 for ItemSelectionInput</p>
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -9329,10 +9329,10 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
+        rule_input_translations: {}
         rule_types_to_inputs:
           Equals:
           - x: InputString
-        rule_input_translations: {}
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
