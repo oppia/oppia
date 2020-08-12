@@ -619,7 +619,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.author_id, self.change, 'test description')
         # Reject the suggestion.
         suggestion_services.reject_suggestion(
-                self.suggestion_id, self.reviewer_id, 'reject review message')
+            self.suggestion_id, self.reviewer_id, 'reject review message')
         # Verify that the suggestion has been rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_REJECTED)
@@ -656,7 +656,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Resubmit rejected suggestion.
         suggestion_services.resubmit_rejected_suggestion(
             self.suggestion_id, 'resubmit summary message', self.author_id)
-    
+
         # Suggestion status should now be in review instead of rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
@@ -680,7 +680,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Summary message cannot be empty.'):
             suggestion_services.resubmit_rejected_suggestion(
                 self.suggestion_id, '', self.author_id)
-    
+
     def test_resubmit_rejected_suggestion_raises_exception_for_unhandled_input(
             self):
         with self.swap(
@@ -694,7 +694,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
-    
+
         # Can't resubmit a rejected suggestion if the suggestion hasn't been
         # rejected yet.
         expected_exception_regexp = (

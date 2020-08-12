@@ -159,8 +159,8 @@ def get_suggestions_by_ids(suggestion_ids):
     )
 
     return [
-        get_suggestion_from_model(suggestion_model) if suggestion_model else None
-        for suggestion_model in general_suggestion_models
+        get_suggestion_from_model(suggestion_model) if suggestion_model
+        else None for suggestion_model in general_suggestion_models
     ]
 
 
@@ -176,9 +176,11 @@ def query_suggestions(query_fields_and_values):
         list(Suggestion). A list of suggestions that match the given query
         values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
     """
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel.query_suggestions(
-                query_fields_and_values)]
+    return [
+        get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel.query_suggestions(
+            query_fields_and_values)
+    ]
 
 
 def get_translation_suggestions_with_exp_ids(exp_ids):
@@ -212,9 +214,11 @@ def get_all_stale_suggestions():
         list(Suggestion). A list of suggestions linked to the entity.
     """
 
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_all_stale_suggestions()]
+    return [
+        get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_all_stale_suggestions()
+    ]
 
 
 def _update_suggestion(suggestion):
@@ -274,7 +278,8 @@ def get_commit_message_for_suggestion(author_username, commit_message):
         author_username, commit_message)
 
 
-def accept_suggestion(suggestion_id, reviewer_id, commit_message, review_message):
+def accept_suggestion(
+        suggestion_id, reviewer_id, commit_message, review_message):
     """Accepts the suggestion with the given suggestion_id after validating it.
 
     Args:
@@ -459,12 +464,9 @@ def resubmit_rejected_suggestion(suggestion_id, summary_message, author_id):
             'Only rejected suggestions can be resubmitted.' % (suggestion_id)
         )
 
-    suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
-        suggestion_id)
-    suggestion_model.status = suggestion_models.STATUS_IN_REVIEW
-    suggestion_model.put()
+    suggestion.set_suggestion_status_to_in_review()
+    _update_suggestion(suggestion)
 
-    #thread_id = suggestion.suggestion_id
     feedback_services.create_message(
         suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
         None, summary_message)

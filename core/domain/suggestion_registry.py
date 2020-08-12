@@ -60,6 +60,10 @@ class BaseSuggestion(python_utils.OBJECT):
 
     def __init__(self):
         """Initializes a Suggestion object."""
+        # These fields are initialized to suppress the 'attributes defined
+        # outside __init__' warning that's raised because of the setters below.
+        self.status = None
+        self.final_reviewer_id = None
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement __init__.')
 
@@ -115,18 +119,22 @@ class BaseSuggestion(python_utils.OBJECT):
             suggestion_models.SCORE_CATEGORY_DELIMITER)[1]
 
     def set_suggestion_status_to_accepted(self):
-        """Sets the status of the suggestion to be accepted."""
+        """Sets the status of the suggestion to accepted."""
         self.status = suggestion_models.STATUS_ACCEPTED
 
+    def set_suggestion_status_to_in_review(self):
+        """Sets the status of the suggestion to in review."""
+        self.status = suggestion_models.STATUS_IN_REVIEW
+
     def set_suggestion_status_to_rejected(self):
-        """Sets the status of the suggestion to be rejected."""
+        """Sets the status of the suggestion to rejected."""
         self.status = suggestion_models.STATUS_REJECTED
 
     def set_final_reviewer_id(self, reviewer_id):
         """Sets the final reviewer id of the suggestion to be reviewer_id.
 
         Args:
-        reviewer_id: str. The ID of the user who completed the review.
+            reviewer_id: str. The ID of the user who completed the review.
         """
         self.final_reviewer_id = reviewer_id
 
