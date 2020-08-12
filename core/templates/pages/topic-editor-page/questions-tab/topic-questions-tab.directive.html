@@ -1,4 +1,4 @@
-<md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown && !activeQuestion">
+<md-card class="oppia-page-card oppia-long-text select-skill-card" ng-if="!questionEditorIsShown && !activeQuestion">
   <div class="questions">
     <h3 class="form-heading"> Questions included in this topic linked to selected skill </h3>
     <select class="form-control select-skill-dropdown protractor-test-select-skill-dropdown"
@@ -9,23 +9,23 @@
             style="width: 300px; margin-bottom: 10px;">
       <option value="" hidden selected> Select Skill </option>
     </select>
-    <questions-list skill-descriptions-are-shown="true"
-                    select-skill-modal-is-shown="true"
-                    skill-ids="topic.getSkillIds()"
-                    selected-skill-id="selectedSkillId"
-                    get-question-summaries-async="getQuestionSummariesAsync"
-                    is-last-question-batch="isLastQuestionBatch"
-                    all-skill-summaries="allSkillSummaries"
-                    can-edit-question="canEditQuestion"
-                    skill-id-to-rubrics-object="skillIdToRubricsObject"
-                    question-suggestion-threads="questionSuggestionThreads"
-                    fetch-from-backend="true"
-                    get-grouped-skill-summaries="getGroupedSkillSummaries"
-                    get-skills-categorized-by-topics="getSkillsCategorizedByTopics"
-                    get-untriaged-skill-summaries="getUntriagedSkillSummaries">
-    </questions-list>
   </div>
 </md-card>
+<questions-list skill-descriptions-are-shown="true"
+                select-skill-modal-is-shown="true"
+                skill-ids="topic.getSkillIds()"
+                selected-skill-id="selectedSkillId"
+                get-question-summaries-async="getQuestionSummariesAsync"
+                is-last-question-batch="isLastQuestionBatch"
+                all-skill-summaries="allSkillSummaries"
+                can-edit-question="canEditQuestion"
+                skill-id-to-rubrics-object="skillIdToRubricsObject"
+                question-suggestion-threads="questionSuggestionThreads"
+                fetch-from-backend="true"
+                get-grouped-skill-summaries="getGroupedSkillSummaries"
+                get-skills-categorized-by-topics="getSkillsCategorizedByTopics"
+                get-untriaged-skill-summaries="getUntriagedSkillSummaries">
+</questions-list>
 
 <style>
   questions-tab .oppia-page-card {
@@ -47,5 +47,8 @@
     display: block;
     font-size: 16px;
     margin: 0;
+  }
+  questions-tab .select-skill-card {
+    margin-bottom: 0;
   }
 </style>
