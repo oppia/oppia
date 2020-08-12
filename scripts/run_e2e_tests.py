@@ -169,17 +169,17 @@ def cleanup():
     """Kill the running subprocesses and server fired in this program, set
     constants back to default values.
     """
-    google_app_engine_path = '%s/' % common.GOOGLE_CLOUD_SDK_BIN
+    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
     webdriver_download_path = '%s/selenium' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
         webdriver_download_path = os.path.abspath(webdriver_download_path)
     processes_to_kill = [
-        '.*%s.*' % re.escape(google_app_engine_path),
-        '.*%s.*' % re.escape(webdriver_download_path)
+        '.*%s.*' % re.escape(google_app_engine_path)
     ]
+    #'.*%s.*' % re.escape(webdriver_download_path)
     for p in SUBPROCESSES:
-        p.send_signal(signal.SIGINT)
+        p.kill()
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
@@ -422,7 +422,7 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=%s '
         '--log_level=%s --skip_sdk_update_check=true %s' % (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_CLOUD_SDK_BIN,
+            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
             GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH},
         shell=True)
@@ -550,16 +550,6 @@ def main(args=None):
 
     portserver_process = start_portserver()
     atexit.register(cleanup_portserver, portserver_process)
-    grpc_path = os.path.join(
-            common.GOOGLE_CLOUD_SDK_HOME, 'platform',
-            'google_appengine', 'lib', 'grpcio-1.20.0')
-    grpc_contents_path = os.path.join(
-            common.GOOGLE_CLOUD_SDK_HOME, 'platform',
-            'google_appengine', 'lib', 'grpcio-1.20.0', 'grpc')
-    subprocess.call(['ls', '-l', grpc_path])
-    subprocess.call(['ls', '-l', grpc_contents_path])
-    subprocess.call([
-        'chmod', '-R', '777', grpc_contents_path])
     start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
 
     common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
@@ -577,7 +567,6 @@ def main(args=None):
     p = subprocess.Popen(commands)
     p.communicate()
     sys.exit(p.returncode)
-
 
 if __name__ == '__main__':  # pragma: no cover
     main()

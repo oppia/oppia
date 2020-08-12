@@ -62,7 +62,9 @@ THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 GOOGLE_APP_ENGINE_HOME = os.path.join(
     OPPIA_TOOLS_DIR_ABS_PATH, 'google_appengine_1.9.67', 'google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
+GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
+    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
@@ -511,6 +513,7 @@ def kill_processes_based_on_regex(pattern):
     for process in psutil.process_iter():
         try:
             cmdline = ' '.join(process.cmdline())
+            # print(cmdline)
             if regex.match(cmdline) and process.is_running():
                 python_utils.PRINT('Killing %s ...' % cmdline)
                 process.kill()
