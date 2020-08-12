@@ -128,7 +128,8 @@ export class AnswerGroupObjectFactory {
     private ruleObjectFactory: RuleObjectFactory) {}
   /**
    * Creates a AnswerGroup object, with empty ruleTypesToInputs. The
-   * updateRuleTypesToInputs() should besubsequently used to populate the rules.
+   * updateRuleTypesToInputs() should be subsequently used to populate the
+   * rules.
    * @param outcome The AnswerGroup outcome.
    * @param trainingData The AnswerGroup training data.
    * @param taggedSkillMisconceptionId The AnswerGroup tagged skill
