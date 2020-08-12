@@ -347,8 +347,7 @@ angular.module('oppia').component('explorationEditorPage', {
               ChangeListService.getChangeList());
             return;
           }
-
-          $scope.$broadcast('refreshStatisticsTab');
+          RouterService.onRefreshStatisticsTab.emit();
           $scope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
           });
@@ -454,10 +453,11 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.$onInit = function() {
         $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
-        $scope.$on('refreshGraph', function() {
-          GraphDataService.recompute();
-          ExplorationWarningsService.updateWarnings();
-        });
+        ctrl.directiveSubscriptions.add(
+          ExplorationStatesService.onRefreshGraph.subscribe(() => {
+            GraphDataService.recompute();
+            ExplorationWarningsService.updateWarnings();
+          }));
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
