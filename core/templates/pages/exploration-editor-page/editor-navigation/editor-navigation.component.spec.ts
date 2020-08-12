@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for editorNavigation.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of, Subscription } from 'rxjs';
 import { WindowDimensionsService } from

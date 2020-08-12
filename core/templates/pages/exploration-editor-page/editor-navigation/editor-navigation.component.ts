@@ -26,8 +26,6 @@ require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-require('pages/exploration-editor-page/services/' +
-  'state-tutorial-first-time.service.ts');
 require('services/context.service.ts');
 require('services/exploration-improvements.service.ts');
 require('services/site-analytics.service.ts');
@@ -48,10 +46,9 @@ angular.module('oppia').component('editorNavigation', {
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationSaveService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
+    'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
     'UserExplorationPermissionsService', 'UserService',
-    'StateTutorialFirstTimeService',
-    'ThreadDataService', 'UrlInterpolationService', 'UserService',
     'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $timeout, $uibModal, ContextService,
@@ -60,7 +57,6 @@ angular.module('oppia').component('editorNavigation', {
         ExplorationSaveService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
         StateTutorialFirstTimeService,
-        ThreadDataService, UrlInterpolationService, UserService,
         ThreadDataService, UrlInterpolationService,
         UserExplorationPermissionsService, UserService,
         WindowDimensionsService) {
