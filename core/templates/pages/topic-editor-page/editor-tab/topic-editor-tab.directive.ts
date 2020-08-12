@@ -75,7 +75,6 @@ angular.module('oppia').directive('topicEditorTab', [
         'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
         'WindowDimensionsService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         function(
             $rootScope, $scope, $uibModal, AlertsService, ContextService,
             CsrfTokenService, EntityCreationService, ImageUploadHelperService,
@@ -84,8 +83,7 @@ angular.module('oppia').directive('topicEditorTab', [
             TopicsAndSkillsDashboardBackendApiService,
             TopicUpdateService, UndoRedoService, UrlInterpolationService,
             WindowDimensionsService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
-            MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+            MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -93,7 +91,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
-          var _initEditor = function() {
+          ctrl.initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.skillQuestionCountDict = (
               TopicEditorStateService.getSkillQuestionCountDict());
@@ -166,7 +164,7 @@ angular.module('oppia').directive('topicEditorTab', [
               controllerAs: '$ctrl',
               size: 'xl'
             }).result.then(function() {
-              _initEditor();
+              ctrl.initEditor();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -285,14 +283,14 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
             TopicUpdateService.removeUncategorizedSkill(
               $scope.topic, skillSummary);
-            _initEditor();
+            ctrl.initEditor();
           };
 
           $scope.removeSkillFromSubtopic = function(subtopicId, skillSummary) {
             $scope.selectedSkillEditOptionsIndex = {};
             TopicUpdateService.removeSkillFromSubtopic(
               $scope.topic, subtopicId, skillSummary);
-            _initEditor();
+            ctrl.initEditor();
           };
 
           $scope.removeSkillFromTopic = function(subtopicId, skillSummary) {
@@ -310,7 +308,7 @@ angular.module('oppia').directive('topicEditorTab', [
             TopicEditorStateService.deleteSubtopicPage(
               $scope.topic.getId(), subtopicId);
             TopicUpdateService.deleteSubtopic($scope.topic, subtopicId);
-            _initEditor();
+            ctrl.initEditor();
           };
 
           $scope.navigateToSubtopic = function(subtopicId, subtopicName) {
@@ -401,7 +399,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.rearrangeSubtopic(
               $scope.topic, $scope.fromIndex, toIndex);
-            _initEditor();
+            ctrl.initEditor();
           };
 
           $scope.showSkillEditOptions = function(subtopicIndex, skillIndex) {
@@ -426,9 +424,15 @@ angular.module('oppia').directive('topicEditorTab', [
               !WindowDimensionsService.isWindowNarrow());
             $scope.storiesListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicInitialized.subscribe(
+                () => ctrl.initEditor()
+              ));
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicReinitialized.subscribe(
+                () => ctrl.initEditor()
+              ));
             $scope.mainTopicCardIsShown = true;
-            $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-            $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
             ctrl.directiveSubscriptions.add(
               TopicsAndSkillsDashboardBackendApiService.
@@ -438,7 +442,7 @@ angular.module('oppia').directive('topicEditorTab', [
                   }
                 )
             );
-            _initEditor();
+            ctrl._initEditor();
             _initStorySummaries();
           };
           ctrl.$onDestroy = function() {

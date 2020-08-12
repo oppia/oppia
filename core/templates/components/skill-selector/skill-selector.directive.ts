@@ -46,6 +46,16 @@ angular.module('oppia').directive('selectSkill', [
             $scope.checkIfEmpty = function(skills) {
               return (skills.length === 0);
             };
+            $scope.checkIfTopicIsEmpty = function(topicName) {
+              for (let key in $scope.categorizedSkills[topicName]) {
+                if (
+                  Object.keys(
+                    $scope.categorizedSkills[topicName][key]).length) {
+                  return true;
+                }
+              }
+              return false;
+            };
             $scope.setSelectedSkillId = function() {
               $scope.selectedSkillId = $scope.selectedSkill;
             };
