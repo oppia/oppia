@@ -26,11 +26,15 @@ require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
+require('pages/exploration-editor-page/services/' +
+  'state-tutorial-first-time.service.ts');
 require('services/context.service.ts');
 require('services/exploration-improvements.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('editorNavigation', {
   template: require('./editor-navigation.component.html'),
@@ -38,14 +42,17 @@ angular.module('oppia').component('editorNavigation', {
     '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
+    'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService', 'UserService',
     'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $timeout, $uibModal, ContextService,
         ExplorationImprovementsService, ExplorationRightsService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
+        StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService, UserService,
         WindowDimensionsService) {
+      this.directiveSubscriptions = new Subscription();
       $scope.showUserHelpModal = () => {
         var explorationId = ContextService.getExplorationId();
         SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
@@ -60,9 +67,9 @@ angular.module('oppia').component('editorNavigation', {
           windowClass: 'oppia-help-modal'
         }).result.then(mode => {
           if (mode === EDITOR_TUTORIAL_MODE) {
-            $rootScope.$broadcast('openEditorTutorial');
+            StateTutorialFirstTimeService.onOpenEditorTutorial.emit();
           } else if (mode === TRANSLATION_TUTORIAL_MODE) {
-            $rootScope.$broadcast('openTranslationTutorial');
+            StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
           }
         }, () => {
           // Note to developers:
@@ -93,24 +100,30 @@ angular.module('oppia').component('editorNavigation', {
         $scope.ExplorationRightsService = ExplorationRightsService;
 
         this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
-        this.resizeSubscription = (
+        this.directiveSubscriptions.add(
           WindowDimensionsService.getResizeEvent().subscribe(evt => {
             this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
             $scope.$applyAsync();
-          }));
+          })
+        );
         $scope.isScreenLarge = () => this.screenIsLarge;
 
         this.postTutorialHelpPopoverIsShown = false;
-        $scope.$on('openPostTutorialHelpPopover', () => {
-          if (this.screenIsLarge) {
-            this.postTutorialHelpPopoverIsShown = true;
-            $timeout(() => {
-              this.postTutorialHelpPopoverIsShown = false;
-            }, 4000);
-          } else {
-            this.postTutorialHelpPopoverIsShown = false;
-          }
-        });
+        this.directiveSubscriptions.add(
+          StateTutorialFirstTimeService.onOpenPostTutorialHelpPopover.subscribe(
+            () => {
+              if (this.screenIsLarge) {
+                this.postTutorialHelpPopoverIsShown = true;
+                $timeout(() => {
+                  this.postTutorialHelpPopoverIsShown = false;
+                }, 4000);
+              } else {
+                this.postTutorialHelpPopoverIsShown = false;
+              }
+            }
+          )
+        );
+
         $scope.isPostTutorialHelpPopoverShown = (
           () => this.postTutorialHelpPopoverIsShown);
 
@@ -128,11 +141,8 @@ angular.module('oppia').component('editorNavigation', {
           });
         $scope.isUserLoggedIn = () => this.userIsLoggedIn;
       };
-
-      this.$onDestroy = () => {
-        if (this.resizeSubscription) {
-          this.resizeSubscription.unsubscribe();
-        }
+      this.$onDestroy = function() {
+        this.directiveSubscriptions.unsubscribe();
       };
     }
   ]

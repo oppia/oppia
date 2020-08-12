@@ -149,6 +149,8 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
@@ -190,6 +192,7 @@ angular.module('oppia').component('explorationEditorPage', {
         UserEmailPreferencesService, UserExplorationPermissionsService,
         EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
       var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
       var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
@@ -344,8 +347,7 @@ angular.module('oppia').component('explorationEditorPage', {
               ChangeListService.getChangeList());
             return;
           }
-
-          $scope.$broadcast('refreshStatisticsTab');
+          RouterService.onRefreshStatisticsTab.emit();
           $scope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
           });
@@ -451,16 +453,21 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.$onInit = function() {
         $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
-        $scope.$on('refreshGraph', function() {
-          GraphDataService.recompute();
-          ExplorationWarningsService.updateWarnings();
-        });
+        ctrl.directiveSubscriptions.add(
+          ExplorationStatesService.onRefreshGraph.subscribe(() => {
+            GraphDataService.recompute();
+            ExplorationWarningsService.updateWarnings();
+          }));
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
         $scope.$on(
           'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
-        $scope.$on('openEditorTutorial', ctrl.startTutorial);
+        ctrl.directiveSubscriptions.add(
+          StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
+            () => {
+              ctrl.startTutorial();
+            }));
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
 
@@ -623,6 +630,9 @@ angular.module('oppia').component('explorationEditorPage', {
         $templateCache.put(
           'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
         ctrl.tutorialInProgress = false;
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

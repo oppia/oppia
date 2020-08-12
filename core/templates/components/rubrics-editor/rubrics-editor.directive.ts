@@ -92,6 +92,9 @@ angular.module('oppia').directive('rubricsEditor', [
           ctrl.cancelEditExplanation = function(difficulty, index) {
             ctrl.editableExplanations[difficulty][index] = (
               explanationsMemento[difficulty][index]);
+            if (!ctrl.editableExplanations[difficulty][index]) {
+              ctrl.deleteExplanation(difficulty, index);
+            }
             ctrl.explanationEditorIsOpen[difficulty][index] = false;
           };
 
