@@ -469,7 +469,11 @@ angular.module('oppia').component('explorationEditorPage', {
         });
         $scope.$on(
           'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
-        $scope.$on('openEditorTutorial', ctrl.startTutorial);
+        ctrl.directiveSubscriptions.add(
+          StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
+            () => {
+              ctrl.startTutorial();
+            }));
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
 
