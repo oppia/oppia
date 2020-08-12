@@ -28,26 +28,44 @@ export class PageTitleService {
   pageSubtitleForMobile: string = null;
   constructor(private titleService: Title) {}
 
+  /**
+   * @param {string} title - Title of the page to be set to.
+   */
   setPageTitle(title: string) {
     this.titleService.setTitle(title);
   }
 
+  /**
+   * @return {string} The page's title.
+   */
   getPageTitle(): string {
     return this.titleService.getTitle();
   }
 
+  /**
+   * @param {string} title - Title of the page to be set to in mobile view.
+   */
   setPageTitleForMobileView(title: string): void {
     this.pageTitleForMobile = title;
   }
 
+  /**
+   * @param {string} subtitle - Subtitle of the page to set to in mobile view.
+   */
   setPageSubtitleForMobileView(subtitle: string): void {
     this.pageSubtitleForMobile = subtitle;
   }
 
+  /**
+   * @return {string} The page's title in mobile view.
+   */
   getPageTitleForMobileView(): string {
     return this.pageTitleForMobile;
   }
 
+  /**
+   * @return {string} The page's subtitle in mobile view.
+   */
   getPageSubtitleForMobileView(): string {
     return this.pageSubtitleForMobile;
   }
