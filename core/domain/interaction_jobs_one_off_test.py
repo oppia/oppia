@@ -110,7 +110,6 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
 
-
         customization_args_dict1 = {
             'choices': {'value': [{
                 'html': '<p>This is value1 for DragAndDropSortInput</p>',

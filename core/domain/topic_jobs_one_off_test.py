@@ -496,7 +496,6 @@ class SubTopicPageMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
 
-
     def setUp(self):
         super(SubTopicPageMathRteAuditOneOffJobTests, self).setUp()
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)

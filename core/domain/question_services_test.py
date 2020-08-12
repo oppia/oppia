@@ -170,7 +170,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.update_question_skill_link_difficulty(
                 self.question_id, 'skill_10', 0.9)
 
-
     def test_get_questions_by_skill_ids_without_fetch_by_difficulty(self):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
@@ -997,7 +996,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
-
 
         question = question_fetchers.get_question_from_model(question_model)
         self.assertEqual(

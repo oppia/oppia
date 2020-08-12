@@ -78,7 +78,6 @@ def main(args=None):
                     common.OPPIA_TOOLS_DIR, 'google_appengine_1.9.67/'))
         os.remove(GAE_DOWNLOAD_ZIP_PATH)
 
-
     python_utils.PRINT(
         'Checking whether google-cloud-sdk is installed in %s'
         % common.GOOGLE_CLOUD_SDK_HOME)

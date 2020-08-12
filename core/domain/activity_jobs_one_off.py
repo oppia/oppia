@@ -227,7 +227,6 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield ('FAILURE_INCORRECT - %s' % class_name, commit_model.id)
 
-
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""

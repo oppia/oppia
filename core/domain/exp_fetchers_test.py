@@ -601,7 +601,6 @@ title: Old Title
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
 
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id_2')
 
@@ -717,7 +716,6 @@ title: Old Title
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
 
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id_3')
 
@@ -770,7 +768,6 @@ title: Old Title
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': '1.2 + 3'})
-
 
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id_4')
