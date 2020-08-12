@@ -632,9 +632,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_user_pin(user_id, user_pin)
         user_services.create_new_profile(
-            gae_id, user_email, profile_pin=profile_pin,
-            profile_display_alias=display_alias
-        )
+            gae_id, user_email, display_alias, profile_pin=profile_pin)
         profile_user_id = (
             user_services.get_all_profiles_auth_details_by_parent_user_id(
                 user_id)[0].user_id
@@ -723,9 +721,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_auth_details_model.id
         user_services.set_user_pin(user_id, user_pin)
         user_services.create_new_profile(
-            gae_id, email, profile_pin=profile_pin,
-            profile_display_alias=display_alias
-        )
+            gae_id, email, display_alias, profile_pin=profile_pin)
 
         user_auth_details_models = (
             user_services.get_all_profiles_auth_details_by_parent_user_id(
@@ -745,9 +741,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         error_msg = 'Pin must be set for a full user before creating a profile.'
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.create_new_profile(
-                gae_id, email, profile_pin=profile_pin,
-                profile_display_alias=display_alias
-            )
+                gae_id, email, display_alias, profile_pin=profile_pin)
 
     def test_create_new_profile_with_nonexistent_user_raises_error(self):
         non_existent_gae_id = 'gae_id_x'
@@ -758,9 +752,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.create_new_profile(
                 non_existent_gae_id, non_existent_email,
-                profile_pin=profile_pin,
-                profile_display_alias=display_alias
-            )
+                display_alias, profile_pin=profile_pin)
 
     def test_mark_user_for_deletion_deletes_user_settings(self):
         gae_id = 'test_id'
@@ -1587,7 +1579,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         error_msg = 'Profile user must have a display alias'
         with self.assertRaisesRegexp(utils.ValidationError, error_msg):
             user_services.create_new_profile(
-                gae_id, self.OWNER_EMAIL, profile_pin=profile_pin)
+                gae_id, self.OWNER_EMAIL, '', profile_pin=profile_pin)
 
     def test_has_not_fully_registered_for_guest_user_is_false(self):
         self.assertFalse(user_services.has_fully_registered_account(None))

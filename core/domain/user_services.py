@@ -224,7 +224,7 @@ class UserSettings(python_utils.OBJECT):
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
 
-        if self.role == feconf.ROLE_ID_LEARNER and self.display_alias is None:
+        if self.role == feconf.ROLE_ID_LEARNER and not self.display_alias:
             raise utils.ValidationError(
                 'Profile user must have a display alias.')
         if (self.display_alias is not None and
@@ -1029,7 +1029,7 @@ def create_new_user(gae_id, email):
 
 
 def create_new_profile(
-        gae_id, email, profile_pin=None, profile_display_alias=None):
+        gae_id, email, profile_display_alias, profile_pin=None):
     """Creates a new profile.
 
     Args:

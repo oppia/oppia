@@ -165,8 +165,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
         user_services.set_user_pin(self.user_1_id, '12345')
         self.profile_user_id = user_services.create_new_profile(
-            self.user_1_gae_id, self.USER_1_EMAIL, profile_pin='123',
-            profile_display_alias='name'
+            self.user_1_gae_id, self.USER_1_EMAIL, 'name', profile_pin='123'
         ).user_id
 
     def test_pre_delete_user_email_subscriptions(self):
@@ -1567,8 +1566,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
         user_services.set_user_pin(self.user_1_id, '12345')
         self.profile_user_id = user_services.create_new_profile(
-            self.user_1_gae_id, self.USER_1_EMAIL, profile_pin='123',
-            profile_display_alias='name'
+            self.user_1_gae_id, self.USER_1_EMAIL, 'name', profile_pin='123',
         ).user_id
         user_models.CompletedActivitiesModel(
             id=self.profile_user_id, exploration_ids=[], collection_ids=[]
@@ -1833,8 +1831,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
         user_services.set_user_pin(self.user_1_id, '12345')
         self.profile_user_id = user_services.create_new_profile(
-            self.user_1_gae_id, self.USER_1_EMAIL, profile_pin='123',
-            profile_display_alias='name'
+            self.user_1_gae_id, self.USER_1_EMAIL, 'name', profile_pin='123',
         ).user_id
         wipeout_service.pre_delete_user(self.user_2_id)
 
