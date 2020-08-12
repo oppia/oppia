@@ -203,6 +203,8 @@ describe('State Graph Visualization directive', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: false
     });
+    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+      $q.resolve());
     $scope.checkAndStartRecording();
 
     expect($scope.unsupportedBrowser).toBe(true);
@@ -217,6 +219,20 @@ describe('State Graph Visualization directive', function() {
       $q.resolve());
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
+    var waveSurferObjSpy = {
+      load: () => {},
+      on: () => {},
+      pause: () => {},
+      play: () => {},
+    };
+    // This throws "Argument of type '{ load: () => void; ... }'
+    // is not assignable to parameter of type 'WaveSurfer'."
+    // This is because the actual 'WaveSurfer.create` function returns a
+    // object with around 50 more properties than `waveSurferObjSpy`.
+    // We are suppressing this error because we have defined the properties
+    // we need for this test in 'waveSurferObjSpy' object.
+    // @ts-expect-error
+    spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
 
     $scope.checkAndStartRecording();
     $scope.$apply();
@@ -398,6 +414,20 @@ describe('State Graph Visualization directive', function() {
     });
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
+    var waveSurferObjSpy = {
+      load: () => {},
+      on: () => {},
+      pause: () => {},
+      play: () => {},
+    };
+    // This throws "Argument of type '{ load: () => void; ... }'
+    // is not assignable to parameter of type 'WaveSurfer'."
+    // This is because the actual 'WaveSurfer.create` function returns a
+    // object with around 50 more properties than `waveSurferObjSpy`.
+    // We are suppressing this error because we have defined the properties
+    // we need for this test in 'waveSurferObjSpy' object.
+    // @ts-expect-error
+    spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
 
     document.body.dispatchEvent(keyEvent);
 
