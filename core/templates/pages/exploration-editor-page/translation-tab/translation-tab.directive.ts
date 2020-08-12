@@ -56,8 +56,6 @@ require('pages/admin-page/services/admin-router.service.ts');
 
 import { Subscription } from 'rxjs';
 
-import { Subscription } from 'rxjs';
-
 angular.module('oppia').directive('translationTab', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -95,7 +93,7 @@ angular.module('oppia').directive('translationTab', [
             $templateCache.get('ng-joyride-title-tplv1.html'));
           ngJoyrideTemplate = ngJoyrideTemplate.replace(
             /\{\{/g, '<[').replace(/\}\}/g, ']>');
-          
+
           var initTranslationTab = function() {
             StateTutorialFirstTimeService.initTranslation(
               ContextService.getExplorationId());
@@ -338,9 +336,6 @@ angular.module('oppia').directive('translationTab', [
                 }
               )
             );
-          };
-          ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe();
           };
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();
