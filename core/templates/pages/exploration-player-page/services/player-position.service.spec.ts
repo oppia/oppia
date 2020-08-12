@@ -90,4 +90,9 @@ describe('Player position service', () => {
     let mockActiveCardChangedEvent = new EventEmitter();
     expect(pps.onActiveCardChanged).toEqual(mockActiveCardChangedEvent);
   });
+
+  it('should fetch EventEmitter when help card is available', () => {
+    let mockHelpCardAvailableEvent = new EventEmitter();
+    expect(pps.onHelpCardAvailable).toEqual(mockHelpCardAvailableEvent);
+  });
 });

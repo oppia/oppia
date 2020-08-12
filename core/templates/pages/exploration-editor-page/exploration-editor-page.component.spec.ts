@@ -65,6 +65,7 @@ describe('Exploration editor page component', function() {
   var ers = null;
   var es = null;
   var ess = null;
+  var esaves = null;
   var ets = null;
   var ews = null;
   var gds = null;
@@ -79,6 +80,8 @@ describe('Exploration editor page component', function() {
   var refreshGraphEmitter = new EventEmitter();
 
   var mockOpenEditorTutorialEmitter = new EventEmitter();
+
+  var mockInitExplorationPageEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -213,6 +216,7 @@ describe('Exploration editor page component', function() {
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
     ess = $injector.get('ExplorationStatesService');
+    esaves = $injector.get('ExplorationSaveService');
     ets = $injector.get('ExplorationTitleService');
     ews = $injector.get('ExplorationWarningsService');
     gds = $injector.get('GraphDataService');
@@ -324,6 +328,8 @@ describe('Exploration editor page component', function() {
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
       spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
+      spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
+        mockInitExplorationPageEmitter);
 
       explorationData.is_version_of_draft_valid = true;
 
@@ -395,6 +401,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
 
       var successCallback = jasmine.createSpy('success');
+      mockInitExplorationPageEmitter.emit(successCallback);
       $rootScope.$broadcast('initExplorationPage', successCallback);
 
       // Need to flush and $apply twice to fire the callback. In practice, this
