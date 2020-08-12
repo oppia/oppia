@@ -140,7 +140,8 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         wipeout_service.delete_user(pending_deletion_request)
         pending_deletion_request.deletion_complete = True
-        wipeout_service.save_pending_deletion_request(pending_deletion_request)
+        wipeout_service.save_pending_deletion_requests(
+            [pending_deletion_request])
 
         output = self._run_one_off_job()
         self.assertIn(['SUCCESS', [self.user_1_id]], output)
@@ -150,7 +151,8 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         wipeout_service.delete_user(pending_deletion_request)
         pending_deletion_request.deletion_complete = True
-        wipeout_service.save_pending_deletion_request(pending_deletion_request)
+        wipeout_service.save_pending_deletion_requests(
+            [pending_deletion_request])
 
         user_models.CompletedActivitiesModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[]

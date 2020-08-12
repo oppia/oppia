@@ -62,34 +62,38 @@ def get_pending_deletion_request(user_id):
     )
 
 
-def save_pending_deletion_request(pending_deletion_request):
-    """Save a pending deletion request domain object as
-    a PendingDeletionRequestModel entity in the datastore.
+def save_pending_deletion_requests(pending_deletion_requests):
+    """Save a list of pending deletion request domain objects as
+    PendingDeletionRequestModel entities in the datastore.
 
     Args:
-        pending_deletion_request: PendingDeletionRequest. The pending deletion
-            request object to be saved in the datastore.
+        pending_deletion_requests: list(PendingDeletionRequest). List of pending
+            deletion request objects to be saved in the datastore.
     """
-    pending_deletion_request.validate()
-    pending_deletion_request_dict = {
-        'email': pending_deletion_request.email,
-        'deletion_complete': pending_deletion_request.deletion_complete,
-        'exploration_ids': pending_deletion_request.exploration_ids,
-        'collection_ids': pending_deletion_request.collection_ids,
-        'activity_mappings': pending_deletion_request.activity_mappings
-    }
+    pending_deletion_request_models = []
+    for deletion_request in pending_deletion_requests:
+        deletion_request.validate()
+        deletion_request_dict = {
+            'email': deletion_request.email,
+            'deletion_complete': deletion_request.deletion_complete,
+            'exploration_ids': deletion_request.exploration_ids,
+            'collection_ids': deletion_request.collection_ids,
+            'activity_mappings': deletion_request.activity_mappings
+        }
+        deletion_request_model = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                deletion_request.user_id))
+        if deletion_request_model is not None:
+            deletion_request_model.populate(**deletion_request_dict)
+        else:
+            deletion_request_dict['id'] = deletion_request.user_id
+            deletion_request_model = user_models.PendingDeletionRequestModel(
+                **deletion_request_dict
+            )
+        pending_deletion_request_models.append(deletion_request_model)
 
-    pending_deletion_request_model = (
-        user_models.PendingDeletionRequestModel.get_by_id(
-            pending_deletion_request.user_id))
-    if pending_deletion_request_model is not None:
-        pending_deletion_request_model.populate(**pending_deletion_request_dict)
-        pending_deletion_request_model.put()
-    else:
-        pending_deletion_request_dict['id'] = pending_deletion_request.user_id
-        user_models.PendingDeletionRequestModel(
-            **pending_deletion_request_dict
-        ).put()
+    user_models.PendingDeletionRequestModel.put_multi(
+        pending_deletion_request_models)
 
 
 def delete_pending_deletion_request(user_id):
@@ -152,7 +156,7 @@ def pre_delete_user(user_id):
             user_id, False, False, False, False)
 
     user_services.mark_user_for_deletion(user_id)
-    save_pending_deletion_request(
+    pending_deletion_requests.append(
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id,
             user_settings.email,
@@ -171,7 +175,7 @@ def pre_delete_user(user_id):
         email = profile_user_settings.email
         profile_id = profile_user_settings.user_id
         user_services.mark_user_for_deletion(profile_id)
-        save_pending_deletion_request(
+        pending_deletion_requests.append(
             wipeout_domain.PendingDeletionRequest.create_default(
                 profile_id,
                 email,
@@ -179,6 +183,8 @@ def pre_delete_user(user_id):
                 []
             )
         )
+
+    save_pending_deletion_requests(pending_deletion_requests)
 
 
 def delete_user(pending_deletion_request):
@@ -328,7 +334,7 @@ def _delete_activity_models(
     if activity_category not in pending_deletion_request.activity_mappings:
         pending_deletion_request.activity_mappings[activity_category] = (
             _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
-        save_pending_deletion_request(pending_deletion_request)
+        save_pending_deletion_requests([pending_deletion_request])
 
     def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.

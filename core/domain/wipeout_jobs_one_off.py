@@ -44,8 +44,8 @@ class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             wipeout_service.delete_user(pending_deletion_request)
             pending_deletion_request.deletion_complete = True
-            wipeout_service.save_pending_deletion_request(
-                pending_deletion_request)
+            wipeout_service.save_pending_deletion_requests(
+                [pending_deletion_request])
             yield ('SUCCESS', pending_deletion_request.user_id)
 
     @staticmethod
@@ -87,8 +87,8 @@ class FullyCompleteUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('SUCCESS', pending_deletion_request.user_id)
         else:
             pending_deletion_request.deletion_complete = False
-            wipeout_service.save_pending_deletion_request(
-                pending_deletion_request)
+            wipeout_service.save_pending_deletion_requests(
+                [pending_deletion_request])
             yield ('FAILURE', pending_deletion_request.user_id)
 
     @staticmethod
