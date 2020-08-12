@@ -71,8 +71,8 @@ def get_all_feature_flag_dicts():
     for providing detailed feature flags information to the admin panel.
 
     Returns:
-        list(dict). A list containinig the dict mappings of all fields
-        of the feature flags.
+        list(dict). A list containing the dict mappings of all fields of the
+        feature flags.
     """
     return [
         registry.Registry.get_platform_parameter(name).to_dict()
