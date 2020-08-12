@@ -33,14 +33,14 @@ export class EditabilityService {
   static inTutorialMode: boolean = false;
 
   /**
-   * @return {boolean} whether the service is editable.
+   * @return {boolean} Whether the service is editable.
    */
   isEditable(): boolean {
     return EditabilityService.isEditable && !EditabilityService.inTutorialMode;
   }
 
   /**
-   * @return {boolean} whether the service is translatable.
+   * @return {boolean} Whether the service is translatable.
    */
   isTranslatable(): boolean {
     return (
@@ -48,7 +48,7 @@ export class EditabilityService {
   }
 
   /**
-   * @return {boolean} whether the service is editable outside tutorial mode.
+   * @return {boolean} Whether the service is editable outside tutorial mode.
    */
   isEditableOutsideTutorialMode(): boolean {
     return EditabilityService.isEditable;
