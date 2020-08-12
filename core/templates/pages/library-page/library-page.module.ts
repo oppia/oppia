@@ -24,9 +24,8 @@ import uiValidate from 'angular-ui-validate';
 import ngInfiniteScroll from 'ng-infinite-scroll';
 
 angular.module('oppia', [
-  'headroom', ngInfiniteScroll, 'ngAnimate',
-  require('angular-cookies'), 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  require('angular-cookies'), 'headroom', 'ngAnimate', ngInfiniteScroll,
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 

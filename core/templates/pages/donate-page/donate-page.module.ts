@@ -20,7 +20,7 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 angular.module('oppia', [
-  'headroom', require('angular-cookies'), 'ngTouch', 'ngSanitize',
+  require('angular-cookies'), 'headroom', 'ngSanitize', 'ngTouch',
   'pascalprecht.translate', 'toastr', 'ui.bootstrap'
 ]);
 

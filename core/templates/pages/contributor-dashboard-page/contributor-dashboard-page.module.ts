@@ -25,9 +25,8 @@ import ngInfiniteScroll from 'ng-infinite-scroll';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
-  'headroom', ngInfiniteScroll, 'ngAnimate',
-  require('angular-cookies'), 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  require('angular-cookies'), 'headroom', 'ngAnimate', ngInfiniteScroll,
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
 ]);
 

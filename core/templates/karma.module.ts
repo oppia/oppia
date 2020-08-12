@@ -16,12 +16,6 @@
  * @fileoverview Module used by karma for frontend tests.
  */
 
-
-
-
-
-
-
 import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/ng-audio.import';
@@ -31,7 +25,7 @@ import 'third-party-imports/ui-tree.import';
 declare var angular: ng.IAngularStatic;
 
 angular.module('oppia', [
-  'ngAnimate', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
+  require('angular-cookies'), 'ngAnimate', 'ngAudio', 'ngJoyRide',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
 ]);

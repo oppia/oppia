@@ -23,9 +23,8 @@ import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
-  'headroom', 'ngAnimate',
-  require('angular-cookies'), 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 

@@ -25,11 +25,11 @@ import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
-  'headroom', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngMaterial',
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngAudio', 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
-  uiValidate, 'ui-leaflet'
+  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui-leaflet',
+  'ui.sortable', 'ui.tree', uiValidate
 ]);
 
 import { NgModule, StaticProvider } from '@angular/core';

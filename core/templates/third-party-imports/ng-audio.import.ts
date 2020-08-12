@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the ngAuidio library.
+ * @fileoverview This file imports the ngAudio library.
  */
 
 require('static/angular-audio-1.7.4/app/angular.audio.js');

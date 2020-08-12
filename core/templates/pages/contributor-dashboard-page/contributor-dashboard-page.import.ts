@@ -16,7 +16,6 @@
  * @fileoverview Directive scripts for the contributor dashboard page.
  */
 
-
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.module.ts');
 require('App.ts');
