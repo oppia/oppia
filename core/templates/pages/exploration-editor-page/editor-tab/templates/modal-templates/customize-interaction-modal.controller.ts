@@ -49,9 +49,9 @@ require(
 
 angular.module('oppia').controller('CustomizeInteractionModalController', [
   '$controller', '$injector', '$scope', '$uibModalInstance',
+  'showMarkAllAudioAsNeedingUpdateModalIfRequired',
   'EditorFirstTimeEventsService',
   'InteractionDetailsCacheService', 'InteractionObjectFactory',
-  'showMarkAllAudioAsNeedingUpdateModalIfRequired',
   'StateCustomizationArgsService', 'StateEditorService',
   'StateInteractionIdService', 'StateNextContentIdIndexService',
   'UrlInterpolationService',
@@ -61,9 +61,9 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   'INTERACTION_SPECS',
   function(
       $controller, $injector, $scope, $uibModalInstance,
+      showMarkAllAudioAsNeedingUpdateModalIfRequired,
       EditorFirstTimeEventsService,
       InteractionDetailsCacheService, InteractionObjectFactory,
-      showMarkAllAudioAsNeedingUpdateModalIfRequired,
       StateCustomizationArgsService, StateEditorService,
       StateInteractionIdService, StateNextContentIdIndexService,
       UrlInterpolationService,
