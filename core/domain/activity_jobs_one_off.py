@@ -238,6 +238,10 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
+    """For every snapshot content of a rights model, merge the data from all
+    the user id fields in content together and put them in the
+    mentioned_user_ids field of an appropriate RightsSnapshotMetadataModel.
+    """
 
     @staticmethod
     def _add_collection_user_ids(snapshot_content_model):
@@ -336,25 +340,26 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
 
 class AddMentionedUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
     """For every snapshot metadata of a rights model, merge the data from all
-    the user id fields in commit_cmds together and put them in the all_user_ids
-    field of an appropriate RightsAllUsersModel.
+    the user id fields in commit_cmds together and put them in the
+    mentioned_user_ids field of an appropriate RightsSnapshotMetadataModel.
     """
+
     @staticmethod
     def are_commit_cmds_role_change(commit_cmds):
         """Check if commit_cmds are of a role change type and there is just one
         commit.
+
         Args:
             commit_cmds: list(dict(str, str)). List of commit commands.
+
         Returns:
-            True when there is one command and it is of role_change type.
+            bool. True when there is one command and it is of role_change type.
         """
         role_change_cmds = (
-            rights_manager.CMD_CHANGE_ROLE,
-            topic_domain.CMD_CHANGE_ROLE,
-            topic_domain.CMD_REMOVE_MANAGER_ROLE)
+            feconf.CMD_CHANGE_ROLE,
+            feconf.CMD_REMOVE_MANAGER_ROLE)
         return (
-                len(commit_cmds) == 1 and
-                commit_cmds[0]['cmd'] in role_change_cmds)
+            len(commit_cmds) == 1 and commit_cmds[0]['cmd'] in role_change_cmds)
 
     @staticmethod
     def _add_col_and_exp_user_ids(snapshot_model):
@@ -365,7 +370,7 @@ class AddMentionedUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
                 snapshot_model.commit_cmds):
             mentioned_user_ids = set(snapshot_model.mentioned_user_ids)
             mentioned_user_ids.add(snapshot_model.commit_cmds[0]['assignee_id'])
-            snapshot_model.all_user_ids = list(mentioned_user_ids)
+            snapshot_model.mentioned_user_ids = list(mentioned_user_ids)
             snapshot_model.put()
 
     @staticmethod
@@ -377,9 +382,10 @@ class AddMentionedUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
         if AddMentionedUserIdsMetadataJob.are_commit_cmds_role_change(
                 commit_cmds):
             mentioned_user_ids = set(snapshot_model.mentioned_user_ids)
-            if commit_cmds[0]['cmd'] == topic_domain.CMD_CHANGE_ROLE:
-                mentioned_user_ids.add(snapshot_model.commit_cmds[0]['assignee_id'])
-            elif commit_cmds[0]['cmd'] == topic_domain.CMD_REMOVE_MANAGER_ROLE:
+            if commit_cmds[0]['cmd'] == feconf.CMD_CHANGE_ROLE:
+                mentioned_user_ids.add(
+                    snapshot_model.commit_cmds[0]['assignee_id'])
+            elif commit_cmds[0]['cmd'] == feconf.CMD_REMOVE_MANAGER_ROLE:
                 mentioned_user_ids.add(
                     snapshot_model.commit_cmds[0]['removed_user_id'])
             snapshot_model.mentioned_user_ids = list(mentioned_user_ids)
@@ -411,7 +417,6 @@ class AddMentionedUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
         elif isinstance(
                 snapshot_model,
                 exp_models.ExplorationRightsSnapshotMetadataModel):
-
             AddMentionedUserIdsMetadataJob._add_col_and_exp_user_ids(
                 snapshot_model)
         elif isinstance(

@@ -45,6 +45,8 @@ import python_utils
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
+    activity_jobs_one_off.AddMentionedUserIdsContentJob,
+    activity_jobs_one_off.AddMentionedUserIdsMetadataJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.FixCommitLastUpdatedOneOffJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,

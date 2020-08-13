@@ -933,6 +933,10 @@ ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
 
+# Command used when changing role in collection, exploration or topic.
+CMD_CHANGE_ROLE = 'change_role'
+# Command used when removing manager from topic.
+CMD_REMOVE_MANAGER_ROLE = 'remove_manager_role'
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
 ROLE_ACTION_UPDATE = 'update'

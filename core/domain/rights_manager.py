@@ -34,7 +34,7 @@ import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
-(collection_models, exp_models,) = models.Registry.import_models([
+(collection_models, exp_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
 ])
 
@@ -42,7 +42,7 @@ current_user_services = models.Registry.import_current_user_services()
 # backward-compatibility with previous exploration snapshots in the datastore.
 # Do not modify the definitions of CMD keys that already exist.
 CMD_CREATE_NEW = 'create_new'
-CMD_CHANGE_ROLE = 'change_role'
+CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
 CMD_CHANGE_EXPLORATION_STATUS = 'change_exploration_status'
 CMD_CHANGE_COLLECTION_STATUS = 'change_collection_status'
 CMD_CHANGE_PRIVATE_VIEWABILITY = 'change_private_viewability'

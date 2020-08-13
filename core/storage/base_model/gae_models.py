@@ -1079,7 +1079,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
     # The user ids that are mentioned in some non-indexed field in this
-    # snapshot. For example
+    # snapshot.
     mentioned_user_ids = ndb.StringProperty(repeated=True, indexed=True)
 
     @staticmethod

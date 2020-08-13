@@ -34,8 +34,8 @@ import utils
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 CMD_CREATE_NEW = 'create_new'
-CMD_CHANGE_ROLE = 'change_role'
-CMD_REMOVE_MANAGER_ROLE = 'remove_manager_role'
+CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
+CMD_REMOVE_MANAGER_ROLE = feconf.CMD_REMOVE_MANAGER_ROLE
 CMD_PUBLISH_TOPIC = 'publish_topic'
 CMD_UNPUBLISH_TOPIC = 'unpublish_topic'
 

@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -527,13 +528,15 @@ class TopicRightsModel(base_models.VersionedModel):
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
-        snapshot_metadata_model.mentioned_user_ids = list(set(self.manager_ids))
-        if commit_cmds[0]['cmd'] == topic_domain.CMD_CHANGE_ROLE:
-            snapshot_metadata_model.add(
-                snapshot_metadata_model.commit_cmds[0]['assignee_id'])
-        elif commit_cmds[0]['cmd'] == topic_domain.CMD_REMOVE_MANAGER_ROLE:
-            snapshot_metadata_model.add(
-                snapshot_metadata_model.commit_cmds[0]['removed_user_id'])
+        mentioned_user_ids = set(self.manager_ids)
+        if len(commit_cmds) == 1:
+            if commit_cmds[0]['cmd'] == feconf.CMD_CHANGE_ROLE:
+                mentioned_user_ids.add(
+                    snapshot_metadata_model.commit_cmds[0]['assignee_id'])
+            elif commit_cmds[0]['cmd'] == feconf.CMD_REMOVE_MANAGER_ROLE:
+                mentioned_user_ids.add(
+                    snapshot_metadata_model.commit_cmds[0]['removed_user_id'])
+        snapshot_metadata_model.mentioned_user_ids = list(mentioned_user_ids)
         snapshot_metadata_model.put()
 
     @staticmethod
