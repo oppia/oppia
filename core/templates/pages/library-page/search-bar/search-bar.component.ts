@@ -17,7 +17,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 /**
- * @fileoverview Directive for the Search Bar.
+ * @fileoverview Component for the Search Bar.
  */
 
 require('filters/string-utility-filters/truncate.filter.ts');
@@ -162,9 +162,9 @@ angular.module('oppia').component('searchBar', {
         ctrl.selectionDetails.categories.selections = {};
         ctrl.selectionDetails.languageCodes.selections = {};
 
-        ctrl.searchQuery =
+        ctrl.searchQuery = (
           SearchService.updateSearchFieldsBasedOnUrlQuery(
-            $window.location.search, ctrl.selectionDetails);
+            $window.location.search, ctrl.selectionDetails));
 
         updateSelectionDetails('categories');
         updateSelectionDetails('languageCodes');
@@ -252,35 +252,36 @@ angular.module('oppia').component('searchBar', {
           }
         });
 
-        $scope.$on(
-          'preferredLanguageCodesLoaded',
-          function(evt, preferredLanguageCodesList) {
-            preferredLanguageCodesList.forEach(function(languageCode) {
-              var selections =
-                ctrl.selectionDetails.languageCodes.selections;
-              if (!selections.hasOwnProperty(languageCode)) {
-                selections[languageCode] = true;
-              } else {
-                selections[languageCode] = !selections[languageCode];
+        ctrl.directiveSubscriptions.add(
+          I18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe(
+            (preferredLanguageCodesList) => {
+              preferredLanguageCodesList.forEach(function(languageCode) {
+                var selections =
+                 ctrl.selectionDetails.languageCodes.selections;
+                if (!selections.hasOwnProperty(languageCode)) {
+                  selections[languageCode] = true;
+                } else {
+                  selections[languageCode] = !selections[languageCode];
+                }
+              });
+
+              updateSelectionDetails('languageCodes');
+
+              if (UrlService.getUrlParams().hasOwnProperty('q')) {
+                updateSearchFieldsBasedOnUrlQuery();
               }
-            });
 
-            updateSelectionDetails('languageCodes');
+              if ($window.location.pathname === '/search/find') {
+                onSearchQueryChangeExec();
+              }
 
-            if (UrlService.getUrlParams().hasOwnProperty('q')) {
-              updateSearchFieldsBasedOnUrlQuery();
+              refreshSearchBarLabels();
+
+              // Notify the function that handles overflow in case the
+              // search elements load after it has already been run.
+              SearchService.onSearchBarLoaded.emit();
             }
-
-            if ($window.location.pathname === '/search/find') {
-              onSearchQueryChangeExec();
-            }
-
-            refreshSearchBarLabels();
-
-            // Notify the function that handles overflow in case the search
-            // elements load after it has already been run.
-            SearchService.onSearchBarLoaded.emit();
-          }
+          )
         );
         $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
         ctrl.directiveSubscriptions.add(
