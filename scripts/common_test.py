@@ -407,6 +407,8 @@ class CommonTests(test_utils.GenericTestBase):
             pass
         def mock_get_remote_alias(unused_url):
             return 'remote'
+        def mock_ask_user_to_confirm(unused_msg):
+            pass
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
         chdir_swap = self.swap(os, 'chdir', mock_chdir)
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
@@ -422,8 +424,10 @@ class CommonTests(test_utils.GenericTestBase):
             mock_verify_current_branch_name)
         get_remote_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         with isdir_swap, chdir_swap, popen_swap, communicate_swap:
-            with check_call_swap, verify_local_repo_swap:
+            with check_call_swap, verify_local_repo_swap, ask_user_swap:
                 with verify_current_branch_name_swap, get_remote_alias_swap:
                     (
                         common

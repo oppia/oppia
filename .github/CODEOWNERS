@@ -86,12 +86,13 @@
 
 
 # Contributor Dashboard project
-/core/controllers/contributor_dashboard*.py @sagangwee
-/core/domain/opportunity*.py @sagangwee
-/core/domain/voiceover_services*.py @sagangwee
-/core/storage/opportunity/ @sagangwee
-/core/templates/domain/opportunity/ @sagangwee
-/core/templates/pages/contributor-dashboard-page/ @sagangwee
+# TODO(#10250): Revert ownership to @sagangwee after 2020-09-08.
+/core/controllers/contributor_dashboard*.py @DubeySandeep
+/core/domain/opportunity*.py @DubeySandeep
+/core/domain/voiceover_services*.py @DubeySandeep
+/core/storage/opportunity/ @DubeySandeep
+/core/templates/domain/opportunity/ @DubeySandeep
+/core/templates/pages/contributor-dashboard-page/ @DubeySandeep
 
 
 # Core documentation
@@ -551,8 +552,7 @@
 
 
 # User Data Takeout.
-/core/domain/takeout_domain.py @vojtechjelinek @seanlip
-/core/domain/takeout_service*.py @vojtechjelinek @seanlip
+/core/domain/takeout_*.py @vojtechjelinek @seanlip
 /core/domain/wipeout_*.py @vojtechjelinek @seanlip
 
 

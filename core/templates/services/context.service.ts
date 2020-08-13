@@ -98,8 +98,8 @@ export class ContextService {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
           return ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
         } else if (
-          pathnameArray[i] === 'practice_session' ||
-            pathnameArray[i] === 'review_test') {
+          pathnameArray[i] === 'session' ||
+            pathnameArray[i] === 'review-test') {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
           return ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
         } else if (pathnameArray[i] === 'collection_editor') {
