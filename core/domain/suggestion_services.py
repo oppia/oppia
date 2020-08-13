@@ -438,8 +438,8 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids):
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
 
 
-def resubmit_rejected_suggestion(suggestion_id, summary_message, author_id,
-        change):
+def resubmit_rejected_suggestion(
+        suggestion_id, summary_message, author_id, change):
     """Resubmit a rejected suggestion with the given suggestion_id.
 
     Args:
