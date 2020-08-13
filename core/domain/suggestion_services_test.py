@@ -671,7 +671,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id, 'resubmit summary message', self.author_id,
             resubmit_change)
 
-        # The suggestion status should now be in review instead of rejected.
+        # The suggestion's status should now be in review instead of rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
         # The suggestion's change should be updated.

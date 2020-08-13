@@ -1243,7 +1243,7 @@ def can_resubmit_suggestion(handler):
     """Decorator to check whether a user can resubmit a suggestion."""
 
     def test_can_resubmit_suggestion(self, suggestion_id, **kwargs):
-        """Checks if the use can edit the given suggestion.
+        """Checks if the user can edit the given suggestion.
 
         Args:
             suggestion_id: str. The ID of the suggestion.
