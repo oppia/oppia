@@ -18,10 +18,10 @@
 # IMPORTANT NOTES FOR CODEOWNERS:
 #
 # - If you will be unavailable for more than 24 hours, please replace your
-#   ownership with a delegate, file an issue, and add a TODO above the owner
+#   ownership with a delegate, file an issue, and add a todo above the owner
 #   line like so:
 #
-#   TODO(ISSUENUMBER): Revert ownership to @USERNAME after YYYY-MM-DD.
+#     TODO(#ISSUE_NUMBER): Revert ownership to @USERNAME after YYYY-MM-DD.
 #
 #   (See #10250 for an example.) Please make sure to restore ownership after
 #   the above date passes.
