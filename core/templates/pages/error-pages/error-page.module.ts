@@ -19,6 +19,9 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/angular-js.import';
+import 'third-party-imports/headroom.import';
+
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
@@ -26,21 +29,23 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
 ]);
 
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
+
+import { ErrorPageComponent } from './error-page.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
 
 @NgModule({
   imports: [
@@ -49,9 +54,11 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
+    ErrorPageComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    ErrorPageComponent,
     OppiaAngularRootComponent
   ],
   providers: [

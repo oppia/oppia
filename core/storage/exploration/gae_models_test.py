@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import datetime
 
 from constants import constants
@@ -85,6 +86,32 @@ class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exp_models.ExplorationModel.get_export_policy(),
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+
+class ExplorationMathRichTextInfoModelUnitTests(test_utils.GenericTestBase):
+    """Tests the ExplorationMathRichTextInfoModel class."""
+
+    def setUp(self):
+        super(ExplorationMathRichTextInfoModelUnitTests, self).setUp()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id',
+            math_images_generation_required=True,
+            estimated_max_size_of_images_in_bytes=1000).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exp_models.ExplorationMathRichTextInfoModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_get_export_policy(self):
+        self.assertEqual(
+            exp_models.ExplorationMathRichTextInfoModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            exp_models.ExplorationContextModel
+            .has_reference_to_user_id('any_id'))
 
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
@@ -181,40 +208,6 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             exp_models.ExplorationRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_convert_to_valid_dict_format_basic(self):
-        transformed_dict = (
-            exp_models.ExplorationRightsModel
-            .convert_to_valid_dict(self.exp_1_dict))
-        self.assertEqual(transformed_dict, self.exp_1_dict)
-
-    def test_convert_to_valid_dict_format_all_viewer_ids(self):
-        broken_dict = dict(**self.exp_1_dict)
-        broken_dict['all_viewer_ids'] = [self.USER_ID_1, self.USER_ID_2]
-
-        transformed_dict = (
-            exp_models.ExplorationRightsModel
-            .convert_to_valid_dict(broken_dict))
-        self.assertEqual(transformed_dict, self.exp_1_dict)
-
-    def test_convert_to_valid_dict_format_status(self):
-        broken_dict = dict(**self.exp_1_dict)
-        broken_dict['status'] = 'publicized'
-
-        transformed_dict = (
-            exp_models.ExplorationRightsModel
-            .convert_to_valid_dict(broken_dict))
-        self.assertEqual(transformed_dict, self.exp_1_dict)
-
-    def test_convert_to_valid_dict_format_translator_ids(self):
-        broken_dict = dict(**self.exp_1_dict)
-        del broken_dict['voice_artist_ids']
-        broken_dict['translator_ids'] = [self.USER_ID_1]
-
-        transformed_dict = (
-            exp_models.ExplorationRightsModel
-            .convert_to_valid_dict(broken_dict))
-        self.assertEqual(transformed_dict, self.exp_1_dict)
 
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
@@ -313,6 +306,132 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'viewable_exploration_ids': []
         }
         self.assertEqual(expected_exploration_ids, exploration_ids)
+
+
+class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
+    """Test the revert method on ExplorationRightsModel class."""
+
+    EXPLORATION_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_3 = 'id_3'
+    USER_ID_COMMITTER = 'id_4'  # User id used in commits
+
+    def setUp(self):
+        super(ExplorationRightsModelRevertUnitTest, self).setUp()
+        self.exploration_model = exp_models.ExplorationRightsModel(
+            id=self.EXPLORATION_ID_1,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[],
+            voice_artist_ids=[self.USER_ID_2],
+            viewer_ids=[],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.4
+        )
+        self.exploration_model.save(
+            self.USER_ID_COMMITTER, 'Created new exploration right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}]
+        )
+        self.excluded_fields = ['created_on', 'last_updated', 'version']
+        # Here copy.deepcopy is needed to mitigate
+        # https://github.com/googlecloudplatform/datastore-ndb-python/issues/208
+        self.original_dict = copy.deepcopy(
+            self.exploration_model.to_dict(exclude=self.excluded_fields))
+        self.exploration_model.owner_ids = [self.USER_ID_1, self.USER_ID_3]
+        self.exploration_model.save(
+            self.USER_ID_COMMITTER, 'Add owner',
+            [{'cmd': rights_manager.CMD_CHANGE_ROLE}]
+        )
+        self.allow_revert_swap = self.swap(
+            exp_models.ExplorationRightsModel, 'ALLOW_REVERT', True)
+
+    def test_revert_to_valid_version_is_successful(self):
+        with self.allow_revert_swap:
+            exp_models.ExplorationRightsModel.revert(
+                self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
+        new_collection_model = (
+            exp_models.ExplorationRightsModel.get_by_id(
+                self.EXPLORATION_ID_1))
+        self.assertDictEqual(
+            self.original_dict,
+            new_collection_model.to_dict(exclude=self.excluded_fields)
+        )
+
+    def test_revert_to_version_with_all_viewer_ids_field_successful(self):
+        broken_dict = dict(**self.original_dict)
+        broken_dict['all_viewer_ids'] = [
+            self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]
+
+        snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel
+            .get_by_id(
+                exp_models.ExplorationRightsModel.get_snapshot_id(
+                    self.EXPLORATION_ID_1, 1))
+        )
+        snapshot_model.content = broken_dict
+        snapshot_model.put()
+
+        with self.allow_revert_swap:
+            exp_models.ExplorationRightsModel.revert(
+                self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
+        new_collection_model = (
+            exp_models.ExplorationRightsModel.get_by_id(
+                self.EXPLORATION_ID_1))
+        self.assertDictEqual(
+            self.original_dict,
+            new_collection_model.to_dict(exclude=self.excluded_fields)
+        )
+
+    def test_revert_to_version_with_invalid_status_is_successful(self):
+        broken_dict = dict(**self.original_dict)
+        broken_dict['status'] = 'publicized'
+
+        snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel
+            .get_by_id(
+                exp_models.ExplorationRightsModel.get_snapshot_id(
+                    self.EXPLORATION_ID_1, 1))
+        )
+        snapshot_model.content = broken_dict
+        snapshot_model.put()
+
+        with self.allow_revert_swap:
+            exp_models.ExplorationRightsModel.revert(
+                self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
+        new_collection_model = (
+            exp_models.ExplorationRightsModel.get_by_id(
+                self.EXPLORATION_ID_1))
+        self.assertDictEqual(
+            self.original_dict,
+            new_collection_model.to_dict(exclude=self.excluded_fields)
+        )
+
+    def test_revert_to_version_with_translator_ids_field_is_successful(self):
+        broken_dict = dict(**self.original_dict)
+        del broken_dict['voice_artist_ids']
+        broken_dict['translator_ids'] = [self.USER_ID_2]
+
+        snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel
+            .get_by_id(
+                exp_models.ExplorationRightsModel.get_snapshot_id(
+                    self.EXPLORATION_ID_1, 1))
+        )
+        snapshot_model.content = broken_dict
+        snapshot_model.put()
+        with self.allow_revert_swap:
+            exp_models.ExplorationRightsModel.revert(
+                self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
+
+        new_collection_model = (
+            exp_models.ExplorationRightsModel.get_by_id(
+                self.EXPLORATION_ID_1))
+        self.assertDictEqual(
+            self.original_dict,
+            new_collection_model.to_dict(exclude=self.excluded_fields)
+        )
 
 
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):

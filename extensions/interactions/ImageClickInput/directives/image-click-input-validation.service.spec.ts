@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IImageClickInputCustomizationArgs } from
+import { ImageClickInputCustomizationArgs } from
   'interactions/customization-args-defs';
 /* eslint-disable max-len*/
 import { ImageClickInputValidationService } from
@@ -40,7 +40,7 @@ describe('ImageClickInputValidationService', () => {
   let currentState: string;
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
   let goodDefaultOutcome: Outcome;
-  var customizationArguments: IImageClickInputCustomizationArgs;
+  var customizationArguments: ImageClickInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let rof: RuleObjectFactory;
 
@@ -96,6 +96,9 @@ describe('ImageClickInputValidationService', () => {
             }
           }]
         }
+      },
+      highlightRegionsOnHover: {
+        value: true
       }
     };
     goodAnswerGroups = [agof.createNew(
@@ -115,6 +118,11 @@ describe('ImageClickInputValidationService', () => {
       goodAnswerGroups[0].rules = [];
       expect(() => {
         validatorService.getAllWarnings(
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'ImageClickInputCustomizationArgs'." We are
+          // purposely assigning the wrong type of customization args in
+          // order to test validations.
+          // @ts-expect-error
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have property: imageAndRegions');

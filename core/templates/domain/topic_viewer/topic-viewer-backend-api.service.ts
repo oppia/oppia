@@ -42,13 +42,15 @@ export class TopicViewerBackendApiService {
     private urlInterpolation: UrlInterpolationService) {}
 
   private _fetchTopicData(
-      topicName: string,
-      successCallback: (value?: ReadOnlyTopic) => void,
-      errorCallback: (reason?: Object) => void
+      topicUrlFragment: string,
+      classroomUrlFragment: string,
+      successCallback: (value: ReadOnlyTopic) => void,
+      errorCallback: (reason: string) => void
   ): void {
     const topicDataUrl = this.urlInterpolation.interpolateUrl(
       TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE, {
-        topic_name: topicName
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: classroomUrlFragment,
       });
     var readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
       new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
@@ -62,14 +64,18 @@ export class TopicViewerBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.error);
+          errorCallback(errorResponse.error.error);
         }
       });
   }
 
-  fetchTopicData(topicName: string): Promise<ReadOnlyTopic> {
+  fetchTopicData(
+      topicUrlFragment: string,
+      classroomUrlFragment: string
+  ): Promise<ReadOnlyTopic> {
     return new Promise((resolve, reject) => {
-      this._fetchTopicData(topicName, resolve, reject);
+      this._fetchTopicData(
+        topicUrlFragment, classroomUrlFragment, resolve, reject);
     });
   }
 }

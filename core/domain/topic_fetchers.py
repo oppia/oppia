@@ -38,13 +38,13 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
     function to account for that new version.
 
     Args:
-        versioned_subtopics: A dict with two keys:
+        versioned_subtopics: dict. A dict with two keys:
           - schema_version: int. The schema version for the subtopics dict.
           - subtopics: list(dict). The list of dicts comprising the topic's
               subtopics.
 
     Raises:
-        Exception: The schema version of subtopics is outside of what
+        Exception. The schema version of subtopics is outside of what
             is supported at present.
     """
     subtopic_schema_version = versioned_subtopics['schema_version']
@@ -69,14 +69,14 @@ def _migrate_story_references_to_latest_schema(versioned_story_references):
     function to account for that new version.
 
     Args:
-        versioned_story_references: A dict with two keys:
+        versioned_story_references: dict. A dict with two keys:
           - schema_version: int. The schema version for the story reference
                 dict.
           - story_references: list(dict). The list of dicts comprising the
                 topic's story references.
 
     Raises:
-        Exception: The schema version of story_references is outside of what
+        Exception. The schema version of story_references is outside of what
             is supported at present.
     """
     story_reference_schema_version = (
@@ -146,6 +146,7 @@ def get_topic_from_model(topic_model):
     return topic_domain.Topic(
         topic_model.id, topic_model.name,
         topic_model.abbreviated_name,
+        topic_model.url_fragment,
         topic_model.thumbnail_filename,
         topic_model.thumbnail_bg_color,
         topic_model.description, [
@@ -227,6 +228,25 @@ def get_topic_by_name(topic_name):
         given id, or None if it does not exist.
     """
     topic_model = topic_models.TopicModel.get_by_name(topic_name)
+    if topic_model is None:
+        return None
+
+    topic = get_topic_from_model(topic_model)
+    return topic
+
+
+def get_topic_by_url_fragment(url_fragment):
+    """Returns a domain object representing a topic.
+
+    Args:
+        url_fragment: str. The url fragment of the topic.
+
+    Returns:
+        Topic or None. The domain object representing a topic with the
+        given id, or None if it does not exist.
+    """
+    topic_model = (
+        topic_models.TopicModel.get_by_url_fragment(url_fragment))
     if topic_model is None:
         return None
 

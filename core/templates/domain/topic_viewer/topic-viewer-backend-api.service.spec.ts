@@ -116,10 +116,10 @@ describe('Topic viewer backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      topicViewerBackendApiService.fetchTopicData('0').then(
+      topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
-        '/topic_data_handler/0');
+        '/topic_data_handler/staging/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -134,12 +134,14 @@ describe('Topic viewer backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      topicViewerBackendApiService.fetchTopicData('0').then(
+      topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
-        '/topic_data_handler/0');
+        '/topic_data_handler/staging/0');
       expect(req.request.method).toEqual('GET');
-      req.flush('Error fetching topic 0.', {
+      req.flush({
+        error: 'Error fetching topic 0.'
+      }, {
         status: 500,
         statusText: 'Error fetching topic 0.'
       });

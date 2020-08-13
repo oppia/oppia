@@ -16,80 +16,173 @@
  * @fileoverview Type definiitions for Customization Args.
  */
 
-import { IGraphAnswer } from 'interactions/answer-defs';
+import { GraphAnswer } from 'interactions/answer-defs';
 
-interface ILabeledRegion {
+import { SubtitledHtmlBackendDict, SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+
+
+interface LabeledRegion {
   region: {
     area: number[][];
   };
   label: string;
 }
 
-interface IImageWithRegions {
-  labeledRegions: ILabeledRegion[];
+interface ImageWithRegions {
+  labeledRegions: LabeledRegion[];
   imagePath: string;
 }
 
-interface IReadableMusicNote {
+interface ReadableMusicNote {
   readableNoteName: string;
 }
 
-export interface IAlgebraicExpressionInputCustomizationArgs { }
-
-export interface ICodeReplCustomizationArgs {
-  language?: {
-    value: string;
-  };
-  placeholder?: {
-    value: string;
-  };
-  preCode?: {
-    value: string;
-  };
-  postCode?: {
-    value: string;
-  };
-}
-
-export interface IContinueCustomizationArgs {
-  buttonText?: {
-    value: string;
-  };
-}
-
-export interface IDragAndDropSortInputCustomizationArgs {
-  choices?: {
+export interface AlgebraicExpressionInputCustomizationArgs {
+  customOskLetters: {
     value: string[];
+  };
+}
+interface AlgebraicExpressionInputCustomizationArgsBackendDict {
+  customOskLetters: {
+    value: string[];
+  };
+}
+
+
+interface CodeReplCustomizationArgsBackendDict {
+  language: {
+    value: string;
+  };
+  placeholder: {
+    value: string;
+  };
+  preCode: {
+    value: string;
+  };
+  postCode: {
+    value: string;
+  };
+}
+export interface CodeReplCustomizationArgs {
+  language: {
+    value: string;
+  };
+  placeholder: {
+    value: string;
+  };
+  preCode: {
+    value: string;
+  };
+  postCode: {
+    value: string;
+  };
+}
+
+
+export interface ContinueCustomizationArgsBackendDict {
+  buttonText: {
+    value: SubtitledUnicodeBackendDict;
+  };
+}
+export interface ContinueCustomizationArgs {
+  buttonText: {
+    value: SubtitledUnicode;
+  };
+}
+
+
+export interface DragAndDropSortInputCustomizationArgsBackendDict {
+  choices: {
+    value: SubtitledHtmlBackendDict[];
+  };
+  allowMultipleItemsInSamePosition: {
+    value: boolean;
+  }
+}
+export interface DragAndDropSortInputCustomizationArgs {
+  choices: {
+    value: SubtitledHtml[];
   };
   allowMultipleItemsInSamePosition: {
     value: boolean;
   }
 }
 
-export interface IEndExplorationCustomizationArgs {
-  recommendedExplorationIds?: {
+
+interface EndExplorationCustomizationArgsBackendDict {
+  recommendedExplorationIds: {
+    value: string[];
+  };
+}
+export interface EndExplorationCustomizationArgs {
+  recommendedExplorationIds: {
     value: string[];
   };
 }
 
-export interface IFractionInputCustomizationArgs {
-  requireSimplestForm?: {
+
+export interface FractionInputCustomizationArgsBackendDict {
+  requireSimplestForm: {
     value: string;
   };
-  allowImproperFraction?: {
+  allowImproperFraction: {
     value: string;
   };
-  allowNonzeroIntegerPart?: {
+  allowNonzeroIntegerPart: {
     value: string;
   };
-  customPlaceholder?: {
+  customPlaceholder: {
+    value: SubtitledUnicodeBackendDict;
+  };
+}
+export interface FractionInputCustomizationArgs {
+  requireSimplestForm: {
     value: string;
+  };
+  allowImproperFraction: {
+    value: string;
+  };
+  allowNonzeroIntegerPart: {
+    value: string;
+  };
+  customPlaceholder: {
+    value: SubtitledUnicode;
   };
 }
 
-export interface IGraphInputCustomizationArgs {
-  graph?: {
-    value: IGraphAnswer;
+
+interface GraphInputCustomizationArgsBackendDict {
+  graph: {
+    value: GraphAnswer;
+  };
+  canAddVertex: {
+    value: boolean;
+  };
+  canDeleteVertex: {
+    value: boolean;
+  };
+  canEditVertexLabel: {
+    value: boolean;
+  };
+  canMoveVertex: {
+    value: boolean;
+  };
+  canAddEdge: {
+    value: boolean;
+  };
+  canDeleteEdge: {
+    value: boolean;
+  };
+  canEditEdgeWeight: {
+    value: boolean;
+  };
+}
+export interface GraphInputCustomizationArgs {
+  graph: {
+    value: GraphAnswer;
   };
   canAddVertex: {
     value: boolean;
@@ -114,117 +207,233 @@ export interface IGraphInputCustomizationArgs {
   };
 }
 
-export interface IImageClickInputCustomizationArgs {
-  imageAndRegions?: {
-    value: IImageWithRegions;
+
+interface ImageClickInputCustomizationArgsBackendDict {
+  imageAndRegions: {
+    value: ImageWithRegions;
   };
-  highlightRegionsOnHover?: {
+  highlightRegionsOnHover: {
     value: string;
   };
 }
+export interface ImageClickInputCustomizationArgs {
+  imageAndRegions: {
+    value: ImageWithRegions;
+  };
+  highlightRegionsOnHover: {
+    value: boolean;
+  };
+}
 
-export interface IInteractiveMapCustomizationArgs {
-  latitude?: {
+
+interface InteractiveMapCustomizationArgsBackendDict {
+  latitude: {
     value: number;
   };
-  longitude?: {
+  longitude: {
     value: number;
   };
-  zoom?: {
+  zoom: {
     value: string;
   };
 }
-
-export interface IItemSelectionInputCustomizationArgs {
-  choices?: {
-    value: string[];
-  };
-  maxAllowableSelectionCount?: {
+export interface InteractiveMapCustomizationArgs {
+  latitude: {
     value: number;
   };
-  minAllowableSelectionCount?: {
+  longitude: {
+    value: number;
+  };
+  zoom: {
     value: number;
   };
 }
 
-export interface ILogicCustomizationArgs {
-  question?: {
+
+export interface ItemSelectionInputCustomizationArgsBackendDict {
+  choices: {
+    value: SubtitledHtmlBackendDict[];
+  };
+  maxAllowableSelectionCount: {
+    value: number;
+  };
+  minAllowableSelectionCount: {
+    value: number;
+  };
+}
+export interface ItemSelectionInputCustomizationArgs {
+  choices: {
+    value: SubtitledHtml[];
+  };
+  maxAllowableSelectionCount: {
+    value: number;
+  };
+  minAllowableSelectionCount: {
+    value: number;
+  };
+}
+
+
+interface LogicProofCustomizationArgsBackendDict {
+  question: {
+    value: Object;
+  };
+}
+export interface LogicProofCustomizationArgs {
+  question: {
     value: Object;
   };
 }
 
-export interface IMathEquationInputCustomizationArgs { }
 
-export interface IMultipleChoiceInputCustomizationArgs {
-  showChoicesInShuffledOrder?: {
-    value: string;
+interface MathEquationInputCustomizationArgsBackendDict {
+  customOskLetters: {
+    value: string[];
   };
-  choices?: {
+}
+export interface MathEquationInputCustomizationArgs {
+  customOskLetters: {
     value: string[];
   };
 }
 
-export interface IMusicNotesInputCustomizationArgs {
-  sequenceToGuess?: {
-    value: IReadableMusicNote[];
+
+export interface MultipleChoiceInputCustomizationArgsBackendDict {
+  showChoicesInShuffledOrder: {
+    value: boolean;
   };
-  initialSequence?: {
-    value: IReadableMusicNote[];
+  choices: {
+    value: SubtitledHtmlBackendDict[];
+  };
+}
+export interface MultipleChoiceInputCustomizationArgs {
+  showChoicesInShuffledOrder: {
+    value: boolean;
+  };
+  choices: {
+    value: SubtitledHtml[];
   };
 }
 
-export interface IPencilCodeCustomizationArgs {
-  initialCode?: {
+
+interface MusicNotesInputCustomizationArgsBackendDict {
+  sequenceToGuess: {
+    value: ReadableMusicNote[];
+  };
+  initialSequence: {
+    value: ReadableMusicNote[];
+  };
+}
+export interface MusicNotesInputCustomizationArgs {
+  sequenceToGuess: {
+    value: ReadableMusicNote[];
+  };
+  initialSequence: {
+    value: ReadableMusicNote[];
+  };
+}
+
+
+interface PencilCodeEditorCustomizationArgsBackendDict {
+  initialCode: {
+    value: string;
+  };
+}
+export interface PencilCodeEditorCustomizationArgs {
+  initialCode: {
     value: string;
   };
 }
 
-export interface ISetInputCustomizationArgs {
-  buttonText?: {
-    value: string;
+
+export interface SetInputCustomizationArgsBackendDict {
+  buttonText: {
+    value: SubtitledUnicodeBackendDict;
+  };
+}
+export interface SetInputCustomizationArgs {
+  buttonText: {
+    value: SubtitledUnicode;
   };
 }
 
-export interface ITextInputCustomizationArgs {
-  placeholder?: {
-    value: string;
+
+export interface TextInputCustomizationArgsBackendDict {
+  placeholder: {
+    value: SubtitledUnicodeBackendDict;
   };
-  rows?: {
+  rows: {
+    value: number;
+  };
+}
+export interface TextInputCustomizationArgs {
+  placeholder: {
+    value: SubtitledUnicode;
+  };
+  rows: {
     value: number;
   };
 }
 
-export interface IMathExpressionCustomizationArgs { }
 
-export interface INumericExpressionInputCustomizationArgs { }
+interface MathExpressionInputCustomizationArgsBackendDict { }
+export interface MathExpressionInputCustomizationArgs { }
 
-export interface INumericInputCustomizationArgs { }
 
-export interface INumberWithUnitsCustomizationArgs { }
+interface NumericExpressionInputCustomizationArgsBackendDict { }
+export interface NumericExpressionInputCustomizationArgs { }
 
-export interface INumberWithUnitsCustomizationArgs {
 
-}
+interface NumericInputCustomizationArgsBackendDict { }
+export interface NumericInputCustomizationArgs { }
 
-export type IInteractionCustomizationArgs = (
-  IAlgebraicExpressionInputCustomizationArgs |
-  ICodeReplCustomizationArgs |
-  IContinueCustomizationArgs |
-  IDragAndDropSortInputCustomizationArgs |
-  IEndExplorationCustomizationArgs |
-  IFractionInputCustomizationArgs |
-  IGraphInputCustomizationArgs |
-  IImageClickInputCustomizationArgs |
-  IInteractiveMapCustomizationArgs |
-  IItemSelectionInputCustomizationArgs |
-  ILogicCustomizationArgs |
-  IMathEquationInputCustomizationArgs |
-  IMathExpressionCustomizationArgs |
-  IMultipleChoiceInputCustomizationArgs |
-  IMusicNotesInputCustomizationArgs |
-  INumberWithUnitsCustomizationArgs |
-  INumericExpressionInputCustomizationArgs |
-  INumericInputCustomizationArgs |
-  IPencilCodeCustomizationArgs |
-  ISetInputCustomizationArgs |
-  ITextInputCustomizationArgs);
+
+interface NumberWithUnitsCustomizationArgsBackendDict { }
+export interface NumberWithUnitsCustomizationArgs { }
+
+
+export type InteractionCustomizationArgsBackendDict = (
+  AlgebraicExpressionInputCustomizationArgsBackendDict |
+  CodeReplCustomizationArgsBackendDict |
+  ContinueCustomizationArgsBackendDict |
+  DragAndDropSortInputCustomizationArgsBackendDict |
+  EndExplorationCustomizationArgsBackendDict |
+  FractionInputCustomizationArgsBackendDict |
+  GraphInputCustomizationArgsBackendDict |
+  ImageClickInputCustomizationArgsBackendDict |
+  InteractiveMapCustomizationArgsBackendDict |
+  ItemSelectionInputCustomizationArgsBackendDict |
+  LogicProofCustomizationArgsBackendDict |
+  MathEquationInputCustomizationArgsBackendDict |
+  MathExpressionInputCustomizationArgsBackendDict |
+  MultipleChoiceInputCustomizationArgsBackendDict |
+  MusicNotesInputCustomizationArgsBackendDict |
+  NumberWithUnitsCustomizationArgsBackendDict |
+  NumericExpressionInputCustomizationArgsBackendDict |
+  NumericInputCustomizationArgsBackendDict |
+  PencilCodeEditorCustomizationArgsBackendDict |
+  SetInputCustomizationArgsBackendDict |
+  TextInputCustomizationArgsBackendDict);
+
+export type InteractionCustomizationArgs = (
+  AlgebraicExpressionInputCustomizationArgs |
+  CodeReplCustomizationArgs |
+  ContinueCustomizationArgs |
+  DragAndDropSortInputCustomizationArgs |
+  EndExplorationCustomizationArgs |
+  FractionInputCustomizationArgs |
+  GraphInputCustomizationArgs |
+  ImageClickInputCustomizationArgs |
+  InteractiveMapCustomizationArgs |
+  ItemSelectionInputCustomizationArgs |
+  LogicProofCustomizationArgs |
+  MathEquationInputCustomizationArgs |
+  MathExpressionInputCustomizationArgs |
+  MultipleChoiceInputCustomizationArgs |
+  MusicNotesInputCustomizationArgs |
+  NumberWithUnitsCustomizationArgs |
+  NumericExpressionInputCustomizationArgs |
+  NumericInputCustomizationArgs |
+  PencilCodeEditorCustomizationArgs |
+  SetInputCustomizationArgs |
+  TextInputCustomizationArgs);

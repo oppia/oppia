@@ -69,6 +69,11 @@ describe('Topic editor routing service', function() {
     TopicEditorRoutingService.navigateToMainTab();
     $rootScope.$apply();
     expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
+
+    TopicEditorRoutingService.navigateToTopicPreviewTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getActiveTabName()).toEqual(
+      'topic_preview');
   });
 
   it('should handle calls with unexpect paths', function() {
@@ -90,5 +95,28 @@ describe('Topic editor routing service', function() {
     TopicEditorRoutingService.navigateToSkillEditorWithId('10');
     expect($window.open).toHaveBeenCalled();
     expect($window.open).toHaveBeenCalledWith('/skill_editor/10');
+  });
+
+  it('should return last tab visited', function() {
+    TopicEditorRoutingService.navigateToSubtopicEditorWithId(1);
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastTabVisited()).toEqual('subtopic');
+    TopicEditorRoutingService.navigateToMainTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastTabVisited()).toEqual('topic');
+  });
+
+  it('should return last visited subtopic id', function() {
+    TopicEditorRoutingService.navigateToSubtopicPreviewTab(1);
+    $rootScope.$apply();
+    TopicEditorRoutingService.navigateToQuestionsTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastSubtopicIdVisited()).toEqual(1);
+
+    TopicEditorRoutingService.navigateToSubtopicPreviewTab(5);
+    $rootScope.$apply();
+    TopicEditorRoutingService.navigateToQuestionsTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastSubtopicIdVisited()).toEqual(5);
   });
 });

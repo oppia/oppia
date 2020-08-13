@@ -27,6 +27,7 @@ import { ReviewTestBackendDict, ReviewTest, ReviewTestObjectFactory } from
   'domain/review_test/review-test-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 
 @Injectable({
   providedIn: 'root'
@@ -35,23 +36,32 @@ export class ReviewTestBackendApiService {
   constructor(
     private http: HttpClient,
     private reviewTestObjectFactory: ReviewTestObjectFactory,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService
   ) {}
 
-  _fetchReviewTestData(storyId: string): Promise<ReviewTest> {
+  _fetchReviewTestData(storyUrlFragment: string): Promise<ReviewTest> {
     return this.http.get<ReviewTestBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
-        {story_id: storyId}
+        {
+          topic_url_fragment: (
+            this.urlService.getTopicUrlFragmentFromLearnerUrl()),
+          classroom_url_fragment: (
+            this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
+          story_url_fragment: storyUrlFragment
+        }
       )
     ).toPromise().then(backendResponse => {
       return this.reviewTestObjectFactory.createFromBackendDict(
         backendResponse);
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 
-  fetchReviewTestData(storyId: string): Promise<ReviewTest> {
-    return this._fetchReviewTestData(storyId);
+  fetchReviewTestData(storyUrlFragment: string): Promise<ReviewTest> {
+    return this._fetchReviewTestData(storyUrlFragment);
   }
 }
 

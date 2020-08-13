@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import re
 
 from constants import constants
 from core.domain import android_validation_constants
@@ -50,10 +51,12 @@ TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
+TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
+SUBTOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
 
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
@@ -109,14 +112,16 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
         TOPIC_PROPERTY_LANGUAGE_CODE,
         TOPIC_PROPERTY_THUMBNAIL_FILENAME,
-        TOPIC_PROPERTY_THUMBNAIL_BG_COLOR)
+        TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
+        TOPIC_PROPERTY_URL_FRAGMENT)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
     SUBTOPIC_PROPERTIES = (
         SUBTOPIC_PROPERTY_TITLE,
         SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
-        SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR)
+        SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
+        SUBTOPIC_PROPERTY_URL_FRAGMENT)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -255,7 +260,7 @@ class StoryReference(python_utils.OBJECT):
         """Returns a dict representing this StoryReference domain object.
 
         Returns:
-            A dict, mapping all fields of StoryReference instance.
+            dict. A dict, mapping all fields of StoryReference instance.
         """
         return {
             'story_id': self.story_id,
@@ -295,7 +300,7 @@ class StoryReference(python_utils.OBJECT):
         """Validates various properties of the StoryReference object.
 
         Raises:
-            ValidationError: One or more attributes of the StoryReference are
+            ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
         if not isinstance(self.story_id, python_utils.BASESTRING):
@@ -313,7 +318,7 @@ class Subtopic(python_utils.OBJECT):
 
     def __init__(
             self, subtopic_id, title, skill_ids, thumbnail_filename,
-            thumbnail_bg_color):
+            thumbnail_bg_color, url_fragment):
         """Constructs a Subtopic domain object.
 
         Args:
@@ -325,25 +330,29 @@ class Subtopic(python_utils.OBJECT):
                 subtopic.
             thumbnail_bg_color: str|None. The thumbnail background color for
                 the subtopic.
+            url_fragment: str. The url fragment for the subtopic.
         """
         self.id = subtopic_id
         self.title = title
         self.skill_ids = skill_ids
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.url_fragment = url_fragment
+
 
     def to_dict(self):
         """Returns a dict representing this Subtopic domain object.
 
         Returns:
-            A dict, mapping all fields of Subtopic instance.
+            dict. A dict, mapping all fields of Subtopic instance.
         """
         return {
             'id': self.id,
             'title': self.title,
             'skill_ids': self.skill_ids,
             'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color
+            'thumbnail_bg_color': self.thumbnail_bg_color,
+            'url_fragment': self.url_fragment
         }
 
     @classmethod
@@ -359,7 +368,7 @@ class Subtopic(python_utils.OBJECT):
         subtopic = cls(
             subtopic_dict['id'], subtopic_dict['title'],
             subtopic_dict['skill_ids'], subtopic_dict['thumbnail_filename'],
-            subtopic_dict['thumbnail_bg_color'])
+            subtopic_dict['thumbnail_bg_color'], subtopic_dict['url_fragment'])
         return subtopic
 
     @classmethod
@@ -374,7 +383,7 @@ class Subtopic(python_utils.OBJECT):
             Subtopic. A subtopic object with given id, title and empty skill ids
             list.
         """
-        return cls(subtopic_id, title, [], None, None)
+        return cls(subtopic_id, title, [], None, None, '')
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -405,7 +414,7 @@ class Subtopic(python_utils.OBJECT):
         """Validates various properties of the Subtopic object.
 
         Raises:
-            ValidationError: One or more attributes of the subtopic are
+            ValidationError. One or more attributes of the subtopic are
                 invalid.
         """
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
@@ -455,10 +464,10 @@ class Topic(python_utils.OBJECT):
     """Domain object for an Oppia Topic."""
 
     def __init__(
-            self, topic_id, name, abbreviated_name, thumbnail_filename,
-            thumbnail_bg_color, description, canonical_story_references,
-            additional_story_references, uncategorized_skill_ids,
-            subtopics, subtopic_schema_version,
+            self, topic_id, name, abbreviated_name, url_fragment,
+            thumbnail_filename, thumbnail_bg_color, description,
+            canonical_story_references, additional_story_references,
+            uncategorized_skill_ids, subtopics, subtopic_schema_version,
             next_subtopic_id, language_code, version,
             story_reference_schema_version, created_on=None,
             last_updated=None):
@@ -468,6 +477,7 @@ class Topic(python_utils.OBJECT):
             topic_id: str. The unique ID of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated topic name.
+            url_fragment: str. The url fragment of the topic.
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
@@ -498,6 +508,7 @@ class Topic(python_utils.OBJECT):
         self.id = topic_id
         self.name = name
         self.abbreviated_name = abbreviated_name
+        self.url_fragment = url_fragment
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
         self.canonical_name = name.lower()
@@ -518,12 +529,13 @@ class Topic(python_utils.OBJECT):
         """Returns a dict representing this Topic domain object.
 
         Returns:
-            A dict, mapping all fields of Topic instance.
+            dict. A dict, mapping all fields of Topic instance.
         """
         return {
             'id': self.id,
             'name': self.name,
             'abbreviated_name': self.abbreviated_name,
+            'url_fragment': self.url_fragment,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'description': self.description,
@@ -579,6 +591,17 @@ class Topic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Topic name should be at most %d characters, received %s.'
                 % (name_limit, name))
+
+    @classmethod
+    def require_valid_url_fragment(cls, url_fragment):
+        """Checks whether the url fragment of the topic is a valid one.
+
+        Args:
+            url_fragment: str. The url fragment to validate.
+        """
+        utils.require_valid_url_fragment(
+            url_fragment, 'Topic URL Fragment',
+            constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -735,16 +758,18 @@ class Topic(python_utils.OBJECT):
             Exception. Invalid input.
         """
         if not isinstance(from_index, int):
-            raise Exception('Expected from_index value to be a number, '
-                            'received %s' % from_index)
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
 
         if not isinstance(to_index, int):
-            raise Exception('Expected to_index value to be a number, '
-                            'received %s' % to_index)
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
 
         if from_index == to_index:
-            raise Exception('Expected from_index and to_index values '
-                            'to be different.')
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
 
         if (from_index >= len(self.canonical_story_references) or
                 from_index < 0):
@@ -819,10 +844,11 @@ class Topic(python_utils.OBJECT):
                 published or is going to be published.
 
         Raises:
-            ValidationError: One or more attributes of the Topic are not
+            ValidationError. One or more attributes of the Topic are not
                 valid.
         """
         self.require_valid_name(self.name)
+        self.require_valid_url_fragment(self.url_fragment)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
@@ -897,6 +923,11 @@ class Topic(python_utils.OBJECT):
                         'Subtopic with title %s does not have any skills '
                         'linked.' % subtopic.title)
 
+        if not self.are_subtopic_url_fragments_unique():
+            raise utils.ValidationError(
+                'Subtopic url fragments are not unique across '
+                'subtopics in the topic')
+
         if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
@@ -942,7 +973,7 @@ class Topic(python_utils.OBJECT):
 
     @classmethod
     def create_default_topic(
-            cls, topic_id, name, abbreviated_name, description):
+            cls, topic_id, name, url_fragment, description):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
@@ -950,18 +981,35 @@ class Topic(python_utils.OBJECT):
         Args:
             topic_id: str. The unique id of the topic.
             name: str. The initial name for the topic.
-            abbreviated_name: str. The abbreviated name for the topic.
+            url_fragment: str. The url fragment for the topic.
             description: str. The description for the topic.
 
         Returns:
             Topic. The Topic domain object with the default values.
         """
         return cls(
-            topic_id, name, abbreviated_name, None, None,
+            topic_id, name, name, url_fragment, None, None,
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
+
+    @classmethod
+    def _convert_subtopic_v2_dict_to_v3_dict(cls, subtopic_dict):
+        """Converts old Subtopic schema to the modern v3 schema. v3 schema
+        introduces the url_fragment field.
+
+        Args:
+            subtopic_dict: dict. A dict used to initialize a Subtopic domain
+                object.
+
+        Returns:
+            dict. The converted subtopic_dict.
+        """
+        subtopic_title = re.sub('[^a-z]+', '', subtopic_dict['title'])
+        subtopic_dict['url_fragment'] = (
+            subtopic_title[:constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT])
+        return subtopic_dict
 
     @classmethod
     def _convert_subtopic_v1_dict_to_v2_dict(cls, subtopic_dict):
@@ -1043,7 +1091,7 @@ class Topic(python_utils.OBJECT):
             new_name: str. The updated name for the topic.
 
         Raises:
-            ValidationError: Name should be a string.
+            ValidationError. Name should be a string.
         """
         if not isinstance(new_name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
@@ -1058,6 +1106,14 @@ class Topic(python_utils.OBJECT):
                 for the topic.
         """
         self.abbreviated_name = new_abbreviated_name
+
+    def update_url_fragment(self, new_url_fragment):
+        """Updates the url_fragment of a topic object.
+
+        Args:
+            new_url_fragment: str. The updated url_fragment for the topic.
+        """
+        self.url_fragment = new_url_fragment
 
     def update_thumbnail_filename(self, new_thumbnail_filename):
         """Updates the thumbnail filename of a topic object.
@@ -1238,6 +1294,22 @@ class Topic(python_utils.OBJECT):
         self.subtopics[subtopic_index].thumbnail_filename = (
             new_thumbnail_filename)
 
+    def update_subtopic_url_fragment(self, subtopic_id, new_url_fragment):
+        """Updates the url fragment of the subtopic.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to edit.
+            new_url_fragment: str. The new url fragment of the subtopic.
+        """
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % subtopic_id)
+        utils.require_valid_url_fragment(
+            new_url_fragment, 'Subtopic Url Fragment',
+            constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
+        self.subtopics[subtopic_index].url_fragment = new_url_fragment
+
     def update_subtopic_thumbnail_bg_color(
             self, subtopic_id, new_thumbnail_bg_color):
         """Updates the thumbnail background color property of the new subtopic.
@@ -1269,16 +1341,18 @@ class Topic(python_utils.OBJECT):
             Exception. Invalid input.
         """
         if not isinstance(from_index, int):
-            raise Exception('Expected from_index value to be a number, '
-                            'received %s' % from_index)
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
 
         if not isinstance(to_index, int):
-            raise Exception('Expected to_index value to be a number, '
-                            'received %s' % to_index)
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
 
         if from_index == to_index:
-            raise Exception('Expected from_index and to_index values '
-                            'to be different.')
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
 
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
@@ -1307,16 +1381,18 @@ class Topic(python_utils.OBJECT):
             Exception. Invalid input.
         """
         if not isinstance(from_index, int):
-            raise Exception('Expected from_index value to be a number, '
-                            'received %s' % from_index)
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
 
         if not isinstance(to_index, int):
-            raise Exception('Expected to_index value to be a number, '
-                            'received %s' % to_index)
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
 
         if from_index == to_index:
-            raise Exception('Expected from_index and to_index values '
-                            'to be different.')
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
 
         if from_index >= len(self.subtopics) or from_index < 0:
             raise Exception('Expected from_index value to be with-in bounds.')
@@ -1404,6 +1480,18 @@ class Topic(python_utils.OBJECT):
         self.subtopics[subtopic_index].skill_ids.remove(skill_id)
         self.uncategorized_skill_ids.append(skill_id)
 
+    def are_subtopic_url_fragments_unique(self):
+        """Checks if all the subtopic url fragments are unique across the
+        topic.
+
+        Returns:
+            bool. Whether the subtopic url fragments are unique in the topic.
+        """
+        url_fragments_list = [
+            subtopic.url_fragment for subtopic in self.subtopics]
+        url_fragments_set = set(url_fragments_list)
+        return len(url_fragments_list) == len(url_fragments_set)
+
 
 class TopicSummary(python_utils.OBJECT):
     """Domain object for Topic Summary."""
@@ -1412,6 +1500,7 @@ class TopicSummary(python_utils.OBJECT):
             self, topic_id, name, canonical_name, language_code, description,
             version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
+            thumbnail_filename, thumbnail_bg_color, url_fragment,
             topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
@@ -1431,6 +1520,9 @@ class TopicSummary(python_utils.OBJECT):
             subtopic_count: int. The number of subtopics in the topic.
             total_skill_count: int. The total number of skills in the topic
                 (including those that are uncategorized).
+            thumbnail_filename: str. The filename for the topic thumbnail.
+            thumbnail_bg_color: str. The background color for the thumbnail.
+            url_fragment: str. The url fragment of the topic.
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
@@ -1447,16 +1539,31 @@ class TopicSummary(python_utils.OBJECT):
         self.uncategorized_skill_count = uncategorized_skill_count
         self.subtopic_count = subtopic_count
         self.total_skill_count = total_skill_count
+        self.thumbnail_filename = thumbnail_filename
+        self.thumbnail_bg_color = thumbnail_bg_color
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
+        self.url_fragment = url_fragment
+
+    @classmethod
+    def require_valid_url_fragment(cls, url_fragment):
+        """Checks whether the url fragment of the topic is a valid one.
+
+        Args:
+            url_fragment: str. The url fragment to validate.
+        """
+        utils.require_valid_url_fragment(
+            url_fragment, 'Topic URL Fragment',
+            constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
 
     def validate(self):
         """Validates all properties of this topic summary.
 
         Raises:
-            ValidationError: One or more attributes of the Topic summary
+            ValidationError. One or more attributes of the Topic summary
                 are not valid.
         """
+        self.require_valid_url_fragment(self.url_fragment)
         if not isinstance(self.name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
         if self.name == '':
@@ -1466,6 +1573,21 @@ class TopicSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
+
+        utils.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if (
+                self.thumbnail_bg_color is not None and not (
+                    Topic.require_valid_thumbnail_bg_color(
+                        self.thumbnail_bg_color))):
+            raise utils.ValidationError(
+                'Topic thumbnail background color %s is not supported.' % (
+                    self.thumbnail_bg_color))
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Topic thumbnail image is not provided.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Topic thumbnail background color is not specified.')
 
         if not isinstance(self.canonical_name, python_utils.BASESTRING):
             raise utils.ValidationError('Canonical name should be a string.')
@@ -1546,6 +1668,7 @@ class TopicSummary(python_utils.OBJECT):
         return {
             'id': self.id,
             'name': self.name,
+            'url_fragment': self.url_fragment,
             'language_code': self.language_code,
             'description': self.description,
             'version': self.version,
@@ -1554,6 +1677,8 @@ class TopicSummary(python_utils.OBJECT):
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
             'total_skill_count': self.total_skill_count,
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
             'topic_model_created_on': utils.get_time_in_millisecs(
                 self.topic_model_created_on),
             'topic_model_last_updated': utils.get_time_in_millisecs(

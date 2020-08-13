@@ -21,17 +21,17 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { AppConstants } from 'app.constants';
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { ISetInputCustomizationArgs } from
+import { SetInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule } from
   'domain/exploration/RuleObjectFactory';
-import { AppConstants } from 'app.constants';
 
-interface IPreviousRule {
+interface PreviousRule {
   answerGroupIndex: number;
   ruleIndex: number;
   rule: Rule;
@@ -86,17 +86,17 @@ export class SetInputValidationService {
   }
 
   getCustomizationArgsWarnings(
-      customizationArgs: ISetInputCustomizationArgs): IWarning[] {
+      customizationArgs: SetInputCustomizationArgs): Warning[] {
     let warningsList = [];
 
-    let buttonText = customizationArgs.buttonText &&
-      customizationArgs.buttonText.value;
-    if (!angular.isString(buttonText)) {
+    let buttonText = (
+      customizationArgs.buttonText && customizationArgs.buttonText.value);
+    if (!buttonText || !angular.isString(buttonText.getUnicode())) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: 'Button text must be a string.'
       });
-    } else if (buttonText.length === 0) {
+    } else if (buttonText.getUnicode().length === 0) {
       warningsList.push({
         message: 'Label for this button should not be empty.',
         type: AppConstants.WARNING_TYPES.ERROR
@@ -111,12 +111,12 @@ export class SetInputValidationService {
    * A rule is considered redundant if it will never be matched.
    *
    * @param {AnswerGroup[]} answerGroups answer groups created from user input.
-   * @return {IWarning[]} Array of warnings.
+   * @return {Warning[]} Array of warnings.
    */
-  getRedundantRuleWarnings(answerGroups: AnswerGroup[]): IWarning[] {
-    let warningsList: IWarning[] = [];
+  getRedundantRuleWarnings(answerGroups: AnswerGroup[]): Warning[] {
+    let warningsList: Warning[] = [];
 
-    let previousRules: IPreviousRule[] = [];
+    let previousRules: PreviousRule[] = [];
 
     for (let [answerGroupIndex, answerGroup] of answerGroups.entries()) {
       for (let [ruleIndex, rule] of answerGroup.rules.entries()) {
@@ -188,8 +188,8 @@ export class SetInputValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: ISetInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      stateName: string, customizationArgs: SetInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     return [
       ...this.getCustomizationArgsWarnings(customizationArgs),
       ...this.getRedundantRuleWarnings(answerGroups),

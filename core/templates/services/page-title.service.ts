@@ -13,21 +13,43 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to set the title of the page.
+ * @fileoverview Service to set and get the title of the page.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PageTitleService {
+  pageTitleForMobile: string = null;
+  pageSubtitleForMobile: string = null;
   constructor(private titleService: Title) {}
 
   setPageTitle(title: string) {
     this.titleService.setTitle(title);
+  }
+
+  getPageTitle(): string {
+    return this.titleService.getTitle();
+  }
+
+  setPageTitleForMobileView(title: string): void {
+    this.pageTitleForMobile = title;
+  }
+
+  setPageSubtitleForMobileView(subtitle: string): void {
+    this.pageSubtitleForMobile = subtitle;
+  }
+
+  getPageTitleForMobileView(): string {
+    return this.pageTitleForMobile;
+  }
+
+  getPageSubtitleForMobileView(): string {
+    return this.pageSubtitleForMobile;
   }
 }
 

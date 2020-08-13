@@ -28,7 +28,7 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
-import { IInteractiveMapCustomizationArgs } from
+import { InteractiveMapCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('InteractiveMapValidationService', () => {
@@ -37,7 +37,7 @@ describe('InteractiveMapValidationService', () => {
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let customizationArguments: IInteractiveMapCustomizationArgs;
+  let customizationArguments: InteractiveMapCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
@@ -70,6 +70,9 @@ describe('InteractiveMapValidationService', () => {
       },
       longitude: {
         value: 0
+      },
+      zoom: {
+        value: 0
       }
     };
     goodAnswerGroups = [agof.createNew(
@@ -101,6 +104,11 @@ describe('InteractiveMapValidationService', () => {
     () => {
       expect(() => {
         validatorService.getAllWarnings(
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'InteractiveMapCustomizationArgs'." We are
+          // purposely assigning the wrong type of customization args in
+          // order to test validations.
+          // @ts-expect-error
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have properties: ' +

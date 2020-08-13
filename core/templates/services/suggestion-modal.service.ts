@@ -19,10 +19,10 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface IParamDict {
+export interface ParamDict {
   action: string;
-  audioUpdateRequired?: boolean;
-  commitMessage?: string;
+  audioUpdateRequired: boolean;
+  commitMessage: string;
   reviewMessage: string;
 }
 
@@ -46,24 +46,19 @@ export class SuggestionModalService {
   SUGGESTION_ACCEPTED: string = 'accepted';
   SUGGESTION_REJECTED: string = 'rejected';
 
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
-  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
-  // have a TS interface.
-  acceptSuggestion($uibModalInstance: any, paramDict: IParamDict): void {
+  acceptSuggestion(
+      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+      paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
 
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
-  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
-  // have a TS interface.
-  rejectSuggestion($uibModalInstance: any, paramDict: IParamDict): void {
+  rejectSuggestion(
+      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+      paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
-
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
-  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
-  // have a TS interface.
-  cancelSuggestion($uibModalInstance: any): void {
+  cancelSuggestion(
+      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance): void {
     $uibModalInstance.dismiss('cancel');
   }
 }

@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IMultipleChoiceInputCustomizationArgs } from
+import { MultipleChoiceInputCustomizationArgs } from
   'interactions/customization-args-defs';
 /* eslint-disable max-len */
 import { MultipleChoiceInputValidationService } from
@@ -29,6 +29,8 @@ import { MultipleChoiceInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
@@ -40,7 +42,7 @@ describe('MultipleChoiceInputValidationService', () => {
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[],
     goodDefaultOutcome: Outcome;
   let validatorService: MultipleChoiceInputValidationService,
-    customizationArguments: IMultipleChoiceInputCustomizationArgs;
+    customizationArguments: MultipleChoiceInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let rof: RuleObjectFactory;
 
@@ -82,7 +84,13 @@ describe('MultipleChoiceInputValidationService', () => {
 
     customizationArguments = {
       choices: {
-        value: ['Option 1', 'Option 2']
+        value: [
+          new SubtitledHtml('Option 1', ''),
+          new SubtitledHtml('Option 2', '')
+        ]
+      },
+      showChoicesInShuffledOrder: {
+        value: true
       }
     };
 
@@ -113,13 +121,18 @@ describe('MultipleChoiceInputValidationService', () => {
   it('should expect a choices customization argument', () => {
     expect(() => {
       validatorService.getAllWarnings(
+      // This throws "Argument of type '{}' is not assignable to
+      // parameter of type 'MultipleChoiceInputCustomizationArgs'." We are
+      // purposely assigning the wrong type of customization args in order
+      // to test validations.
+      // @ts-expect-error
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have property: choices');
   });
 
   it('should expect non-empty and unique choices', () => {
-    customizationArguments.choices.value[0] = '';
+    customizationArguments.choices.value[0].setHtml('');
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -128,7 +141,7 @@ describe('MultipleChoiceInputValidationService', () => {
       message: 'Please ensure the choices are nonempty.'
     }]);
 
-    customizationArguments.choices.value[0] = 'Option 2';
+    customizationArguments.choices.value[0].setHtml('Option 2');
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

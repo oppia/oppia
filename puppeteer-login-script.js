@@ -29,6 +29,8 @@ module.exports = async(browser, context) => {
     await setRoleAdmin(context, page);
   } else if (context.url.includes('collection/0')) {
     await createCollections(context, page);
+  } else if (context.url.includes('explore/0')) {
+    await createExplorations(context, page);
   }
   await page.close();
 };
@@ -39,7 +41,7 @@ const login = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Logging into Oppia...');
     // eslint-disable-next-line dot-notation
-    await page.goto(context.url);
+    await page.goto(context.url, { waitUntil: 'networkidle0' });
     await page.click('#admin');
     await Promise.all([
       page.waitForNavigation(),
@@ -70,7 +72,7 @@ const setRoleAdmin = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Changing role to admin...');
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles');
+    await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
     await page.waitFor(2000);
     await page.type('#update-role-username-input', 'username1');
     await page.select('#update-role-input', 'string:ADMIN');
@@ -93,7 +95,7 @@ const createCollections = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles');
+    await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
     await page.waitFor(2000);
     await page.type('#update-role-username-textbook', 'username1');
     await page.select('#update-role-input', 'string:COLLECTION_EDITOR');
@@ -111,6 +113,27 @@ const createCollections = async function(context, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Creating Collections Failed');
+    // eslint-disable-next-line no-console
+    console.log(e);
+  }
+};
+
+const createExplorations = async function(context, page) {
+  try {
+    // eslint-disable-next-line no-console
+    console.log('Creating Exploration...');
+    // Load in Exploration
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://127.0.0.1:8181/admin', { waitUntil: 'networkidle0' });
+    await page.waitFor(2000);
+    await page.evaluate('window.confirm = () => true');
+    await page.click(
+      '.protractor-test-reload-exploration-button');
+    // eslint-disable-next-line no-console
+    console.log('Exploration Created');
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('Creating Exploration Failed');
     // eslint-disable-next-line no-console
     console.log(e);
   }

@@ -12,7 +12,7 @@ cron:
   url: /cron/users/user_deletion
   schedule: every 12 hours
 - description: run user deletion verification job
-  url: /cron/users/verify_user_deletion
+  url: /cron/users/fully_complete_user_deletion
   schedule: every 12 hours
 - description: weekly exploration recommendations computation
   url: /cron/explorations/recommendations

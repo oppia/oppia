@@ -23,15 +23,15 @@ import { HttpClient } from '@angular/common/http';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { ConceptCard, IConceptCardBackendDict, ConceptCardObjectFactory} from
+import { ConceptCard, ConceptCardBackendDict, ConceptCardObjectFactory} from
   'domain/skill/ConceptCardObjectFactory';
 import { SkillDomainConstants } from
   'domain/skill/skill-domain.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface IConceptCardBackendDicts {
-  'concept_card_dicts': IConceptCardBackendDict[];
+interface ConceptCardBackendDicts {
+  'concept_card_dicts': ConceptCardBackendDict[];
 }
 
 @Injectable({
@@ -48,8 +48,8 @@ export class ConceptCardBackendApiService {
 
   private _fetchConceptCards(
       skillIds: string[],
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: ConceptCard[]) => void,
+      errorCallback: (reason: string) => void): void {
     var conceptCardDataUrl = this.urlInterpolation.interpolateUrl(
       SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(',')
@@ -57,7 +57,7 @@ export class ConceptCardBackendApiService {
 
     var conceptCardObjects = [];
 
-    this.http.get<IConceptCardBackendDicts>(conceptCardDataUrl).toPromise()
+    this.http.get<ConceptCardBackendDicts>(conceptCardDataUrl).toPromise()
       .then(response => {
         if (successCallback) {
           var conceptCardDicts = response.concept_card_dicts;
@@ -70,7 +70,7 @@ export class ConceptCardBackendApiService {
         }
       }, errorResponse => {
         if (errorCallback) {
-          errorCallback(errorResponse.error);
+          errorCallback(errorResponse.error.error);
         }
       });
   }

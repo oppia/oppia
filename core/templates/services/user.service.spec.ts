@@ -265,40 +265,41 @@ describe('User Service', function() {
     $httpBackend.flush();
   });
 
-  it('should return user community rights data', function() {
-    var sampleUserCommunityRightsDict = {
+  it('should return user contribution rights data', function() {
+    var sampleUserContributionRightsDict = {
       translation: ['hi'],
       voiceover: [],
       question: true
     };
-    $httpBackend.expect('GET', '/usercommunityrightsdatahandler').respond(
-      200, sampleUserCommunityRightsDict);
+    $httpBackend.expect('GET', '/usercontributionrightsdatahandler').respond(
+      200, sampleUserContributionRightsDict);
 
-    UserService.getUserCommunityRightsData().then(function(
-        userCommunityRights) {
-      expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
+    UserService.getUserContributionRightsData().then(function(
+        userContributionRights) {
+      expect(userContributionRights).toEqual(sampleUserContributionRightsDict);
     });
     $httpBackend.flush();
   });
 
-  it('should not fetch userCommunityRights if it is was fetched before',
+  it('should not fetch userContributionRights if it is was fetched before',
     function() {
-      var sampleUserCommunityRightsDict = {
+      var sampleUserContributionRightsDict = {
         translation: ['hi'],
         voiceover: [],
         question: true
       };
-      $httpBackend.expect('GET', '/usercommunityrightsdatahandler').respond(
-        200, sampleUserCommunityRightsDict);
+      $httpBackend.expect('GET', '/usercontributionrightsdatahandler').respond(
+        200, sampleUserContributionRightsDict);
 
-      UserService.getUserCommunityRightsData().then(
-        function(userCommunityRights) {
-          expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
-          // Fetch userCommunityRightsInfo again.
-          UserService.getUserCommunityRightsData().then(function(
-              sameUserCommunityRights) {
-            expect(sameUserCommunityRights).toEqual(
-              sampleUserCommunityRightsDict);
+      UserService.getUserContributionRightsData().then(
+        function(userContributionRights) {
+          expect(userContributionRights).toEqual(
+            sampleUserContributionRightsDict);
+          // Fetch userContributionRightsInfo again.
+          UserService.getUserContributionRightsData().then(function(
+              sameUserContributionRights) {
+            expect(sameUserContributionRights).toEqual(
+              sampleUserContributionRightsDict);
           });
         });
       $httpBackend.flush(1);

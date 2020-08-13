@@ -34,6 +34,8 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('topicEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -44,15 +46,14 @@ angular.module('oppia').directive('topicEditorNavbar', [
         '$scope', '$rootScope', '$uibModal', '$window', 'AlertsService',
         'UndoRedoService', 'TopicEditorStateService', 'UrlService',
         'TopicRightsBackendApiService', 'TopicEditorRoutingService',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED', 'TOPIC_VIEWER_URL_TEMPLATE',
         function(
             $scope, $rootScope, $uibModal, $window, AlertsService,
             UndoRedoService, TopicEditorStateService, UrlService,
             TopicRightsBackendApiService, TopicEditorRoutingService,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.isSaveInProgress = function() {
             return TopicEditorStateService.isSavingTopic();
           };
@@ -75,16 +76,28 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 'with the changes', 2000);
               return;
             }
+            var topicUrlFragment = $scope.topic.getUrlFragment();
+            var classroomUrlFragment = (
+              TopicEditorStateService.getClassroomUrlFragment());
             $window.open(
               UrlInterpolationService.interpolateUrl(
                 TOPIC_VIEWER_URL_TEMPLATE, {
-                  topic_name: $scope.topic.getName()
+                  topic_url_fragment: topicUrlFragment,
+                  classroom_url_fragment: classroomUrlFragment
                 }
               ), 'blank');
           };
 
           var _validateTopic = function() {
             $scope.validationIssues = $scope.topic.validate();
+            if (TopicEditorStateService.getTopicWithNameExists()) {
+              $scope.validationIssues.push(
+                'A topic with this name already exists.');
+            }
+            if (TopicEditorStateService.getTopicWithUrlFragmentExists()) {
+              $scope.validationIssues.push(
+                'Topic URL fragment already exists.');
+            }
             var prepublishTopicValidationIssues = (
               $scope.topic.prepublishValidate());
             var subtopicPrepublishValidationIssues = (
@@ -168,6 +181,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
           };
 
           $scope.toggleDiscardChangeButton = function() {
+            $scope.showTopicEditOptions = false;
             $scope.discardChangesButtonIsShown = (
               !$scope.discardChangesButtonIsShown);
           };
@@ -193,6 +207,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
           };
 
           $scope.unpublishTopic = function() {
+            $scope.showTopicEditOptions = false;
             if (!$scope.topicRights.canPublishTopic()) {
               return false;
             }
@@ -203,18 +218,109 @@ angular.module('oppia').directive('topicEditorNavbar', [
               });
           };
 
+          $scope.toggleNavigationOptions = function() {
+            $scope.showNavigationOptions = !$scope.showNavigationOptions;
+          };
+
+          $scope.toggleTopicEditOptions = function() {
+            $scope.showTopicEditOptions = !$scope.showTopicEditOptions;
+          };
+
+          $scope.toggleWarningText = function() {
+            $scope.warningsAreShown = !$scope.warningsAreShown;
+          };
+
+          $scope._validateTopic = function() {
+            $scope.validationIssues = $scope.topic.validate();
+            var prepublishTopicValidationIssues = (
+              $scope.topic.prepublishValidate());
+            var subtopicPrepublishValidationIssues = (
+              [].concat.apply([], $scope.topic.getSubtopics().map(
+                (subtopic) => subtopic.prepublishValidate())));
+            $scope.prepublishValidationIssues = (
+              prepublishTopicValidationIssues.concat(
+                subtopicPrepublishValidationIssues));
+          };
+
+          $scope.getWarningsCount = function() {
+            return $scope.validationIssues.length;
+          };
+
+          $scope.getTotalWarningsCount = function() {
+            var validationIssuesCount = $scope.validationIssues.length;
+            var prepublishValidationIssuesCount = (
+              $scope.prepublishValidationIssues.length);
+            return validationIssuesCount + prepublishValidationIssuesCount;
+          };
+
+          $scope.openTopicViewer = function() {
+            $scope.showNavigationOptions = false;
+            var activeTab = TopicEditorRoutingService.getActiveTabName();
+            if (activeTab !== 'subtopic_editor') {
+              if ($scope.getChangeListLength() > 0) {
+                AlertsService.addInfoMessage(
+                  'Please save all pending changes to preview the topic ' +
+                    'with the changes', 2000);
+                return;
+              }
+              var topicName = $scope.topic.getName();
+              $window.open(
+                UrlInterpolationService.interpolateUrl(
+                  TOPIC_VIEWER_URL_TEMPLATE, {
+                    topic_name: topicName
+                  }
+                ), 'blank');
+            } else {
+              $scope.activeTab = 'Preview';
+              var subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
+              TopicEditorRoutingService.navigateToSubtopicPreviewTab(
+                subtopicId);
+            }
+          };
+
+          $scope.selectMainTab = function() {
+            $scope.activeTab = 'Editor';
+            $scope.showNavigationOptions = false;
+            TopicEditorRoutingService.navigateToMainTab();
+          };
+
+          $scope.selectQuestionsTab = function() {
+            $scope.activeTab = 'Question';
+            $scope.showNavigationOptions = false;
+            TopicEditorRoutingService.navigateToQuestionsTab();
+          };
+
+          $scope.getActiveTabName = function() {
+            return TopicEditorRoutingService.getActiveTabName();
+          };
+
           ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicInitialized.subscribe(
+                () => _validateTopic()
+              ));
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicReinitialized.subscribe(
+                () => _validateTopic()
+              ));
             $scope.topicId = UrlService.getTopicIdFromUrl();
+            $scope.navigationChoices = ['Topic', 'Questions', 'Preview'];
+            $scope.activeTab = 'Editor';
+            $scope.showNavigationOptions = false;
+            $scope.warningsAreShown = false;
+            $scope.showTopicEditOptions = false;
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicSkillIds = $scope.topic.getSkillIds();
             $scope.discardChangesButtonIsShown = false;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             $scope.topicRights = TopicEditorStateService.getTopicRights();
-            $scope.$on(EVENT_TOPIC_INITIALIZED, _validateTopic);
-            $scope.$on(EVENT_TOPIC_REINITIALIZED, _validateTopic);
             $scope.$on(
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateTopic);
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

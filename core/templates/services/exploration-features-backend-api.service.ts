@@ -26,13 +26,11 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 interface ExplorationFeaturesBackendDict {
-  'is_improvements_tab_enabled': boolean;
   'is_exploration_whitelisted': boolean;
   'always_ask_learners_for_answer_details': boolean;
 }
 
 export interface ExplorationFeatures {
-  isImprovementsTabEnabled: boolean;
   isExplorationWhitelisted: boolean;
   alwaysAskLearnersForAnswerDetails: boolean;
 }
@@ -42,30 +40,23 @@ export interface ExplorationFeatures {
 })
 export class ExplorationFeaturesBackendApiService {
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient
-  ) {}
+      private http: HttpClient,
+      private urlInterpolationService: UrlInterpolationService) {}
 
-  _fetchExplorationFeatures(
+  fetchExplorationFeatures(
       explorationId: string): Promise<ExplorationFeatures> {
     return this.http.get<ExplorationFeaturesBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ServicesConstants.EXPLORATION_FEATURES_URL,
         {exploration_id: explorationId}
       )
-    ).toPromise().then(response => {
-      return {
-        isExplorationWhitelisted: response.is_exploration_whitelisted,
-        isImprovementsTabEnabled: response.is_improvements_tab_enabled,
-        alwaysAskLearnersForAnswerDetails: (
-          response.always_ask_learners_for_answer_details)
-      };
+    ).toPromise().then(response => ({
+      isExplorationWhitelisted: response.is_exploration_whitelisted,
+      alwaysAskLearnersForAnswerDetails: (
+        response.always_ask_learners_for_answer_details),
+    }), errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
-  }
-
-  fetchExplorationFeatures(
-      explorationId: string): Promise<ExplorationFeatures> {
-    return this._fetchExplorationFeatures(explorationId);
   }
 }
 

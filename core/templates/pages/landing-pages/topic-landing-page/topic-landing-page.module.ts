@@ -19,6 +19,9 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/angular-js.import';
+import 'third-party-imports/headroom.import';
+
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
@@ -26,15 +29,18 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
 ]);
 
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
+
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { TopicLandingPageComponent } from
+  'pages/landing-pages/topic-landing-page/topic-landing-page.component';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -45,6 +51,7 @@ import { ServicesConstants } from 'services/services.constants';
 import { TopicLandingPageConstants } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
 
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -52,10 +59,12 @@ import { TopicLandingPageConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    TopicLandingPageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    TopicLandingPageComponent
   ],
   providers: [
     AppConstants,

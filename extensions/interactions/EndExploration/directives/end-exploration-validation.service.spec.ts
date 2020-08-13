@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IEndExplorationCustomizationArgs } from
+import { EndExplorationCustomizationArgs } from
   'interactions/customization-args-defs';
 import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/end-exploration-validation.service';
@@ -36,7 +36,7 @@ describe('EndExplorationValidationService', () => {
 
   let currentState: string;
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
-  let customizationArguments: IEndExplorationCustomizationArgs;
+  let customizationArguments: EndExplorationCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
@@ -113,6 +113,11 @@ describe('EndExplorationValidationService', () => {
 
   it('should throw for missing recommendations argument', () => {
     expect(() => {
+      // This throws "Argument of type '{}' is not assignable to
+      // parameter of type 'EndExplorationCustomizationArgs'." We are purposely
+      // assigning the wrong type of customization args in order to test
+      // validations.
+      // @ts-expect-error
       validatorService.getAllWarnings(currentState, {}, [], null);
     }).toThrowError(
       'Expected customization arguments to have property: ' +
@@ -136,9 +141,10 @@ describe('EndExplorationValidationService', () => {
 
   it('should catch non-string value for recommended exploration ID',
     () => {
-      // TS ignore is used here because we are assigning the wrong type of
-      // value to test the warnings.
-      // @ts-ignore
+      // This throws "Type 'number' is not assignable to type 'string'."
+      // Here we are assigning the wrong type of value to
+      // "customizationArguments" in order to test validations.
+      // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = [1];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
@@ -150,9 +156,10 @@ describe('EndExplorationValidationService', () => {
 
   it('should have warnings for non-list format of recommended exploration IDs',
     () => {
-      // TS ignore is used here because we are assigning the wrong type of
-      // value to test the warnings.
-      // @ts-ignore
+      // This throws "Type '"ExpID0"' is not assignable to type 'string[]'."
+      // Here we are assigning the wrong type of value to
+      // "customizationArguments" in order to test validations.
+      // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = 'ExpID0';
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);

@@ -16,11 +16,13 @@
  * @fileoverview Unit tests for RearrangeSkillsInSubtopicsModalController.
  */
 
+import { EventEmitter } from '@angular/core';
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var $scope = null;
+  var ctrl = null;
   var topic = null;
   var $uibModalInstance = null;
   var TopicEditorStateService = null;
@@ -28,6 +30,8 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var TopicUpdateService;
   var SubtopicObjectFactory;
   var TopicObjectFactory;
+  var topicInitializedEventEmitter = null;
+  var topicReinitializedEventEmitter = null;
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -47,49 +51,99 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     topic = TopicObjectFactory.createInterstitialTopic();
     topic._subtopics = [subtopic];
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    $controller('RearrangeSkillsInSubtopicsModalController', {
+    ctrl = $controller('RearrangeSkillsInSubtopicsModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
 
     });
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should initialize the variables', function() {
-    $scope.init();
-    expect($scope.topic).toEqual(topic);
+    ctrl.init();
+    expect(ctrl.topic).toEqual(topic);
   });
 
   it('get skill editor url', function() {
-    expect($scope.getSkillEditorUrl('1')).toBe('/skill_editor/1');
+    expect(ctrl.getSkillEditorUrl('1')).toBe('/skill_editor/1');
   });
-
 
   it('should record skill summary to move and subtopic Id', function() {
     var skillSummary = SkillSummaryObjectFactory.create(
       '1', 'Skill description');
-    $scope.onMoveSkillStart(1, skillSummary);
-    expect($scope.skillSummaryToMove).toEqual(skillSummary);
-    expect($scope.oldSubtopicId).toEqual(1);
+    ctrl.onMoveSkillStart(1, skillSummary);
+    expect(ctrl.skillSummaryToMove).toEqual(skillSummary);
+    expect(ctrl.oldSubtopicId).toEqual(1);
   });
 
   it('should call TopicUpdateService when skill is moved', function() {
     var moveSkillSpy = spyOn(TopicUpdateService, 'moveSkillToSubtopic');
-    $scope.onMoveSkillEnd(1);
+    ctrl.onMoveSkillEnd(1);
     expect(moveSkillSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when skill is removed from subtopic',
     function() {
       var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      $scope.onMoveSkillEnd(null);
+      ctrl.onMoveSkillEnd(null);
       expect(removeSkillSpy).toHaveBeenCalled();
     });
 
   it('should not call TopicUpdateService when skill is moved to same subtopic',
     function() {
       var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      $scope.oldSubtopicId = null;
-      $scope.onMoveSkillEnd(null);
+      ctrl.oldSubtopicId = null;
+      ctrl.onMoveSkillEnd(null);
       expect(removeSkillSpy).not.toHaveBeenCalled();
+    });
+
+  it('should not call TopicUpdateService if subtopic name validation fails',
+    function() {
+      ctrl.editableName = 'subtopic1';
+      var subtopicTitleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
+      ctrl.updateSubtopicTitle(1);
+      expect(subtopicTitleSpy).not.toHaveBeenCalled();
+    });
+
+  it('should call TopicUpdateService to update subtopic title', function() {
+    var subtopicTitleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
+    ctrl.updateSubtopicTitle(1);
+    expect(subtopicTitleSpy).toHaveBeenCalled();
+  });
+
+  it('should call set and reset the selected subtopic index', function() {
+    ctrl.editNameOfSubtopicWithId(1);
+    expect(ctrl.selectedSubtopicId).toEqual(1);
+    ctrl.editNameOfSubtopicWithId(10);
+    expect(ctrl.selectedSubtopicId).toEqual(10);
+    ctrl.editNameOfSubtopicWithId(0);
+    expect(ctrl.editableName).toEqual('');
+    expect(ctrl.selectedSubtopicId).toEqual(0);
+  });
+
+  it('should call initEditor on calls from topic being initialized',
+    function() {
+      topicInitializedEventEmitter = new EventEmitter();
+      topicReinitializedEventEmitter = new EventEmitter();
+
+      spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
+        function() {
+          return topicInitializedEventEmitter;
+        });
+      spyOnProperty(
+        TopicEditorStateService, 'onTopicReinitialized').and.callFake(
+        function() {
+          return topicReinitializedEventEmitter;
+        });
+      spyOn(ctrl, 'initEditor').and.callThrough();
+      ctrl.init();
+      expect(ctrl.initEditor).toHaveBeenCalledTimes(1);
+      topicInitializedEventEmitter.emit();
+      expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
+      topicReinitializedEventEmitter.emit();
+      expect(ctrl.initEditor).toHaveBeenCalledTimes(3);
     });
 });

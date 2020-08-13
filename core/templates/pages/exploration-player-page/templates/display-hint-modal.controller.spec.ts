@@ -26,6 +26,8 @@ import { StateCardObjectFactory } from
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
+import { Subscription } from 'rxjs';
+
 describe('Display Hint Modal Controller', function() {
   var $rootScope = null;
   var $scope = null;
@@ -43,6 +45,9 @@ describe('Display Hint Modal Controller', function() {
 
   var card = null;
   var hintContent = null;
+
+  var testSubscriptions = null;
+  const autoplayAudioSpy = jasmine.createSpy('autoplayAudio');
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -80,7 +85,7 @@ describe('Display Hint Modal Controller', function() {
       confirmed_unclassified_answers: [],
       customization_args: {},
       hints: [],
-      id: 'interaction_1'
+      id: null
     });
     var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
     card = stateCardObjectFactory.createNewCard(
@@ -88,7 +93,10 @@ describe('Display Hint Modal Controller', function() {
       recordedVoiceovers, 'content_id');
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      AudioPlayerService.onAutoplayAudio.subscribe(
+        autoplayAudioSpy));
 
     $scope = $rootScope.$new();
     $controller('DisplayHintModalController', {
@@ -99,11 +107,15 @@ describe('Display Hint Modal Controller', function() {
     });
   }));
 
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   it('should evaluate initialized properties', function() {
     expect($scope.isHint).toBe(true);
     expect($scope.hint).toEqual(hintContent);
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('autoPlayAudio');
+    expect(autoplayAudioSpy).toHaveBeenCalled();
   });
 
   it('should dismiss modal', function() {

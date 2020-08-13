@@ -198,8 +198,14 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             interaction_dict['customization_arg_specs'], [{
                 'name': 'placeholder',
                 'description': 'Placeholder text (optional)',
-                'schema': {'type': 'unicode'},
-                'default_value': '',
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'SubtitledUnicode'
+                },
+                'default_value': {
+                    'content_id': None,
+                    'unicode_str': ''
+                },
             }, {
                 'name': 'rows',
                 'description': 'Height (in rows)',
@@ -232,7 +238,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         _check_num_interaction_rules('MultipleChoiceInput', 1)
         _check_num_interaction_rules('NumericInput', 7)
         _check_num_interaction_rules('Continue', 0)
-        with self.assertRaises(KeyError):
+        with self.assertRaisesRegexp(KeyError, 'u\'FakeObjType\''):
             _check_num_interaction_rules('FakeObjType', 0)
 
     def test_interaction_rule_descriptions_in_dict(self):
@@ -734,6 +740,11 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
-        self.assertEqual(len(missing_interaction_ids), 0, msg=(
-            'Missing interaction IDs in demo exploration: %s' %
-            missing_interaction_ids))
+        if list(missing_interaction_ids) != ['MathExpressionInput']:
+            # Ignoring the lack of the MathExpressionInput since it is going
+            # to be deprecated and explorations that use it will now be using
+            # one of AlgebraicExpressionInput, NumericExpressionInput, or
+            # MathEquationInput.
+            self.assertEqual(len(missing_interaction_ids), 0, msg=(
+                'Missing interaction IDs in demo exploration: %s' %
+                missing_interaction_ids))

@@ -27,7 +27,8 @@ import python_utils
 
 from . import common
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Python execution environment setup for scripts that require GAE.
 """)
 
@@ -69,7 +70,7 @@ def main(args=None):
                 'google_appengine_1.9.67.zip', filename='gae-download.zip')
         except Exception:
             python_utils.PRINT('Error downloading Google App Engine. Exiting.')
-            raise Exception
+            raise Exception('Error downloading Google App Engine.')
         python_utils.PRINT('Download complete. Installing Google App Engine...')
         with zipfile.ZipFile(GAE_DOWNLOAD_ZIP_PATH, 'r') as zip_ref:
             zip_ref.extractall(
@@ -92,7 +93,7 @@ def main(args=None):
                 filename='gcloud-sdk.tar.gz')
         except Exception:
             python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
-            raise Exception
+            raise Exception('Error downloading Google Cloud SDK.')
         python_utils.PRINT('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(

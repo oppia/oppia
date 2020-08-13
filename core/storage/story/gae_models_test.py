@@ -45,7 +45,8 @@ class StoryModelTest(test_utils.GenericTestBase):
             story_contents_schema_version=(
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             corresponding_topic_id='topic_id',
-            language_code='language_code')
+            language_code='language_code',
+            url_fragment='title')
         story_instance.commit(
             'committer_id', 'commit_message', [{'cmd': 'test_command'}])
         self.assertTrue(
@@ -68,7 +69,8 @@ class StoryModelTest(test_utils.GenericTestBase):
             story_contents_schema_version=(
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             corresponding_topic_id='topic_id',
-            language_code='language_code')
+            language_code='language_code',
+            url_fragment='title')
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_id('id')
 
@@ -77,6 +79,32 @@ class StoryModelTest(test_utils.GenericTestBase):
         self.assertEqual(story_by_id.notes, 'notes')
         self.assertEqual(story_by_id.language_code, 'language_code')
         self.assertEqual(story_by_id.title, 'title')
+        self.assertEqual(story_by_id.url_fragment, 'title')
+
+    def test_get_by_url_fragment(self):
+        committer_id = 'test_committer_id'
+        commit_message = 'test_commit_message'
+        commit_cmds = [{'cmd': 'test_command'}]
+
+        story_instance = story_models.StoryModel(
+            id='id',
+            title='title',
+            description='description',
+            notes='notes',
+            story_contents_schema_version=(
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            corresponding_topic_id='topic_id',
+            language_code='language_code',
+            url_fragment='unique-url')
+        story_instance.commit(committer_id, commit_message, commit_cmds)
+        story_by_id = story_models.StoryModel.get_by_url_fragment('unique-url')
+
+        self.assertEqual(story_by_id.description, 'description')
+        self.assertEqual(story_by_id.id, 'id')
+        self.assertEqual(story_by_id.notes, 'notes')
+        self.assertEqual(story_by_id.language_code, 'language_code')
+        self.assertEqual(story_by_id.title, 'title')
+        self.assertEqual(story_by_id.url_fragment, 'unique-url')
 
 
 class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
@@ -126,7 +154,8 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             node_titles=['Chapter 1'],
             thumbnail_filename='image.svg',
             thumbnail_bg_color='#F8BF74',
-            version=1)
+            version=1,
+            url_fragment='story-summary-frag')
         story_summary_model.put()
         story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
 
@@ -137,3 +166,5 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
         self.assertEqual(story_summary_by_id.thumbnail_bg_color, '#F8BF74')
         self.assertEqual(story_summary_by_id.thumbnail_filename, 'image.svg')
         self.assertEqual(story_summary_by_id.version, 1)
+        self.assertEqual(
+            story_summary_by_id.url_fragment, 'story-summary-frag')

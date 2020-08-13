@@ -23,14 +23,9 @@ import { Injectable } from '@angular/core';
 import { group } from 'd3-array';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
-import {
-  CyclicStateTransitionsPlaythroughIssue,
-  EarlyQuitPlaythroughIssue,
-  MultipleIncorrectSubmissionsPlaythroughIssue,
-  PlaythroughIssue
-} from 'domain/statistics/PlaythroughIssueObjectFactory';
-import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+import { States } from 'domain/exploration/StatesObjectFactory';
+import { ExplorationImprovementsConfig } from
+  'domain/improvements/exploration-improvements-config-object.factory';
 import {
   ExplorationTask,
   ExplorationTaskObjectFactory,
@@ -44,9 +39,16 @@ import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { NeedsGuidingResponsesTask } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { States } from 'domain/exploration/StatesObjectFactory';
+import {
+  CyclicStateTransitionsPlaythroughIssue,
+  EarlyQuitPlaythroughIssue,
+  MultipleIncorrectSubmissionsPlaythroughIssue,
+  PlaythroughIssue
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+import { ExplorationStats } from
+  'domain/statistics/ExplorationStatsObjectFactory';
 
 type HbrTask = HighBounceRateTask;
 type IflTask = IneffectiveFeedbackLoopTask;
@@ -119,9 +121,10 @@ class StateTasks implements Iterable<ExplorationTask> {
     this.supportingStateStats = supportingStateStats;
   }
 
-  public refresh(expStats: ExplorationStats): void {
+  public refresh(
+      expStats: ExplorationStats, config: ExplorationImprovementsConfig): void {
     this.hbrTask.refreshStatus(
-      expStats, this.supportingStateStats.eqPlaythroughIssues.length);
+      expStats, this.supportingStateStats.eqPlaythroughIssues.length, config);
     this.iflTask.refreshStatus(
       this.supportingStateStats.cstPlaythroughIssues.length);
     this.ngrTask.refreshStatus(
@@ -155,8 +158,7 @@ class StateTasks implements Iterable<ExplorationTask> {
  */
 @Injectable({providedIn: 'root'})
 export class ExplorationImprovementsTaskRegistryService {
-  private expId: string;
-  private expVersion: number;
+  private config: ExplorationImprovementsConfig;
   private expStats: ExplorationStats;
   private tasksByState: Map<string, StateTasks>;
   private tasksByType: Map<ExplorationTaskType, ExplorationTask[]>;
@@ -165,21 +167,19 @@ export class ExplorationImprovementsTaskRegistryService {
       private explorationTaskObjectFactory: ExplorationTaskObjectFactory) {}
 
   initialize(
-      expId: string,
-      expVersion: number,
+      config: ExplorationImprovementsConfig,
       states: States,
       expStats: ExplorationStats,
       openTasks: readonly ExplorationTask[],
       resolvedTaskTypesByStateName: ReadonlyMap<string, ExplorationTaskType[]>,
-      topAnswersByStateName: ReadonlyMap<string, AnswerStats[]>,
+      topAnswersByStateName: ReadonlyMap<string, readonly AnswerStats[]>,
       playthroughIssues: readonly PlaythroughIssue[]): void {
+    this.config = config;
     this.validateInitializationArgs(
-      expId, expVersion, states, expStats, openTasks,
+      config, states, expStats, openTasks,
       resolvedTaskTypesByStateName, topAnswersByStateName,
       playthroughIssues);
 
-    this.expId = expId;
-    this.expVersion = expVersion;
     this.expStats = expStats;
     this.tasksByState = new Map();
     this.tasksByType = new Map(
@@ -207,7 +207,7 @@ export class ExplorationImprovementsTaskRegistryService {
         cstPlaythroughIssues || [],
         eqPlaythroughIssues || [],
         misPlaythroughIssues || []);
-      newStateTasks.refresh(this.expStats);
+      newStateTasks.refresh(this.expStats, this.config);
     }
   }
 
@@ -215,7 +215,8 @@ export class ExplorationImprovementsTaskRegistryService {
     const newStateTasks = new StateTasks(
       new Map(ImprovementsConstants.TASK_TYPES.map(taskType => [
         taskType, this.explorationTaskObjectFactory.createNewObsoleteTask(
-          this.expId, this.expVersion, taskType, newStateName),
+          this.config.explorationId, this.config.explorationVersion, taskType,
+          newStateName),
       ])));
 
     for (const newTask of newStateTasks) {
@@ -267,27 +268,31 @@ export class ExplorationImprovementsTaskRegistryService {
   }
 
   onChangeInteraction(stateName: string): void {
-    this.tasksByState.get(stateName).refresh(this.expStats);
+    this.tasksByState.get(stateName).refresh(this.expStats, this.config);
   }
 
-  getHighBounceRateTasks(): HbrTask[] {
+  getOpenHighBounceRateTasks(): HbrTask[] {
     return <HbrTask[]> this.tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
+      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE)
+      .filter(t => t.isOpen());
   }
 
-  getIneffectiveFeedbackLoopTasks(): IflTask[] {
+  getOpenIneffectiveFeedbackLoopTasks(): IflTask[] {
     return <IflTask[]> this.tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
+      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP)
+      .filter(t => t.isOpen());
   }
 
-  getNeedsGuidingResponsesTasks(): NgrTask[] {
+  getOpenNeedsGuidingResponsesTasks(): NgrTask[] {
     return <NgrTask[]> this.tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
+      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES)
+      .filter(t => t.isOpen());
   }
 
-  getSuccessiveIncorrectAnswersTasks(): SiaTask[] {
+  getOpenSuccessiveIncorrectAnswersTasks(): SiaTask[] {
     return <SiaTask[]> this.tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
+      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS)
+      .filter(t => t.isOpen());
   }
 
   getSupportingStateStats(task: ExplorationTask): SupportingStateStats {
@@ -298,24 +303,23 @@ export class ExplorationImprovementsTaskRegistryService {
   }
 
   private validateInitializationArgs(
-      expId: string,
-      expVersion: number,
+      config: ExplorationImprovementsConfig,
       states: States,
       expStats: ExplorationStats,
       openTasks: readonly ExplorationTask[],
       resolvedTaskTypesByStateName: ReadonlyMap<string, ExplorationTaskType[]>,
-      topAnswersByStateName: ReadonlyMap<string, AnswerStats[]>,
+      topAnswersByStateName: ReadonlyMap<string, readonly AnswerStats[]>,
       playthroughIssues: readonly PlaythroughIssue[]): void {
     // Validate that the exploration stats correspond with provided exploration.
-    if (expStats.expId !== expId) {
+    if (expStats.expId !== config.explorationId) {
       throw new Error(
-        'Expected stats for exploration "' + expId + '", but got stats for ' +
-        'exploration "' + expStats.expId + '"');
+        'Expected stats for exploration "' + config.explorationId + '", but ' +
+        'got stats for exploration "' + expStats.expId + '"');
     }
-    if (expStats.expVersion !== expVersion) {
+    if (expStats.expVersion !== config.explorationVersion) {
       throw new Error(
-        'Expected stats for exploration version ' + expVersion + ', but got ' +
-        'stats for exploration version ' + expStats.expVersion);
+        'Expected stats for exploration version ' + config.explorationVersion +
+        ', but got stats for exploration version ' + expStats.expVersion);
     }
 
     // Validate that all state names referenced by the provided arguments exist
@@ -337,15 +341,16 @@ export class ExplorationImprovementsTaskRegistryService {
 
     // Validate that each open task is targeting the provided exploration.
     for (const task of openTasks) {
-      if (task.entityId !== expId) {
+      if (task.entityId !== config.explorationId) {
         throw new Error(
-          'Expected task for exploration "' + expId + '", but got task for ' +
-          'exploration "' + task.entityId + '"');
+          'Expected task for exploration "' + config.explorationId + '", but ' +
+          'got task for exploration "' + task.entityId + '"');
       }
-      if (task.entityVersion !== expVersion) {
+      if (task.entityVersion !== config.explorationVersion) {
         throw new Error(
-          'Expected task for exploration version ' + expVersion + ', but got ' +
-          'task for exploration version ' + task.entityVersion);
+          'Expected task for exploration version ' +
+          config.explorationVersion + ', but got task for exploration ' +
+          'version ' + task.entityVersion);
       }
     }
 
@@ -392,14 +397,16 @@ export class ExplorationImprovementsTaskRegistryService {
       //    map.get('a'); // Returns 9.
       ...ImprovementsConstants.TASK_TYPES.map(taskType => [
         taskType, this.explorationTaskObjectFactory.createNewObsoleteTask(
-          this.expId, this.expVersion, taskType, stateName)
+          this.config.explorationId, this.config.explorationVersion, taskType,
+          stateName)
       ]),
       ...openTasks.map(task => [
         task.taskType, task
       ]),
       ...resolvedTaskTypes.map(taskType => [
         taskType, this.explorationTaskObjectFactory.createNewResolvedTask(
-          this.expId, this.expVersion, taskType, stateName)
+          this.config.explorationId, this.config.explorationVersion, taskType,
+          stateName)
       ]),
     ]);
     const supportingStateStats = new SupportingStateStats(

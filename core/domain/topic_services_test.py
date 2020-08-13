@@ -65,18 +65,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
         self.save_new_story(
-            self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_3,
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 3',
+            description='Description 3'
+        )
         self.save_new_story(
-            self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
-            self.TOPIC_ID)
-        self.save_new_story(
-            self.story_id_2, self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_2,
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 2',
+            description='Description 2'
+        )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -102,6 +108,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
         self.assertEqual(topic_summary.total_skill_count, 2)
+        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
+        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
     def test_get_all_summaries(self):
         topic_summaries = topic_services.get_all_topic_summaries()
@@ -164,6 +172,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            url_fragment='name-one',
             description='description1',
             canonical_name='canonical_name',
             next_subtopic_id=1,
@@ -187,6 +196,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id_2',
             name='name 2',
             abbreviated_name='abbrev',
+            url_fragment='name-two',
             description='description',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
@@ -218,6 +228,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.total_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
+        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
+        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
     def test_get_topic_summary_by_id(self):
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
@@ -229,6 +241,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
+        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
+        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
     def test_get_all_skill_ids_assigned_to_some_topic(self):
         change_list = [topic_domain.TopicChange({
@@ -243,6 +257,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.user_id, name='Name 2', description='Description',
+            abbreviated_name='random', url_fragment='name-three',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id_1, 'skill_3'],
             subtopics=[], next_subtopic_id=1)
@@ -262,16 +277,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_rearrange_story_with_missing_index_values(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'from_index, to_index')):
+            Exception, (
+                'The following required attributes are missing: '
+                'from_index, to_index')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
             })
 
     def test_cannot_rearrange_story_with_missing_from_index_value(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'from_index')):
+            Exception, (
+                'The following required attributes are missing: '
+                'from_index')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
                 'to_index': 1
@@ -279,8 +296,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_rearrange_story_with_missing_to_index_value(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'to_index')):
+            Exception, (
+                'The following required attributes are missing: to_index')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
                 'from_index': 1
@@ -391,8 +408,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'title': 'Title2',
             'subtopic_id': 2
         }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'title-two',
+            'old_value': '',
+            'subtopic_id': 2
+        }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title3',
+            'subtopic_id': 3
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'title-three',
+            'old_value': '',
             'subtopic_id': 3
         })]
         topic_services.update_topic_and_subtopic_pages(
@@ -570,8 +599,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 'invalid_story', self.user_id_admin)
 
         self.save_new_story(
-            'story_10', self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            'story_10',
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 2',
+            description='Description 2'
+        )
         with self.assertRaisesRegexp(
             Exception, 'Story with given id doesn\'t exist in the topic'):
             topic_services.publish_story(
@@ -584,8 +617,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         # Throw error if a story node doesn't have an exploration.
         self.save_new_story(
-            'story_id_new', self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            'story_id_new',
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 2',
+            description='Description 2'
+        )
         topic_services.add_canonical_story(
             self.user_id_admin, self.TOPIC_ID, 'story_id_new')
         changelist = [
@@ -653,7 +690,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME,
             'old_value': '',
-            'new_value': 'short name'
+            'new_value': 'short-name'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_URL_FRAGMENT,
+            'old_value': '',
+            'new_value': 'url-name'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
@@ -671,11 +713,14 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.description, 'New Description')
-        self.assertEqual(topic.abbreviated_name, 'short name')
+        self.assertEqual(topic.abbreviated_name, 'short-name')
+        self.assertEqual(topic.url_fragment, 'url-name')
         self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic_summary.version, 3)
+        self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
+        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
         # Test whether a topic_manager can edit a topic.
         changelist = [topic_domain.TopicChange({
@@ -1057,6 +1102,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'old_subtopic_id': self.subtopic_id,
                 'new_subtopic_id': 2,
                 'skill_id': self.skill_id_2
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+                'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+                'new_value': 'new-subtopic',
+                'old_value': '',
+                'subtopic_id': 2
             })
         ]
         topic_services.update_topic_and_subtopic_pages(
@@ -1281,6 +1333,137 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 canonical_story_ids=[], additional_story_ids=[],
                 uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
 
+    def test_does_not_update_subtopic_url_fragment_if_it_already_exists(self):
+        topic_id = topic_services.get_new_topic_id()
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title',
+            'subtopic_id': 1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'original',
+            'old_value': '',
+            'subtopic_id': 1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title',
+            'subtopic_id': 2
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'original',
+            'old_value': '',
+            'subtopic_id': 2
+        })]
+        self.save_new_topic(
+            topic_id, self.user_id, name='topic-with-duplicate-subtopic',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='frag-dup-subtopic')
+        with self.assertRaisesRegexp(
+            Exception,
+            'Subtopic url fragments are not unique across subtopics '
+            'in the topic'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, changelist, 'Update url fragment')
+
+    def test_does_not_create_topic_url_fragment_if_it_already_exists(self):
+        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_2 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic 1',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag-one')
+        with self.assertRaisesRegexp(
+            Exception,
+            'Topic with URL Fragment \'topic-frag-one\' already exists'):
+            self.save_new_topic(
+                topic_id_2, self.user_id, name='topic 2',
+                description='Description', canonical_story_ids=[],
+                additional_story_ids=[], uncategorized_skill_ids=[],
+                subtopics=[], next_subtopic_id=1,
+                url_fragment='topic-frag-one')
+
+    def test_does_not_update_topic_if_url_fragment_already_exists(self):
+        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_2 = topic_services.get_new_topic_id()
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'topic-frag-one',
+            'old_value': 'topic-frag-two',
+        })]
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic name 1',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag-one')
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic name 2',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag-two')
+        with self.assertRaisesRegexp(
+            Exception,
+            'Topic with URL Fragment \'topic-frag-one\' already exists'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id_2, changelist, 'Update url fragment')
+
+    def test_does_not_update_topic_if_name_already_exists(self):
+        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_2 = topic_services.get_new_topic_id()
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_NAME,
+            'new_value': 'topic 1',
+            'old_value': 'topic 2',
+        })]
+        self.save_new_topic(
+            topic_id_1, self.user_id, name='topic 1',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag-one')
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='topic 2',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag-two')
+        with self.assertRaisesRegexp(
+            Exception,
+            'Topic with name \'topic 1\' already exists'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id_2, changelist, 'Update name')
+
+    def test_does_not_create_topic_if_name_is_non_string(self):
+        topic_id = topic_services.get_new_topic_id()
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_NAME,
+            'new_value': 123,
+            'old_value': 'topic name',
+        })]
+        self.save_new_topic(
+            topic_id, self.user_id, name='topic name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1, url_fragment='topic-frag')
+        with self.assertRaisesRegexp(
+            Exception, 'Name should be a string.'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, changelist, 'Update topic name')
+
+    def test_url_fragment_existence_fails_for_non_string_url_fragment(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Topic URL fragment should be a string.'):
+            topic_services.does_topic_with_url_fragment_exist(123)
+
+    def test_name_existence_fails_for_non_string_name(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Name should be a string.'):
+            topic_services.does_topic_with_name_exist(123)
+
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.language_code, 'en')
@@ -1393,11 +1576,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
             'topic_2', self.user_id, name='Name 2',
+            abbreviated_name='name-two', url_fragment='name-six',
             description='Description 2',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
             'topic_3', self.user_id, name='Name 3',
+            abbreviated_name='name-three', url_fragment='name-seven',
             description='Description 3',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
@@ -1488,17 +1673,19 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             'title': 'subtopic_title',
             'skill_ids': []
         }
-        subtopic_v2_dict = {
+        subtopic_v3_dict = {
             'id': 1,
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
             'title': 'subtopic_title',
-            'skill_ids': []
+            'skill_ids': [],
+            'url_fragment': 'subtopictitle'
         }
         model = topic_models.TopicModel(
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            url_fragment='name-eight',
             canonical_name='Name',
             description='description1',
             next_subtopic_id=1,
@@ -1513,18 +1700,18 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
 
         swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 2)
+            feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 3)
 
         with swap_topic_object, current_schema_version_swap:
             topic = topic_fetchers.get_topic_from_model(model)
 
-        self.assertEqual(topic.subtopic_schema_version, 2)
+        self.assertEqual(topic.subtopic_schema_version, 3)
         self.assertEqual(topic.name, 'name')
         self.assertEqual(topic.canonical_name, 'name')
         self.assertEqual(topic.next_subtopic_id, 1)
         self.assertEqual(topic.language_code, 'en')
         self.assertEqual(len(topic.subtopics), 1)
-        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_v2_dict)
+        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_v3_dict)
 
 
 class StoryReferenceMigrationTests(test_utils.GenericTestBase):
@@ -1543,6 +1730,7 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            url_fragment='name-nine',
             canonical_name='Name',
             description='description1',
             next_subtopic_id=1,

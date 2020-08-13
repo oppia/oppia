@@ -27,18 +27,18 @@ import { GraphInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { IGraphAnswer } from 'interactions/answer-defs';
+import { GraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
-import { IGraphInputCustomizationArgs } from
+import { GraphInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('GraphInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
   let validatorService: GraphInputValidationService;
   let currentState: string;
-  let customizationArguments: IGraphInputCustomizationArgs;
+  let customizationArguments: GraphInputCustomizationArgs;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let rof: RuleObjectFactory;
@@ -132,9 +132,11 @@ describe('GraphInputValidationService', () => {
   it('should expect graph and edit customization arguments', () => {
     expect(() => {
       validatorService.getAllWarnings(
-        // TS ignore is used because we are assigning no customization
-        // args here to test errors.
-        // @ts-ignore
+        // This throws "Argument of type '{}' is not assignable to
+        // parameter of type 'GraphInputCustomizationArgs'." We are purposely
+        // assigning the wrong type of customization args in order to test
+        // validations.
+        // @ts-expect-error
         currentState, {}, answerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have properties: ' +
@@ -158,11 +160,11 @@ describe('GraphInputValidationService', () => {
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
   () => {
-    (<IGraphAnswer>
+    (<GraphAnswer>
       answerGroups[0].rules[0].inputs.g).vertices = new Array(11);
-    (<IGraphAnswer>
+    (<GraphAnswer>
       answerGroups[0].rules[1].inputs.g).vertices = new Array(11);
-    (<IGraphAnswer>
+    (<GraphAnswer>
       answerGroups[1].rules[0].inputs.g).vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,

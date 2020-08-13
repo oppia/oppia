@@ -233,11 +233,37 @@ describe('Playthrough Object Factory', () => {
       actions: []
     };
 
-    // TS ignore is used because playthrough dict is assigned a invalid type
-    // to test errors.
-    // @ts-ignore
+    // This throws "Type 'string' is not assignable to type
+    // '"CyclicStateTransitions"'." This is because 'playthroughDict' has an
+    // invalid value of 'issue_type' property. We need to do that in order
+    // to test validations.
+    // @ts-expect-error
     expect(() => pof.createFromBackendDict(playthroughDict)).toThrowError(
       'Backend dict does not match any known issue type: ' +
       JSON.stringify(playthroughDict));
+  });
+
+  it('should identify the problematic state', () => {
+    let eqPlaythrough = pof.createNewEarlyQuitPlaythrough(
+      'expId1', 1, {
+        state_name: {value: 'state'},
+        time_spent_in_exp_in_msecs: {value: 30000},
+      }, []);
+    expect(eqPlaythrough.getStateNameWithIssue()).toEqual('state');
+
+    var misPlaythrough = pof.createNewMultipleIncorrectSubmissionsPlaythrough(
+      'expId1', 1, {
+        state_name: {value: 'state'},
+        num_times_answered_incorrectly: {value: 10},
+      }, []);
+    expect(misPlaythrough.getStateNameWithIssue()).toEqual('state');
+
+    var cstPlaythrough = pof.createNewCyclicStateTransitionsPlaythrough(
+      'expId1', 1, {
+        state_names: {
+          value: ['state1', 'state2']
+        }
+      }, []);
+    expect(cstPlaythrough.getStateNameWithIssue()).toEqual('state2');
   });
 });
