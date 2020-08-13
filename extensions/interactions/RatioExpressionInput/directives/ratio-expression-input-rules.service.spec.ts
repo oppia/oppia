@@ -20,37 +20,37 @@ import { RatioExpressionInputRulesService } from
 // eslint-disable-next-line max-len
   'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 
-describe('Algebraic expression input rules service', () => {
-  let aeirs: RatioExpressionInputRulesService = null;
+describe('Ratio expression input rules service', () => {
+  let reirs: RatioExpressionInputRulesService = null;
   let inputString;
 
   beforeEach(() => {
-    aeirs = new RatioExpressionInputRulesService();
+    reirs = new RatioExpressionInputRulesService();
   });
 
   it('should have a correct Equals rule', () => {
     inputString = '1:2:3';
 
-    expect(aeirs.Equals('1:2:3',
+    expect(reirs.Equals('1:2:3',
       {x: inputString})).toBeTrue();
-    expect(aeirs.Equals('3:2:1',
+    expect(reirs.Equals('3:2:1',
       {x: inputString})).toBeFalse();
-    expect(aeirs.Equals('1:2',
+    expect(reirs.Equals('1:2',
       {x: inputString})).toBeFalse();
-    expect(aeirs.Equals('1:2:3:4',
+    expect(reirs.Equals('1:2:3:4',
       {x: inputString})).toBeFalse();
   });
 
   it('should have a correct HasNumberOfTermsEqualTo rule', () => {
     inputString = '1:2:3';
 
-    expect(aeirs.HasNumberOfTermsEqualTo('1:2:3',
+    expect(reirs.HasNumberOfTermsEqualTo('1:2:3',
       {x: inputString})).toBeTrue();
-    expect(aeirs.HasNumberOfTermsEqualTo('3:2:1',
+    expect(reirs.HasNumberOfTermsEqualTo('3:2:1',
       {x: inputString})).toBeTrue();
-    expect(aeirs.HasNumberOfTermsEqualTo('1:2',
+    expect(reirs.HasNumberOfTermsEqualTo('1:2',
       {x: inputString})).toBeFalse();
-    expect(aeirs.HasNumberOfTermsEqualTo('1:2:3:4',
+    expect(reirs.HasNumberOfTermsEqualTo('1:2:3:4',
       {x: inputString})).toBeFalse();
   });
 });

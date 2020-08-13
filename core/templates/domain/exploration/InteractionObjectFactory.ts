@@ -408,7 +408,8 @@ export class InteractionObjectFactory {
       case 'PencilCodeEditor':
         return <PencilCodeEditorCustomizationArgs> cloneDeep(caBackendDict);
       case 'RatioExpressionInput':
-        return <RatioExpressionInputCustomizationArgs> cloneDeep(caBackendDict);
+        return this._createFromRatioExpressionInputCustomizationArgsBackendDict(
+          <RatioExpressionInputCustomizationArgsBackendDict> caBackendDict);
       case 'SetInput':
         return this._createFromSetInputCustomizationArgsBackendDict(
           <SetInputCustomizationArgsBackendDict> caBackendDict);

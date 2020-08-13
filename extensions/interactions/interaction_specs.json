@@ -1016,16 +1016,20 @@
         "description": "Custom placeholder text (optional)",
         "name": "customPlaceholder",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": ""
+        "default_value": {
+          "content_id": null,
+          "unicode_str": ""
+        }
       }
     ],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
       "Equals": "is equals to {{x|RatioExpression}}",
-      "HasNumberOfTermsEqualTo": "is equal to length {{x|NonnegativeInt}}"
+      "HasNumberOfTermsEqualTo": "has number of terms equal to {{x|NonnegativeInt}}"
     }
   }
 }

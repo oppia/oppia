@@ -269,7 +269,7 @@
       "description": "is equal to {{x|RatioExpression}}"
     },
     "HasNumberOfTermsEqualTo": {
-      "description": "is equal to length {{x|NonnegativeInt}}"
+      "description": "has number of terms equal to {{x|NonnegativeInt}}"
     }
   }
 }

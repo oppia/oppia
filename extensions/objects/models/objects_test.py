@@ -762,15 +762,23 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.AlgebraicIdentifier, mappings,
             invalid_values_with_error_messages)
 
-    def test_ratio__validation(self):
+    def test_ratio_validation(self):
         """Tests objects of type RatioExpression."""
 
-        mappings = [('a', 'a'), ('alpha', 'alpha'), ('Z', 'Z')]
+        mappings = [('1:2', '1:2'), ('1:2:3', '1:2:3')]
 
-        invalid_values = [None, 2, 'string', 'item']
+        invalid_values_with_error_messages = [
+            (None, 'Expected unicode string, received None'),
+            ('a', 'Expected unicode string, received a'),
+            (
+                'string',
+                'Received string which is not in the allowed range of choices'),
+            (
+                'item',
+                'Received item which is not in the allowed range of choices')]
 
         self.check_normalization(
-            objects.AlgebraicIdentifier, mappings, invalid_values)        
+            objects.RatioExpression, mappings, invalid_values)        
 
 
 class SchemaValidityTests(test_utils.GenericTestBase):
