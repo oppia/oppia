@@ -58,8 +58,9 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
           // is not compatible with nerdamer or with the backend validations.
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
             ctrl.value);
-          let answerIsValid = MathInteractionsService.validateExpression(
-            ctrl.value, GuppyInitializationService.customOskLetters, true);
+          let answerIsValid = (
+            MathInteractionsService.validateAlgebraicExpression(
+              ctrl.value, GuppyInitializationService.customOskLetters));
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
         }
