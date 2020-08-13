@@ -20,22 +20,39 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AppConstants } from 'app.constants';
+
 export class NewlyCreatedTopic {
   name: string;
   description: string;
+  urlFragment: string;
   /**
    * @param {String} name - name of the topic.
    * @param {String} description - description of the topic.
+   * @param {String} urlFragment - url fragment of the topic.
    */
-  constructor(name, description) {
+  constructor(name, description, urlFragment) {
     this.name = name;
     this.description = description;
+    this.urlFragment = urlFragment;
   }
   /**
    * @returns {Boolean} - A boolean indicating if the topic is valid.
    */
   isValid(): boolean {
-    return Boolean(this.name && this.description);
+    let validUrlFragmentRegex = new RegExp(
+      // TODO(#7434): Use dot notation after we find a way to get
+      // rid of the TS2339 error on AppConstants.
+      // eslint-disable-next-line dot-notation
+      AppConstants['VALID_URL_FRAGMENT_REGEX']);
+    // TODO(#7434): Use dot notation after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    // eslint-disable-next-line dot-notation
+    let urlFragmentCharLimit = AppConstants['MAX_CHARS_IN_TOPIC_URL_FRAGMENT'];
+    return Boolean(
+      this.name && this.description && this.urlFragment &&
+      validUrlFragmentRegex.test(this.urlFragment) &&
+      this.urlFragment.length <= urlFragmentCharLimit);
   }
 }
 
@@ -47,7 +64,7 @@ export class NewlyCreatedTopicObjectFactory {
    * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance.
    */
   createDefault(): NewlyCreatedTopic {
-    return new NewlyCreatedTopic('', '');
+    return new NewlyCreatedTopic('', '', '');
   }
 }
 

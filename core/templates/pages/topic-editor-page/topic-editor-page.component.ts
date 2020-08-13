@@ -41,6 +41,9 @@ require('services/page-title.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require('pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('topicEditorPage', [
   'UrlInterpolationService', function(
@@ -56,16 +59,15 @@ angular.module('oppia').directive('topicEditorPage', [
         '$scope', '$window', 'AlertsService', 'BottomNavbarStatusService',
         'ContextService', 'PageTitleService', 'EntityCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_TOPIC_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
-        'TOPIC_VIEWER_URL_TEMPLATE',
+        'UndoRedoService', 'UrlService',
+        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED', 'TOPIC_VIEWER_URL_TEMPLATE',
         function($scope, $window, AlertsService, BottomNavbarStatusService,
             ContextService, PageTitleService, EntityCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService, EVENT_TOPIC_INITIALIZED,
-            EVENT_TOPIC_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED,
-            TOPIC_VIEWER_URL_TEMPLATE) {
+            UndoRedoService, UrlService,
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {
             return TopicEditorRoutingService.getActiveTabName();
           };
@@ -93,24 +95,19 @@ angular.module('oppia').directive('topicEditorPage', [
             var activeTab = TopicEditorRoutingService.getActiveTabName();
             var lastSubtopicIdVisited = (
               TopicEditorRoutingService.getLastSubtopicIdVisited());
-            if (activeTab !== 'subtopic_editor' && !lastSubtopicIdVisited) {
-              if (ctrl.getChangeListLength() > 0) {
-                AlertsService.addInfoMessage(
-                  'Please save all pending changes to preview the topic ' +
-                    'with the changes', 2000);
-                return;
-              }
-              var topicName = ctrl.topic.getName();
-              var newTab = $window.open();
-              newTab.location.href = UrlInterpolationService.interpolateUrl(
-                TOPIC_VIEWER_URL_TEMPLATE, {
-                  topic_name: topicName
-                });
+            if (!activeTab.startsWith('subtopic') && !lastSubtopicIdVisited) {
+              TopicEditorRoutingService.navigateToTopicPreviewTab();
             } else {
               var subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
               TopicEditorRoutingService.navigateToSubtopicPreviewTab(
                 subtopicId);
             }
+          };
+          ctrl.isInPreviewTab = function() {
+            var activeTab = TopicEditorRoutingService.getActiveTabName();
+            return (
+              activeTab === 'subtopic_preview' ||
+                activeTab === 'topic_preview');
           };
           ctrl.selectMainTab = function() {
             const activeTab = ctrl.getActiveTabName();
@@ -145,11 +142,21 @@ angular.module('oppia').directive('topicEditorPage', [
                 return 'Subtopic Preview';
               } else if (activeTab === 'questions') {
                 return 'Question Editor';
+              } else if (activeTab === 'topic_preview') {
+                return 'Topic Preview';
               }
             }
           };
           ctrl._validateTopic = function() {
             ctrl.validationIssues = ctrl.topic.validate();
+            if (TopicEditorStateService.getTopicWithNameExists()) {
+              ctrl.validationIssues.push(
+                'A topic with this name already exists.');
+            }
+            if (TopicEditorStateService.getTopicWithUrlFragmentExists()) {
+              ctrl.validationIssues.push(
+                'Topic URL fragment already exists.');
+            }
             var prepublishTopicValidationIssues = (
               ctrl.topic.prepublishValidate());
             var subtopicPrepublishValidationIssues = (
@@ -173,16 +180,26 @@ angular.module('oppia').directive('topicEditorPage', [
 
 
           ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicInitialized.subscribe(
+                () => setPageTitle()
+              ));
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicReinitialized.subscribe(
+                () => setPageTitle()
+              ));
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
             PageTitleService.setPageTitleForMobileView('Topic Editor');
             ctrl.validationIssues = [];
             ctrl.prepublishValidationIssues = [];
             ctrl.warningsAreShown = false;
             BottomNavbarStatusService.markBottomNavbarStatus(true);
-            $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
-            $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
             $scope.$on(
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, setPageTitle);
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

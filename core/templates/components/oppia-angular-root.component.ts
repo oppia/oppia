@@ -169,7 +169,7 @@ import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
-  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+  'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -509,6 +509,8 @@ import { RubricObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SchemaDefaultValueService } from
   'services/schema-default-value.service';
+import { SchemaFormSubmittedService } from
+  'services/schema-form-submitted.service';
 import { SchemaUndefinedLastElementService } from
   'services/schema-undefined-last-element.service';
 import { SearchExplorationsBackendApiService } from
@@ -937,6 +939,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static rubricObjectFactory: RubricObjectFactory;
   static ruleObjectFactory: RuleObjectFactory;
   static schemaDefaultValueService: SchemaDefaultValueService;
+  static schemaFormSubmittedService: SchemaFormSubmittedService;
   static schemaUndefinedLastElementService: SchemaUndefinedLastElementService;
   static searchExplorationsBackendApiService: SearchExplorationsBackendApiService;
   static setInputRulesService: SetInputRulesService;
@@ -1265,6 +1268,7 @@ private reviewTestObjectFactory: ReviewTestObjectFactory,
 private rubricObjectFactory: RubricObjectFactory,
 private ruleObjectFactory: RuleObjectFactory,
 private schemaDefaultValueService: SchemaDefaultValueService,
+private schemaFormSubmittedService: SchemaFormSubmittedService,
 private schemaUndefinedLastElementService: SchemaUndefinedLastElementService,
 private searchExplorationsBackendApiService: SearchExplorationsBackendApiService,
 private setInputRulesService: SetInputRulesService,
@@ -1594,6 +1598,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.rubricObjectFactory = this.rubricObjectFactory;
     OppiaAngularRootComponent.ruleObjectFactory = this.ruleObjectFactory;
     OppiaAngularRootComponent.schemaDefaultValueService = this.schemaDefaultValueService;
+    OppiaAngularRootComponent.schemaFormSubmittedService = this.schemaFormSubmittedService;
     OppiaAngularRootComponent.schemaUndefinedLastElementService = this.schemaUndefinedLastElementService;
     OppiaAngularRootComponent.searchExplorationsBackendApiService = this.searchExplorationsBackendApiService;
     OppiaAngularRootComponent.setInputRulesService = this.setInputRulesService;

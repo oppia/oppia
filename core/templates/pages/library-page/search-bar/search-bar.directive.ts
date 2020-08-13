@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Subscription } from 'rxjs';
+
 /**
  * @fileoverview Directive for the Search Bar.
  */
 
 require('filters/string-utility-filters/truncate.filter.ts');
 
+require('domain/classroom/classroom-backend-api.service.ts');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/construct-translation-ids.service.ts');
@@ -40,15 +43,22 @@ angular.module('oppia').directive('searchBar', [
       controllerAs: '$ctrl',
       controller: [
         '$location', '$rootScope', '$scope', '$timeout', '$translate',
-        '$window', 'ConstructTranslationIdsService', 'DebouncerService',
-        'HtmlEscaperService', 'LanguageUtilService', 'NavigationService',
+        '$window', 'ClassroomBackendApiService',
+        'ConstructTranslationIdsService', 'DebouncerService',
+        'HtmlEscaperService', 'I18nLanguageCodeService',
+        'LanguageUtilService', 'NavigationService',
         'SearchService', 'UrlService', 'SEARCH_DROPDOWN_CATEGORIES',
         function(
             $location, $rootScope, $scope, $timeout, $translate,
-            $window, ConstructTranslationIdsService, DebouncerService,
-            HtmlEscaperService, LanguageUtilService, NavigationService,
+            $window, ClassroomBackendApiService,
+            ConstructTranslationIdsService, DebouncerService,
+            HtmlEscaperService, I18nLanguageCodeService,
+            LanguageUtilService, NavigationService,
             SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
           var ctrl = this;
+
+          ctrl.directiveSubscriptions = new Subscription();
+
           ctrl.isSearchInProgress = function() {
             return SearchService.isSearchInProgress();
           };
@@ -247,38 +257,47 @@ angular.module('oppia').directive('searchBar', [
               }
             });
 
-            $scope.$on(
-              'preferredLanguageCodesLoaded',
-              function(evt, preferredLanguageCodesList) {
-                preferredLanguageCodesList.forEach(function(languageCode) {
-                  var selections =
-                   ctrl.selectionDetails.languageCodes.selections;
-                  if (!selections.hasOwnProperty(languageCode)) {
-                    selections[languageCode] = true;
-                  } else {
-                    selections[languageCode] = !selections[languageCode];
+
+            ctrl.directiveSubscriptions.add(
+              I18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe(
+                (preferredLanguageCodesList) => {
+                  preferredLanguageCodesList.forEach(function(languageCode) {
+                    var selections =
+                     ctrl.selectionDetails.languageCodes.selections;
+                    if (!selections.hasOwnProperty(languageCode)) {
+                      selections[languageCode] = true;
+                    } else {
+                      selections[languageCode] = !selections[languageCode];
+                    }
+                  });
+
+                  updateSelectionDetails('languageCodes');
+
+                  if (UrlService.getUrlParams().hasOwnProperty('q')) {
+                    updateSearchFieldsBasedOnUrlQuery();
                   }
-                });
 
-                updateSelectionDetails('languageCodes');
+                  if ($window.location.pathname === '/search/find') {
+                    onSearchQueryChangeExec();
+                  }
 
-                if (UrlService.getUrlParams().hasOwnProperty('q')) {
-                  updateSearchFieldsBasedOnUrlQuery();
+                  refreshSearchBarLabels();
+
+                  // Notify the function that handles overflow in case the
+                  // search elements load after it has already been run.
+                  SearchService.onSearchBarLoaded.emit();
                 }
-
-                if ($window.location.pathname === '/search/find') {
-                  onSearchQueryChangeExec();
-                }
-
-                refreshSearchBarLabels();
-
-                // Notify the function that handles overflow in case the search
-                // elements load after it has already been run.
-                SearchService.onSearchBarLoaded.emit();
-              }
+              )
             );
             $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
-            $rootScope.$on('initializeTranslation', refreshSearchBarLabels);
+            ctrl.directiveSubscriptions.add(
+              ClassroomBackendApiService.onInitializeTranslation.subscribe(
+                () => refreshSearchBarLabels()
+              )
+            );
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
