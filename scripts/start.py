@@ -27,13 +27,15 @@ import re
 import subprocess
 import time
 
-import python_utils
-
-from . import build
-from . import common
 from . import install_third_party_libs
-# Install third party libraries before importing other files.
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
+
+from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -156,9 +158,10 @@ def main(args=None):
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
-        'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 --admin_port '
-        '8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check true %s' % (
-            common.GOOGLE_CLOUD_SDK_BIN, clear_datastore_arg,
+        'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 '
+        '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '
+        'true %s' % (
+            common.GOOGLE_APP_ENGINE_SDK_HOME, clear_datastore_arg,
             enable_console_arg, disable_host_checking_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             app_yaml_filepath), shell=True))

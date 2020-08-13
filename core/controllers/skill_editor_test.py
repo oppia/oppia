@@ -278,6 +278,21 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             'New Description', json_response['skill']['description'])
         self.logout()
 
+    def test_editable_skill_handler_fails_long_commit_message(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        put_payload_copy = self.put_payload.copy()
+        put_payload_copy['commit_message'] = (
+            'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1))
+        json_response = self.put_json(
+            self.url, put_payload_copy, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Commit messages must be at most 1000 characters long.'
+        )
+        self.logout()
+
     def test_editable_skill_handler_put_fails(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()

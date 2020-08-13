@@ -179,7 +179,10 @@
                dnd-draggable="subtopic">
             <div class="subtopics-list-item">
               <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
-                <span class="clickable-item protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())"><[subtopic.getTitle()]></span>
+                <span class="clickable-item" ng-click="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
+                  <span class="material-icons draggable-icon-indicator">drag_indicator</span>
+                  <span class="protractor-test-subtopic"><[subtopic.getTitle()]></span>
+                </span>
                 <div class="subtopic-edit-options-container edit-options-container">
                   <span><[subtopicQuestionCountDict[subtopic.getId()] ]></span>
                   <i class="fa fa-ellipsis-v protractor-test-show-subtopic-options" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
@@ -244,10 +247,10 @@
           + ADD STORY
         </button>
         <div class="canonical-stories">
-          <stories-list ng-if="topic.getCanonicalStoryIds().length > 0"
-                        story-summaries="canonicalStorySummaries"
-                        topic="topic">
-          </stories-list>
+          <topic-editor-stories-list ng-if="topic.getCanonicalStoryIds().length > 0"
+                                     story-summaries="canonicalStorySummaries"
+                                     topic="topic">
+          </topic-editor-stories-list>
         </div>
       </div>
     </md-card>
@@ -611,7 +614,8 @@
       padding: 0;
     }
 
-    .topic-editor .entity-count {
+    .topic-editor .entity-count,
+    .topic-editor .draggable-icon-indicator {
       display: none;
     }
 
