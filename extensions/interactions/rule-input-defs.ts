@@ -23,9 +23,20 @@ import {
   GraphAnswer } from
   'interactions/answer-defs';
 
-export interface AlgebraicExpressionRuleInputs {
+// AlgebraicExpressionInput interaction has multiple types of inputs based on
+// rule type.
+export interface AlgebraicExpressionRuleInputsWithPlaceholder {
+  x: string;
+  y: Array<string>;
+}
+
+export interface AlgebraicExpressionRuleInputsWithoutPlaceholder {
   x: string;
 }
+
+export type AlgebraicExpressionRuleInputs = (
+  AlgebraicExpressionRuleInputsWithPlaceholder |
+  AlgebraicExpressionRuleInputsWithoutPlaceholder);
 
 export interface CodeReplRuleInputs {
   x: string;
@@ -108,13 +119,19 @@ export interface MathEquationRuleInputsWithSide {
   y: string;
 }
 
+export interface MathEquationRuleInputsWithPlaceholder {
+  x: string;
+  y: Array<string>;
+}
+
 export interface MathEquationRuleInputsWithoutSide {
   x: string;
 }
 
 export type MathEquationRuleInputs = (
   MathEquationRuleInputsWithSide |
-  MathEquationRuleInputsWithoutSide);
+  MathEquationRuleInputsWithoutSide |
+  MathEquationRuleInputsWithPlaceholder);
 
 export interface MathExpressionRuleInputs {
   x: string;

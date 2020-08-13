@@ -374,6 +374,55 @@ export class MathInteractionsService {
 
     return partsList1.length === 0 && partsList2.length === 0;
   }
+
+  expressionMatchWithPlaceholders(
+      expressionWithPlaceholders: string, expressionWithoutPlaceholders: string,
+      placeholders: Array<string>): boolean {
+
+    // Check if expressionWithoutPlaceholders contains any placeholders.
+    for (let variable of nerdamer(expressionWithoutPlaceholders).variables()) {
+      if (placeholders.includes(variable)) {
+        return false;
+      }
+    }
+
+    // The expressions are first split into terms by addition and subtraction.
+    let termsWithPlaceholders = this.getTerms(expressionWithPlaceholders);
+    let termsWithoutPlaceholders = this.getTerms(expressionWithoutPlaceholders);
+
+    for (let i = termsWithPlaceholders.length - 1; i >= 0; i--) {
+      for (let j = 0; j < termsWithoutPlaceholders.length; j++) {
+        let termWithPlaceholders = termsWithPlaceholders[i];
+        let termWithoutPlaceholders = termsWithoutPlaceholders[j];
+
+        let divisionCondition;
+        try {
+          let variablesAfterDivision = nerdamer(termWithPlaceholders).divide(
+            termWithoutPlaceholders).variables();
+          divisionCondition = variablesAfterDivision.every(
+            variable => placeholders.includes(variable));
+        } catch (e) {
+          divisionCondition = true;
+        }
+
+        let variablesAfterSubtraction = nerdamer(termWithPlaceholders).subtract(
+          termWithoutPlaceholders).variables();
+        let subtractionCondition = variablesAfterSubtraction.every(
+          variable => placeholders.includes(variable));
+
+        // If only placeholders are left in the term after dividing/subtracting
+        // them, then the terms are said to match.
+        if (divisionCondition || subtractionCondition) {
+          termsWithPlaceholders.splice(i, 1);
+          termsWithoutPlaceholders.splice(j, 1);
+          break;
+        }
+      }
+    }
+
+    // Checks if all terms have matched.
+    return termsWithPlaceholders.length + termsWithoutPlaceholders.length === 0;
+  }
 }
 
 angular.module('oppia').factory(

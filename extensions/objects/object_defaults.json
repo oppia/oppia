@@ -24,6 +24,7 @@
     "NonnegativeInt": 0,
     "NormalizedString": "",
     "Real": 0.0,
+    "SetOfAlgebraicIdentifier": [],
     "SetOfHtmlString": [],
     "SetOfNormalizedString": [],
     "SetOfUnicodeString": [],

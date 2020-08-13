@@ -364,4 +364,13 @@ describe('Math equation input rules service', () => {
     expect(meirs.OmitsSomeOf('y-mx=c',
       {x: inputString, y: positionOfTerms})).toBeFalse();
   });
+
+  it('should have a correct MatchesWithGeneralForm rule', () => {
+    inputString = 'y = mx + c';
+
+    expect(meirs.MatchesWithGeneralForm('y = 3x + 5',
+      {x: 'y = mx + c', y: ['m', 'c']})).toBeTrue();
+    expect(meirs.MatchesWithGeneralForm('3x + 5 = y',
+      {x: 'y = mx + c', y: ['m', 'c']})).toBeFalse();
+  });
 });

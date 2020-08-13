@@ -143,6 +143,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           replacementText = NumberWithUnitsObjectFactory
             .fromDict(inputs[varName]).toString();
         } else if (
+          varType === 'SetOfAlgebraicIdentifier' ||
           varType === 'SetOfUnicodeString' ||
           varType === 'SetOfNormalizedString') {
           replacementText = '[';

@@ -370,4 +370,13 @@ describe('Algebraic expression input rules service', () => {
     expect(algebraicRulesService.OmitsSomeOf('9x^2 - 6x + 1',
       {x: inputString})).toBeFalse();
   });
+
+  it('should have a correct MatchesWithGeneralForm rule', () => {
+    inputString = 'x/a + y/b';
+
+    expect(algebraicRulesService.MatchesWithGeneralForm('x/2 + y/3',
+      {x: 'x/a + y/b', y: ['a', 'b']})).toBeTrue();
+    expect(algebraicRulesService.MatchesWithGeneralForm('x/2 + z/4',
+      {x: 'x/a + y/b', y: ['a', 'b']})).toBeFalse();
+  });
 });

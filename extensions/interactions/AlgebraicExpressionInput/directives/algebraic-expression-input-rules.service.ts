@@ -23,7 +23,10 @@ import nerdamer from 'nerdamer';
 
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
 import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
-import { AlgebraicExpressionRuleInputs } from 'interactions/rule-input-defs';
+import {
+  AlgebraicExpressionRuleInputsWithPlaceholder,
+  AlgebraicExpressionRuleInputsWithoutPlaceholder
+} from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +34,7 @@ import { AlgebraicExpressionRuleInputs } from 'interactions/rule-input-defs';
 export class AlgebraicExpressionInputRulesService {
   MatchesExactlyWith(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputs): boolean {
+      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     let mis = new MathInteractionsService();
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);
@@ -42,7 +45,7 @@ export class AlgebraicExpressionInputRulesService {
 
   IsEquivalentTo(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputs): boolean {
+      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     let mis = new MathInteractionsService();
     // Inserting '*' signs between variables if not present.
     answer = mis.insertMultiplicationSigns(answer);
@@ -61,7 +64,7 @@ export class AlgebraicExpressionInputRulesService {
 
   ContainsSomeOf(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputs): boolean {
+      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     // At least one term should match between answer and input.
     let mis = new MathInteractionsService();
     // Inserting '*' signs between variables if not present.
@@ -84,7 +87,7 @@ export class AlgebraicExpressionInputRulesService {
 
   OmitsSomeOf(
       answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputs): boolean {
+      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
     // There must be at least one term in the input that is not present in the
     // answer.
     let mis = new MathInteractionsService();
@@ -109,6 +112,19 @@ export class AlgebraicExpressionInputRulesService {
       }
     }
     return false;
+  }
+
+  MatchesWithGeneralForm(
+      answer: AlgebraicExpressionAnswer,
+      inputs: AlgebraicExpressionRuleInputsWithPlaceholder): boolean {
+    let mis = new MathInteractionsService();
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
+    let placeholders = inputs.y;
+
+    return mis.expressionMatchWithPlaceholders(inputs.x, answer, placeholders);
   }
 }
 

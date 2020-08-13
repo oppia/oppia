@@ -367,4 +367,87 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.termsMatch('4*(5+3)', '32')).toBeFalse();
     expect(mathInteractionsService.termsMatch('sqrt(x^2)', 'x')).toBeFalse();
   });
+
+  it('should correctly match terms with placeholders', function() {
+    let expressionWithPlaceholders = 'a*x + b';
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '2x + 3', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3 + 4x', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '-3 + 4x', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3 - 4.5x', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3 + x*5/2', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3^5 + 4x', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x + 5/2', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '0 + x', ['a', 'b'])).toBeTrue();
+
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '4x', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '4x^2', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '4a + 3', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'ax + b', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3x^2 + 2', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '5x + 4 + 5', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3x + 2y + 4', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'ax + 3', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3x + b', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '4x + 5 + b', ['a', 'b'])).toBeFalse();
+    
+
+    expressionWithPlaceholders = 'x/alpha + y/beta';
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x/2 + y/3', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'y/2 + x/3', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '4x/2.5 + y', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x + y', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x/5 - y/2', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '-x/2 + 3y', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'y - 8x', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      'x/3 + y/(8/22)', ['alpha', 'beta'])).toBeTrue();
+
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      '(x^2)/4 + y/2', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x/5', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      'x/2 + y/3 - 5', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      'x/alpha + y/2', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      'x/2 + y/5 + 2x/2', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'z/2 + y/3', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      'x/(x+1) + y/8', ['alpha', 'beta'])).toBeFalse();
+  });
 });

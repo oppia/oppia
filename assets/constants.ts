@@ -5361,6 +5361,16 @@ export = {
     "Omega": "Ω"
   },
 
+  "VALID_ALGEBRAIC_IDENTIFIERS": [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
+    "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+    "T", "U", "V", "W", "X", "Y", "Z",
+    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
+    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
+    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
+    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
+
   // Number of custom letters allowed in the on-screen keyboard for math
   // interactions.
   "MAX_CUSTOM_LETTERS_FOR_OSK": 10,

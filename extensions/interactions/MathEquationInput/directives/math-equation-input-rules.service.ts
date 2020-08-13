@@ -26,8 +26,9 @@ import { AlgebraicExpressionInputRulesService } from
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts';
 import { MathEquationAnswer } from 'interactions/answer-defs';
 import {
+  MathEquationRuleInputsWithSide,
   MathEquationRuleInputsWithoutSide,
-  MathEquationRuleInputsWithSide
+  MathEquationRuleInputsWithPlaceholder
 } from 'interactions/rule-input-defs';
 
 @Injectable({
@@ -190,6 +191,25 @@ export class MathEquationInputRulesService {
       return algebraicRulesService.OmitsSomeOf  (
         expressionAnswer, {x: expressionInput});
     }
+  }
+
+  MatchesWithGeneralForm(
+      answer: MathEquationAnswer,
+      inputs: MathEquationRuleInputsWithPlaceholder): boolean {
+    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
+
+    let splitAnswer = answer.split('=');
+    let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
+
+    let splitInput = inputs.x.split('=');
+    let lhsInput = splitInput[0], rhsInput = splitInput[1];
+
+    let placeholders = inputs.y;
+
+    return algebraicRulesService.MatchesWithGeneralForm(
+      lhsAnswer, {x: lhsInput, y: placeholders}) && (
+        algebraicRulesService.MatchesWithGeneralForm(
+          rhsAnswer, {x: rhsInput, y: placeholders}));
   }
 }
 
