@@ -19,17 +19,29 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface FeatureStatusSummaryBackendDict {
-  [featureName: string]: boolean;
-}
-
+/**
+ * Names of all feature flags should be defined here, with format:
+ * FeatureName = 'feature_name', where the LHS is the feature name in
+ * PascalCase, and the RHS is in snake_case, which is the naming convention
+ * of features in the backend.
+ */
 export enum FeatureNames {
   DummyFeature = 'dummy_feature',
 }
 
+export interface FeatureStatusSummaryBackendDict {
+  [featureName: string]: boolean;
+}
+
+/**
+ * Summary of feature flags, which are keyed on their names defined in
+ * FeatureNames. This provides interface for developer to access feature flag
+ * values with feature name hint:
+ *   featureSummaryDict.DummyFeature.isEnabled === true
+ */
 export type FeatureSummaryDict = {
   [name in keyof typeof FeatureNames]: {
-      isEnabled: string;
+      isEnabled: boolean;
   }
 };
 
@@ -66,6 +78,11 @@ export class FeatureStatusSummary {
     return backendDict;
   }
 
+  /**
+   * Construct and returns the feature summary.
+   *
+   * @returns {FeatureSummaryDict} - The feature summary dict.
+   */
   toSummaryDict(): FeatureSummaryDict {
     const summary = <FeatureSummaryDict>{};
     Object.keys(FeatureNames).forEach(name => {

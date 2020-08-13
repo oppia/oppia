@@ -82,10 +82,12 @@ export class PlatformFeatureService {
   }
 
   /**
-   * TODO
-   * Gets the value of the feature flag.
+   * Returns the summary object of feature flags, which can be used to get the
+   * value of feature flags.
+   * Example:
+   *   platformFeatureService.featureSummary.DummyFeature.isEnabled === true.
    *
-   * @returns {boolean} - True if the feature is enabled.
+   * @returns {FeatureSummaryDict} - Summary object of feature flags.
    * @throws {Error} - If this method is called before inialization.
    */
   get featureSummary(): FeatureSummaryDict {

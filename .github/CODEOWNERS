@@ -576,7 +576,7 @@
 /core/platform_feature*.py @BenHenning @vinitamurthi
 /core/storage/config/ @BenHenning @vinitamurthi
 /core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
-/core/templates/services/platform_feature*.ts @BenHenning @vinitamurthi
+/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
 
 
 # Frontend unit tests
