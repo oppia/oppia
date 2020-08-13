@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import change_domain
 from core.platform import models
 import feconf
@@ -70,6 +71,17 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
             'schema': {
                 'type': 'unicode'
             }
+        }, {
+            'name': 'url_fragment',
+            'schema': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_url_fragment',
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+                }]
+            },
         }, {
             'name': 'course_details',
             'schema': {
@@ -365,6 +377,7 @@ CLASSROOM_PAGES_DATA = ConfigProperty(
     'classroom_pages_data', SET_OF_CLASSROOM_DICTS_SCHEMA,
     'The details for each classroom page.', [{
         'name': 'math',
+        'url_fragment': 'math',
         'topic_ids': [],
         'course_details': '',
         'topic_list_intro': ''
@@ -419,4 +432,11 @@ MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH = ConfigProperty(
     INT_SCHEMA,
     'The maximum number of Math SVGs that can be send in a batch of math rich '
     'text svgs.',
-    20)
+    25)
+
+MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
+    'max_number_of_explorations_in_math_svgs_batch',
+    INT_SCHEMA,
+    'The maximum number of explorations that can be send in a batch of math '
+    'rich text svgs.',
+    2)

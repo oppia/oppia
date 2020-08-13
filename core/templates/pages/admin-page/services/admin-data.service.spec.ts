@@ -203,12 +203,53 @@ describe('Admin Data Service', () => {
       expect(response).toEqual(expectedResponse);
     });
     var req = httpTestingController.expectOne(
-      '/adminmathsvghandler');
+      '/explorationslatexsvghandler');
     expect(req.request.method).toEqual('POST');
     req.flush(expectedResponse);
 
     flushMicrotasks();
   }));
+
+  it('should send the suggestion math SVGs to the admin backend service',
+    fakeAsync(() => {
+      var expectedResponse = {
+        result: 'success'
+      };
+      var suggestionLatexToSvgMapping = {
+        suggestionId1: {
+          latex_string1: {
+            file: new Blob(),
+            dimensions: {
+              encoded_height_string: '4d456',
+              encoded_width_string: '3d467',
+              encoded_vertical_padding_string: '0d234'
+            },
+            latexId: '3rmYki9MyZ'
+          }
+        },
+        suggestionId2: {
+          latex_string2: {
+            file: new Blob(),
+            dimensions: {
+              encoded_height_string: '3d456',
+              encoded_width_string: '5d467',
+              encoded_vertical_padding_string: '0d234'
+            },
+            latexId: '4rm6ki9MsZ'
+          }
+        }
+      };
+      adminDataService.sendSuggestionMathSvgsToBackendAsync(
+        suggestionLatexToSvgMapping).then(function(response) {
+        expect(response).toEqual(expectedResponse);
+      });
+      var req = httpTestingController.expectOne(
+        '/suggestionslatexsvghandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(expectedResponse);
+
+      flushMicrotasks();
+    }));
 
   it('should cache the response and not make a second request',
     fakeAsync(() => {

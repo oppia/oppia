@@ -1,7 +1,7 @@
 <div class="story-summary-tile">
   <div class="oppia-story-title">
     <strong class="title-text">
-      <a ng-href="<[$ctrl.getStoryLink()]>"><[$ctrl.getStorySummary().getTitle()]> </a>
+      <a ng-href="<[$ctrl.getStoryLink()]>" ng-class="{'disabled-link': !ctrl.classroomUrlFragment}"><[$ctrl.storySummary.getTitle()]> </a>
     </strong>
     <span style="padding-left: 10px; font-size: 0.75em; color: #404040;">
        <[$ctrl.nodeCount]> <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span><[($ctrl.nodeCount > 1) ? 's' : '']>
@@ -9,16 +9,16 @@
   </div>
   <div class="story-details">
     <div class="story-thumbnail"
-         ng-style="{background: $ctrl.getStorySummary().getThumbnailBgColor()}">
+         ng-style="{background: $ctrl.storySummary.getThumbnailBgColor()}">
       <img ng-src="<[$ctrl.thumbnailUrl]>"
            alt=""
            class="img-thumbnail"
-           ng-style="{background: $ctrl.getStorySummary().getThumbnailBgColor()}">
+           ng-style="{background: $ctrl.storySummary.getThumbnailBgColor()}">
     </div>
     <div class="chapter-details">
-      <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed, 'unavailable-chapter': !$ctrl.isPreviousChapterCompleted($index)}" class="chapter-title" ng-repeat="title in $ctrl.getStorySummary().getNodeTitles()">
+      <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed, 'unavailable-chapter': !$ctrl.isPreviousChapterCompleted($index)}" class="chapter-title" ng-repeat="title in $ctrl.storySummary.getNodeTitles()">
         <span ng-if="$index < $ctrl.chaptersDisplayed">
-          <span ng-if="$ctrl.getStorySummary().isNodeCompleted(title)" class="material-icons completed-icon">
+          <span ng-if="$ctrl.storySummary.isNodeCompleted(title)" class="material-icons completed-icon">
             done
           </span>
           <span ng-class="{'incomplete-chapter': !$ctrl.isChapterCompleted(title)}"
@@ -58,7 +58,7 @@
   }
 
   story-summary-tile .unavailable-chapter {
-    color: rgb(0, 0, 0, 0.5);
+    color: rgba(0, 0, 0, 0.5);
   }
 
   story-summary-tile .view-button {
@@ -101,6 +101,13 @@
   story-summary-tile .title-text {
     border-right: 1px solid #7B7B7B;
     padding-right: 10px;
+  }
+
+  story-summary-tile .disabled-link,
+  story-summary-tile .disabled-link:hover,
+  story-summary-tile .disabled-link:active {
+    color: #000;
+    cursor: default;
   }
 
   story-summary-tile .img-thumbnail {

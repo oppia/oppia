@@ -22,9 +22,11 @@ require('domain/story/story-domain.constants.ajs.ts');
 angular.module('oppia').factory('EditableStoryBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EDITABLE_STORY_DATA_URL_TEMPLATE', 'STORY_PUBLISH_URL_TEMPLATE',
+  'STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE',
   'VALIDATE_EXPLORATIONS_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService,
       EDITABLE_STORY_DATA_URL_TEMPLATE, STORY_PUBLISH_URL_TEMPLATE,
+      STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE,
       VALIDATE_EXPLORATIONS_URL_TEMPLATE) {
     var _fetchStory = function(storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
@@ -139,6 +141,23 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
       });
     };
 
+    var _doesStoryWithUrlFragmentExist = function(
+        storyUrlFragment, successCallback, errorCallback) {
+      var storyUrlFragmentUrl = UrlInterpolationService.interpolateUrl(
+        STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
+          story_url_fragment: storyUrlFragment
+        });
+      $http.get(storyUrlFragmentUrl).then(function(response) {
+        if (successCallback) {
+          successCallback(response.data.story_url_fragment_exists);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     return {
       fetchStory: function(storyId) {
         return $q(function(resolve, reject) {
@@ -181,6 +200,12 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
       deleteStory: function(storyId) {
         return $q(function(resolve, reject) {
           _deleteStory(storyId, resolve, reject);
+        });
+      },
+
+      doesStoryWithUrlFragmentExistAsync: async function(storyUrlFragment) {
+        return $q(function(resolve, reject) {
+          _doesStoryWithUrlFragmentExist(storyUrlFragment, resolve, reject);
         });
       }
     };

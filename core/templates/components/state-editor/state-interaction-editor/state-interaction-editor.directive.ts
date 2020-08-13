@@ -59,6 +59,7 @@ require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -93,7 +94,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'InteractionDetailsCacheService', 'UrlInterpolationService',
         'ExplorationHtmlFormatterService', 'ResponsesService',
         'SubtitledHtmlObjectFactory', 'StateSolutionService',
-        'StateHintsService', 'StateContentService', function(
+        'StateHintsService', 'StateContentService',
+        'WindowDimensionsService', function(
             $scope, $http, $rootScope, $uibModal, $injector, $filter,
             AlertsService, HtmlEscaperService, StateEditorService,
             INTERACTION_SPECS, StateInteractionIdService,
@@ -102,7 +104,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             InteractionDetailsCacheService, UrlInterpolationService,
             ExplorationHtmlFormatterService, ResponsesService,
             SubtitledHtmlObjectFactory, StateSolutionService,
-            StateHintsService, StateContentService) {
+            StateHintsService, StateContentService,
+            WindowDimensionsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var DEFAULT_TERMINAL_STATE_CONTENT =
@@ -205,9 +208,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
             // This must be called here so that the rules are updated before the
             // state graph is recomputed.
             if (hasInteractionIdChanged) {
-              $rootScope.$broadcast(
-                'onInteractionIdChanged',
-                StateInteractionIdService.savedMemento);
+              StateInteractionIdService.onInteractionIdChanged.emit(
+                StateInteractionIdService.savedMemento
+              );
             }
 
             $scope.recomputeGraph();
@@ -263,9 +266,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
 
-              $rootScope.$broadcast(
-                'onInteractionIdChanged',
-                StateInteractionIdService.savedMemento);
+              StateInteractionIdService.onInteractionIdChanged.emit(
+                StateInteractionIdService.savedMemento
+              );
               $scope.recomputeGraph();
               _updateInteractionPreview();
               _updateAnswerChoices();
@@ -274,9 +277,15 @@ angular.module('oppia').directive('stateInteractionEditor', [
             });
           };
 
+          $scope.toggleInteractionEditor = function() {
+            $scope.interactionEditorIsShown = !$scope.interactionEditorIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
-
+            $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+            $scope.interactionEditorIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.StateInteractionIdService = StateInteractionIdService;
             $scope.hasLoaded = false;
             $scope.customizationModalReopened = false;
