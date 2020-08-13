@@ -15,7 +15,7 @@
           </span>
         </span>
 
-        <div class="oppia-items-container">
+        <div class="oppia-custom-editor-container">
           <span ng-if="item.type == 'checkboxes'" class="text-dark">
             <object-editor obj-type="SetOfHtmlString" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
@@ -49,15 +49,15 @@
   </div>
 </div>
 <style>
-  .form-group.oppia-rule-editor-span {
+  rule-editor .form-group.oppia-rule-editor-span {
     display: inline-block;
     margin-right: 5px;
     width: 100%;
   }
-  .oppia-rule-description-choice {
+  rule-editor .oppia-rule-description-choice {
     width: 250px;
   }
-  .oppia-items-container {
+  rule-editor .oppia-custom-editor-container {
     max-height: 320px;
     overflow-x: hidden;
     overflow-y: auto;

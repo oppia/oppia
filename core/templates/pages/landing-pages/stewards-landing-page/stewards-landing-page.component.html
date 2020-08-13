@@ -1,5 +1,5 @@
 <div>
-  <div class="oppia-stewards-landing-section oppia-stewards-landing-section-color">
+  <div class="oppia-stewards-landing-section oppia-stewards-landing-section-custom-container">
     <div class="oppia-stewards-landing-section-inner">
       <div class="container-fluid">
         <div class="row">
@@ -319,22 +319,22 @@
 </div>
 
 <style>
-  .oppia-stewards-landing-background-icon-row-container {
+  stewards-landing-page .oppia-stewards-landing-background-icon-row-container {
     position: absolute;
     top: 50px;
   }
-  .oppia-stewards-sidebar {
+  stewards-landing-page .oppia-stewards-sidebar {
     float: left;
     margin-right: 80px;
     max-width: 240px;
     padding-top: 20px;
     width: 200px;
   }
-  .oppia-stewards-sidebar ul {
+  stewards-landing-page .oppia-stewards-sidebar ul {
     margin: 0;
     padding: 0;
   }
-  .oppia-stewards-sidebar li {
+  stewards-landing-page .oppia-stewards-sidebar li {
     display: flex;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     line-height: 20px;
@@ -343,7 +343,7 @@
     position: relative;
     width: 200px;
   }
-  .oppia-stewards-sidebar li.active {
+  stewards-landing-page .oppia-stewards-sidebar li.active {
     background-color: #BC5A29;
     color: #222222;
     /* Disables the link completely instead of just cursor: default; */
@@ -351,7 +351,7 @@
     pointer-events: none;
     text-decoration: none;
   }
-  .oppia-stewards-sidebar li.active:after {
+  stewards-landing-page .oppia-stewards-sidebar li.active:after {
     border: 12px solid transparent;
     border-left: 12px solid #BC5A29;
     content: "";
@@ -361,7 +361,7 @@
     top: 18px;
     width: 0;
   }
-  .oppia-stewards-sidebar li a {
+  stewards-landing-page .oppia-stewards-sidebar li a {
     color: black;
     display: table;
     flex: 1;
@@ -369,21 +369,21 @@
     padding: 20px;
     vertical-align: middle;
   }
-  .oppia-stewards-sidebar li.active a {
+  stewards-landing-page .oppia-stewards-sidebar li.active a {
     color: white;
   }
-  .oppia-stewards-sidebar li a:hover,
+  stewards-landing-page .oppia-stewards-sidebar li a:hover,
   .oppia-stewards-sidebar li a:focus {
     text-decoration: none
   }
 
-  .oppia-stewards-dropdown {
+  stewards-landing-page .oppia-stewards-dropdown {
     margin-bottom: 50px;
     margin-top: 12px;
     position: relative;
     width: 80%;
   }
-  .oppia-stewards-dropdown .caret {
+  stewards-landing-page .oppia-stewards-dropdown .caret {
     bottom: 0;
     color: black;
     margin: auto;
@@ -391,7 +391,7 @@
     right: 5px;
     top: 0;
   }
-  .oppia-stewards-dropdown .selection {
+  stewards-landing-page .oppia-stewards-dropdown .selection {
     padding: 12px 20px 12px 18px;
     position: relative;
     text-align: left;
@@ -399,27 +399,27 @@
     width: inherit;
   }
 
-  .oppia-stewards-landing-section {
+  stewards-landing-page .oppia-stewards-landing-section {
     height: auto;
     margin-left: auto;
     margin-right: auto;
     position: relative;
   }
-  .oppia-stewards-landing-image {
+  stewards-landing-page .oppia-stewards-landing-image {
     max-height: 500px;
     max-width: 100%;
     position: relative;
     width: 60%;
     z-index: 20;
   }
-  .oppia-stewards-landing-h1 {
+  stewards-landing-page .oppia-stewards-landing-h1 {
     font-size: 3.5vw;
     line-height: 5vw;
     margin: 0;
     text-align: left;
     top: 160px;
   }
-  .oppia-stewards-landing-section-inner {
+  stewards-landing-page .oppia-stewards-landing-section-inner {
     height: auto;
     margin-left: auto;
     margin-right: auto;
@@ -427,7 +427,7 @@
     padding-top: 6%;
     position: relative;
   }
-  .oppia-stewards-landing-h2 {
+  stewards-landing-page .oppia-stewards-landing-h2 {
     font-size: 1.95vmax;
     line-height: 1.6em;
     margin-bottom: 30px;
@@ -436,16 +436,16 @@
     text-align: left;
     z-index: 20;
   }
-  .oppia-stewards-landing-h1, .oppia-stewards-landing-h2 {
+  stewards-landing-page .oppia-stewards-landing-h1, .oppia-stewards-landing-h2 {
     color: #005c5e;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
   }
-  .oppia-stewards-landing-section .tab-content p {
+  stewards-landing-page .oppia-stewards-landing-section .tab-content p {
     margin-bottom: 20px;
     margin-top: 20px;
   }
 
-  .oppia-stewards-button {
+  stewards-landing-page .oppia-stewards-button {
     border-radius: 0;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 20px;
@@ -456,45 +456,45 @@
     text-transform: uppercase;
     z-index: 20;
   }
-  .oppia-stewards-button-primary {
+  stewards-landing-page .oppia-stewards-button-primary {
     background-color: #015c53;
     color: #fff;
     left: 0;
     margin-right: 15px;
   }
-  .oppia-stewards-button-secondary {
+  stewards-landing-page .oppia-stewards-button-secondary {
     background-color: transparent;
     border: 4px solid #265a53;
     box-sizing: border-box;
     color: #265a53;
     margin-right: 15px;
   }
-  .oppia-stewards-button-primary:hover,
+  stewards-landing-page .oppia-stewards-button-primary:hover,
   .oppia-stewards-button-primary:focus,
   .oppia-stewards-button-primary:active {
     background-color: #05beb2;
     color: #fff;
   }
-  .oppia-stewards-button-secondary:hover,
+  stewards-landing-page .oppia-stewards-button-secondary:hover,
   .oppia-stewards-button-secondary:focus,
   .oppia-stewards-button-secondary:active {
     border-color: #05beb2;
     color: #05beb2;
   }
-  .oppia-stewards-main-content {
+  stewards-landing-page .oppia-stewards-main-content {
     float: left;
     height: 500px;
     margin-left: 20px;
   }
-  .oppia-stewards-main-content-buttons {
+  stewards-landing-page .oppia-stewards-main-content-buttons {
     display: block;
     margin: 40px auto 0;
     text-align: center;
   }
-  .oppia-stewards-landing-top-section {
+  stewards-landing-page .oppia-stewards-landing-top-section {
     margin-left: 60px;
   }
-  .oppia-stewards-landing-background-icon-row {
+  stewards-landing-page .oppia-stewards-landing-background-icon-row {
     margin-bottom: 0;
     margin-left: -webkit-calc((100vw - 2700px) / 2);
     margin-left: -moz-calc((100vw - 2700px) / 2);
@@ -510,36 +510,36 @@
     text-align: center;
     width: 2700px;
   }
-  .oppia-stewards-landing-background-icon {
+  stewards-landing-page .oppia-stewards-landing-background-icon {
     margin: -1px;
     max-width: 96px;
     width: 10%;
   }
-  .oppia-stewards-landing-section-color {
+  stewards-landing-page .oppia-stewards-landing-section-custom-container {
     background-color: #afd2eb;
   }
-  .oppia-stewards-landing-image-container {
+  stewards-landing-page .oppia-stewards-landing-image-container {
     height: auto;
     z-index: 20;
   }
-  .oppia-stewards-landing-top-section-container {
+  stewards-landing-page .oppia-stewards-landing-top-section-container {
     z-index: 20;
   }
-  .oppia-support-text {
+  stewards-landing-page .oppia-support-text {
     padding-right: 15px;
   }
-  .oppia-stewards-landing-background-icons-container {
+  stewards-landing-page .oppia-stewards-landing-background-icons-container {
     margin-top: 20px;
   }
-  .oppia-stewards-landing-section-div {
+  stewards-landing-page .oppia-stewards-landing-section-div {
     background-color: #e8e7e3;
     max-width: 90%;
     padding-bottom: 50px;
   }
-  .oppia-landing-section {
+  stewards-landing-page .oppia-landing-section {
     padding: 30px;
   }
-  .oppia-dropdown-menu {
+  stewards-landing-page .oppia-dropdown-menu {
     width: inherit;
   }
 
