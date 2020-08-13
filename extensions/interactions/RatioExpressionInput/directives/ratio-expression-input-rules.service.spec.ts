@@ -56,12 +56,12 @@ describe('Ratio expression input rules service', () => {
 
 
   it('should have a correct IsEquivalent rule', () => {
-    inputString = '1:2:3';
+    inputString = '2:4:6';
 
     expect(reirs.IsEquivalent('1:2:3',
       {x: inputString})).toBeTrue();
     expect(reirs.IsEquivalent('2:4:6',
-      {x: inputString})).toBeTrue();
+      {x: inputString})).toBeFalse();
     expect(reirs.IsEquivalent('1:2',
       {x: inputString})).toBeFalse();
     expect(reirs.IsEquivalent('1:2:3:4',

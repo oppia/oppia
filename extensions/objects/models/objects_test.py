@@ -769,7 +769,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         invalid_values_with_error_messages = [
             (None, 'Expected unicode string, received None'),
-            ('a', 'Expected unicode string, received a'),
+            (2, 'Expected unicode string, received 2'),
             (
                 'string',
                 'Received string which is not in the allowed range of choices'),

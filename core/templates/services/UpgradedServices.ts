@@ -436,6 +436,9 @@ import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
+import { RatioExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -1063,6 +1066,9 @@ export class UpgradedServices {
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
         new ReadOnlyStoryNodeObjectFactory(
           upgradedServices['LearnerExplorationSummaryObjectFactory']);
+    upgradedServices['RatioExpressionInputValidationService'] =
+          new RatioExpressionInputValidationService(
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
@@ -1284,6 +1290,7 @@ export class UpgradedServices {
         upgradedServices['NumericExpressionInputRulesService'],
         upgradedServices['NumericInputRulesService'],
         upgradedServices['PencilCodeEditorRulesService'],
+        upgradedServices['RatioExpressionInputRulesService'],
         upgradedServices['SetInputRulesService'],
         upgradedServices['TextInputRulesService']);
     upgradedServices['AudioTranslationLanguageService'] =
