@@ -111,13 +111,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_check_call(unused_commands):
             pass
 
-        # pylint: disable=unused-argument
-        def mock_build_main(args):
+        def mock_build_main(args):  # pylint: disable=unused-argument
             pass
 
-        def mock_popen(args, env, shell):
+        def mock_popen(args, env, shell):  # pylint: disable=unused-argument
             return
-        # pylint: enable=unused-argument
 
         def mock_remove(unused_path):
             pass
@@ -680,10 +678,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'tweak_webdriver_manager', mock_tweak_webdriver)
 
         expected_commands = [
-            (['update', '--versions.chrome',
-              CHROME_DRIVER_VERSION],),
-            (['start', '--versions.chrome',
-              CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
+            ([
+                'update', '--versions.chrome',
+                CHROME_DRIVER_VERSION],),
+            ([
+                'start', '--versions.chrome',
+                CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
         ]
 
         run_swap = self.swap_with_checks(
@@ -704,7 +704,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
              '--capabilities.maxInstances=3'], result)
 
     def test_get_parameter_for_negative_sharding_instances(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(
+            ValueError, 'Sharding instance should be larger than 0'):
             run_e2e_tests.get_parameter_for_sharding(-3)
 
     def test_get_parameter_for_dev_mode(self):
@@ -1018,7 +1019,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                                 run_e2e_tests.main(
                                     args=['--skip-install', '--skip-build'])
 
-    def test_chrome_not_found_failure(self):
+    def test_linux_chrome_version_command_not_found_failure(self):
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
 
         def mock_popen(unused_commands, stdout):
             self.assertEqual(stdout, -1)
@@ -1035,7 +1037,35 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             'follow the instructions mentioned in the following URL:\n'
             'https://chromedriver.chromium.org/downloads/version-selection')
 
-        with popen_swap, self.assertRaisesRegexp(Exception, expected_message):
+        with os_name_swap, popen_swap, self.assertRaisesRegexp(
+            Exception, expected_message):
+            run_e2e_tests.get_chrome_driver_version()
+
+    def test_mac_chrome_version_command_not_found_failure(self):
+        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+
+        def mock_popen(unused_commands, stdout):
+            self.assertEqual(stdout, -1)
+            raise OSError(
+                r'/Applications/Google\ Chrome.app/Contents/MacOS/Google\ '
+                'Chrome not found')
+
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen, expected_args=[([
+                '/Applications/Google Chrome.app/Contents/MacOS/Google '
+                'Chrome', '--version'],)])
+        expected_message = (
+            r'Failed to execute "/Applications/Google\\ '
+            r'Chrome.app/Contents/MacOS/Google\\ Chrome --version" command. '
+            'This is used to determine the chromedriver version to use. '
+            'Please set the chromedriver version manually using '
+            '--chrome_driver_version flag. To determine the chromedriver '
+            'version to be used, please follow the instructions mentioned '
+            'in the following URL:\n'
+            'https://chromedriver.chromium.org/downloads/version-selection')
+
+        with os_name_swap, popen_swap, self.assertRaisesRegexp(
+            Exception, expected_message):
             run_e2e_tests.get_chrome_driver_version()
 
     def test_start_tests_in_debug_mode(self):
@@ -1276,25 +1306,25 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                                         '--chrome_driver_version',
                                         CHROME_DRIVER_VERSION])
 
-    def test_update_community_dashboard_status_with_dashboard_enabled(self):
+    def test_update_contributor_dashboard_status_with_dashboard_enabled(self):
         swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
             run_e2e_tests.FECONF_FILE_PATH,
-            'COMMUNITY_DASHBOARD_ENABLED = .*',
-            'COMMUNITY_DASHBOARD_ENABLED = True'
+            'CONTRIBUTOR_DASHBOARD_ENABLED = .*',
+            'CONTRIBUTOR_DASHBOARD_ENABLED = True'
         )])
 
         with swap_inplace_replace:
-            run_e2e_tests.update_community_dashboard_status_in_feconf_file(
+            run_e2e_tests.update_contributor_dashboard_status_in_feconf_file(
                 run_e2e_tests.FECONF_FILE_PATH, True)
 
-    def test_update_community_dashboard_status_with_dashboard_disabled(self):
+    def test_update_contributor_dashboard_status_with_dashboard_disabled(self):
         swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
             run_e2e_tests.FECONF_FILE_PATH,
-            'COMMUNITY_DASHBOARD_ENABLED = .*',
-            'COMMUNITY_DASHBOARD_ENABLED = False'
+            'CONTRIBUTOR_DASHBOARD_ENABLED = .*',
+            'CONTRIBUTOR_DASHBOARD_ENABLED = False'
         )])
         with swap_inplace_replace:
-            run_e2e_tests.update_community_dashboard_status_in_feconf_file(
+            run_e2e_tests.update_contributor_dashboard_status_in_feconf_file(
                 run_e2e_tests.FECONF_FILE_PATH, False)
 
     def test_cleanup_portserver_when_server_shuts_down_cleanly(self):

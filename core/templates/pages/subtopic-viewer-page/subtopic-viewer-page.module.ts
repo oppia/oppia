@@ -19,6 +19,9 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/angular-js.import';
+import 'third-party-imports/headroom.import';
+
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
@@ -35,6 +38,10 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { SubtopicViewerNavbarBreadcrumbComponent } from
+  // eslint-disable-next-line max-len
+  'pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
+
 
 import { SubtopicViewerDomainConstants } from
   'domain/subtopic_viewer/subtopic-viewer-domain.constants';
@@ -46,10 +53,12 @@ import { SubtopicViewerDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SubtopicViewerNavbarBreadcrumbComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
     SubtopicViewerDomainConstants,

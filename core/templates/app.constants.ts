@@ -40,9 +40,6 @@ export class AppConstants {
 
   public static RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
 
-  /* Called always when learner moves to a new card.
-     Also called when card is selected by clicking on progress dots */
-  public static EVENT_ACTIVE_CARD_CHANGED = 'activeCardChanged';
   /* Called when the learner moves to a new card that they haven't seen
      before. */
   public static EVENT_NEW_CARD_OPENED = 'newCardOpened';
@@ -121,6 +118,13 @@ export class AppConstants {
     QUESTION: 'worked_example_question',
     EXPLANATION: 'worked_example_explanation'
   };
+
+  // Do not modify these without a state migration of all existing content ids.
+  // Content id prefixes should indicate what type of content they are
+  // associated with.
+  public static CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS = 'ca';
+  public static CONTENT_ID_PREFIX_HINT = 'hint';
+  public static CONTENT_ID_PREFIX_FEEDBACK = 'feedback';
 
   public static ACTION_TYPE_EXPLORATION_START: 'ExplorationStart' =
     'ExplorationStart';

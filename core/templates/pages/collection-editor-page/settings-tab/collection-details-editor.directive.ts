@@ -29,29 +29,28 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('services/alerts.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('collectionDetailsEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/settings-tab/' +
-        'collection-details-editor.directive.html'),
+      template: require('./collection-details-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
         'CollectionValidationService', 'AlertsService', 'ALL_CATEGORIES',
         'SUPPORTED_CONTENT_LANGUAGES', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
-        'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'TAG_REGEX',
         function(
             $scope, CollectionEditorStateService, CollectionUpdateService,
             CollectionValidationService, AlertsService, ALL_CATEGORIES,
             SUPPORTED_CONTENT_LANGUAGES, COLLECTION_TITLE_INPUT_FOCUS_LABEL,
-            EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             TAG_REGEX) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var refreshSettingsTab = function() {
             ctrl.displayedCollectionTitle = ctrl.collection.getTitle();
             ctrl.displayedCollectionObjective = (
@@ -124,8 +123,11 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             return CollectionEditorStateService.hasLoadedCollection();
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
-            $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
+            ctrl.directiveSubscriptions.add(
+              CollectionEditorStateService.onCollectionInitialized.subscribe(
+                () => refreshSettingsTab()
+              )
+            );
             ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
               COLLECTION_TITLE_INPUT_FOCUS_LABEL);
@@ -140,7 +142,21 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             ctrl.languageListForSelect = SUPPORTED_CONTENT_LANGUAGES;
             ctrl.TAG_REGEX = TAG_REGEX;
           };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          };
         }
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+@Directive({
+  selector: 'collection-details-editor'
+})
+export class CollectionDetailsEditor extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('collectionDetailsEditor', elementRef, injector);
+  }
+}

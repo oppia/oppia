@@ -242,36 +242,6 @@ class CollectionRightsModel(base_models.VersionedModel):
         """Model contains user data."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
-    @staticmethod
-    def convert_to_valid_dict(model_dict):
-        """Replace invalid fields and values in the CollectionRightsModel dict.
-
-        Some old CollectionRightsSnapshotContentModels can contain fields
-        and field values that are no longer supported and would cause
-        an exception when we try to reconstitute a CollectionRightsModel from
-        them. We need to remove or replace these fields and values.
-
-        Args:
-            model_dict: dict. The content of the model. Some fields and field
-                values might no longer exist in the CollectionRightsModel
-                schema.
-
-        Returns:
-            dict. The content of the model. Only valid fields and values are
-            present.
-        """
-        # The status field could historically take the value 'publicized', this
-        # value is now equivalent to 'public'.
-        if model_dict['status'] == 'publicized':
-            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
-        # The voice_artist_ids field was previously named translator_ids. We
-        # need to move the values from translator_ids field to voice_artist_ids
-        # and delete translator_ids.
-        if 'translator_ids' in model_dict and model_dict['translator_ids']:
-            model_dict['voice_artist_ids'] = model_dict['translator_ids']
-            model_dict['translator_ids'] = []
-        return model_dict
-
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether CollectionRightsModel references the given user.
@@ -307,6 +277,39 @@ class CollectionRightsModel(base_models.VersionedModel):
         """
         super(CollectionRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
+
+    def _reconstitute(self, snapshot_dict):
+        """Populates the model instance with the snapshot.
+
+        Some old CollectionRightsSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a CollectionRightsModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            snapshot_dict: dict(str, *). The snapshot with the model
+                property values.
+
+        Returns:
+            VersionedModel. The instance of the VersionedModel class populated
+            with the the snapshot.
+        """
+        # The status field could historically take the value 'publicized', this
+        # value is now equivalent to 'public'.
+        if snapshot_dict['status'] == 'publicized':
+            snapshot_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+        # The voice_artist_ids field was previously named translator_ids. We
+        # need to move the values from translator_ids field to voice_artist_ids
+        # and delete translator_ids.
+        if (
+                'translator_ids' in snapshot_dict and
+                snapshot_dict['translator_ids']
+        ):
+            snapshot_dict['voice_artist_ids'] = snapshot_dict['translator_ids']
+            snapshot_dict['translator_ids'] = []
+
+        self.populate(**snapshot_dict)
+        return self
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -450,8 +453,8 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 fetched.
 
         Raises:
-            ValueError. max_age is neither an instance of datetime.timedelta nor
-                None.
+            ValueError. The max_age is neither an instance of datetime.timedelta
+                nor None.
 
         Returns:
             3-tuple of (results, cursor, more). Where:
@@ -599,7 +602,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         at least viewable by the given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with private collection summary models that
@@ -608,9 +611,10 @@ class CollectionSummaryModel(base_models.BaseModel):
         return CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ndb.OR(CollectionSummaryModel.owner_ids == user_id,
-                   CollectionSummaryModel.editor_ids == user_id,
-                   CollectionSummaryModel.viewer_ids == user_id)
+            ndb.OR(
+                CollectionSummaryModel.owner_ids == user_id,
+                CollectionSummaryModel.editor_ids == user_id,
+                CollectionSummaryModel.viewer_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -621,15 +625,16 @@ class CollectionSummaryModel(base_models.BaseModel):
         editable by the given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with collection summary models that are at
             least viewable by the given user.
         """
         return CollectionSummaryModel.query().filter(
-            ndb.OR(CollectionSummaryModel.owner_ids == user_id,
-                   CollectionSummaryModel.editor_ids == user_id)
+            ndb.OR(
+                CollectionSummaryModel.owner_ids == user_id,
+                CollectionSummaryModel.editor_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

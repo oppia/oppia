@@ -70,17 +70,19 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             self.publish_exploration(self.owner_id, exp.id)
 
         topic_1 = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'topic', 'abbrev', 'description')
+            self.topic_id_1, 'topic', 'abbrev-one', 'description')
         topic_services.save_new_topic(self.owner_id, topic_1)
 
         topic_2 = topic_domain.Topic.create_default_topic(
-            self.topic_id_2, 'topic2', 'abbrev', 'description')
+            self.topic_id_2, 'topic2', 'abbrev-two', 'description')
         topic_services.save_new_topic(self.owner_id, topic_2)
 
         story_1 = story_domain.Story.create_default_story(
-            story_id_1, title='A story', corresponding_topic_id=self.topic_id_1)
+            story_id_1, 'A story', 'description', self.topic_id_1,
+            'story-one')
         story_2 = story_domain.Story.create_default_story(
-            story_id_2, title='A story', corresponding_topic_id=self.topic_id_2)
+            story_id_2, 'A story', 'description', self.topic_id_2,
+            'story-two')
 
         story_services.save_new_story(self.owner_id, story_1)
         story_services.save_new_story(self.owner_id, story_2)

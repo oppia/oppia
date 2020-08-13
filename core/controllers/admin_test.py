@@ -27,6 +27,7 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import question_fetchers
@@ -39,6 +40,7 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -47,12 +49,14 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
-(exp_models, job_models, opportunity_models, audit_models) = (
-    models.Registry.import_models(
+(
+    exp_models, job_models, opportunity_models, audit_models,
+    suggestion_models) = models.Registry.import_models(
         [models.NAMES.exploration, models.NAMES.job, models.NAMES.opportunity,
-         models.NAMES.audit]))
+         models.NAMES.audit, models.NAMES.suggestion])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -350,8 +354,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            story_id, title='A story',
-            corresponding_topic_id=topic_id)
+            story_id, 'A story', 'Description', topic_id, 'story')
         story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(
             owner_id, topic_id, story_id)
@@ -401,7 +404,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_admin_topics_csv_download_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_custom_response(
-            '/admintopicscsvdownloadhandler', expected_content_type='text/csv')
+            '/admintopicscsvdownloadhandler', 'text/csv')
 
         self.assertEqual(
             response.headers['Content-Disposition'],
@@ -933,6 +936,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, user_id, name='Name',
+            abbreviated_name='abbrev', url_fragment='url-fragment',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -961,6 +965,467 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict, {username: feconf.ROLE_ID_TOPIC_MANAGER})
 
+        self.logout()
+
+
+class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
+    """Tests for Saving Math SVGs in explorations."""
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(ExplorationsLatexSvgHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+    def test_get_latex_to_svg_mapping(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        multiple_explorations_math_rich_text_info = []
+
+        math_rich_text_info1 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['abc1', 'xyz1']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info1)
+        math_rich_text_info2 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id2', True, ['abc2', 'xyz2']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info2)
+        math_rich_text_info3 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id3', True, ['abc3', 'xyz3']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info3)
+
+        exp_services.save_multi_exploration_math_rich_text_info_model(
+            multiple_explorations_math_rich_text_info)
+
+        response_dict = self.get_json(
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            params={'item_to_fetch': 'exp_id_to_latex_mapping'})
+        expected_response = {
+            'exp_id1': ['abc1', 'xyz1'],
+            'exp_id2': ['abc2', 'xyz2']
+        }
+        self.assertEqual(
+            response_dict,
+            {'latex_strings_to_exp_id_mapping': expected_response})
+
+    def test_get_when_invalid_item_to_fetch_item_given(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            params={'item_to_fetch': 'invalid'},
+            expected_status_int=400)
+
+        self.assertIn(
+            'Please specify a valid type of item to fetch.',
+            response_dict['error'])
+
+    def test_get_number_explorations_left_to_update(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        multiple_explorations_math_rich_text_info = []
+
+        math_rich_text_info1 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['abc1', 'xyz1']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info1)
+        math_rich_text_info2 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id2', True, ['abc2', 'xyz2']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info2)
+        math_rich_text_info3 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id3', True, ['abc3', 'xyz3']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info3)
+
+        exp_services.save_multi_exploration_math_rich_text_info_model(
+            multiple_explorations_math_rich_text_info)
+
+        response_dict = self.get_json(
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            params={'item_to_fetch': 'number_of_explorations_left_to_update'})
+        self.assertEqual(
+            response_dict,
+            {'number_of_explorations_left_to_update': '3'})
+
+    def test_post_svgs_when_all_values_are_valid(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        editor_id = self.get_user_id_from_email(user_email)
+
+        post_data = {
+            'exp_id1': {
+                '+,+,+,+': {
+                    'latexId': 'latex_id1',
+                    'dimensions': {
+                        'encoded_height_string': '1d429',
+                        'encoded_width_string': '1d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                },
+                '\\frac{x}{y}': {
+                    'latexId': 'latex_id2',
+                    'dimensions': {
+                        'encoded_height_string': '1d525',
+                        'encoded_width_string': '3d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                }
+            }
+        }
+        csrf_token = self.get_new_csrf_token()
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        svg_file_2 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+
+        exp_services.save_new_exploration(editor_id, exploration1)
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+
+        response_dict = self.post_json(
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            {'latexMapping': post_data},
+            csrf_token=csrf_token,
+            upload_files=(
+                ('latex_id1', 'latex_id1', svg_file_1),
+                ('latex_id2', 'latex_id2', svg_file_2), ),
+            expected_status_int=200)
+        self.assertEqual(
+            response_dict,
+            {
+                'number_of_explorations_updated': '1',
+                'number_of_explorations_left_to_update': '0'
+            })
+        self.logout()
+
+    def test_post_svgs_when_some_images_are_not_supplied(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        editor_id = self.get_user_id_from_email(user_email)
+
+        post_data = {
+            'exp_id1': {
+                '+,+,+,+': {
+                    'latexId': 'latex_id1',
+                    'dimensions': {
+                        'encoded_height_string': '1d429',
+                        'encoded_width_string': '1d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                },
+                '\\frac{x}{y}': {
+                    'latexId': 'latex_id2',
+                    'dimensions': {
+                        'encoded_height_string': '1d525',
+                        'encoded_width_string': '3d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                }
+            }
+        }
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+
+        exp_services.save_new_exploration(editor_id, exploration1)
+        response_dict = self.post_json(
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            {'latexMapping': post_data},
+            csrf_token=csrf_token,
+            upload_files=(
+                ('latex_id1', 'latex_id1', svg_file_1),),
+            expected_status_int=400)
+        self.assertIn(
+            'SVG for LaTeX string \\frac{x}{y} in exploration exp_id1 is not '
+            'supplied.', response_dict['error'])
+        self.logout()
+
+
+class SuggestionsLatexSvgHandlerTest(test_utils.GenericTestBase):
+    """Tests for Saving Math SVGs in suggestions."""
+
+    target_id_1 = 'exp1'
+    target_version_at_submission = 1
+    valid_html_content1 = (
+        '<oppia-noninteractive-math math_content-with-value="{&amp;'
+        'quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;'
+        'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+        '-noninteractive-math>'
+    )
+    valid_html_content2 = (
+        '<oppia-noninteractive-math math_content-with-value="{&amp;'
+        'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+        'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+        '-noninteractive-math>'
+    )
+    change1 = {
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'state_name': 'state_1',
+        'new_value': {
+            'content_id': 'content',
+            'html': '<p>Suggestion html</p>'
+        },
+        'old_value': {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+    }
+    change2 = {
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'state_name': 'state_2',
+        'new_value': {
+            'content_id': 'content',
+            'html': '<p>Suggestion html2</p>'
+        },
+        'old_value': {
+            'content_id': 'content',
+            'html': valid_html_content2
+        }
+    }
+
+    class MockExploration(python_utils.OBJECT):
+        """Mocks an exploration. To be used only for testing."""
+
+        def __init__(self, exploration_id, states):
+            self.id = exploration_id
+            self.states = states
+            self.category = 'Algebra'
+
+    # All mock explorations created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
+    ]
+
+    def mock_get_exploration_by_id(self, exp_id):
+        for exp in self.explorations:
+            if exp.id == exp_id:
+                return exp
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(SuggestionsLatexSvgHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.editor_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+
+            self.suggestion1 = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.editor_id, self.change1, 'test description')
+
+            self.suggestion2 = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.editor_id, self.change2, 'test description')
+
+    def test_get_latex_to_svg_mapping(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(feconf.SUGGESTIONS_LATEX_SVG_HANDLER)
+        expected_response = {
+            self.suggestion1.suggestion_id: ['-,-,-,-'],
+            self.suggestion2.suggestion_id: ['+,+,+,+']
+        }
+        self.assertEqual(
+            response_dict,
+            {'latex_strings_to_suggestion_ids_mapping': expected_response})
+
+    def test_post_svgs_when_all_values_are_valid(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        post_data = {
+            self.suggestion1.suggestion_id: {
+                '-,-,-,-': {
+                    'latexId': 'latex_id1',
+                    'dimensions': {
+                        'encoded_height_string': '1d429',
+                        'encoded_width_string': '1d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                }
+            },
+            self.suggestion2.suggestion_id: {
+                '+,+,+,+': {
+                    'latexId': 'latex_id2',
+                    'dimensions': {
+                        'encoded_height_string': '1d525',
+                        'encoded_width_string': '3d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                }
+            }
+        }
+        csrf_token = self.get_new_csrf_token()
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        svg_file_2 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        response_dict = self.post_json(
+            feconf.SUGGESTIONS_LATEX_SVG_HANDLER,
+            {'latexMapping': post_data},
+            csrf_token=csrf_token,
+            upload_files=(
+                ('latex_id1', 'latex_id1', svg_file_1),
+                ('latex_id2', 'latex_id2', svg_file_2), ),
+            expected_status_int=200)
+        self.assertEqual(
+            response_dict,
+            {
+                'number_of_suggestions_updated': '2'
+            })
+        self.logout()
+
+    def test_post_svgs_when_some_images_are_not_supplied(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        post_data = {
+            self.suggestion1.suggestion_id: {
+                '-,-,-,-': {
+                    'latexId': 'latex_id1',
+                    'dimensions': {
+                        'encoded_height_string': '1d429',
+                        'encoded_width_string': '1d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                }
+            },
+            self.suggestion2.suggestion_id: {
+                '+,+,+,+': {
+                    'latexId': 'latex_id2',
+                    'dimensions': {
+                        'encoded_height_string': '1d525',
+                        'encoded_width_string': '3d33',
+                        'encoded_vertical_padding_string': '0d241'
+                    }
+                }
+            }
+        }
+        csrf_token = self.get_new_csrf_token()
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        response_dict = self.post_json(
+            feconf.SUGGESTIONS_LATEX_SVG_HANDLER,
+            {'latexMapping': post_data},
+            csrf_token=csrf_token,
+            upload_files=(
+                ('latex_id1', 'latex_id1', svg_file_1),),
+            expected_status_int=400)
+        self.assertIn(
+            'SVG for LaTeX string +,+,+,+ in suggestion %s is not '
+            'supplied.' % (self.suggestion2.suggestion_id),
+            response_dict['error'])
+        self.logout()
+
+    def test_post_svgs_when_latex_to_svg_mappings_is_invalid(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        post_data = []
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.post_json(
+            feconf.SUGGESTIONS_LATEX_SVG_HANDLER,
+            {'latexMapping': post_data},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertIn(
+            'Expected latex_to_svg_mappings to be a dict.',
+            response_dict['error'])
         self.logout()
 
 
@@ -1120,13 +1585,13 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             generated_response = self.post_json(
-                '/senddummymailtoadminhandler', payload={},
+                '/senddummymailtoadminhandler', {},
                 csrf_token=csrf_token, expected_status_int=200)
             self.assertEqual(generated_response, {})
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             generated_response = self.post_json(
-                '/senddummymailtoadminhandler', payload={},
+                '/senddummymailtoadminhandler', {},
                 csrf_token=csrf_token, expected_status_int=400)
             self.assertEqual(
                 generated_response['error'], 'This app cannot send emails.')
@@ -1148,7 +1613,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': self.OLD_USERNAME,
                 'new_username': None},
             csrf_token=csrf_token,
@@ -1162,7 +1627,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': None,
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
@@ -1176,7 +1641,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': self.OLD_USERNAME,
                 'new_username': 123},
             csrf_token=csrf_token,
@@ -1190,7 +1655,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': 123,
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
@@ -1205,7 +1670,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': self.OLD_USERNAME,
                 'new_username': long_username},
             csrf_token=csrf_token,
@@ -1222,7 +1687,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': non_existent_username,
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
@@ -1234,7 +1699,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': self.OLD_USERNAME,
                 'new_username': self.OLD_USERNAME},
             csrf_token=csrf_token,
@@ -1247,7 +1712,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': self.OLD_USERNAME,
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token)
@@ -1271,7 +1736,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             mock_get_current_time_in_millisecs):
             self.put_json(
                 '/updateusernamehandler',
-                payload={
+                {
                     'old_username': self.OLD_USERNAME,
                     'new_username': self.NEW_USERNAME},
                 csrf_token=csrf_token)
@@ -1291,7 +1756,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             username_change_audit_model.new_username, self.NEW_USERNAME)
 
 
-class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
+class AddContributionReviewerHandlerTest(test_utils.GenericTestBase):
     """Tests related to add reviewers for contributor's
     suggestion/application.
     """
@@ -1301,7 +1766,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(AddCommunityReviewerHandlerTest, self).setUp()
+        super(AddContributionReviewerHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -1319,7 +1784,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'invalid',
                 'review_category': 'translation',
                 'language_code': 'en'
@@ -1337,7 +1802,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'translator',
                 'review_category': 'translation',
                 'language_code': 'hi'
@@ -1351,7 +1816,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'translator',
                 'review_category': 'translation',
                 'language_code': 'invalid'
@@ -1367,7 +1832,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'translator',
                 'review_category': 'translation',
                 'language_code': 'hi'
@@ -1376,7 +1841,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'translator',
                 'review_category': 'translation',
                 'language_code': 'hi'
@@ -1396,7 +1861,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'review_category': 'voiceover',
                 'language_code': 'hi'
@@ -1413,7 +1878,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'review_category': 'voiceover',
                 'language_code': 'invalid'
@@ -1433,7 +1898,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'review_category': 'voiceover',
                 'language_code': 'hi'
@@ -1443,7 +1908,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 self.voiceover_reviewer_id, language_code='hi'))
 
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'review_category': 'voiceover',
                 'language_code': 'hi'
@@ -1462,7 +1927,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'question',
                 'review_category': 'question'
             }, csrf_token=csrf_token)
@@ -1477,7 +1942,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'question',
                 'review_category': 'question'
             }, csrf_token=csrf_token)
@@ -1485,7 +1950,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'question',
                 'review_category': 'question'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -1499,7 +1964,7 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcommunityreviewerhandler', {
+            '/addcontributionreviewerhandler', {
                 'username': 'question',
                 'review_category': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -1508,15 +1973,15 @@ class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid review_category: invalid')
 
 
-class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
-    """Tests related to remove reviewers from community dashboard page."""
+class RemoveContributionReviewerHandlerTest(test_utils.GenericTestBase):
+    """Tests related to remove reviewers from contributor dashboard page."""
 
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(RemoveCommunityReviewerHandlerTest, self).setUp()
+        super(RemoveContributionReviewerHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -1534,7 +1999,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'removal_type': 'all'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -1545,7 +2010,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'invalid',
                 'removal_type': 'all'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -1567,7 +2032,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
                 'review_category': 'translation',
@@ -1582,7 +2047,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
                 'review_category': 'translation',
@@ -1599,7 +2064,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
                 'review_category': 'translation',
@@ -1625,7 +2090,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'review_category': 'voiceover',
@@ -1640,7 +2105,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'review_category': 'voiceover',
@@ -1657,7 +2122,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'review_category': 'voiceover',
@@ -1677,7 +2142,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'review_category': 'question'
@@ -1693,7 +2158,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'review_category': 'question'
@@ -1707,7 +2172,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'review_category': 'invalid'
@@ -1720,7 +2185,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -1749,7 +2214,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'all'
             }, csrf_token=csrf_token)
@@ -1764,15 +2229,15 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
 
 
-class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
-    """Tests CommunityReviewersListHandler."""
+class ContributionReviewersListHandlerTest(test_utils.GenericTestBase):
+    """Tests ContributionReviewersListHandler."""
 
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(CommunityReviewersListHandlerTest, self).setUp()
+        super(ContributionReviewersListHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -1785,14 +2250,14 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
 
-    def test_check_community_reviewer_by_translation_reviewer_role(self):
+    def test_check_contribution_reviewer_by_translation_reviewer_role(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_translation_in_language(
             self.translation_reviewer_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/getcommunityreviewershandler', params={
+            '/getcontributionreviewershandler', params={
                 'review_category': 'translation',
                 'language_code': 'hi'
             })
@@ -1801,14 +2266,14 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('translator' in response['usernames'])
         self.assertTrue('voiceartist' in response['usernames'])
 
-    def test_check_community_reviewer_by_voiceover_reviewer_role(self):
+    def test_check_contribution_reviewer_by_voiceover_reviewer_role(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_voiceover_in_language(
             self.translation_reviewer_id, 'hi')
         user_services.allow_user_to_review_voiceover_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/getcommunityreviewershandler', params={
+            '/getcontributionreviewershandler', params={
                 'review_category': 'voiceover',
                 'language_code': 'hi'
             })
@@ -1817,12 +2282,12 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('translator' in response['usernames'])
         self.assertTrue('voiceartist' in response['usernames'])
 
-    def test_check_community_reviewer_by_question_reviewer_role(self):
+    def test_check_contribution_reviewer_by_question_reviewer_role(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_question(self.voiceover_reviewer_id)
         response = self.get_json(
-            '/getcommunityreviewershandler', params={
+            '/getcontributionreviewershandler', params={
                 'review_category': 'question'
             })
 
@@ -1830,11 +2295,11 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('question' in response['usernames'])
         self.assertTrue('voiceartist' in response['usernames'])
 
-    def test_check_community_reviewer_with_invalid_language_code_raise_error(
+    def test_check_contribution_reviewer_with_invalid_language_code_raise_error(
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/getcommunityreviewershandler', params={
+            '/getcontributionreviewershandler', params={
                 'review_category': 'voiceover',
                 'language_code': 'invalid'
             }, expected_status_int=400)
@@ -1842,11 +2307,11 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Invalid language_code: invalid')
         self.logout()
 
-    def test_check_community_reviewer_with_invalid_review_category_raise_error(
+    def test_check_contribution_reviewer_with_invalid_review_category_raise_error( # pylint: disable=line-too-long
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/getcommunityreviewershandler', params={
+            '/getcontributionreviewershandler', params={
                 'review_category': 'invalid',
                 'language_code': 'hi'
             }, expected_status_int=400)
@@ -1855,22 +2320,22 @@ class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
-    """Tests CommunityReviewerRightsDataHandler."""
+class ContributionReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
+    """Tests ContributionReviewerRightsDataHandler."""
 
     REVIEWER_EMAIL = 'reviewer@example.com'
 
     def setUp(self):
-        super(CommunityReviewerRightsDataHandlerTest, self).setUp()
+        super(ContributionReviewerRightsDataHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
 
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
-    def test_check_community_reviewer_rights(self):
+    def test_check_contribution_reviewer_rights(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/communityreviewerrightsdatahandler', params={
+            '/contributionreviewerrightsdatahandler', params={
                 'username': 'reviewer'
             })
         self.assertEqual(
@@ -1886,7 +2351,7 @@ class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
             self.reviewer_id, 'hi')
 
         response = self.get_json(
-            '/communityreviewerrightsdatahandler', params={
+            '/contributionreviewerrightsdatahandler', params={
                 'username': 'reviewer'
             })
         self.assertEqual(
@@ -1895,20 +2360,20 @@ class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
             response['can_review_voiceover_for_language_codes'], ['hi'])
         self.assertEqual(response['can_review_questions'], True)
 
-    def test_check_community_reviewer_rights_invalid_username(self):
+    def test_check_contribution_reviewer_rights_invalid_username(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/communityreviewerrightsdatahandler', params={
+            '/contributionreviewerrightsdatahandler', params={
                 'username': 'invalid'
             }, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Invalid username: invalid')
         self.logout()
 
-    def test_check_community_reviewer_rights_without_username(self):
+    def test_check_contribution_reviewer_rights_without_username(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/communityreviewerrightsdatahandler', params={},
+            '/contributionreviewerrightsdatahandler', params={},
             expected_status_int=400)
 
         self.assertEqual(response['error'], 'Missing username param')

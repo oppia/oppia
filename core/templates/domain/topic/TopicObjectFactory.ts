@@ -25,18 +25,18 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import {
-  IStoryReferenceBackendDict,
+  StoryReferenceBackendDict,
   StoryReference,
   StoryReferenceObjectFactory
 } from 'domain/topic/StoryReferenceObjectFactory';
 import {
-  ISkillIdToDescriptionMap,
+  SkillIdToDescriptionMap,
   Subtopic,
-  ISubtopicBackendDict,
+  SubtopicBackendDict,
   SubtopicObjectFactory
 } from 'domain/topic/SubtopicObjectFactory';
 
-interface ITopicBackendDict {
+interface TopicBackendDict {
   'id': string;
   'name': string;
   'abbreviated_name': string;
@@ -47,10 +47,13 @@ interface ITopicBackendDict {
   'version': number;
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
-  'subtopics': ISubtopicBackendDict[];
-  'canonical_story_references': IStoryReferenceBackendDict[];
-  'additional_story_references': IStoryReferenceBackendDict[];
+  'subtopics': SubtopicBackendDict[];
+  'canonical_story_references': StoryReferenceBackendDict[];
+  'additional_story_references': StoryReferenceBackendDict[];
+  'url_fragment': string;
 }
+
+const constants = require('constants.ts');
 
 export class Topic {
   _id: string;
@@ -66,24 +69,27 @@ export class Topic {
   _subtopics: Array<Subtopic>;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
+  _urlFragment: string;
   skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
-      id: string, name: string, abbreviatedName: string, description: string,
-      languageCode: string, canonicalStoryReferences: Array<StoryReference>,
+      id: string, name: string, abbreviatedName: string, urlFragment: string,
+      description: string, languageCode: string,
+      canonicalStoryReferences: Array<StoryReference>,
       additionalStoryReferences: Array<StoryReference>,
       uncategorizedSkillIds: Array<string>,
       nextSubtopicId: number, version: number, subtopics: Array<Subtopic>,
       thumbnailFilename: string,
       thumbnailBgColor: string,
-      skillIdToDescriptionMap: ISkillIdToDescriptionMap,
+      skillIdToDescriptionMap: SkillIdToDescriptionMap,
       skillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
       subtopicObjectFactory: SubtopicObjectFactory,
       storyReferenceObjectFactory: StoryReferenceObjectFactory) {
     this._id = id;
     this._name = name;
     this._abbreviatedName = abbreviatedName;
+    this._urlFragment = urlFragment;
     this._description = description;
     this._languageCode = languageCode;
     this._canonicalStoryReferences = canonicalStoryReferences;
@@ -122,6 +128,14 @@ export class Topic {
 
   setAbbreviatedName(abbreviatedName: string): void {
     this._abbreviatedName = abbreviatedName;
+  }
+
+  getUrlFragment(): string {
+    return this._urlFragment;
+  }
+
+  setUrlFragment(urlFragment: string): void {
+    this._urlFragment = urlFragment;
   }
 
   setThumbnailFilename(thumbnailFilename: string): void {
@@ -165,9 +179,19 @@ export class Topic {
   }
 
   validate(): Array<string> {
+    let validUrlFragmentRegex = new RegExp(constants.VALID_URL_FRAGMENT_REGEX);
+    let topicUrlFragmentCharLimit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
     let issues = [];
     if (this._name === '') {
       issues.push('Topic name should not be empty.');
+    }
+    if (!validUrlFragmentRegex.test(this._urlFragment)) {
+      issues.push('Topic url fragment is not valid.');
+    }
+    if (this._urlFragment.length > topicUrlFragmentCharLimit) {
+      issues.push(
+        'Topic url fragment should not be longer than ' +
+        `${topicUrlFragmentCharLimit} characters.`);
     }
 
     let subtopics = this._subtopics;
@@ -460,6 +484,7 @@ export class Topic {
     this._id = otherTopic.getId();
     this.setName(otherTopic.getName());
     this.setAbbreviatedName(otherTopic.getAbbreviatedName());
+    this.setUrlFragment(otherTopic.getUrlFragment());
     this.setThumbnailFilename(otherTopic.getThumbnailFilename());
     this.setThumbnailBgColor(otherTopic.getThumbnailBgColor());
     this.setDescription(otherTopic.getDescription());
@@ -496,28 +521,29 @@ export class TopicObjectFactory {
       private storyReferenceObjectFactory: StoryReferenceObjectFactory,
       private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
   create(
-      topicBackendDict: ITopicBackendDict,
-      skillIdToDescriptionDict: ISkillIdToDescriptionMap): Topic {
+      topicBackendDict: TopicBackendDict,
+      skillIdToDescriptionDict: SkillIdToDescriptionMap): Topic {
     let subtopics = topicBackendDict.subtopics.map((
-        subtopic: ISubtopicBackendDict) => {
+        subtopic: SubtopicBackendDict) => {
       return this.subtopicObjectFactory.create(
         subtopic, skillIdToDescriptionDict);
     });
     let canonicalStoryReferences =
         topicBackendDict.canonical_story_references.map(
-          (reference: IStoryReferenceBackendDict) => {
+          (reference: StoryReferenceBackendDict) => {
             return this.storyReferenceObjectFactory.createFromBackendDict(
               reference);
           });
     let additionalStoryReferences =
         topicBackendDict.additional_story_references.map(
-          (reference: IStoryReferenceBackendDict) => {
+          (reference: StoryReferenceBackendDict) => {
             return this.storyReferenceObjectFactory.createFromBackendDict(
               reference);
           });
     return new Topic(
       topicBackendDict.id, topicBackendDict.name,
       topicBackendDict.abbreviated_name,
+      topicBackendDict.url_fragment,
       topicBackendDict.description, topicBackendDict.language_code,
       canonicalStoryReferences, additionalStoryReferences,
       topicBackendDict.uncategorized_skill_ids,
@@ -533,8 +559,9 @@ export class TopicObjectFactory {
   // the actual topic is fetched from the backend.
   createInterstitialTopic(): Topic {
     return new Topic(
-      null, 'Topic name loading', 'Topic abbreviated name loading',
-      'Topic description loading', 'en', [], [], [], 1, 1, [], '', '', {},
+      null, 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], '', '', {},
       this.skillSummaryObjectFactory, this.subtopicObjectFactory,
       this.storyReferenceObjectFactory
     );

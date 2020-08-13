@@ -17,7 +17,10 @@
     </picture>
   </a>
 </div>
-
+<div class="nav-mobile-header-text-container">
+  <span class="nav-mobile-header-editor"><[headerText()]></span>
+  <span class="nav-mobile-header-text"><[subheaderText()]></span>
+</div>
 <div ng-cloak class="float-right navbar-header" ng-if="$ctrl.userMenuIsShown">
   <ul class="nav oppia-navbar-nav" ng-if="$ctrl.standardNavIsShown">
     <li>
@@ -45,8 +48,7 @@
           </a>
           <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
               ng-mouseover="$ctrl.openSubmenu($event, 'aboutMenu')"
-              ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)"
-              role="menu">
+              ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
             <li class="nav-item">
               <a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {shiftTab: $ctrl.ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
@@ -180,7 +182,7 @@
         </div>
       </a>
 
-      <ul uib-dropdown-menu class="ng-cloak oppia-navbar-dropdown uib-dropdown-menu" role="menu"
+      <ul uib-dropdown-menu class="ng-cloak oppia-navbar-dropdown uib-dropdown-menu"
           ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
           ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
         <li class="nav-item">
@@ -254,14 +256,14 @@
           <span translate="I18N_TOPNAV_SIGN_IN"></span>
         </button>
       </div>
-      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown" role="menu"
+      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
           style="margin-right: 15px; padding: 0;">
         <li class="nav-item">
           <a href="" style="padding: 0; width: 190px;" ng-click="$ctrl.onLoginButtonClicked()"
              class="nav-link">
             <div class="oppia-signin-google">
               <div class="oppia-signin-g-icon">
-                <img ng-src="<[$ctrl.googleSignInIconUrl]>">
+                <img ng-src="<[$ctrl.googleSignInIconUrl]>" alt="Google signin icon">
               </div>
               <span class="oppia-signin-text" translate="I18N_TOPNAV_SIGN_IN_WITH_GOOGLE"></span>
             </div>
@@ -320,6 +322,9 @@
     font-weight: bold;
     position: absolute;
     right: 4px;
+  }
+  top-navigation-bar .nav-mobile-header-text-container {
+    display: none;
   }
   top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.uib-dropdown-menu {
     display: block;
@@ -381,4 +386,30 @@
   .oppia-navbar-profile > li:hover {
     background-color: #fff;
    }
+  @media screen and (max-width: 768px) {
+    top-navigation-bar .nav-mobile-header-text-container {
+      display: inline-block;
+      font-size: 1px;
+      margin-top: 2px;
+      max-height: 56px;
+      text-overflow: ellipsis;
+      width: 50%;
+    }
+    top-navigation-bar .nav-mobile-header-editor {
+      color: #FFF;
+      display: block;
+      font-family: Roboto, arial, sans-serif;
+      font-size: 19px;
+    }
+    top-navigation-bar .nav-mobile-header-text {
+      color: #FFF;
+      display: inline-block;
+      font-size: 15px;
+      max-width: 205px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+  }
 </style>

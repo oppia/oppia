@@ -180,7 +180,7 @@ def _get_augmented_skill_summaries_in_batches(
                   for topic_model in all_topic_models]
 
     topic_classroom_dict = {}
-    all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
+    all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
 
     for classroom in all_classrooms_dict:
         for topic_id in classroom['topic_ids']:
@@ -380,10 +380,12 @@ def get_skill_summary_from_model(skill_summary_model):
     skill summary model.
 
     Args:
-        skill_summary_model: SkillSummaryModel.
+        skill_summary_model: SkillSummaryModel. The skill summary model object
+            to get corresponding domain object.
 
     Returns:
-        SkillSummary.
+        SkillSummary. The domain object corresponding to given skill summmary
+        model.
     """
     return skill_domain.SkillSummary(
         skill_summary_model.id, skill_summary_model.description,
@@ -534,8 +536,8 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
     skill.version += 1
     create_skill_summary(skill.id)
     opportunity_services.create_skill_opportunity(
-        skill_id=skill.id,
-        skill_description=skill.description)
+        skill.id,
+        skill.description)
 
 
 def save_new_skill(committer_id, skill):
@@ -577,9 +579,10 @@ def apply_change_list(skill_id, change_list, committer_id):
                             'The user does not have enough rights to edit the '
                             'skill description.')
                     skill.update_description(change.new_value)
-                    (opportunity_services
-                     .update_skill_opportunity_skill_description(
-                         skill.id, change.new_value))
+                    (
+                        opportunity_services
+                        .update_skill_opportunity_skill_description(
+                            skill.id, change.new_value))
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
                     skill.update_language_code(change.new_value)
@@ -592,8 +595,10 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
-                    skill.update_explanation(
+                    explanation = (
                         state_domain.SubtitledHtml.from_dict(change.new_value))
+                    explanation.validate()
+                    skill.update_explanation(explanation)
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     worked_examples_list = [
@@ -667,9 +672,9 @@ def _save_skill(committer_id, skill, commit_message, change_list):
         change_list: list(SkillChange). List of changes applied to a skill.
 
     Raises:
-        Exception: The skill model and the incoming skill domain object have
+        Exception. The skill model and the incoming skill domain object have
             different version numbers.
-        Exception: Received invalid change list.
+        Exception. Received invalid change list.
     """
     if not change_list:
         raise Exception(
@@ -732,7 +737,7 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
             unpublished skills, it may be equal to None.
 
     Raises:
-        ValueError: No commit message was provided.
+        ValueError. No commit message was provided.
     """
     if not commit_message:
         raise ValueError(
@@ -769,7 +774,7 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
     # force_deletion is True or not).
     delete_skill_summary(skill_id)
     opportunity_services.delete_skill_opportunity(skill_id)
-    suggestion_services.reject_question_suggestions_with_skill_target_id(
+    suggestion_services.auto_reject_question_suggestions_for_skill_id(
         skill_id)
 
 
@@ -824,8 +829,8 @@ def save_skill_summary(skill_summary):
     entity in the datastore.
 
     Args:
-        skill_summary: The skill summary object to be saved in the
-            datastore.
+        skill_summary: SkillSummaryModel. The skill summary object to be saved
+            in the datastore.
     """
     skill_summary_dict = {
         'description': skill_summary.description,

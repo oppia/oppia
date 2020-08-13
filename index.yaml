@@ -15,6 +15,24 @@ indexes:
   - name: status
   - name: next_scheduled_check_time
 
+- kind: CollectionRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: CollectionSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: ConfigPropertySnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
 - kind: DeleteExpCopiesRealtimeModel
   properties:
   - name: realtime_layer
@@ -92,6 +110,18 @@ indexes:
   properties:
   - name: deleted
   - name: status
+
+- kind: ExplorationRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: ExplorationSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
 
 - kind: FeedbackAnalyticsRealtimeModel
   properties:
@@ -210,6 +240,12 @@ indexes:
   - name: skill_difficulty
     direction: desc
 
+- kind: QuestionSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
 - kind: RecentUpdatesRealtimeModel
   properties:
   - name: realtime_layer
@@ -230,15 +266,45 @@ indexes:
   - name: deleted
   - name: created_on
 
+- kind: SkillSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
 - kind: StatisticsRealtimeModel
   properties:
   - name: realtime_layer
   - name: created_on
 
+- kind: StorySnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: SubtopicPageSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
 - kind: TaskEntryModel
   properties:
   - name: composite_entity_id
   - name: status
+
+- kind: TopicRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: TopicSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
 
 - kind: UserContributionScoringModel
   properties:

@@ -41,10 +41,14 @@ export class LearnerDashboardIdsBackendApiService {
     LearnerDashboardActivityIdsObjectFactory) {}
 
   _fetchLearnerDashboardIds(): Promise<LearnerDashboardActivityIds> {
-    return this.http.get<LearnerDashboardIdsBackendResponse>(
-      '/learnerdashboardidshandler/data').toPromise().then(response => {
-      return this.learnerDashboardActivityIdsObjectFactory
-        .createFromBackendDict(response.learner_dashboard_activity_ids);
+    return new Promise((resolve, reject) => {
+      this.http.get<LearnerDashboardIdsBackendResponse>(
+        '/learnerdashboardidshandler/data').toPromise().then(response => {
+        resolve(this.learnerDashboardActivityIdsObjectFactory
+          .createFromBackendDict(response.learner_dashboard_activity_ids));
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 

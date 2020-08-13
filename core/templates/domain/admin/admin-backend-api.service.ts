@@ -28,27 +28,27 @@ import {
   TopicSummaryObjectFactory
 } from 'domain/topic/TopicSummaryObjectFactory';
 import {
-  IComputationDataBackendDict,
   ComputationData,
+  ComputationDataBackendDict,
   ComputationDataObjectFactory
 } from 'domain/admin/computation-data-object.factory';
 import {
-  IJobDataBackendDict,
   Job,
+  JobDataBackendDict,
   JobDataObjectFactory
 } from 'domain/admin/job-data-object.factory';
 import {
-  IJobStatusSummaryBackendDict,
   JobStatusSummary,
+  JobStatusSummaryBackendDict,
   JobStatusSummaryObjectFactory
 } from 'domain/admin/job-status-summary-object.factory';
 
 
-interface IUserRoles {
+interface UserRoles {
   [role: string]: string;
 }
 
-interface IRoleGraphData {
+interface RoleGraphData {
   nodes: {
     [role: string]: string;
   };
@@ -58,24 +58,24 @@ interface IRoleGraphData {
   }[];
 }
 
-interface IConfigProperties {
+interface ConfigProperties {
   [property: string]: Object;
 }
 
-export interface IAdminPageDataBackendDict {
+export interface AdminPageDataBackendDict {
   'demo_explorations': string[][];
   'demo_collections': string[][];
   'demo_exploration_ids': string[];
-  'one_off_job_status_summaries': IJobStatusSummaryBackendDict[];
+  'one_off_job_status_summaries': JobStatusSummaryBackendDict[];
   'human_readable_current_time': string;
-  'audit_job_status_summaries': IJobStatusSummaryBackendDict[];
-  'updatable_roles': IUserRoles;
-  'role_graph_data': IRoleGraphData;
-  'config_properties': IConfigProperties;
-  'viewable_roles': IUserRoles;
-  'unfinished_job_data': IJobDataBackendDict[];
-  'recent_job_data': IJobDataBackendDict[];
-  'continuous_computations_data': IComputationDataBackendDict[];
+  'audit_job_status_summaries': JobStatusSummaryBackendDict[];
+  'updatable_roles': UserRoles;
+  'role_graph_data': RoleGraphData;
+  'config_properties': ConfigProperties;
+  'viewable_roles': UserRoles;
+  'unfinished_job_data': JobDataBackendDict[];
+  'recent_job_data': JobDataBackendDict[];
+  'continuous_computations_data': ComputationDataBackendDict[];
   'topic_summaries': TopicSummaryBackendDict[];
 }
 
@@ -86,10 +86,10 @@ export interface AdminPageData {
   oneOffJobStatusSummaries: JobStatusSummary[];
   humanReadableCurrentTime: string;
   auditJobStatusSummaries: JobStatusSummary[];
-  updatableRoles: IUserRoles;
-  roleGraphData: IRoleGraphData;
-  configProperties: IConfigProperties;
-  viewableRoles: IUserRoles;
+  updatableRoles: UserRoles;
+  roleGraphData: RoleGraphData;
+  configProperties: ConfigProperties;
+  viewableRoles: UserRoles;
   unfinishedJobData: Job[];
   recentJobData: Job[];
   continuousComputationsData: ComputationData[];
@@ -108,31 +108,86 @@ export class AdminBackendApiService {
     private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
 
   getData(): Promise<AdminPageData> {
-    return this.http.get<IAdminPageDataBackendDict>(
-      AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(response => {
-      return {
-        demoExplorations: response.demo_explorations,
-        demoCollections: response.demo_collections,
-        demoExplorationIds: response.demo_exploration_ids,
-        oneOffJobStatusSummaries: response.one_off_job_status_summaries.map(
-          this.jobStatusSummaryObjectFactory.createFromBackendDict),
-        humanReadableCurrentTime: response.human_readable_current_time,
-        auditJobStatusSummaries: response.audit_job_status_summaries.map(
-          this.jobStatusSummaryObjectFactory.createFromBackendDict),
-        updatableRoles: response.updatable_roles,
-        roleGraphData: response.role_graph_data,
-        configProperties: response.config_properties,
-        viewableRoles: response.viewable_roles,
-        unfinishedJobData: response.unfinished_job_data.map(
-          this.jobDataObjectFactory.createFromBackendDict),
-        recentJobData: response.recent_job_data.map(
-          this.jobDataObjectFactory.createFromBackendDict),
-        continuousComputationsData: response.continuous_computations_data.map(
-          this.computationDataObjectFactory.createFromBackendDict),
-        topicSummaries: response.topic_summaries.map(
-          this.topicSummaryObjectFactory.createFromBackendDict)
-      };
+    return new Promise((resolve, reject) => {
+      this.http.get<AdminPageDataBackendDict>(
+        AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(response => {
+        resolve({
+          demoExplorations: response.demo_explorations,
+          demoCollections: response.demo_collections,
+          demoExplorationIds: response.demo_exploration_ids,
+          oneOffJobStatusSummaries: response.one_off_job_status_summaries.map(
+            this.jobStatusSummaryObjectFactory.createFromBackendDict),
+          humanReadableCurrentTime: response.human_readable_current_time,
+          auditJobStatusSummaries: response.audit_job_status_summaries.map(
+            this.jobStatusSummaryObjectFactory.createFromBackendDict),
+          updatableRoles: response.updatable_roles,
+          roleGraphData: response.role_graph_data,
+          configProperties: response.config_properties,
+          viewableRoles: response.viewable_roles,
+          unfinishedJobData: response.unfinished_job_data.map(
+            this.jobDataObjectFactory.createFromBackendDict),
+          recentJobData: response.recent_job_data.map(
+            this.jobDataObjectFactory.createFromBackendDict),
+          continuousComputationsData: response.continuous_computations_data.map(
+            this.computationDataObjectFactory.createFromBackendDict),
+          topicSummaries: response.topic_summaries.map(
+            this.topicSummaryObjectFactory.createFromBackendDict)
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
+  }
+
+  // TODO(#10045): Remove this function once all the math-rich text
+  // components in explorations have a valid math SVG stored in the
+  // datastore.
+  sendMathSvgsToBackend(latexToSvgMapping): Promise<Object> {
+    let body = new FormData();
+    for (var expId in latexToSvgMapping) {
+      for (var latexString in latexToSvgMapping[expId]) {
+        // LaTeX strings cannot be appended in the request body as keys for
+        // files because of encoding issues (multiple backslash in the LaTeX
+        // string is processed improperly, e.g 3 backslashes in an
+        // expressions becomes 2 backslashes). As a workaround, we use a
+        // temporary latexId as keys for adding and retrieving raw images from
+        // the request body. Images can be extracted based on the latexId in the
+        // backend.
+        body.set(
+          latexToSvgMapping[expId][latexString].latexId,
+          latexToSvgMapping[expId][latexString].file);
+        delete latexToSvgMapping[expId][latexString].file;
+      }
+    }
+    body.append(
+      'payload', JSON.stringify({latexMapping: latexToSvgMapping}));
+    return this.http.post('/explorationslatexsvghandler', body).toPromise();
+  }
+
+  // TODO(#10045): Remove this function once all the math-rich text
+  // components in suggestions have a valid math SVG stored in the
+  // datastore.
+  sendSuggestionMathSvgsToBackend(
+      suggestionLatexToSvgMapping): Promise<Object> {
+    let body = new FormData();
+    for (var suggestionId in suggestionLatexToSvgMapping) {
+      for (var latexString in suggestionLatexToSvgMapping[suggestionId]) {
+        // LaTeX strings cannot be appended in the request body as keys for
+        // files because of encoding issues (multiple backslash in the LaTeX
+        // string is processed improperly, e.g 3 backslashes in an
+        // expressions becomes 2 backslashes). As a workaround, we use a
+        // temporary latexId as keys for adding and retrieving raw images from
+        // the request body. Images can be extracted based on the latexId in the
+        // backend.
+        body.set(
+          suggestionLatexToSvgMapping[suggestionId][latexString].latexId,
+          suggestionLatexToSvgMapping[suggestionId][latexString].file);
+        delete suggestionLatexToSvgMapping[suggestionId][latexString].file;
+      }
+    }
+    body.append(
+      'payload', JSON.stringify({latexMapping: suggestionLatexToSvgMapping}));
+    return this.http.post('/suggestionslatexsvghandler', body).toPromise();
   }
 }
 

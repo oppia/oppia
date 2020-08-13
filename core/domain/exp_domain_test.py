@@ -461,7 +461,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Invalid character / in a state name')
 
         new_state = state_domain.State.create_default_state('ABC')
-        new_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(new_state, 'TextInput')
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
@@ -541,8 +541,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'destination DEF is not a valid')
 
         # Restore a valid exploration.
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            'TextInput')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'TextInput')
         answer_group.outcome.dest = exploration.init_state_name
         exploration.validate()
 
@@ -669,7 +669,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
         self._assert_validation_error(exploration, 'Invalid interaction id')
 
-        interaction.id = 'TextInput'
+        self.set_interaction_for_state(init_state, 'TextInput')
+        valid_text_input_cust_args = init_state.interaction.customization_args
         exploration.validate()
 
         interaction.customization_args = []
@@ -678,9 +679,23 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         interaction.customization_args = {15: ''}
         self._assert_validation_error(
+            exploration,
+            (
+                'Expected customization arg value to be a '
+                'InteractionCustomizationArg'
+            )
+        )
+
+        interaction.customization_args = {
+            15: state_domain.InteractionCustomizationArg('', {
+                'type': 'unicode'
+            })
+        }
+        self._assert_validation_error(
             exploration, 'Invalid customization arg name')
 
-        interaction.customization_args = {'placeholder': ''}
+        interaction.customization_args = valid_text_input_cust_args
+        self.set_interaction_for_state(init_state, 'TextInput')
         exploration.validate()
 
         interaction.answer_groups = {}
@@ -688,18 +703,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Expected answer groups to be a list')
 
         interaction.answer_groups = answer_groups
-        interaction.id = 'EndExploration'
+        self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have a default outcome.')
 
-        interaction.id = 'TextInput'
+        self.set_interaction_for_state(init_state, 'TextInput')
         init_state.update_interaction_default_outcome(None)
         self._assert_validation_error(
             exploration,
             'Non-terminal interactions must have a default outcome.')
 
-        interaction.id = 'EndExploration'
+        self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
@@ -710,7 +725,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Restore a valid exploration.
-        interaction.id = 'TextInput'
+        self.set_interaction_for_state(init_state, 'TextInput')
         answer_groups_list = [
             answer_group.to_dict() for answer_group in answer_groups]
         init_state.update_interaction_answer_groups(answer_groups_list)
@@ -812,8 +827,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.State.create_default_state(
                     exploration.init_state_name))
         }
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            'TextInput')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'TextInput')
         exploration.validate()
 
         exploration.language_code = 'fake_code'
@@ -845,7 +860,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
         exploration.validate()
 
@@ -1046,13 +1061,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
@@ -1073,13 +1090,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
@@ -1094,13 +1113,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'html': '<p>New state translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>New state translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>New State translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>New State translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
@@ -1120,13 +1141,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': True
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
@@ -1147,17 +1170,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi-en': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     },
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
@@ -1174,13 +1200,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             })
 
     def test_get_content_count(self):
+        # Adds 2 to content count to exploration (content, default_outcome).
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_content_count(), 2)
 
+        # Adds 2 to content count to exploration (content default_outcome).
         exploration.add_states(['New state'])
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
+
+        # Adds 1 to content count to exploration (ca_placeholder_0)
+        self.set_interaction_for_state(init_state, 'TextInput')
 
         answer_group_dict = {
             'outcome': {
@@ -1203,6 +1233,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
+        # Adds 1 to content count to exploration (feedback_1).
         init_state.update_interaction_answer_groups([answer_group_dict])
 
         hints_list = [
@@ -1210,6 +1241,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
             )
         ]
+        # Adds 1 to content count to exploration (hint_1).
         init_state.update_interaction_hints(hints_list)
 
         solution_dict = {
@@ -1222,15 +1254,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
+        # Adds 1 to content count to exploration (solution).
         init_state.update_interaction_solution(solution)
 
-        self.assertEqual(exploration.get_content_count(), 7)
+        self.assertEqual(exploration.get_content_count(), 8)
 
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -1253,7 +1286,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(init_state, 'TextInput')
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -1592,7 +1625,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.add_states(['End'])
         end_state = exploration.states['End']
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         with self.assertRaisesRegexp(
@@ -1638,11 +1671,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             objective='objective', end_state_name='End')
         exploration.validate(strict=True)
 
-        (exploration.init_state.interaction.default_outcome
-         .labelled_as_correct) = True
+        (
+            exploration.init_state.interaction.default_outcome
+            .labelled_as_correct) = True
 
-        (exploration.init_state.interaction.default_outcome
-         .dest) = exploration.init_state_name
+        (
+            exploration.init_state.interaction.default_outcome
+            .dest) = exploration.init_state_name
 
         with self.assertRaisesRegexp(
             Exception,
@@ -1939,14 +1974,24 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         exp_domain.Exploration.from_untitled_yaml(
             'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Please ensure that you are uploading a YAML text file, '
+            'not a zip file. The YAML parser returned the following error: '):
             exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: mapping '
+            'values are not allowed here'):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'Invalid\ninit_state_name:\nMore stuff')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: while '
+            'scanning a simple key'):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'State1:\n(\nInvalid yaml')
 
@@ -2004,7 +2049,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V1 = ("""default_skin: conversation_v1
+    YAML_CONTENT_V1 = (
+        """default_skin: conversation_v1
 param_changes: []
 param_specs: {}
 schema_version: 1
@@ -2054,7 +2100,8 @@ states:
     widget_id: TextInput
 """)
 
-    YAML_CONTENT_V2 = ("""default_skin: conversation_v1
+    YAML_CONTENT_V2 = (
+        """default_skin: conversation_v1
 init_state_name: (untitled state)
 param_changes: []
 param_specs: {}
@@ -2105,7 +2152,8 @@ states:
       widget_id: TextInput
 """)
 
-    YAML_CONTENT_V3 = ("""author_notes: ''
+    YAML_CONTENT_V3 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2169,7 +2217,8 @@ states:
       widget_id: TextInput
 """)
 
-    YAML_CONTENT_V4 = ("""author_notes: ''
+    YAML_CONTENT_V4 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2231,7 +2280,8 @@ states:
     param_changes: []
 """)
 
-    YAML_CONTENT_V5 = ("""author_notes: ''
+    YAML_CONTENT_V5 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2326,7 +2376,8 @@ states:
 tags: []
 """)
 
-    YAML_CONTENT_V6 = ("""author_notes: ''
+    YAML_CONTENT_V6 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2412,7 +2463,8 @@ states_schema_version: 3
 tags: []
 """)
 
-    YAML_CONTENT_V7 = ("""author_notes: ''
+    YAML_CONTENT_V7 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2486,7 +2538,8 @@ states_schema_version: 4
 tags: []
 """)
 
-    YAML_CONTENT_V8 = ("""author_notes: ''
+    YAML_CONTENT_V8 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2560,7 +2613,8 @@ states_schema_version: 5
 tags: []
 """)
 
-    YAML_CONTENT_V9 = ("""author_notes: ''
+    YAML_CONTENT_V9 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2624,8 +2678,10 @@ states:
       customization_args:
         placeholder:
           value: ''
-        rows:
-          value: 1
+        postCode:
+          value: ''
+        preCode:
+          value: ''
         language:
           value: ''
       default_outcome:
@@ -2639,7 +2695,8 @@ states_schema_version: 6
 tags: []
 """)
 
-    YAML_CONTENT_V10 = ("""author_notes: ''
+    YAML_CONTENT_V10 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -2717,7 +2774,8 @@ states_schema_version: 7
 tags: []
 title: Title
 """)
-    YAML_CONTENT_V11 = ("""author_notes: ''
+    YAML_CONTENT_V11 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -2798,7 +2856,8 @@ states_schema_version: 8
 tags: []
 title: Title
 """)
-    YAML_CONTENT_V12 = ("""author_notes: ''
+    YAML_CONTENT_V12 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -2885,7 +2944,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V13 = ("""author_notes: ''
+    YAML_CONTENT_V13 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -2974,7 +3034,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V14 = ("""author_notes: ''
+    YAML_CONTENT_V14 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -3063,7 +3124,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V15 = ("""author_notes: ''
+    YAML_CONTENT_V15 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -3152,7 +3214,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V16 = ("""author_notes: ''
+    YAML_CONTENT_V16 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -3238,7 +3301,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V17 = ("""author_notes: ''
+    YAML_CONTENT_V17 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -3321,7 +3385,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V18 = ("""author_notes: ''
+    YAML_CONTENT_V18 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3409,7 +3474,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V19 = ("""author_notes: ''
+    YAML_CONTENT_V19 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3498,7 +3564,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V20 = ("""author_notes: ''
+    YAML_CONTENT_V20 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3588,7 +3655,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V21 = ("""author_notes: ''
+    YAML_CONTENT_V21 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3661,10 +3729,14 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
-        placeholder:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
           value: ''
-        rows:
-          value: 1
+        requireSimplestForm:
+          value: false
       default_outcome:
         dest: END
         feedback:
@@ -3681,7 +3753,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V22 = ("""author_notes: ''
+    YAML_CONTENT_V22 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3775,7 +3848,8 @@ states_schema_version: 17
 tags: []
 title: Title
 """)
-    YAML_CONTENT_V23 = ("""author_notes: ''
+    YAML_CONTENT_V23 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3870,7 +3944,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V24 = ("""author_notes: ''
+    YAML_CONTENT_V24 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3966,7 +4041,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V25 = ("""author_notes: ''
+    YAML_CONTENT_V25 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4066,7 +4142,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V26 = ("""author_notes: ''
+    YAML_CONTENT_V26 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4175,7 +4252,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V27 = ("""author_notes: ''
+    YAML_CONTENT_V27 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4284,7 +4362,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V28 = ("""author_notes: ''
+    YAML_CONTENT_V28 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4393,7 +4472,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V29 = ("""author_notes: ''
+    YAML_CONTENT_V29 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4480,10 +4560,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
+        highlightRegionsOnHover:
+          value: false
         imageAndRegions:
           value:
             imagePath: s1ImagePath.png
@@ -4505,7 +4583,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V30 = ("""author_notes: ''
+    YAML_CONTENT_V30 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4614,7 +4693,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V31 = ("""author_notes: ''
+    YAML_CONTENT_V31 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4724,7 +4804,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V32 = ("""author_notes: ''
+    YAML_CONTENT_V32 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4845,7 +4926,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V33 = ("""author_notes: ''
+    YAML_CONTENT_V33 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4969,7 +5051,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V34 = ("""author_notes: ''
+    YAML_CONTENT_V34 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5096,7 +5179,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V35 = ("""author_notes: ''
+    YAML_CONTENT_V35 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5223,7 +5307,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V36 = ("""author_notes: ''
+    YAML_CONTENT_V36 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5350,7 +5435,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V37 = ("""author_notes: ''
+    YAML_CONTENT_V37 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5477,7 +5563,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V38 = ("""author_notes: ''
+    YAML_CONTENT_V38 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5604,7 +5691,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V39 = ("""author_notes: ''
+    YAML_CONTENT_V39 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5731,7 +5819,552 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V39
+    YAML_CONTENT_V40 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 40
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 35
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V41 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 41
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 36
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V42 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 42
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 37
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V43 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 43
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 38
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V43
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -5770,7 +6403,8 @@ title: Title
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_cannot_load_from_v6_with_invalid_handler_name(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
+        invalid_yaml_content_v6 = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -5863,7 +6497,8 @@ tags: []
                 'eid', 'Title', 'Category', invalid_yaml_content_v6)
 
     def test_cannot_load_from_v6_with_invalid_rule(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
+        invalid_yaml_content_v6 = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -5956,7 +6591,8 @@ tags: []
                 'eid', 'Title', 'Category', invalid_yaml_content_v6)
 
     def test_cannot_load_from_v6_with_invalid_subject(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
+        invalid_yaml_content_v6 = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -6050,7 +6686,8 @@ tags: []
                 'eid', 'Title', 'Category', invalid_yaml_content_v6)
 
     def test_cannot_load_from_v6_with_invalid_interaction_id(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
+        invalid_yaml_content_v6 = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -6156,7 +6793,8 @@ tags: []
 
     def test_load_from_v9(self):
         """Test direct loading from a v9 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
+        latest_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6166,7 +6804,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -6193,7 +6831,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6208,15 +6848,18 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
@@ -6235,6 +6878,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6260,8 +6904,6 @@ states:
           value: ''
         preCode:
           value: ''
-        rows:
-          value: 1
       default_outcome:
         dest: END
         feedback:
@@ -6274,6 +6916,7 @@ states:
       hints: []
       id: CodeRepl
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6284,7 +6927,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 34
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -6306,7 +6949,8 @@ title: Title
 
     def test_load_from_v12(self):
         """Test direct loading from a v12 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
+        latest_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6316,7 +6960,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -6343,7 +6987,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6358,15 +7004,18 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
@@ -6385,6 +7034,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6403,7 +7053,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6421,19 +7073,22 @@ states:
           html: <p>Correct!</p>
       id: TextInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         hint_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 34
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -6473,7 +7128,8 @@ title: Title
 
     def test_load_from_v18(self):
         """Test direct loading from a v18 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
+        latest_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6483,7 +7139,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -6510,7 +7166,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6525,15 +7183,18 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
@@ -6552,6 +7213,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6570,7 +7232,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6593,9 +7257,11 @@ states:
         explanation:
           content_id: solution
           html: ''
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         hint_1: {}
@@ -6603,11 +7269,12 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 34
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -6629,7 +7296,8 @@ title: Title
 
     def test_load_from_v21(self):
         """Test direct loading from a v21 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
+        latest_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6639,7 +7307,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -6666,7 +7334,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6681,15 +7351,18 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
@@ -6708,6 +7381,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6730,13 +7404,11 @@ states:
         allowNonzeroIntegerPart:
           value: true
         customPlaceholder:
-          value: ''
-        placeholder:
-          value: ''
+          value:
+            content_id: ca_customPlaceholder_0
+            unicode_str: ''
         requireSimplestForm:
           value: false
-        rows:
-          value: 1
       default_outcome:
         dest: END
         feedback:
@@ -6749,17 +7421,20 @@ states:
       hints: []
       id: FractionInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_customPlaceholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_customPlaceholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 34
+states_schema_version: 38
 tags: []
 title: Title
 """)
@@ -6811,7 +7486,8 @@ title: Title
 
     def test_load_from_v29(self):
         """Test direct loading from a v29 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
+        latest_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6821,7 +7497,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -6848,7 +7524,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6863,6 +7541,169 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        highlightRegionsOnHover:
+          value: false
+        imageAndRegions:
+          value:
+            imagePath: s1ImagePath_height_120_width_120.png
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ImageClickInput
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 38
+tags: []
+title: Title
+""")
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V29)
+        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
+
+    def test_load_from_v30(self):
+        """Test direct loading from a v30 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V30)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v31(self):
+        """Test direct loading from a v31 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V31)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v32(self):
+        """Test direct loading from a v32 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V32)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v33(self):
+        """Test direct loading from a v33 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V33)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v40_special_cases(self):
+        """Test to cover some special cases that occurs in the migration from
+        v40 to v41 exploration schema. This includes modifying existing written
+        translations, converting hmtl to SubtitledHtml, and filling in empty
+        SubtitledHtml list customization arguments with a default value.
+        """
+        sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 40
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -6872,7 +7713,10 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
-        content: {}
+        content:
+            en:
+                html: <p>Translation</p>
+                needs_update: false
         default_outcome: {}
         feedback_1: {}
   END:
@@ -6907,11 +7751,6 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
-        highlightRegionsOnHover:
-          value: false
-        imageAndRegions:
-          value:
-            imagePath: s1ImagePath_height_120_width_120.png
         placeholder:
           value: ''
         rows:
@@ -6926,7 +7765,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: ImageClickInput
+      id: TextInput
       solution: null
     param_changes: []
     recorded_voiceovers:
@@ -6938,40 +7777,438 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 34
+states_schema_version: 35
+tags: []
+title: Title
+""")
+
+        latest_sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 43
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: ''
+        showChoicesInShuffledOrder:
+          value: true
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        content:
+          en:
+            data_format: html
+            needs_update: false
+            translation: <p>Translation</p>
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 38
 tags: []
 title: Title
 """)
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V29)
-        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
+            'eid', sample_yaml_content)
+        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
-    def test_load_from_v30(self):
-        """Test direct loading from a v30 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V30)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+    def test_load_from_v41_with_text_inputs_case_sensitive_equals_rule(self):
+        """Test to cover the case where a TextInput interaction contains
+        an AnswerGroup that has a CaseSensitiveEquals rule.
+        """
+        sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 40
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: CaseSensitiveEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content:
+            en:
+                html: <p>Translation</p>
+                needs_update: false
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 35
+tags: []
+title: Title
+""")
 
-    def test_load_from_v31(self):
-        """Test direct loading from a v31 yaml file."""
+        latest_sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 43
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content:
+          en:
+            data_format: html
+            needs_update: false
+            translation: <p>Translation</p>
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 38
+tags: []
+title: Title
+""")
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V31)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+            'eid', sample_yaml_content)
+        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
-    def test_load_from_v32(self):
-        """Test direct loading from a v32 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V32)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v33(self):
-        """Test direct loading from a v33 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V33)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_cannot_load_from_yaml_with_no_schema_version(self):
-        sample_yaml_content = ("""author_notes: ''
+        sample_yaml_content = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -7070,7 +8307,8 @@ tags: []
                 'eid', 'Title', 'Category', sample_yaml_content)
 
     def test_cannot_load_from_yaml_with_invalid_schema_version(self):
-        sample_yaml_content = ("""author_notes: ''
+        sample_yaml_content = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -7175,7 +8413,8 @@ tags: []
 class HTMLMigrationUnitTests(test_utils.GenericTestBase):
     """Test HTML migration."""
 
-    YAML_CONTENT_V26_TEXTANGULAR = ("""author_notes: ''
+    YAML_CONTENT_V26_TEXTANGULAR = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -7191,7 +8430,8 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: '<p>This is test </p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">
+      html: '<p>This is test </p><oppia-noninteractive-math
+      raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">
         </oppia-noninteractive-math>'
     content_ids_to_audio_translations:
       content: {}
@@ -7344,7 +8584,8 @@ states:
                 filepath-with-value="&amp;quot;startBlue.png&amp;quot;"
                 alt-with-value="&amp;quot;&amp;quot;">
                 </oppia-noninteractive-image></i>Here is the image2
-                <div><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+                <div><oppia-noninteractive-image
+                caption-with-value="&amp;quot;&amp;quot;"
                 filepath-with-value="&amp;quot;startBlue.png&amp;quot;"
                 alt-with-value="&amp;quot;&amp;quot;">
                 </oppia-noninteractive-image></div>
@@ -7392,8 +8633,9 @@ tags: []
 title: title
 """)
 
-# pylint: disable=line-too-long
-    YAML_CONTENT_V35_IMAGE_DIMENSIONS = ("""author_notes: ''
+# pylint: disable=line-too-long, single-line-pragma
+    YAML_CONTENT_V43_IMAGE_DIMENSIONS = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -7403,249 +8645,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 35
-states:
-  Introduction:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: Introduction
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: null
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-  state1:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <blockquote><p>Hello, this is state1</p></blockquote>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: state2
-        feedback:
-          content_id: default_outcome
-          html: <p>Default </p><p>outcome</p><p> for state1</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution:
-        answer_is_exclusive: true
-        correct_answer: Answer1
-        explanation:
-          content_id: solution
-          html: <p>This is <em>solution</em> for state1</p>
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        solution: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        solution: {}
-  state2:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Hello, </p><p>this <em>is </em>state2</p>
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: state1
-          feedback:
-            content_id: feedback_1
-            html: <p>Outcome1 for state2</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 0
-          rule_type: Equals
-        - inputs:
-            x: 1
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: state3
-          feedback:
-            content_id: feedback_2
-            html: "<pre>Outcome2 \\nfor state2</pre>"
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        choices:
-          value:
-          - <p>This is </p><p>value1 <br>for MultipleChoice</p>
-          - <p>This is value2 for <br>MultipleChoice</p>
-      default_outcome:
-        dest: state2
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints:
-      - hint_content:
-          content_id: hint_1
-          html: <p>Hello, this is</p><p> html1<strong> for </strong></p><p>state2</p>
-      - hint_content:
-          content_id: hint_2
-          html: <p>Here is link 2 <oppia-noninteractive-link text-with-value="&amp;quot;discussion
-            forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/
-            forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
-      id: MultipleChoiceInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        feedback_2: {}
-        hint_1: {}
-        hint_2: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        feedback_2: {}
-        hint_1: {}
-        hint_2: {}
-  state3:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Hello, this is state3</p>
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: state1
-          feedback:
-            content_id: feedback_1
-            html: <p>Here is the image1 </p><oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
-              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </oppia-noninteractive-image><p>Here is the image2 </p><oppia-noninteractive-image
-              alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
-              filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </oppia-noninteractive-image>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-            - <p>This is value1 for ItemSelectionInput</p>
-          rule_type: Equals
-        - inputs:
-            x:
-            - <p>This is value3 for ItemSelectionInput</p>
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        choices:
-          value:
-          - <p>This is value1 for ItemSelection</p>
-          - <p>This is value2 for ItemSelection</p>
-          - <p>This is value3 for ItemSelection</p>
-        maxAllowableSelectionCount:
-          value: 1
-        minAllowableSelectionCount:
-          value: 1
-      default_outcome:
-        dest: state3
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: ItemSelectionInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-states_schema_version: 30
-tags: []
-title: title
-""")
-
-# pylint: disable=line-too-long
-    YAML_CONTENT_V39_IMAGE_DIMENSIONS = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: category
-correctness_feedback_enabled: false
-init_state_name: Introduction
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 39
+schema_version: 43
 states:
   Introduction:
     classifier_model_id: null
@@ -7670,6 +8670,7 @@ states:
       hints: []
       id: null
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7690,7 +8691,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -7710,15 +8713,18 @@ states:
         explanation:
           content_id: solution
           html: <p>This is <em>solution</em> for state1</p>
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
         solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
         solution: {}
@@ -7766,8 +8772,10 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is </p><p>value1 <br>for MultipleChoice</p>
-          - <p>This is value2 for <br>MultipleChoice</p>
+          - content_id: ca_choices_3
+            html: <p>This is </p><p>value1 <br>for MultipleChoice</p>
+          - content_id: ca_choices_4
+            html: <p>This is value2 for <br>MultipleChoice</p>
         showChoicesInShuffledOrder:
           value: false
       default_outcome:
@@ -7790,9 +8798,12 @@ states:
             forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
       id: MultipleChoiceInput
       solution: null
+    next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
@@ -7802,6 +8813,8 @@ states:
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
@@ -7844,9 +8857,12 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is value1 for ItemSelection</p>
-          - <p>This is value2 for ItemSelection</p>
-          - <p>This is value3 for ItemSelection</p>
+          - content_id: ca_choices_2
+            html: <p>This is value1 for ItemSelection</p>
+          - content_id: ca_choices_3
+            html: <p>This is value2 for ItemSelection</p>
+          - content_id: ca_choices_4
+            html: <p>This is value3 for ItemSelection</p>
         maxAllowableSelectionCount:
           value: 1
         minAllowableSelectionCount:
@@ -7863,24 +8879,33 @@ states:
       hints: []
       id: ItemSelectionInput
       solution: null
+    next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 34
+states_schema_version: 38
 tags: []
 title: title
 """)
 
-    YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION = ("""author_notes: ''
+
+    YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7992,7 +9017,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V35_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V35_WITH_IMAGE_CAPTION = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8121,7 +9147,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V39_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V43_WITH_IMAGE_CAPTION = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8131,7 +9158,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 39
+schema_version: 43
 states:
   (untitled state):
     classifier_model_id: null
@@ -8162,7 +9189,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -8177,15 +9206,18 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
@@ -8204,6 +9236,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -8222,7 +9255,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -8237,22 +9272,24 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 34
+states_schema_version: 38
 tags: []
 title: Title
 """)
-
-# pylint: enable=line-too-long
+# pylint: enable=line-too-long, single-line-pragma
 
 
     def test_load_from_v26_textangular(self):
@@ -8265,7 +9302,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V39_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V43_IMAGE_DIMENSIONS)
 
 
     def test_load_from_v27_without_image_caption(self):
@@ -8278,7 +9315,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V39_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V43_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -8295,6 +9332,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name):
             """Gets the default state dict of the exploration."""
             return {
+                'next_content_id_index': 0,
                 'classifier_model_id': None,
                 'content': {
                     'content_id': 'content',
@@ -8373,6 +9411,67 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             exploration.delete_state('fake state')
 
 
+class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
+
+    def test_create_html_math_rich_text_info(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['abc', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.to_dict(), {
+                'exp_id': 'exp_id1',
+                'math_images_generation_required': True,
+                'latex_strings_without_svg': ['abc', 'x']
+            })
+
+    def test_validate_when_latex_strings_not_list(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected latex_strings to be a list, received '
+            'invalid_latex_format'):
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, 'invalid_latex_format')
+
+    def test_validate_when_each_latex_expressions_are_not_strings(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected each element in the list of latex strings to be a str, '
+            'received 3'):
+            exp_domain.ExplorationMathRichTextInfo('exp_id1', True, ['x^2', 3])
+
+    def test_validate_exp_id_is_string(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected exp_id to be a str, received 0'):
+            exp_domain.ExplorationMathRichTextInfo(0, True, ['x^2', 3])
+
+    def test_validate_math_images_generation_required_is_bool(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected math_images_generation_required to be an bool, '
+            'received invalid'):
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', 'invalid', ['x^2', 3])
+
+    def test_get_svg_size_in_bytes(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['x^2 + 2ax', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.get_svg_size_in_bytes(), 10000)
+
+    def test_get_longest_latex_expression(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['x^2 + 2ax', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.get_longest_latex_expression(),
+            'x^2 + 2ax')
+
+
 class HtmlCollectionTests(test_utils.GenericTestBase):
     """Test method to obtain all html strings."""
 
@@ -8410,34 +9509,63 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state4.update_content(
             state_domain.SubtitledHtml.from_dict(content4_dict))
 
-        state1.update_interaction_id('TextInput')
-        state2.update_interaction_id('MultipleChoiceInput')
-        state3.update_interaction_id('ItemSelectionInput')
-        state4.update_interaction_id('DragAndDropSortInput')
+        self.set_interaction_for_state(state1, 'TextInput')
+        self.set_interaction_for_state(state2, 'MultipleChoiceInput')
+        self.set_interaction_for_state(state3, 'ItemSelectionInput')
+        self.set_interaction_for_state(state4, 'DragAndDropSortInput')
 
         customization_args_dict1 = {
-            'placeholder': {'value': ''},
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': 'Enter here.'
+                }
+            },
             'rows': {'value': 1}
         }
         customization_args_dict2 = {
             'choices': {'value': [
-                '<p>This is value1 for MultipleChoice</p>',
-                '<p>This is value2 for MultipleChoice</p>'
+                {
+                    'content_id': 'ca_choices_0',
+                    'html': '<p>This is value1 for MultipleChoice</p>'
+                },
+                {
+                    'content_id': 'ca_choices_1',
+                    'html': '<p>This is value2 for MultipleChoice</p>'
+                }
             ]},
             'showChoicesInShuffledOrder': {'value': True}
         }
         customization_args_dict3 = {
             'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-                '<p>This is value3 for ItemSelection</p>'
-            ]}
+                {
+                    'content_id': 'ca_choices_0',
+                    'html': '<p>This is value1 for ItemSelection</p>'
+                },
+                {
+                    'content_id': 'ca_choices_1',
+                    'html': '<p>This is value2 for ItemSelection</p>'
+                },
+                {
+                    'content_id': 'ca_choices_2',
+                    'html': '<p>This is value3 for ItemSelection</p>'
+                }
+            ]},
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 2}
         }
         customization_args_dict4 = {
             'choices': {'value': [
-                '<p>This is value1 for DragAndDropSortInput</p>',
-                '<p>This is value2 for DragAndDropSortInput</p>',
-            ]}
+                {
+                    'content_id': 'ca_choices_0',
+                    'html': '<p>This is value1 for DragAndDropSortInput</p>'
+                },
+                {
+                    'content_id': 'ca_choices_1',
+                    'html': '<p>This is value2 for DragAndDropSortInput</p>'
+                }
+            ]},
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         state1.update_interaction_customization_args(customization_args_dict1)

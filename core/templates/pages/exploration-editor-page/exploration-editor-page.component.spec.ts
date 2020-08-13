@@ -16,38 +16,42 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+import { StateEditorService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
   'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import { PageTitleService } from 'services/page-title.service';
 import { LoaderService } from 'services/loader.service';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
+import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { StateTopAnswersStats } from
-  'domain/statistics/state-top-answers-stats-object.factory';
+
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
 describe('Exploration editor page component', function() {
   var ctrl = null;
+
   var $q = null;
   var $rootScope = null;
   var $scope = null;
@@ -56,22 +60,26 @@ describe('Exploration editor page component', function() {
   var aims = null;
   var cls = null;
   var cs = null;
-  var es = null;
-  var ess = null;
   var efbas = null;
-  var efs = null;
+  var eis = null;
   var ers = null;
+  var es = null;
+  var eps = null;
+  var ess = null;
   var ets = null;
   var ews = null;
   var gds = null;
   var pts = null;
   var rs = null;
-  var ses = null;
-  var stasbas = null;
-  var stass = null;
   var sas = null;
+  var ses = null;
+  var stass = null;
+  var stfts = null;
   var tds = null;
   var ueps = null;
+  var refreshGraphEmitter = new EventEmitter();
+
+  var mockOpenEditorTutorialEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -163,9 +171,8 @@ describe('Exploration editor page component', function() {
       return $q.resolve(explorationData);
     }
   };
-  var getPermissionsSpy = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         ContextService,
@@ -187,6 +194,10 @@ describe('Exploration editor page component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
     $provide.value('ExplorationDataService', mockExplorationDataService);
   }));
 
@@ -198,20 +209,21 @@ describe('Exploration editor page component', function() {
     aims = $injector.get('AutosaveInfoModalsService');
     cls = $injector.get('ChangeListService');
     cs = $injector.get('ContextService');
-    es = $injector.get('EditabilityService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
-    efs = $injector.get('ExplorationFeaturesService');
+    eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
+    es = $injector.get('EditabilityService');
+    eps = $injector.get('ExplorationPropertyService');
     ess = $injector.get('ExplorationStatesService');
     ets = $injector.get('ExplorationTitleService');
     ews = $injector.get('ExplorationWarningsService');
     gds = $injector.get('GraphDataService');
     pts = $injector.get('PageTitleService');
     rs = $injector.get('RouterService');
-    ses = $injector.get('StateEditorService');
-    stasbas = $injector.get('StateTopAnswersStatsBackendApiService');
-    stass = $injector.get('StateTopAnswersStatsService');
     sas = $injector.get('SiteAnalyticsService');
+    ses = $injector.get('StateEditorService');
+    stass = $injector.get('StateTopAnswersStatsService');
+    stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataService');
     ueps = $injector.get('UserExplorationPermissionsService');
 
@@ -219,533 +231,554 @@ describe('Exploration editor page component', function() {
     ctrl = $componentController('explorationEditorPage');
   }));
 
-  describe('when user permission is true and draft changes not valid',
-    function() {
-      var userPermissions = {
-        canEdit: true,
-        canVoiceover: true
-      };
-
-      beforeEach(function() {
-        getPermissionsSpy = spyOn(
-          ueps, 'getPermissionsAsync');
-        spyOnAllFunctions(sas);
-        spyOn(ews, 'updateWarnings').and.callThrough();
-        spyOn(gds, 'recompute').and.callThrough();
-        spyOn(pts, 'setPageTitle').and.callThrough();
-
-        getPermissionsSpy.and.returnValue($q.resolve(userPermissions));
-        spyOn(cs, 'getExplorationId').and.returnValue(
-          explorationId);
-        spyOn(efbas, 'fetchExplorationFeatures')
-          .and.returnValue($q.resolve({}));
-        spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
-          $q.resolve(0));
-
-        explorationData.is_version_of_draft_valid = false;
-
-        ctrl.$onInit();
-      });
-
-      it('should mark exploration as editable and translatable',
-        function() {
-          spyOn(es, 'markEditable').and.callThrough();
-          spyOn(es, 'markTranslatable').and.callThrough();
-          $scope.$apply();
-
-          expect(es.markEditable).toHaveBeenCalled();
-          expect(es.markTranslatable).toHaveBeenCalled();
-        });
-
-      it('should set active state name when active state name does not exist' +
-        ' on exploration', function() {
-        spyOn(ses, 'getActiveStateName').and.returnValue(
-          'State2');
-        spyOn(ses, 'setActiveStateName').and.callThrough();
-        $scope.$apply();
-
-        expect(ses.setActiveStateName).toHaveBeenCalledWith(
-          'Introduction');
-      });
-
-      it('should load change list by draft changes successfully', function() {
-        spyOn(cls, 'loadAutosavedChangeList').and.callThrough();
-        $scope.$apply();
-
-        expect(cls.loadAutosavedChangeList).toHaveBeenCalledWith(
-          explorationData.draft_changes);
-      });
-
-      it('should show mismatch version modal when draft change is not null',
-        function() {
-          spyOn(aims, 'showVersionMismatchModal').and
-            .callThrough();
-          $scope.$apply();
-
-          expect(aims.showVersionMismatchModal)
-            .toHaveBeenCalled();
-        });
-
-      it('should navigate to main tab', function() {
-        spyOn(rs, 'isLocationSetToNonStateEditorTab').and
-          .returnValue(null);
-        spyOn(rs, 'getCurrentStateFromLocationPath').and
-          .returnValue(null);
-        spyOn(rs, 'navigateToMainTab').and.callThrough();
-        $scope.$apply();
-
-        expect(rs.navigateToMainTab).toHaveBeenCalled();
-      });
-    });
-
-  describe('when user permission is false and draft changes are true',
-    function() {
-      var userPermissions = {
-        canEdit: false
-      };
-
-      beforeEach(function() {
-        getPermissionsSpy = spyOn(
-          ueps, 'getPermissionsAsync');
-        spyOnAllFunctions(sas);
-        spyOn(ews, 'updateWarnings').and.callThrough();
-        spyOn(gds, 'recompute').and.callThrough();
-        spyOn(pts, 'setPageTitle').and.callThrough();
-
-        getPermissionsSpy.and.returnValue($q.resolve(userPermissions));
-        spyOn(cs, 'getExplorationId').and.returnValue(
-          explorationId);
-        spyOn(efbas, 'fetchExplorationFeatures')
-          .and.returnValue($q.resolve({}));
-        spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue(
-          $q.resolve(1));
-
-        explorationData.is_version_of_draft_valid = true;
-
-        ctrl.$onInit();
-      });
-
-      it('should link exploration to story when initing exploration page',
-        function() {
-          spyOn(cs, 'setExplorationIsLinkedToStory').and
-            .callThrough();
-          $scope.$apply();
-
-          expect(cs.setExplorationIsLinkedToStory)
-            .toHaveBeenCalled();
-        });
-
-      it('should check ctrl properties according to data get from backend',
-        function() {
-          $scope.$apply();
-          expect(ctrl.explorationUrl).toBe('/create/' + explorationId);
-          expect(ctrl.explorationDownloadUrl).toBe(
-            '/createhandler/download/' + explorationId);
-          expect(ctrl.revertExplorationUrl).toBe(
-            '/createhandler/revert/' + explorationId);
-          expect(ctrl.areExplorationWarningsVisible).toBe(false);
-
-          expect(ctrl.currentUserIsAdmin).toBe(true);
-          expect(ctrl.currentUserIsModerator).toBe(true);
-          expect(ctrl.currentUser).toEqual(explorationData.user);
-          expect(ctrl.currentVersion).toBe(explorationData.version);
-
-          expect(ctrl.tutorialInProgress).toBe(false);
-        });
-
-      it('should get state top answers stats after initing exploration page',
-        fakeAsync(function() {
-          spyOn(ers, 'isPublic').and.returnValue(true);
-          spyOn(stasbas, 'fetchStatsAsync').and
-            .returnValue(Promise.resolve(new StateTopAnswersStats({}, {})));
-          $scope.$apply();
-          flushMicrotasks();
-
-          expect(ews.updateWarnings)
-            .toHaveBeenCalled();
-        }));
-
-      it('should navigate to feedback tab', function() {
-        spyOn(rs, 'isLocationSetToNonStateEditorTab').and
-          .returnValue(null);
-        spyOn(rs, 'getCurrentStateFromLocationPath').and
-          .returnValue(null);
-        spyOn(rs, 'navigateToFeedbackTab').and.callThrough();
-        $scope.$apply();
-
-        expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
-      });
-
-      it('should react when exploration property changes', function() {
-        ets.init('Exploration Title');
-        $rootScope.$broadcast('explorationPropertyChanged');
-
-        expect(pts.setPageTitle).toHaveBeenCalledWith(
-          'Exploration Title - Oppia Editor');
-      });
-
-      it('should react when untitled exploration property changes', function() {
-        ets.init('');
-        $rootScope.$broadcast('explorationPropertyChanged');
-
-        expect(pts.setPageTitle).toHaveBeenCalledWith(
-          'Untitled Exploration - Oppia Editor');
-      });
-
-      it('should react when refreshing graph', function() {
-        $rootScope.$broadcast('refreshGraph');
-
-        expect(gds.recompute).toHaveBeenCalled();
-        expect(ews.updateWarnings).toHaveBeenCalled();
-      });
-
-      it('should react when initExplorationPage is broadcasted', function() {
-        $scope.$apply();
-
-        var successCallback = jasmine.createSpy('success');
-        $rootScope.$broadcast('initExplorationPage', successCallback);
-        $scope.$apply();
-
-        expect(successCallback).toHaveBeenCalled();
-      });
-
-      it('should accept tutorial when closing welcome exploration modal and' +
-        ' then skip it', function() {
-        spyOn(rs, 'navigateToMainTab').and.callThrough();
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve(explorationId)
-        });
-
-        expect(ctrl.tutorialInProgress).toBe(false);
-
-        ctrl.showWelcomeExplorationModal();
-        $scope.$apply();
-
-        expect(sas.registerAcceptTutorialModalEvent)
-          .toHaveBeenCalledWith(explorationId);
-        expect(rs.navigateToMainTab).toHaveBeenCalled();
-        $timeout.flush();
-
-        expect(ctrl.tutorialInProgress).toBe(true);
-
-        ctrl.onSkipTutorial();
-        expect(sas.registerSkipTutorialEvent)
-          .toHaveBeenCalledWith(explorationId);
-        expect(ctrl.tutorialInProgress).toBe(false);
-      });
-
-      it('should accept tutorial when closing welcome exploration modal and' +
-        ' then finish it', function() {
-        spyOn(rs, 'navigateToMainTab').and.callThrough();
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve(explorationId)
-        });
-
-        expect(ctrl.tutorialInProgress).toBe(false);
-
-        ctrl.showWelcomeExplorationModal();
-        $scope.$apply();
-
-        expect(sas.registerAcceptTutorialModalEvent)
-          .toHaveBeenCalledWith(explorationId);
-        expect(rs.navigateToMainTab).toHaveBeenCalled();
-        $timeout.flush();
-
-        expect(ctrl.tutorialInProgress).toBe(true);
-
-        ctrl.onFinishTutorial();
-        expect(sas.registerFinishTutorialEvent)
-          .toHaveBeenCalledWith(explorationId);
-        expect(ctrl.tutorialInProgress).toBe(false);
-      });
-
-      it('should check if improvements tab is enabled', function() {
-        var isInitializedSpy = spyOn(
-          efs, 'isInitialized');
-        var isImprovementsTabEnabledSpy = spyOn(
-          efs, 'isImprovementsTabEnabled');
-        isInitializedSpy.and.returnValue(true);
-        isImprovementsTabEnabledSpy.and.returnValue(true);
-        expect(ctrl.isImprovementsTabEnabled()).toBe(true);
-
-        isInitializedSpy.and.returnValue(false);
-        isImprovementsTabEnabledSpy.and.returnValue(true);
-        expect(ctrl.isImprovementsTabEnabled()).toBe(false);
-
-        isInitializedSpy.and.returnValue(true);
-        isImprovementsTabEnabledSpy.and.returnValue(false);
-        expect(ctrl.isImprovementsTabEnabled()).toBe(false);
-
-        isInitializedSpy.and.returnValue(false);
-        isImprovementsTabEnabledSpy.and.returnValue(false);
-        expect(ctrl.isImprovementsTabEnabled()).toBe(false);
-      });
-
-      it('should decline tutorial when dismissing welcome exploration modal',
-        function() {
-          spyOn($uibModal, 'open').and.returnValue({
-            result: $q.reject(explorationId)
-          });
-
-          expect(ctrl.tutorialInProgress).toBe(false);
-
-          ctrl.showWelcomeExplorationModal();
-          $scope.$apply();
-
-          expect(sas.registerDeclineTutorialModalEvent)
-            .toHaveBeenCalled();
-          expect(ctrl.tutorialInProgress).toBe(false);
-        });
-
-      it('should toggle exploration warning visibility', function() {
-        expect(ctrl.areExplorationWarningsVisible).toBe(false);
-
-        ctrl.toggleExplorationWarningVisibility();
-        expect(ctrl.areExplorationWarningsVisible).toBe(true);
-
-        ctrl.toggleExplorationWarningVisibility();
-        expect(ctrl.areExplorationWarningsVisible).toBe(false);
-      });
-
-      it('should get exploration url', function() {
-        expect(ctrl.getExplorationUrl(explorationId)).toBe('/explore/exp1');
-        expect(ctrl.getExplorationUrl()).toBe('');
-      });
-
-      it('should get active tab name', function() {
-        var activeTabNameSpy = spyOn(rs, 'getActiveTabName');
-
-        activeTabNameSpy.and.returnValue('preview');
-        expect(ctrl.getActiveTabName(activeTabNameSpy)).toBe('preview');
-
-        activeTabNameSpy.and.returnValue('history');
-        expect(ctrl.getActiveTabName(activeTabNameSpy)).toBe('history');
-      });
-
-      // The describe block below tests all the possible functions
-      // included on ctrl.EDITOR_TUTORIAL_OPTIONS array, which manipulates
-      // with JQuery the 'save from tutorial' button.
-      describe('when testing functions for JQuery manipulation from' +
-        ' ctrl.EDITOR_TUTORIAL_OPTIONS array', function() {
-        it('should change element scroll top when calling fn property' +
-          ' function on index 1 of ctrl.EDITOR_TUTORIAL_OPTIONS array',
-        function() {
-          var element = angular.element('div');
-          // @ts-ignore is being used in order to ignore JQuery properties that
-          // should be declared.
-          spyOn(window, '$').and.returnValue(element);
-
-          var animateSpy = spyOn(element, 'animate').and.callThrough();
-
-          ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(false);
-
-          expect(animateSpy).toHaveBeenCalledWith({
-            scrollTop: 20
-          }, 1000);
-        });
-
-        it('should not change element scroll top when calling fn property' +
-          ' function on index 1 of EDITOR_TUTORIAL_OPTIONS array', function() {
-          var element = angular.element('div');
-          // @ts-ignore is being used in order to ignore JQuery properties that
-          // should be declared.
-          spyOn(window, '$').and.returnValue(element);
-
-          var animateSpy = spyOn(element, 'animate').and.callThrough();
-
-          ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(true);
-
-          expect(animateSpy).toHaveBeenCalledWith({
-            scrollTop: 0
-          }, 1000);
-        });
-
-        it('should change state interaction element scroll top when calling' +
-          ' fn property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
-        function() {
-          var element = angular.element('div');
-          // @ts-ignore is being used in order to ignore JQuery properties that
-          // should be declared.
-          spyOn(window, '$').and.returnValue(element);
-          var animateSpy = spyOn(element, 'animate').and.callThrough();
-          // @ts-ignore Angular element method doesn't expect to receive
-          // 1 argument in the lints.
-          spyOn(angular, 'element').withArgs('#tutorialStateContent').and
-            .returnValue({
-              // @ts-ignore Angular element should have more properties than
-              // just offset in the lint settings.
-              offset: () => ({
-                top: 5
-              })
-            });
-
-          ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(false);
-
-          expect(animateSpy).toHaveBeenCalledWith({
-            scrollTop: (5 - 200)
-          }, 1000);
-        });
-
-        it('should change state content element scroll top when calling fn' +
-          ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
-        function() {
-          var element = angular.element('div');
-          // @ts-ignore is being used in order to ignore JQuery properties that
-          // should be declared.
-          spyOn(window, '$').and.returnValue(element);
-          var animateSpy = spyOn(element, 'animate').and.callThrough();
-          // @ts-ignore Angular element method doesn't expect to receive
-          // 1 argument in the lints.
-          spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
-            .returnValue({
-              // @ts-ignore Angular element should have more properties than
-              // just offset in the lint settings.
-              offset: () => ({
-                top: 20
-              })
-            });
-
-          ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(true);
-
-          expect(animateSpy).toHaveBeenCalledWith({
-            scrollTop: (20 - 200)
-          }, 1000);
-        });
-
-        it('should change preview tab element scroll top when calling fn' +
-          ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
-        function() {
-          var element = angular.element('div');
-          // @ts-ignore is being used in order to ignore JQuery properties that
-          // should be declared.
-          spyOn(window, '$').and.returnValue(element);
-          var animateSpy = spyOn(element, 'animate').and.callThrough();
-          // @ts-ignore Angular element method doesn't expect to receive
-          // 1 argument in the lints.
-          spyOn(angular, 'element').withArgs('#tutorialPreviewTab').and
-            .returnValue({
-              // @ts-ignore Angular element should have more properties than
-              // just offset in the lint settings.
-              offset: () => ({
-                top: 5
-              })
-            });
-
-          ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(true);
-
-          expect(animateSpy).toHaveBeenCalledWith({
-            scrollTop: (5 - 200)
-          }, 1000);
-        });
-
-        it('should change state interaction element scroll top when calling' +
-          ' fn property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
-        function() {
-          var element = angular.element('div');
-          // @ts-ignore is being used in order to ignore JQuery properties that
-          // should be declared.
-          spyOn(window, '$').and.returnValue(element);
-          var animateSpy = spyOn(element, 'animate').and.callThrough();
-          // @ts-ignore Angular element method doesn't expect to receive
-          // 1 argument in the lints.
-          spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
-            .returnValue({
-              // @ts-ignore Angular element should have more properties than
-              // just offset in the lint settings.
-              offset: () => ({
-                top: 20
-              })
-            });
-
-          ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(false);
-
-          expect(animateSpy).toHaveBeenCalledWith({
-            scrollTop: (20 - 200)
-          }, 1000);
-        });
-
-        it('should change preview tabn element scroll top when calling fn' +
-          ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
-        function() {
-          var element = angular.element('div');
-          // @ts-ignore is being used in order to ignore JQuery properties that
-          // should be declared.
-          spyOn(window, '$').and.returnValue(element);
-          var animateSpy = spyOn(element, 'animate').and.callThrough();
-          // @ts-ignore Angular element method doesn't expect to receive
-          // 1 argument in the lints.
-          spyOn(angular, 'element').withArgs('#tutorialPreviewTab').and
-            .returnValue({
-              // @ts-ignore Angular element should have more properties than
-              // just offset in the lint settings.
-              offset: () => ({
-                top: 5
-              })
-            });
-
-          ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(true);
-
-          expect(animateSpy).toHaveBeenCalledWith({
-            scrollTop: (5 - 200)
-          }, 1000);
-        });
-
-        it('should change state interaction element scroll top when calling' +
-          ' fn property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
-        function() {
-          var element = angular.element('div');
-          // @ts-ignore is being used in order to ignore JQuery properties that
-          // should be declared.
-          spyOn(window, '$').and.returnValue(element);
-          var animateSpy = spyOn(element, 'animate').and.callThrough();
-          // @ts-ignore Angular element method doesn't expect to receive
-          // 1 argument in the lints.
-          spyOn(angular, 'element').withArgs('#tutorialStateInteraction').and
-            .returnValue({
-              // @ts-ignore Angular element should have more properties than
-              // just offset in the lint settings.
-              offset: () => ({
-                top: 20
-              })
-            });
-
-          ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(false);
-
-          expect(animateSpy).toHaveBeenCalledWith({
-            scrollTop: (20 - 200)
-          }, 1000);
-        });
-      });
-    });
-
-  describe('Should register stats hooks', () => {
-    var userPermissions = {
-      canEdit: false
-    };
-
-    beforeEach(function() {
+  describe('when user permission is true and draft changes not valid', () => {
+    beforeEach(() => {
       spyOnAllFunctions(sas);
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue($q.resolve(userPermissions));
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
+        mockOpenEditorTutorialEmitter);
+
+      explorationData.is_version_of_draft_valid = false;
+
+      ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    it('should start tutorial on event of opening tutorial', () => {
+      spyOn(ctrl, 'startTutorial');
+      mockOpenEditorTutorialEmitter.emit();
+      expect(ctrl.startTutorial).toHaveBeenCalled();
+    });
+
+    it('should mark exploration as editable and translatable', () => {
+      spyOn(es, 'markEditable').and.callThrough();
+      spyOn(es, 'markTranslatable').and.callThrough();
+      $scope.$apply();
+
+      expect(es.markEditable).toHaveBeenCalled();
+      expect(es.markTranslatable).toHaveBeenCalled();
+    });
+
+    it('should set active state name when active state name does not exist' +
+      ' on exploration', () => {
+      spyOn(ses, 'getActiveStateName').and.returnValue(
+        'State2');
+      spyOn(ses, 'setActiveStateName').and.callThrough();
+      $scope.$apply();
+
+      expect(ses.setActiveStateName).toHaveBeenCalledWith(
+        'Introduction');
+    });
+
+    it('should load change list by draft changes successfully', () => {
+      spyOn(cls, 'loadAutosavedChangeList').and.callThrough();
+      $scope.$apply();
+
+      expect(cls.loadAutosavedChangeList).toHaveBeenCalledWith(
+        explorationData.draft_changes);
+    });
+
+    it('should show mismatch version modal when draft change exists', () => {
+      spyOn(aims, 'showVersionMismatchModal').and.callThrough();
+      $scope.$apply();
+
+      expect(aims.showVersionMismatchModal)
+        .toHaveBeenCalled();
+    });
+
+    it('should navigate to main tab', () => {
+      spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
+      spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
+      spyOn(rs, 'navigateToMainTab').and.callThrough();
+      $scope.$apply();
+
+      expect(rs.navigateToMainTab).toHaveBeenCalled();
+    });
+  });
+
+  describe('when user permission is false and draft changes are true', () => {
+    var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
+
+    beforeEach(() => {
+      spyOnAllFunctions(sas);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
+      spyOnProperty(eps, 'onExplorationPropertyChanged').and.returnValue(
+        mockExplorationPropertyChangedEventEmitter);
+      spyOn(ews, 'updateWarnings');
+      spyOn(gds, 'recompute');
+      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
-      spyOn(ers, 'isPublic').and.returnValue(true);
-      spyOn(stasbas, 'fetchStatsAsync')
-        .and.returnValue(Promise.resolve(new StateTopAnswersStats({}, {})));
-      $scope.$apply();
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({canEdit: false}));
+      spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
+
 
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
     });
 
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    it('should link exploration to story when initing exploration page', () => {
+      spyOn(cs, 'setExplorationIsLinkedToStory').and.callThrough();
+      $scope.$apply();
+
+      expect(cs.setExplorationIsLinkedToStory)
+        .toHaveBeenCalled();
+    });
+
+    it('should have ctrl properties correspond to backend data', () => {
+      $scope.$apply();
+      expect(ctrl.explorationUrl).toBe('/create/' + explorationId);
+      expect(ctrl.explorationDownloadUrl).toBe(
+        '/createhandler/download/' + explorationId);
+      expect(ctrl.revertExplorationUrl).toBe(
+        '/createhandler/revert/' + explorationId);
+      expect(ctrl.areExplorationWarningsVisible).toBeFalse();
+
+      expect(ctrl.currentUserIsAdmin).toBeTrue();
+      expect(ctrl.currentUserIsModerator).toBeTrue();
+      expect(ctrl.currentUser).toEqual(explorationData.user);
+      expect(ctrl.currentVersion).toBe(explorationData.version);
+
+      expect(ctrl.tutorialInProgress).toBeFalse();
+    });
+
+    it('should navigate to feedback tab', () => {
+      spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
+      spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
+      spyOn(rs, 'navigateToFeedbackTab').and.callThrough();
+      $scope.$apply();
+
+      expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
+    });
+
+    it('should react when exploration property changes', () => {
+      ets.init('Exploration Title');
+      mockExplorationPropertyChangedEventEmitter.emit();
+
+      expect(pts.setPageTitle).toHaveBeenCalledWith(
+        'Exploration Title - Oppia Editor');
+    });
+
+    it('should react when untitled exploration property changes', () => {
+      ets.init('');
+      mockExplorationPropertyChangedEventEmitter.emit();
+
+      expect(pts.setPageTitle).toHaveBeenCalledWith(
+        'Untitled Exploration - Oppia Editor');
+    });
+
+    it('should react when refreshing graph', () => {
+      refreshGraphEmitter.emit();
+
+      expect(gds.recompute).toHaveBeenCalled();
+      expect(ews.updateWarnings).toHaveBeenCalled();
+    });
+
+    it('should react to initExplorationPage broadcasts', fakeAsync(() => {
+      $scope.$apply();
+
+      var successCallback = jasmine.createSpy('success');
+      $rootScope.$broadcast('initExplorationPage', successCallback);
+
+      // Need to flush and $apply twice to fire the callback. In practice, this
+      // will occur seamlessly.
+      flushMicrotasks();
+      $scope.$apply();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect(successCallback).toHaveBeenCalled();
+    }));
+
+    it('should accept tutorial when closing welcome exploration modal and' +
+      ' then skip it', () => {
+      spyOn(rs, 'navigateToMainTab').and.callThrough();
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve(explorationId)
+      });
+
+      expect(ctrl.tutorialInProgress).toBeFalse();
+
+      ctrl.showWelcomeExplorationModal();
+      $scope.$apply();
+
+      expect(sas.registerAcceptTutorialModalEvent)
+        .toHaveBeenCalledWith(explorationId);
+      expect(rs.navigateToMainTab).toHaveBeenCalled();
+      $timeout.flush();
+
+      expect(ctrl.tutorialInProgress).toBeTrue();
+
+      ctrl.onSkipTutorial();
+      expect(sas.registerSkipTutorialEvent)
+        .toHaveBeenCalledWith(explorationId);
+      expect(ctrl.tutorialInProgress).toBeFalse();
+    });
+
+    it('should accept tutorial when closing welcome exploration modal and' +
+      ' then finish it', () => {
+      spyOn(rs, 'navigateToMainTab').and.callThrough();
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve(explorationId)
+      });
+
+      expect(ctrl.tutorialInProgress).toBeFalse();
+
+      ctrl.showWelcomeExplorationModal();
+      $scope.$apply();
+
+      expect(sas.registerAcceptTutorialModalEvent)
+        .toHaveBeenCalledWith(explorationId);
+      expect(rs.navigateToMainTab).toHaveBeenCalled();
+      $timeout.flush();
+
+      expect(ctrl.tutorialInProgress).toBeTrue();
+
+      ctrl.onFinishTutorial();
+      expect(sas.registerFinishTutorialEvent)
+        .toHaveBeenCalledWith(explorationId);
+      expect(ctrl.tutorialInProgress).toBeFalse();
+    });
+
+    it('should dismiss tutorial if welcome exploration modal dismissed', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject(explorationId)
+      });
+
+      expect(ctrl.tutorialInProgress).toBeFalse();
+
+      ctrl.showWelcomeExplorationModal();
+      $scope.$apply();
+
+      expect(sas.registerDeclineTutorialModalEvent)
+        .toHaveBeenCalled();
+      expect(ctrl.tutorialInProgress).toBeFalse();
+    });
+
+    it('should toggle exploration warning visibility', () => {
+      expect(ctrl.areExplorationWarningsVisible).toBeFalse();
+
+      ctrl.toggleExplorationWarningVisibility();
+      expect(ctrl.areExplorationWarningsVisible).toBeTrue();
+
+      ctrl.toggleExplorationWarningVisibility();
+      expect(ctrl.areExplorationWarningsVisible).toBeFalse();
+    });
+
+    it('should get exploration url', () => {
+      expect(ctrl.getExplorationUrl(explorationId)).toBe('/explore/exp1');
+      expect(ctrl.getExplorationUrl()).toBe('');
+    });
+
+    it('should get active tab name', () => {
+      var activeTabNameSpy = spyOn(rs, 'getActiveTabName');
+
+      activeTabNameSpy.and.returnValue('preview');
+      expect(ctrl.getActiveTabName(activeTabNameSpy)).toBe('preview');
+
+      activeTabNameSpy.and.returnValue('history');
+      expect(ctrl.getActiveTabName(activeTabNameSpy)).toBe('history');
+    });
+
+    // The describe block below tests all the possible functions
+    // included on ctrl.EDITOR_TUTORIAL_OPTIONS array, which manipulates
+    // with JQuery the 'save from tutorial' button.
+    describe('when testing functions for JQuery manipulation from' +
+      ' ctrl.EDITOR_TUTORIAL_OPTIONS array', () => {
+      it('should change element scroll top when calling fn property' +
+        ' function on index 1 of ctrl.EDITOR_TUTORIAL_OPTIONS array',
+      () => {
+        var element = angular.element('div');
+        spyOn(window, '$').and.returnValue(element);
+
+        var animateSpy = spyOn(element, 'animate').and.callThrough();
+
+        ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(false);
+
+        expect(animateSpy).toHaveBeenCalledWith({
+          scrollTop: 20
+        }, 1000);
+      });
+
+      it('should not change element scroll top when calling fn property' +
+        ' function on index 1 of EDITOR_TUTORIAL_OPTIONS array', () => {
+        var element = angular.element('div');
+        spyOn(window, '$').and.returnValue(element);
+
+        var animateSpy = spyOn(element, 'animate').and.callThrough();
+
+        ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(true);
+
+        expect(animateSpy).toHaveBeenCalledWith({
+          scrollTop: 0
+        }, 1000);
+      });
+
+      it('should change state interaction element scroll top when calling' +
+        ' fn property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
+      () => {
+        var element = angular.element('div');
+        spyOn(window, '$').and.returnValue(element);
+        var animateSpy = spyOn(element, 'animate').and.callThrough();
+        spyOn(angular, 'element')
+          .withArgs('#tutorialStateContent').and.returnValue({
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
+            offset: () => ({
+              top: 5
+            })
+          });
+
+        ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(false);
+
+        expect(animateSpy).toHaveBeenCalledWith({
+          scrollTop: (5 - 200)
+        }, 1000);
+      });
+
+      it('should change state content element scroll top when calling fn' +
+        ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
+      () => {
+        var element = angular.element('div');
+        spyOn(window, '$').and.returnValue(element);
+        var animateSpy = spyOn(element, 'animate').and.callThrough();
+        spyOn(angular, 'element')
+          .withArgs('#tutorialStateInteraction').and.returnValue({
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
+            offset: () => ({
+              top: 20
+            })
+          });
+
+        ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(true);
+
+        expect(animateSpy).toHaveBeenCalledWith({
+          scrollTop: (20 - 200)
+        }, 1000);
+      });
+
+      it('should change preview tab element scroll top when calling fn' +
+        ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
+      () => {
+        var element = angular.element('div');
+        spyOn(window, '$').and.returnValue(element);
+        var animateSpy = spyOn(element, 'animate').and.callThrough();
+        spyOn(angular, 'element')
+          .withArgs('#tutorialPreviewTab').and.returnValue({
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
+            offset: () => ({
+              top: 5
+            })
+          });
+
+        ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(true);
+
+        expect(animateSpy).toHaveBeenCalledWith({
+          scrollTop: (5 - 200)
+        }, 1000);
+      });
+
+      it('should change state interaction element scroll top when calling' +
+        ' fn property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
+      () => {
+        var element = angular.element('div');
+        spyOn(window, '$').and.returnValue(element);
+        var animateSpy = spyOn(element, 'animate').and.callThrough();
+        spyOn(angular, 'element')
+          .withArgs('#tutorialStateInteraction').and.returnValue({
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
+            offset: () => ({
+              top: 20
+            })
+          });
+
+        ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(false);
+
+        expect(animateSpy).toHaveBeenCalledWith({
+          scrollTop: (20 - 200)
+        }, 1000);
+      });
+
+      it('should change preview tabn element scroll top when calling fn' +
+        ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
+      () => {
+        var element = angular.element('div');
+        spyOn(window, '$').and.returnValue(element);
+        var animateSpy = spyOn(element, 'animate').and.callThrough();
+        spyOn(angular, 'element')
+          .withArgs('#tutorialPreviewTab').and.returnValue({
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
+            offset: () => ({
+              top: 5
+            })
+          });
+
+        ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(true);
+
+        expect(animateSpy).toHaveBeenCalledWith({
+          scrollTop: (5 - 200)
+        }, 1000);
+      });
+
+      it('should change state interaction element scroll top when calling' +
+        ' fn property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
+      () => {
+        var element = angular.element('div');
+        spyOn(window, '$').and.returnValue(element);
+        var animateSpy = spyOn(element, 'animate').and.callThrough();
+        spyOn(angular, 'element')
+          .withArgs('#tutorialStateInteraction').and.returnValue({
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
+            offset: () => ({
+              top: 20
+            })
+          });
+
+        ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(false);
+
+        expect(animateSpy).toHaveBeenCalledWith({
+          scrollTop: (20 - 200)
+        }, 1000);
+      });
+    });
+  });
+
+  describe('Initializing improvements tab', () => {
+    beforeEach(() => {
+      spyOnAllFunctions(sas);
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeatures')
+        .and.returnValue(Promise.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
+      spyOn(ers, 'isPublic').and.returnValue(true);
+      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(tds, 'getOpenThreadsCountAsync')
+        .and.returnValue(Promise.resolve(1));
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve({canEdit: true}));
+
+      explorationData.is_version_of_draft_valid = true;
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    it('should recognize when improvements tab is enabled', fakeAsync(() => {
+      spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
+        Promise.resolve(true));
+
+      ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect(ctrl.isImprovementsTabEnabled()).toBeTrue();
+    }));
+
+    it('should recognize when improvements tab is disabled', fakeAsync(() => {
+      spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
+        Promise.resolve(false));
+
+      ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect(ctrl.isImprovementsTabEnabled()).toBeFalse();
+    }));
+  });
+
+  describe('State-change registration', () => {
+    beforeEach(() => {
+      spyOnAllFunctions(sas);
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
+      spyOn(ers, 'isPublic').and.returnValue(true);
+      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({canEdit: false}));
+      $scope.$apply();
+
+      explorationData.is_version_of_draft_valid = true;
+
+      ctrl.$onInit();
+    });
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     it('should callback state-added method for stats', fakeAsync(() => {
       let onStateAddedSpy = spyOn(stass, 'onStateAdded');
       spyOn(cls, 'addState');
+
       $scope.$apply();
       flushMicrotasks();
 
@@ -759,6 +792,7 @@ describe('Exploration editor page component', function() {
       let onStateDeletedSpy = spyOn(stass, 'onStateDeleted');
       spyOn(cls, 'deleteState');
       spyOn($uibModal, 'open').and.returnValue({result: Promise.resolve()});
+
       $scope.$apply();
       flushMicrotasks();
 
@@ -771,6 +805,7 @@ describe('Exploration editor page component', function() {
     it('should callback state-renamed method for stats', fakeAsync(() => {
       let onStateRenamedSpy = spyOn(stass, 'onStateRenamed');
       spyOn(cls, 'renameState');
+
       $scope.$apply();
       flushMicrotasks();
 
@@ -783,6 +818,7 @@ describe('Exploration editor page component', function() {
     it('should callback interaction-changed method for stats', fakeAsync(() => {
       let onStateInteractionSavedSpy = spyOn(stass, 'onStateInteractionSaved');
       spyOn(cls, 'editStateProperty');
+
       $scope.$apply();
       flushMicrotasks();
 
