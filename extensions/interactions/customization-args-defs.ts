@@ -213,7 +213,7 @@ export interface ImageClickInputCustomizationArgsBackendDict {
     value: ImageWithRegions;
   };
   highlightRegionsOnHover: {
-    value: string;
+    value: boolean;
   };
 }
 export interface ImageClickInputCustomizationArgs {
@@ -234,7 +234,7 @@ export interface InteractiveMapCustomizationArgsBackendDict {
     value: number;
   };
   zoom: {
-    value: string;
+    value: number;
   };
 }
 export interface InteractiveMapCustomizationArgs {

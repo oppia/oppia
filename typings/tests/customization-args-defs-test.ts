@@ -104,7 +104,7 @@ type TestCodeReplCustomizationArgsInterfacesMatch = AssertTrue<
 type TestContinueCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     ContinueCustomizationArgsBackendDict,
-    {buttonText?: {value: SubtitledUnicode}},
+    {buttonText: {value: SubtitledUnicode}},
     ContinueCustomizationArgs
   >
 >;
@@ -112,7 +112,7 @@ type TestContinueCustomizationArgsInterfacesMatch = AssertTrue<
 type TestDragAndDropSortInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     DragAndDropSortInputCustomizationArgsBackendDict,
-    {choices?: {value: SubtitledHtml[]}},
+    {choices: {value: SubtitledHtml[]}},
     DragAndDropSortInputCustomizationArgs
   >
 >;
@@ -128,7 +128,7 @@ type TestEndExplorationCustomizationArgsInterfacesMatch = AssertTrue<
 type TestFractionInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     FractionInputCustomizationArgsBackendDict,
-    {customPlaceholder?: {value: SubtitledUnicode}},
+    {customPlaceholder: {value: SubtitledUnicode}},
     FractionInputCustomizationArgs
   >
 >;
@@ -160,7 +160,7 @@ type TestInteractiveMapCustomizationArgsInterfacesMatch = AssertTrue<
 type TestItemSelectionInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     ItemSelectionInputCustomizationArgsBackendDict,
-    {choices?: {value: SubtitledHtml[]}},
+    {choices: {value: SubtitledHtml[]}},
     ItemSelectionInputCustomizationArgs
   >
 >;
@@ -192,7 +192,7 @@ type TestMathExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
 type TestMultipleChoiceInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     MultipleChoiceInputCustomizationArgsBackendDict,
-    {choices?: {value: SubtitledHtml[]}},
+    {choices: {value: SubtitledHtml[]}},
     MultipleChoiceInputCustomizationArgs
   >
 >;
@@ -240,7 +240,7 @@ type TestPencilCodeEditorCustomizationArgsInterfacesMatch = AssertTrue<
 type TestSetInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     SetInputCustomizationArgsBackendDict,
-    {buttonText?: {value: SubtitledUnicode}},
+    {buttonText: {value: SubtitledUnicode}},
     SetInputCustomizationArgs
   >
 >;
@@ -248,7 +248,7 @@ type TestSetInputCustomizationArgsInterfacesMatch = AssertTrue<
 type TestTextInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     TextInputCustomizationArgsBackendDict,
-    {placeholder?: {value: SubtitledUnicode}},
+    {placeholder: {value: SubtitledUnicode}},
     TextInputCustomizationArgs
   >
 >;
