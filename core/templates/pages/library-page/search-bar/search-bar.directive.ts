@@ -45,13 +45,15 @@ angular.module('oppia').directive('searchBar', [
         '$location', '$rootScope', '$scope', '$timeout', '$translate',
         '$window', 'ClassroomBackendApiService',
         'ConstructTranslationIdsService', 'DebouncerService',
-        'HtmlEscaperService', 'LanguageUtilService', 'NavigationService',
+        'HtmlEscaperService', 'I18nLanguageCodeService',
+        'LanguageUtilService', 'NavigationService',
         'SearchService', 'UrlService', 'SEARCH_DROPDOWN_CATEGORIES',
         function(
             $location, $rootScope, $scope, $timeout, $translate,
             $window, ClassroomBackendApiService,
             ConstructTranslationIdsService, DebouncerService,
-            HtmlEscaperService, LanguageUtilService, NavigationService,
+            HtmlEscaperService, I18nLanguageCodeService,
+            LanguageUtilService, NavigationService,
             SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
           var ctrl = this;
 
@@ -255,35 +257,37 @@ angular.module('oppia').directive('searchBar', [
               }
             });
 
-            $scope.$on(
-              'preferredLanguageCodesLoaded',
-              function(evt, preferredLanguageCodesList) {
-                preferredLanguageCodesList.forEach(function(languageCode) {
-                  var selections =
-                   ctrl.selectionDetails.languageCodes.selections;
-                  if (!selections.hasOwnProperty(languageCode)) {
-                    selections[languageCode] = true;
-                  } else {
-                    selections[languageCode] = !selections[languageCode];
+
+            ctrl.directiveSubscriptions.add(
+              I18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe(
+                (preferredLanguageCodesList) => {
+                  preferredLanguageCodesList.forEach(function(languageCode) {
+                    var selections =
+                     ctrl.selectionDetails.languageCodes.selections;
+                    if (!selections.hasOwnProperty(languageCode)) {
+                      selections[languageCode] = true;
+                    } else {
+                      selections[languageCode] = !selections[languageCode];
+                    }
+                  });
+
+                  updateSelectionDetails('languageCodes');
+
+                  if (UrlService.getUrlParams().hasOwnProperty('q')) {
+                    updateSearchFieldsBasedOnUrlQuery();
                   }
-                });
 
-                updateSelectionDetails('languageCodes');
+                  if ($window.location.pathname === '/search/find') {
+                    onSearchQueryChangeExec();
+                  }
 
-                if (UrlService.getUrlParams().hasOwnProperty('q')) {
-                  updateSearchFieldsBasedOnUrlQuery();
+                  refreshSearchBarLabels();
+
+                  // Notify the function that handles overflow in case the
+                  // search elements load after it has already been run.
+                  SearchService.onSearchBarLoaded.emit();
                 }
-
-                if ($window.location.pathname === '/search/find') {
-                  onSearchQueryChangeExec();
-                }
-
-                refreshSearchBarLabels();
-
-                // Notify the function that handles overflow in case the search
-                // elements load after it has already been run.
-                SearchService.onSearchBarLoaded.emit();
-              }
+              )
             );
             $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
             ctrl.directiveSubscriptions.add(

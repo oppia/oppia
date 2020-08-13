@@ -27,10 +27,6 @@ angular.module('oppia').constant(
   ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
 angular.module('oppia').constant(
-  'EVENT_EXPLORATION_PROPERTY_CHANGED',
-  ExplorationEditorPageConstants.EVENT_EXPLORATION_PROPERTY_CHANGED);
-
-angular.module('oppia').constant(
   'PARAM_ACTION_GET', ExplorationEditorPageConstants.PARAM_ACTION_GET);
 
 angular.module('oppia').constant(
