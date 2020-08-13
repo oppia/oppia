@@ -19,7 +19,7 @@
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 
-fdescribe('SetOfAlgebraicIdentifier', function() {
+describe('SetOfAlgebraicIdentifier', function() {
   var ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
