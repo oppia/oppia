@@ -1,0 +1,34 @@
+// this additional tsconfig is required by dtslint
+// see: https://github.com/Microsoft/dtslint#typestsconfigjson
+{
+  "compilerOptions": {
+    "lib": ["es2017", "dom", "webworker"],
+    "target": "es5",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": false,
+    "strictFunctionTypes": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "typeRoots": ["../../node_modules/@types", "../."],
+    "paths": {
+      "app.constants": ["../../core/templates/app.constants"],
+      "app-type.constants": ["../../core/templates/app-type.constants"],
+      "components/*": ["../../core/templates/components/*"],
+      "domain/*": ["../../core/templates/domain/*"],
+      "expressions/*": ["../../core/templates/expressions/*"],
+      "pages/*": ["../../core/templates/pages/*"],
+      "services/*": ["../../core/templates/services/*"],
+      "classifiers/*": ["../../extensions/classifiers/*"],
+      "interactions/*": ["../../extensions/interactions/*"],
+      "filters/*": ["../../core/templates/filters/*"],
+      "static/*": ["../../third_party/static/*"],
+      "tests/*": ["../../core/templates/tests/*"]
+    }
+  },
+  "include": ["../."]
+}

@@ -29,6 +29,8 @@ from . import check_frontend_coverage
 from . import common
 from . import install_third_party_libs
 
+DTSLINT_TYPE_TESTS = os.path.join('typings', 'tests')
+
 _PARSER = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
@@ -53,9 +55,32 @@ _PARSER.add_argument(
     action='store_true'
 )
 
+def run_dtslint_type_tests():
+    """Runs the dtslint type tests in typings/tests."""
+    python_utils.PRINT('Running dtslint type tests.')
+
+    cmd = ['./node_modules/dtslint/bin/index.js', DTSLINT_TYPE_TESTS]
+    task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    output_lines = []
+    # Reads and prints realtime output from the subprocess until it terminates.
+    while True:
+        line = task.stdout.readline()
+        # No more output from the subprocess, and the subprocess has ended.
+        if len(line) == 0 and task.poll() is not None:
+            break
+        if line:
+            python_utils.PRINT(line, end='')
+            output_lines.append(line)
+    concatenated_output = ''.join(
+        line.decode('utf-8') for line in output_lines)
+    python_utils.PRINT('Done!')
+    if task.returncode:
+        sys.exit('The dtslint (type tests) failed.')
 
 def main(args=None):
     """Runs the frontend tests."""
+    run_dtslint_type_tests()
+
     parsed_args = _PARSER.parse_args(args=args)
 
     if not parsed_args.skip_install:
@@ -116,7 +141,6 @@ def main(args=None):
             check_frontend_coverage.main()
     elif task.returncode:
         sys.exit(task.returncode)
-
 
 if __name__ == '__main__':
     main()
