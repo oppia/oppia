@@ -34,14 +34,14 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     this._undoneChanges = [];
     this._undoRedoChangeEventEmitter = new EventEmitter();
 
-    var _dispatchMutation = function() {
+    var _dispatchMutation = () => {
       this._undoRedoChangeEventEmitter.emit();
     };
-    var _applyChange = function(changeObject, domainObject) {
+    var _applyChange = (changeObject, domainObject) => {
       changeObject.applyChange(domainObject);
       _dispatchMutation();
     };
-    var _reverseChange = function(changeObject, domainObject) {
+    var _reverseChange = (changeObject, domainObject) => {
       changeObject.reverseChange(domainObject);
       _dispatchMutation();
     };
@@ -49,7 +49,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     BaseUndoRedoService['init'] = function() {
-    /* eslint-enable dot-notation */
+      /* eslint-enable dot-notation */
       this._appliedChanges = [];
       this._undoneChanges = [];
       this._undoRedoChangeEventEmitter = new EventEmitter();
@@ -79,7 +79,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     BaseUndoRedoService['undoChange'] = function(domainObject) {
-    /* eslint-enable dot-notation */
+      /* eslint-enable dot-notation */
       if (this._appliedChanges.length !== 0) {
         var change = this._appliedChanges.pop();
         this._undoneChanges.push(change);
@@ -97,7 +97,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     BaseUndoRedoService['redoChange'] = function(domainObject) {
-    /* eslint-enable dot-notation */
+      /* eslint-enable dot-notation */
       if (this._undoneChanges.length !== 0) {
         var change = this._undoneChanges.pop();
         this._appliedChanges.push(change);
@@ -115,7 +115,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     BaseUndoRedoService['getChangeList'] = function() {
-    /* eslint-enable dot-notation */
+      /* eslint-enable dot-notation */
       // TODO(bhenning): Consider integrating something like Immutable.js to
       // avoid the slice here and ensure the returned object is truly an
       // immutable copy.
@@ -130,7 +130,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     BaseUndoRedoService['getCommittableChangeList'] = function() {
-    /* eslint-enable dot-notation */
+      /* eslint-enable dot-notation */
       var committableChangeList = [];
       for (var i = 0; i < this._appliedChanges.length; i++) {
         committableChangeList[i] =
@@ -142,7 +142,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     BaseUndoRedoService['setChangeList'] = function(changeList) {
-    /* eslint-enable dot-notation */
+      /* eslint-enable dot-notation */
       this._appliedChanges = angular.copy(changeList);
     };
 
@@ -153,7 +153,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     BaseUndoRedoService['getChangeCount'] = function() {
-    /* eslint-enable dot-notation */
+      /* eslint-enable dot-notation */
       return this._appliedChanges.length;
     };
 
@@ -175,7 +175,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     BaseUndoRedoService['clearChanges'] = function() {
-    /* eslint-enable dot-notation */
+      /* eslint-enable dot-notation */
       this._appliedChanges = [];
       this._undoneChanges = [];
       this._undoRedoChangeAppliedEventEmitter = new EventEmitter();
@@ -184,7 +184,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
 
     /* eslint-disable dot-notation */
     BaseUndoRedoService['onUndoRedoChangeApplied'] = function() {
-    /* eslint-enable dot-notation */
+      /* eslint-enable dot-notation */
       return this._undoRedoChangeEventEmitter;
     };
 
