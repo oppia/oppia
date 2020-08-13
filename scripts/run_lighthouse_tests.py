@@ -107,7 +107,7 @@ def main():
     atexit.register(cleanup)
 
     python_utils.PRINT('Building files in production mode.')
-    build.main(args=['--prod_env'])
+    build.main(args=['--prod_env', '--source_maps'])
     build.modify_constants(prod_env=True)
     start_google_app_engine_server()
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
