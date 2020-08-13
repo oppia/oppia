@@ -97,7 +97,7 @@ describe('Profile page', function() {
     windowRefMock.nativeWindow.location.href = '';
   });
 
-  it('should formatted date string from the timestamp in milliseconds',
+  it('should get formatted date string from the timestamp in milliseconds',
     function() {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
       var NOW_MILLIS = 1416563100000;

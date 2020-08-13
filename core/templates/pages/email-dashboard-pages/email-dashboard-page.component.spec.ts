@@ -165,7 +165,7 @@ describe('Email Dashboard Page', function() {
   });
 
   describe('recheckStatus', function() {
-    it('should reckeck status when getting next page of queries',
+    it('should fetch query page again when getting next page of queries',
       function() {
         spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(
           function() {
@@ -193,8 +193,7 @@ describe('Email Dashboard Page', function() {
         expect(ctrl.currentPageOfQueries[0]).toEqual(updatedQuery);
       });
 
-    it('should not get query backend for rechecking its content when' +
-      ' it does not exist', function() {
+    it('should not get query page again when it does not exist', function() {
       expect(ctrl.currentPageOfQueries).toBe(undefined);
       ctrl.recheckStatus(0);
       expect(ctrl.currentPageOfQueries).toBe(undefined);

@@ -19,7 +19,12 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Create new skill modal', function() {
-  beforeEach(angular.mock.module('oppia'));
+  var $scope = null;
+  var $uibModalInstance = null;
+  var skillDifficulties = null;
+  var RubricObjectFactory = null;
+  var COMPONENT_NAME_EXPLANATION = null;
+  var SubtitledHtmlObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -28,12 +33,6 @@ describe('Create new skill modal', function() {
     }
   }));
 
-  var $scope = null;
-  var $uibModalInstance = null;
-  var skillDifficulties = null;
-  var RubricObjectFactory = null;
-  var COMPONENT_NAME_EXPLANATION = null;
-  var SubtitledHtmlObjectFactory = null;
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     $uibModalInstance = jasmine.createSpyObj(
@@ -77,6 +76,9 @@ describe('Create new skill modal', function() {
     ' changing skill description', function() {
     $scope.errorMsg = 'Please enter a valid description';
     $scope.newSkillDescription = 'Addition';
+    expect($scope.rubrics[1].getExplanations()).toEqual(['']);
+    expect($scope.errorMsg).toEqual('Please enter a valid description');
+
     $scope.updateSkillDescription();
     expect($scope.rubrics[1].getExplanations()).toEqual(['Addition']);
     expect($scope.errorMsg).toEqual('');
@@ -128,8 +130,10 @@ describe('Create new skill modal', function() {
     var newExplanationObject = explanationObject.toBackendDict();
 
     $scope.newSkillDescription = 'Large addition';
+    expect($scope.rubrics[1].getExplanations()).toEqual(['']);
     $scope.updateSkillDescription();
     $scope.createNewSkill();
+    expect($scope.rubrics[1].getExplanations()).toEqual(['Large addition']);
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       description: 'Large addition',
       rubrics: rubrics,

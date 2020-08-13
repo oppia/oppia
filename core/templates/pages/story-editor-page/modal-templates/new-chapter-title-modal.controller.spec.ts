@@ -159,8 +159,8 @@ describe('Create New Chapter Modal Controller', function() {
     expect($scope.isValid()).toEqual(false);
   });
 
-  it('should warn exploration is not published when trying to save a chapter' +
-    ' with an invalid exploration id', function() {
+  it('should warn that the exploration is not published when trying to save' +
+    ' a chapter with an invalid exploration id', function() {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();
     deferred.resolve(false);
@@ -171,8 +171,9 @@ describe('Create New Chapter Modal Controller', function() {
     expect($scope.invalidExpId).toEqual(true);
   });
 
-  it('should warn exploration already exists in the story when trying to save' +
-    ' a chapter with an already used exploration id', function() {
+  it('should warn that the exploration already exists in the story when' +
+    ' trying to save a chapter with an already used exploration id',
+  function() {
     $scope.explorationId = 'exp_1';
     $scope.updateExplorationId();
     expect($scope.invalidExpErrorString).toEqual(

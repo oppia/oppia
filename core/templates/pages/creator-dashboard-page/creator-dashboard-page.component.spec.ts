@@ -332,7 +332,7 @@ describe('Creator dashboard controller', () => {
         $rootScope.$apply();
       });
 
-      it('should evaluate dashboard data get from backend', function() {
+      it('should evaluate dashboard data retrieved from backend', function() {
         var suggestionThreadObject = (
           SuggestionThreadObjectFactory.createFromBackendDicts(
             dashboardData.threads_for_created_suggestions_list[0],

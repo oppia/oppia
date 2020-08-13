@@ -247,7 +247,8 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
         expect($scope.errorMessage).toBe('');
       });
 
-    it('should accept suggestion from suggestion modal service', function() {
+    it('should accept suggestion and close the modal on clicking the accept' +
+      ' suggestion button', function() {
       spyOn(SuggestionModalService, 'acceptSuggestion').and.callThrough();
       $scope.acceptSuggestion();
 
@@ -255,7 +256,8 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalled();
     });
 
-    it('should reject suggestion from suggestion modal service', function() {
+    it('should reject suggestion and close the modal on clicking the reject' +
+      ' suggestion button', function() {
       spyOn(SuggestionModalService, 'rejectSuggestion').and.callThrough();
       $scope.rejectSuggestion();
 

@@ -146,14 +146,14 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
           expect($scope.activityTitle).toEqual(activity.title);
         });
 
-      it('should not remove activity from backend when clicking remove button',
-        function() {
-          expect(function() {
-            $scope.remove();
-          }).toThrowError('Subsection name is not valid.');
+      it('should not remove activity from backend when clicking remove' +
+        ' button if there is an error', function() {
+        expect(function() {
+          $scope.remove();
+        }).toThrowError('Subsection name is not valid.');
 
-          expect($uibModalInstance.close).not.toHaveBeenCalled();
-        });
+        expect($uibModalInstance.close).not.toHaveBeenCalled();
+      });
     });
 
     describe('when section name is not valid', function() {
@@ -176,13 +176,13 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should remove activity from backend when clicking remove button',
-        function() {
-          expect(function() {
-            $scope.remove();
-          }).toThrowError('Section name is not valid.');
+      it('should not remove activity from backend when clicking remove button' +
+        ' if there is an error', function() {
+        expect(function() {
+          $scope.remove();
+        }).toThrowError('Section name is not valid.');
 
-          expect($uibModalInstance.close).not.toHaveBeenCalled();
-        });
+        expect($uibModalInstance.close).not.toHaveBeenCalled();
+      });
     });
   });
