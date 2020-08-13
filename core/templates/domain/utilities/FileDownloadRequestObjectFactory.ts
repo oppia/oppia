@@ -18,17 +18,15 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
 
 export class FileDownloadRequest {
   filename: string;
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has kept as
-  // 'any' since canceler is a 'Deferred' type object which is native to
-  // AngularJS and does not have a type in native typescript.
-  canceler: any;
+  subscription: Subscription;
 
-  constructor(filename: string, canceler: any) {
+  constructor(filename: string, subscription: Subscription) {
     this.filename = filename;
-    this.canceler = canceler;
+    this.subscription = subscription;
   }
 }
 
@@ -36,11 +34,8 @@ export class FileDownloadRequest {
   providedIn: 'root'
 })
 export class FileDownloadRequestObjectFactory {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has kept as
-  // 'any' since canceler is a 'Deferred' type object which is native to
-  // AngularJS and does not have a type in native typescript.
-  createNew(filename: string, canceler: any): FileDownloadRequest {
-    return new FileDownloadRequest(filename, canceler);
+  createNew(filename: string, subscription: Subscription): FileDownloadRequest {
+    return new FileDownloadRequest(filename, subscription);
   }
 }
 angular.module('oppia').factory(
