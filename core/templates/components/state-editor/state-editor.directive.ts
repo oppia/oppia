@@ -40,6 +40,9 @@ require(
   'state-name.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-param-changes.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -47,6 +50,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
+require('services/contextual/window-dimensions.service');
 
 import { Subscription } from 'rxjs';
 
@@ -63,9 +67,10 @@ angular.module('oppia').directive('stateEditor', [
         navigateToState: '=',
         onSaveHints: '=',
         onSaveInteractionAnswerGroups: '=',
-        onSaveInteractionId: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveInteractionId: '=',
+        onSaveNextContentIdIndex: '=',
         onSaveSolicitAnswerDetails: '=',
         onSaveSolution: '=',
         onSaveStateContent: '=',
@@ -79,14 +84,16 @@ angular.module('oppia').directive('stateEditor', [
         '$rootScope', '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService', 'StateNameService',
+        'StateNextContentIdIndexService',
         'StateParamChangesService', 'StateSolicitAnswerDetailsService',
-        'StateSolutionService', 'INTERACTION_SPECS',
+        'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
             $rootScope, $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
+            StateNextContentIdIndexService,
             StateParamChangesService, StateSolicitAnswerDetailsService,
-            StateSolutionService, INTERACTION_SPECS) {
+            StateSolutionService, WindowDimensionsService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var updateInteractionVisibility = function(newInteractionId) {
@@ -102,17 +109,27 @@ angular.module('oppia').directive('stateEditor', [
           $scope.reinitializeEditor = function() {
             StateEditorService.onStateEditorInitialized.emit($scope.stateData);
           };
+
+          $scope.toggleConceptCard = function() {
+            $scope.conceptCardIsShown = !$scope.conceptCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg');
             $scope.currentStateIsTerminal = false;
+            $scope.conceptCardIsShown = true;
+            $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             $scope.interactionIdIsSet = false;
             $scope.servicesInitialized = false;
             $scope.stateName = StateEditorService.getActiveStateName();
-            $scope.$on(
-              'onInteractionIdChanged', function(evt, newInteractionId) {
-                updateInteractionVisibility(newInteractionId);
-              });
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                (newInteractionId) => {
+                  updateInteractionVisibility(newInteractionId);
+                }
+              )
+            );
 
             ctrl.directiveSubscriptions.add(
               StateEditorService.onStateEditorInitialized.subscribe(
@@ -133,6 +150,8 @@ angular.module('oppia').directive('stateEditor', [
                     $scope.stateName, stateData.interaction.id);
                   StateCustomizationArgsService.init(
                     $scope.stateName, stateData.interaction.customizationArgs);
+                  StateNextContentIdIndexService.init(
+                    $scope.stateName, stateData.nextContentIdIndex);
                   StateNameService.init($scope.stateName, stateData.name);
                   StateParamChangesService.init(
                     $scope.stateName, stateData.paramChanges);

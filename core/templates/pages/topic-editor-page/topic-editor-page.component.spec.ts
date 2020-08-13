@@ -23,6 +23,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/topic-editor-page/topic-editor-page.component.ts');
 
+import { EventEmitter } from '@angular/core';
+
 describe('Topic editor page', function() {
   var ctrl = null;
   var $scope = null;
@@ -55,16 +57,27 @@ describe('Topic editor page', function() {
 
   it('should load topic based on its id on url when component is initialized' +
     ' and set page title', function() {
-    spyOn(TopicEditorStateService, 'loadTopic').and.stub();
+    let topicInitializedEventEmitter = new EventEmitter();
+    let topicReinitializedEventEmitter = new EventEmitter();
+    spyOn(TopicEditorStateService, 'loadTopic').and.callFake(function() {
+      topicInitializedEventEmitter.emit();
+      topicReinitializedEventEmitter.emit();
+    });
+    spyOnProperty(TopicEditorStateService,
+      'onTopicInitialized').and.returnValue(
+      topicInitializedEventEmitter);
+    spyOnProperty(TopicEditorStateService,
+      'onTopicReinitialized').and.returnValue(
+      topicReinitializedEventEmitter);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
     ctrl.$onInit();
-    $scope.$broadcast('topicInitialized');
-    $scope.$broadcast('topicReinitialized');
 
     expect(TopicEditorStateService.loadTopic).toHaveBeenCalledWith('topic_1');
     expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
+
+    ctrl.$onDestroy();
   });
 
   it('should get active tab name', function() {

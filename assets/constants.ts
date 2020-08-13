@@ -17,6 +17,14 @@ export = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
+  // The term 'staging' is used instead of the classroom url fragment field
+  // in the URL for topics that are not yet attached to a classroom.
+  "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
+
+  // The default classroom URL fragment to use when the provided classroom URL
+  // fragment in the controller is invalid.
+  "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
+
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
@@ -5227,7 +5235,17 @@ export = {
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
+
+  // This represents the maximum number of characters in the URL fragment for
+  // classroom in the classroom page URL. E.g. in /learn/math/...,
+  // 'math' is the 'classroom URL fragment'.
+  "MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_NAME": 39,
+  "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 12,
+  // This represents the maximum number of characters in the URL fragment for
+  // topic in the topic page URL. E.g. in /learn/math/fractions/...,
+  // 'fractions' is the 'topic URL fragment'.
+  "MAX_CHARS_IN_TOPIC_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
@@ -5235,6 +5253,16 @@ export = {
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
+  // This represents the maximum number of characters in the URL fragment for
+  // story in the story page URL. E.g.
+  // in /learn/math/fractions/story/bakery/..., 'bakery' is the
+  // 'story URL fragment'.
+  "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
+  // This represents the maximum number of characters in the URL fragment for
+  // subtopic in the revision page URL. E.g.
+  // in /learn/math/fractions/revision/place-values, 'place-values' is the
+  // 'subtopic URL fragment'.
+  "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
@@ -5261,6 +5289,7 @@ export = {
       "hints": [],
       "solution": null
     },
+    "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
       "voiceovers_mapping": {
@@ -5286,6 +5315,9 @@ export = {
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
 
+  // A regular expression for allowed characters in URL fragment fields.
+  "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
+
   // Invalid names for parameters used in expressions.
   "INVALID_PARAMETER_NAMES": [
     "answer", "choices", "abs", "all", "and", "any", "else",
@@ -5293,12 +5325,45 @@ export = {
   ],
 
   // Greek letters allowed in math interactions.
-  "GREEK_LETTERS": [
-    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
-    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
-    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
-    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
-  ],
+  "GREEK_LETTER_NAMES_TO_SYMBOLS": {
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "ε",
+    "zeta": "ζ",
+    "eta": "η",
+    "theta": "θ",
+    "iota": "ι",
+    "kappa": "κ",
+    "lambda": "λ",
+    "mu": "μ",
+    "nu": "ν",
+    "xi": "ξ",
+    "pi": "π",
+    "rho": "ρ",
+    "sigma": "σ",
+    "tau": "τ",
+    "upsilon": "υ",
+    "phi": "φ",
+    "chi": "χ",
+    "psi": "ψ",
+    "omega": "ω",
+    "Gamma": "Γ",
+    "Delta": "Δ",
+    "Theta": "Θ",
+    "Lambda": "Λ",
+    "Xi": "Ξ",
+    "Pi": "Π",
+    "Sigma": "Σ",
+    "Phi": "Φ",
+    "Psi": "Ψ",
+    "Omega": "Ω"
+  },
+
+  // Number of custom letters allowed in the on-screen keyboard for math
+  // interactions.
+  "MAX_CUSTOM_LETTERS_FOR_OSK": 10,
 
   // Functions allowed in math interactions.
   "MATH_FUNCTION_NAMES": [
@@ -5309,6 +5374,9 @@ export = {
   "OSK_MAIN_TAB": "mainTab",
   "OSK_FUNCTIONS_TAB": "functionsTab",
   "OSK_LETTERS_TAB": "lettersTab",
+
+  "CUSTOM_LETTERS_LATIN_TAB": "latinTab",
+  "CUSTOM_LETTERS_GREEK_TAB": "greekTab",
 
   // Name to human readable form mapping of the position of terms object.
   "POSITION_OF_TERMS_MAPPING": [{
@@ -5351,6 +5419,9 @@ export = {
 
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": false,
+
+  // Link to open when the Oppia avatar is clicked on any page.
+  "OPPIA_AVATAR_LINK_URL": null,
 
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,

@@ -20,9 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import itertools
 import logging
-import re
 
 from constants import constants
 from core import jobs
@@ -38,127 +36,6 @@ import utils
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
-
-ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
-_COMMIT_TYPE_REVERT = 'revert'
-ALL_IMAGES_VERIFIED = 'Images verified'
-ERROR_IN_FILENAME = 'There is an error in the filename'
-FILE_COPIED = 'File Copied'
-FILE_ALREADY_EXISTS = 'File already exists in GCS'
-FILE_FOUND_IN_GCS = 'File found in GCS'
-FILE_IS_NOT_IN_GCS = 'File does not exist in GCS'
-FILE_REFERENCES_NON_EXISTENT_EXP_KEY = 'File references nonexistent exp'
-FILE_REFERENCES_DELETED_EXP_KEY = 'File references deleted exp'
-FILE_DELETED = 'File has been deleted'
-FILE_FOUND_IN_GCS = 'File is there in GCS'
-EXP_REFERENCES_UNICODE_FILES = 'Exploration references unicode files'
-INVALID_GCS_URL = 'The url for the entity on GCS is invalid'
-NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
-WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
-ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
-    'Added compressed versions of images in exploration')
-ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
-ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
-    iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
-GCS_AUDIO_ID_REGEX = re.compile(
-    r'^/([^/]+)/([^/]+)/assets/audio/(([^/]+)\.(' + '|'.join(
-        ALLOWED_AUDIO_EXTENSIONS) + '))$')
-GCS_IMAGE_ID_REGEX = re.compile(
-    r'^/([^/]+)/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
-        ALLOWED_IMAGE_EXTENSIONS) + '))$')
-GCS_EXTERNAL_IMAGE_ID_REGEX = re.compile(
-    r'^/([^/]+)/exploration/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
-        ALLOWED_IMAGE_EXTENSIONS) + '))$')
-SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
-AUDIO_FILE_PREFIX = 'audio'
-AUDIO_ENTITY_TYPE = 'exploration'
-AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
-# This threshold puts a cap on the number of valid inputs, i.e.,
-# expressions/equations that can be yielded by the math expression one-off jobs.
-# The reason for limiting the number of valid inputs yielded by the jobs is that
-# we don't need to closely inspect all of the valid inputs, they are displayed
-# just to make sure that the job output is what we expect.
-VALID_MATH_INPUTS_YIELD_LIMIT = 200
-
-
-class DragAndDropSortInputInteractionOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of all (exploration, state) pairs that use the
-    DragAndDropSortInput interaction and have invalid choices.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-        exp_status = rights_manager.get_exploration_rights(item.id).status
-        if exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-            return
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        validation_errors = []
-        for state_name, state in exploration.states.items():
-            if state.interaction.id == 'DragAndDropSortInput':
-                for answer_group_index, answer_group in enumerate(
-                        state.interaction.answer_groups):
-                    for rule_index, rule_spec in enumerate(
-                            answer_group.rule_specs):
-                        for rule_input in rule_spec.inputs:
-                            value = rule_spec.inputs[rule_input]
-                            if value == '' or value == []:
-                                validation_errors.append(
-                                    'State name: %s, AnswerGroup: %s,' % (
-                                        state_name,
-                                        answer_group_index) +
-                                    ' Rule input %s in rule with index %s'
-                                    ' is empty. ' % (rule_input, rule_index))
-        if validation_errors:
-            yield (item.id, validation_errors)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
-class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of all (exploration, state) pairs that use the
-    Multiple selection interaction and have rules that do not correspond to any
-    answer choices.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.items():
-            if state.interaction.id == 'MultipleChoiceInput':
-                choices_length = len(
-                    state.interaction.customization_args['choices']['value'])
-                for answer_group_index, answer_group in enumerate(
-                        state.interaction.answer_groups):
-                    for rule_index, rule_spec in enumerate(
-                            answer_group.rule_specs):
-                        if rule_spec.inputs['x'] >= choices_length:
-                            yield (
-                                item.id,
-                                'State name: %s, AnswerGroup: %s,' % (
-                                    state_name.encode('utf-8'),
-                                    answer_group_index) +
-                                ' Rule: %s is invalid.' % (rule_index) +
-                                '(Indices here are 0-indexed.)')
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
 
 
 class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -252,6 +129,58 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
+class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-off job for testing exploration migration from any
+    exploration schema version to the latest. This job runs the state
+    migration, but does not commit the new exploration to the store.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExplorationMigrationAuditJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        current_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+
+        states_schema_version = item.states_schema_version
+        versioned_exploration_states = {
+            'states_schema_version': states_schema_version,
+            'states': item.states
+        }
+        while states_schema_version < current_state_schema_version:
+            try:
+                exp_domain.Exploration.update_states_from_model(
+                    versioned_exploration_states, states_schema_version,
+                    item.id)
+                states_schema_version += 1
+            except Exception as e:
+                error_message = (
+                    'Exploration %s failed migration to states v%s: %s' %
+                    (item.id, states_schema_version + 1, e))
+                logging.exception(error_message)
+                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+                break
+
+            if states_schema_version == current_state_schema_version:
+                yield ('SUCCESS', None)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
 class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
     versions. This job will load all existing explorations from the data store
@@ -312,41 +241,6 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
-
-
-class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of (exploration, state) pairs that use the item
-    selection interaction and that have rules that do not match the answer
-    choices. These probably need to be fixed manually.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.items():
-            if state.interaction.id == 'ItemSelectionInput':
-                choices = (
-                    state.interaction.customization_args['choices']['value'])
-                for group in state.interaction.answer_groups:
-                    for rule_spec in group.rule_specs:
-                        for rule_item in rule_spec.inputs['x']:
-                            if rule_item not in choices:
-                                yield (
-                                    item.id,
-                                    '%s: %s' % (
-                                        state_name.encode('utf-8'),
-                                        rule_item.encode('utf-8')))
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
 
 
 class ExplorationMathSvgFilenameValidationOneOffJob(
@@ -667,7 +561,7 @@ class ExplorationContentValidationJobForCKEditor(
             yield (key[:exp_id_index - 1], output_values)
 
 
-class InteractionCustomizationArgsValidationJob(
+class RTECustomizationArgsValidationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job for validating all the customizations arguments of
     Rich Text Components.
@@ -694,20 +588,33 @@ class InteractionCustomizationArgsValidationJob(
         html_list = exploration.get_all_html_content_strings()
         err_dict = html_validation_service.validate_customization_args(
             html_list)
-
         for key in err_dict:
-            if err_dict[key]:
-                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
+            err_value_with_exp_id = err_dict[key]
+            err_value_with_exp_id.append('Exp ID: %s' % item.id)
+            yield (key, err_value_with_exp_id)
 
     @staticmethod
     def reduce(key, values):
         final_values = [ast.literal_eval(value) for value in values]
-        # Combine all values from multiple lists into a single list
-        # for that error type.
-        output_values = list(set().union(*final_values))
-        exp_id_index = key.find('Exp Id:')
-        if exp_id_index == -1:
-            yield (key, output_values)
-        else:
-            output_values.append(key[exp_id_index:])
-            yield (key[:exp_id_index - 1], output_values)
+        flattened_values = [
+            item for sublist in final_values for item in sublist]
+
+        # Errors produced while loading exploration only contain exploration id
+        # in error message, so no further formatting is required. For errors
+        # from validation the output is in format [err1, expid1, err2, expid2].
+        # So, we further format it as [(expid1, err1), (expid2, err2)].
+        if 'loading exploration' in key:
+            yield (key, flattened_values)
+            return
+
+        output_values = []
+        index = 0
+        while index < len(flattened_values):
+            # flattened_values[index] = error message.
+            # flattened_values[index + 1] = exp id in which error message
+            # is present.
+            output_values.append((
+                flattened_values[index + 1], flattened_values[index]))
+            index += 2
+        output_values.sort()
+        yield (key, output_values)

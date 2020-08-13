@@ -38,6 +38,15 @@ SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
 SCHEMA_KEY_VALIDATORS = schema_utils.SCHEMA_KEY_VALIDATORS
 SCHEMA_KEY_DESCRIPTION = 'description'
 SCHEMA_KEY_UI_CONFIG = 'ui_config'
+# This key is used for 'type: custom' objects, as a way of indicating how
+# default ui_config values defined in objects.py should be replaced. The value
+# is a dictionary mapping the accessor of the object value to the ui_config.
+# For example, for SubtitledHtml (defined as a dict), to replace the ui_config
+# of the inner html schema, the accessor/key would be 'html'. Note that the
+# existing ui_config is not replaced or deleted - the frontend needs to handle
+# the override of the ui_config, usually in a custom object editor.
+SCHEMA_KEY_REPLACEMENT_UI_CONFIG = 'replacement_ui_config'
+
 # The following keys are always accepted as optional keys in any schema.
 OPTIONAL_SCHEMA_KEYS = [
     SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS, SCHEMA_KEY_UI_CONFIG,
@@ -53,13 +62,16 @@ SCHEMA_TYPE_HTML = schema_utils.SCHEMA_TYPE_HTML
 SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
 SCHEMA_TYPE_LIST = schema_utils.SCHEMA_TYPE_LIST
 SCHEMA_TYPE_UNICODE = schema_utils.SCHEMA_TYPE_UNICODE
+SCHEMA_TYPE_UNICODE_OR_NONE = schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE
 ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
-    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
+    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST,
+    SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE]
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
-    'ListOfTabs', 'SkillSelector', 'SvgFilename']
+    'ListOfTabs', 'SkillSelector', 'SubtitledHtml', 'SubtitledUnicode',
+    'SvgFilename', 'CustomOskLetters']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not
@@ -172,7 +184,13 @@ VALIDATOR_SPECS = {
         'is_valid_algebraic_expression': {},
         'is_valid_numeric_expression': {},
         'is_valid_math_equation': {},
-        'is_supported_audio_language_code': {}
+        'is_supported_audio_language_code': {},
+        'is_url_fragment': {},
+        'has_length_at_most': {
+            'max_value': {
+                'type': SCHEMA_TYPE_INT
+            }
+        }
     },
 }
 
@@ -271,7 +289,7 @@ def validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
-            [])
+            [SCHEMA_KEY_REPLACEMENT_UI_CONFIG])
         assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(
@@ -425,7 +443,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                     'id': 'is_at_least',
                     'min_value': 'value_of_wrong_type',
                 }]
-            }, 'could not convert string to float: value_of_wrong_type'),
+            }, 'Could not convert unicode to float: value_of_wrong_type'),
             ({
                 'type': 'unicode',
                 'ui_config': {
@@ -615,6 +633,18 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_supported_audio_language_code('zz'))
         self.assertFalse(is_supported_audio_language_code('test'))
 
+    def test_is_url_fragment(self):
+        validate_url_fragment = schema_utils.get_validator(
+            'is_url_fragment')
+
+        self.assertTrue(validate_url_fragment('math'))
+        self.assertTrue(validate_url_fragment('computer-science'))
+        self.assertTrue(validate_url_fragment('bio-tech'))
+
+        self.assertFalse(validate_url_fragment(''))
+        self.assertFalse(validate_url_fragment('Abc'))
+        self.assertFalse(validate_url_fragment('!@#$%^&*()_+='))
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
@@ -651,9 +681,32 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         mappings = [(1.2, 1.2), (3, 3.0), (-1, -1.0), ('1', 1.0)]
         invalid_values_with_error_messages = [
-            ([13], r'float\(\) argument must be a string or a number'),
-            ('abc', 'could not convert string to float: abc'),
-            (None, r'float\(\) argument must be a string or a number')]
+            ([13], r'Could not convert list to float: \[13\]'),
+            ('abc', 'Could not convert unicode to float: abc'),
+            (None, 'Could not convert NoneType to float: None')]
+        self.check_normalization(
+            schema, mappings, invalid_values_with_error_messages)
+
+    def test_int_schema(self):
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_INT,
+        }
+        mappings = [(1.2, 1), (3.7, 3), (-1, -1), ('1', 1)]
+        invalid_values_with_error_messages = [
+            ([13], r'Could not convert list to int: \[13\]'),
+            ('abc', 'Could not convert unicode to int: abc'),
+            (None, 'Could not convert NoneType to int: None')]
+        self.check_normalization(
+            schema, mappings, invalid_values_with_error_messages)
+
+    def test_unicode_or_none_schema(self):
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE,
+        }
+        mappings = [('a', 'a'), ('', ''), (b'bytes', 'bytes'), (None, None)]
+        invalid_values_with_error_messages = [
+            ([], r'Expected unicode string or None, received'),
+        ]
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 

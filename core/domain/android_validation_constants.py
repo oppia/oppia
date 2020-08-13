@@ -13,7 +13,8 @@
 # limitations under the License.
 
 """Constants that are relevant to the validation of new structures for Android
-app.
+app. This file should only contain validations which affect UI display and
+general functionality on Android.
 """
 
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -24,13 +25,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 # interactions or remove existing ones.
 VALID_INTERACTION_IDS = [
     'Continue', 'DragAndDropSortInput', 'EndExploration', 'FractionInput',
-    'ItemSelectionInput', 'MultipleChoiceInput', 'NumericInput',
-    'NumberWithUnits', 'TextInput'
+    'ImageClickInput', 'ItemSelectionInput', 'MultipleChoiceInput',
+    'NumericInput', 'NumberWithUnits', 'TextInput'
 ]
 
 SUPPORTED_LANGUAGES = ['en']
 
-VALID_RTE_COMPONENTS = ['image', 'link', 'skillreview']
+VALID_RTE_COMPONENTS = ['image', 'link', 'math', 'skillreview']
 
 # If any of the following values are changed, edit the corresponding value in
 # app.constants.ts as well.
