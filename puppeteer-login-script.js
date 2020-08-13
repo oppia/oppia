@@ -41,7 +41,7 @@ const login = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Logging into Oppia...');
     // eslint-disable-next-line dot-notation
-    await page.goto(context.url);
+    await page.goto(context.url, { waitUntil: 'networkidle0' });
     await page.waitForSelector('#admin');
     await page.click('#admin');
     await page.click('#submit-login');
@@ -67,7 +67,7 @@ const setRoleAdmin = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Changing role to admin...');
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles');
+    await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
     await page.waitForSelector('#update-role-username-input');
     await page.waitFor(2000);
     await page.type('#update-role-username-input', 'username1');
@@ -98,7 +98,7 @@ const createCollections = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles');
+    await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
     await page.waitFor(2000);
     await page.type('#update-role-username-textbook', 'username1');
     await page.select('#update-role-input', 'string:COLLECTION_EDITOR');
@@ -127,7 +127,7 @@ const createExplorations = async function(context, page) {
     console.log('Creating Exploration...');
     // Load in Exploration
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin');
+    await page.goto('http://127.0.0.1:8181/admin', { waitUntil: 'networkidle0' });
     await page.waitFor(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click(
