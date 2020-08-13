@@ -17,9 +17,6 @@
  * editor.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-/*
 angular.module('oppia').directive('continueButton', [
   function() {
     return {
@@ -33,19 +30,3 @@ angular.module('oppia').directive('continueButton', [
     };
   }
 ]);
-*/
-
-@Component({
-  selector: 'continue-button',
-  templateUrl: './continue-button.directive.html',
-  styleUrls: []
-})
-export class ContinueButtonComponent {
-
-  constructor(
-  ) {}
-  
-  }
-  angular.module('oppia').directive(
-    'conceptCard', downgradeComponent(
-      {component: ContinueButtonComponent}));
