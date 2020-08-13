@@ -33,7 +33,7 @@ from google.appengine.ext import ndb
 current_user_services = models.Registry.import_current_user_services()
 (
     base_models, feedback_models, improvements_models,
-    question_models,  skill_models, story_models,
+    question_models, skill_models, story_models,
     suggestion_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.feedback, models.NAMES.improvements,
@@ -163,7 +163,8 @@ def delete_user(pending_deletion_request):
     _delete_models(pending_deletion_request.user_id, models.NAMES.user,)
     _hard_delete_explorations_and_collections(pending_deletion_request)
     _delete_models(pending_deletion_request.user_id, models.NAMES.improvements)
-    _delete_models(pending_deletion_request.user_id, models.NAMES.feedback)
+    _pseudonymize_feedback_models(pending_deletion_request)
+    _pseudonymize_suggestion_models(pending_deletion_request)
     _pseudonymize_activity_models(
         pending_deletion_request,
         models.NAMES.question,
@@ -344,7 +345,7 @@ def _pseudonymize_activity_models(
                 pseudonymized_user_id)
 
 
-def _pseudonymize_feedback_and_suggestion_models(pending_deletion_request):
+def _pseudonymize_feedback_models(pending_deletion_request):
     """Pseudonymize the activity models for the user with user_id.
 
     Args:
@@ -357,7 +358,7 @@ def _pseudonymize_feedback_and_suggestion_models(pending_deletion_request):
     feedback_thread_models = feedback_thread_model_class.query(ndb.OR(
         feedback_thread_model_class.original_author_id == user_id,
         feedback_thread_model_class.last_nonempty_message_author_id == user_id
-    )).fetch(keys_only=True)
+    )).fetch()
     feedback_ids = set([model.id for model in feedback_thread_models])
 
     feedback_message_model_class = feedback_models.GeneralFeedbackMessageModel
@@ -370,13 +371,13 @@ def _pseudonymize_feedback_and_suggestion_models(pending_deletion_request):
     general_suggestion_models = suggestion_model_class.query(ndb.OR(
         suggestion_model_class.author_id == user_id,
         suggestion_model_class.final_reviewer_id == user_id
-    )).fetch(keys_only=True)
+    )).fetch()
     feedback_ids |= set([model.id for model in general_suggestion_models])
 
     if models.NAMES.feedback not in pending_deletion_request.activity_mappings:
         pending_deletion_request.activity_mappings[models.NAMES.feedback] = (
-            _generate_activity_to_pseudonymized_ids_mapping(
-                models.NAMES.feedback))
+            _generate_activity_to_pseudonymized_ids_mapping(feedback_ids)
+        )
         save_pending_deletion_request(pending_deletion_request)
 
     def _pseudonymize_models(feedback_related_models, pseudonymized_user_id):
@@ -392,11 +393,12 @@ def _pseudonymize_feedback_and_suggestion_models(pending_deletion_request):
             model for model in feedback_related_models
             if isinstance(model, feedback_thread_model_class)]
         for feedback_thread_model in feedback_thread_models:
-            if feedback_thread_model.original_author_id == pseudonymized_user_id:
+            if feedback_thread_model.original_author_id == user_id:
                 feedback_thread_model.original_author_id = pseudonymized_user_id
-            if feedback_thread_model.last_nonempty_message_author_id == pseudonymized_user_id:
-                feedback_thread_model.last_nonempty_message_author_id = pseudonymized_user_id
-        feedback_thread_model_class.put_multi(feedback_thread_model)
+            if feedback_thread_model.last_nonempty_message_author_id == user_id:
+                feedback_thread_model.last_nonempty_message_author_id = (
+                    pseudonymized_user_id)
+        feedback_thread_model_class.put_multi(feedback_thread_models)
 
         feedback_message_models = [
             model for model in feedback_related_models
@@ -409,10 +411,11 @@ def _pseudonymize_feedback_and_suggestion_models(pending_deletion_request):
             model for model in feedback_related_models
             if isinstance(model, suggestion_model_class)]
         for general_suggestion_model in general_suggestion_models:
-            if general_suggestion_model.author_id == pseudonymized_user_id:
+            if general_suggestion_model.author_id == user_id:
                 general_suggestion_model.author_id = pseudonymized_user_id
-            if general_suggestion_model.final_reviewer_id == pseudonymized_user_id:
-                general_suggestion_model.final_reviewer_id = pseudonymized_user_id
+            if general_suggestion_model.final_reviewer_id == user_id:
+                general_suggestion_model.final_reviewer_id = (
+                    pseudonymized_user_id)
         feedback_thread_model_class.put_multi(general_suggestion_models)
 
     feedback_mappings = (
@@ -437,6 +440,63 @@ def _pseudonymize_feedback_and_suggestion_models(pending_deletion_request):
                 pseudonymized_user_id)
 
 
+def _pseudonymize_suggestion_models(pending_deletion_request):
+    """Pseudonymize the activity models for the user with user_id.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to be saved in the datastore.
+    """
+    user_id = pending_deletion_request.user_id
+
+    voiceover_application_class = (
+        suggestion_models.GeneralVoiceoverApplicationModel)
+    voiceover_application_models = voiceover_application_class.query(ndb.OR(
+        voiceover_application_class.author_id == user_id,
+        voiceover_application_class.final_reviewer_id == user_id
+    )).fetch()
+    suggestion_ids = set([model.id for model in voiceover_application_models])
+
+    if (
+            models.NAMES.suggestion not in
+            pending_deletion_request.activity_mappings):
+        pending_deletion_request.activity_mappings[models.NAMES.suggestion] = (
+            _generate_activity_to_pseudonymized_ids_mapping(suggestion_ids)
+        )
+        save_pending_deletion_request(pending_deletion_request)
+
+    suggestion_mappings = (
+        pending_deletion_request.activity_mappings[models.NAMES.suggestion])
+
+    def _pseudonymize_models(voiceover_application_models):
+        """Pseudonymize user ID fields in the models.
+
+        Args:
+            voiceover_application_models:
+                list(GeneralVoiceoverApplicationModel). Models whose user IDs
+                should be pseudonymized.
+        """
+        for voiceover_application_model in voiceover_application_models:
+            if voiceover_application_model.author_id == user_id:
+                voiceover_application_model.author_id = (
+                    suggestion_mappings[voiceover_application_model.id]
+                )
+            if voiceover_application_model.final_reviewer_id == user_id:
+                voiceover_application_model.final_reviewer_id = (
+                    suggestion_mappings[voiceover_application_model.id]
+                )
+        voiceover_application_class.put_multi(voiceover_application_models)
+
+    for i in python_utils.RANGE(
+            0,
+            len(voiceover_application_models),
+            MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+        transaction_services.run_in_transaction(
+            _pseudonymize_models,
+            voiceover_application_models[
+                i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION])
+
+
 def _verify_basic_models_deleted(user_id):
     """Verify that the models that do not represent any activity for the user
     with user_id are deleted.
@@ -448,8 +508,12 @@ def _verify_basic_models_deleted(user_id):
         bool. True if all the improvements and user models were correctly
         deleted, False otherwise.
     """
-    for model_class in models.Registry.get_storage_model_classes(
-            [models.NAMES.improvements, models.NAMES.user]):
+    for model_class in models.Registry.get_storage_model_classes([
+            models.NAMES.feedback,
+            models.NAMES.improvements,
+            models.NAMES.suggestion,
+            models.NAMES.user
+    ]):
         if (model_class.get_deletion_policy() not in
                 [base_models.DELETION_POLICY.KEEP,
                  base_models.DELETION_POLICY.NOT_APPLICABLE] and
