@@ -168,7 +168,7 @@ def cleanup():
     """Kill the running subprocesses and server fired in this program, set
     constants back to default values.
     """
-    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
+    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
     webdriver_download_path = '%s/selenium' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
@@ -422,7 +422,7 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=%s '
         '--log_level=%s --skip_sdk_update_check=true %s' % (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_CLOUD_SDK_BIN,
+            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
             GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH},
         shell=True)

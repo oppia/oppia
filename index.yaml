@@ -9,12 +9,6 @@ indexes:
 
 - kind: "JobModel"
   properties:
-<<<<<<< HEAD
-  - name: "status_code"
-  - name: "time_queued_msec"
-    direction: desc
-- kind: "ExpSummaryModel"
-=======
   - name: status
   - name: next_scheduled_check_time
 
@@ -37,7 +31,6 @@ indexes:
   - name: commit_type
 
 - kind: DeleteExpCopiesRealtimeModel
->>>>>>> upstream/develop
   properties:
   - name: "deleted"
   - name: "status"
@@ -108,11 +101,6 @@ indexes:
   - name: "created_on"
 - kind: "ExplorationRightsModel"
   properties:
-<<<<<<< HEAD
-  - name: "deleted"
-  - name: "status"
-- kind: "FeedbackAnalyticsRealtimeModel"
-=======
   - name: deleted
   - name: status
 
@@ -129,7 +117,6 @@ indexes:
   - name: commit_type
 
 - kind: FeedbackAnalyticsRealtimeModel
->>>>>>> upstream/develop
   properties:
   - name: "realtime_layer"
   - name: "created_on"
@@ -222,9 +209,6 @@ indexes:
   - name: "skill_id"
   - name: "skill_difficulty"
     direction: desc
-<<<<<<< HEAD
-- kind: "RecentUpdatesRealtimeModel"
-=======
 
 - kind: QuestionSnapshotMetadataModel
   properties:
@@ -233,7 +217,6 @@ indexes:
   - name: commit_type
 
 - kind: RecentUpdatesRealtimeModel
->>>>>>> upstream/develop
   properties:
   - name: "realtime_layer"
   - name: "created_on"
@@ -247,19 +230,6 @@ indexes:
   - name: "sent_datetime"
 - kind: "SkillOpportunityModel"
   properties:
-<<<<<<< HEAD
-  - name: "deleted"
-  - name: "created_on"
-- kind: "StatisticsRealtimeModel"
-  properties:
-  - name: "realtime_layer"
-  - name: "created_on"
-- kind: "TaskEntryModel"
-  properties:
-  - name: "composite_entity_id"
-  - name: "status"
-- kind: "UserImpactRealtimeModel"
-=======
   - name: deleted
   - name: created_on
 
@@ -304,7 +274,6 @@ indexes:
   - name: commit_type
 
 - kind: UserContributionScoringModel
->>>>>>> upstream/develop
   properties:
   - name: "realtime_layer"
   - name: "created_on"
