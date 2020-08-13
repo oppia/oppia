@@ -778,7 +778,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                 'Received item which is not in the allowed range of choices')]
 
         self.check_normalization(
-            objects.RatioExpression, mappings, invalid_values_with_error_messages)
+            objects.RatioExpression, mappings,
+            invalid_values_with_error_messages)
 
 
 class SchemaValidityTests(test_utils.GenericTestBase):
