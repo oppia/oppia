@@ -34,6 +34,7 @@ describe('Router Service', () => {
   var refreshStatisticsTabSpy = null;
   var refreshSettingsTabSpy = null;
   var refreshTranslationTabSpy = null;
+  var refreshVersionHistorySpy = null;
 
   beforeEach(angular.mock.module('oppia', $provide => {
     var ugs = new UpgradedServices();
@@ -164,6 +165,7 @@ describe('Router Service', () => {
     refreshStatisticsTabSpy = jasmine.createSpy('refreshStatisticsTab');
     refreshSettingsTabSpy = jasmine.createSpy('refreshSettingsTab');
     refreshTranslationTabSpy = jasmine.createSpy('refreshTranslationTab');
+    refreshVersionHistorySpy = jasmine.createSpy('refreshVersionHistory');
     testSubscriptions = new Subscription();
     testSubscriptions.add(
       RouterService.onRefreshStatisticsTab.subscribe(refreshStatisticsTabSpy));
@@ -172,6 +174,9 @@ describe('Router Service', () => {
     testSubscriptions.add(
       RouterService.onRefreshTranslationTab.subscribe(
         refreshTranslationTabSpy));
+    testSubscriptions.add(
+      RouterService.onRefreshVersionHistory.subscribe(
+        refreshVersionHistorySpy));
   });
 
   afterEach(() => {
@@ -478,9 +483,7 @@ describe('Router Service', () => {
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
-    expect(broadcastSpy).toHaveBeenCalledWith('refreshVersionHistory', {
-      forceRefresh: false
-    });
+    expect(refreshVersionHistorySpy).toHaveBeenCalled();
     expect(RouterService.getActiveTabName()).toBe('history');
 
     expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);

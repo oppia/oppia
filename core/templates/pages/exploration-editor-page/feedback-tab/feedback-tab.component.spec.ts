@@ -51,6 +51,8 @@ describe('Feedback Tab Component', function() {
     $provide.value('StateObjectFactory', TestBed.get(StateObjectFactory));
     $provide.value(
       'SuggestionModalService', TestBed.get(SuggestionModalService));
+    $provide.value(
+      'RouterService', {});
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
