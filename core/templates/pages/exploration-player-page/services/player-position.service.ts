@@ -18,10 +18,6 @@
 
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-<<<<<<< HEAD
-import { EventEmitter, Injectable } from '@angular/core';
-=======
->>>>>>> upstream/develop
 
 import { ContextService } from 'services/context.service';
 import { PlayerTranscriptService } from
@@ -105,7 +101,7 @@ export class PlayerPositionService {
   get onNewCardOpened() {
     return this._newCardOpenedEventEmitter;
   }
-  
+
   get onActiveCardChanged() {
     return this._activeCardChangedEventEmitter;
   }
