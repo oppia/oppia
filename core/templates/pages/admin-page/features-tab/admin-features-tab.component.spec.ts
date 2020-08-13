@@ -24,12 +24,12 @@ import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminFeaturesTabComponent } from './admin-features-tab.component';
 import { AdminPageData } from 'domain/admin/admin-backend-api.service';
-import { FeatureGatingAdminBackendApiService } from
-  'domain/feature_gating/feature-gating-admin-backend-api.service';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformParameterObjectFactory, FeatureStage } from
-  'domain/feature_gating/PlatformParameterObjectFactory';
+  'domain/platform_feature/platform-parameter-object.factory';
 import { PlatformParameterFilterType, ServerMode } from
-  'domain/feature_gating/PlatformParameterFilterObjectFactory';
+  'domain/platform_feature/platform-parameter-filter-object.factory';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 
@@ -39,7 +39,7 @@ fdescribe('Admin page feature tab', function() {
 
   let paramFactory: PlatformParameterObjectFactory;
   let adminDataService: AdminDataService;
-  let featureApiService: FeatureGatingAdminBackendApiService;
+  let featureApiService: PlatformFeatureAdminBackendApiService;
   let windowRef: WindowRef;
 
   let updateApiSpy: jasmine.Spy;
@@ -54,7 +54,7 @@ fdescribe('Admin page feature tab', function() {
 
     paramFactory = TestBed.get( PlatformParameterObjectFactory);
     adminDataService = TestBed.get(AdminDataService);
-    featureApiService = TestBed.get( FeatureGatingAdminBackendApiService);
+    featureApiService = TestBed.get( PlatformFeatureAdminBackendApiService);
     windowRef = TestBed.get(WindowRef);
 
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({

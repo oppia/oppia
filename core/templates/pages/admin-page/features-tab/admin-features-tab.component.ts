@@ -27,21 +27,21 @@ import { AdminDataService } from
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { PlatformParameter, FeatureStage } from
-  'domain/feature_gating/PlatformParameterObjectFactory';
-import { FeatureGatingAdminBackendApiService } from
-  'domain/feature_gating/feature-gating-admin-backend-api.service';
+  'domain/platform_feature/platform-parameter-object.factory';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
 
 import cloneDeep from 'lodash/cloneDeep';
 
 
 import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
-  'domain/feature_gating/PlatformParameterRuleObjectFactory';
+  'domain/platform_feature/platform-parameter-rule-object.factory';
 import {
   PlatformParameterFilterType,
   PlatformParameterFilterObjectFactory,
   PlatformParameterFilter,
   ServerMode,
-} from 'domain/feature_gating/PlatformParameterFilterObjectFactory';
+} from 'domain/platform_feature/platform-parameter-filter-object.factory';
 
 @Component({
   selector: 'admin-features-tab',
@@ -115,7 +115,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     private windowRef: WindowRef,
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
-    private apiService: FeatureGatingAdminBackendApiService,
+    private apiService: PlatformFeatureAdminBackendApiService,
     private ruleFactory: PlatformParameterRuleObjectFactory,
     private filterFactory: PlatformParameterFilterObjectFactory,
   ) {}

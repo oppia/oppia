@@ -46,7 +46,7 @@ import {
   PlatformParameterBackendDict,
   PlatformParameter,
   PlatformParameterObjectFactory
-} from 'domain/feature_gating/PlatformParameterObjectFactory';
+} from 'domain/platform_feature/platform-parameter-object.factory';
 
 
 interface UserRoles {
@@ -82,7 +82,7 @@ export interface AdminPageDataBackendDict {
   'recent_job_data': JobDataBackendDict[];
   'continuous_computations_data': ComputationDataBackendDict[];
   'topic_summaries': TopicSummaryBackendDict[];
-  'feature_flags': {[name: string]: PlatformParameterBackendDict};
+  'feature_flags': PlatformParameterBackendDict[];
 }
 
 export interface AdminPageData {
@@ -140,7 +140,7 @@ export class AdminBackendApiService {
             this.computationDataObjectFactory.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(
             this.topicSummaryObjectFactory.createFromBackendDict),
-          featureFlags: Object.values(response.feature_flags).map(
+          featureFlags: response.feature_flags.map(
             dict => this.platformParameterObjectFactory.createFromBackendDict(
               dict)
           )

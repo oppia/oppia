@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { ServerMode } from
-  'domain/feature_gating/PlatformParameterFilterObjectFactory';
+  'domain/platform_feature/platform-parameter-filter-object.factory';
 
 const constants = require('constants.ts');
 
