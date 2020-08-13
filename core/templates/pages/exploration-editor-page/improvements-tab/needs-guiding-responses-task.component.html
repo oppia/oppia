@@ -1,0 +1,31 @@
+<div class="improvement-task-container">
+  <div class="improvement-task-header">
+    <div class="improvement-task-health-bar critical">&nbsp;</div>
+    <div class="improvement-task-overview">
+      <div class="title">Needs Guiding Responses</div>
+      <div class="summary">Provide feedback for answers that currently do not get any</div>
+    </div>
+  </div>
+  <div class="improvement-task-content">
+    <div class="improvement-task-details">
+      <div class="header">Top answers with no feedback</div>
+      <oppia-visualization-sorted-tiles
+        data="$ctrl.sortedTilesData" options="$ctrl.sortedTilesOptions"
+        total-frequency="$ctrl.sortedTilesTotalFrequency">
+      </oppia-visualization-sorted-tiles>
+      <div class="navigation">
+        <a ng-click="$ctrl.navigateToStateEditor()">
+          Address Answers <i class="material-icons east">east</i>
+        </a>
+      </div>
+    </div>
+    <div class="improvement-task-suggestions">
+      <div class="suggestions-header">suggestions</div>
+      <div class="suggestions-content">
+        <strong>Give direction</strong><br>
+        Address the most frequent wrong answers so that your learners can identify and fix errors in
+        their understanding.
+      </div>
+    </div>
+  </div>
+</div>

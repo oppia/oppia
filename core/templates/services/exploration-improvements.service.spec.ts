@@ -447,6 +447,10 @@ describe('ExplorationImprovementsService', function() {
       const answerStats = new AnswerStats('foo', 'foo', 100, false);
       this.stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(
         Promise.resolve(new Map([[stateName, [answerStats]]])));
+      const expStats = new ExplorationStats(
+        expId, expVersion, 0, 0, 0,
+        new Map([[stateName, new StateStats(0, 0, 0, 0, 0, 0)]]));
+      this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
 
       // Initialize the service, this should generate a new NGR task.
       let p = explorationImprovementsService.initAsync();

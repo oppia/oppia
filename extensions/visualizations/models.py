@@ -153,4 +153,9 @@ class SortedTiles(BaseVisualization):
         'name': 'use_percentages',
         'description': 'Summarize frequency through percentages',
         'schema': {'type': 'bool'},
+    }, {
+        'name': 'frequency_sum',
+        'description': (
+            'The total frequency for when the data is a subset of all answers'),
+        'schema': {'type': 'float'},
     }]

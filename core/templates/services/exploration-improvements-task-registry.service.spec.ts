@@ -464,25 +464,18 @@ describe('Exploration improvements task registrar service', () => {
       ).toEqual(0);
     });
 
-    it('should return the supporting stats of a registered task', () => {
-      const task = makeTask<HighBounceRateTask>(
-        {...taskBackendDict, ...{status: 'open'}});
-      taskRegistryService.initialize(
-        config, makeStates(), makeExpStats(), [task], new Map(), new Map(), []);
+    it('should return tasks for each state in a dictionary', () => {
+      statesBackendDict = {
+        Introduction: stateBackendDict,
+        Middle: stateBackendDict,
+        End: stateBackendDict,
+      };
 
-      expect(taskRegistryService.getSupportingStateStats(task)).toBeDefined();
-    });
-
-    it('should throw an error when fetching the supporting stats of an ' +
-      'unregistered task', () => {
-      delete statesBackendDict.End;
-      const task = makeTask<HighBounceRateTask>(
-        {...taskBackendDict, ...{target_id: 'End'}});
       taskRegistryService.initialize(
         config, makeStates(), makeExpStats(), [], new Map(), new Map(), []);
 
-      expect(() => taskRegistryService.getSupportingStateStats(task))
-        .toThrowError('Unregistered task has no supporting stats');
+      expect(Object.keys(taskRegistryService.makeStateTasksDictionary()))
+        .toEqual(jasmine.arrayContaining(['Introduction', 'Middle', 'End']));
     });
   });
 

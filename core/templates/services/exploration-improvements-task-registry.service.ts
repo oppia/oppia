@@ -20,6 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { group } from 'd3-array';
+import { Dictionary, fromPairs } from 'lodash';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { States } from 'domain/exploration/StatesObjectFactory';
@@ -49,6 +50,7 @@ import {
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
+import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
 
 type HbrTask = HighBounceRateTask;
 type IflTask = IneffectiveFeedbackLoopTask;
@@ -73,17 +75,20 @@ type MisPlaythroughIssue = MultipleIncorrectSubmissionsPlaythroughIssue;
  * would be holding a reference to the exact same instance. Instead, we pass
  * them explicitly as needed.
  */
-class SupportingStateStats {
+export class SupportingStateStats {
+  public readonly stateStats: StateStats;
   public readonly answerStats: readonly AnswerStats[];
   public readonly cstPlaythroughIssues: readonly CstPlaythroughIssue[];
   public readonly eqPlaythroughIssues: readonly EqPlaythroughIssue[];
   public readonly misPlaythroughIssues: readonly MisPlaythroughIssue[];
 
   constructor(
+      stateStats: StateStats,
       answerStats: readonly AnswerStats[] = [],
       cstPlaythroughIssues: readonly CstPlaythroughIssue[] = [],
       eqPlaythroughIssues: readonly EqPlaythroughIssue[] = [],
       misPlaythroughIssues: readonly MisPlaythroughIssue[] = []) {
+    this.stateStats = stateStats;
     this.answerStats = [...answerStats];
     this.cstPlaythroughIssues = [...cstPlaythroughIssues];
     this.eqPlaythroughIssues = [...eqPlaythroughIssues];
@@ -98,18 +103,18 @@ class SupportingStateStats {
  * The class provides a container-like interface for convenience and because it
  * fits with the "container" model the class aims to fulfill.
  */
-class StateTasks implements Iterable<ExplorationTask> {
+export class StateTasks implements Iterable<ExplorationTask> {
   public readonly hbrTask: HighBounceRateTask;
   public readonly iflTask: IneffectiveFeedbackLoopTask;
   public readonly ngrTask: NeedsGuidingResponsesTask;
   public readonly siaTask: SuccessiveIncorrectAnswersTask;
   public readonly length: number = 4;
 
-  public readonly supportingStateStats: SupportingStateStats;
+  public readonly supportingStats: SupportingStateStats;
 
   constructor(
       tasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask>,
-      supportingStateStats: SupportingStateStats = new SupportingStateStats()) {
+      supportingStats: SupportingStateStats) {
     this.hbrTask = <HbrTask> tasksByType.get(
       ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
     this.iflTask = <IflTask> tasksByType.get(
@@ -118,20 +123,19 @@ class StateTasks implements Iterable<ExplorationTask> {
       ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
     this.siaTask = <SiaTask> tasksByType.get(
       ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
-
-    this.supportingStateStats = supportingStateStats;
+    this.supportingStats = supportingStats;
   }
 
   public refresh(
       expStats: ExplorationStats, config: ExplorationImprovementsConfig): void {
     this.hbrTask.refreshStatus(
-      expStats, this.supportingStateStats.eqPlaythroughIssues.length, config);
+      expStats, this.supportingStats.eqPlaythroughIssues.length, config);
     this.iflTask.refreshStatus(
-      this.supportingStateStats.cstPlaythroughIssues.length);
+      this.supportingStats.cstPlaythroughIssues.length);
     this.ngrTask.refreshStatus(
-      this.supportingStateStats.answerStats);
+      this.supportingStats.answerStats);
     this.siaTask.refreshStatus(
-      this.supportingStateStats.misPlaythroughIssues.length);
+      this.supportingStats.misPlaythroughIssues.length);
   }
 
   *[Symbol.iterator](): Iterator<ExplorationTask> {
@@ -218,18 +222,20 @@ export class ExplorationImprovementsTaskRegistryService {
   }
 
   onStateAdded(newStateName: string): void {
+    this.expStats = this.expStats.createNewWithStateAdded(newStateName);
     const newStateTasks = new StateTasks(
       new Map(ImprovementsConstants.TASK_TYPES.map(taskType => [
         taskType, this.explorationTaskObjectFactory.createNewObsoleteTask(
           this.config.explorationId, this.config.explorationVersion, taskType,
           newStateName),
-      ])));
+      ])),
+      new SupportingStateStats(this.expStats.getStateStats(newStateName)));
 
     this.tasksByState.set(newStateName, newStateTasks);
-    this.expStats = this.expStats.createNewWithStateAdded(newStateName);
   }
 
   onStateDeleted(oldStateName: string): void {
+    this.expStats = this.expStats.createNewWithStateDeleted(oldStateName);
     const oldStateTasks = this.tasksByState.get(oldStateName);
 
     for (const oldTask of oldStateTasks) {
@@ -242,10 +248,11 @@ export class ExplorationImprovementsTaskRegistryService {
     // Map uses the reserved keyword delete as a method name.
     // eslint-disable-next-line dot-notation
     this.tasksByState.delete(oldStateName);
-    this.expStats = this.expStats.createNewWithStateDeleted(oldStateName);
   }
 
   onStateRenamed(oldStateName: string, newStateName: string): void {
+    this.expStats = this.expStats.createNewWithStateRenamed(
+      oldStateName, newStateName);
     const oldStateTasks = this.tasksByState.get(oldStateName);
     const newStateTasks = new StateTasks(
       new Map(oldStateTasks.map(oldTask => [
@@ -255,7 +262,12 @@ export class ExplorationImprovementsTaskRegistryService {
           ...{target_id: newStateName},
         })
       ])),
-      oldStateTasks.supportingStateStats);
+      new SupportingStateStats(
+        this.expStats.getStateStats(newStateName),
+        oldStateTasks.supportingStats.answerStats,
+        oldStateTasks.supportingStats.cstPlaythroughIssues,
+        oldStateTasks.supportingStats.eqPlaythroughIssues,
+        oldStateTasks.supportingStats.misPlaythroughIssues));
 
     for (const newTask of newStateTasks) {
       if (newTask.isOpen()) {
@@ -273,8 +285,6 @@ export class ExplorationImprovementsTaskRegistryService {
     // Map uses the reserved keyword delete as a method name.
     // eslint-disable-next-line dot-notation
     this.tasksByState.delete(oldStateName);
-    this.expStats = this.expStats.createNewWithStateRenamed(
-      oldStateName, newStateName);
   }
 
   onStateInteractionSaved(state: State): void {
@@ -301,11 +311,8 @@ export class ExplorationImprovementsTaskRegistryService {
       ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
   }
 
-  getSupportingStateStats(task: ExplorationTask): SupportingStateStats {
-    if (!this.tasksByState.has(task.targetId)) {
-      throw new Error('Unregistered task has no supporting stats');
-    }
-    return this.tasksByState.get(task.targetId).supportingStateStats;
+  makeStateTasksDictionary(): Dictionary<StateTasks> {
+    return fromPairs([...this.tasksByState]);
   }
 
   private validateInitializationArgs(
@@ -398,6 +405,10 @@ export class ExplorationImprovementsTaskRegistryService {
       cstPlaythroughIssues: readonly CstPlaythroughIssue[],
       eqPlaythroughIssues: readonly EqPlaythroughIssue[],
       misPlaythroughIssues: readonly MisPlaythroughIssue[]): StateTasks {
+    if (!this.expStats.hasStateStates(stateName)) {
+      // Not an error to be missing stats.
+      this.expStats = this.expStats.createNewWithStateAdded(stateName);
+    }
     const tasksByType = new Map(<[ExplorationTaskType, ExplorationTask][]> [
       // NOTE TO DEVELOPERS: The last repeated key wins. For example:
       //    let map = new Map([['a', 1], ['b', 3], ['a', 9]]);
@@ -416,10 +427,10 @@ export class ExplorationImprovementsTaskRegistryService {
           stateName)
       ]),
     ]);
-    const supportingStateStats = new SupportingStateStats(
-      answerStats, cstPlaythroughIssues, eqPlaythroughIssues,
-      misPlaythroughIssues);
-    const newStateTasks = new StateTasks(tasksByType, supportingStateStats);
+    const supportingStats = new SupportingStateStats(
+      this.expStats.getStateStats(stateName), answerStats, cstPlaythroughIssues,
+      eqPlaythroughIssues, misPlaythroughIssues);
+    const newStateTasks = new StateTasks(tasksByType, supportingStats);
 
     for (const task of newStateTasks) {
       if (task.isOpen()) {
