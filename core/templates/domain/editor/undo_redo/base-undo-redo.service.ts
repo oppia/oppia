@@ -17,6 +17,8 @@
  * Changes may be undone, redone, or replaced.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require('domain/editor/editor-domain.constants.ajs.ts');
 
 /**
@@ -25,15 +27,15 @@ require('domain/editor/editor-domain.constants.ajs.ts');
  * not currently supported.
  */
 angular.module('oppia').factory('BaseUndoRedoService', [
-  '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
-  function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+  function() {
     var BaseUndoRedoService = {};
 
     this._appliedChanges = [];
     this._undoneChanges = [];
+    this._undoRedoChangeEventEmitter = new EventEmitter();
 
     var _dispatchMutation = function() {
-      $rootScope.$broadcast(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
+      this._undoRedoChangeEventEmitter.emit();
     };
     var _applyChange = function(changeObject, domainObject) {
       changeObject.applyChange(domainObject);
@@ -50,6 +52,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /* eslint-enable dot-notation */
       this._appliedChanges = [];
       this._undoneChanges = [];
+      this._undoRedoChangeEventEmitter = new EventEmitter();
     };
 
     /**
@@ -175,7 +178,14 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /* eslint-enable dot-notation */
       this._appliedChanges = [];
       this._undoneChanges = [];
+      this._undoRedoChangeAppliedEventEmitter = new EventEmitter();
       _dispatchMutation();
+    };
+
+    /* eslint-disable dot-notation */
+    BaseUndoRedoService['onUndoRedoChangeApplied'] = function() {
+    /* eslint-enable dot-notation */
+      return this._undoRedoChangeEventEmitter;
     };
 
     return BaseUndoRedoService;
