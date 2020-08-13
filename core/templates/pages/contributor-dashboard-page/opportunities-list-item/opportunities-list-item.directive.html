@@ -9,7 +9,7 @@
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
-  <div class="oppia-opportunities-progress oppia-animate-fadein" ng-if="$ctrl.isProgressBarRequired()">
+  <div class="oppia-opportunities-progress oppia-animate-fadein" ng-if="isProgressBarRequired()">
     <div class="oppia-opportunities-progress-bar">
       <div ng-show="!$ctrl.opportunityDataIsLoading" class="progress">
         <div class="progress-bar bg-success" role="progressbar" ng-style="$ctrl.progressBarStyle"></div>
@@ -21,13 +21,13 @@
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
-  <div class="oppia-opportunities-label-container oppia-animate-fadein"ng-if="$ctrl.isLabelRequired()">
+  <div class="oppia-opportunities-label-container oppia-animate-fadein"ng-if="isLabelRequired()">
     <div class="oppia-opportunities-label" ng-style="$ctrl.labelStyle" >
       <span ng-show="!$ctrl.opportunityDataIsLoading"><[$ctrl.labelText]></span>
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
-    <button ng-show="!$ctrl.opportunityDataIsLoading" class="oppia-opportunities-button" ng-click="$ctrl.onClickActionButton($ctrl.opportunity.id)"><[$ctrl.opportunity.actionButtonTitle]></button>
+    <button ng-show="!$ctrl.opportunityDataIsLoading" class="oppia-opportunities-button" ng-click="onClickActionButton($ctrl.opportunity.id)"><[$ctrl.opportunity.actionButtonTitle]></button>
   </div>
 </div>

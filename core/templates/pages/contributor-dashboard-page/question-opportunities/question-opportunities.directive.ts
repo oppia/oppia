@@ -52,7 +52,7 @@ require('domain/question/QuestionObjectFactory.ts');
 require('interactions/codemirrorRequires.ts');
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.component.ts');
+  'opportunities-list.directive.ts');
 require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
