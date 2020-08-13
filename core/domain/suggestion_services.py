@@ -201,8 +201,8 @@ def get_translation_suggestions_with_exp_ids(exp_ids):
         return []
 
     return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
+        get_suggestion_from_model(s) for s in
+        suggestion_models.GeneralSuggestionModel
         .get_translation_suggestions_with_exp_ids(exp_ids)
     ]
 
@@ -216,9 +216,8 @@ def get_all_stale_suggestions():
     """
 
     return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_all_stale_suggestions()
+        get_suggestion_from_model(s) for s in
+        suggestion_models.GeneralSuggestionModel.get_all_stale_suggestions()
     ]
 
 
@@ -636,10 +635,10 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
         list(str). All user_ids of users who are allowed to review in the given
         category.
     """
-    return [model.user_id for model in
-            user_models.UserContributionScoringModel
-            .get_all_users_with_score_above_minimum_for_category(
-                score_category)]
+    return [
+        model.user_id for model in user_models.UserContributionScoringModel
+        .get_all_users_with_score_above_minimum_for_category(score_category)
+    ]
 
 
 def increment_score_for_user(user_id, score_category, increment_by):
