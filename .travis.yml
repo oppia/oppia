@@ -65,16 +65,16 @@ script:
 # We are using travis_wait here because webpack can take more than 10 minutes
 # to compile. If this is not done, then the test may stall due
 # to lack of test output during this time.
-- if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_PLAYER_FEATURES" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_CONTRIBUTOR_DASHBOARD" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait python -m scripts.run_e2e_tests --suite="contributorDashboard"  --contributor_dashboard_enabled --prod_env; fi
-- if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_CREATOR_DASHBOARD" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_AND_HISTORY_TAB" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait python -m scripts.run_e2e_tests --suite="explorationFeedbackTab" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationHistoryTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_AND_TRANSLATION_TAB" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait python -m scripts.run_e2e_tests --suite="explorationStatisticsTab" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationTranslationTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait python -m scripts.run_e2e_tests --suite="extensions" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait python -m scripts.run_e2e_tests --suite="learner" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait python -m scripts.run_e2e_tests --suite="embedding" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_PLAYER_FEATURES" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait 60 python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_CONTRIBUTOR_DASHBOARD" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait 60 python -m scripts.run_e2e_tests --suite="contributorDashboard"  --contributor_dashboard_enabled --prod_env; fi
+- if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait 60 python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_CREATOR_DASHBOARD" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait 60 python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_AND_HISTORY_TAB" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait 60 python -m scripts.run_e2e_tests --suite="explorationFeedbackTab" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationHistoryTab" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_AND_TRANSLATION_TAB" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait 60 python -m scripts.run_e2e_tests --suite="explorationStatisticsTab" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationTranslationTab" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait 60 python -m scripts.run_e2e_tests --suite="extensions" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait 60 python -m scripts.run_e2e_tests --suite="learner" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait 60 python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_wait 60 python -m scripts.run_e2e_tests --suite="embedding" --prod_env; fi
 
 cache:
   # Cache Oppia's dependencies.
