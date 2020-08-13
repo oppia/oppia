@@ -77,247 +77,181 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-interface AlgebraicExpressionInputCustomizationArgsBackendDictReplacement {}
+// Compares the customization argument frontend dict and backend dict after
+// replacing properties of the backend dict by properties in the Replacements
+// interface.
+type IsExactAfterReplacement<BackendDict, Replacements, FrontendDict> = (
+  IsExact<
+    FrontendDict,
+    Omit<BackendDict, keyof Replacements> & Replacements
+  >
+);
+
+
 type TestAlgebraicExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      AlgebraicExpressionInputCustomizationArgs,
-      Omit<
-        AlgebraicExpressionInputCustomizationArgsBackendDict,
-        keyof AlgebraicExpressionInputCustomizationArgsBackendDictReplacement
-      > & AlgebraicExpressionInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    AlgebraicExpressionInputCustomizationArgsBackendDict,
+    {},
+    AlgebraicExpressionInputCustomizationArgs
+  >
 >;
 
-interface CodeReplCustomizationArgsBackendDictReplacement {}
 type TestCodeReplCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      CodeReplCustomizationArgs,
-      Omit<
-        CodeReplCustomizationArgsBackendDict,
-        keyof CodeReplCustomizationArgsBackendDictReplacement
-      > & CodeReplCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    CodeReplCustomizationArgsBackendDict,
+    {},
+    CodeReplCustomizationArgs
+  >
 >;
 
-interface ContinueCustomizationArgsBackendDictReplacement {
-  buttonText?: {value: SubtitledUnicode};
-}
 type TestContinueCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      ContinueCustomizationArgs,
-      Omit<
-        ContinueCustomizationArgsBackendDict,
-        keyof ContinueCustomizationArgsBackendDictReplacement
-      > & ContinueCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    ContinueCustomizationArgsBackendDict,
+    {buttonText?: {value: SubtitledUnicode}},
+    ContinueCustomizationArgs
+  >
 >;
 
-interface DragAndDropSortInputCustomizationArgsBackendDictReplacement {
-  choices?: {value: SubtitledHtml[]};
-}
 type TestDragAndDropSortInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      DragAndDropSortInputCustomizationArgs,
-      Omit<
-        DragAndDropSortInputCustomizationArgsBackendDict,
-        keyof DragAndDropSortInputCustomizationArgsBackendDictReplacement
-      > & DragAndDropSortInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    DragAndDropSortInputCustomizationArgsBackendDict,
+    {choices?: {value: SubtitledHtml[]}},
+    DragAndDropSortInputCustomizationArgs
+  >
 >;
 
-interface EndExplorationCustomizationArgsBackendDictReplacement {}
 type TestEndExplorationCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      EndExplorationCustomizationArgs,
-      Omit<
-        EndExplorationCustomizationArgsBackendDict,
-        keyof EndExplorationCustomizationArgsBackendDictReplacement
-      > & EndExplorationCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    EndExplorationCustomizationArgsBackendDict,
+    {},
+    EndExplorationCustomizationArgs
+  >
 >;
 
-interface FractionInputCustomizationArgsBackendDictReplacement {
-  customPlaceholder?: {value: SubtitledUnicode};
-}
 type TestFractionInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      FractionInputCustomizationArgs,
-      Omit<
-        FractionInputCustomizationArgsBackendDict,
-        keyof FractionInputCustomizationArgsBackendDictReplacement
-      > & FractionInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    FractionInputCustomizationArgsBackendDict,
+    {customPlaceholder?: {value: SubtitledUnicode}},
+    FractionInputCustomizationArgs
+  >
 >;
 
-interface GraphInputCustomizationArgsBackendDictReplacement {}
 type TestGraphInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      GraphInputCustomizationArgs,
-      Omit<
-        GraphInputCustomizationArgsBackendDict,
-        keyof GraphInputCustomizationArgsBackendDictReplacement
-      > & GraphInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    GraphInputCustomizationArgsBackendDict,
+    {},
+    GraphInputCustomizationArgs
+  >
 >;
 
-interface ImageClickInputCustomizationArgsBackendDictReplacement {}
 type TestImageClickInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      ImageClickInputCustomizationArgs,
-      Omit<
-        ImageClickInputCustomizationArgsBackendDict,
-        keyof ImageClickInputCustomizationArgsBackendDictReplacement
-      > & ImageClickInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    ImageClickInputCustomizationArgsBackendDict,
+    {},
+    ImageClickInputCustomizationArgs
+  >
 >;
 
-interface InteractiveMapCustomizationArgsBackendDictReplacement {}
 type TestInteractiveMapCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      InteractiveMapCustomizationArgs,
-      Omit<
-        InteractiveMapCustomizationArgsBackendDict,
-        keyof InteractiveMapCustomizationArgsBackendDictReplacement
-      > & InteractiveMapCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    InteractiveMapCustomizationArgsBackendDict,
+    {},
+    InteractiveMapCustomizationArgs
+  >
 >;
 
-interface ItemSelectionInputCustomizationArgsBackendDictReplacement {
-  choices?: {value: SubtitledHtml[]};
-}
 type TestItemSelectionInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      ItemSelectionInputCustomizationArgs,
-      Omit<
-        ItemSelectionInputCustomizationArgsBackendDict,
-        keyof ItemSelectionInputCustomizationArgsBackendDictReplacement
-      > & ItemSelectionInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    ItemSelectionInputCustomizationArgsBackendDict,
+    {choices?: {value: SubtitledHtml[]}},
+    ItemSelectionInputCustomizationArgs
+  >
 >;
 
-interface LogicProofCustomizationArgsBackendDictReplacement {}
 type TestLogicProofCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      LogicProofCustomizationArgs,
-      Omit<
-        LogicProofCustomizationArgsBackendDict,
-        keyof LogicProofCustomizationArgsBackendDictReplacement
-      > & LogicProofCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    LogicProofCustomizationArgsBackendDict,
+    {},
+    LogicProofCustomizationArgs
+  >
 >;
 
-interface MathEquationInputCustomizationArgsBackendDictReplacement {}
 type TestMathEquationInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      MathEquationInputCustomizationArgs,
-      Omit<
-        MathEquationInputCustomizationArgsBackendDict,
-        keyof MathEquationInputCustomizationArgsBackendDictReplacement
-      > & MathEquationInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    MathEquationInputCustomizationArgsBackendDict,
+    {},
+    MathEquationInputCustomizationArgs
+  >
 >;
 
-interface MathExpressionInputCustomizationArgsBackendDictReplacement {}
 type TestMathExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      MathExpressionInputCustomizationArgs,
-      Omit<
-        MathExpressionInputCustomizationArgsBackendDict,
-        keyof MathExpressionInputCustomizationArgsBackendDictReplacement
-      > & MathExpressionInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    MathExpressionInputCustomizationArgsBackendDict,
+    {},
+    MathExpressionInputCustomizationArgs
+  >
 >;
 
-interface MultipleChoiceInputCustomizationArgsBackendDictReplacement {
-  choices?: {value: SubtitledHtml[]};
-}
 type TestMultipleChoiceInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      MultipleChoiceInputCustomizationArgs,
-      Omit<
-        MultipleChoiceInputCustomizationArgsBackendDict,
-        keyof MultipleChoiceInputCustomizationArgsBackendDictReplacement
-      > & MultipleChoiceInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    MultipleChoiceInputCustomizationArgsBackendDict,
+    {choices?: {value: SubtitledHtml[]}},
+    MultipleChoiceInputCustomizationArgs
+  >
 >;
 
-interface MusicNotesInputCustomizationArgsBackendDictReplacement {}
 type TestMusicNotesInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      MusicNotesInputCustomizationArgs,
-      Omit<
-        MusicNotesInputCustomizationArgsBackendDict,
-        keyof MusicNotesInputCustomizationArgsBackendDictReplacement
-      > & MusicNotesInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    MusicNotesInputCustomizationArgsBackendDict,
+    {},
+    MusicNotesInputCustomizationArgs
+  >
 >;
 
-interface NumberWithUnitsCustomizationArgsBackendDictReplacement {}
 type TestNumberWithUnitsCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      NumberWithUnitsCustomizationArgs,
-      Omit<
-        NumberWithUnitsCustomizationArgsBackendDict,
-        keyof NumberWithUnitsCustomizationArgsBackendDictReplacement
-      > & NumberWithUnitsCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    NumberWithUnitsCustomizationArgsBackendDict,
+    {},
+    NumberWithUnitsCustomizationArgs
+  >
 >;
 
-interface NumericExpressionInputCustomizationArgsBackendDictReplacement {}
 type TestNumericExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      NumericExpressionInputCustomizationArgs,
-      Omit<
-        NumericExpressionInputCustomizationArgsBackendDict,
-        keyof NumericExpressionInputCustomizationArgsBackendDictReplacement
-      > & NumericExpressionInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    NumericExpressionInputCustomizationArgsBackendDict,
+    {},
+    NumericExpressionInputCustomizationArgs
+  >
 >;
 
-interface NumericInputCustomizationArgsBackendDictReplacement {}
 type TestNumericInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      NumericInputCustomizationArgs,
-      Omit<
-        NumericInputCustomizationArgsBackendDict,
-        keyof NumericInputCustomizationArgsBackendDictReplacement
-      > & NumericInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    NumericInputCustomizationArgsBackendDict,
+    {},
+    NumericInputCustomizationArgs
+  >
 >;
 
-interface PencilCodeEditorCustomizationArgsBackendDictReplacement {}
 type TestPencilCodeEditorCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      PencilCodeEditorCustomizationArgs,
-      Omit<
-        PencilCodeEditorCustomizationArgsBackendDict,
-        keyof PencilCodeEditorCustomizationArgsBackendDictReplacement
-      > & PencilCodeEditorCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    PencilCodeEditorCustomizationArgsBackendDict,
+    {},
+    PencilCodeEditorCustomizationArgs
+  >
 >;
 
-interface SetInputCustomizationArgsBackendDictReplacement {
-  buttonText?: {value: SubtitledUnicode};
-}
 type TestSetInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      SetInputCustomizationArgs,
-      Omit<
-        SetInputCustomizationArgsBackendDict,
-        keyof SetInputCustomizationArgsBackendDictReplacement
-      > & SetInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    SetInputCustomizationArgsBackendDict,
+    {buttonText?: {value: SubtitledUnicode}},
+    SetInputCustomizationArgs
+  >
 >;
 
-interface TextInputCustomizationArgsBackendDictReplacement {
-  placeholder?: {value: SubtitledUnicode};
-}
 type TestTextInputCustomizationArgsInterfacesMatch = AssertTrue<
-    IsExact<
-      TextInputCustomizationArgs,
-      Omit<
-        TextInputCustomizationArgsBackendDict,
-        keyof TextInputCustomizationArgsBackendDictReplacement
-      > & TextInputCustomizationArgsBackendDictReplacement
-    >
+  IsExactAfterReplacement<
+    TextInputCustomizationArgsBackendDict,
+    {placeholder?: {value: SubtitledUnicode}},
+    TextInputCustomizationArgs
+  >
 >;

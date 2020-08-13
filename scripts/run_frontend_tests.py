@@ -41,6 +41,11 @@ a single test or test suite.
 """)
 
 _PARSER.add_argument(
+    '--dtslint_only',
+    help='optional; if specified, only runs dtslint type tests.',
+    action='store_true'
+)
+_PARSER.add_argument(
     '--skip_install',
     help='optional; if specified, skips installing dependencies',
     action='store_true')
@@ -54,6 +59,7 @@ _PARSER.add_argument(
     help='option; if specified, checks frontend test coverage',
     action='store_true'
 )
+
 
 def run_dtslint_type_tests():
     """Runs the dtslint type tests in typings/tests."""
@@ -71,17 +77,18 @@ def run_dtslint_type_tests():
         if line:
             python_utils.PRINT(line, end='')
             output_lines.append(line)
-    concatenated_output = ''.join(
-        line.decode('utf-8') for line in output_lines)
     python_utils.PRINT('Done!')
     if task.returncode:
         sys.exit('The dtslint (type tests) failed.')
 
+
 def main(args=None):
     """Runs the frontend tests."""
-    run_dtslint_type_tests()
-
     parsed_args = _PARSER.parse_args(args=args)
+
+    run_dtslint_type_tests()
+    if parsed_args.dtslint_only:
+        return
 
     if not parsed_args.skip_install:
         install_third_party_libs.main()
@@ -141,6 +148,7 @@ def main(args=None):
             check_frontend_coverage.main()
     elif task.returncode:
         sys.exit(task.returncode)
+
 
 if __name__ == '__main__':
     main()
