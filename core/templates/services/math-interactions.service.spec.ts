@@ -84,11 +84,13 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     // Failure cases.
-    expect(mathInteractionsService.validateExpression('', [], true)).toBeFalse();
+    expect(mathInteractionsService.validateExpression(
+      '', [], true)).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Please enter an answer before submitting.');
 
-    expect(mathInteractionsService.validateExpression('a/', ['a'], true)).toBeFalse();
+    expect(mathInteractionsService.validateExpression(
+      'a/', ['a'], true)).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a variable/number after the "/".');
 
