@@ -64,7 +64,11 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -84,7 +88,12 @@ describe('Exploration editor tab component', function() {
   var stateEditorService = null;
   var subtitledHtmlObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(function() {
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
@@ -168,7 +177,13 @@ describe('Exploration editor tab component', function() {
         },
         interaction: {
           id: 'TextInput',
-          customization_args: {},
+          customization_args: {
+            placeholder: {value: {
+              content_id: 'ca_placeholder',
+              unicode_str: ''
+            }},
+            rows: {value: 1}
+          },
           answer_groups: [{
             rule_specs: [],
             outcome: {
@@ -202,6 +217,7 @@ describe('Exploration editor tab component', function() {
           },
           hints: []
         },
+        next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
         recorded_voiceovers: {
@@ -245,6 +261,13 @@ describe('Exploration editor tab component', function() {
         },
         interaction: {
           id: 'TextInput',
+          customization_args: {
+            placeholder: {value: {
+              content_id: 'ca_placeholder',
+              unicode_str: ''
+            }},
+            rows: {value: 1}
+          },
           answer_groups: [{
             rule_specs: [],
             outcome: {
@@ -270,6 +293,7 @@ describe('Exploration editor tab component', function() {
           },
           hints: []
         },
+        next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
         written_translations: {
@@ -367,6 +391,18 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
   });
 
+  it('should save state next content id index successfully', function() {
+    stateEditorService.setActiveStateName('First State');
+    expect(
+      explorationStatesService.getState('First State').nextContentIdIndex
+    ).toEqual(0);
+
+    ctrl.saveNextContentIdIndex(2);
+    expect(
+      explorationStatesService.getState('First State').nextContentIdIndex
+    ).toBe(2);
+  });
+
   it('should save interaction answer groups successfully', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
@@ -445,7 +481,10 @@ describe('Exploration editor tab component', function() {
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
 
-    expect(stateEditorService.interaction.customizationArgs).toEqual({});
+    expect(stateEditorService.interaction.customizationArgs).toEqual({
+      rows: { value: 1 },
+      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') }
+    });
 
     var displayedValue = {
       placeholder: {

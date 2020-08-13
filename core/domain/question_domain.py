@@ -24,12 +24,15 @@ import datetime
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import customization_args_util
 from core.domain import exp_domain
+from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
+from extensions import domain
 import feconf
 import python_utils
 import schema_utils
@@ -225,7 +228,7 @@ class Question(python_utils.OBJECT):
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
-                initalize a State domain object.
+                initialize a State domain object.
 
         Returns:
             dict. The converted question_state_dict.
@@ -245,7 +248,7 @@ class Question(python_utils.OBJECT):
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
-                initalize a State domain object.
+                initialize a State domain object.
 
         Returns:
             dict. The converted question_state_dict.
@@ -329,7 +332,8 @@ class Question(python_utils.OBJECT):
         """
         question_state_dict = state_domain.State.convert_html_fields_in_state(
             question_state_dict,
-            html_validation_service.add_math_content_to_math_rte_components)
+            html_validation_service.add_math_content_to_math_rte_components,
+            state_uses_old_interaction_cust_args_schema=True)
         return question_state_dict
 
     @classmethod
@@ -456,6 +460,257 @@ class Question(python_utils.OBJECT):
                         correct_answer)
                     question_state_dict['interaction'][
                         'solution']['correct_answer'] = correct_answer
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v35_dict_to_v36_dict(cls, question_state_dict):
+        """Converts from version 35 to 36. Version 35 adds translation support
+        for interaction customization arguments. This migration converts
+        customization arguments whose schemas have been changed from unicode to
+        SubtitledUnicode or html to SubtitledHtml. It also populates missing
+        customization argument keys on all interactions, removes extra
+        customization arguments, normalizes customization arguments against
+        its schema, and changes PencilCodeEditor's customization argument
+        name from initial_code to initialCode.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        max_existing_content_id_index = -1
+        translations_mapping = question_state_dict[
+            'written_translations']['translations_mapping']
+        for content_id in translations_mapping:
+            # Find maximum existing content_id index.
+            content_id_suffix = content_id.split('_')[-1]
+
+            # Possible values of content_id_suffix are a digit, or from
+            # a 'outcome' (from 'default_outcome'). If the content_id_suffix
+            # is not a digit, we disregard it here.
+            if content_id_suffix.isdigit():
+                max_existing_content_id_index = max(
+                    max_existing_content_id_index,
+                    int(content_id_suffix)
+                )
+
+            # Move 'html' field to 'translation' field and set 'data_format'
+            # to 'html' for all WrittenTranslations.
+            for lang_code in translations_mapping[content_id]:
+                translations_mapping[
+                    content_id][lang_code]['data_format'] = 'html'
+                translations_mapping[
+                    content_id][lang_code]['translation'] = (
+                        translations_mapping[content_id][lang_code]['html'])
+                del translations_mapping[content_id][lang_code]['html']
+
+        interaction_id = question_state_dict['interaction']['id']
+        if interaction_id is None:
+            question_state_dict['next_content_id_index'] = (
+                max_existing_content_id_index + 1)
+            return question_state_dict
+
+        class ContentIdCounter(python_utils.OBJECT):
+            """This helper class is used to keep track of
+            next_content_id_index and new_content_ids, and provides a
+            function to generate new content_ids.
+            """
+
+            new_content_ids = []
+
+            def __init__(self, next_content_id_index):
+                """Initializes a ContentIdCounter object.
+
+                Args:
+                    next_content_id_index: int. The next content id index.
+                """
+                self.next_content_id_index = next_content_id_index
+
+            def generate_content_id(self, content_id_prefix):
+                """Generate a new content_id from the prefix provided and
+                the next content id index.
+
+                Args:
+                    content_id_prefix: str. The prefix of the content_id.
+
+                Returns:
+                    str. The generated content_id.
+                """
+                content_id = '%s%i' % (
+                    content_id_prefix,
+                    self.next_content_id_index)
+                self.next_content_id_index += 1
+                self.new_content_ids.append(content_id)
+                return content_id
+
+        content_id_counter = (
+            ContentIdCounter(max_existing_content_id_index + 1))
+
+        ca_dict = question_state_dict['interaction']['customization_args']
+        if (interaction_id == 'PencilCodeEditor' and
+                'initial_code' in ca_dict):
+            ca_dict['initialCode'] = ca_dict['initial_code']
+            del ca_dict['initial_code']
+
+        # Retrieve a cached version (state schema v35) of
+        # interaction_specs.json to ensure that this migration remains
+        # stable even when interaction_specs.json is changed.
+        ca_specs = [
+            domain.CustomizationArgSpec(
+                ca_spec_dict['name'],
+                ca_spec_dict['description'],
+                ca_spec_dict['schema'],
+                ca_spec_dict['default_value']
+            ) for ca_spec_dict in (
+                interaction_registry.Registry
+                .get_all_specs_for_state_schema_version(36)[
+                    interaction_id]['customization_arg_specs']
+            )
+        ]
+
+        for ca_spec in ca_specs:
+            schema = ca_spec.schema
+            ca_name = ca_spec.name
+            content_id_prefix = 'ca_%s_' % ca_name
+
+            # We only have to migrate unicode to SubtitledUnicode or
+            # list of html to list of SubtitledHtml. No interactions
+            # were changed from html to SubtitledHtml.
+            is_subtitled_unicode_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+            is_subtitled_html_list_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
+                schema['items']['type'] ==
+                schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['items']['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+
+            if is_subtitled_unicode_spec:
+                # Default is a SubtitledHtml dict or SubtitleUnicode dict.
+                new_value = copy.deepcopy(ca_spec.default_value)
+
+                # If available, assign value to html or unicode_str.
+                if ca_name in ca_dict:
+                    new_value['unicode_str'] = ca_dict[ca_name]['value']
+
+                # Assign content_id.
+                new_value['content_id'] = (
+                    content_id_counter
+                    .generate_content_id(content_id_prefix)
+                )
+
+                ca_dict[ca_name] = {'value': new_value}
+            elif is_subtitled_html_list_spec:
+                new_value = []
+
+                if ca_name in ca_dict:
+                    # Assign values to html fields.
+                    for html in ca_dict[ca_name]['value']:
+                        new_value.append({
+                            'html': html, 'content_id': None
+                        })
+                else:
+                    # Default is a list of SubtitledHtml dict.
+                    new_value.extend(copy.deepcopy(ca_spec.default_value))
+
+                # Assign content_ids.
+                for subtitled_html_dict in new_value:
+                    subtitled_html_dict['content_id'] = (
+                        content_id_counter
+                        .generate_content_id(content_id_prefix)
+                    )
+
+                ca_dict[ca_name] = {'value': new_value}
+            elif ca_name not in ca_dict:
+                ca_dict[ca_name] = {'value': ca_spec.default_value}
+
+        (
+            customization_args_util
+            .validate_customization_args_and_values(
+                'interaction',
+                interaction_id,
+                ca_dict,
+                ca_specs)
+        )
+
+        question_state_dict['next_content_id_index'] = (
+            content_id_counter.next_content_id_index)
+        for new_content_id in content_id_counter.new_content_ids:
+            question_state_dict[
+                'written_translations'][
+                    'translations_mapping'][new_content_id] = {}
+            question_state_dict[
+                'recorded_voiceovers'][
+                    'voiceovers_mapping'][new_content_id] = {}
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v36_dict_to_v37_dict(cls, question_state_dict):
+        """Converts from version 36 to 37. Version 37 changes all rules with
+        type CaseSensitiveEquals to Equals.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] != 'TextInput':
+            return question_state_dict
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for answer_group_dict in answer_group_dicts:
+            for rule_spec_dict in answer_group_dict['rule_specs']:
+                if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                    rule_spec_dict['rule_type'] = 'Equals'
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v37_dict_to_v38_dict(cls, question_state_dict):
+        """Converts from version 37 to 38. Version 38 adds a customization arg
+        for the Math interactions that allows creators to specify the letters
+        that would be displayed to the learner.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] in (
+                'AlgebraicExpressionInput', 'MathEquationInput'):
+            variables = set()
+            for group in question_state_dict[
+                    'interaction']['answer_groups']:
+                for rule_spec in group['rule_specs']:
+                    rule_input = rule_spec['inputs']['x']
+                    for variable in expression_parser.get_variables(
+                            rule_input):
+                        # Replacing greek letter names with greek symbols.
+                        if len(variable) > 1:
+                            variable = (
+                                constants.GREEK_LETTER_NAMES_TO_SYMBOLS[
+                                    variable])
+                        variables.add(variable)
+
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'customOskLetters': {
+                    'value': sorted(variables)
+                }
+            })
 
         return question_state_dict
 

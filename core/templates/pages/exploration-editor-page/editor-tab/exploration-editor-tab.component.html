@@ -1,5 +1,5 @@
-<div class="row">
-  <div class="col-lg-8 col-md-8 col-sm-8">
+<div class="exp-editor-content-container">
+  <div class="exp-editor-main-editor">
     <div class="oppia-editor-cards-container">
       <div class="oppia-editor-header">
         <state-name-editor></state-name-editor>
@@ -11,6 +11,7 @@
 
       <state-editor on-save-state-content="$ctrl.saveStateContent"
                     on-save-interaction-customization-args="$ctrl.saveInteractionCustomizationArgs"
+                    on-save-next-content-id-index="$ctrl.saveNextContentIdIndex"
                     on-save-interaction-id="$ctrl.saveInteractionId"
                     on-save-interaction-default-outcome="$ctrl.saveInteractionDefaultOutcome"
                     on-save-interaction-answer-groups="$ctrl.saveInteractionAnswerGroups"
@@ -28,11 +29,35 @@
       </state-editor>
     </div>
   </div>
-  <div class="col-lg-4 col-md-4 col-sm-4">
-    <div class="oppia-editor-sidebar d-none d-md-block">
+  <div class="exp-editor-overview">
+    <div class="exp-editor-overview-content">
       <exploration-graph></exploration-graph>
       <unresolved-answers-overview></unresolved-answers-overview>
     </div>
   </div>
   <attribution-guide></attribution-guide>
 </div>
+
+<style>
+  exploration-editor-tab .exp-editor-content-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  exploration-editor-tab .exp-editor-main-editor {
+    margin-right: 3%;
+    width: 40%;
+  }
+  exploration-editor-tab .exp-editor-overview {
+    width: 30%;
+  }
+  exploration-editor-tab .exp-editor-overview-content {
+    margin-top: 40px;
+  }
+  @media screen and (max-width: 768px) {
+    exploration-editor-tab .exp-editor-main-editor {
+      margin-right: 0;
+      width: 100%;
+    }
+  }
+</style>
