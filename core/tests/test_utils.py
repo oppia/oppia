@@ -1608,7 +1608,8 @@ tags: []
             self, story_id, thumbnail_filename, thumbnail_bg_color,
             owner_id, title, description,
             notes, corresponding_topic_id,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='story-frag'):
         """Saves a new story with a default version 1 story contents
         data dictionary.
 
@@ -1635,6 +1636,7 @@ tags: []
                 belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
+            url_fragment: str. The URL fragment for the story.
         """
         story_model = story_models.StoryModel(
             id=story_id,
@@ -1646,7 +1648,8 @@ tags: []
             story_contents_schema_version=1,
             notes=notes,
             corresponding_topic_id=corresponding_topic_id,
-            story_contents=self.VERSION_1_STORY_CONTENTS_DICT
+            story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
+            url_fragment=url_fragment
         )
         commit_message = (
             'New story created with title \'%s\'.' % title)
