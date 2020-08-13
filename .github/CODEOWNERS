@@ -543,13 +543,7 @@
 /.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
 /puppeteer-login-script.js @jimbyo
 /scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
-/webpack.common.config.ts @nishantwrp @jameesjohn @vojtechjelinek
-/webpack.common.macros.ts @jameesjohn @vojtechjelinek
-/webpack.dev.config.ts @nishantwrp @jameesjohn @vojtechjelinek
-/webpack.dev.sourcemap.config.ts @nishantwrp @vojtechjelinek
-/webpack.prod.config.ts @nishantwrp @jameesjohn @vojtechjelinek
-/webpack.prod.sourcemap.config.ts @nishantwrp @vojtechjelinek
-/webpack.terser.config.ts @nishantwrp @vojtechjelinek
+/webpack.*.ts @nishantwrp @vojtechjelinek
 
 
 # Typings.

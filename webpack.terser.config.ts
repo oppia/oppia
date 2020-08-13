@@ -17,10 +17,10 @@
  */
 
 const { merge } = require('webpack-merge');
-const prod = require('./webpack.prod.config.ts');
+const prodSourcemaps = require('./webpack.prod.sourcemap.config.ts');
 const TerserPlugin = require('terser-webpack-plugin');
 
-module.exports = merge(prod, {
+module.exports = merge(prodSourcemaps, {
   optimization: {
     minimizer: [
       new TerserPlugin({
