@@ -1,24 +1,24 @@
 <div class="oppia-opportunities-list">
-  <div infinite-scroll="$ctrl.showMoreOpportunities()"
+  <div infinite-scroll="$ctrl.onLoadMoreOpportunities()"
        infinite-scroll-distance="1"
        infinite-scroll-disabled="false">
-    <div ng-repeat="opportunity in getOpportunities()">
+    <div ng-repeat="opportunity in $ctrl.getOpportunities()">
       <opportunities-list-item opportunity="opportunity"
-                               on-click-action-button="onClickActionButton"
-                               progress-bar-required="isProgressBarRequired()"
-                               label-required="isLabelRequired()"
-                               opportunity-heading-truncation-length="getOpportunityHeadingTruncationLength()">
+                               on-click-action-button="$ctrl.onClickActionButton"
+                               progress-bar-required="$ctrl.isProgressBarRequired()"
+                               label-required="$ctrl.isLabelRequired()"
+                               opportunity-heading-truncation-length="$ctrl.getOpportunityHeadingTruncationLength()">
       </opportunities-list-item>
     </div>
   </div>
-  <div ng-show="opportunityDataIsLoading">
+  <div ng-show="$ctrl.opportunityDataIsLoading">
     <opportunities-list-item></opportunities-list-item>
     <opportunities-list-item></opportunities-list-item>
   </div>
-  <div class="oppia-end-availability" ng-if="!opportunityDataIsLoading && !isMoreOpportunitiesAvailable()">
+  <div class="oppia-end-availability" ng-if="!$ctrl.opportunityDataIsLoading && !$ctrl.isMoreOpportunitiesAvailable()">
     <div class="oppia-end-availability-line"></div>
-    <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length === 0">No opportunity available!</div>
-    <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length !== 0">End of results.</div>
+    <div class="oppia-opportunity-availablity-message" ng-if="$ctrl.getOpportunities().length === 0">No opportunity available!</div>
+    <div class="oppia-opportunity-availablity-message" ng-if="$ctrl.getOpportunities().length !== 0">End of results.</div>
     <div class="oppia-end-availability-line"></div>
   </div>
 </div>
