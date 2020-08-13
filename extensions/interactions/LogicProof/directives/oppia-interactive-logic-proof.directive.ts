@@ -28,6 +28,9 @@ require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require(
   'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
 import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
@@ -38,8 +41,8 @@ import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
   'interactions/LogicProof/static/js/generatedDefaultData.ts';
 
 angular.module('oppia').directive('oppiaInteractiveLogicProof', [
-  'InteractionAttributesExtractorService', 'EVENT_NEW_CARD_AVAILABLE',
-  function(InteractionAttributesExtractorService, EVENT_NEW_CARD_AVAILABLE) {
+  'InteractionAttributesExtractorService', 'PlayerPositionService',
+  function(InteractionAttributesExtractorService, PlayerPositionService) {
     return {
       restrict: 'E',
       scope: {},
@@ -57,6 +60,7 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
             WindowDimensionsService, UrlService,
             CurrentInteractionService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           // NOTE: for information on integrating angular and code-mirror see
           // http://github.com/angular-ui/ui-codemirror
           ctrl.codeEditor = function(editor) {
@@ -233,9 +237,11 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
             });
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => ctrl.interactionIsActive = false
+              )
+            );
             const {
               question
             } = InteractionAttributesExtractorService.getValuesFromAttributes(
@@ -309,6 +315,9 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
 
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitProof, null);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

@@ -16,14 +16,15 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
+require('pages/exploration-player-page/services/player-position.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').factory('HintsAndSolutionManagerService', [
-  '$rootScope', '$timeout', 'EVENT_NEW_CARD_AVAILABLE',
+  '$rootScope', '$timeout', 'PlayerPositionService',
   'WAIT_FOR_FIRST_HINT_MSEC', 'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
   function(
-      $rootScope, $timeout, EVENT_NEW_CARD_AVAILABLE,
+      $rootScope, $timeout, PlayerPositionService,
       WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
     var timeout = null;
     var ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
@@ -46,13 +47,12 @@ angular.module('oppia').factory('HintsAndSolutionManagerService', [
     var hintsDiscovered = false;
     var tooltipTimeout = null;
 
-
-    $rootScope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-      correctAnswerSubmitted = true;
-      // This prevents tooltip to hide the Continue button of the help card in
-      // mobile view.
-      tooltipIsOpen = false;
-    });
+    PlayerPositionService.onNewCardAvailable.subscribe(
+      () => {
+        correctAnswerSubmitted = true;
+        tooltipIsOpen = false;
+      }
+    );
 
     // This replaces any timeouts that are already queued.
     var enqueueTimeout = function(func, timeToWaitMsec) {

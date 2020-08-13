@@ -371,7 +371,7 @@ angular.module('oppia').directive('conversationSkin', [
         'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_AUTOPLAY_AUDIO',
-        'EVENT_NEW_CARD_AVAILABLE', 'EVENT_NEW_CARD_OPENED',
+        'EVENT_NEW_CARD_OPENED',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'FEEDBACK_POPOVER_PATH',
         'INTERACTION_SPECS', 'REVIEW_TESTS_URL_TEMPLATE',
         'STORY_VIEWER_URL_TEMPLATE',
@@ -404,7 +404,7 @@ angular.module('oppia').directive('conversationSkin', [
             ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             EVENT_ACTIVE_CARD_CHANGED, EVENT_AUTOPLAY_AUDIO,
-            EVENT_NEW_CARD_AVAILABLE, EVENT_NEW_CARD_OPENED,
+            EVENT_NEW_CARD_OPENED,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, FEEDBACK_POPOVER_PATH,
             INTERACTION_SPECS, REVIEW_TESTS_URL_TEMPLATE,
             STORY_VIEWER_URL_TEMPLATE,
@@ -1089,7 +1089,7 @@ angular.module('oppia').directive('conversationSkin', [
                           hasContinueButton: true
                         });
                       }
-                      $rootScope.$broadcast(EVENT_NEW_CARD_AVAILABLE);
+                      PlayerPositionService.onNewCardAvailable.emit();
                       _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
                       FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                       scrollToBottom();

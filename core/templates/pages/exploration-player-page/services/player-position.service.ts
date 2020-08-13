@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
 import { ContextService } from 'services/context.service';
 import { PlayerTranscriptService } from
@@ -34,6 +34,8 @@ export class PlayerPositionService {
   displayedCardIndex = null;
   onChangeCallback = null;
   learnerJustSubmittedAnAnswer = false;
+
+  private _newCardAvailableEventEmitter = new EventEmitter();
 
   init(callback: Function): void {
     this.displayedCardIndex = null;
@@ -93,6 +95,10 @@ export class PlayerPositionService {
    */
   hasLearnerJustSubmittedAnAnswer(): boolean {
     return this.learnerJustSubmittedAnAnswer;
+  }
+
+  get onNewCardAvailable() {
+    return this._newCardAvailableEventEmitter;
   }
 }
 
