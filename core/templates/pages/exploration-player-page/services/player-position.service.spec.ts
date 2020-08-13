@@ -86,14 +86,13 @@ describe('Player position service', () => {
     expect(pps.getDisplayedCardIndex()).toBe(5);
   });
 
-<<<<<<< HEAD
   it('should get onNewCardOpened EventEmitter', () => {
     let mockNewCardOpenedEventEmitter = new EventEmitter();
     expect(pps.onNewCardOpened).toEqual(mockNewCardOpenedEventEmitter);
-=======
+  });
+
   it('should fetch EventEmitter for changing active card', () => {
     let mockActiveCardChangedEvent = new EventEmitter();
     expect(pps.onActiveCardChanged).toEqual(mockActiveCardChangedEvent);
->>>>>>> upstream/develop
   });
 });

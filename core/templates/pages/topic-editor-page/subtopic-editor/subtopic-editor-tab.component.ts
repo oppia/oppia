@@ -59,7 +59,6 @@ angular.module('oppia').component('subtopicEditorTab', {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
-      ctrl.directiveSubscriptions = new Subscription();
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
       ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
