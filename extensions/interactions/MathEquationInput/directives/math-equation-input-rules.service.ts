@@ -188,7 +188,7 @@ export class MathEquationInputRulesService {
       let rhsInputModified = nerdamer(rhsInput).multiply('-1').text();
       let expressionInput = nerdamer(rhsInputModified).add(lhsInput).text();
 
-      return algebraicRulesService.OmitsSomeOf  (
+      return algebraicRulesService.OmitsSomeOf(
         expressionAnswer, {x: expressionInput});
     }
   }
