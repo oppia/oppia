@@ -313,7 +313,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             target_version_at_submission=1,
             status=suggestion_models.STATUS_IN_REVIEW,
             author_id=self.user_1_id,
-            final_reviewer_id=None,
+            final_reviewer_id=self.user_2_id,
             change_cmd={},
             score_category=suggestion_models.SCORE_TYPE_CONTENT
         ).put()
@@ -489,7 +489,7 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             target_version_at_submission=1,
             status=suggestion_models.STATUS_IN_REVIEW,
             author_id=self.user_1_id,
-            final_reviewer_id=None,
+            final_reviewer_id=self.user_1_id,
             change_cmd={},
             score_category=suggestion_models.SCORE_TYPE_CONTENT
         ).put()
