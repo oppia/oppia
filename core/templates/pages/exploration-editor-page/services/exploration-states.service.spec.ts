@@ -167,6 +167,15 @@ describe('ExplorationStatesService', function() {
               labelled_as_correct: true,
             },
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'Hola',
             feedback: {
@@ -242,7 +251,8 @@ describe('ExplorationStatesService', function() {
         ExplorationStatesService.registerOnStateInteractionSavedCallback(spy);
         ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
 
-        expect(spy).toHaveBeenCalledWith('Hola');
+        expect(spy)
+          .toHaveBeenCalledWith(ExplorationStatesService.getState('Hola'));
       });
     });
   });

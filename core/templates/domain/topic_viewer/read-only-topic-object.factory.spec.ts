@@ -18,8 +18,8 @@
 
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 
 describe('Read only topic object Factory', () => {
@@ -28,8 +28,8 @@ describe('Read only topic object Factory', () => {
 
   beforeEach(() => {
     readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
-      new SubtopicObjectFactory(new SkillSummaryObjectFactory()),
-      new SkillSummaryObjectFactory());
+      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
+      new ShortSkillSummaryObjectFactory());
 
     let sampleTopicDataDict = {
       topic_name: 'topic_name',
@@ -42,7 +42,9 @@ describe('Read only topic object Factory', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        story_is_published: true
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title'
       }],
       additional_story_dicts: [{
         id: '1',
@@ -51,7 +53,9 @@ describe('Read only topic object Factory', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        story_is_published: true
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title-one'
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
@@ -59,7 +63,8 @@ describe('Read only topic object Factory', () => {
         id: 1,
         title: 'subtopic_name',
         thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74'
+        thumbnail_bg_color: '#F8BF74',
+        url_fragment: 'subtopic-name'
       }],
       degrees_of_mastery: {
         skill_id_1: 0.5,
@@ -118,6 +123,9 @@ describe('Read only topic object Factory', () => {
       .getDescription()).toEqual('Story Description');
     expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getNodeTitles())
       .toEqual(['Chapter 1']);
+    expect(
+      _sampleReadOnlyTopic.getCanonicalStorySummaries()[0].isNodeCompleted(
+        'Chapter 1')).toEqual(true);
   });
 
   it('should return correct values of additional stories', () => {
@@ -129,6 +137,9 @@ describe('Read only topic object Factory', () => {
       .getDescription()).toEqual('Story Description');
     expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
       .getNodeTitles()).toEqual(['Chapter 1']);
+    expect(
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0].isNodeCompleted(
+        'Chapter 1')).toEqual(true);
   });
 
   it('should return the correct value of degrees for skills', () => {

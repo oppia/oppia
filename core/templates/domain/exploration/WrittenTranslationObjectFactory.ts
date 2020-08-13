@@ -20,34 +20,51 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ITranslationBackendDict {
-  'html': string;
+export const WRITTEN_TRANSLATION_TYPE_HTML = 'html';
+export const WRITTEN_TRANSLATION_TYPE_UNICODE = 'unicode';
+
+type WrittenTranslationDataFormat = typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
+  typeof WRITTEN_TRANSLATION_TYPE_HTML;
+
+export interface TranslationBackendDict {
+  'data_format': WrittenTranslationDataFormat;
+  'translation': string;
   'needs_update': boolean;
 }
 
 export class WrittenTranslation {
-  html: string;
-  needsUpdate: boolean;
-  constructor(html: string, needsUpdate: boolean) {
-    this.html = html;
-    this.needsUpdate = needsUpdate;
-  }
-  getHtml(): string {
-    return this.html;
-  }
-  setHtml(html: string): void {
-    this.html = html;
-  }
+  constructor(
+      public dataFormat: WrittenTranslationDataFormat,
+      public translation: string,
+      public needsUpdate: boolean
+  ) {}
+
   markAsNeedingUpdate(): void {
     this.needsUpdate = true;
   }
+
   toggleNeedsUpdateAttribute(): void {
     this.needsUpdate = !this.needsUpdate;
   }
 
-  toBackendDict(): ITranslationBackendDict {
+  getHtml(): string {
+    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
+      throw new Error('This translation is not of type html');
+    }
+    return this.translation;
+  }
+
+  setHtml(html: string): void {
+    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
+      throw new Error('This translation is not of type html');
+    }
+    this.translation = html;
+  }
+
+  toBackendDict(): TranslationBackendDict {
     return {
-      html: this.html,
+      data_format: this.dataFormat,
+      translation: this.translation,
       needs_update: this.needsUpdate
     };
   }
@@ -57,13 +74,17 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(html: string): WrittenTranslation {
-    return new WrittenTranslation(html, false);
+  createNew(
+      type: WrittenTranslationDataFormat,
+      html: string
+  ): WrittenTranslation {
+    return new WrittenTranslation(type, html, false);
   }
 
-  createFromBackendDict(translationBackendDict: ITranslationBackendDict) {
+  createFromBackendDict(translationBackendDict: TranslationBackendDict) {
     return new WrittenTranslation(
-      translationBackendDict.html,
+      translationBackendDict.data_format,
+      translationBackendDict.translation,
       translationBackendDict.needs_update);
   }
 }

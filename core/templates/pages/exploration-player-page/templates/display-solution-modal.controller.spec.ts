@@ -24,6 +24,8 @@ import { RecordedVoiceoversObjectFactory } from
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 
+import { Subscription } from 'rxjs';
+
 describe('Display Solution Modal Controller', function() {
   var $rootScope = null;
   var $scope = null;
@@ -41,6 +43,9 @@ describe('Display Solution Modal Controller', function() {
 
   var card = null;
   var solution = null;
+
+  var testSubscriptions = null;
+  const autoplayAudioSpy = jasmine.createSpy('autoplayAudio');
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -76,9 +81,12 @@ describe('Display Solution Modal Controller', function() {
     var interaction = interactionObjectFactory.createFromBackendDict({
       answer_groups: [],
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        placeholder: {value: {content_id: 'ca_placeholder', unicode_str: ''}},
+        rows: {value: 1}
+      },
       hints: [],
-      id: 'interaction_1'
+      id: 'TextInput'
     });
     var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
     card = stateCardObjectFactory.createNewCard(
@@ -86,7 +94,10 @@ describe('Display Solution Modal Controller', function() {
       recordedVoiceovers, 'content_id');
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      AudioPlayerService.onAutoplayAudio.subscribe(
+        autoplayAudioSpy));
 
     $scope = $rootScope.$new();
     $controller('DisplaySolutionModalController', {
@@ -96,16 +107,20 @@ describe('Display Solution Modal Controller', function() {
     });
   }));
 
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   it('should evaluate initialized properties', function() {
     expect($scope.isHint).toBe(false);
     expect($scope.shortAnswerHtml).toEqual({
       prefix: 'The only',
-      answer: '<oppia-short-response-interaction_1 answer="&amp;quot;' +
-        'Correct answer&amp;quot;"></oppia-short-response-interaction_1>'
+      answer: '<oppia-short-response-text-input answer="&amp;quot;' +
+        'Correct answer&amp;quot;"></oppia-short-response-text-input>'
     });
     expect($scope.solutionExplanationHtml).toBe('Explanation html');
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('autoPlayAudio');
+    expect(autoplayAudioSpy).toHaveBeenCalled();
   });
 
   it('should dismiss modal', function() {

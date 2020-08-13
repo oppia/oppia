@@ -16,6 +16,7 @@
  * @fileoverview Directive for the navbar breadcrumb of the story viewer.
  */
 
+require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
@@ -25,23 +26,30 @@ angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-viewer-page/navbar-breadcrumb/' +
         'story-viewer-navbar-breadcrumb.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$rootScope', 'StoryViewerBackendApiService', 'UrlService',
-        function($rootScope, StoryViewerBackendApiService, UrlService) {
+      controller: [
+        '$rootScope', 'UrlService', 'TOPIC_VIEWER_STORY_URL_TEMPLATE',
+        function(
+            $rootScope, UrlService, TOPIC_VIEWER_STORY_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.$onInit = function() {
-            StoryViewerBackendApiService.fetchStoryData(
-              UrlService.getStoryIdFromViewerUrl()).then(
-              function(storyDataDict) {
-                ctrl.storyTitle = storyDataDict.title;
-                // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the directive is migrated to angular.
-                $rootScope.$apply();
+          ctrl.getTopicUrl = function() {
+            return UrlInterpolationService.interpolateUrl(
+              TOPIC_VIEWER_STORY_URL_TEMPLATE, {
+                topic_url_fragment: (
+                  UrlService.getTopicUrlFragmentFromLearnerUrl()),
+                classroom_url_fragment: (
+                  UrlService.getClassroomUrlFragmentFromLearnerUrl())
               });
+          };
+
+          ctrl.$onInit = function() {
+            $rootScope.$on('storyData', function(evt, data) {
+              ctrl.topicName = data.topicName;
+              ctrl.storyTitle = data.storyTitle;
+            });
           };
         }
       ]

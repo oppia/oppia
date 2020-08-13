@@ -19,6 +19,9 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/angular-js.import';
+import 'third-party-imports/headroom.import';
+
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
@@ -38,6 +41,9 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 import { AppConstants } from 'app.constants';
+import { CkEditorCopyToolbarComponent } from
+  /* eslint-disable max-len */
+  'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants';
 import { CollectionSummaryTileConstants } from
@@ -65,9 +71,11 @@ import { ExplorationEditorPageConstants } from
     SharedComponentsModule
   ],
   declarations: [
+    CkEditorCopyToolbarComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    CkEditorCopyToolbarComponent,
     OppiaAngularRootComponent
   ],
   providers: [

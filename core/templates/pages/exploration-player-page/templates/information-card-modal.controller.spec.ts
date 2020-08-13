@@ -19,12 +19,14 @@
 describe('Information Card Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
+  var DateTimeFormatService = null;
 
   var expInfo = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
+    DateTimeFormatService = $injector.get('DateTimeFormatService');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -63,6 +65,11 @@ describe('Information Card Modal Controller', function() {
       title: 'Test of all interactions'
     };
 
+    // This method is being mocked because the return value can be tricky
+    // depending on timezone.
+    spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString').and
+      .returnValue('Feb 17');
+
     $scope = $rootScope.$new();
     $controller('InformationCardModalController', {
       $scope: $scope,
@@ -94,8 +101,13 @@ describe('Information Card Modal Controller', function() {
 
   it('should get title wrapper css', function() {
     spyOn(document, 'querySelectorAll')
-      // @ts-ignore document querySelectorAll returns more than clientWidth
-      // property according with lint settings.
+      // This throws "Type '{ clientWidth: number; }' is missing the following
+      // properties from type 'Element': assignedSlot, attributes, classList,
+      // className, and 122 more.". This is because typescript
+      // expects around 120 more properties than just one
+      // (clientWidth). We need only one 'clientWidth' for
+      // testing purposes.
+      // @ts-expect-error
       .withArgs('.oppia-info-card-logo-thumbnail').and.returnValue([{
         clientWidth: 200
       }]);

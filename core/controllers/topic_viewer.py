@@ -74,14 +74,24 @@ class TopicPageDataHandler(base.BaseHandler):
 
         canonical_story_dicts = []
         for story_summary in canonical_story_summaries:
+            completed_node_titles = [
+                completed_node.title for completed_node in
+                story_fetchers.get_completed_nodes_in_story(
+                    self.user_id, story_summary.id)]
             story_summary_dict = story_summary.to_human_readable_dict()
             story_summary_dict['story_is_published'] = True
+            story_summary_dict['completed_node_titles'] = completed_node_titles
             canonical_story_dicts.append(story_summary_dict)
 
         additional_story_dicts = []
         for story_summary in additional_story_summaries:
+            completed_node_titles = [
+                completed_node.title for completed_node in
+                story_fetchers.get_completed_nodes_in_story(
+                    self.user_id, story_summary.id)]
             story_summary_dict = story_summary.to_human_readable_dict()
             story_summary_dict['story_is_published'] = True
+            story_summary_dict['completed_node_titles'] = completed_node_titles
             additional_story_dicts.append(story_summary_dict)
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
@@ -114,9 +124,10 @@ class TopicPageDataHandler(base.BaseHandler):
 
         train_tab_should_be_displayed = False
         if all_skill_ids:
-            questions = question_services.get_questions_by_skill_ids(
-                5, all_skill_ids, False)
-            if len(questions) == 5:
+            question_count = (
+                question_services.get_total_question_count_for_skill_ids(
+                    all_skill_ids))
+            if question_count >= 5:
                 train_tab_should_be_displayed = True
 
         self.values.update({

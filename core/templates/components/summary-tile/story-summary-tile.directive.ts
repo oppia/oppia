@@ -27,10 +27,11 @@ angular.module('oppia').directive('storySummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getStorySummary: '&storySummary'
+        classroomUrlFragment: '<',
+        storySummary: '<',
+        topicUrlFragment: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/story-summary-tile.directive.html'),
+      template: require('./story-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'AssetsBackendApiService', 'WindowDimensionsService',
@@ -40,10 +41,30 @@ angular.module('oppia').directive('storySummaryTile', [
             ENTITY_TYPE, STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getStoryLink = function() {
+            // This component is being used in the topic editor as well and
+            // we want to disable the linking in this case.
+            if (!ctrl.classroomUrlFragment || !ctrl.topicUrlFragment) {
+              return '#';
+            }
             return UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_URL_TEMPLATE, {
-                story_id: ctrl.getStorySummary().getId()
+                classroom_url_fragment: ctrl.classroomUrlFragment,
+                story_url_fragment: ctrl.storySummary.getUrlFragment(),
+                topic_url_fragment: ctrl.topicUrlFragment
               });
+          };
+
+          ctrl.isChapterCompleted = function(title) {
+            return ctrl.storySummary.isNodeCompleted(title);
+          };
+
+          ctrl.isPreviousChapterCompleted = function(index) {
+            if (index === 0) {
+              return true;
+            }
+            var previousNodeTitle = (
+              ctrl.storySummary.getNodeTitles()[index - 1]);
+            return ctrl.storySummary.isNodeCompleted(previousNodeTitle);
           };
 
           ctrl.showAllChapters = function() {
@@ -56,7 +77,7 @@ angular.module('oppia').directive('storySummaryTile', [
           };
 
           ctrl.$onInit = function() {
-            ctrl.nodeCount = ctrl.getStorySummary().getNodeTitles().length;
+            ctrl.nodeCount = ctrl.storySummary.getNodeTitles().length;
             ctrl.chaptersDisplayed = 3;
             if (WindowDimensionsService.getWidth() <= 800) {
               ctrl.chaptersDisplayed = 2;
@@ -66,11 +87,11 @@ angular.module('oppia').directive('storySummaryTile', [
               ctrl.showButton = true;
             }
 
-            if (ctrl.getStorySummary().getThumbnailFilename()) {
+            if (ctrl.storySummary.getThumbnailFilename()) {
               ctrl.thumbnailUrl = (
                 AssetsBackendApiService.getThumbnailUrlForPreview(
-                  ENTITY_TYPE.STORY, ctrl.getStorySummary().getId(),
-                  ctrl.getStorySummary().getThumbnailFilename()));
+                  ENTITY_TYPE.STORY, ctrl.storySummary.getId(),
+                  ctrl.storySummary.getThumbnailFilename()));
             } else {
               ctrl.thumbnailUrl = null;
             }
@@ -79,3 +100,18 @@ angular.module('oppia').directive('storySummaryTile', [
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'story-summary-tile'
+})
+export class StorySummaryTileDirective extends UpgradeComponent {
+  @Input() classroomUrlFragment;
+  @Input() storySummary;
+  @Input() topicUrlFragment;
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('storySummaryTile', elementRef, injector);
+  }
+}

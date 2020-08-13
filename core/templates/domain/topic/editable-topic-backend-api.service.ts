@@ -23,10 +23,12 @@ require('domain/topic/topic-domain.constants.ajs.ts');
 angular.module('oppia').factory('EditableTopicBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EDITABLE_TOPIC_DATA_URL_TEMPLATE', 'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
-  'TOPIC_EDITOR_STORY_URL_TEMPLATE',
+  'TOPIC_EDITOR_STORY_URL_TEMPLATE', 'TOPIC_NAME_HANDLER_URL_TEMPLATE',
+  'TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService,
       EDITABLE_TOPIC_DATA_URL_TEMPLATE, SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE,
-      TOPIC_EDITOR_STORY_URL_TEMPLATE) {
+      TOPIC_EDITOR_STORY_URL_TEMPLATE, TOPIC_NAME_HANDLER_URL_TEMPLATE,
+      TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE) {
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -47,8 +49,12 @@ angular.module('oppia').factory('EditableTopicBackendApiService', [
               response.data.grouped_skill_summary_dicts),
             skillIdToDescriptionDict: angular.copy(
               response.data.skill_id_to_description_dict),
+            skillQuestionCountDict: {
+              ...response.data.skill_question_count_dict
+            },
             skillIdToRubricsDict: angular.copy(
-              response.data.skill_id_to_rubrics_dict)
+              response.data.skill_id_to_rubrics_dict),
+            classroomUrlFragment: response.data.classroom_url_fragment,
           });
         }
       }, function(errorResponse) {
@@ -147,6 +153,40 @@ angular.module('oppia').factory('EditableTopicBackendApiService', [
       });
     };
 
+    var _doesTopicWithUrlFragmentExist = function(
+        topicUrlFragment, successCallback, errorCallback) {
+      var topicUrlFragmentUrl = UrlInterpolationService.interpolateUrl(
+        TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
+          topic_url_fragment: topicUrlFragment
+        });
+      $http.get(topicUrlFragmentUrl).then(function(response) {
+        if (successCallback) {
+          successCallback(response.data.topic_url_fragment_exists);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _doesTopicWithNameExist = function(
+        topicName, successCallback, errorCallback) {
+      var topicNameUrl = UrlInterpolationService.interpolateUrl(
+        TOPIC_NAME_HANDLER_URL_TEMPLATE, {
+          topic_name: topicName
+        });
+      $http.get(topicNameUrl).then(function(response) {
+        if (successCallback) {
+          successCallback(response.data.topic_name_exists);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     return {
       fetchTopic: function(topicId) {
         return $q(function(resolve, reject) {
@@ -188,6 +228,18 @@ angular.module('oppia').factory('EditableTopicBackendApiService', [
       deleteTopic: function(topicId) {
         return $q(function(resolve, reject) {
           _deleteTopic(topicId, resolve, reject);
+        });
+      },
+
+      doesTopicWithNameExistAsync: async function(topicName) {
+        return $q(function(resolve, reject) {
+          _doesTopicWithNameExist(topicName, resolve, reject);
+        });
+      },
+
+      doesTopicWithUrlFragmentExistAsync: async function(topicUrlFragment) {
+        return $q(function(resolve, reject) {
+          _doesTopicWithUrlFragmentExist(topicUrlFragment, resolve, reject);
         });
       }
     };

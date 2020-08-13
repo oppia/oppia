@@ -19,6 +19,9 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/angular-js.import';
+import 'third-party-imports/headroom.import';
+
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
@@ -35,6 +38,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { ProfilePageNavbarComponent } from
+  'pages/profile-page/profile-page-navbar.component';
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -49,10 +54,12 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    ProfilePageNavbarComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    ProfilePageNavbarComponent
   ],
   providers: [
     AppConstants,

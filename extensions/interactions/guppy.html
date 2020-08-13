@@ -1,5 +1,4 @@
 <link rel="stylesheet" href="/third_party/static/guppy-175999/build/guppy-default.min.css">
-<link rel="stylesheet" href="/third_party/static/guppy-175999/build/guppy-default-osk.min.css">
 <script>
   // Use the normal default browser eventlistener without passive set to false.
   // TODO(#8833): Use passive listeners when guppy supports it.
@@ -7,7 +6,6 @@
     EventTarget.prototype.addEventListener._original);
 </script>
 <script type="text/javascript" src="/third_party/static/guppy-175999/build/guppy.min.js"></script>
-<script type="text/javascript" src="/third_party/static/guppy-175999/build/guppy_osk.min.js"></script>
 
 <style>
   /* Some of the style attributes have been marked with '!important' since they
@@ -16,9 +14,9 @@
   here: https://github.com/daniel3735928559/guppy/blob/1759992a3885cb99d3ead04241f318a074c9f963/build/guppy.js#L4292*/
 
   .guppy_help {
-    left: 12% !important;
-    top: 4% !important;
-    width: 80%;
+    max-width: fit-content;
+    position: fixed !important;
+    top: 10% !important;
     z-index: 1052;
   }
 
@@ -54,28 +52,5 @@
     to {
       visibility: hidden;
     }
-  }
-
-  /* On-screen keyboard styles */
-  #guppy_osk_tab_array {
-    display: none;
-  }
-
-  .guppy_osk {
-    height: 45%;
-    z-index: 1051;
-  }
-
-  .tabbar a {
-    line-height: 35px;
-  }
-
-  .tabbar ul {
-    height: 45px;
-  }
-
-  .guppy_osk .guppy_osk_key {
-    height: 14vw;
-    min-width: 9vw;
   }
 </style>

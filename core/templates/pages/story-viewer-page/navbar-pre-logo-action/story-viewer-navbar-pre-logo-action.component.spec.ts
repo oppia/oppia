@@ -24,26 +24,30 @@ require('pages/story-viewer-page/navbar-pre-logo-action/' +
 describe('story viewer pre logo action', function() {
   let ctrl = null;
   let urlService: UrlService = null;
+  let rootScope = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     urlService = TestBed.get(UrlService);
-    spyOn(urlService, 'getTopicNameFromLearnerUrl')
-      .and.returnValue('Topic Name');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
+      .and.returnValue('abbrev');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('math');
   });
-  beforeEach(angular.mock.inject(function($componentController) {
+  beforeEach(angular.mock.inject(function($componentController, $rootScope) {
     ctrl = $componentController(
       'storyViewerNavbarPreLogoAction',
       { UrlService: urlService });
+    rootScope = $rootScope;
   }));
 
-  it('should set the topic name from the URL correctly', function() {
+  it('should set the topic name and URL correctly', function() {
     ctrl.$onInit();
+    rootScope.$emit('storyData', {
+      topicName: 'Topic Name'
+    });
+    rootScope.$digest();
     expect(ctrl.topicName).toEqual('Topic Name');
-  });
-
-  it('should set the topic url from the topic name correctly', function() {
-    ctrl.$onInit();
-    expect(ctrl.topicUrl).toEqual('/topic/Topic%20Name');
+    expect(ctrl.getTopicUrl()).toEqual('/learn/math/abbrev/story');
   });
 });

@@ -41,32 +41,51 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         super(BaseModelUnitTests, self).tearDown()
 
     def test_get_deletion_policy(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The get_deletion_policy\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.get_deletion_policy()
 
     def test_has_reference_to_user_id(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The has_reference_to_user_id\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.has_reference_to_user_id('user_id')
 
     def test_error_cases_for_get_method(self):
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class BaseModel with id Invalid id not found'):
             base_models.BaseModel.get('Invalid id')
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class BaseModel with id Invalid id not found'):
             base_models.BaseModel.get('Invalid id', strict=True)
 
         self.assertIsNone(
             base_models.BaseModel.get('Invalid id', strict=False))
 
     def test_base_model_export_data_raises_not_implemented_error(self):
-        with self.assertRaises(NotImplementedError):
-            base_models.BaseModel.export_data('user_id')
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The export_data\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
+            base_models.BaseModel.export_data('')
 
     def test_export_data(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The export_data\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.export_data('user_id')
 
     def test_get_export_policy(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The get_export_policy\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.get_export_policy()
 
     def test_generic_query_put_get_and_delete_operations(self):
@@ -86,7 +105,9 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model.delete()
         all_models = [m for m in base_models.BaseModel.get_all()]
         self.assertEqual(len(all_models), 0)
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class BaseModel with id 1 not found'):
             model.get(model_id)
 
     def test_put(self):
@@ -310,7 +331,10 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
     def test_base_class_get_instance_id_raises_not_implemented_error(self):
         # Raise NotImplementedError as _get_instance_id is to be overwritten
         # in child classes of BaseCommitLogEntryModel.
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _get_instance_id\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             base_models.BaseCommitLogEntryModel.get_commit('id', 1)
 
 
@@ -340,9 +364,8 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
 
     def test_export_data_trivial(self):
-        user_data = (base_models
-                     .BaseSnapshotMetadataModel
-                     .export_data('trivial_user'))
+        user_data = (
+            base_models.BaseSnapshotMetadataModel.export_data('trivial_user'))
         expected_data = {}
         self.assertEqual(user_data, expected_data)
 
@@ -355,22 +378,16 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
             'model_id-2', 'committer_id', 'create', 'Hi this is a commit.',
             [{'cmd': 'some_command'}, {'cmd2': 'another_command'}])
         model2.put()
-        user_data = (version_model
-                     .SNAPSHOT_METADATA_CLASS
-                     .export_data('committer_id'))
+        user_data = (
+            version_model.SNAPSHOT_METADATA_CLASS.export_data('committer_id'))
         expected_data = {
             'model_id-1': {
                 'commit_type': 'create',
                 'commit_message': None,
-                'commit_cmds': None
             },
             'model_id-2': {
                 'commit_type': 'create',
                 'commit_message': 'Hi this is a commit.',
-                'commit_cmds': [
-                    {'cmd': 'some_command'},
-                    {'cmd2': 'another_command'}
-                ]
             }
         }
         self.assertEqual(user_data, expected_data)
@@ -494,7 +511,10 @@ class VersionedModelTests(test_utils.GenericTestBase):
     def test_put_raises_not_implemented_error_for_versioned_models(self):
         model1 = TestVersionedModel(id='model_id1')
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The put\(\) method is missing from the '
+            r'derived class. It should be implemented in the derived class.'):
             model1.put()
 
     def test_commit_with_invalid_change_list_raises_error(self):
@@ -541,14 +561,20 @@ class VersionedModelTests(test_utils.GenericTestBase):
             TestVersionedModel.get_version('nonexistent_id1', 4, strict=False))
         self.assertIsNone(version_model)
 
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class TestVersionedModel with id nonexistent_id1 '
+            'not found'):
             TestVersionedModel.get_version('nonexistent_id1', 4, strict=True)
 
         version_model = (
             TestVersionedModel.get_version('model_id1', 4, strict=False))
         self.assertIsNone(version_model)
 
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class TestSnapshotContentModel with id model_id1-4 '
+            'not found'):
             TestVersionedModel.get_version('model_id1', 4, strict=True)
 
     def test_get_multi_versions(self):

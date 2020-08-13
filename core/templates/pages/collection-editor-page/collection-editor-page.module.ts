@@ -19,6 +19,9 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/angular-js.import';
+import 'third-party-imports/headroom.import';
+
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
@@ -49,6 +52,20 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { ServicesConstants } from 'services/services.constants';
 
+import { CollectionHistoryTabComponent } from
+  'pages/collection-editor-page/history-tab/collection-history-tab.component';
+import { CollectionDetailsEditor } from
+  // eslint-disable-next-line max-len
+  'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
+import { CollectionPermissionsCard } from
+  // eslint-disable-next-line max-len
+  'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
+import { CollectionSettingsTabComponent } from
+  'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
+import { CollectionStatisticsTabComponent } from
+  // eslint-disable-next-line max-len
+  'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -56,10 +73,18 @@ import { ServicesConstants } from 'services/services.constants';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    CollectionHistoryTabComponent,
+    CollectionSettingsTabComponent,
+    CollectionStatisticsTabComponent,
+    CollectionDetailsEditor,
+    CollectionPermissionsCard
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    CollectionHistoryTabComponent,
+    CollectionSettingsTabComponent,
+    CollectionStatisticsTabComponent,
   ],
   providers: [
     AppConstants,

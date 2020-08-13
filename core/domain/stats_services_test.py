@@ -262,7 +262,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         # Revert to an older version, exploration issues model also changes.
         exp_services.revert_exploration(
-            'committer_id_v4', exp_id, current_version=3, revert_to_version=2)
+            'committer_id_v4', exp_id, 3, 2)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
         self.assertEqual(exp_issues.exp_version, exploration.version)
@@ -346,7 +346,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         # Revert to an older version.
         exp_services.revert_exploration(
-            'committer_id_v3', exp_id, current_version=2, revert_to_version=1)
+            'committer_id_v3', exp_id, 2, 1)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exp_id, 3
         )
@@ -381,7 +381,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -411,7 +411,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -431,7 +431,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -460,7 +460,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -490,7 +490,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -535,7 +535,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -567,7 +567,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.version += 1
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=None, revert_to_version=5)
+            None, 5)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -1178,6 +1178,26 @@ class AnswerEventTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'TextInput',
             }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': first_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': 'Enter here'
+                        }
+                    },
+                    'rows': {'value': 1}
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': first_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                'new_value': 1
+            }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': second_state_name,
             }), exp_domain.ExplorationChange({
@@ -1190,9 +1210,48 @@ class AnswerEventTests(test_utils.GenericTestBase):
                 'new_value': 'TextInput',
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': second_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': 'Enter here'
+                        }
+                    },
+                    'rows': {'value': 1}
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': second_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                'new_value': 1
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': third_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'Continue',
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': third_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'new_value': {
+                    'buttonText': {
+                        'value': {
+                            'content_id': 'ca_buttonText_1',
+                            'unicode_str': 'Continue'
+                        }
+                    },
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': third_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                'new_value': 2
             })], 'Add new state')
         exp = exp_fetchers.get_exploration_by_id('eid')
 
@@ -1822,20 +1881,6 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 'new_state_name': new_state_name
             })], 'Update state name')
 
-    def _change_state_interaction_id(
-            self, interaction_id, exp_id=TEXT_INPUT_EXP_ID,
-            state_name=INIT_STATE_NAME):
-        """Updates the state interaction id corresponding to the given
-        exploration id and state name.
-        """
-        exp_services.update_exploration(
-            self.owner_id, exp_id, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': interaction_id
-            })], 'Update state interaction ID')
-
     def _change_state_content(
             self, new_content, exp_id=TEXT_INPUT_EXP_ID,
             state_name=INIT_STATE_NAME):
@@ -2082,7 +2127,30 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     def test_no_vis_info_for_exp_with_new_interaction_before_calculations(self):
         with self._get_swap_context():
             self._record_answer('Answer A')
-            self._change_state_interaction_id('SetInput')
+            exp_services.update_exploration(
+                self.owner_id, self.TEXT_INPUT_EXP_ID, [
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': self.INIT_STATE_NAME,
+                        'property_name':
+                            exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                        'new_value': 'SetInput'
+                    }), exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': self.INIT_STATE_NAME,
+                        'property_name':
+                            exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                        'new_value': {
+                            'buttonText': {
+                                'value': {
+                                    'content_id': 'ca_buttonText_0',
+                                    'unicode_str': 'Enter here'
+                                }
+                            },
+                        }
+                    })], 'Update state interaction'
+            )
+
             self._run_answer_summaries_aggregator()
 
             visualizations = self._get_visualizations()
@@ -2093,7 +2161,31 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             self._record_answer('Answer A')
             self._run_answer_summaries_aggregator()
-            self._change_state_interaction_id('SetInput')
+            exp_services.update_exploration(
+                self.owner_id, self.TEXT_INPUT_EXP_ID, [
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': self.INIT_STATE_NAME,
+                        'property_name':
+                            exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                        'new_value': 'SetInput'
+                    }),
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': self.INIT_STATE_NAME,
+                        'property_name':
+                            exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                        'new_value': {
+                            'buttonText': {
+                                'value': {
+                                    'content_id': 'ca_buttonText_0',
+                                    'unicode_str': 'Enter here'
+                                }
+                            },
+                        }
+                    })
+                ], 'Update state interaction'
+            )
 
             visualizations = self._get_visualizations()
 
@@ -2265,10 +2357,12 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.question_id = 'q_id_1'
         self.interaction_id = 'TextInput'
         self.state_reference_exploration = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.
+            get_state_reference_for_exploration(
                 self.exp_id, self.state_name))
         self.state_reference_question = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question( #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.
+            get_state_reference_for_question(
                 self.question_id))
         self.learner_answer_details_model_exploration = (
             stats_models.LearnerAnswerDetailsModel.create_model_instance(

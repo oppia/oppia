@@ -25,10 +25,12 @@ import { SetInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { AppConstants } from 'app.constants';
-import { ISetInputCustomizationArgs } from
+import { SetInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('SetInputValidationService', () => {
@@ -40,7 +42,7 @@ describe('SetInputValidationService', () => {
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
-  let goodCustomizationArgs: ISetInputCustomizationArgs;
+  let goodCustomizationArgs: SetInputCustomizationArgs;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
@@ -56,7 +58,11 @@ describe('SetInputValidationService', () => {
     agof = TestBed.get(AnswerGroupObjectFactory);
     rof = TestBed.get(RuleObjectFactory);
 
-    goodCustomizationArgs = { buttonText: { value: 'Add Item'} };
+    goodCustomizationArgs = {
+      buttonText: {
+        value: new SubtitledUnicode('Add Item', 'ca_buttonText')
+      }
+    };
 
     currentState = 'First State';
 
@@ -109,7 +115,9 @@ describe('SetInputValidationService', () => {
     });
 
     it('should generate errors when buttonText is empty', () => {
-      let badCustomizationArgs = { buttonText: { value: '' } };
+      let badCustomizationArgs = {
+        buttonText: { value: new SubtitledUnicode('', '') }
+      };
 
       let warnings = validatorService.getAllWarnings(
         currentState,

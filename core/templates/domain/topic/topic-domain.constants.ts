@@ -20,6 +20,12 @@ export class TopicDomainConstants {
   public static
     TOPIC_EDITOR_STORY_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
 
+  public static TOPIC_NAME_HANDLER_URL_TEMPLATE = (
+    '/topic_name_handler/<topic_name>');
+
+  public static TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE = (
+  '/topic_url_fragment_handler/<topic_url_fragment>');
+
   public static
     TOPIC_EDITOR_QUESTION_URL_TEMPLATE =
     '/topic_editor_question_handler/<topic_id>?cursor=<cursor>';
@@ -37,6 +43,7 @@ export class TopicDomainConstants {
   public static CMD_DELETE_SUBTOPIC = 'delete_subtopic';
   public static CMD_REARRANGE_CANONICAL_STORY = 'rearrange_canonical_story';
   public static CMD_REARRANGE_SKILL_IN_SUBTOPIC = 'rearrange_skill_in_subtopic';
+  public static CMD_REARRANGE_SUBTOPIC = 'rearrange_subtopic';
   public static
     CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id';
   public static CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic';
@@ -54,10 +61,12 @@ export class TopicDomainConstants {
   public static TOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
   public static TOPIC_PROPERTY_DESCRIPTION = 'description';
   public static TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code';
+  public static TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment';
 
   public static SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
   public static SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
   public static SUBTOPIC_PROPERTY_TITLE = 'title';
+  public static SUBTOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment';
 
   public static
     SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML = 'page_contents_html';

@@ -26,6 +26,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import time
 
 import python_utils
 import release_constants
@@ -83,6 +84,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 
 
 def is_windows_os():
@@ -323,7 +325,14 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
                 'git@github.com:oppia/release-scripts.git'])
 
     with CD(release_scripts_dirpath):
+        ask_user_to_confirm(
+            'Please make sure that the ../release-scripts repo is clean and '
+            'you are on master branch in ../release-scripts repo.')
+        python_utils.PRINT('Verifying that ../release-scripts repo is clean...')
         verify_local_repo_is_clean()
+        python_utils.PRINT(
+            'Verifying that user is on master branch in '
+            '../release-scripts repo...')
         verify_current_branch_name('master')
 
         # Update the local repo.
@@ -428,7 +437,7 @@ def get_personal_access_token():
         str. The personal access token for the GitHub id of user.
 
     Raises:
-        Exception: Personal access token is None.
+        Exception. Personal access token is None.
     """
     personal_access_token = getpass.getpass(
         prompt=(
@@ -450,8 +459,8 @@ def check_blocking_bug_issue_count(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: Number of unresolved blocking bugs is not zero.
-        Exception: The blocking bug milestone is closed.
+        Exception. Number of unresolved blocking bugs is not zero.
+        Exception. The blocking bug milestone is closed.
     """
     blocking_bugs_milestone = repo.get_milestone(
         number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
@@ -475,7 +484,7 @@ def check_prs_for_current_release_are_released(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: Some pull requests for current release do not have a
+        Exception. Some pull requests for current release do not have a
             "PR: released" label.
     """
     current_release_label = repo.get_label(
@@ -577,6 +586,26 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         os.remove(filename)
         shutil.move(backup_filename, filename)
         raise
+
+
+def wait_for_port_to_be_open(port_number):
+    """Wait until the port is open and exit if port isn't open after
+    1000 seconds.
+
+    Args:
+        port_number: int. The port number to wait.
+    """
+    waited_seconds = 0
+    while (not is_port_open(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+            and not is_port_open(port_number)):
+        python_utils.PRINT(
+            'Failed to start server on port %s, exiting ...' %
+            port_number)
+        sys.exit(1)
 
 
 class CD(python_utils.OBJECT):

@@ -38,6 +38,8 @@ require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 require('services/questions-list.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -55,8 +57,7 @@ angular.module('oppia').directive('questionsTab', [
         'QuestionObjectFactory', 'QuestionsListService',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
         'QuestionUndoRedoService', 'UndoRedoService',
-        'NUM_QUESTIONS_PER_PAGE', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_TOPIC_REINITIALIZED', function(
+        'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $q, $uibModal, $window,
             AlertsService, TopicEditorStateService,
             UrlService, EditableQuestionBackendApiService,
@@ -65,9 +66,9 @@ angular.module('oppia').directive('questionsTab', [
             QuestionObjectFactory, QuestionsListService,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
             QuestionUndoRedoService, UndoRedoService,
-            NUM_QUESTIONS_PER_PAGE, EVENT_TOPIC_INITIALIZED,
-            EVENT_TOPIC_REINITIALIZED) {
+            NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.getQuestionSummariesAsync =
             QuestionsListService.getQuestionSummariesAsync;
           $scope.getGroupedSkillSummaries =
@@ -93,7 +94,9 @@ angular.module('oppia').directive('questionsTab', [
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
                 $scope.getSkillsCategorizedByTopics = (
-                  response.categorized_skills_dict);
+                  response.categorizedSkillsDict);
+                $scope.getUntriagedSkillSummaries = (
+                  response.untriagedSkillSummaries);
               });
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.misconceptions = [];
@@ -111,9 +114,19 @@ angular.module('oppia').directive('questionsTab', [
           };
           ctrl.$onInit = function() {
             $scope.selectedSkillId = null;
-            $scope.$on(EVENT_TOPIC_INITIALIZED, _initTab);
-            $scope.$on(EVENT_TOPIC_REINITIALIZED, _initTab);
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicInitialized.subscribe(
+                () => _initTab()
+              ));
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicReinitialized.subscribe(
+                () => _initTab()
+              ));
             _initTab();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

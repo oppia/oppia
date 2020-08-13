@@ -33,6 +33,7 @@ angular.module('oppia').factory('TopicUpdateService', [
   'CMD_DELETE_CANONICAL_STORY', 'CMD_DELETE_SUBTOPIC',
   'CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'CMD_REARRANGE_CANONICAL_STORY',
   'CMD_REARRANGE_SKILL_IN_SUBTOPIC',
+  'CMD_REARRANGE_SUBTOPIC',
   'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC',
   'CMD_REMOVE_UNCATEGORIZED_SKILL_ID', 'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY',
   'CMD_UPDATE_SUBTOPIC_PROPERTY', 'CMD_UPDATE_TOPIC_PROPERTY',
@@ -40,15 +41,18 @@ angular.module('oppia').factory('TopicUpdateService', [
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML',
   'SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
   'SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME', 'SUBTOPIC_PROPERTY_TITLE',
+  'SUBTOPIC_PROPERTY_URL_FRAGMENT',
   'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
   'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_NAME',
   'TOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
-  'TOPIC_PROPERTY_THUMBNAIL_FILENAME', function(
+  'TOPIC_PROPERTY_THUMBNAIL_FILENAME',
+  'TOPIC_PROPERTY_URL_FRAGMENT', function(
       ChangeObjectFactory, UndoRedoService,
       CMD_ADD_SUBTOPIC, CMD_DELETE_ADDITIONAL_STORY,
       CMD_DELETE_CANONICAL_STORY, CMD_DELETE_SUBTOPIC,
       CMD_MOVE_SKILL_ID_TO_SUBTOPIC, CMD_REARRANGE_CANONICAL_STORY,
       CMD_REARRANGE_SKILL_IN_SUBTOPIC,
+      CMD_REARRANGE_SUBTOPIC,
       CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
       CMD_REMOVE_UNCATEGORIZED_SKILL_ID, CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
       CMD_UPDATE_SUBTOPIC_PROPERTY, CMD_UPDATE_TOPIC_PROPERTY,
@@ -56,10 +60,12 @@ angular.module('oppia').factory('TopicUpdateService', [
       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
       SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
       SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME, SUBTOPIC_PROPERTY_TITLE,
+      SUBTOPIC_PROPERTY_URL_FRAGMENT,
       TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
       TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_NAME,
       TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
-      TOPIC_PROPERTY_THUMBNAIL_FILENAME) {
+      TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+      TOPIC_PROPERTY_URL_FRAGMENT) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // topic.
@@ -152,6 +158,26 @@ angular.module('oppia').factory('TopicUpdateService', [
           }, function(changeDict, topic) {
             // ---- Undo ----
             topic.setAbbreviatedName(oldAbbreviatedName);
+          });
+      },
+
+      /**
+       * Changes the url fragment of a topic and records the change in the
+       * undo/redo service.
+       */
+      setTopicUrlFragment: function(topic, urlFragment) {
+        var oldUrlFragment = angular.copy(topic.getUrlFragment());
+        _applyTopicPropertyChange(
+          topic, TOPIC_PROPERTY_URL_FRAGMENT,
+          urlFragment, oldUrlFragment,
+          function(changeDict, topic) {
+            // ---- Apply ----
+            var newUrlFragment = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            topic.setUrlFragment(newUrlFragment);
+          }, function(changeDict, topic) {
+            // ---- Undo ----
+            topic.setUrlFragment(oldUrlFragment);
           });
       },
 
@@ -457,6 +483,30 @@ angular.module('oppia').factory('TopicUpdateService', [
       },
 
       /**
+       * Changes the url fragment of a subtopic and records the change in
+       * the undo/redo service.
+       */
+      setSubtopicUrlFragment: function(topic, subtopicId, urlFragment) {
+        var subtopic = topic.getSubtopicById(subtopicId);
+        if (!subtopic) {
+          throw new Error('Subtopic doesn\'t exist');
+        }
+        var oldUrlFragment = angular.copy(subtopic.getUrlFragment());
+        _applySubtopicPropertyChange(
+          topic, SUBTOPIC_PROPERTY_URL_FRAGMENT, subtopicId,
+          urlFragment, oldUrlFragment,
+          function(changeDict, topic) {
+            // ---- Apply ----
+            var newUrlFragment = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            subtopic.setUrlFragment(newUrlFragment);
+          }, function(changeDict, topic) {
+            // ---- Undo ----
+            subtopic.setUrlFragment(oldUrlFragment);
+          });
+      },
+
+      /**
        * Changes the thumbnail background color of a subtopic and records
        * the change in the undo/redo service.
        */
@@ -603,6 +653,23 @@ angular.module('oppia').factory('TopicUpdateService', [
         }, function(changeDict, topic) {
           // ---- Undo ----
           topic.rearrangeSkillInSubtopic(subtopicId, toIndex, fromIndex);
+        });
+      },
+      /**
+       * Rearranges a subtopic to another position and records the change in
+       * undo/redo service.
+       */
+      rearrangeSubtopic: function(
+          topic, fromIndex, toIndex) {
+        _applyChange(topic, CMD_REARRANGE_SUBTOPIC, {
+          from_index: fromIndex,
+          to_index: toIndex
+        }, function(changeDict, topic) {
+          // ---- Apply ----
+          topic.rearrangeSubtopic(fromIndex, toIndex);
+        }, function(changeDict, topic) {
+          // ---- Undo ----
+          topic.rearrangeSubtopic(toIndex, fromIndex);
         });
       },
 

@@ -16,17 +16,10 @@
  * @fileoverview Primary directive for the collection editor page.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'pages/collection-editor-page/editor-tab/collection-editor-tab.directive.ts');
-require(
-  'pages/collection-editor-page/history-tab/' +
-  'collection-history-tab.directive.ts');
-require(
-  'pages/collection-editor-page/settings-tab/' +
-  'collection-settings-tab.directive.ts');
-require(
-  'pages/collection-editor-page/statistics-tab/' +
-  'collection-statistics-tab.directive.ts');
 
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
@@ -47,13 +40,12 @@ angular.module('oppia').directive('collectionEditorPage', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'CollectionEditorStateService', 'PageTitleService',
-        'RouterService', 'UrlService', 'EVENT_COLLECTION_INITIALIZED',
-        'EVENT_COLLECTION_REINITIALIZED',
+        'RouterService', 'UrlService',
         function(
             $scope, CollectionEditorStateService, PageTitleService,
-            RouterService, UrlService, EVENT_COLLECTION_INITIALIZED,
-            EVENT_COLLECTION_REINITIALIZED) {
+            RouterService, UrlService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var setTitle = function() {
             var title = (
               CollectionEditorStateService.getCollection().getTitle());
@@ -69,11 +61,17 @@ angular.module('oppia').directive('collectionEditorPage', [
             return RouterService.getActiveTabName();
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_COLLECTION_INITIALIZED, setTitle);
-            $scope.$on(EVENT_COLLECTION_REINITIALIZED, setTitle);
+            ctrl.directiveSubscriptions.add(
+              CollectionEditorStateService.onCollectionInitialized.subscribe(
+                () => setTitle()
+              )
+            );
             // Load the collection to be edited.
             CollectionEditorStateService.loadCollection(
               UrlService.getCollectionIdFromEditorUrl());
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

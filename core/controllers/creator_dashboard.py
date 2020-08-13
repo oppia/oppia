@@ -45,9 +45,8 @@ import utils
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
 
-EXPLORATION_ID_KEY = 'explorationId'
-COLLECTION_ID_KEY = 'collectionId'
-QUESTION_ID_KEY = 'questionId'
+EXPLORATION_ID_KEY = 'exploration_id'
+COLLECTION_ID_KEY = 'collection_id'
 
 
 class OldNotificationsDashboardRedirectPage(base.BaseHandler):
@@ -59,13 +58,13 @@ class OldNotificationsDashboardRedirectPage(base.BaseHandler):
         self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL, permanent=True)
 
 
-class OldCommunityDashboardRedirectPage(base.BaseHandler):
-    """Redirects the old community dashboard URL to the new one."""
+class OldContributorDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old contributor dashboard URL to the new one."""
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/community-dashboard', permanent=True)
+        self.redirect('/contributor-dashboard', permanent=True)
 
 
 class NotificationsDashboardPage(base.BaseHandler):

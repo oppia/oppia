@@ -17,6 +17,8 @@
  */
 
 require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require(
   'components/forms/schema-based-editors/' +
   'schema-based-bool-editor.directive.ts');
 require(
@@ -42,6 +44,12 @@ require(
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.directive.ts');
+require('components/forms/validators/is-at-least.filter.ts');
+require('components/forms/validators/is-at-most.filter.ts');
+require('components/forms/validators/is-float.filter.ts');
+require('components/forms/validators/is-integer.filter.ts');
+require('components/forms/validators/is-nonempty.filter.ts');
+require('components/forms/validators/is-url-fragment.filter.ts');
 
 angular.module('oppia').directive('schemaBasedEditor', [
   function() {

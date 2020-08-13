@@ -19,6 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { MathInteractionsService } from 'services/math-interactions.service';
+
 class GuppyObject {
   divId = null;
   guppyInstance = null;
@@ -33,16 +35,47 @@ class GuppyObject {
 })
 export class GuppyInitializationService {
   private guppyInstances: Array<GuppyObject> = [];
+  private onScreenKeyboardShown = false;
+  static interactionType: string;
+  static customOskLetters: Array<string> = [];
 
-  init(guppyDivClassName: string): void {
+  init(guppyDivClassName: string, placeholderText: string, initialValue = ''):
+      void {
+    this.onScreenKeyboardShown = false;
     let guppyDivs = document.querySelectorAll('.' + guppyDivClassName);
     let divId, guppyInstance;
+    let mathInteractionsService = new MathInteractionsService();
     for (let i = 0; i < guppyDivs.length; i++) {
       divId = 'guppy_' + Math.floor(Math.random() * 100000000);
       // Dynamically assigns a unique id to the guppy div.
       guppyDivs[i].setAttribute('id', divId);
       // Create a new guppy instance for that div.
       guppyInstance = new Guppy(divId, {});
+
+      guppyInstance.configure(
+        'empty_content',
+        '\\color{grey}{\\text{\\small{' + placeholderText + '}}}');
+
+      // Initialize it with a value for the creator's view.
+      if (guppyDivClassName === 'guppy-div-creator' &&
+        initialValue.length !== 0) {
+        if (initialValue.indexOf('=') !== -1) {
+          let splitByEquals = initialValue.split('=');
+          splitByEquals[0] = mathInteractionsService.insertMultiplicationSigns(
+            splitByEquals[0]);
+          splitByEquals[1] = mathInteractionsService.insertMultiplicationSigns(
+            splitByEquals[1]);
+          initialValue = splitByEquals.join('=');
+        } else {
+          initialValue = mathInteractionsService.insertMultiplicationSigns(
+            initialValue);
+        }
+        initialValue = initialValue.replace(/abs\(/g, 'absolutevalue(');
+        initialValue = initialValue.replace(/sqrt\(/g, 'squareroot(');
+        guppyInstance.import_text(initialValue);
+        guppyInstance.engine.end();
+        guppyInstance.render(true);
+      }
       this.guppyInstances.push(new GuppyObject(divId, guppyInstance));
     }
   }
@@ -54,6 +87,14 @@ export class GuppyInitializationService {
         return guppyObject;
       }
     }
+  }
+
+  getShowOSK(): boolean {
+    return this.onScreenKeyboardShown;
+  }
+
+  setShowOSK(value: boolean): void {
+    this.onScreenKeyboardShown = value;
   }
 }
 

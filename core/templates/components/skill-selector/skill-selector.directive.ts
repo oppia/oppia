@@ -30,6 +30,7 @@ angular.module('oppia').directive('selectSkill', [
         selectedSkillId: '=',
         getCountOfSkillsToPrioritize: '&countOfSkillsToPrioritize',
         getCategorizedSkills: '&categorizedSkills',
+        getUntriagedSkillSummaries: '&untriagedSkillSummaries',
         canAllowSkillsFromOtherTopics: '&allowSkillsFromOtherTopics',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -40,21 +41,27 @@ angular.module('oppia').directive('selectSkill', [
           ctrl.$onInit = function() {
             $scope.selectedSkill = null;
             $scope.categorizedSkills = $scope.getCategorizedSkills();
+            $scope.untriagedSkillSummaries = (
+              $scope.getUntriagedSkillSummaries());
             $scope.checkIfEmpty = function(skills) {
               return (skills.length === 0);
+            };
+            $scope.checkIfTopicIsEmpty = function(topicName) {
+              for (let key in $scope.categorizedSkills[topicName]) {
+                if (
+                  Object.keys(
+                    $scope.categorizedSkills[topicName][key]).length) {
+                  return true;
+                }
+              }
+              return false;
             };
             $scope.setSelectedSkillId = function() {
               $scope.selectedSkillId = $scope.selectedSkill;
             };
-            $scope.hasUntriagedSkills = function(topicName) {
-              return (topicName === 'untriaged_skills');
-            };
             $scope.topicFilterList = [];
             $scope.subTopicFilterDict = {};
             for (var topicName in $scope.categorizedSkills) {
-              if (topicName === 'untriaged_skills') {
-                continue;
-              }
               var topicNameDict = {
                 topicName: topicName,
                 checked: false
