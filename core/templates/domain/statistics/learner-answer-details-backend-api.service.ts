@@ -32,7 +32,36 @@ export class LearnerAnswerDetailsBackendApiService {
   constructor(
     private httpClient: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
-
+  
+  LEARNER_ANSWER_INFO_DATA_URL = (
+    '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
+    '<entity_id>'
+  );
+  _expId: string;
+  _fetchLearnerAnswerInfoData() {
+    const learnerAnswerInfoDataUrl =
+      this.urlInterpolationService.interpolateUrl(
+        this.LEARNER_ANSWER_INFO_DATA_URL, {
+          entity_type: 'exploration',
+          entity_id: this._expId
+        });
+    return this.httpClient.get(learnerAnswerInfoDataUrl).toPromise();
+  }
+  _deleteLearnerAnswerInfo(
+      entityId, stateName, learnerAnswerInfoId) {
+    const learnerAnswerInfoDataUrl =
+      this.urlInterpolationService.interpolateUrl(
+        this.LEARNER_ANSWER_INFO_DATA_URL, {
+          entity_type: 'exploration',
+          entity_id: entityId
+        });
+    return this.httpClient['delete'](learnerAnswerInfoDataUrl, {
+      params: {
+        state_name: stateName,
+        learner_answer_info_id: learnerAnswerInfoId
+      }
+    });
+  }
   recordLearnerAnswerDetails(
       explorationId: string, stateName: string, interactionId: string,
       answer: string, answerDetails: string): Promise<void> {

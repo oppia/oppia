@@ -28,6 +28,8 @@ import { LearnerAnswerInfo } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { LearnerAnswerDetailsBackendApiService } from 
+  'domain/statistics/learner-answer-details-backend-api.service';
 @Injectable( {
   providedIn: 'root'
 })
@@ -35,6 +37,7 @@ export class LearnerAnswerDetailsDataService {
   constructor(
     private explorationDataService:ExplorationDataService,
     private http:HttpClient,
+    private learnerAnswerDetailsBackendApiService:LearnerAnswerDetailsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
   _expId: string;
@@ -44,36 +47,11 @@ export class LearnerAnswerDetailsDataService {
     '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
     '<entity_id>'
   );
-
-  private _fetchLearnerAnswerInfoData() {
-    const learnerAnswerInfoDataUrl =
-      this.urlInterpolationService.interpolateUrl(
-        this.LEARNER_ANSWER_INFO_DATA_URL, {
-          entity_type: 'exploration',
-          entity_id: this._expId
-        });
-    return this.http.get(learnerAnswerInfoDataUrl).toPromise();
-  }
-  private _deleteLearnerAnswerInfo(
-      entityId, stateName, learnerAnswerInfoId) {
-    const learnerAnswerInfoDataUrl =
-      this.urlInterpolationService.interpolateUrl(
-        this.LEARNER_ANSWER_INFO_DATA_URL, {
-          entity_type: 'exploration',
-          entity_id: entityId
-        });
-    return this.http['delete'](learnerAnswerInfoDataUrl, {
-      params: {
-        state_name: stateName,
-        learner_answer_info_id: learnerAnswerInfoId
-      }
-    });
-  }
   public getData() {
     return this._data;
   }
   public fetchLearnerAnswerInfoData() {
-    return this._fetchLearnerAnswerInfoData().then(
+    return this.learnerAnswerDetailsBackendApiService._fetchLearnerAnswerInfoData().then(
       (response)=>{
         this.learnerAnswerInfoData = response.learner_answer_info_data;
         for (let i = 0;i < this.learnerAnswerInfoData.length;i++) {
@@ -99,7 +77,7 @@ export class LearnerAnswerDetailsDataService {
     );
   }
   public deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId) {
-    return this._deleteLearnerAnswerInfo(
+    return this.learnerAnswerDetailsBackendApiService._deleteLearnerAnswerInfo(
       entityId, stateName, learnerAnswerInfoId
     ).toPromise().then((response)=>{
       return response.status;

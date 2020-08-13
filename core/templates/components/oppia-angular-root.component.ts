@@ -337,6 +337,8 @@ import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
+import { LearnerAnswerDetailsDataService } from
+  'pages/exploration-editor-page/services/learner-answer-details-data.service';
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
@@ -691,8 +693,6 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { TranslateService } from 'services/translate.service';
-import { LearnerAnswerDetailsDataService } from
-  'pages/exploration-editor-page/services/learner-answer-details-data.service';
 @Component({
   selector: 'oppia-angular-root',
   template: ''
