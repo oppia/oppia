@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for I18nLanguageCodeService.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { Subscription } from 'rxjs';
 
@@ -42,5 +44,11 @@ describe('I18nLanguageCodeService', () => {
     i18nLanguageCodeService.setI18nLanguageCode('es');
     const latestCode = i18nLanguageCodeService.getCurrentI18nLanguageCode();
     expect(latestCode).toBe('es');
+  });
+
+  it('should get event emitter for loading of preferred language codes', () => {
+    let mockPreferredLanguageCodesLoadedEventEmitter = new EventEmitter();
+    expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded).toEqual(
+      mockPreferredLanguageCodesLoadedEventEmitter);
   });
 });

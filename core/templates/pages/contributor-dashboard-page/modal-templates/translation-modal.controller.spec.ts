@@ -30,7 +30,6 @@ describe('Translation Modal Controller', function() {
     subheading: 'Subheading',
     heading: 'Heading'
   };
-  const userIsLoggedIn = true;
   let getTextToTranslateSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -73,14 +72,12 @@ describe('Translation Modal Controller', function() {
     $controller('TranslationModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      opportunity: opportunity,
-      userIsLoggedIn: userIsLoggedIn
+      opportunity: opportunity
     });
   }));
 
   it('should initialize $scope properties after controller is initialized',
     function() {
-      expect($scope.userIsLoggedIn).toBe(userIsLoggedIn);
       expect($scope.uploadingTranslation).toBe(false);
       expect($scope.activeWrittenTranslation).toEqual({
         html: ''

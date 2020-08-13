@@ -108,6 +108,15 @@ describe('Create new skill modal', function() {
       expect($scope.errorMsg).toEqual(errorString);
     });
 
+  it('should return if the skill description is valid', function() {
+    $scope.newSkillDescription = 'valid';
+    expect($scope.isSkillDescriptionValid()).toBe(true);
+    $scope.newSkillDescription = 'invalid{{}}';
+    expect($scope.isSkillDescriptionValid()).toBe(false);
+    $scope.newSkillDescription = 'valid';
+    expect($scope.isSkillDescriptionValid()).toBe(true);
+  });
+
   it('should close the modal with skill input values', function() {
     var rubrics = [
       RubricObjectFactory.create(skillDifficulties[0], []),
