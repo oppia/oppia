@@ -25,7 +25,7 @@ require(
 
 require(
   'pages/story-viewer-page/navbar-breadcrumb/' +
-  'story-viewer-navbar-breadcrumb.component.ts');
+  'story-viewer-navbar-breadcrumb.directive.ts');
 require(
   'pages/story-viewer-page/navbar-pre-logo-action/' +
   'story-viewer-navbar-pre-logo-action.component.ts');
