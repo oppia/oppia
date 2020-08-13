@@ -24,6 +24,8 @@
  * example, ContinueCustomizationArgsBackendDict contains a
  * SubtitledUnicodeBackendDict value, but it is replaced with a SubtitledUnicode
  * value in its frontend counterpart ContinueCustomizationArgs.
+ * Note: there is a regex test in the backend in customization_args_util_test.py
+ * that tests that all interaction ids are covered here.
  */
 
 import { IsExact, AssertTrue } from 'conditional-type-checks';
