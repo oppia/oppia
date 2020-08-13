@@ -16,13 +16,12 @@
  * @fileoverview Service for keeping track of the learner's position.
  */
 
+import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { ContextService } from 'services/context.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +29,8 @@ import { PlayerTranscriptService } from
 export class PlayerPositionService {
   constructor(private contextService: ContextService,
               private playerTranscriptService: PlayerTranscriptService) {}
+
+  private _activeCardChangedEventEmitter = new EventEmitter();
 
   displayedCardIndex = null;
   onChangeCallback = null;
@@ -41,31 +42,18 @@ export class PlayerPositionService {
   }
 
   /**
-   * Get the name of the current state.
-   * @return {object} a string that shows the name of the current state.
-   * @throws Will throw error if the index of card is out of the range of the transcript.
+   * This function is used to find the name of the current state.
+   * @return {string} a string that shows the name of current state.
    */
   getCurrentStateName(): string {
-    try {
-      return (
-        this.playerTranscriptService.getCard(
-          this.displayedCardIndex).getStateName());
-    } catch (e) {
-      let additionalInfo = ('\nUndefined card error debug logs:' +
-          '\nRequested card index: ' + this.displayedCardIndex +
-          '\nExploration ID: ' + this.contextService.getExplorationId() +
-          '\nTotal cards: ' + this.playerTranscriptService.getNumCards() +
-          '\nLast state name: ' +
-          this.playerTranscriptService.getLastStateName()
-      );
-      e.message += additionalInfo;
-      throw e;
-    }
+    return (
+      this.playerTranscriptService.getCard(
+        this.displayedCardIndex).getStateName());
   }
 
   /**
-   * Set the index of the displayed card.
-   * @param {object} index - A number which represents the index of card.
+   * This function is used to set the index of the displayed card.
+   * @param {number} index - The new index of the card.
    */
   setDisplayedCardIndex(index: number): void {
     let oldIndex = this.displayedCardIndex;
@@ -77,33 +65,39 @@ export class PlayerPositionService {
   }
 
   /**
-   * Get the index of the displayed card.
-   * @return {object} a number which represents the index of displayed card.
+   * This function is used to find the index of the displayed card.
+   * @return {number} The index of the displayed card.
    */
   getDisplayedCardIndex(): number {
     return this.displayedCardIndex;
   }
 
   /**
-   * record that the user has submitted an answer.
+   * This function is used to record that the user has submitted an answer.
    */
   recordAnswerSubmission(): void {
     this.learnerJustSubmittedAnAnswer = true;
   }
 
   /**
-   * Record that the user has clicked on the navigation button.
+   * This function is used to record that the user has clicked
+   * on the navigation button.
    */
   recordNavigationButtonClick(): void {
     this.learnerJustSubmittedAnAnswer = false;
   }
 
   /**
-   * Gets whether the learner has just submitted an answer.
-   * @return {boolean} a boolean that shows if the learner has just submitted an answer.
+   * This function is used to get whether the learner has just
+   * submitted an answer.
+   * @return {boolean} Whether the learner has just submitted an answer.
    */
   hasLearnerJustSubmittedAnAnswer(): boolean {
     return this.learnerJustSubmittedAnAnswer;
+  }
+
+  get onActiveCardChanged() {
+    return this._activeCardChangedEventEmitter;
   }
 }
 
