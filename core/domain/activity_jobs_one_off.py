@@ -191,6 +191,10 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         '2020-06-28T07:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
     MIGRATION_END = datetime.datetime.strptime(
         '2020-06-30T13:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+    TEST_SERVER_MIGRATION_START = datetime.datetime.strptime(
+        '2020-06-12T07:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+    TEST_SERVER_MIGRATION_END = datetime.datetime.strptime(
+        '2020-06-14T13:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
@@ -219,6 +223,13 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             commit_model.last_updated = commit_model.created_on
             commit_model.put(update_last_updated_time=False)
             yield ('SUCCESS_FIXED - %s' % class_name, commit_model.id)
+        elif (FixCommitLastUpdatedOneOffJob.TEST_SERVER_MIGRATION_START <
+              last_updated <
+              FixCommitLastUpdatedOneOffJob.TEST_SERVER_MIGRATION_END):
+            commit_model.last_updated = commit_model.created_on
+            commit_model.put(update_last_updated_time=False)
+            yield (
+                'SUCCESS_TEST_SERVER_FIXED - %s' % class_name, commit_model.id)
         elif (datetime.timedelta(0) < last_updated - created_on <
               datetime.timedelta(hours=1)):
             yield ('SUCCESS_NEWLY_CREATED - %s' % class_name, commit_model.id)
