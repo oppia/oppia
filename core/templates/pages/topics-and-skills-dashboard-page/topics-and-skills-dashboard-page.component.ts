@@ -65,8 +65,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
     'TopicsAndSkillsDashboardBackendApiService',
     'TopicsAndSkillsDashboardPageService', 'UrlInterpolationService',
     'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-    'EVENT_TYPE_SKILL_CREATION_ENABLED',
-    'EVENT_TYPE_TOPIC_CREATION_ENABLED',
     'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
     'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
     'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
@@ -80,8 +78,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService, UrlInterpolationService,
         EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-        EVENT_TYPE_SKILL_CREATION_ENABLED,
-        EVENT_TYPE_TOPIC_CREATION_ENABLED,
         FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
         MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
         SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
@@ -121,10 +117,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
             }
             ctrl.userCanCreateTopic = response.canCreateTopic;
             ctrl.userCanCreateSkill = response.canCreateSkill;
-            $rootScope.$broadcast(
-              EVENT_TYPE_TOPIC_CREATION_ENABLED, ctrl.userCanCreateTopic);
-            $rootScope.$broadcast(
-              EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
             ctrl.userCanDeleteTopic = response.canDeleteTopic;
             ctrl.userCanDeleteSkill = response.canDeleteSkill;
 

@@ -195,13 +195,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           }, 20);
         };
 
-        // When page is in the smaller one card format, reinitialize staff after
-        // the user navigates to the Interaction Panel. Otherwise the dimensions
-        // for the staff will be incorrectly calculated.
-        scope.$on('showInteraction', function() {
-          scope.reinitStaff();
-        });
-
         // Creates draggable notes and droppable staff.
         scope.init = function() {
           scope.CONTAINER_WIDTH = staffContainerElt.width();

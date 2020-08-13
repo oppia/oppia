@@ -21,17 +21,15 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('TranslationTabActiveModeService', [
-  '$rootScope', 'TRANSLATION_MODE', 'VOICEOVER_MODE',
-  function($rootScope, TRANSLATION_MODE, VOICEOVER_MODE) {
+  'TRANSLATION_MODE', 'VOICEOVER_MODE',
+  function(TRANSLATION_MODE, VOICEOVER_MODE) {
     var activeMode = null;
     return {
       activateVoiceoverMode: function() {
         activeMode = VOICEOVER_MODE;
-        $rootScope.$broadcast('translationTabModeChange');
       },
       activateTranslationMode: function() {
         activeMode = TRANSLATION_MODE;
-        $rootScope.$broadcast('translationTabModeChange');
       },
       isTranslationModeActive: function() {
         return activeMode === TRANSLATION_MODE;

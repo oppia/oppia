@@ -128,10 +128,6 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
               ctrl.setOverlay();
             });
 
-            $scope.$on('showInteraction', function() {
-              refreshMap();
-            });
-
             $scope.$on('leafletDirectiveMap.interactiveMap.mouseover',
               function() {
                 if (!ctrl.interactionIsActive) {

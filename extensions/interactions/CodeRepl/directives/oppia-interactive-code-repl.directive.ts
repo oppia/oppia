@@ -78,15 +78,6 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
               ctrl.code = editor.getValue();
             });
 
-            // Without this, the editor does not show up correctly on small
-            // screens when the user switches to the supplemental interaction.
-            $scope.$on('showInteraction', function() {
-              $timeout(function() {
-                editor.refresh();
-                initMarkers(editor);
-              }, 200);
-            });
-
             ctrl.hasLoaded = true;
           };
           ctrl.runAndSubmitCode = function(codeInput) {
