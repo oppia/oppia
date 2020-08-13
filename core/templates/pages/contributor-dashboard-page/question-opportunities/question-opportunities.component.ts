@@ -30,11 +30,18 @@ require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
 require(
+  'pages/contributor-dashboard-page/login-required-message/' +
+  'login-required-message.directive.ts');
+require(
+  'pages/contributor-dashboard-page/opportunities-list/' +
+  'opportunities-list.directive.ts');
+require(
   'pages/contributor-dashboard-page/modal-templates/' +
   'question-suggestion-editor-modal.controller.ts');
 require(
   'pages/topic-editor-page/modal-templates/' +
   'question-opportunities-select-skill-and-difficulty-modal.controller.ts');
+
 require(
   'components/question-directives/questions-list/' +
   'questions-list.constants.ajs.ts');
@@ -56,14 +63,15 @@ angular.module('oppia').component('questionOpportunities', {
   controller: [
     '$rootScope', '$uibModal', 'AlertsService',
     'ContributionOpportunitiesService', 'QuestionObjectFactory',
-    'QuestionUndoRedoService', 'UrlInterpolationService',
+    'QuestionUndoRedoService', 'UrlInterpolationService', 'UserService',
     'MAX_QUESTIONS_PER_SKILL',
     function(
         $rootScope, $uibModal, AlertsService,
         ContributionOpportunitiesService, QuestionObjectFactory,
-        QuestionUndoRedoService, UrlInterpolationService,
+        QuestionUndoRedoService, UrlInterpolationService, UserService,
         MAX_QUESTIONS_PER_SKILL) {
       const ctrl = this;
+      let userIsLoggedIn = false;
 
       const updateWithNewOpportunities = function(opportunities, more) {
         for (const index in opportunities) {
@@ -97,6 +105,11 @@ angular.module('oppia').component('questionOpportunities', {
       };
 
       ctrl.onClickSuggestQuestionButton = function(skillId) {
+        if (!userIsLoggedIn) {
+          ContributionOpportunitiesService.showRequiresLoginModal();
+          return;
+        }
+
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic-editor-page/modal-templates/' +
@@ -154,6 +167,9 @@ angular.module('oppia').component('questionOpportunities', {
         ctrl.moreOpportunitiesAvailable = true;
         ctrl.progressBarRequired = true;
         ctrl.opportunityHeadingTruncationLength = 45;
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          userIsLoggedIn = userInfo.isLoggedIn();
+        });
         ContributionOpportunitiesService.getSkillOpportunities(
           updateWithNewOpportunities);
       };

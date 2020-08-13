@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for RearrangeSkillsInSubtopicsModalController.
  */
 
+import { EventEmitter } from '@angular/core';
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
@@ -29,6 +30,8 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var TopicUpdateService;
   var SubtopicObjectFactory;
   var TopicObjectFactory;
+  var topicInitializedEventEmitter = null;
+  var topicReinitializedEventEmitter = null;
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -54,6 +57,10 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
 
     });
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should initialize the variables', function() {
     ctrl.init();
@@ -116,4 +123,27 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     expect(ctrl.editableName).toEqual('');
     expect(ctrl.selectedSubtopicId).toEqual(0);
   });
+
+  it('should call initEditor on calls from topic being initialized',
+    function() {
+      topicInitializedEventEmitter = new EventEmitter();
+      topicReinitializedEventEmitter = new EventEmitter();
+
+      spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
+        function() {
+          return topicInitializedEventEmitter;
+        });
+      spyOnProperty(
+        TopicEditorStateService, 'onTopicReinitialized').and.callFake(
+        function() {
+          return topicReinitializedEventEmitter;
+        });
+      spyOn(ctrl, 'initEditor').and.callThrough();
+      ctrl.init();
+      expect(ctrl.initEditor).toHaveBeenCalledTimes(1);
+      topicInitializedEventEmitter.emit();
+      expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
+      topicReinitializedEventEmitter.emit();
+      expect(ctrl.initEditor).toHaveBeenCalledTimes(3);
+    });
 });

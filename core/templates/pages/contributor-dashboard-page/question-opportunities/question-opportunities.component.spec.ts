@@ -30,13 +30,13 @@ describe('Question opportunities component', function() {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
-  var $scope = null;
   var $uibModal = null;
   var alertsService = null;
   var contributionOpportunitiesService = null;
   var questionUndoRedoService = null;
   var skillObjectFactory = null;
   var skillOpportunityObjectFactory = null;
+  var userService = null;
 
   var opportunitiesArray = [];
 
@@ -63,6 +63,7 @@ describe('Question opportunities component', function() {
     contributionOpportunitiesService = $injector.get(
       'ContributionOpportunitiesService');
     questionUndoRedoService = $injector.get('QuestionUndoRedoService');
+    userService = $injector.get('UserService');
 
     opportunitiesArray = [
       skillOpportunityObjectFactory.createFromBackendDict({
@@ -79,7 +80,6 @@ describe('Question opportunities component', function() {
       })
     ];
 
-    $scope = $rootScope.$new();
     ctrl = $componentController('questionOpportunities', {
       $rootScope: $rootScope,
       AlertsService: alertsService
@@ -106,7 +106,7 @@ describe('Question opportunities component', function() {
         callback(opportunitiesArray, true);
       });
     ctrl.$onInit();
-    $scope.$apply();
+    $rootScope.$apply();
 
     expect(ctrl.opportunities.length).toBe(2);
     expect(ctrl.moreOpportunitiesAvailable).toBe(true);
@@ -120,7 +120,7 @@ describe('Question opportunities component', function() {
         callback(opportunitiesArray, false);
       });
     ctrl.onLoadMoreOpportunities();
-    $scope.$apply();
+    $rootScope.$apply();
 
     getMoreSkillOpportunitiesSpy.calls.reset();
 
@@ -132,9 +132,33 @@ describe('Question opportunities component', function() {
     expect(getMoreSkillOpportunitiesSpy).not.toHaveBeenCalled();
   });
 
+  it('should open requires login modal when trying to select a question and' +
+    ' a skill difficulty and user is not logged', function() {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => false
+    }));
+    ctrl.$onInit();
+    $rootScope.$apply();
+
+    spyOn($uibModal, 'open');
+    // The callFake is to avoid conflicts when testing modal calls.
+    spyOn(contributionOpportunitiesService, 'showRequiresLoginModal').and
+      .callFake(() => {});
+    ctrl.onClickSuggestQuestionButton('1');
+
+    expect($uibModal.open).not.toHaveBeenCalled();
+  });
+
+
   it('should open select skill and skill difficulty modal when clicking' +
     ' on suggesting question button', function() {
     spyOn($uibModal, 'open').and.callThrough();
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => true
+    }));
+    ctrl.$onInit();
+    $rootScope.$apply();
+
     ctrl.onClickSuggestQuestionButton('1');
     $rootScope.$apply();
 
@@ -171,6 +195,12 @@ describe('Question opportunities component', function() {
     function() {
       alertsService.clearWarnings();
       var openSpy = spyOn($uibModal, 'open');
+      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+        isLoggedIn: () => true
+      }));
+      ctrl.$onInit();
+      $rootScope.$apply();
+
       openSpy.and.returnValue({
         result: $q.resolve({
           skill: skillObjectFactory.createFromBackendDict({
@@ -211,6 +241,12 @@ describe('Question opportunities component', function() {
     function() {
       alertsService.clearWarnings();
       var openSpy = spyOn($uibModal, 'open');
+      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+        isLoggedIn: () => true
+      }));
+      ctrl.$onInit();
+      $rootScope.$apply();
+
       openSpy.and.returnValue({
         result: $q.resolve({
           skill: skillObjectFactory.createFromBackendDict({
@@ -252,6 +288,12 @@ describe('Question opportunities component', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => true
+    }));
+    ctrl.$onInit();
+    $rootScope.$apply();
+
     ctrl.onClickSuggestQuestionButton('1');
     $rootScope.$apply();
 
