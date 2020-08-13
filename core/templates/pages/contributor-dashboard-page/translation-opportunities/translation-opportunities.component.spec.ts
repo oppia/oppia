@@ -63,9 +63,6 @@ describe('Translation opportunities component', function() {
 
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en');
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedId: () => true
-    }));
 
     opportunitiesArray = [
       explorationOpportunitySummaryObjectFactory.createFromBackendDict({
@@ -160,12 +157,16 @@ describe('Translation opportunities component', function() {
     });
 
   it('should open translation modal when clicking button', function() {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => true
+    }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {
         callback(opportunitiesArray, false);
       });
     ctrl.$onInit();
     $scope.$apply();
+
     spyOn($uibModal, 'open').and.callThrough();
     ctrl.onClickButton('2');
 
@@ -173,12 +174,16 @@ describe('Translation opportunities component', function() {
   });
 
   it('shoud close translation modal when clicking save', function() {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => true
+    }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {
         callback(opportunitiesArray, false);
       });
     ctrl.$onInit();
     $scope.$apply();
+
     var modalSpy = spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });
@@ -189,12 +194,16 @@ describe('Translation opportunities component', function() {
   });
 
   it('should dismiss translation modal when clicking cancel', function() {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => true
+    }));
     spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
       .callFake((activeLanguage, callback) => {
         callback(opportunitiesArray, false);
       });
     ctrl.$onInit();
     $scope.$apply();
+
     var modalSpy = spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
@@ -202,5 +211,26 @@ describe('Translation opportunities component', function() {
     $scope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
+  });
+
+  it('should not open translation modal when user is not logged', function() {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => false
+    }));
+    spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
+      .callFake((activeLanguage, callback) => {
+        callback(opportunitiesArray, false);
+      });
+    ctrl.$onInit();
+    $scope.$apply();
+
+    spyOn($uibModal, 'open');
+    // The callFake is to avoid conflicts when testing modal calls.
+    spyOn(contributionOpportunitiesService, 'showRequiresLoginModal').and
+      .callFake(() => {});
+    ctrl.onClickButton('2');
+    $scope.$apply();
+
+    expect($uibModal.open).not.toHaveBeenCalled();
   });
 });

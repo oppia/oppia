@@ -23,6 +23,9 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 require(
+  'pages/contributor-dashboard-page/login-required-message/' +
+  'login-required-message.directive.ts');
+require(
   'pages/contributor-dashboard-page/modal-templates/' +
   'translation-modal.controller.ts');
 require(
@@ -32,6 +35,7 @@ require(
 require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
+require('pages/contributor-dashboard-page/services/translate-text.service.ts');
 
 angular.module('oppia').component('translationOpportunities', {
   template: require('./translation-opportunities.component.html'),
@@ -89,6 +93,10 @@ angular.module('oppia').component('translationOpportunities', {
       };
 
       ctrl.onClickButton = function(expId) {
+        if (!userIsLoggedIn) {
+          ContributionOpportunitiesService.showRequiresLoginModal();
+          return;
+        }
         var opportunity = getOpportunitySummary(expId);
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -99,9 +107,6 @@ angular.module('oppia').component('translationOpportunities', {
           resolve: {
             opportunity: function() {
               return opportunity;
-            },
-            userIsLoggedIn: function() {
-              return userIsLoggedIn;
             }
           },
           controller: 'TranslationModalController'

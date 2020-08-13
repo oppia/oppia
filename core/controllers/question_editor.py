@@ -221,6 +221,13 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         if not commit_message:
             raise self.PageNotFoundException
+
+        if (commit_message is not None and
+                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+
         if not self.payload.get('change_list'):
             raise self.PageNotFoundException
         change_list = [
