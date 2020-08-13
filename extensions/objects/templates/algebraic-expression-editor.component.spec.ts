@@ -25,17 +25,17 @@ import { MathInteractionsService } from 'services/math-interactions.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 describe('AlgebraicExpressionEditor', function() {
-  var ctrl = null, $window = null;
-  var mockGuppyObject = {
+  let ctrl = null, $window = null;
+  let mockGuppyObject = {
     guppyInstance: {
       asciimath: function() {
         return 'Dummy value';
       }
     }
   };
-  var guppyConfigurationService = null;
-  var mathInteractionsService = null;
-  var guppyInitializationService = null;
+  let guppyConfigurationService = null;
+  let mathInteractionsService = null;
+  let guppyInitializationService = null;
   let deviceInfoService = null;
 
   class MockGuppy {

@@ -16,10 +16,17 @@
  * @fileoverview Unit tests for the set of algebraic identifier component.
  */
 
-describe('SetOfAlgebraicIdentifier', function() {
+import { GuppyInitializationService } from
+  'services/guppy-initialization.service.ts';
+
+fdescribe('SetOfAlgebraicIdentifier', function() {
   var ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'GuppyInitializationService', new GuppyInitializationService());
+  }));
   beforeEach(angular.mock.inject(function($componentController) {
     ctrl = $componentController('setOfAlgebraicIdentifierEditor');
   }));
