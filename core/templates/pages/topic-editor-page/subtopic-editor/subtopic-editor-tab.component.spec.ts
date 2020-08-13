@@ -17,6 +17,8 @@
  * @fileoverview Unit tests for the subtopic editor tab component.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Subtopic editor tab', function() {
@@ -50,6 +52,9 @@ describe('Subtopic editor tab', function() {
     isWindowNarrow: () => false
   };
 
+  var topicInitializedEventEmitter = null;
+  var topicReinitializedEventEmitter = null;
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -81,6 +86,19 @@ describe('Subtopic editor tab', function() {
     topic._uncategorizedSkillSummaries = [skillSummary];
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
     topic._id = 'sndsjfn42';
+
+    topicInitializedEventEmitter = new EventEmitter();
+    topicReinitializedEventEmitter = new EventEmitter();
+
+    spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
+      function() {
+        return topicInitializedEventEmitter;
+      });
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicReinitialized').and.callFake(
+      function() {
+        return topicReinitializedEventEmitter;
+      });
 
     topic.getSubtopicById = function() {
       return subtopic;
@@ -324,6 +342,14 @@ describe('Subtopic editor tab', function() {
       ctrl.navigateToTopicEditor();
       expect(navigateSpy).toHaveBeenCalled();
     });
+
+  it('should call initEditor when topic is initialized', function() {
+    spyOn(ctrl, 'initEditor').and.callThrough();
+    topicInitializedEventEmitter.emit();
+    expect(ctrl.initEditor).toHaveBeenCalledTimes(1);
+    topicReinitializedEventEmitter.emit();
+    expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
+  });
 
   it('should hide the html data input on canceling', function() {
     ctrl.schemaEditorIsShown = true;

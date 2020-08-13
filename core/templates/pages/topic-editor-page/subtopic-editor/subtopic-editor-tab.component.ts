@@ -46,8 +46,7 @@ angular.module('oppia').component('subtopicEditorTab', {
     'TopicEditorRoutingService', 'TopicUpdateService',
     'UndoRedoService',
     'UrlInterpolationService', 'WindowDimensionsService',
-    'EVENT_TOPIC_INITIALIZED',
-    'EVENT_TOPIC_REINITIALIZED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
+    'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
         $scope, EntityCreationService, QuestionBackendApiService,
@@ -55,16 +54,16 @@ angular.module('oppia').component('subtopicEditorTab', {
         TopicEditorRoutingService, TopicUpdateService,
         UndoRedoService,
         UrlInterpolationService, WindowDimensionsService,
-        EVENT_TOPIC_INITIALIZED,
-        EVENT_TOPIC_REINITIALIZED, MAX_CHARS_IN_SUBTOPIC_TITLE,
+        MAX_CHARS_IN_SUBTOPIC_TITLE,
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
       ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
-      var _initEditor = function() {
+      ctrl.initEditor = function() {
         ctrl.topic = TopicEditorStateService.getTopic();
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
@@ -250,7 +249,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.selectedSkillEditOptionsIndex = -1;
         TopicUpdateService.removeSkillFromSubtopic(
           ctrl.topic, ctrl.subtopicId, skillSummary);
-        _initEditor();
+        ctrl.initEditor();
       };
 
       ctrl.removeSkillFromTopic = function(skillSummary) {
@@ -259,7 +258,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.topic, ctrl.subtopicId, skillSummary);
         TopicUpdateService.removeUncategorizedSkill(
           ctrl.topic, skillSummary);
-        _initEditor();
+        ctrl.initEditor();
       };
 
       ctrl.navigateToTopicEditor = function() {
@@ -279,8 +278,6 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.subtopicPreviewCardIsShown = false;
         ctrl.subtopicEditorCardIsShown = true;
         ctrl.schemaEditorIsShown = false;
-        $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-        $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
         ctrl.directiveSubscriptions.add(
           TopicEditorStateService.onSubtopicPageLoaded.subscribe(
             () => {
@@ -291,8 +288,16 @@ angular.module('oppia').component('subtopicEditorTab', {
             }
           )
         );
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onTopicInitialized.subscribe(
+            () => ctrl.initEditor()
+          ));
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onTopicReinitialized.subscribe(
+            () => ctrl.initEditor()
+          ));
 
-        _initEditor();
+        ctrl.initEditor();
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

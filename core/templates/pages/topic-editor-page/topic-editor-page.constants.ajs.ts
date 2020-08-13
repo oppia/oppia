@@ -24,10 +24,3 @@ import { TopicEditorPageConstants } from
 angular.module('oppia').constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL',
   TopicEditorPageConstants.TOPIC_NAME_INPUT_FOCUS_LABEL);
-
-angular.module('oppia').constant(
-  'EVENT_TOPIC_INITIALIZED',
-  TopicEditorPageConstants.EVENT_TOPIC_INITIALIZED);
-angular.module('oppia').constant(
-  'EVENT_TOPIC_REINITIALIZED',
-  TopicEditorPageConstants.EVENT_TOPIC_REINITIALIZED);

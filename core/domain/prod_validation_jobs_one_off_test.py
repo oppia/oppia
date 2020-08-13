@@ -14854,6 +14854,17 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 'not marked as deleted"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
+    def test_incorrect_keys_in_activity_mappings(self):
+        self.model_instance.activity_mappings = {'wrong_key': {'some_id': 'id'}}
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for correct activity_mappings '
+                'check of PendingDeletionRequestModel\', '
+                '[u"Entity id %s: activity_mappings contains keys '
+                '[u\'wrong_key\'] that are not allowed"]]') % self.user_id]
+        run_job_and_check_output(self, expected_output)
+
 
 class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
 

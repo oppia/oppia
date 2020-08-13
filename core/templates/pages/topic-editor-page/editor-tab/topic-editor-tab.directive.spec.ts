@@ -17,12 +17,12 @@
  * @fileoverview Unit tests for the topic editor tab directive.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-
-import { EventEmitter } from '@angular/core';
 
 describe('Topic editor tab directive', function() {
   beforeEach(angular.mock.module('oppia'));
@@ -58,6 +58,9 @@ describe('Topic editor tab directive', function() {
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
+
+  var topicInitializedEventEmitter = null;
+  var topicReinitializedEventEmitter = null;
   var MockWindowDimensionsService = {
     isWindowNarrow: () => false
   };
@@ -91,6 +94,20 @@ describe('Topic editor tab directive', function() {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
+
+    topicInitializedEventEmitter = new EventEmitter();
+    topicReinitializedEventEmitter = new EventEmitter();
+
+    spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
+      function() {
+        return topicInitializedEventEmitter;
+      });
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicReinitialized').and.callFake(
+      function() {
+        return topicReinitializedEventEmitter;
+      });
+
     ctrl = $injector.instantiate(directive.controller, {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
@@ -491,5 +508,12 @@ describe('Topic editor tab directive', function() {
     mockStorySummariesInitializedEventEmitter.emit();
     expect(
       TopicEditorStateService.getCanonicalStorySummaries).toHaveBeenCalled();
+  });
+
+  it('should call initEditor on initialization of topic', function() {
+    spyOn(ctrl, 'initEditor').and.callThrough();
+    topicInitializedEventEmitter.emit();
+    topicReinitializedEventEmitter.emit();
+    expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
   });
 });

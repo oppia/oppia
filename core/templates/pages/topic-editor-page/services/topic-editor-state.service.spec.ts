@@ -69,6 +69,9 @@ describe('Topic editor state service', function() {
   var testSubscriptions = null;
   var subtopicPageLoadedSpy = null;
 
+  const topicInitializedSpy = jasmine.createSpy('topicInitialized');
+  const topicReinitializedSpy = jasmine.createSpy('topicReinitialized');
+
   var FakeEditableTopicBackendApiService = function() {
     var self = {
       newBackendSubtopicPageObject: null,
@@ -357,6 +360,11 @@ describe('Topic editor state service', function() {
     testSubscriptions.add(
       TopicEditorStateService.onSubtopicPageLoaded.subscribe(
         subtopicPageLoadedSpy));
+    testSubscriptions.add(TopicEditorStateService.onTopicInitialized.subscribe(
+      topicInitializedSpy));
+    testSubscriptions.add(
+      TopicEditorStateService.onTopicReinitialized.subscribe(
+        topicReinitializedSpy));
   });
 
   afterEach(() => {
@@ -503,14 +511,12 @@ describe('Topic editor state service', function() {
 
   it('should fire an init event after loading the first topic',
     function() {
-      spyOn($rootScope, '$broadcast').and.callThrough();
-
       TopicEditorStateService.loadTopic(5);
       $rootScope.$apply();
       var skillIdToRubricsObject =
         TopicEditorStateService.getSkillIdToRubricsObject();
       expect(skillIdToRubricsObject.skill_1.length).toEqual(3);
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('topicInitialized');
+      expect(topicInitializedSpy).toHaveBeenCalled();
     }
   );
 
@@ -533,7 +539,7 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.loadTopic(1);
     $rootScope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('topicReinitialized');
+    expect(topicReinitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently loading the topic', function() {
@@ -694,12 +700,10 @@ describe('Topic editor state service', function() {
       TopicEditorStateService.getTopic(), 'New name');
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
     TopicEditorStateService.saveTopic('Commit message');
     $rootScope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'topicReinitialized');
+    expect(topicReinitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently saving the topic', function() {

@@ -40,9 +40,6 @@ export class AppConstants {
 
   public static RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
 
-  /* Called always when learner moves to a new card.
-     Also called when card is selected by clicking on progress dots */
-  public static EVENT_ACTIVE_CARD_CHANGED = 'activeCardChanged';
   /* Called when the learner moves to a new card that they haven't seen
      before. */
   public static EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE =

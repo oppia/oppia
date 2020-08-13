@@ -19,7 +19,4 @@
 export class TopicEditorPageConstants {
   public static TOPIC_NAME_INPUT_FOCUS_LABEL =
     'topicNameInputFocusLabel';
-
-  public static EVENT_TOPIC_INITIALIZED = 'topicInitialized';
-  public static EVENT_TOPIC_REINITIALIZED = 'topicReinitialized';
 }

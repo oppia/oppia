@@ -43,14 +43,12 @@ angular.module('oppia').component('subtopicPreviewTab', {
     'TopicEditorRoutingService', 'TopicUpdateService',
     'UndoRedoService', 'UrlInterpolationService', 'UrlService',
     'WindowDimensionsService',
-    'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
     function(
         $location, $scope, $uibModal, SubtopicPageObjectFactory,
         EntityCreationService, TopicEditorStateService,
         TopicEditorRoutingService, TopicUpdateService,
         UndoRedoService, UrlInterpolationService, UrlService,
-        WindowDimensionsService,
-        EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+        WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var _initEditor = function() {
@@ -100,8 +98,15 @@ angular.module('oppia').component('subtopicPreviewTab', {
         $scope.thumbnailIsShown = false;
       };
 
-      $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-      $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+      ctrl.directiveSubscriptions.add(
+        TopicEditorStateService.onTopicInitialized.subscribe(
+          () => _initEditor()
+        ));
+      ctrl.directiveSubscriptions.add(
+        TopicEditorStateService.onTopicReinitialized.subscribe(
+          () => _initEditor()
+        ));
+
       ctrl.$onInit = function() {
         $scope.THUMBNAIL = 'thumbnail';
         $scope.CONTENT = 'content';
@@ -109,6 +114,7 @@ angular.module('oppia').component('subtopicPreviewTab', {
           !WindowDimensionsService.isWindowNarrow());
         _initEditor();
       };
+
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
       };
