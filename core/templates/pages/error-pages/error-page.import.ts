@@ -16,7 +16,9 @@
  * @fileoverview Scripts for the error page.
  */
 
-// The module needs to be loaded before everything else since it defines the
+// Jquery needs to be loaded before anything else to make angular js work.
+require('third-party-imports/jquery.import');
+// The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/error-pages/error-page.module.ts');
 require('App.ts');

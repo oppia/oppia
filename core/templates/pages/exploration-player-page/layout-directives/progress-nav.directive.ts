@@ -23,6 +23,7 @@ require(
 require('domain/utilities/browser-checker.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
+require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('services/contextual/url.service.ts');
@@ -47,15 +48,15 @@ angular.module('oppia').directive('progressNav', [
       template: require('./progress-nav.directive.html'),
       controller: [
         '$rootScope', '$scope', 'BrowserCheckerService',
-        'ExplorationPlayerStateService', 'PlayerPositionService',
-        'PlayerTranscriptService', 'UrlService', 'WindowDimensionsService',
-        'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
-        'TWO_CARD_THRESHOLD_PX',
+        'ExplorationEngineService', 'ExplorationPlayerStateService',
+        'PlayerPositionService', 'PlayerTranscriptService', 'UrlService',
+        'WindowDimensionsService', 'CONTINUE_BUTTON_FOCUS_LABEL',
+        'INTERACTION_SPECS', 'TWO_CARD_THRESHOLD_PX',
         function($rootScope, $scope, BrowserCheckerService,
-            ExplorationPlayerStateService, PlayerPositionService,
-            PlayerTranscriptService, UrlService, WindowDimensionsService,
-            CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS,
-            TWO_CARD_THRESHOLD_PX) {
+            ExplorationEngineService, ExplorationPlayerStateService,
+            PlayerPositionService, PlayerTranscriptService, UrlService,
+            WindowDimensionsService, CONTINUE_BUTTON_FOCUS_LABEL,
+            INTERACTION_SPECS, TWO_CARD_THRESHOLD_PX) {
           var ctrl = this;
           var transcriptLength = 0;
           var interactionIsInline = true;
@@ -122,7 +123,7 @@ angular.module('oppia').directive('progressNav', [
             if (index >= 0 && index < transcriptLength) {
               PlayerPositionService.recordNavigationButtonClick();
               PlayerPositionService.setDisplayedCardIndex(index);
-              $rootScope.$broadcast('updateActiveStateIfInEditor',
+              ExplorationEngineService.onUpdateActiveStateIfInEditor.emit(
                 PlayerPositionService.getCurrentStateName());
               $rootScope.$broadcast('currentQuestionChanged', index);
             } else {

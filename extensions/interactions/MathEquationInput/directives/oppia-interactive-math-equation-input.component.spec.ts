@@ -85,6 +85,9 @@ describe('MathEquationInputInteractive', function() {
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);
+    $provide.value('$attrs', {
+      customOskLettersWithValue: '[&quot;a&quot;, &quot;b&quot;]'
+    });
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $window = $injector.get('$window');

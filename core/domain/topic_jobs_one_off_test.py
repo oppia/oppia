@@ -51,7 +51,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         'skill_ids': ['skill_1'],
         'thumbnail_bg_color': None,
         'thumbnail_filename': None,
-        'title': 'A subtitle'
+        'title': 'A subtitle',
+        'url_fragment': 'subtitle'
     }
 
     def setUp(self):
@@ -136,7 +137,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         """
         # Generate topic with old(v1) subtopic data.
         self.save_new_topic_with_subtopic_schema_v1(
-            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
+            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev', 'topic-one',
             'a name', '', 'Image.svg', '#C6DCDA', [], [], [], 2)
         topic_model = (
             topic_models.TopicModel.get(self.TOPIC_ID))
@@ -149,7 +150,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'title': 'A subtitle'
             })
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.subtopic_schema_version, 2)
+        self.assertEqual(topic.subtopic_schema_version, 3)
         self.assertEqual(
             topic.subtopics[0].to_dict(),
             self.MIGRATED_SUBTOPIC_DICT)
@@ -188,7 +189,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # The topic model created will be invalid due to invalid language code.
         self.save_new_topic_with_subtopic_schema_v1(
-            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
+            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev', 'topic-two',
             'a name', 'description', 'Image.svg',
             '#C6DCDA', [], [], [], 2,
             language_code='invalid_language_code')
@@ -361,7 +362,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
     def test_job_skips_deleted_topic(self):
         """Tests that the regenerate summary job skips deleted topic."""
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A title', 'Abbrev title', 'description')
+            self.TOPIC_ID, 'A title', 'url-frag-one', 'description')
         topic_services.save_new_topic(self.albert_id, topic)
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
 
@@ -462,7 +463,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A title', 'Abbrev title', 'description')
+            self.TOPIC_ID, 'A title', 'url-frag-two', 'description')
         topic_services.save_new_topic(self.albert_id, topic)
 
         get_topic_by_id_swap = self.swap(
