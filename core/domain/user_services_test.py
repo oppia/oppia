@@ -185,25 +185,48 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
-    def test_set_invalid_user_display_alias_raises_exception(self):
+    def test_update_user_settings_for_invalid_display_alias_raises_error(self):
         gae_id = 'someUser'
         user_id = user_services.create_new_user(
             gae_id, 'user@example.com').user_id
+        user_settings = user_services.get_user_settings(user_id)
+        data = {
+            'subject_interests': ['es', 'el'],
+            'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
+            'pin': None
+        }
         bad_display_aliases_with_expected_error = [
             ('', 'Expected display alias to be a string, received '),
-            (None, 'Expected display alias to be a string, received None')]
+            (0, 'Expected display alias to be a string, received 0')]
         for display_alias, error_msg in bad_display_aliases_with_expected_error:
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
-                user_services.set_user_display_alias(user_id, display_alias)
+                data['display_alias'] = display_alias
+                user_services.update_user_settings_and_auth_data(
+                    user_id, data)
 
-    def test_set_user_valid_display_alias_is_set_successfully(self):
+    def test_update_user_settings_valid_display_alias_set_successfully(self):
         gae_id = 'someUser'
         user_id = user_services.create_new_user(
             gae_id, 'user@example.com').user_id
         display_alias = 'Name'
         user_settings = user_services.get_user_settings(user_id)
+        data = {
+            'subject_interests': ['es', 'el'],
+            'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
+            'pin': None,
+            'display_alias': display_alias
+        }
         self.assertIsNone(user_settings.display_alias)
-        user_services.set_user_display_alias(user_id, display_alias)
+        user_services.update_user_settings_and_auth_data(
+            user_id, data)
         user_settings = user_services.get_user_settings(user_id)
         self.assertEqual(user_settings.display_alias, display_alias)
 
@@ -214,9 +237,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         profile_pin = '123'
         display_alias = 'display_alias'
         user_id = user_services.create_new_user(gae_id, user_email).user_id
-        user_services.set_user_pin(user_id, user_pin)
-        user_services.create_new_profile(
-            gae_id, user_email, display_alias, profile_pin=profile_pin)
+        user_settings = user_services.get_user_settings(user_id)
+        data = {
+            'subject_interests': ['es', 'el'],
+            'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
+            'pin': user_pin,
+            'display_alias': display_alias
+        }
+        user_services.update_user_settings_and_auth_data(user_id, data)
         error_msg = 'Display alias display_alias already exists in the account.'
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.create_new_profile(
@@ -228,10 +260,21 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             gae_id, 'user@example.com').user_id
         bad_pins_with_expected_error = [
             ('', 'Expected PIN to be a string, received '),
-            (None, 'Expected PIN to be a string, received None')]
+            (0, 'Expected PIN to be a string, received 0')]
+        user_settings = user_services.get_user_settings(user_id)
+        data = {
+            'subject_interests': ['es', 'el'],
+            'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
+            'display_alias': None
+        }
         for pin, error_msg in bad_pins_with_expected_error:
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
-                user_services.set_user_pin(user_id, pin)
+                data['pin'] = pin
+                user_services.update_user_settings_and_auth_data(user_id, data)
 
     def test_create_new_user_with_invalid_emails_raises_exception(self):
         bad_email_addresses_with_expected_error_message = [
@@ -663,7 +706,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         profile_pin = '123'
         display_alias = 'display_alias'
         user_id = user_services.create_new_user(gae_id, user_email).user_id
-        user_services.set_user_pin(user_id, user_pin)
+        user_settings = user_services.get_user_settings(user_id)
+        data = {
+            'subject_interests': ['es', 'el'],
+            'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
+            'pin': user_pin,
+            'display_alias': None
+        }
+        user_services.update_user_settings_and_auth_data(user_id, data)
         user_services.create_new_profile(
             gae_id, user_email, display_alias, profile_pin=profile_pin)
         profile_user_id = (
@@ -757,7 +811,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.AUTH_METHOD_GAE, gae_id)
         )
         user_id = user_auth_details_model.id
-        user_services.set_user_pin(user_id, user_pin)
+        user_settings = user_services.get_user_settings(user_id)
+        data = {
+            'subject_interests': ['es', 'el'],
+            'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
+            'pin': user_pin,
+            'display_alias': None
+        }
+        user_services.update_user_settings_and_auth_data(user_id, data)
         user_services.create_new_profile(
             gae_id, email, display_alias, profile_pin=profile_pin)
 
@@ -794,7 +859,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.AUTH_METHOD_GAE, gae_id)
         )
         user_id = user_auth_details_model.id
-        user_services.set_user_pin(user_id, user_pin)
+        user_settings = user_services.get_user_settings(user_id)
+        data = {
+            'subject_interests': ['es', 'el'],
+            'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
+            'pin': user_pin,
+            'display_alias': None
+        }
+        user_services.update_user_settings_and_auth_data(user_id, data)
         profile_1_id = user_services.create_new_profile(
             gae_id, email, display_alias, profile_pin=profile_pin).user_id
         profile_2_id = user_services.create_new_profile(
@@ -1611,13 +1687,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_display_alias_raises_exception(self):
-        self.user_settings.display_alias = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected display alias to be a string'
-        ):
-            self.user_settings.validate()
-
     def test_validate_empty_user_id_raises_exception(self):
         self.user_settings.user_id = ''
         with self.assertRaisesRegexp(
@@ -1657,10 +1726,21 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_validate_empty_display_alias_for_profiles_raises_error(self):
-        user_services.set_user_pin(self.owner_id, '12345')
+        user_settings = user_services.get_user_settings(self.owner_id)
+        data = {
+            'subject_interests': ['es', 'el'],
+            'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
+            'pin': '12345',
+            'display_alias': None
+        }
+        user_services.update_user_settings_and_auth_data(self.owner_id, data)
         gae_id = self.get_gae_id_from_email(self.OWNER_EMAIL)
         profile_pin = '123'
-        error_msg = 'Profile user must have a display alias'
+        error_msg = 'Expected display alias to be a string, received'
         with self.assertRaisesRegexp(utils.ValidationError, error_msg):
             user_services.create_new_profile(
                 gae_id, self.OWNER_EMAIL, '', profile_pin=profile_pin)

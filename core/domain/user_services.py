@@ -224,16 +224,6 @@ class UserSettings(python_utils.OBJECT):
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
 
-        if self.role == feconf.ROLE_ID_LEARNER and not self.display_alias:
-            raise utils.ValidationError(
-                'Profile user must have a display alias.')
-        if (self.display_alias is not None and
-                not isinstance(self.display_alias, python_utils.BASESTRING)):
-            raise utils.ValidationError(
-                'Expected display alias to be a string, received %s' %
-                self.display_alias
-            )
-
     @property
     def truncated_email(self):
         """Returns truncated email by replacing last two characters before @
@@ -1068,6 +1058,12 @@ def create_new_profile(
             'Pin must be set for a full user before creating a profile.')
     parent_user_id = parent_user_auth_details.user_id
 
+    if (not profile_display_alias or
+            not isinstance(profile_display_alias, python_utils.BASESTRING)):
+        raise utils.ValidationError(
+            'Expected display alias to be a string, received %s' %
+            profile_display_alias
+        )
     if does_profile_with_display_alias_exist(
             parent_user_id, profile_display_alias):
         raise Exception(
@@ -1254,36 +1250,78 @@ def set_username(user_id, new_username):
     _save_user_settings(user_settings)
 
 
-def set_user_display_alias(user_id, new_display_alias):
-    """Updates the display alias of the user with the given user_id.
+def update_user_settings_and_auth_data(user_id, data):
+    """Updates PIN, display alias, subject interests and language preferences
+    for the user with the given user_id.
 
     Args:
-        user_id: str. The unique ID of the user.
-        new_display_alias: str. The new display alias to be set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    if (not new_display_alias or
-            not isinstance(new_display_alias, python_utils.BASESTRING)):
-        raise utils.ValidationError(
-            'Expected display alias to be a string, received %s' %
-            new_display_alias
-        )
-    user_settings.display_alias = new_display_alias
-    _save_user_settings(user_settings)
-
-
-def set_user_pin(user_id, new_pin):
-    """Updates the pin of the user with the given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        new_pin: str. The new pin to be set.
+        user_id: str. The unique ID of the user whose data has to be updated.
+        data: dict. The dictionary containing the new user data, whose keys
+            are the attributes of the user settings and user auth details model.
     """
     user_auth_details = get_auth_details_by_user_id(user_id, strict=True)
-    if not new_pin or not isinstance(new_pin, python_utils.BASESTRING):
+    if data['pin'] is None:
+        if user_auth_details.pin is not None:
+            raise utils.ValidationError(
+                'PIN already exists this profile, but provided as empty')
+    else:
+        if not data['pin'] or not isinstance(
+                data['pin'], python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected PIN to be a string, received %s' % data['pin'])
+        user_auth_details.pin = data['pin']
+
+    user_settings = get_user_settings(user_id, strict=True)
+
+    if user_settings.display_alias != data['display_alias']:
+        if (not data['display_alias'] or
+                not isinstance(data['display_alias'], python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected display alias to be a string, received %s' %
+                data['display_alias']
+            )
+        parent_id = (
+            user_auth_details.parent_user_id if user_auth_details.parent_user_id
+            else user_id
+        )
+        if does_profile_with_display_alias_exist(
+                parent_id, data['display_alias']):
+            raise Exception(
+                'Display alias %s already exists in the account.'
+                % (data['display_alias'])
+            )
+        user_settings.display_alias = data['display_alias']
+
+    if not isinstance(data['subject_interests'], list):
+        raise utils.ValidationError('Expected subject_interests to be a list.')
+    else:
+        for interest in data['subject_interests']:
+            if not isinstance(interest, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each subject interest to be a string.')
+            elif not interest:
+                raise utils.ValidationError(
+                    'Expected each subject interest to be non-empty.')
+            elif not re.match(constants.TAG_REGEX, interest):
+                raise utils.ValidationError(
+                    'Expected each subject interest to consist only of '
+                    'lowercase alphabetic characters and spaces.')
+
+    if len(set(data['subject_interests'])) != len(data['subject_interests']):
         raise utils.ValidationError(
-            'Expected PIN to be a string, received %s' % new_pin)
-    user_auth_details.pin = new_pin
+            'Expected each subject interest to be distinct.')
+    user_settings.subject_interests = data['subject_interests']
+
+    user_settings.preferred_language_codes = (
+        data['preferred_language_codes'])
+
+    user_settings.preferred_site_language_code = (
+        data['preferred_site_language_code'])
+
+    user_settings.preferred_audio_language_code = (
+        data['preferred_audio_language_code'])
+
+    _save_user_settings(user_settings)
     _save_user_auth_details(user_auth_details)
 
 
