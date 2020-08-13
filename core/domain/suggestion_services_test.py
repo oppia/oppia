@@ -653,14 +653,33 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Assert that the suggestion has been rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_REJECTED)
+        # Create the new change for the resubmitted suggestion.
+        resubmit_change_content = state_domain.SubtitledHtml(
+            'content', '<p>resubmit change content html</p>').to_dict()
+        resubmit_change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'state_1',
+                'new_value': resubmit_change_content,
+                'old_value': self.change['new_value']
+            }
+        )
 
         # Resubmit rejected suggestion.
         suggestion_services.resubmit_rejected_suggestion(
-            self.suggestion_id, 'resubmit summary message', self.author_id)
+            self.suggestion_id, 'resubmit summary message', self.author_id,
+            resubmit_change)
 
         # Suggestion status should now be in review instead of rejected.
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
+        # Suggestion's change should be updated.
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
+        self.assertEqual(
+            suggestion.change.new_value['html'],
+            resubmit_change_content['html'])
 
     def test_resubmit_rejected_suggestion_raises_exception_for_empty_message(
             self):
@@ -680,7 +699,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Summary message cannot be empty.'):
             suggestion_services.resubmit_rejected_suggestion(
-                self.suggestion_id, '', self.author_id)
+                self.suggestion_id, '', self.author_id, {})
 
     def test_resubmit_rejected_suggestion_raises_exception_for_unhandled_input(
             self):
@@ -704,7 +723,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
-                self.suggestion_id, 'resubmit summary message', self.author_id)
+                self.suggestion_id, 'resubmit summary message',
+                self.author_id, {}
+            )
 
     def test_resubmit_rejected_suggestion_raises_excep_for_accepted_suggestion(
             self):
@@ -737,7 +758,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
                 self.suggestion_id, 'resubmit summary message',
-                self.author_id
+                self.author_id, {}
             )
 
         # Verfiy that the suggestion is still accepted.

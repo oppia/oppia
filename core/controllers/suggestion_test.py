@@ -649,7 +649,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])[0]
         suggestion_services.reject_suggestion(
-            suggestion, self.reviewer_id, 'reject message')
+            suggestion.suggestion_id, self.reviewer_id, 'reject message')
         self.logout()
 
         self.login(self.AUTHOR_EMAIL)

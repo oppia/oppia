@@ -438,7 +438,8 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids):
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
 
 
-def resubmit_rejected_suggestion(suggestion_id, summary_message, author_id):
+def resubmit_rejected_suggestion(suggestion_id, summary_message, author_id,
+        change):
     """Resubmit a rejected suggestion with the given suggestion_id.
 
     Args:
@@ -446,6 +447,7 @@ def resubmit_rejected_suggestion(suggestion_id, summary_message, author_id):
         summary_message: str. The message provided by the author to
             summarize new suggestion.
         author_id: str. The ID of the author creating the suggestion.
+        change: ExplorationChange. The new change to apply to the suggestion.
 
     Raises:
         Exception. The summary message is empty.
@@ -465,6 +467,8 @@ def resubmit_rejected_suggestion(suggestion_id, summary_message, author_id):
             'Only rejected suggestions can be resubmitted.' % (suggestion_id)
         )
 
+    suggestion.pre_update_validate(change)
+    suggestion.change = change
     suggestion.set_suggestion_status_to_in_review()
     _update_suggestion(suggestion)
 

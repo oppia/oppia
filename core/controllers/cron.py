@@ -230,5 +230,5 @@ class CronAcceptStaleSuggestionsHandler(base.BaseHandler):
             suggestions = suggestion_services.get_all_stale_suggestions()
             for suggestion in suggestions:
                 suggestion_services.accept_suggestion(
-                    suggestion, feconf.SUGGESTION_BOT_USER_ID,
+                    suggestion.suggestion_id, feconf.SUGGESTION_BOT_USER_ID,
                     suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)
