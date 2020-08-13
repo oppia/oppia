@@ -29,6 +29,7 @@ import { MathEquationInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { MathEquationInputRulesService } from
   './math-equation-input-rules.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
@@ -67,6 +68,7 @@ export class MathEquationInputValidationService {
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     let warningsList = [];
     let meirs = new MathEquationInputRulesService();
+    let mathInteractionsService = new MathInteractionsService();
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
@@ -92,6 +94,12 @@ export class MathEquationInputValidationService {
         let currentRuleType = <string> rules[j].type;
 
         let splitInput = currentInput.split('=');
+
+        // Explicitly inserting '*' signs wherever necessary.
+        splitInput[0] = mathInteractionsService.insertMultiplicationSigns(
+          splitInput[0]);
+        splitInput[1] = mathInteractionsService.insertMultiplicationSigns(
+          splitInput[1]);
 
         for (let variable of nerdamer(splitInput[0]).variables()) {
           if (seenVariables.indexOf(variable) === -1) {
