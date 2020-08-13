@@ -259,7 +259,7 @@ class AdminHandler(base.BaseHandler):
                         feature_name, self.user_id, commit_message,
                         new_rule_dicts)
                 except Exception as e:
-                    raise self.InvalidInputException(e.message)
+                    raise self.InvalidInputException(e)
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))
