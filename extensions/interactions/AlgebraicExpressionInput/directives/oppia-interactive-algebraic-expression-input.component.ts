@@ -59,7 +59,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
             ctrl.value);
           let answerIsValid = MathInteractionsService.validateExpression(
-            ctrl.value, GuppyInitializationService.customOskLetters);
+            ctrl.value, GuppyInitializationService.customOskLetters, true);
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
         }

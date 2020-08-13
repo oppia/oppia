@@ -86,7 +86,7 @@ export class MathInteractionsService {
 
   validateExpression(
       expressionString: string, validVariablesList: Array<string>,
-      algebraic = true): boolean {
+      algebraic): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     let expressionObject;
     if (expressionString.length === 0) {
@@ -175,9 +175,9 @@ export class MathInteractionsService {
     let splitString = equationString.split('=');
     let lhsString = splitString[0], rhsString = splitString[1];
     let lhsIsAlgebraicallyValid = this.validateExpression(
-      lhsString, validVariablesList);
+      lhsString, validVariablesList, true);
     let rhsIsAlgebraicallyValid = this.validateExpression(
-      rhsString, validVariablesList);
+      rhsString, validVariablesList, true);
     let lhsIsNumericallyValid = this.validateExpression(lhsString, [], false);
     let rhsIsNumericallyValid = this.validateExpression(rhsString, [], false);
 
@@ -195,9 +195,9 @@ export class MathInteractionsService {
     }
     // Neither side is algebraically valid. Calling validation functions again
     // to appropriately update the warningText.
-    this.validateExpression(lhsString, validVariablesList);
+    this.validateExpression(lhsString, validVariablesList, true);
     if (this.getWarningText().length === 0) {
-      this.validateExpression(rhsString, validVariablesList);
+      this.validateExpression(rhsString, validVariablesList, true);
     }
     return false;
   }
