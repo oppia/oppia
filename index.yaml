@@ -9,10 +9,35 @@ indexes:
 
 - kind: "JobModel"
   properties:
+<<<<<<< HEAD
   - name: "status_code"
   - name: "time_queued_msec"
     direction: desc
 - kind: "ExpSummaryModel"
+=======
+  - name: status
+  - name: next_scheduled_check_time
+
+- kind: CollectionRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: CollectionSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: ConfigPropertySnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: DeleteExpCopiesRealtimeModel
+>>>>>>> upstream/develop
   properties:
   - name: "deleted"
   - name: "status"
@@ -83,9 +108,28 @@ indexes:
   - name: "created_on"
 - kind: "ExplorationRightsModel"
   properties:
+<<<<<<< HEAD
   - name: "deleted"
   - name: "status"
 - kind: "FeedbackAnalyticsRealtimeModel"
+=======
+  - name: deleted
+  - name: status
+
+- kind: ExplorationRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: ExplorationSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: FeedbackAnalyticsRealtimeModel
+>>>>>>> upstream/develop
   properties:
   - name: "realtime_layer"
   - name: "created_on"
@@ -178,7 +222,18 @@ indexes:
   - name: "skill_id"
   - name: "skill_difficulty"
     direction: desc
+<<<<<<< HEAD
 - kind: "RecentUpdatesRealtimeModel"
+=======
+
+- kind: QuestionSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: RecentUpdatesRealtimeModel
+>>>>>>> upstream/develop
   properties:
   - name: "realtime_layer"
   - name: "created_on"
@@ -192,6 +247,7 @@ indexes:
   - name: "sent_datetime"
 - kind: "SkillOpportunityModel"
   properties:
+<<<<<<< HEAD
   - name: "deleted"
   - name: "created_on"
 - kind: "StatisticsRealtimeModel"
@@ -203,6 +259,52 @@ indexes:
   - name: "composite_entity_id"
   - name: "status"
 - kind: "UserImpactRealtimeModel"
+=======
+  - name: deleted
+  - name: created_on
+
+- kind: SkillSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: StatisticsRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: StorySnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: SubtopicPageSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: TaskEntryModel
+  properties:
+  - name: composite_entity_id
+  - name: status
+
+- kind: TopicRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: TopicSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: UserContributionScoringModel
+>>>>>>> upstream/develop
   properties:
   - name: "realtime_layer"
   - name: "created_on"
