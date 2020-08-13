@@ -21,9 +21,16 @@ import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { PracticeTabComponent } from './practice-tab.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined):string {
+    return value;
+  }
+}
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
@@ -56,7 +63,7 @@ describe('Practice tab component', function() {
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      declarations: [PracticeTabComponent],
+      declarations: [PracticeTabComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,
         { provide: UrlService, useClass: MockUrlService },
