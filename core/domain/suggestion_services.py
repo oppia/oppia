@@ -178,8 +178,8 @@ def query_suggestions(query_fields_and_values):
         values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
     """
     return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel.query_suggestions(
+        get_suggestion_from_model(s) for s in
+        suggestion_models.GeneralSuggestionModel.query_suggestions(
             query_fields_and_values)
     ]
 
