@@ -14,15 +14,6 @@
 
 /**
  * @fileoverview Test for type definitions in customization-args-defs.ts.
- * These dtslint type tests check that for each interaction, its frontend
- * and backend customization argument interfaces are exactly the same, excluding
- * specific properties that are replaced. We do this because some customization
- * arguments values contain different frontend/backend types in their values.
- * For example, ContinueCustomizationArgsBackendDict contains a
- * SubtitledUnicodeBackendDict value, but it is replaced with a SubtitledUnicode
- * value in its frontend counterpart ContinueCustomizationArgs.
- * Note: there is a regex test in the backend in customization_args_util_test.py
- * that tests that all interaction ids are covered here.
  */
 
 import { IsExact, AssertTrue } from 'conditional-type-checks';
@@ -74,9 +65,21 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-// Compares the customization argument frontend dict and backend dict after
-// replacing properties of the backend dict by properties in the Replacements
-// interface.
+/**
+ * These dtslint type tests check that for each interaction, its frontend
+ * and backend customization argument interfaces are exactly the same, excluding
+ * specific properties that are replaced. We do this because some customization
+ * arguments values contain different frontend/backend types in their values.
+ * For example, ContinueCustomizationArgsBackendDict contains a
+ * SubtitledUnicodeBackendDict value, but it is replaced with a SubtitledUnicode
+ * value in its frontend counterpart ContinueCustomizationArgs.
+ * Note: there is a regex test in the backend in customization_args_util_test.py
+ * that tests that all interaction ids are covered here.
+ */
+
+// This generic type compares the customization argument frontend dict and
+// backend dict after replacing properties of the backend dict by properties in
+// the Replacements interface.
 type IsExactAfterReplacement<BackendDict, Replacements, FrontendDict> = (
   IsExact<
     FrontendDict,
