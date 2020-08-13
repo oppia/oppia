@@ -13,15 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Test for type definiitions in customization-args-defs.ts.
+ * @fileoverview Test for type definitions in customization-args-defs.ts.
  * These dtslint type tests check that for each interaction, its frontend
  * and backend customization argument interfaces are exactly the same, excluding
- * properties defined in the 'CustomizationArgsBackendDictReplacement'
- * interfaces. The 'CustomizationArgsBackendDictReplacement' interfaces define
- * which backend interface fields should be overwritten to match the frontend
- * interface. This functionaliy is for customization arguments that contain
- * different frontend/backend types as customization argument values. For
- * example, ContinueCustomizationArgsBackendDict contains a
+ * specific properties that are replaced. We do this because some customization
+ * arguments values contain different frontend/backend types in their values.
+ * For example, ContinueCustomizationArgsBackendDict contains a
  * SubtitledUnicodeBackendDict value, but it is replaced with a SubtitledUnicode
  * value in its frontend counterpart ContinueCustomizationArgs.
  * Note: there is a regex test in the backend in customization_args_util_test.py
