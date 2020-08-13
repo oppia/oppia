@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview TODO Directive for the configuration tab in the admin panel.
+ * @fileoverview Component for the feature tab in the admin panel.
  */
 
 import { Component, OnInit, Input } from '@angular/core';
@@ -195,7 +195,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     feature.rules.splice(ruleIndex + 1, 0, rule);
   }
 
-  async saveFeatureAsync(feature: PlatformParameter): Promise<void> {
+  async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
     if (this.adminTaskManager.isTaskRunning()) {
       return;
     }
