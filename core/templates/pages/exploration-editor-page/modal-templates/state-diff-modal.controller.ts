@@ -88,7 +88,7 @@ angular.module('oppia').controller('StateDiffModalController', [
       lineNumbers: true,
       readOnly: true,
       mode: 'yaml',
-      viewportMargin: 20
+      viewportMargin: 100
     };
   }
 ]);
