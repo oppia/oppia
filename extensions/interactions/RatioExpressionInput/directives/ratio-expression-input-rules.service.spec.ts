@@ -53,4 +53,20 @@ describe('Ratio expression input rules service', () => {
     expect(reirs.HasNumberOfTermsEqualTo('1:2:3:4',
       {x: inputString})).toBeFalse();
   });
+
+
+  it('should have a correct IsEquivalent rule', () => {
+    inputString = '1:2:3';
+
+    expect(reirs.IsEquivalent('1:2:3',
+      {x: inputString})).toBeTrue();
+    expect(reirs.IsEquivalent('2:4:6',
+      {x: inputString})).toBeTrue();
+    expect(reirs.IsEquivalent('1:2',
+      {x: inputString})).toBeFalse();
+    expect(reirs.IsEquivalent('1:2:3:4',
+      {x: inputString})).toBeFalse();
+    expect(reirs.IsEquivalent('2:4:3',
+      {x: inputString})).toBeFalse();
+  });
 });

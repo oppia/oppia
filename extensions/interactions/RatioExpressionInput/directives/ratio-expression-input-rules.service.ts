@@ -38,6 +38,26 @@ export class RatioExpressionInputRulesService {
       inputs: RatioInputRulesInputs): boolean {
     return answer.split(':').length === inputs.x.split(':').length;
   }
+
+  static convertToSimplestForm(answer: RatioInputAnswer): string {
+    var gcd = (x: number, y: number) => {
+      return y === 0 ? x : gcd(y, x % y);
+    };
+    var ratios = answer.split(':').map(Number);
+    var value = ratios.reduce(gcd);
+    if (value === null) {
+      return answer;
+    } else {
+      return ratios.map(currentValue => currentValue / value).join(':');
+    }
+  }
+
+  IsEquivalent(
+      answer: RatioInputAnswer,
+      inputs: RatioInputRulesInputs): boolean {
+    // eslint-disable-next-line max-len
+    return answer === RatioExpressionInputRulesService.convertToSimplestForm(inputs.x);
+  }
 }
 
 angular.module('oppia').factory(
