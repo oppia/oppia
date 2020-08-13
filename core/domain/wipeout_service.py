@@ -298,6 +298,8 @@ def _pseudonymize_activity_models(
             list(commit_log_ids - activity_ids))
 
     activity_ids |= commit_log_ids
+    # The activity_mappings field might have only been partially generated, so
+    # we fill in the missing part for this activity category.
     if activity_category not in pending_deletion_request.activity_mappings:
         pending_deletion_request.activity_mappings[activity_category] = (
             _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
@@ -374,6 +376,8 @@ def _pseudonymize_feedback_models(pending_deletion_request):
     )).fetch()
     feedback_ids |= set([model.id for model in general_suggestion_models])
 
+    # The activity_mappings field might have only been partially generated, so
+    # we fill in the missing part for this activity category.
     if models.NAMES.feedback not in pending_deletion_request.activity_mappings:
         pending_deletion_request.activity_mappings[models.NAMES.feedback] = (
             _generate_activity_to_pseudonymized_ids_mapping(feedback_ids)
@@ -457,6 +461,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
     )).fetch()
     suggestion_ids = set([model.id for model in voiceover_application_models])
 
+    # The activity_mappings field might have only been partially generated, so
+    # we fill in the missing part for this activity category.
     if (
             models.NAMES.suggestion not in
             pending_deletion_request.activity_mappings):

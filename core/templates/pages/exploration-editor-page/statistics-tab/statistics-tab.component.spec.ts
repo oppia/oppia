@@ -24,6 +24,17 @@ import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
+
+class MockRouterService {
+  private refreshStatisticsTabEventEmitter: EventEmitter<void>;
+  get onRefreshStatisticsTab() {
+    return this.refreshStatisticsTabEventEmitter;
+  }
+  set refreshStatisticsTabEmitter(val) {
+    this.refreshStatisticsTabEventEmitter = val;
+  }
+}
 
 describe('Statistics Tab Component', function() {
   var ctrl = null;
@@ -37,6 +48,7 @@ describe('Statistics Tab Component', function() {
   var readOnlyExplorationBackendApiService = null;
   var stateInteractionStatsService = null;
   var statesObjectFactory = null;
+  var routerService = null;
 
   var explorationId = 'exp1';
   var state = {
@@ -75,7 +87,14 @@ describe('Statistics Tab Component', function() {
         tagged_skill_misconception_id: ''
       }],
       confirmed_unclassified_answers: null,
-      customization_args: {},
+      customization_args: {
+        buttonText: {
+          value: {
+            content_id: 'ca_buttonText_0',
+            unicode_str: 'Continue'
+          }
+        }
+      },
       hints: [],
       solution: {
         answer_is_exclusive: false,
@@ -86,6 +105,7 @@ describe('Statistics Tab Component', function() {
         }
       }
     },
+    next_content_id_index: 0,
     param_changes: [],
     recorded_voiceovers: {
       voiceovers_mapping: {}
@@ -107,6 +127,7 @@ describe('Statistics Tab Component', function() {
     explorationStatsService = TestBed.get(ExplorationStatsService);
     stateInteractionStatsService = TestBed.get(StateInteractionStatsService);
     statesObjectFactory = TestBed.get(StatesObjectFactory);
+    routerService = new MockRouterService();
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -142,17 +163,23 @@ describe('Statistics Tab Component', function() {
         visualizationsInfo: {}
       }));
 
+    routerService.refreshStatisticsTabEmitter = new EventEmitter();
     $scope = $rootScope.$new();
     ctrl = $componentController('statisticsTab', {
       $scope: $scope,
       AlertsService: alertsService,
       ComputeGraphService: computeGraphService,
       ExplorationStatsService: explorationStatsService,
+      RouterService: routerService,
       StateInteractionStatsService: stateInteractionStatsService,
       StatesObjectFactory: statesObjectFactory
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should evaluate controller properties after its initialization',
     function() {
@@ -162,7 +189,7 @@ describe('Statistics Tab Component', function() {
 
   it('should refresh exploration statistics when broadcasting' +
     ' refreshStatisticsTab', function() {
-    $rootScope.$broadcast('refreshStatisticsTab');
+    routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
     $scope.$apply();
@@ -191,7 +218,7 @@ describe('Statistics Tab Component', function() {
   });
 
   it('should open state stats modal using $uibModal', function() {
-    $rootScope.$broadcast('refreshStatisticsTab');
+    routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
     $scope.$apply();
@@ -207,7 +234,7 @@ describe('Statistics Tab Component', function() {
 
   it('should open state stats modal and close it when clicking in stats' +
     ' graph', function() {
-    $rootScope.$broadcast('refreshStatisticsTab');
+    routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
     $scope.$apply();
@@ -224,7 +251,7 @@ describe('Statistics Tab Component', function() {
 
   it('should open state stats modal and dismiss it when clicking in' +
     ' stats graph', function() {
-    $rootScope.$broadcast('refreshStatisticsTab');
+    routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
     $scope.$apply();

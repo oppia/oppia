@@ -40,6 +40,9 @@ require(
   'state-name.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-param-changes.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -47,6 +50,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
+require('services/contextual/window-dimensions.service');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -61,9 +67,10 @@ angular.module('oppia').directive('stateEditor', [
         navigateToState: '=',
         onSaveHints: '=',
         onSaveInteractionAnswerGroups: '=',
-        onSaveInteractionId: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveInteractionId: '=',
+        onSaveNextContentIdIndex: '=',
         onSaveSolicitAnswerDetails: '=',
         onSaveSolution: '=',
         onSaveStateContent: '=',
@@ -77,15 +84,18 @@ angular.module('oppia').directive('stateEditor', [
         '$rootScope', '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService', 'StateNameService',
+        'StateNextContentIdIndexService',
         'StateParamChangesService', 'StateSolicitAnswerDetailsService',
-        'StateSolutionService', 'INTERACTION_SPECS',
+        'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
             $rootScope, $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
+            StateNextContentIdIndexService,
             StateParamChangesService, StateSolicitAnswerDetailsService,
-            StateSolutionService, INTERACTION_SPECS) {
+            StateSolutionService, WindowDimensionsService, INTERACTION_SPECS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var updateInteractionVisibility = function(newInteractionId) {
             $scope.interactionIdIsSet = Boolean(newInteractionId);
             $scope.currentInteractionCanHaveSolution = Boolean(
@@ -97,50 +107,68 @@ angular.module('oppia').directive('stateEditor', [
           };
 
           $scope.reinitializeEditor = function() {
-            $rootScope.$broadcast('stateEditorInitialized', $scope.stateData);
+            StateEditorService.onStateEditorInitialized.emit($scope.stateData);
           };
+
+          $scope.toggleConceptCard = function() {
+            $scope.conceptCardIsShown = !$scope.conceptCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg');
             $scope.currentStateIsTerminal = false;
+            $scope.conceptCardIsShown = true;
+            $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             $scope.interactionIdIsSet = false;
             $scope.servicesInitialized = false;
             $scope.stateName = StateEditorService.getActiveStateName();
-            $scope.$on(
-              'onInteractionIdChanged', function(evt, newInteractionId) {
-                updateInteractionVisibility(newInteractionId);
-              });
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                (newInteractionId) => {
+                  updateInteractionVisibility(newInteractionId);
+                }
+              )
+            );
 
-            $scope.$on('stateEditorInitialized', function(evt, stateData) {
-              if (stateData === undefined || $.isEmptyObject(stateData)) {
-                throw new Error(
-                  'Expected stateData to be defined but ' +
-                  'received ' + stateData);
-              }
-              $scope.stateData = stateData;
-              $scope.stateName = StateEditorService.getActiveStateName();
-              StateEditorService.setInteraction(stateData.interaction);
-              StateContentService.init(
-                $scope.stateName, stateData.content);
-              StateHintsService.init(
-                $scope.stateName, stateData.interaction.hints);
-              StateInteractionIdService.init(
-                $scope.stateName, stateData.interaction.id);
-              StateCustomizationArgsService.init(
-                $scope.stateName, stateData.interaction.customizationArgs);
-              StateNameService.init($scope.stateName, stateData.name);
-              StateParamChangesService.init(
-                $scope.stateName, stateData.paramChanges);
-              StateSolicitAnswerDetailsService.init(
-                $scope.stateName, stateData.solicitAnswerDetails);
-              StateSolutionService.init(
-                $scope.stateName, stateData.interaction.solution);
-              updateInteractionVisibility(stateData.interaction.id);
-              $scope.servicesInitialized = true;
-            });
-
-            $rootScope.$broadcast('stateEditorDirectiveInitialized');
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onStateEditorInitialized.subscribe(
+                (stateData) => {
+                  if (stateData === undefined || $.isEmptyObject(stateData)) {
+                    throw new Error(
+                      'Expected stateData to be defined but ' +
+                      'received ' + stateData);
+                  }
+                  $scope.stateData = stateData;
+                  $scope.stateName = StateEditorService.getActiveStateName();
+                  StateEditorService.setInteraction(stateData.interaction);
+                  StateContentService.init(
+                    $scope.stateName, stateData.content);
+                  StateHintsService.init(
+                    $scope.stateName, stateData.interaction.hints);
+                  StateInteractionIdService.init(
+                    $scope.stateName, stateData.interaction.id);
+                  StateCustomizationArgsService.init(
+                    $scope.stateName, stateData.interaction.customizationArgs);
+                  StateNextContentIdIndexService.init(
+                    $scope.stateName, stateData.nextContentIdIndex);
+                  StateNameService.init($scope.stateName, stateData.name);
+                  StateParamChangesService.init(
+                    $scope.stateName, stateData.paramChanges);
+                  StateSolicitAnswerDetailsService.init(
+                    $scope.stateName, stateData.solicitAnswerDetails);
+                  StateSolutionService.init(
+                    $scope.stateName, stateData.interaction.solution);
+                  updateInteractionVisibility(stateData.interaction.id);
+                  $scope.servicesInitialized = true;
+                }
+              )
+            );
+            StateEditorService.onStateEditorDirectiveInitialized.emit();
             StateEditorService.updateStateEditorDirectiveInitialised();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

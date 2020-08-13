@@ -43,7 +43,7 @@ _OPENING_PARENS = ['[', '{', '(']
 _CLOSING_PARENS = [')', '}', ']']
 _VALID_OPERATORS = _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
 VALID_ALGEBRAIC_IDENTIFIERS = (
-    list(string.ascii_letters) + constants.GREEK_LETTERS)
+    list(string.ascii_letters) + constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys())
 
 _TOKEN_CATEGORY_IDENTIFIER = 'identifier'
 _TOKEN_CATEGORY_FUNCTION = 'function'
@@ -95,7 +95,7 @@ def is_algebraic(expression):
         letter or greek symbol name.
 
     Raises:
-        Exception: Invalid syntax.
+        Exception. Invalid syntax.
     """
     # This raises an exception if the syntax is invalid.
     Parser().parse(expression)
@@ -117,7 +117,7 @@ def tokenize(expression):
         expression.
 
     Raises:
-        Exception: Invalid token.
+        Exception. Invalid token.
     """
     expression = expression.replace(' ', '')
 
@@ -127,7 +127,8 @@ def tokenize(expression):
     # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
         '|'.join(sorted(
-            constants.GREEK_LETTERS + constants.MATH_FUNCTION_NAMES,
+            constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys() +
+            constants.MATH_FUNCTION_NAMES,
             reverse=True, key=len)),
         '\\'.join(_VALID_OPERATORS))
 
@@ -178,6 +179,29 @@ def tokenize(expression):
     return final_token_list
 
 
+def get_variables(expression):
+    """Extracts all variables along with pi and e from a given expression.
+
+    Args:
+        expression: str. A math expression.
+
+    Returns:
+        list(str). A list containing all the variables present in the given
+        expression.
+    """
+    if '=' in expression:
+        lhs, rhs = expression.split('=')
+        token_list = tokenize(lhs) + tokenize(rhs)
+    else:
+        token_list = tokenize(expression)
+    variables = set()
+    for token in token_list:
+        if token.category == _TOKEN_CATEGORY_IDENTIFIER or token.text in [
+                'pi', 'e']:
+            variables.add(token.text)
+    return list(variables)
+
+
 class Token(python_utils.OBJECT):
     """Class for tokens of the math expression."""
 
@@ -188,7 +212,7 @@ class Token(python_utils.OBJECT):
             text: str. String representation of the token.
 
         Raises:
-            Exception: Invalid token.
+            Exception. Invalid token.
         """
         self.text = text
 
@@ -410,9 +434,9 @@ class Parser(python_utils.OBJECT):
             Node. Root node of the generated parse tree.
 
         Raises:
-            Exception: Invalid syntax: Unexpected end of expression.
-            Exception: Invalid character.
-            Exception: Invalid bracket pairing.
+            Exception. Invalid syntax: Unexpected end of expression.
+            Exception. Invalid character.
+            Exception. Invalid bracket pairing.
         """
         # Expression should not contain any invalid characters.
         for character in expression:
@@ -518,7 +542,7 @@ class Parser(python_utils.OBJECT):
             Node. Root node of the generated parse tree.
 
         Raises:
-            Exception: Invalid token.
+            Exception. Invalid token.
         """
         token = self._get_next_token(token_list)
         if token.category == _TOKEN_CATEGORY_IDENTIFIER:
@@ -552,7 +576,7 @@ class Parser(python_utils.OBJECT):
             Token. Token at the next position.
 
         Raises:
-            Exception: Invalid syntax: Unexpected end of expression.
+            Exception. Invalid syntax: Unexpected end of expression.
         """
         if self._next_token_index < len(token_list):
             token = token_list[self._next_token_index]

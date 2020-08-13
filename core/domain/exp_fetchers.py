@@ -59,7 +59,7 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
         exploration_id: str. ID of the exploration.
 
     Raises:
-        Exception: The given states_schema_version is invalid.
+        Exception. The given states_schema_version is invalid.
     """
     states_schema_version = versioned_exploration_states[
         'states_schema_version']
@@ -346,7 +346,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         objects. Any invalid exploration ids are omitted.
 
     Raises:
-        ValueError: When strict is True and at least one of the given exp_ids
+        ValueError. When strict is True and at least one of the given exp_ids
             is invalid.
     """
     exp_ids = set(exp_ids)

@@ -53,7 +53,7 @@ def try_upgrading_draft_to_exp_version(
         objects after upgrade or None if upgrade fails.
 
     Raises:
-        InvalidInputException. current_draft_version is greater than
+        InvalidInputException. The current_draft_version is greater than
             to_exp_version.
     """
     if current_draft_version > to_exp_version:
@@ -168,6 +168,72 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v37_dict_to_v38_dict(cls, draft_change_list):
+        """Converts draft change list from state version 37 to 38. State
+        version 38 adds a customization arg for the Math interactions that
+        allows creators to specify the letters that would be displayed to the
+        learner, for which there should be no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v36_dict_to_v37_dict(cls, draft_change_list):
+        """Converts draft change list from version 36 to 37.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                # Find all RuleSpecs in AnwerGroups and change
+                # CaseSensitiveEquals rule types to Equals.
+                for answer_group_dict in change.new_value:
+                    for rule_spec_dict in answer_group_dict['rule_specs']:
+                        if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                            rule_spec_dict['rule_type'] = 'Equals'
+
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v35_dict_to_v36_dict(cls, draft_change_list):
+        """Converts draft change list from version 35 to 36.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            Exception. Conversion cannot be completed.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                # Converting the customization arguments depends on getting an
+                # exploration state of v35, because we need an interaction's id
+                # to properly convert ExplorationChanges that set customization
+                # arguments. Since we do not yet support passing
+                # an exploration state of a given version into draft conversion
+                # functions, we throw an Exception to indicate that the
+                # conversion cannot be completed.
+                raise Exception('Conversion cannot be completed.')
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v34_dict_to_v35_dict(cls, draft_change_list):
         """Converts draft change list from state version 34 to 35. State
         version 35 upgrades all explorations that use the MathExpressionInput
@@ -183,7 +249,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
 
         Raises:
-            Exception: Conversion cannot be completed.
+            Exception. Conversion cannot be completed.
         """
         for change in draft_change_list:
             # We don't want to migrate any changes that involve the
@@ -238,10 +304,16 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             conversion_fn(value))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-                new_value = (
-                    state_domain.WrittenTranslations.
-                    convert_html_in_written_translations(
-                        new_value, conversion_fn))
+                for content_id, language_code_to_written_translation in (
+                        new_value['translations_mapping'].items()):
+                    for language_code in (
+                            language_code_to_written_translation.keys()):
+                        new_value['translations_mapping'][
+                            content_id][language_code]['html'] = (
+                                conversion_fn(new_value[
+                                    'translations_mapping'][content_id][
+                                        language_code]['html'])
+                            )
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                 new_value = (
