@@ -11,7 +11,10 @@
 #   https://github.com/oppia/oppia/projects
 # - You do not need to assign yourself as a codeowner (unless you are a project
 #   lead listed on the page above).
-
+# - If you will be unavailable for more than 24 hours, please replace your
+#   ownership with a delegate, and add a TODO above the owner line like so:
+#     TODO(handle): Reclaim ownership after YYYY-MM-DD.
+#   Please make sure to restore ownership after the above date passes.
 
 # Blanket codeowners
 # This is for the case when new files are created in any directories that aren't
@@ -31,7 +34,8 @@
 
 
 # Android team
-/core/domain/android_validation_constants*.py @seanlip  # After 16 August 2020, restore @BenHenning
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/core/domain/android_validation_constants*.py @seanlip
 
 
 # Angular Migration team
@@ -128,7 +132,8 @@
 
 
 # Dev workflow team.
-/.circleci/ @vinitamurthi @U8NWXD @kevintab95  # After 16 August 2020, restore @BenHenning
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/.circleci/ @vinitamurthi @U8NWXD @kevintab95
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -138,7 +143,8 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @vinitamurthi @U8NWXD @kevintab95  # After 16 August 2020, restore @BenHenning
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/.travis.yml @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -570,8 +576,10 @@
 
 
 # Dynamic Feature Gating project
-/core/storage/config/ @vinitamurthi  # After 16 August 2020, restore @BenHenning
-/core/domain/platform_parameter*.py @vinitamurthi  # After 16 August 2020, restore @BenHenning
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/core/storage/config/ @vinitamurthi
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/core/domain/platform_parameter*.py @vinitamurthi
 
 
 # Frontend unit tests
@@ -624,4 +632,5 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
-/.github/workflows/ @vinitamurthi  # After 16 August 2020, restore @BenHenning
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/.github/workflows/ @vinitamurthi
