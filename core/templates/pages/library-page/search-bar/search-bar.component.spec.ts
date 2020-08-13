@@ -20,6 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { EventEmitter } from '@angular/core';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 var MockWindow = function() {
   this.location = {
@@ -35,16 +36,19 @@ describe('Search bar component', function() {
   var $rootScope = null;
   var classroomBackendApiService = null;
   var constructTranslationIdsService = null;
+  var i18nLanguageCodeService = null;
   var navigationService = null;
   var searchService = null;
   var urlService = null;
 
   var initTranslationEmitter = new EventEmitter();
+  var preferredLanguageCodesLoadedEmitter = new EventEmitter();
   var mockWindow = null;
 
   beforeEach(function() {
     constructTranslationIdsService = TestBed.get(
       ConstructTranslationIdsService);
+    i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -66,6 +70,7 @@ describe('Search bar component', function() {
       $rootScope: $rootScope,
       $scope: $scope,
       ConstructTranslationIdsService: constructTranslationIdsService,
+      I18nLanguageCodeService: i18nLanguageCodeService
     });
 
     // This approach was choosen because spyOn() doesn't work on properties
@@ -83,6 +88,10 @@ describe('Search bar component', function() {
     spyOnProperty(
       classroomBackendApiService,
       'onInitializeTranslation').and.returnValue(initTranslationEmitter);
+    spyOnProperty(
+      i18nLanguageCodeService,
+      'onPreferredLanguageCodesLoaded').and.returnValue(
+      preferredLanguageCodesLoadedEmitter);
     ctrl.$onInit();
   }));
 
@@ -114,7 +123,7 @@ describe('Search bar component', function() {
     expect(ctrl.isSearchInProgress()).toBe(false);
 
     mockWindow.location.pathname = '/search/find';
-    $rootScope.$broadcast('preferredLanguageCodesLoaded', ['en', 'es', 'hi']);
+    preferredLanguageCodesLoadedEmitter.emit(['en', 'es', 'hi']);
     expect(ctrl.isSearchInProgress()).toBe(true);
 
     expect(ctrl.translationData).toEqual({
@@ -124,7 +133,7 @@ describe('Search bar component', function() {
     expect($location.url()).toBe(
       '/find?q=&language_code=(%22en%22%20OR%20%22es%22%20OR%20%22hi%22)');
 
-    $rootScope.$broadcast('preferredLanguageCodesLoaded', ['en']);
+    preferredLanguageCodesLoadedEmitter.emit(['en']);
 
     expect(ctrl.translationData).toEqual({
       categoriesCount: 0,
@@ -150,7 +159,7 @@ describe('Search bar component', function() {
         '?q=%22sun%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
       spyOn(urlService, 'getUrlParams').and.returnValue({q: ''});
       $scope.$digest();
-      $rootScope.$broadcast('preferredLanguageCodesLoaded', []);
+      preferredLanguageCodesLoadedEmitter.emit([]);
 
       expect(mockWindow.location.href).toBe(
         '/search/find?q=%22sun%22&category=("astronomy")&language_code=("pt")');
@@ -178,7 +187,7 @@ describe('Search bar component', function() {
   });
 
   it('should toggle select languages when searching content', function() {
-    $rootScope.$broadcast('preferredLanguageCodesLoaded', ['en', 'es', 'hi']);
+    preferredLanguageCodesLoadedEmitter.emit(['en', 'es', 'hi']);
 
     expect(ctrl.translationData).toEqual({
       categoriesCount: 0,
@@ -201,7 +210,7 @@ describe('Search bar component', function() {
   });
 
   it('should deselect all selected languages at once', function() {
-    $rootScope.$broadcast('preferredLanguageCodesLoaded', ['en', 'es', 'hi']);
+    preferredLanguageCodesLoadedEmitter.emit(['en', 'es', 'hi']);
 
     expect(ctrl.translationData).toEqual({
       categoriesCount: 0,

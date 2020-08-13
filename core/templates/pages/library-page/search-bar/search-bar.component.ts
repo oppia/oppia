@@ -39,13 +39,13 @@ angular.module('oppia').component('searchBar', {
   template: require('./search-bar.component.html'),
   controller: [
     '$location', '$rootScope', '$scope', '$translate', '$window',
-    'ConstructTranslationIdsService', 'LanguageUtilService',
-    'NavigationService', 'SearchService', 'UrlService',
+    'ConstructTranslationIdsService', 'I18nLanguageCodeService',
+    'LanguageUtilService', 'NavigationService', 'SearchService', 'UrlService',
     'SEARCH_DROPDOWN_CATEGORIES',
     function(
         $location, $rootScope, $scope, $translate, $window,
-        ConstructTranslationIdsService, LanguageUtilService,
-        NavigationService, SearchService, UrlService,
+        ConstructTranslationIdsService, I18nLanguageCodeService,
+        LanguageUtilService, NavigationService, SearchService, UrlService,
         SEARCH_DROPDOWN_CATEGORIES) {
       var ctrl = this;
 
