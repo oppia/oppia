@@ -9,18 +9,22 @@
 #
 # - When assigning codeowners for new files, please do so by picking an
 #   appropriate team lead from this page:
-#   https://github.com/oppia/oppia/projects
 #
-# - You do not need to assign yourself as a codeowner (unless you are a project
+#       https://github.com/oppia/oppia/projects
+#
+#   You do not need to assign yourself as a codeowner (unless you are a project
 #   lead listed on the page above).
+
+# IMPORTANT NOTES FOR CODEOWNERS:
 #
 # - If you will be unavailable for more than 24 hours, please replace your
-#   ownership with a delegate, and file an issue + add a TODO above the owner
+#   ownership with a delegate, file an issue, and add a TODO above the owner
 #   line like so:
 #
-#     TODO(#issue_number): Reclaim ownership after YYYY-MM-DD.
+#     TODO(#ISSUE_NUMBER): Revert ownership to @USERNAME after YYYY-MM-DD.
 #
-#   Please make sure to restore ownership after the above date passes.
+#   (See #10250 for an example.) Please make sure to restore ownership after
+#   the above date passes.
 
 # Blanket codeowners
 # This is for the case when new files are created in any directories that aren't
