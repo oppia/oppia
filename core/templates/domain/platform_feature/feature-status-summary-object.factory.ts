@@ -23,6 +23,24 @@ export interface FeatureStatusSummaryBackendDict {
   [featureName: string]: boolean;
 }
 
+export enum FeatureNames {
+  DummyFeature = 'dummy_feature',
+}
+
+export type FeatureSummaryDict = {
+  [name in keyof typeof FeatureNames]: {
+      isEnabled: string;
+  }
+};
+
+class FeatureSummaryDictItem {
+  constructor(private getterFn: () => boolean) {}
+
+  get isEnabled(): boolean {
+    return this.getterFn();
+  }
+}
+
 /**
  * Represents the evaluation result summary of all feature flags received from
  * the server. This is used only in the frontend feature value retrieval.
@@ -48,6 +66,16 @@ export class FeatureStatusSummary {
     return backendDict;
   }
 
+  toSummaryDict(): FeatureSummaryDict {
+    const summary = <FeatureSummaryDict>{};
+    Object.keys(FeatureNames).forEach(name => {
+      summary[name] = new FeatureSummaryDictItem(
+        () => this.isFeatureEnabled(FeatureNames[name])
+      );
+    });
+    return summary;
+  }
+
   /**
    * Gets the value of a feature flag in the result.
    *
@@ -56,7 +84,7 @@ export class FeatureStatusSummary {
    * @returns {boolean} - The value of the feature flag, true if enabled.
    * @throws {Error} - If the feature with the specified name doesn't exist.
    */
-  isFeatureEnabled(featureName: string): boolean {
+  private isFeatureEnabled(featureName: string): boolean {
     if (!this.featureNameToFlag.has(featureName)) {
       throw new Error(`Feature '${featureName}' does not exist.`);
     }
@@ -71,6 +99,13 @@ export class FeatureStatusSummaryObjectFactory {
   createFromBackendDict(
       backendDict: FeatureStatusSummaryBackendDict): FeatureStatusSummary {
     return new FeatureStatusSummary(backendDict);
+  }
+
+  createDefault(): FeatureStatusSummary {
+    const defaultDict: FeatureStatusSummaryBackendDict = {};
+    Object.keys(FeatureNames).forEach(
+      name => defaultDict[FeatureNames[name]] = false);
+    return this.createFromBackendDict(defaultDict);
   }
 }
 

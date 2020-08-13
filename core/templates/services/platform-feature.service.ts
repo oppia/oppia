@@ -23,16 +23,13 @@ import { ClientContext, ClientContextObjectFactory } from
   'domain/platform_feature/client-context-object.factory';
 import {
   FeatureStatusSummary,
-  FeatureStatusSummaryObjectFactory
+  FeatureStatusSummaryObjectFactory,
+  FeatureSummaryDict
 } from 'domain/platform_feature/feature-status-summary-object.factory';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-
-export enum FeatureNames {
-    DummyFeature = 'Dummy_Feature',
-}
 
 interface FeatureFlagsCacheItem {
   timestamp: number;
@@ -85,18 +82,15 @@ export class PlatformFeatureService {
   }
 
   /**
+   * TODO
    * Gets the value of the feature flag.
-   *
-   * @param {FeatureNames} name - Name of the feature.
    *
    * @returns {boolean} - True if the feature is enabled.
    * @throws {Error} - If this method is called before inialization.
    */
-  isFeatureEnabled(name: FeatureNames): boolean {
+  get featureSummary(): FeatureSummaryDict {
     if (PlatformFeatureService.featureStatusSummary) {
-      return PlatformFeatureService.featureStatusSummary.isFeatureEnabled(name);
-    } else if (PlatformFeatureService._initializedWithError) {
-      return false;
+      return PlatformFeatureService.featureStatusSummary.toSummaryDict();
     } else {
       throw new Error('The platform feature service has not been initialized.');
     }
@@ -161,6 +155,8 @@ export class PlatformFeatureService {
       }
     } catch (err) {
       // If any error, just disable all features.
+      PlatformFeatureService.featureStatusSummary = this
+        .featureStatusSummaryObjectFactory.createDefault();
       PlatformFeatureService._initializedWithError = true;
       this.clearSavedResults();
     }

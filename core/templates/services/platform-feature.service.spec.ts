@@ -21,15 +21,15 @@ import { TestBed, fakeAsync, flushMicrotasks, tick } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { FeatureNames, PlatformFeatureService } from
+import { PlatformFeatureService } from
   'services/platform-feature.service';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { FeatureStatusSummaryObjectFactory } from
+import { FeatureNames, FeatureStatusSummaryObjectFactory } from
   'domain/platform_feature/feature-status-summary-object.factory';
 
-describe('PlatformFeatureService', () => {
+fdescribe('PlatformFeatureService', () => {
   let windowRef: WindowRef;
   let i18n: I18nLanguageCodeService;
   let apiService: PlatformFeatureBackendApiService;
@@ -81,8 +81,7 @@ describe('PlatformFeatureService', () => {
     spyOn(i18n, 'getCurrentI18nLanguageCode').and.returnValue('en');
     apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
       summaryFactory.createFromBackendDict({
-        feature_name_a: true,
-        feature_name_b: false
+        [FeatureNames.DummyFeature]: true,
       })
     );
   });
@@ -133,8 +132,7 @@ describe('PlatformFeatureService', () => {
         timestamp: timestamp,
         sessionId: sessionId,
         featureStatusSummary: {
-          feature_name_a: true,
-          feature_name_b: false
+          [FeatureNames.DummyFeature]: true,
         }
       });
       expect(platformFeatureService.initialzedWithError).toBeFalse();
@@ -185,8 +183,7 @@ describe('PlatformFeatureService', () => {
             sessionId: sessionId,
             timestamp: Date.now(),
             featureStatusSummary: {
-              feature_name_a: true,
-              feature_name_b: false
+              [FeatureNames.DummyFeature]: true,
             }
           })
         });
@@ -210,8 +207,7 @@ describe('PlatformFeatureService', () => {
             sessionId: sessionId,
             timestamp: Date.now(),
             featureStatusSummary: {
-              feature_name_a: true,
-              feature_name_b: true
+              [FeatureNames.DummyFeature]: true,
             }
           })
         });
@@ -236,8 +232,7 @@ describe('PlatformFeatureService', () => {
             sessionId: 'different session id',
             timestamp: Date.now(),
             featureStatusSummary: {
-              feature_name_a: true,
-              feature_name_b: true
+              [FeatureNames.DummyFeature]: true,
             }
           })
         });
@@ -277,10 +272,7 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(
-        platformFeatureService.isFeatureEnabled(<FeatureNames>'feature_name_a')
-      ).toBeFalse();
-      expect(
-        platformFeatureService.isFeatureEnabled(<FeatureNames>'feature_name_b')
+        platformFeatureService.featureSummary.DummyFeature.isEnabled
       ).toBeFalse();
       expect(platformFeatureService.initialzedWithError).toBeTrue();
     }));
@@ -324,18 +316,15 @@ describe('PlatformFeatureService', () => {
     });
   });
 
-  describe('.isFeatureEnabled', () => {
+  describe('.featureSummary', () => {
     it('should return correct values of feature flags', fakeAsync(() => {
       platformFeatureService = TestBed.get(PlatformFeatureService);
 
       flushMicrotasks();
 
       expect(
-        platformFeatureService.isFeatureEnabled(<FeatureNames>'feature_name_a')
+        platformFeatureService.featureSummary.DummyFeature.isEnabled
       ).toBeTrue();
-      expect(
-        platformFeatureService.isFeatureEnabled(<FeatureNames>'feature_name_b')
-      ).toBeFalse();
       expect(platformFeatureService.initialzedWithError).toBeFalse();
     }));
 
@@ -343,7 +332,7 @@ describe('PlatformFeatureService', () => {
       () => {
         platformFeatureService = TestBed.get(PlatformFeatureService);
         expect(
-          () => platformFeatureService.isFeatureEnabled(<FeatureNames>'name')
+          () => platformFeatureService.featureSummary.DummyFeature.isEnabled
         ).toThrowError(
           'The platform feature service has not been initialized.');
       })

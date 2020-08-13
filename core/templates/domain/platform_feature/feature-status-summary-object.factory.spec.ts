@@ -17,7 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { FeatureStatusSummaryObjectFactory } from
+import { FeatureStatusSummaryObjectFactory, FeatureNames } from
   './feature-status-summary-object.factory';
 
 describe('FeatureStatusSummaryObjectFactory', () => {
@@ -29,17 +29,15 @@ describe('FeatureStatusSummaryObjectFactory', () => {
 
   it('should create an instance from a backend dict.', () => {
     const summary = factory.createFromBackendDict({
-      feature_name_a: true,
-      feature_name_b: false
+      [FeatureNames.DummyFeature]: true,
     });
 
-    expect(summary.featureNameToFlag.size).toBe(2);
+    expect(summary.featureNameToFlag.size).toBe(1);
   });
 
   it('should convert an instance back to a dict.', () => {
     const backendDict = {
-      feature_name_a: true,
-      feature_name_b: false
+      [FeatureNames.DummyFeature]: true,
     };
     const summary = factory.createFromBackendDict(backendDict);
     expect(summary.toBackendDict()).toEqual(backendDict);
@@ -48,23 +46,21 @@ describe('FeatureStatusSummaryObjectFactory', () => {
   describe('.isFeatureEnabled', () => {
     it('should return the value of the parameter', () => {
       const summary = factory.createFromBackendDict({
-        feature_name_a: true,
-        feature_name_b: false
+        [FeatureNames.DummyFeature]: true
       });
+      const summaryDict = summary.toSummaryDict();
 
-      expect(summary.isFeatureEnabled('feature_name_a')).toBeTrue();
-      expect(summary.isFeatureEnabled('feature_name_b')).toBeFalse();
+      expect(summaryDict.DummyFeature.isEnabled).toBeTrue();
     });
 
-    it('should throw if the feature does not exist.', () => {
-      const summary = factory.createFromBackendDict({
-        feature_name_a: true,
-        feature_name_b: false
-      });
+    it('should throw if the feature status is missing in backend dict.', () => {
+      const summary = factory.createFromBackendDict({});
+      const summaryDict = summary.toSummaryDict();
 
       expect(
-        () => summary.isFeatureEnabled('invalid_name')
-      ).toThrowError('Feature \'invalid_name\' does not exist.');
+        () => summaryDict.DummyFeature.isEnabled
+      ).toThrowError(
+        `Feature \'${FeatureNames.DummyFeature}\' does not exist.`);
     });
   });
 });
