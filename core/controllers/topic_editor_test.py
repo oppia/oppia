@@ -181,7 +181,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'title': 'Story title',
             'description': 'Story Description',
             'filename': 'test_svg.svg',
-            'thumbnailBgColor': '#F8BF74'
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'story-frag-one'
         }
 
         with python_utils.open_file(
@@ -207,7 +208,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'title': 'Story title',
             'description': 'Story Description',
             'filename': 'cafe.flac',
-            'thumbnailBgColor': '#F8BF74'
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'story-frag-two'
         }
 
         with python_utils.open_file(
