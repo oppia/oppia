@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for feature gating handler."""
+"""Tests for platform feature handler."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.domain import feature_gating_services as feature_services
+from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as param_domain
 from core.domain import platform_parameter_registry as registry
 from core.platform import models
@@ -27,11 +27,11 @@ from core.tests import test_utils
 memcache_services = models.Registry.import_memcache_services()
 
 
-class FeatureGatingHandlerTest(test_utils.GenericTestBase):
-    """Tests for the FeatureGatingHandler."""
+class PlatformFeatureHandlerTest(test_utils.GenericTestBase):
+    """Tests for the PlatformFeatureHandler."""
 
     def setUp(self):
-        super(FeatureGatingHandlerTest, self).setUp()
+        super(PlatformFeatureHandlerTest, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -72,7 +72,7 @@ class FeatureGatingHandlerTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
 
     def tearDown(self):
-        super(FeatureGatingHandlerTest, self).tearDown()
+        super(PlatformFeatureHandlerTest, self).tearDown()
 
         feature_services.ALL_FEATURES_LIST = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = self.original_feature_name_set
@@ -82,7 +82,7 @@ class FeatureGatingHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'DEV_MODE', True):
             result = self.post_json(
-                '/featuregatinghandler',
+                '/platformfeaturehandler',
                 {
                     'client_type': 'Android',
                     'browser_type': None,
@@ -97,7 +97,7 @@ class FeatureGatingHandlerTest(test_utils.GenericTestBase):
     def test_post_handler_with_invalid_context_raises_400(self):
         csrf_token = self.get_new_csrf_token()
         resp_dict = self.post_json(
-            '/featuregatinghandler',
+            '/platformfeaturehandler',
             {
                 'client_type': 'Invalid',
                 'browser_type': None,

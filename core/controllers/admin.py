@@ -32,9 +32,9 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import feature_gating_services
 from core.domain import html_domain
 from core.domain import opportunity_services
+from core.domain import platform_feature_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -122,8 +122,8 @@ class AdminHandler(base.BaseHandler):
                     utils.get_human_readable_time_string(
                         computation['last_finished_msec']))
 
-        feature_flag_settings = (
-            feature_gating_services.get_all_feature_flag_setting_dicts())
+        feature_flag_dicts = (
+            platform_feature_services.get_all_feature_flag_dicts())
 
         self.render_json({
             'config_properties': (
@@ -149,7 +149,7 @@ class AdminHandler(base.BaseHandler):
             },
             'topic_summaries': topic_summary_dicts,
             'role_graph_data': role_services.get_role_graph_data(),
-            'feature_flags': feature_flag_settings,
+            'feature_flags': feature_flag_dicts,
         })
 
     @acl_decorators.can_access_admin_page
@@ -254,8 +254,12 @@ class AdminHandler(base.BaseHandler):
                 feature_name = self.payload.get('feature_name')
                 new_rule_dicts = self.payload.get('new_rules')
                 commit_message = self.payload.get('message')
-                feature_gating_services.update_feature_flag_rules(
-                    feature_name, self.user_id, commit_message, new_rule_dicts)
+                try:
+                    platform_feature_services.update_feature_flag_rules(
+                        feature_name, self.user_id, commit_message,
+                        new_rule_dicts)
+                except Exception as e:
+                    raise self.InvalidInputException(e.message)
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))
