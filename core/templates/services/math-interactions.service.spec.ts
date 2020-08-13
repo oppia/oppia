@@ -407,7 +407,7 @@ describe('MathInteractionsService', () => {
       expressionWithPlaceholders, '3x + b', ['a', 'b'])).toBeFalse();
     expect(mathInteractionsService.expressionMatchWithPlaceholders(
       expressionWithPlaceholders, '4x + 5 + b', ['a', 'b'])).toBeFalse();
-    
+
 
     expressionWithPlaceholders = 'x/alpha + y/beta';
     expect(mathInteractionsService.expressionMatchWithPlaceholders(

@@ -34,7 +34,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import re
-import string
 
 from constants import constants
 import python_utils

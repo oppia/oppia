@@ -158,7 +158,7 @@ export class MathEquationInputRulesService {
     }
   }
 
-  OmitsSomeOf (
+  OmitsSomeOf(
       answer: MathEquationAnswer,
       inputs: MathEquationRuleInputsWithSide): boolean {
     let algebraicRulesService = new AlgebraicExpressionInputRulesService();
@@ -172,13 +172,13 @@ export class MathEquationInputRulesService {
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
 
     if (positionOfTerms === 'lhs') {
-      return algebraicRulesService.OmitsSomeOf  (lhsAnswer, {x: lhsInput});
+      return algebraicRulesService.OmitsSomeOf(lhsAnswer, {x: lhsInput});
     } else if (positionOfTerms === 'rhs') {
-      return algebraicRulesService.OmitsSomeOf  (rhsAnswer, {x: rhsInput});
+      return algebraicRulesService.OmitsSomeOf(rhsAnswer, {x: rhsInput});
     } else if (positionOfTerms === 'both') {
       return (
-        algebraicRulesService.OmitsSomeOf (lhsAnswer, {x: lhsInput}) && (
-          algebraicRulesService.OmitsSomeOf (rhsAnswer, {x: rhsInput})));
+        algebraicRulesService.OmitsSomeOf(lhsAnswer, {x: lhsInput}) && (
+          algebraicRulesService.OmitsSomeOf(rhsAnswer, {x: rhsInput})));
     } else {
       // Position of terms is irrelevant. So, we bring all terms on one side
       // and perform an exact match.
@@ -208,8 +208,8 @@ export class MathEquationInputRulesService {
 
     return algebraicRulesService.MatchesWithGeneralForm(
       lhsAnswer, {x: lhsInput, y: placeholders}) && (
-        algebraicRulesService.MatchesWithGeneralForm(
-          rhsAnswer, {x: rhsInput, y: placeholders}));
+      algebraicRulesService.MatchesWithGeneralForm(
+        rhsAnswer, {x: rhsInput, y: placeholders}));
   }
 }
 

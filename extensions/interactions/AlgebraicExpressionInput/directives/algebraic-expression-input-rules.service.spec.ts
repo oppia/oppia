@@ -263,7 +263,7 @@ describe('Algebraic expression input rules service', () => {
       {x: inputString})).toBeFalse();
     expect(algebraicRulesService.ContainsSomeOf('(a + b)^2',
       {x: inputString})).toBeFalse();
-      expect(algebraicRulesService.ContainsSomeOf('a + b + c',
+    expect(algebraicRulesService.ContainsSomeOf('a + b + c',
       {x: inputString})).toBeFalse();
 
 

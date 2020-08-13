@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 
 from constants import constants
-from core.domain import expression_parser
 import python_utils
 import schema_utils
 
