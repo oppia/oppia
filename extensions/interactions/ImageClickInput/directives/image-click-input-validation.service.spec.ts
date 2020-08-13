@@ -96,6 +96,9 @@ describe('ImageClickInputValidationService', () => {
             }
           }]
         }
+      },
+      highlightRegionsOnHover: {
+        value: true
       }
     };
     goodAnswerGroups = [agof.createNew(
@@ -115,6 +118,11 @@ describe('ImageClickInputValidationService', () => {
       goodAnswerGroups[0].rules = [];
       expect(() => {
         validatorService.getAllWarnings(
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'ImageClickInputCustomizationArgs'." We are
+          // purposely assigning the wrong type of customization args in
+          // order to test validations.
+          // @ts-expect-error
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have property: imageAndRegions');

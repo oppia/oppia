@@ -58,7 +58,30 @@ describe('Collection object factory', () => {
   var _addCollectionNode = function(explorationId) {
     var collectionNodeBackendObject = {
       exploration_id: explorationId,
-      exploration: {}
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }
     };
     return _sampleCollection.addCollectionNode(
       collectionNodeObjectFactory.create(collectionNodeBackendObject));
@@ -88,7 +111,30 @@ describe('Collection object factory', () => {
     () => {
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
-        exploration: {}
+        exploration_summary: {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Test Title'
+        }
       };
       var collection = collectionObjectFactory.create({
         id: 'collection_id',
@@ -119,7 +165,30 @@ describe('Collection object factory', () => {
 
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
-        exploration: {}
+        exploration_summary: {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Test Title'
+        }
       };
       var collectionNode = collectionNodeObjectFactory.create(
         collectionNodeBackendObject);
@@ -140,7 +209,30 @@ describe('Collection object factory', () => {
   it('should not add duplicate explorations', () => {
     var collectionNodeBackendObject = {
       exploration_id: 'exp_id0',
-      exploration: {}
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }
     };
     var collectionNode = collectionNodeObjectFactory.create(
       collectionNodeBackendObject);
@@ -158,11 +250,57 @@ describe('Collection object factory', () => {
 
     var collectionNodeBackendObject1 = {
       exploration_id: 'exp_id0',
-      exploration: {}
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }
     };
     var collectionNodeBackendObject2 = {
       exploration_id: 'exp_id1',
-      exploration: {}
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }
     };
     var collectionNode1 = collectionNodeObjectFactory.create(
       collectionNodeBackendObject1);
@@ -188,7 +326,30 @@ describe('Collection object factory', () => {
       expect(_getCollectionNode('exp_id0')).toBeUndefined();
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
-        exploration: {}
+        exploration_summary: {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Test Title'
+        }
       };
       _sampleCollection.addCollectionNode(
         collectionNodeObjectFactory.create(collectionNodeBackendObject));

@@ -74,13 +74,49 @@ describe('LogicProofValidationService', () => {
 
   it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      currentState, {
+        question: {
+          value: {
+            assumptions: [{
+              top_kind_name: 'variable',
+              top_operator_name: 'p',
+              arguments: [],
+              dummies: []
+            }],
+            results: [{
+              top_kind_name: 'variable',
+              top_operator_name: 'p',
+              arguments: [],
+              dummies: []
+            }],
+            default_proof_string: ''
+          }
+        }
+      }, goodAnswerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
   it('should not have warnings for a confusing default outcome', () => {
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, [], badOutcome);
+      currentState, {
+        question: {
+          value: {
+            assumptions: [{
+              top_kind_name: 'variable',
+              top_operator_name: 'p',
+              arguments: [],
+              dummies: []
+            }],
+            results: [{
+              top_kind_name: 'variable',
+              top_operator_name: 'p',
+              arguments: [],
+              dummies: []
+            }],
+            default_proof_string: ''
+          }
+        }
+      }, [], badOutcome);
     expect(warnings).toEqual([]);
   });
 });

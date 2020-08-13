@@ -104,6 +104,11 @@ describe('SetInputValidationService', () => {
 
       let warnings = validatorService.getAllWarnings(
         currentState,
+        // This throws "Argument of type '{}' is not assignable to
+        // parameter of type 'SetInputCustomizationArgs'." We are purposely
+        // assigning the wrong type of customization args in order to test
+        // validations.
+        // @ts-expect-error
         badCustomizationArgs,
         goodAnswerGroups,
         goodDefaultOutcome

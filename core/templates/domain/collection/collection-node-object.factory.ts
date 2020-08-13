@@ -27,8 +27,8 @@ import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary-object.factory';
 
 export interface CollectionNodeBackendDict {
-  'exploration_id'?: string;
-  'exploration_summary'?: LearnerExplorationSummaryBackendDict;
+  'exploration_id': string;
+  'exploration_summary': LearnerExplorationSummaryBackendDict;
 }
 
 export class CollectionNode {

@@ -152,10 +152,10 @@ describe('Collection rights object factory', () => {
       collectionRightsObjectFactory.createEmptyCollectionRights());
 
     expect(
-      emptyCollectionRightsBackendObject.getCollectionId()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.canEdit()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.canUnpublish()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.isPrivate()).toBeUndefined();
+      emptyCollectionRightsBackendObject.getCollectionId()).toBeNull();
+    expect(emptyCollectionRightsBackendObject.canEdit()).toBeNull();
+    expect(emptyCollectionRightsBackendObject.canUnpublish()).toBeNull();
+    expect(emptyCollectionRightsBackendObject.isPrivate()).toBeNull();
     expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual([]);
   });
 
