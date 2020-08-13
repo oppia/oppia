@@ -103,6 +103,18 @@ export class RatioExpressionInputValidationService {
                 ' will never be matched because it is preceded ' +
                 'by a \'HasNumberOfTermsEqualTo\' rule with a matching input.')
             });
+          } else if (currentRuleType === 'IsEquivalent' && (
+            ratioRulesService.IsEquivalent(
+              seenInput, {x: currentInput}))) {
+            // This rule will make the following inputs with
+            // IsEquivalent rule obsolete.
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+                ' will never be matched because it is preceded ' +
+                'by a \'IsEquivalent\' rule with a matching input.')
+            });
           }
         }
         seenRules.push(rules[j]);
