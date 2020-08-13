@@ -21,7 +21,7 @@
 #   ownership with a delegate, file an issue, and add a TODO above the owner
 #   line like so:
 #
-#     TODO(#ISSUE_NUMBER): Revert ownership to @USERNAME after YYYY-MM-DD.
+#     TODO(ISSUENUMBER): Revert ownership to @USERNAME after YYYY-MM-DD.
 #
 #   (See #10250 for an example.) Please make sure to restore ownership after
 #   the above date passes.
