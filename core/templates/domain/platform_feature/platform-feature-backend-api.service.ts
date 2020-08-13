@@ -20,38 +20,38 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { FeatureGatingDomainConstants } from
-  'domain/feature_gating/feature-gating-domain.constants';
+import { PlatformFeatureDomainConstants } from
+  'domain/platform_feature/platform-feature-domain.constants';
 import {
-  FeatureFlagResults,
-  FeatureFlagResultsObjectFactory,
-  FeatureFlagResultsBackendDict,
-} from 'domain/feature_gating/FeatureFlagResultsObjectFactory';
+  FeatureStatusSummary,
+  FeatureStatusSummaryBackendDict,
+  FeatureStatusSummaryObjectFactory,
+} from 'domain/platform_feature/feature-status-summary-object.factory';
 import { ClientContext } from
-  'domain/feature_gating/ClientContextObjectFactory';
+  'domain/platform_feature/client-context-object.factory';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FeatureGatingBackendApiService {
+export class PlatformFeatureBackendApiService {
   constructor(
     private http: HttpClient,
-    private featureFlagResultsObjectFactory:
-      FeatureFlagResultsObjectFactory
+    private featureStatusSummaryObjectFactory:
+      FeatureStatusSummaryObjectFactory
   ) {}
 
   async fetchFeatureFlags(context: ClientContext):
-      Promise<FeatureFlagResults> {
-    const backendDict = await this.http.post<FeatureFlagResultsBackendDict>(
-      FeatureGatingDomainConstants.FEATURE_GATING_HANDLER_URL,
+      Promise<FeatureStatusSummary> {
+    const backendDict = await this.http.post<FeatureStatusSummaryBackendDict>(
+      PlatformFeatureDomainConstants.PLATFORM_FEATURE_HANDLER_URL,
       context.toBackendDict()
     ).toPromise();
 
-    return this.featureFlagResultsObjectFactory.createFromBackendDict(
+    return this.featureStatusSummaryObjectFactory.createFromBackendDict(
       backendDict);
   }
 }
 
 angular.module('oppia').factory(
-  'FeatureGatingBackendApiService',
-  downgradeInjectable(FeatureGatingBackendApiService));
+  'PlatformFeatureBackendApiService',
+  downgradeInjectable(PlatformFeatureBackendApiService));

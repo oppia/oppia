@@ -20,15 +20,15 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { FeatureGatingDomainConstants } from
-  'domain/feature_gating/feature-gating-domain.constants';
+import { PlatformFeatureDomainConstants } from
+  'domain/platform_feature/platform-feature-domain.constants';
 import { PlatformParameterRule } from
-  'domain/feature_gating/PlatformParameterRuleObjectFactory';
+  'domain/platform_feature/platform-parameter-rule-object.factory';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FeatureGatingAdminBackendApiService {
+export class PlatformFeatureAdminBackendApiService {
   constructor(
     private http: HttpClient,
   ) {}
@@ -37,9 +37,9 @@ export class FeatureGatingAdminBackendApiService {
       name: string, message: string, newRules: PlatformParameterRule[]):
       Promise<void> {
     await this.http.post(
-      FeatureGatingDomainConstants.FEATURE_GATING_ADMIN_HANDLER_URL,
+      PlatformFeatureDomainConstants.ADMIN_HANDLER_URL,
       {
-        action: 'update_feature_flag_rules',
+        action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_RULES_ACTION,
         feature_name: name,
         message: message,
         new_rules: newRules.map(rule => rule.toBackendDict())
@@ -49,5 +49,5 @@ export class FeatureGatingAdminBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'FeatureGatingAdminBackendApiService',
-  downgradeInjectable(FeatureGatingAdminBackendApiService));
+  'PlatformFeatureAdminBackendApiService',
+  downgradeInjectable(PlatformFeatureAdminBackendApiService));

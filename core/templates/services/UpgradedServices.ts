@@ -225,11 +225,6 @@ import { ExtractImageFilenamesFromStateService } from
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
-import { FeatureGatingService } from 'services/feature-gating.service';
-import { FeatureGatingAdminBackendApiService } from
-  'domain/feature_gating/feature-gating-admin-backend-api.service';
-import { FeatureGatingBackendApiService } from
-  'domain/feature_gating/feature-gating-backend-api.service';
 import { FeatureStatusSummaryObjectFactory } from
   'domain/platform_feature/feature-status-summary-object.factory';
 import { FeedbackMessageSummaryObjectFactory } from
@@ -407,6 +402,11 @@ import { PencilCodeEditorRulesService } from
 import { PencilCodeEditorValidationService } from
   // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureBackendApiService } from
+  'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformParameterFilterObjectFactory } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
 import { PlatformParameterObjectFactory } from
@@ -1383,14 +1383,6 @@ export class UpgradedServices {
         upgradedServices['ExplorationStatsObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['FeatureGatingBackendApiService'] =
-      new FeatureGatingBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['FeatureFlagResultsObjectFactory']
-      );
-    upgradedServices['FeatureGatingAdminBackendApiService'] =
-      new FeatureGatingAdminBackendApiService(
-        upgradedServices['HttpClient']);
     upgradedServices['GenerateContentIdService'] =
      new GenerateContentIdService(
        upgradedServices['StateNextContentIdIndexService']);
@@ -1410,6 +1402,14 @@ export class UpgradedServices {
         new LearnerDashboardIdsBackendApiService(
           upgradedServices['HttpClient'],
           upgradedServices['LearnerDashboardActivityIdsObjectFactory']);
+    upgradedServices['PlatformFeatureBackendApiService'] =
+      new PlatformFeatureBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['FeatureStatusSummaryObjectFactory']
+      );
+    upgradedServices['PlatformFeatureAdminBackendApiService'] =
+      new PlatformFeatureAdminBackendApiService(
+        upgradedServices['HttpClient']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
@@ -1570,10 +1570,10 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
-    upgradedServices['FeatureGatingService'] = new FeatureGatingService(
+    upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
       upgradedServices['ClientContextObjectFactory'],
-      upgradedServices['FeatureGatingBackendApiService'],
-      upgradedServices['FeatureFlagResultsObjectFactory'],
+      upgradedServices['PlatformFeatureBackendApiService'],
+      upgradedServices['FeatureStatusSummaryObjectFactory'],
       upgradedServices['I18nLanguageCodeService'],
       upgradedServices['WindowRef']);
     upgradedServices['PredictionAlgorithmRegistryService'] =

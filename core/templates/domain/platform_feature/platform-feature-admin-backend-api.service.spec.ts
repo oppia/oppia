@@ -13,22 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for FeatureGatingAdminBackendApiService.
+ * @fileoverview Unit tests for PlatformFeatureAdminBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { FeatureGatingDomainConstants } from
-  'domain/feature_gating/feature-gating-domain.constants';
-import { FeatureGatingAdminBackendApiService } from
-  'domain/feature_gating/feature-gating-admin-backend-api.service';
+import { PlatformFeatureDomainConstants } from
+  'domain/platform_feature/platform-feature-domain.constants';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformParameterRuleObjectFactory } from
-  'domain/feature_gating/PlatformParameterRuleObjectFactory';
+  'domain/platform_feature/platform-parameter-rule-object.factory';
 
-describe('FeatureGatingAdminBackendApiService', () => {
-  let featureAdminService: FeatureGatingAdminBackendApiService = null;
+describe('PlatformFeatureAdminBackendApiService', () => {
+  let featureAdminService: PlatformFeatureAdminBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let ruleFactory: PlatformParameterRuleObjectFactory = null;
 
@@ -37,7 +37,7 @@ describe('FeatureGatingAdminBackendApiService', () => {
       imports: [HttpClientTestingModule]
     });
 
-    featureAdminService = TestBed.get(FeatureGatingAdminBackendApiService);
+    featureAdminService = TestBed.get(PlatformFeatureAdminBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
     ruleFactory = TestBed.get(PlatformParameterRuleObjectFactory);
   });
@@ -63,7 +63,7 @@ describe('FeatureGatingAdminBackendApiService', () => {
       ).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-        FeatureGatingDomainConstants.FEATURE_GATING_ADMIN_HANDLER_URL);
+        PlatformFeatureDomainConstants.ADMIN_HANDLER_URL);
       req.flush({});
       expect(req.request.method).toEqual('POST');
 

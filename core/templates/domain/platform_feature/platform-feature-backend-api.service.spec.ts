@@ -13,38 +13,38 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for FeatureGatingBackendApiService.
+ * @fileoverview Unit tests for PlatformFeatureBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ClientContextObjectFactory } from './ClientContextObjectFactory';
-import { FeatureFlagResultsObjectFactory } from
-  'domain/feature_gating/FeatureFlagResultsObjectFactory';
-import { FeatureGatingDomainConstants } from
-  'domain/feature_gating/feature-gating-domain.constants';
-import { FeatureGatingBackendApiService } from
-  'domain/feature_gating/feature-gating-backend-api.service';
+import { ClientContextObjectFactory } from './client-context-object.factory';
+import { FeatureStatusSummaryObjectFactory } from
+  'domain/platform_feature/feature-status-summary-object.factory';
+import { PlatformFeatureDomainConstants } from
+  'domain/platform_feature/platform-feature-domain.constants';
+import { PlatformFeatureBackendApiService } from
+  'domain/platform_feature/platform-feature-backend-api.service';
 
-describe('FeatureGatingBackendApiService', () => {
+describe('PlatformFeatureBackendApiService', () => {
   let httpTestingController: HttpTestingController;
-  let featureGatingBackendApiService: FeatureGatingBackendApiService = null;
-  let clientContextObjectFactory: ClientContextObjectFactory = null;
-  let featureFlagResultsObjectFactory: FeatureFlagResultsObjectFactory = null;
+  let platformFeatureBackendApiService: PlatformFeatureBackendApiService;
+  let clientContextObjectFactory: ClientContextObjectFactory;
+  let featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
 
-    featureGatingBackendApiService = TestBed.get(
-      FeatureGatingBackendApiService);
+    platformFeatureBackendApiService = TestBed.get(
+      PlatformFeatureBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
     clientContextObjectFactory = TestBed.get(ClientContextObjectFactory);
-    featureFlagResultsObjectFactory = TestBed.get(
-      FeatureFlagResultsObjectFactory);
+    featureStatusSummaryObjectFactory = TestBed.get(
+      FeatureStatusSummaryObjectFactory);
   });
 
   afterEach(() => {
@@ -63,16 +63,16 @@ describe('FeatureGatingBackendApiService', () => {
         feature_b: false,
       };
 
-      featureGatingBackendApiService.fetchFeatureFlags(context)
+      platformFeatureBackendApiService.fetchFeatureFlags(context)
         .then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
-        FeatureGatingDomainConstants.FEATURE_GATING_HANDLER_URL);
+        PlatformFeatureDomainConstants.PLATFORM_FEATURE_HANDLER_URL);
       req.flush(responseDict);
 
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        featureFlagResultsObjectFactory.createFromBackendDict(responseDict));
+        featureStatusSummaryObjectFactory.createFromBackendDict(responseDict));
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
