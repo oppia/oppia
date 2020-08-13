@@ -24,7 +24,7 @@ require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 require(
   'pages/contributor-dashboard-page/login-required-message/' +
-  'login-required-message.directive.ts');
+  'login-required-message.component.ts');
 require(
   'pages/contributor-dashboard-page/modal-templates/' +
   'translation-modal.controller.ts');
