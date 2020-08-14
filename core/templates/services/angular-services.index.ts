@@ -41,6 +41,9 @@ import { AnswerClassificationService } from
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
+import { ClassroomDataObjectFactory } from 'domain/classroom/ClassroomDataObjectFactory';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
@@ -674,6 +677,7 @@ export const angularServices: [string, unknown][] = [
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['ClassifierObjectFactory', ClassifierObjectFactory],
   ['ClassroomBackendApiService', ClassroomBackendApiService],
+  ['ClassroomDataObjectFactory', ClassroomDataObjectFactory],
   ['CodeNormalizerService', CodeNormalizerService],
   ['CodeReplPredictionService', CodeReplPredictionService],
   ['CodeReplRulesService', CodeReplRulesService],
@@ -862,6 +866,7 @@ export const angularServices: [string, unknown][] = [
   ['RubricObjectFactory', RubricObjectFactory],
   ['RuleObjectFactory', RuleObjectFactory],
   ['SchemaDefaultValueService', SchemaDefaultValueService],
+  ['SchemaFormSubmittedService', SchemaFormSubmittedService],
   ['SchemaUndefinedLastElementService', SchemaUndefinedLastElementService],
   ['SearchExplorationsBackendApiService', SearchExplorationsBackendApiService],
   ['SetInputRulesService', SetInputRulesService],
@@ -894,6 +899,7 @@ export const angularServices: [string, unknown][] = [
   ['StateInteractionStatsBackendApiService', StateInteractionStatsBackendApiService],
   ['StateInteractionStatsService', StateInteractionStatsService],
   ['StateNameService', StateNameService],
+  ['StateNextContentIdIndexService', StateNextContentIdIndexService],
   ['StateObjectFactory', StateObjectFactory],
   ['StateParamChangesService', StateParamChangesService],
   ['StateRecordedVoiceoversService', StateRecordedVoiceoversService],
@@ -960,5 +966,5 @@ export const angularServices: [string, unknown][] = [
   ['WinnowingPreprocessingService', WinnowingPreprocessingService],
   ['WorkedExampleObjectFactory', WorkedExampleObjectFactory],
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
-  ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory]
+  ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
 ];
