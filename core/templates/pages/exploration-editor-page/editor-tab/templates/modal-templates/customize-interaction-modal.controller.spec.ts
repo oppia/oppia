@@ -56,7 +56,7 @@ describe('Customize Interaction Modal Controller', function() {
   var stateEditorService = null;
   var stateInteractionIdService = null;
   var stateNextContentIdIndexService = null;
-  const showMarkAllAudioAsNeedingUpdateModalIfRequiredProvider = () => {};
+  const showMarkAllAudioAsNeedingUpdateModalIfRequired = () => {};
 
   var stateName = 'Introduction';
 
@@ -109,7 +109,7 @@ describe('Customize Interaction Modal Controller', function() {
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
         StateNextContentIdIndexService: stateNextContentIdIndexService,
-        showMarkAllAudioAsNeedingUpdateModalIfRequiredProvider: () => {}
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
       });
     }));
 
@@ -328,7 +328,7 @@ describe('Customize Interaction Modal Controller', function() {
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
         StateNextContentIdIndexService: stateNextContentIdIndexService,
-        showMarkAllAudioAsNeedingUpdateModalIfRequiredProvider: () => {}
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
       });
     }));
 
@@ -419,7 +419,7 @@ describe('Customize Interaction Modal Controller', function() {
           StateEditorService: stateEditorService,
           StateInteractionIdService: stateInteractionIdService,
           StateNextContentIdIndexService: stateNextContentIdIndexService,
-          showMarkAllAudioAsNeedingUpdateModalIfRequiredProvider: () => {}
+          showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
         });
       }).toThrowError(
         'Interaction is missing customization argument highlightRegionsOnHover'
@@ -494,7 +494,7 @@ describe('Customize Interaction Modal Controller', function() {
         StateInteractionIdService: stateInteractionIdService,
         StateNextContentIdIndexService: stateNextContentIdIndexService,
         INTERACTION_SPECS: INTERACTION_SPECS,
-        showMarkAllAudioAsNeedingUpdateModalIfRequiredProvider: () => {}
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
       });
     });
     stateNextContentIdIndexService.displayed = 0;
