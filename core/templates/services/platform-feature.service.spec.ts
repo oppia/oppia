@@ -29,7 +29,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { FeatureNames, FeatureStatusSummaryObjectFactory } from
   'domain/platform_feature/feature-status-summary-object.factory';
 
-fdescribe('PlatformFeatureService', () => {
+describe('PlatformFeatureService', () => {
   let windowRef: WindowRef;
   let i18n: I18nLanguageCodeService;
   let apiService: PlatformFeatureBackendApiService;
