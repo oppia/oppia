@@ -73,10 +73,10 @@ export class PlatformFeatureBackendApiService {
    *
    * @returns {Promise<string>} - A promise that resolves to the csrf token.
    */
-  private async getCsrfTokenAsync(): Promise<string> {
-    const res = await this.http.get<{token: string}>(
+  async getCsrfTokenAsync(): Promise<string> {
+    const { token } = await this.http.get<{token: string}>(
       '/csrfhandler').toPromise();
-    return res.token;
+    return token;
   }
 }
 

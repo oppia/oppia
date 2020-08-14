@@ -51,28 +51,61 @@ describe('PlatformFeatureBackendApiService', () => {
     httpTestingController.verify();
   });
 
-  it('should correctly fetch feature flags',
-    fakeAsync(() => {
+  describe('.getCsrfTokenAsync', () => {
+    it('should correctly fetch csrf token', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      const context = clientContextObjectFactory.create('Web', 'Chrome', 'en');
-      const responseDict = {
-        feature_a: true,
-        feature_b: false,
-      };
-
-      platformFeatureBackendApiService.fetchFeatureFlags(context)
+      platformFeatureBackendApiService.getCsrfTokenAsync()
         .then(successHandler, failHandler);
-      const req = httpTestingController.expectOne(
-        PlatformFeatureDomainConstants.PLATFORM_FEATURE_HANDLER_URL);
-      req.flush(responseDict);
+
+      httpTestingController
+        .expectOne('/csrfhandler')
+        .flush({ token: 'mock_csrf_token' });
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        featureStatusSummaryObjectFactory.createFromBackendDict(responseDict));
+      expect(successHandler).toHaveBeenCalledWith('mock_csrf_token');
       expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    }));
+  });
+
+  describe('.fetchFeatureFlags', () => {
+    let spy: jasmine.Spy;
+
+    beforeEach(() => {
+      spy = spyOn(platformFeatureBackendApiService, 'getCsrfTokenAsync')
+        .and.resolveTo('mock_csrf_token');
+    });
+
+    it('should correctly fetch feature flags',
+      fakeAsync(() => {
+        const successHandler = jasmine.createSpy('success');
+        const failHandler = jasmine.createSpy('fail');
+
+        const context = clientContextObjectFactory.create(
+          'Web', 'Chrome', 'en');
+        const responseDict = {
+          feature_a: true,
+          feature_b: false,
+        };
+
+        platformFeatureBackendApiService.fetchFeatureFlags(context)
+          .then(successHandler, failHandler);
+
+        flushMicrotasks();
+        httpTestingController
+          .expectOne(
+            PlatformFeatureDomainConstants.PLATFORM_FEATURE_HANDLER_URL)
+          .flush(responseDict);
+
+        flushMicrotasks();
+        expect(successHandler).toHaveBeenCalledWith(
+          featureStatusSummaryObjectFactory.createFromBackendDict(responseDict)
+        );
+        expect(failHandler).not.toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
+      })
+    );
+  });
 });
