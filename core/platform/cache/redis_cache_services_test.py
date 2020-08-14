@@ -24,6 +24,7 @@ import os
 from core.platform.cache import redis_cache_services
 from core.tests import test_utils
 import feconf
+import python_utils
 from scripts import common
 
 
@@ -121,7 +122,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             os.path.join(common.CURR_DIR, 'redis.conf')))
 
         with python_utils.open_file(
-            os.path.join(common.CURR_DIR, 'redis.conf')) as redis_conf:
+            os.path.join(common.CURR_DIR, 'redis.conf'), 'r') as redis_conf:
             lines = redis_conf.readlines()
             elements = lines[0].split()
             self.assertEqual(len(elements), 2)
