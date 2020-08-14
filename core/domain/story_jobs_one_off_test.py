@@ -347,7 +347,8 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             notes='Story notes',
             corresponding_topic_id=self.TOPIC_ID,
-            story_contents=story_contents
+            story_contents=story_contents,
+            url_fragment='story-frag-one'
         )
         commit_message = (
             'New story created with title \'Story title\'.')
@@ -466,7 +467,8 @@ class StoryMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             notes='Story notes',
             corresponding_topic_id='topic_id1',
-            story_contents=story_contents1
+            story_contents=story_contents1,
+            url_fragment='story-frag-two'
         )
         commit_message = (
             'New story created with title \'Story title1\'.')
@@ -503,7 +505,8 @@ class StoryMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             notes='Story notes',
             corresponding_topic_id='topic_id1',
-            story_contents=story_contents2
+            story_contents=story_contents2,
+            url_fragment='story-frag-three'
         )
         commit_message = (
             'New story created with title \'Story title2\'.')
@@ -568,7 +571,8 @@ class StoryMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             notes='Story notes',
             corresponding_topic_id='topic_id1',
-            story_contents=story_contents1
+            story_contents=story_contents1,
+            url_fragment='story-frag-four'
         )
         commit_message = (
             'New story created with title \'Story title1\'.')
@@ -643,7 +647,8 @@ class StoryMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             notes='Story notes',
             corresponding_topic_id='topic_id1',
-            story_contents=story_contents1
+            story_contents=story_contents1,
+            url_fragment='story-frag-five'
         )
         commit_message = (
             'New story created with title \'Story title1\'.')
@@ -680,7 +685,8 @@ class StoryMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             notes='Story notes',
             corresponding_topic_id='topic_id1',
-            story_contents=story_contents2
+            story_contents=story_contents2,
+            url_fragment='story-frag-six'
         )
         commit_message = (
             'New story created with title \'Story title2\'.')

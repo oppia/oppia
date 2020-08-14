@@ -19,9 +19,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import subprocess
 import sys
 import tarfile
-import zipfile
 
 import python_utils
 
@@ -45,9 +45,9 @@ def main(args=None):
     # PUT requests from the frontend fail.
     sys.path.append('.')
     sys.path.append(coverage_home)
-    sys.path.append(common.GOOGLE_APP_ENGINE_HOME)
+    sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
     sys.path.append(
-        os.path.join(common.GOOGLE_APP_ENGINE_HOME, 'lib', 'webob_0_9'))
+        os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'))
     sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
 
     # Delete old *.pyc files.
@@ -56,27 +56,6 @@ def main(args=None):
             if file_name.endswith('.pyc'):
                 filepath = os.path.join(directory, file_name)
                 os.remove(filepath)
-
-    python_utils.PRINT(
-        'Checking whether Google App Engine is installed in %s'
-        % common.GOOGLE_APP_ENGINE_HOME)
-    if not os.path.exists(common.GOOGLE_APP_ENGINE_HOME):
-        python_utils.PRINT(
-            'Downloading Google App Engine (this may take a little while)...')
-        os.makedirs(common.GOOGLE_APP_ENGINE_HOME)
-        try:
-            python_utils.url_retrieve(
-                'https://storage.googleapis.com/appengine-sdks/featured/'
-                'google_appengine_1.9.67.zip', filename='gae-download.zip')
-        except Exception:
-            python_utils.PRINT('Error downloading Google App Engine. Exiting.')
-            raise Exception('Error downloading Google App Engine.')
-        python_utils.PRINT('Download complete. Installing Google App Engine...')
-        with zipfile.ZipFile(GAE_DOWNLOAD_ZIP_PATH, 'r') as zip_ref:
-            zip_ref.extractall(
-                path=os.path.join(
-                    common.OPPIA_TOOLS_DIR, 'google_appengine_1.9.67/'))
-        os.remove(GAE_DOWNLOAD_ZIP_PATH)
 
     python_utils.PRINT(
         'Checking whether google-cloud-sdk is installed in %s'
@@ -88,7 +67,7 @@ def main(args=None):
         try:
             python_utils.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-251.0.0-linux-x86_64.tar.gz',
+                'google-cloud-sdk-304.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')
         except Exception:
             python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
@@ -97,8 +76,20 @@ def main(args=None):
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0/'))
+                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))
         tar.close()
+
+        # This command installs specific google cloud components for the google
+        # cloud sdk to prevent the need for developers to install it themselves
+        # when the app engine development server starts up. The --quiet
+        # parameter specifically tells the gcloud program to autofill all
+        # prompts with default values. In this case, that means accepting all
+        # installations of gcloud packages.
+        subprocess.call([
+            common.GCLOUD_PATH,
+            'components', 'install', 'cloud-datastore-emulator',
+            'app-engine-python', 'app-engine-python-extras', '--quiet'])
+
         os.remove('gcloud-sdk.tar.gz')
 
 
