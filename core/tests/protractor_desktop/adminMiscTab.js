@@ -30,6 +30,7 @@ describe('Admin misc tab', function() {
   var topicEditorPage = null;
   var topicId = null;
   var allowedErrors = [];
+  const topicName = 'MiscTabTestTopic';
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
@@ -40,10 +41,10 @@ describe('Admin misc tab', function() {
     await users.createAndLoginAdminUser(
       'miscTabTester@miscTab.com', 'miscTabTester');
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(
-      'MiscTabTestTopic', 'A topic to test the Admin Page\'s Misc Tab', true);
-    await waitFor.pageToFullyLoad();
-    await topicsAndSkillsDashboardPage.editTopic('MiscTabTestTopic');
+    await topicsAndSkillsDashboardPage.createTopic(topicName,
+      'admin-misc-tab-test', 'A topic to test the Admin Page\'s Misc Tab',
+      true);
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4].substring(0, 12);
     await adminPage.get();
@@ -53,45 +54,47 @@ describe('Admin misc tab', function() {
   it('should upload and download similarity files', async function() {
     await adminPage.uploadTopicSimilarities(
       '../data/sample_topic_similarities.csv', true);
-    allowedErrors.push('encode', 'Object', 'resource');
     await adminPage.expectSimilaritiesToBeUploaded();
     await adminPage.uploadTopicSimilarities('../data/cafe.mp3', false);
+    // We uploaded an invalid file (cafe.mp3), so we expect the errors below.
+    allowedErrors.push('encode', 'Object', 'resource');
     await adminPage.downloadSimilarityFile();
+    await waitFor.fileToBeDownloaded('topic_similarities.csv');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
     await waitFor.fileToBeDownloaded('topic_similarities.csv');
   });
 
   it('should clear the search index', async function() {
     await adminPage.clearSearchIndex();
-    await adminPage.expectSearchIndexToBeCleared();
   });
 
   it('should flush migration bot contributions', async function() {
     await adminPage.flushMigrationBotContributions();
-    await adminPage.expectMigrationBotContributionsToBeFlushed();
   });
 
   it('should successfully change the username', async function() {
     await adminPage.changeUsername('miscTabTester', 'mTabChecker');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
     await adminPage.expectUsernameToBeChanged('mTabChecker');
   });
 
-  it('should fetch and save SVGs', async function() {
-    await adminPage.fetchSVG();
-    await adminPage.expectSVGToBeFetched();
+  it('should generate SVGs for explorations', async function() {
+    await adminPage.generateSVG();
   });
 
   it('should regenerate contribution opportunities for a topic',
     async function() {
-      await adminPage.regenerateContributionsForTopic('0');
-      await adminPage.expectRegenerationOutcome(false, '0');
-      await adminPage.regenerateContributionsForTopic(topicId);
-      await adminPage.expectRegenerationOutcome(true);
+      await adminPage.regenerateContributionsForTopic('0', false);
+      // These errors come from supplying '0' as the topic ID (invalid)
       allowedErrors.push('500', 'id 0', 'Entity', 'Object');
+      await adminPage.regenerateContributionsForTopic(topicId, true);
     });
 
   it('should send a test mail to admin', async function() {
-    await adminPage.sendTestEmailToAdmin();
-    await adminPage.expectEmailError();
+    // Locally, Oppia is unable to send emails, hence we expect errors.
+    await adminPage.sendTestEmailToAdminAndExpectError();
     allowedErrors.push('400', 'Object', 'This app cannot send emails.');
   });
 

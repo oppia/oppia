@@ -135,6 +135,7 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
 };
 
 /**
+ * @param {string} filename - Name of file to check (not the path of the file)
  * Check if a file has been downloaded
  */
 

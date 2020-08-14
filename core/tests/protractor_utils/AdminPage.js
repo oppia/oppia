@@ -85,7 +85,7 @@ var AdminPage = function() {
     by.css('.protractor-test-regeneration-error-message'));
   var usernameSection = element(
     by.css('.protractor-test-dropdown-username-section'));
-  var startSVGButton = element(
+  var generateSVGButton = element(
     by.css('.protractor-test-fetch-svg-button'));
   var stopSVGButton = element(
     by.css('.protractor-test-stop-svg-button'));
@@ -335,9 +335,7 @@ var AdminPage = function() {
   };
 
   this.getMiscTab = async function() {
-    await waitFor.elementToBeClickable(miscTabButton,
-      'Misc tab button not clickable');
-    await miscTabButton.click();
+    await action.click('Misc Tab Button', miscTabButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -347,24 +345,20 @@ var AdminPage = function() {
       await waitFor.visibilityOf(chooseSimilarityFileInput,
         'Similarity upload form is not visible');
       await chooseSimilarityFileInput.sendKeys(absPath);
-      await waitFor.elementToBeClickable(similarityFileUploadButton,
-        'Upload button taking too long to be clickable');
-      await similarityFileUploadButton.click();
+      await action.click('Upload button', similarityFileUploadButton);
       if (isValidFile) {
         var text = 'Topic similarities uploaded successfully.';
         await waitFor.visibilityOf(statusMessage,
           'Status message not visible');
         await waitFor.textToBePresentInElement(statusMessage, text,
-          'Status message not visible');
-        expect(await statusMessage.getText()).toEqual(text);
+          'Text not showing up in status message');
       } else {
         var text = 'Server error: \'ascii\' codec can\'t encode characters' +
           ' in position 1024-1025: ordinal not in range(128)';
         await waitFor.visibilityOf(statusMessage,
           'Status message not visible');
-        await waitFor.textToBePresentInElement(statusMessage,
-          text, 'Text not showing up in status message');
-        expect(await statusMessage.getText()).toEqual(text);
+        await waitFor.textToBePresentInElement(statusMessage, text,
+          'Text not showing up in status message');
       }
     };
 
@@ -374,73 +368,50 @@ var AdminPage = function() {
   };
 
   this.downloadSimilarityFile = async function() {
-    await waitFor.elementToBeClickable(similarityDownloadButton,
-      'Download similarity file button not clickable');
-    await similarityDownloadButton.click();
+    await action.click('Download Similarity File Button',
+      similarityDownloadButton);
   };
 
   this.clearSearchIndex = async function() {
-    await waitFor.elementToBeClickable(searchIndexClearButton,
-      'Clear search index button not clickable');
-    await searchIndexClearButton.click();
+    await action.click('Clear search index button', searchIndexClearButton);
     await general.acceptAlert();
-  };
-
-  this.expectSearchIndexToBeCleared = async function() {
     await waitFor.visibilityOf(statusMessage,
       'Status message not showing up.');
     await waitFor.textToBePresentInElement(statusMessage,
       'Index successfully cleared.');
-    expect(statusMessage.getText()).toEqual(
-      'Index successfully cleared.');
   };
 
   this.flushMigrationBotContributions = async function() {
-    await waitFor.elementToBeClickable(flushMigrationBotContributionsButton,
-      'Migration bot flush contributions button not clickable');
-    await flushMigrationBotContributionsButton.click();
+    await action.click('Migration bot flush contributions button',
+      flushMigrationBotContributionsButton);
     await general.acceptAlert();
-  };
-
-  this.expectMigrationBotContributionsToBeFlushed = async function() {
     await waitFor.textToBePresentInElement(statusMessage,
       'Migration bot contributions successfully flushed.',
       'Migration bot cuntributions not flushing.');
-    return true;
   };
 
-  this.regenerateContributionsForTopic = async function(topicId) {
-    await waitFor.visibilityOf(regenerateContributionsTopicIdInput,
-      'Regenerate contributions topic ID input not showing up.');
-    await regenerateContributionsTopicIdInput.sendKeys(topicId);
-    await waitFor.elementToBeClickable(regenerateContributionsSubmitButton,
-      'Regenerate conributions form submit button not clickable');
-    await regenerateContributionsSubmitButton.click();
-    await general.acceptAlert();
-    await waitFor.visibilityOf(regenerateContributionsTopicIdInput,
-      'Regenerate contributions topic ID input not showing up.');
-    await regenerateContributionsTopicIdInput.clear();
-  };
-
-  this.expectRegenerationOutcome = async function(isMeantToSucceed,
-      topicId = '0') {
-    if (!isMeantToSucceed) {
-      var text = 'Server error: Entity for class TopicModel with id ' +
-        topicId + ' not found';
-    } else {
-      var text = 'No. of opportunities model created: 0';
-    }
-    await waitFor.visibilityOf(regenerationMessage,
-      'Regeneration message not visible');
-    expect(regenerationMessage.getText()).toEqual(text);
-  };
-
-  this.expectConributionsToBeRegeneratedForTopic = async function() {
-    var text = 'No. of opportunities model created: 0';
-    await waitFor.visibilityOf(regenerationMessage,
-      'Regeneration message not visible');
-    expect(regenerationMessage.getText()).toEqual(text);
-  };
+  this.regenerateContributionsForTopic =
+    async function(topicId, isMeantToSucceed) {
+      await waitFor.visibilityOf(regenerateContributionsTopicIdInput,
+        'Regenerate contributions topic ID input not showing up.');
+      await regenerateContributionsTopicIdInput.sendKeys(topicId);
+      await action.click('Regenerate contributions form submit button',
+        regenerateContributionsSubmitButton);
+      await general.acceptAlert();
+      await waitFor.visibilityOf(regenerateContributionsTopicIdInput,
+        'Regenerate contributions topic ID input not showing up.');
+      await regenerateContributionsTopicIdInput.clear();
+      var text;
+      if (!isMeantToSucceed) {
+        text = 'Server error: Entity for class TopicModel with id ' +
+          topicId + ' not found';
+      } else {
+        text = 'No. of opportunities model created: 0';
+      }
+      await waitFor.visibilityOf(regenerationMessage,
+        'Regeneration message not visible');
+      await waitFor.textToBePresentInElement(regenerationMessage, text);
+    };
 
   this.changeUsername = async function(oldUsername, newUsername) {
     await waitFor.visibilityOf(oldUsernameInput,
@@ -451,9 +422,8 @@ var AdminPage = function() {
     await newUsernameInput.sendKeys(newUsername);
     await waitFor.visibilityOf(usernameChangeSubmitButton,
       'Change username submit button not visible');
-    await waitFor.elementToBeClickable(usernameChangeSubmitButton,
-      'Username change submit button not clickable');
-    await usernameChangeSubmitButton.click();
+    await action.click('Username change submit button',
+      usernameChangeSubmitButton);
     var text = 'Successfully renamed ' + oldUsername + ' to ' + newUsername;
     await waitFor.textToBePresentInElement(statusMessage, text,
       'Username was not successfully changed');
@@ -463,26 +433,12 @@ var AdminPage = function() {
     expect(usernameSection.getText()).toEqual(newUsername);
   };
 
-  this.fetchSVG = async function() {
-    await action.click('Start SVG Button', startSVGButton);
-  };
-
-  this.expectSVGToBeFetched = async function() {
+  this.generateSVG = async function() {
+    await action.click('Generate SVG Button', generateSVGButton);
     await waitFor.visibilityOf(
       statusMessage, 'Status message not visible');
     await waitFor.textToBePresentInElement(
       statusMessage, 'SVGs generated for all explorations .');
-  };
-
-  this.saveSVG = async function() {
-    await action.click('Save SVG Button', stopSVGButton);
-  };
-
-  this.expectSVGToBeSaved = async function() {
-    await waitFor.visibilityOf(
-      statusMessage, 'Status message not visible');
-    await waitFor.textToBePresentInElement(
-      statusMessage, 'Successfully updated 0 explorations, 0 left');
   };
 
   this.extractDataAndExpectExtraction = async function(expID, expVersion,
@@ -504,13 +460,11 @@ var AdminPage = function() {
       extractDataFormSubmitButton);
     var newHandles = await browser.driver.getAllWindowHandles();
     expect(newHandles.length).toEqual(handles.length + 1);
+    browser.driver.close();
   };
 
-  this.sendTestEmailToAdmin = async function() {
+  this.sendTestEmailToAdminAndExpectError = async function() {
     await action.click('Send Email Button', sendEmailButton);
-  };
-
-  this.expectEmailError = async function() {
     await waitFor.visibilityOf(
       statusMessage, 'Status message not visible');
     await waitFor.textToBePresentInElement(
