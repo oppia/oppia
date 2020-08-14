@@ -52,7 +52,8 @@ describe('Email Dashboard Result Page', function() {
     });
   }));
 
-  it('should sucessfully init ctrl properties', function() {
+  it('should initialize correctly ctrl properties after controller' +
+    ' initialization', function() {
     ctrl.$onInit();
 
     expect(ctrl.emailOption).toBe('all');
@@ -76,29 +77,30 @@ describe('Email Dashboard Result Page', function() {
     expect(ctrl.testEmailSentSuccesfully).toBe(false);
   });
 
-  it('should sucessfully submit email', function() {
-    ctrl.$onInit();
-    ctrl.emailSubject = 'Subject';
-    ctrl.emailBody = 'Body';
-    ctrl.emailOption = 'custom';
-    ctrl.maxRecipients = 10;
+  it('should submit an email when fields are populated with valid values.',
+    function() {
+      ctrl.$onInit();
+      ctrl.emailSubject = 'Subject';
+      ctrl.emailBody = 'Body';
+      ctrl.emailOption = 'custom';
+      ctrl.maxRecipients = 10;
 
-    $httpBackend.expect('POST', '/emaildashboardresult/0').respond(200);
-    ctrl.submitEmail();
+      $httpBackend.expect('POST', '/emaildashboardresult/0').respond(200);
+      ctrl.submitEmail();
 
-    expect(ctrl.submitIsInProgress).toBe(true);
-    expect(ctrl.emailSubmitted).toBe(false);
+      expect(ctrl.submitIsInProgress).toBe(true);
+      expect(ctrl.emailSubmitted).toBe(false);
 
-    $httpBackend.flush();
+      $httpBackend.flush();
 
-    expect(ctrl.emailSubmitted).toBe(true);
-    $timeout.flush(4000);
+      expect(ctrl.emailSubmitted).toBe(true);
+      $timeout.flush(4000);
 
-    expect(windowRef.nativeWindow.location.href).toBe('/emaildashboard');
-    expect(ctrl.invalid.subject).toBe(false);
-    expect(ctrl.invalid.body).toBe(false);
-    expect(ctrl.invalid.maxRecipients).toBe(false);
-  });
+      expect(windowRef.nativeWindow.location.href).toBe('/emaildashboard');
+      expect(ctrl.invalid.subject).toBe(false);
+      expect(ctrl.invalid.body).toBe(false);
+      expect(ctrl.invalid.maxRecipients).toBe(false);
+    });
 
   it('should use reject handler when submit email fails', function() {
     ctrl.$onInit();
@@ -146,7 +148,7 @@ describe('Email Dashboard Result Page', function() {
     expect(ctrl.invalid.maxRecipients).toBe(true);
   });
 
-  it('should reset form', function() {
+  it('should clear form when resetting form', function() {
     ctrl.emailSubject = 'Subject';
     ctrl.emailBody = 'Body';
     ctrl.emailOption = 'custom';
@@ -158,7 +160,7 @@ describe('Email Dashboard Result Page', function() {
     expect(ctrl.emailOption).toBe('all');
   });
 
-  it('should sucessfully cancel email', function() {
+  it('should discard email when canceling email', function() {
     ctrl.$onInit();
 
     $httpBackend.expectPOST('/emaildashboardcancelresult/0').respond(200);
@@ -184,7 +186,7 @@ describe('Email Dashboard Result Page', function() {
     expect(windowRef.nativeWindow.location.href).toBe('');
   });
 
-  it('should send test email', function() {
+  it('should send test email to backend when testing submissions', function() {
     ctrl.$onInit();
     ctrl.emailSubject = 'Subject';
     ctrl.emailBody = 'Body';

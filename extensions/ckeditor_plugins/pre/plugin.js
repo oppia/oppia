@@ -31,7 +31,7 @@ CKEDITOR.plugins.add('pre', {
       !editor.readOnly && editor.getCommand('pre').setState(state);
     });
 
-    editor.ui.addButton( 'Pre', {
+    editor.ui.addButton('Pre', {
       label: 'Pre',
       command: 'pre',
       toolbar: 'insert'
