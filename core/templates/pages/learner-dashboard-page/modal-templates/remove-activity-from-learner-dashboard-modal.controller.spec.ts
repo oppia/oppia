@@ -58,22 +58,24 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should init the variables', function() {
-        expect($scope.sectionNameI18nId).toEqual(sectionNameI18nId);
-        expect($scope.subsectionName).toEqual(subsectionName);
-        expect($scope.activityTitle).toEqual(activity.title);
-      });
+      it('should initialize $scope properties after controller is initialized',
+        function() {
+          expect($scope.sectionNameI18nId).toEqual(sectionNameI18nId);
+          expect($scope.subsectionName).toEqual(subsectionName);
+          expect($scope.activityTitle).toEqual(activity.title);
+        });
 
-      it('should remove activity', function() {
-        $httpBackend.expectDELETE(
-          '/learnerplaylistactivityhandler/exploration/1').respond(200);
-        $scope.remove();
+      it('should remove activity from backend when clicking remove button',
+        function() {
+          $httpBackend.expectDELETE(
+            '/learnerplaylistactivityhandler/exploration/1').respond(200);
+          $scope.remove();
 
-        $httpBackend.flush();
-        expect($uibModalInstance.close).toHaveBeenCalled();
-        $httpBackend.verifyNoOutstandingExpectation();
-        $httpBackend.verifyNoOutstandingRequest();
-      });
+          $httpBackend.flush();
+          expect($uibModalInstance.close).toHaveBeenCalled();
+          $httpBackend.verifyNoOutstandingExpectation();
+          $httpBackend.verifyNoOutstandingRequest();
+        });
     });
 
     describe('when section name is incomplete and subsection name is' +
@@ -104,16 +106,17 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should remove activity', function() {
-        $httpBackend.expectDELETE(
-          '/learnerincompleteactivityhandler/collection/1').respond(200);
-        $scope.remove();
+      it('should remove activity from backend when clicking remove button',
+        function() {
+          $httpBackend.expectDELETE(
+            '/learnerincompleteactivityhandler/collection/1').respond(200);
+          $scope.remove();
 
-        $httpBackend.flush();
-        expect($uibModalInstance.close).toHaveBeenCalled();
-        $httpBackend.verifyNoOutstandingExpectation();
-        $httpBackend.verifyNoOutstandingRequest();
-      });
+          $httpBackend.flush();
+          expect($uibModalInstance.close).toHaveBeenCalled();
+          $httpBackend.verifyNoOutstandingExpectation();
+          $httpBackend.verifyNoOutstandingRequest();
+        });
     });
 
     describe('when sub section name is not valid', function() {
@@ -136,13 +139,15 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should init the variables', function() {
-        expect($scope.sectionNameI18nId).toEqual(sectionNameI18nId);
-        expect($scope.subsectionName).toEqual(subsectionName);
-        expect($scope.activityTitle).toEqual(activity.title);
-      });
+      it('should initialize $scope properties after controller is initialized',
+        function() {
+          expect($scope.sectionNameI18nId).toEqual(sectionNameI18nId);
+          expect($scope.subsectionName).toEqual(subsectionName);
+          expect($scope.activityTitle).toEqual(activity.title);
+        });
 
-      it('should not remove activity', function() {
+      it('should not remove activity from backend when clicking remove' +
+        ' button if there is an error', function() {
         expect(function() {
           $scope.remove();
         }).toThrowError('Subsection name is not valid.');
@@ -171,7 +176,8 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should remove activity', function() {
+      it('should not remove activity from backend when clicking remove button' +
+        ' if there is an error', function() {
         expect(function() {
           $scope.remove();
         }).toThrowError('Section name is not valid.');

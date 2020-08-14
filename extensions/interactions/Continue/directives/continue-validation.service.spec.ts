@@ -63,7 +63,7 @@ describe('ContinueValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
     customizationArguments = {
       buttonText: {
         value: new SubtitledUnicode('Some Button Text', 'ca_buttonText')
@@ -88,6 +88,11 @@ describe('ContinueValidationService', () => {
 
       expect(() => {
         validatorService.getAllWarnings(
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'ContinueCustomizationArgs'." We are purposely
+          // assigning the wrong type of customization args in order to test
+          // validations.
+          // @ts-expect-error
           currentState, {}, [], goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have property: buttonText');
