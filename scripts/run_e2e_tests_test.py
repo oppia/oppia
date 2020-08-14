@@ -97,6 +97,10 @@ class MockProcessClass(python_utils.OBJECT):
             self.poll_return = False
 
     def wait(self):
+        """Wait for the process completion.
+
+        Mocks the process waiting for completion before it continues execution.
+        """
         return
 
 

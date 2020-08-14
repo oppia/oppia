@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
+
 from core.domain import collection_domain
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain
@@ -26,10 +28,7 @@ from core.domain import skill_domain
 from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
-import json
 import python_utils
-
-import logging
 
 memory_cache_services = models.Registry.import_cache_services()
 

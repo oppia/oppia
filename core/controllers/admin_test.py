@@ -2379,6 +2379,7 @@ class ContributionReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Missing username param')
         self.logout()
 
+
 class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
     """Tests MemoryCacheAdminHandler."""
 
@@ -2410,4 +2411,3 @@ class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/memorycacheadminhandler')
         self.assertEqual(response['total_keys_stored'], 0)
-

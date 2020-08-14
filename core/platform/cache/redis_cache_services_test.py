@@ -19,15 +19,17 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from core.platform.cache import redis_cache_services
 from core.tests import test_utils
 import feconf
-import os
 from scripts import common
 
 
 class RedisCacheServicesUnitTests(test_utils.TestBase):
     """Tests for redis_cache_services."""
+
     @classmethod
     def setUpClass(cls):
         super(RedisCacheServicesUnitTests, cls).setUpClass()
@@ -112,15 +114,15 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             redis_cache_services.get_multi(['a', 'b', 'c']), [None, '2', '3'])
 
     def test_redis_configuration_is_valid(self):
-        """ Tests that the redis configuration file and feconf variables have
+        """Tests that the redis configuration file and feconf variables have
         the same port configuration.
         """
         self.assertTrue(os.path.exists(
             os.path.join(common.CURR_DIR, 'redis.conf')))
 
-        with open(os.path.join(common.CURR_DIR, 'redis.conf')) as redis_conf:
+        with python_utils.open_file(
+            os.path.join(common.CURR_DIR, 'redis.conf')) as redis_conf:
             lines = redis_conf.readlines()
             elements = lines[0].split()
             self.assertEqual(len(elements), 2)
             self.assertEqual(elements[1], feconf.REDISPORT)
-

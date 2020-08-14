@@ -641,6 +641,7 @@ def start_redis_server():
             'machine is on the Windows operating system. The redis server '
             'cannot start.')
 
+
 def stop_redis_server():
     """Stops the redis server by shutting it down."""
     if not is_windows_os():

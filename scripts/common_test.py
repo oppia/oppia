@@ -849,7 +849,7 @@ class CommonTests(test_utils.GenericTestBase):
         with swap_call:
             common.start_redis_server()
 
-        self.assertEquals(check_function_calls, expected_check_function_calls)
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
         # Test that stopping the server calls subprocess.call().
         check_function_calls = {
@@ -864,4 +864,4 @@ class CommonTests(test_utils.GenericTestBase):
         with swap_call:
             common.stop_redis_server()
 
-        self.assertEquals(check_function_calls, expected_check_function_calls)
+        self.assertEqual(check_function_calls, expected_check_function_calls)
