@@ -8,11 +8,6 @@ if (argv.prodEnv) {
 
 module.exports = function(config) {
   config.set({
-    client: {
-      jasmine: {
-        random: false
-      }
-    },
     basePath: '../../',
     frameworks: ['jasmine'],
     files: [
