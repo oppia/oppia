@@ -57,7 +57,7 @@ describe('Library index page', function() {
     await users.logout();
   });
 
-  fit('should display private and published explorations', async function() {
+  it('should display private and published explorations', async function() {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
     var CATEGORY_ARCHITECTURE = 'Architecture';
