@@ -345,3 +345,17 @@ class UserContributionRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected can_review_questions to be a boolean value, '
                 'found: %s' % type(self.can_review_questions))
+
+class FullyQualifiedUserScoreIdentifier(python_utils.OBJECT):
+    """Domain object representing the full identifier of a user's contribution
+    score for a specific category.
+
+    Attributes:
+        user_id: str. The ID of the user.
+        score_category: str. The category of the suggestion which the score
+            applies.
+    """
+
+    def __init__(self, user_id, score_category):
+        self.user_id = user_id
+        self.score_category = score_category

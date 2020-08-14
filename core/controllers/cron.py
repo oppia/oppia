@@ -227,8 +227,7 @@ class CronAcceptStaleSuggestionsHandler(base.BaseHandler):
     def get(self):
         """Handles get requests."""
         if feconf.ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS:
-            suggestions = suggestion_services.get_all_stale_suggestions()
-            for suggestion in suggestions:
-                suggestion_services.accept_suggestion(
-                    suggestion.suggestion_id, feconf.SUGGESTION_BOT_USER_ID,
-                    suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)
+            suggestion_ids = suggestion_services.get_all_stale_suggestion_ids()
+            suggestion_services.accept_suggestions(
+                suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
+                suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)

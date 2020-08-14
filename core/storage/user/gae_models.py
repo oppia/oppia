@@ -1976,19 +1976,23 @@ class UserContributionScoringModel(base_models.BaseModel):
         return model.score if model else None
 
     @classmethod
-    def create(cls, user_id, score_category, score):
+    def create(cls, user_score_identifier, score):
         """Creates a new UserContributionScoringModel entry.
 
         Args:
-            user_id: str. The ID of the user.
-            score_category: str. The category of the suggestion.
+            user_score_identifier: FullyQualifiedUserScoreIdentifier. Contains
+                the unique (user_id, score_category) pair that corresponds to
+                the id of the user and the suggestion score_category to create
+                the scoring model for.
             score: float. The score of the user.
 
         Raises:
             Exception. There is already an entry with the given id.
         """
-        instance_id = cls._get_instance_id(user_id, score_category)
+        user_id = user_score_identifier.user_id
+        score_category = user_score_identifier.score_category
 
+        instance_id = cls._get_instance_id(user_id, score_category)
         if cls.get_by_id(instance_id):
             raise Exception(
                 'There is already a UserContributionScoringModel entry with the'
@@ -1999,22 +2003,34 @@ class UserContributionScoringModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, score_category=score_category,
             score=score).put()
 
-        @classmethod
-    def create_multi(cls, user_ids, score_category, score):
+    @classmethod
+    def create_multi(cls, user_score_identifiers, score):
         """Creates new UserContributionScoringModel entries.
 
         Args:
-            user_ids: list(str). The IDs of the users.
-            score_category: str. The category of the suggestion.
-            score: float. The score of the user.
+            user_score_identifiers: list(FullyQualifiedUserScoreIdentifier). A
+                list of unique (user_id, score_category) pairs that correspond
+                to the id of the users and the suggestion score categories to
+                create the scoring models for.
+            score: float. The score of the users.
 
         Raises:
             Exception. There is already an entry with the given id.
         """
+        user_ids = [
+            user_score_identifier.user_id for user_score_identifier in
+            user_score_identifiers
+        ]
+        score_categories = [
+            user_score_identifier.score_category for user_score_identifier in
+            user_score_identifiers
+        ]
         instance_ids = [
             cls._get_instance_id(user_id, score_category)
-            for user_id in user_ids
+            for user_id, score_category in python_utils.ZIP(
+                user_ids, score_categories)
         ]
+
         user_scoring_models = cls.get_multi(instance_ids)
         for user_scoring_model in user_scoring_models:
             if user_scoring_model:
@@ -2028,57 +2044,64 @@ class UserContributionScoringModel(base_models.BaseModel):
                 id=instance_id, user_id=user_id, score_category=score_category,
                 score=score
             )
-            for instance_id, user_id in python_utils.ZIP(instance_ids, user_ids)
+            for instance_id, user_id, score_category in python_utils.ZIP(
+                instance_ids, user_ids, score_categories)
         ]
         cls.put_multi(new_user_scoring_models)
 
     @classmethod
-    def increment_score_for_user(cls, user_id, score_category, increment_by):
+    def increment_score_for_user(cls, user_score_identifier, increment_by):
         """Increment the score of the user in the category by the given amount.
 
         Args:
-            user_id: str. The id of the user.
-            score_category: str. The category of the suggestion.
+            user_score_identifier: FullyQualifiedUserScoreIdentifier. A
+                (user_id, score_category) pair that corresponds
+                to the id of the user and the suggestion score category to
+                increment the score for.
             increment_by: float. The amount to increase the score of the user
                 by. May be negative, in which case the score is reduced.
         """
-        instance_id = cls._get_instance_id(user_id, score_category)
-        model = cls.get_by_id(instance_id)
-        if not model:
-            cls.create(user_id, score_category, increment_by)
-        else:
-            model.score += increment_by
-            model.put()
+        cls.increment_score_for_users([user_score_identifier], increment_by)
 
     @classmethod
-    def increment_score_for_users(cls, user_ids, score_category, increment_by):
-        """Increments the score of the users with user_ids in the category by
-        the given amount.
+    def increment_score_for_users(
+            cls, user_score_identifiers, increment_by):
+        """Increments the score of each (user_id, score_category) pair by the
+        given amount.
 
         Args:
-            user_ids: list(str). The ids of the users.
-            score_category: str. The category of the suggestion.
+            user_score_identifiers: list(FullyQualifiedUserScoreIdentifier). A
+                list of unique (user_id, score_category) pairs that correspond
+                to the id of the users and the suggestion score categories to
+                increment the scores for.
             increment_by: float. The amount to increase the score of the users
                 by. May be negative, in which case the score is reduced.
         """
+        user_ids = [
+            user_score_identifier.user_id for user_score_identifier in
+            user_score_identifiers
+        ]
+        score_categories = [
+            user_score_identifier.score_category for user_score_identifier in
+            user_score_identifiers
+        ]
         instance_ids = [
-            cls._get_instance_id(user_id, score_category) for user_id in
-            user_ids
+            cls._get_instance_id(user_id, score_category)
+            for user_id, score_category in python_utils.ZIP(
+                user_ids, score_categories)
         ]
         user_scoring_models = cls.get_multi(instance_ids)
-        user_ids_missing_user_scoring_models = []
+        user_score_identifiers_missing_models = []
         for index, user_scoring_model in enumerate(user_scoring_models):
             if user_scoring_model:
                 user_scoring_model.score += increment_by
             else:
-                user_ids_missing_user_scoring)models.append(user_ids[index])
+                user_score_identifiers_missing_models.append(
+                    user_score_identifiers[index])
         
-        new_user_scoring_models = cls.create_multi(
-            user_ids_missing_user_scoring)models, score_category, score)
-        for new_user_scoring_model in new_user_scoring_models:
-            new_user_scoring_model.score += increment_by
+        cls.create_multi(user_score_identifiers_missing_models, increment_by)
+        user_scoring_models =  cls.get_multi(instance_ids)
 
-        user_scoring_models.extend(new_user_scoring_models)
         cls.put_multi(user_scoring_models)
 
 

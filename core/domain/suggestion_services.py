@@ -346,6 +346,80 @@ def accept_suggestion(
                         suggestion.author_id, suggestion.score_category)
 
 
+def accept_suggestions(
+        suggestion_ids, reviewer_id, commit_message, review_message):
+    """Accepts the suggestions with the given suggestion_ids.
+
+    Args:
+        suggestion_id: str. The id of the suggestion to be accepted.
+        reviewer_id: str. The ID of the reviewer accepting the suggestions.
+        commit_message: str. The commit message.
+        review_message: str. The message provided by the reviewer while
+            accepting the suggestions.
+
+    Raises:
+        Exception. A suggestion is already handled.
+        Exception. A suggestion is not valid.
+        Exception. The commit message is empty.
+    """
+    if not commit_message or not commit_message.strip():
+            raise Exception('Commit message cannot be empty.')
+    
+    suggestions = get_suggestion_by_ids(suggestion_ids)
+    for suggestion in suggestions:
+        if suggestion.is_handled:
+            raise Exception(
+                'The suggestion with id %s has already been accepted/'
+                'rejected.' % (suggestion_id)
+            )
+        suggestion.pre_accept_validate()
+        html_string = ''.join(suggestion.get_all_html_content_strings())
+        error_list = (
+            html_validation_service.
+            validate_math_tags_in_html_with_attribute_math_content(
+                html_string))
+        if len(error_list) > 0:
+            raise Exception(
+                'Invalid math tags found in the suggestion with id %s.' % (
+                    suggestion.suggestion_id)
+            )
+
+    author_ids = [suggestion.author_id for suggestion in suggestions]
+    author_names = user_services.get_usernames(author_ids)
+    commit_messages = [
+        get_commit_message_for_suggestion(author_name, commit_message)
+        for author_name in author_names
+    ]
+
+    for index, suggestion in enumerate(suggestions):
+        suggestion.set_suggestion_status_to_accepted()
+        suggestion.set_final_reviewer_id(reviewer_id)
+        suggestion.accept(commit_messages[index])
+
+    _update_suggestion(suggestions)
+
+    feedback_services.create_messages(
+        suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
+        None, review_message)
+
+    if feconf.ENABLE_RECORDING_OF_SCORES:
+        increment_score_for_user(
+            suggestion.author_id, suggestion.score_category,
+            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+        if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
+            scores = get_all_scores_of_user(suggestion.author_id)
+            if (
+                    suggestion.score_category in scores and
+                    scores[suggestion.score_category] >=
+                    feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
+                if not check_if_email_has_been_sent_to_user(
+                        suggestion.author_id, suggestion.score_category):
+                    email_manager.send_mail_to_onboard_new_reviewers(
+                        suggestion.author_id, suggestion.score_category)
+                    mark_email_has_been_sent_to_user(
+                        suggestion.author_id, suggestion.score_category)
+
+
 def reject_suggestion(suggestion_id, reviewer_id, review_message):
     """Rejects the suggestion with the given suggestion_id.
 
@@ -642,20 +716,38 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
     ]
 
 
-def increment_score_for_user(user_id, score_category, increment_by):
-    """Increment the score of the user in the category by the given amount.
+def increment_score_for_user(score_identifier, increment_by):
+    """Increments the score of the user in the category by the given amount.
 
     In the first version of the scoring system, the increment_by quantity will
     be +1, i.e, each user gains a point for a successful contribution and
     doesn't lose score in any way.
 
     Args:
-        user_id: str. The id of the user.
-        score_category: str. The category of the suggestion.
+        score_identifier: FullyQualifiedScoreIdentifier. A
+            (user_id, score_category) pair that corresponds to which user
+            score to update.
         increment_by: float. The amount to increase the score of the user by.
     """
-    user_models.UserContributionScoringModel.increment_score_for_user(
-        user_id, score_category, increment_by)
+    increment_score_for_users([score_identifier], increment_by)
+
+
+def increment_score_for_users(score_identifiers, increment_by):
+    """Increments the score for each user in their corresponding category by
+    the given amount.
+
+    In the first version of the scoring system, the increment_by quantity will
+    be +1, i.e, each user gains a point for a successful contribution and
+    doesn't lose score in any way.
+
+    Args:
+        list(FullyQualifiedScoreIdentifier). A list of unique
+            (user_id, score_category) pairs that correspond to which user
+            scores to update.
+    """
+
+    user_models.UserContributionScoringModel.increment_score_for_users(
+        score_identifiers, increment_by)
 
 
 def create_new_user_contribution_scoring_model(user_id, score_category, score):

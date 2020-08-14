@@ -24,6 +24,7 @@ import types
 
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import user_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -1971,7 +1972,10 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         )
 
     def test_create_model(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category1')
+        user_models.UserContributionScoringModel.create(
+            user_score_identifier, 1)
         score_models = (
             user_models.UserContributionScoringModel
             .get_all_scores_of_user('user1'))
@@ -1982,26 +1986,41 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertEqual(score_models[0].score, 1)
 
     def test_create_entry_already_exists_failure(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category1')
+        user_models.UserContributionScoringModel.create(
+            user_score_identifier, 1)
         with self.assertRaisesRegexp(
-            Exception, 'There is already an entry with the given id:'
-                       ' category1.user1'):
+            Exception, 'There is already a UserContributionScoringModel entry '
+            'with the given id: category1.user1'):
             user_models.UserContributionScoringModel.create(
-                'user1', 'category1', 2)
+            user_score_identifier, 2)
 
     def test_get_all_users_with_score_above_minimum_for_category(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-        user_models.UserContributionScoringModel.create(
-            'user2', 'category1', 21)
-        user_models.UserContributionScoringModel.create(
-            'user3', 'category1', 11)
-        user_models.UserContributionScoringModel.create(
-            'user4', 'category1', 11)
-        user_models.UserContributionScoringModel.create(
-            'user1', 'category2', 11)
-        user_models.UserContributionScoringModel.create('user2', 'category2', 1)
-        user_models.UserContributionScoringModel.create('user3', 'category2', 1)
-        user_models.UserContributionScoringModel.create('user4', 'category2', 1)
+        user_score_identifiers_large_score = [
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category2'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user2', 'category1'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user3', 'category1'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user4', 'category1')
+        ]
+        user_models.UserContributionScoringModel.create_multi(
+            user_score_identifiers_large_score, 11)
+        user_score_identifiers_small_score = [
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category1'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user2', 'category2'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user3', 'category2'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user4', 'category2')
+        ]
+        user_models.UserContributionScoringModel.create_multi(
+            user_score_identifiers_small_score, 1)
 
         score_models = (
             user_models.UserContributionScoringModel
@@ -2024,7 +2043,10 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             'category2.user1'), score_models)
 
     def test_get_score_of_user_for_category(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category1')
+        user_models.UserContributionScoringModel.create(
+            user_score_identifier, 1)
 
         score = (
             user_models.UserContributionScoringModel
@@ -2033,10 +2055,13 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertEqual(score, 1)
 
     def test_increment_score_for_user(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category1')
+        user_models.UserContributionScoringModel.create(
+            user_score_identifier, 1)
 
         user_models.UserContributionScoringModel.increment_score_for_user(
-            'user1', 'category1', 2)
+            user_score_identifier, 2)
 
         score = (
             user_models.UserContributionScoringModel
@@ -2045,9 +2070,16 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertEqual(score, 3)
 
     def test_get_all_scores_of_user(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-        user_models.UserContributionScoringModel.create('user1', 'category2', 1)
-        user_models.UserContributionScoringModel.create('user1', 'category3', 1)
+        user_score_identifiers = [
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category1'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category2'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category3')
+        ]
+        user_models.UserContributionScoringModel.create_multi(
+            user_score_identifiers, 1)
 
         score_models = (
             user_models.UserContributionScoringModel
@@ -2061,11 +2093,20 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             'category3.user1'), score_models)
 
     def test_get_categories_where_user_can_review(self):
+        user_score_identifiers_can_review = [
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category1'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category3')
+        ]
+        user_models.UserContributionScoringModel.create_multi(
+            user_score_identifiers_can_review, 15)
+        user_score_identifier_cannot_review = (
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category2')
+        )
         user_models.UserContributionScoringModel.create(
-            'user1', 'category1', 15)
-        user_models.UserContributionScoringModel.create('user1', 'category2', 1)
-        user_models.UserContributionScoringModel.create(
-            'user1', 'category3', 15)
+            user_score_identifier_cannot_review, 1)
         score_categories = (
             user_models.UserContributionScoringModel
             .get_all_categories_where_user_can_review('user1'))
