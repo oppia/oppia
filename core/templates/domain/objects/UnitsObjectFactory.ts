@@ -93,7 +93,7 @@ export class UnitsObjectFactory {
     return unitList;
   }
 
-  unitWithMultiplier(unitList: string[]): Array<[string, number]> {
+  unitWithMultiplier(unitList: string[]): [string, number][] {
     var multiplier = 1;
     var unitsWithMultiplier = [];
     var parenthesisStack = [];
@@ -135,7 +135,7 @@ export class UnitsObjectFactory {
     return unitList;
   }
 
-  unitToList(unitsWithMultiplier: Array<[string, number]>): Unit[] {
+  unitToList(unitsWithMultiplier: [string, number][]): Unit[] {
     var unitDict = {};
     for (var i = 0; i < unitsWithMultiplier.length; i++) {
       var unit = unitsWithMultiplier[i][0];

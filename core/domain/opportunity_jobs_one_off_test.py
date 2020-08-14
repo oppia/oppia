@@ -74,14 +74,14 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             self.publish_exploration(self.owner_id, exp.id)
 
         topic_1 = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'topic', 'abbrev', 'description')
+            self.topic_id_1, 'topic', 'abbrev-one', 'description')
         topic_1.thumbnail_filename = 'thumbnail.svg'
         topic_1.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic_1)
         topic_services.publish_topic(self.topic_id_1, self.admin_id)
 
         topic_2 = topic_domain.Topic.create_default_topic(
-            self.topic_id_2, 'topic2', 'abbrev', 'description')
+            self.topic_id_2, 'topic2', 'abbrev-two', 'description')
         topic_2.thumbnail_filename = 'thumbnail.svg'
         topic_2.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic_2)

@@ -301,12 +301,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Contains': [{'x': 'Test'}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }

@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import logging
 
 from core.domain import exp_domain
@@ -31,6 +32,15 @@ import utils
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
+
+
+class InvalidDraftConversion(Exception):
+    """Error class for invalid draft conversion. Should be raised in a draft
+    conversion function if it is not possible to upgrade a draft, and indicates
+    that try_upgrading_draft_to_exp_version should return None.
+    """
+
+    pass
 
 
 def try_upgrading_draft_to_exp_version(
@@ -60,7 +70,7 @@ def try_upgrading_draft_to_exp_version(
         raise utils.InvalidInputException(
             'Current draft version is greater than the exploration version.')
     if current_draft_version == to_exp_version:
-        return
+        return None
 
     exp_versions = list(
         python_utils.RANGE(current_draft_version + 1, to_exp_version + 1))
@@ -74,18 +84,18 @@ def try_upgrading_draft_to_exp_version(
                 len(commit.commit_cmds) != 1 or
                 commit.commit_cmds[0]['cmd'] !=
                 exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
-            return
+            return None
         conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
             commit.commit_cmds[0]['from_version'],
             commit.commit_cmds[0]['to_version'])
         if not hasattr(DraftUpgradeUtil, conversion_fn_name):
             logging.warning('%s is not implemented' % conversion_fn_name)
-            return
+            return None
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
         try:
             draft_change_list = conversion_fn(draft_change_list)
-        except Exception:
-            return
+        except InvalidDraftConversion:
+            return None
         upgrade_times += 1
     return draft_change_list
 
@@ -168,6 +178,86 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v38_dict_to_v39_dict(cls, draft_change_list):
+        """Converts draft change list from version 38 to 39.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                for answer_group_dict in change.new_value:
+                    # Convert the list of rule specs into the new
+                    # rule_types_to_inputs dict format. Instead of a list of
+                    # dictionaries that have properties 'rule_type' and
+                    # 'inputs', the new format groups rule inputs of the same
+                    # rule type by mapping rule type to a list of rule inputs.
+                    # E.g. Old format: rule_specs = [
+                    #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
+                    #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}
+                    # ]
+                    # New format: rule_types_to_inputs = {
+                    #   'Equals': [
+                    #       {x: 'Yes'}, {x: 'Y'}
+                    #   ]
+                    # }
+                    rule_types_to_inputs = collections.defaultdict(list)
+                    for rule_spec_dict in answer_group_dict['rule_specs']:
+                        rule_type = rule_spec_dict['rule_type']
+                        rule_types_to_inputs[rule_type].append(
+                            rule_spec_dict['inputs'])
+                    del answer_group_dict['rule_specs']
+                    answer_group_dict['rule_input_translations'] = {}
+                    answer_group_dict['rule_types_to_inputs'] = dict(
+                        rule_types_to_inputs)
+
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v37_dict_to_v38_dict(cls, draft_change_list):
+        """Converts draft change list from state version 37 to 38. State
+        version 38 adds a customization arg for the Math interactions that
+        allows creators to specify the letters that would be displayed to the
+        learner, for which there should be no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v36_dict_to_v37_dict(cls, draft_change_list):
+        """Converts draft change list from version 36 to 37.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                # Find all RuleSpecs in AnwerGroups and change
+                # CaseSensitiveEquals rule types to Equals.
+                for answer_group_dict in change.new_value:
+                    for rule_spec_dict in answer_group_dict['rule_specs']:
+                        if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                            rule_spec_dict['rule_type'] = 'Equals'
+
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v35_dict_to_v36_dict(cls, draft_change_list):
         """Converts draft change list from version 35 to 36.
 
@@ -179,7 +269,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
 
         Raises:
-            Exception. Conversion cannot be completed.
+            InvalidDraftConversion. Conversion cannot be completed.
         """
         for change in draft_change_list:
             if (change.property_name ==
@@ -191,7 +281,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.
-                raise Exception('Conversion cannot be completed.')
+                raise InvalidDraftConversion('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
@@ -210,7 +300,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
 
         Raises:
-            Exception. Conversion cannot be completed.
+            InvalidDraftConversion. Conversion cannot be completed.
         """
         for change in draft_change_list:
             # We don't want to migrate any changes that involve the
@@ -226,7 +316,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         'IsMathematicallyEquivalentTo')))
             if interaction_id_change_condition or (
                     answer_groups_change_condition):
-                raise Exception('Conversion cannot be completed.')
+                raise InvalidDraftConversion('Conversion cannot be completed.')
 
         return draft_change_list
 
@@ -314,7 +404,9 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                   exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 new_value = [
                     (state_domain.AnswerGroup.convert_html_in_answer_group(
-                        answer_group, conversion_fn))
+                        answer_group,
+                        conversion_fn,
+                        state_uses_old_rule_spec_schema=True))
                     for answer_group in new_value]
             if new_value is not None:
                 draft_change_list[i] = exp_domain.ExplorationChange({

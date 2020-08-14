@@ -18,7 +18,12 @@
 
 export class ClassroomDomainConstants {
   public static CLASSROOOM_DATA_URL_TEMPLATE =
-    '/classroom_data_handler/<classroom_name>';
+    '/classroom_data_handler/<classroom_url_fragment>';
 
-  public static TOPIC_VIEWER_URL_TEMPLATE = '/topic/<topic_name>';
+  public static TOPIC_VIEWER_URL_TEMPLATE = (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>');
+  public static TOPIC_VIEWER_REVISION_URL_TEMPLATE = (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision');
+  public static TOPIC_VIEWER_STORY_URL_TEMPLATE = (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/story');
 }

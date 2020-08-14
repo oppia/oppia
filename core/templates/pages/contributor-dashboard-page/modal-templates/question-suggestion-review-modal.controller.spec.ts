@@ -77,7 +77,8 @@ describe('Question Suggestion Review Modal Controller', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
             }],
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -139,28 +140,31 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it('should init the constiables', function() {
-      expect($scope.authorName).toBe(authorName);
-      expect($scope.contentHtml).toBe(contentHtml);
-      expect($scope.reviewable).toBe(reviewable);
-      expect($scope.reviewMessage).toBe('');
-      expect($scope.question).toEqual(question);
-      expect($scope.questionHeader).toBe(questionHeader);
-      expect($scope.questionStateData).toEqual(question.getStateData());
-      expect($scope.questionId).toEqual(question.getId());
-      expect($scope.canEditQuestion).toBe(false);
-      expect($scope.misconceptionsBySkill).toEqual(misconceptionsBySkill);
-      expect($scope.skillDifficultyLabel).toBe('Easy');
-      expect($scope.skillRubricExplanations).toEqual(['explanation']);
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.authorName).toBe(authorName);
+        expect($scope.contentHtml).toBe(contentHtml);
+        expect($scope.reviewable).toBe(reviewable);
+        expect($scope.reviewMessage).toBe('');
+        expect($scope.question).toEqual(question);
+        expect($scope.questionHeader).toBe(questionHeader);
+        expect($scope.questionStateData).toEqual(question.getStateData());
+        expect($scope.questionId).toEqual(question.getId());
+        expect($scope.canEditQuestion).toBe(false);
+        expect($scope.misconceptionsBySkill).toEqual(misconceptionsBySkill);
+        expect($scope.skillDifficultyLabel).toBe('Easy');
+        expect($scope.skillRubricExplanations).toEqual(['explanation']);
+      });
 
-    it('should define validation error as null', function() {
-      expect($scope.validationError).toBe(undefined);
-      $scope.questionChanged();
-      expect($scope.validationError).toBe(null);
-    });
+    it('should reset validation error message when user updates question',
+      function() {
+        $scope.validationError = 'This is an error message';
+        $scope.questionChanged();
+        expect($scope.validationError).toBe(null);
+      });
 
-    it('should successfully accept suggestion', function() {
+    it('should accept suggestion in suggestion modal when clicking accept' +
+      ' suggestion', function() {
       $scope.reviewMessage = 'Review message example';
       $scope.accept();
 
@@ -172,7 +176,8 @@ describe('Question Suggestion Review Modal Controller', function() {
         });
     });
 
-    it('should successfully reject suggestion', function() {
+    it('should reject suggestion in suggestion modal when clicking reject' +
+    ' suggestion button', function() {
       $scope.reviewMessage = 'Review message example';
       $scope.reject();
 
@@ -183,7 +188,8 @@ describe('Question Suggestion Review Modal Controller', function() {
         });
     });
 
-    it('should successfully cancel suggestion', function() {
+    it('should cancel suggestion in suggestion modal when clicking cancel' +
+    ' suggestion button', function() {
       $scope.cancel();
 
       expect(SuggestionModalService.cancelSuggestion).toHaveBeenCalledWith(
@@ -223,7 +229,8 @@ describe('Question Suggestion Review Modal Controller', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
             }],
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -285,7 +292,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it('should validate that the skill rubric explanation has been injected',
+    it('should initialize $scope properties after controller is initialized',
       function() {
         expect($scope.skillRubricExplanations).toBe(
           'This rubric has not yet been specified.');

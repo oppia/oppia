@@ -24,6 +24,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants.ts';
+import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'practice-tab',
@@ -32,13 +33,14 @@ import { PracticeSessionPageConstants } from
 })
 export class PracticeTabComponent implements OnInit {
   @Input() topicName: string;
-  @Input() subtopicsList: Array<Subtopic>;
-  selectedSubtopics: Array<Subtopic> = [];
-  availableSubtopics: Array<Subtopic> = [];
-  selectedSubtopicIndices: Array<Boolean> = [];
+  @Input() subtopicsList: Subtopic[];
+  selectedSubtopics: Subtopic[] = [];
+  availableSubtopics: Subtopic[] = [];
+  selectedSubtopicIndices: boolean[] = [];
 
   constructor(
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
@@ -71,7 +73,10 @@ export class PracticeTabComponent implements OnInit {
     }
     const practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
-        topic_name: this.topicName,
+        topic_url_fragment: (
+          this.urlService.getTopicUrlFragmentFromLearnerUrl()),
+        classroom_url_fragment: (
+          this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
         comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
       });
     window.location.href = practiceSessionsUrl;
