@@ -1364,3 +1364,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.KILL_PORTSERVER_TIMEOUT_SECS + 1
         )
         self.assertEqual(process.signals_received, [signal.SIGINT])
+
+    def test_windows_os_throws_exception(self):
+        def mock_is_windows_os():
+            return True
+        windows_not_supported_exception = self.assertRaisesRegexp(
+            Exception,
+            'Redis command line interface is not installed because your '
+            'machine is on the Windows operating system. Caching will '
+            'not work on a Windows machine.')
+        with self.swap(common, 'is_windows_os', mock_is_windows_os), (
+            windows_not_supported_exception):
+            run_e2e_tests.main(
+                args=['--skip-install', '--skip-build'])

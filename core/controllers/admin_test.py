@@ -2378,3 +2378,36 @@ class ContributionReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(response['error'], 'Missing username param')
         self.logout()
+
+class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
+    """Tests MemoryCacheAdminHandler."""
+
+    def setUp(self):
+        super(MemoryCacheAdminHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+    def test_get_memory_cache_data(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_json(
+            '/memorycacheadminhandler')
+        self.assertEqual(
+            response['total_allocation'], 0)
+        self.assertEqual(
+            response['peak_allocation'], 0)
+        self.assertEqual(response['total_keys_stored'], 1)
+
+    def test_flush_memory_cache(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/memorycacheadminhandler')
+        self.assertEqual(response['total_keys_stored'], 1)
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/memorycacheadminhandler', {}, csrf_token=csrf_token)
+
+        response = self.get_json(
+            '/memorycacheadminhandler')
+        self.assertEqual(response['total_keys_stored'], 0)
+

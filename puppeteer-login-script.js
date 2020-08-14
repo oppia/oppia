@@ -54,7 +54,6 @@ const login = async function(context, page) {
 
     await Promise.all([
       page.waitForNavigation(),
-      await page.waitForSelector('#signup-submit', {timeout: 50000}),
       await page.click('#signup-submit')
     ]);
     // eslint-disable-next-line no-console

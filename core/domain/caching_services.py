@@ -26,7 +26,10 @@ from core.domain import skill_domain
 from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
+import json
 import python_utils
+
+import logging
 
 memory_cache_services = models.Registry.import_cache_services()
 
@@ -87,8 +90,8 @@ DESERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
     CACHE_NAMESPACE_PLATFORM_PARAMETER: (
         platform_parameter_domain.PlatformParameter.deserialize),
-    CACHE_NAMESPACE_CONFIG: lambda x: x,
-    CACHE_NAMESPACE_DEFAULT: lambda x: x
+    CACHE_NAMESPACE_CONFIG: lambda x: json.loads(x),
+    CACHE_NAMESPACE_DEFAULT: lambda x: json.loads(x)
 }
 
 SERIALIZATION_FUNCTIONS = {
@@ -98,8 +101,10 @@ SERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
     CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),
-    CACHE_NAMESPACE_CONFIG: lambda x: x,
-    CACHE_NAMESPACE_DEFAULT: lambda x: x
+    CACHE_NAMESPACE_CONFIG: lambda x: (
+        value if isinstance(x, str) else json.dumps(x)),
+    CACHE_NAMESPACE_DEFAULT: lambda x: (
+        value if isinstance(x, str) else json.dumps(x))
 }
 
 

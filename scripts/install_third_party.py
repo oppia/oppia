@@ -391,7 +391,6 @@ def install_redis_cli():
             # run the server from inside the oppia folder by executing the
             # script src/redis-cli and src/redis-server.
             subprocess.call(['make'])
-            subprocess.call(['make', 'test'])
 
         # Make the scripts executable.
         subprocess.call([
@@ -411,7 +410,7 @@ def main(args=None):
         install_redis_cli()
     else:
         raise Exception(
-            'Redis command line interface is not installed because your ' +
+            'Redis command line interface is not installed because your '
             'machine is on the Windows operating system.')
 
 
