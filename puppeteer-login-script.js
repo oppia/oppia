@@ -48,12 +48,14 @@ const login = async function(context, page) {
       page.click('#submit-login'),
     ]);
 
+    await page.waitForSelector('#username', {timeout: 50000});
     await page.type('#username', 'username1');
+    await page.waitForSelector('#terms-checkbox', {timeout: 50000});
     await page.click('#terms-checkbox');
 
     await Promise.all([
       page.waitForNavigation(),
-      await page.waitForSelector('#signup-submit'),
+      await page.waitForSelector('#signup-submit', {timeout: 50000}),
       await page.click('#signup-submit')
     ]);
     // eslint-disable-next-line no-console
