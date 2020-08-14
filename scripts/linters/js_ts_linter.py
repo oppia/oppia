@@ -1179,7 +1179,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             'NormalizeWhitespacePunctuationAndCasePipe\n',
             'MockCsrfTokenService',
             'StatePropertyService',
-            'StateNextContentIdIndexService',
+            'StateNextContentIdIndexService\n',
             'SubtitledUnicodeObjectFactory',
             'UpgradedServices'
         ]
