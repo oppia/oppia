@@ -1,5 +1,5 @@
-// this additional tsconfig is required by dtslint
-// see: https://github.com/Microsoft/dtslint#typestsconfigjson
+// This additional tsconfig is required by dtslint.
+// See: https://github.com/Microsoft/dtslint#typestsconfigjson
 {
   "compilerOptions": {
     "lib": ["es2017", "dom", "webworker"],
