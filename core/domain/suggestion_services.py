@@ -207,16 +207,17 @@ def get_translation_suggestions_with_exp_ids(exp_ids):
     ]
 
 
-def get_all_stale_suggestions():
-    """Gets a list of suggestions without any activity on them for
-    THRESHOLD_TIME_BEFORE_ACCEPT time.
+def get_all_stale_suggestion_ids():
+    """Gets a list of the suggestion ids corresponding to suggestions that have
+    not had any activity on them for THRESHOLD_TIME_BEFORE_ACCEPT time.
 
     Returns:
-        list(Suggestion). A list of suggestions linked to the entity.
+        list(str). A list of suggestion ids that correspond to stale
+        suggestions.
     """
 
     return [
-        get_suggestion_from_model(s) for s in
+        suggestion_model.id for suggestion_model in
         suggestion_models.GeneralSuggestionModel.get_all_stale_suggestions()
     ]
 

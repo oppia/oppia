@@ -1991,11 +1991,46 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         if cls.get_by_id(instance_id):
             raise Exception(
-                'There is already an entry with the given id: %s' % instance_id)
+                'There is already a UserContributionScoringModel entry with the'
+                ' given id: %s' % instance_id
+            )
 
         cls(
             id=instance_id, user_id=user_id, score_category=score_category,
             score=score).put()
+
+        @classmethod
+    def create_multi(cls, user_ids, score_category, score):
+        """Creates new UserContributionScoringModel entries.
+
+        Args:
+            user_ids: list(str). The IDs of the users.
+            score_category: str. The category of the suggestion.
+            score: float. The score of the user.
+
+        Raises:
+            Exception. There is already an entry with the given id.
+        """
+        instance_ids = [
+            cls._get_instance_id(user_id, score_category)
+            for user_id in user_ids
+        ]
+        user_scoring_models = cls.get_multi(instance_ids)
+        for user_scoring_model in user_scoring_models:
+            if user_scoring_model:
+                raise Exception(
+                    'There is already a UserContributionScoringModel entry with'
+                    ' the given id: %s' % instance_id
+                )
+        
+        new_user_scoring_models = [
+            cls(
+                id=instance_id, user_id=user_id, score_category=score_category,
+                score=score
+            )
+            for instance_id, user_id in python_utils.ZIP(instance_ids, user_ids)
+        ]
+        cls.put_multi(new_user_scoring_models)
 
     @classmethod
     def increment_score_for_user(cls, user_id, score_category, increment_by):
@@ -2014,6 +2049,37 @@ class UserContributionScoringModel(base_models.BaseModel):
         else:
             model.score += increment_by
             model.put()
+
+    @classmethod
+    def increment_score_for_users(cls, user_ids, score_category, increment_by):
+        """Increments the score of the users with user_ids in the category by
+        the given amount.
+
+        Args:
+            user_ids: list(str). The ids of the users.
+            score_category: str. The category of the suggestion.
+            increment_by: float. The amount to increase the score of the users
+                by. May be negative, in which case the score is reduced.
+        """
+        instance_ids = [
+            cls._get_instance_id(user_id, score_category) for user_id in
+            user_ids
+        ]
+        user_scoring_models = cls.get_multi(instance_ids)
+        user_ids_missing_user_scoring_models = []
+        for index, user_scoring_model in enumerate(user_scoring_models):
+            if user_scoring_model:
+                user_scoring_model.score += increment_by
+            else:
+                user_ids_missing_user_scoring)models.append(user_ids[index])
+        
+        new_user_scoring_models = cls.create_multi(
+            user_ids_missing_user_scoring)models, score_category, score)
+        for new_user_scoring_model in new_user_scoring_models:
+            new_user_scoring_model.score += increment_by
+
+        user_scoring_models.extend(new_user_scoring_models)
+        cls.put_multi(user_scoring_models)
 
 
 class UserContributionRightsModel(base_models.BaseModel):
