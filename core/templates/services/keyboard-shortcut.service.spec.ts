@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the keyboard shortcut service.
  */
 import 'mousetrap';
-import { TestBed } from '@angular/core/testing';
 
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 
@@ -28,7 +27,7 @@ describe('Keyboard Shortcuts', () => {
   var searchBar = document.createElement('input');
   var categoryBar = document.createElement('select');
 
-  const keyboardShortcutService = TestBed.get(KeyboardShortcutService);
+  const keyboardShortcutService = new KeyboardShortcutService();
 
   beforeAll(() => {
     skipButton.setAttribute('id', 'skipToMainContentId');
