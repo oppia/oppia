@@ -29,21 +29,19 @@ describe('PlatformParameterMetadataObjectFactory', () => {
   });
 
   it('should create an instance.', () => {
-    const context = factory.create('Web', 'Chrome', null, 'en');
+    const context = factory.create('Web', 'Chrome', 'en');
 
     expect(context.clientType).toEqual('Web');
     expect(context.browserType).toEqual('Chrome');
-    expect(context.appVersion).toBeNull();
     expect(context.userLocale).toEqual('en');
   });
 
   it('should convert an instance to a dict.', () => {
-    const context = factory.create('Web', 'Chrome', null, 'en');
+    const context = factory.create('Web', 'Chrome', 'en');
 
     expect(context.toBackendDict()).toEqual({
       client_type: 'Web',
       browser_type: 'Chrome',
-      app_version: null,
       user_locale: 'en'
     });
   });
