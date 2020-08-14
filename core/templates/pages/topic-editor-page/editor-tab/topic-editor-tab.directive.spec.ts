@@ -57,12 +57,19 @@ describe('Topic editor tab directive', function() {
   var UndoRedoService = null;
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
-
+  var mockTasdReinitializedEventEmitter;
+  s;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
   var MockWindowDimensionsService = {
     isWindowNarrow: () => false
   };
+  var MockTopicsAndSkillsDashboardBackendApiService = {
+    get onTopicsAndSkillsDashboardReinitialized() {
+      return mockTasdReinitializedEventEmitter;
+    }
+  };
+
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -93,6 +100,7 @@ describe('Topic editor tab directive', function() {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
+    mockTasdReinitializedEventEmitter = new EventEmitter();
 
     topicInitializedEventEmitter = new EventEmitter();
     topicReinitializedEventEmitter = new EventEmitter();
@@ -119,7 +127,9 @@ describe('Topic editor tab directive', function() {
       WindowDimensionsService: MockWindowDimensionsService,
       StoryCreationService: StoryCreationService,
       TopicEditorStateService: TopicEditorStateService,
-      EntityCreationService: EntityCreationService
+      EntityCreationService: EntityCreationService,
+      TopicsAndSkillsDashboardBackendApiService:
+        MockTopicsAndSkillsDashboardBackendApiService
     });
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
     topic = TopicObjectFactory.createInterstitialTopic();
@@ -220,7 +230,8 @@ describe('Topic editor tab directive', function() {
       'topics and skills dashboard is reinitialized',
   function() {
     var refreshTopicSpy = spyOn(TopicEditorStateService, 'loadTopic');
-    $rootScope.$broadcast('topicsAndSkillsDashboardReinitialized');
+    MockTopicsAndSkillsDashboardBackendApiService.
+      onTopicsAndSkillsDashboardReinitialized.emit();
     expect(refreshTopicSpy).toHaveBeenCalled();
   });
 
