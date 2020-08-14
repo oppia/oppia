@@ -103,6 +103,8 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
 var TIME_FADEOUT_MSEC = 100;
@@ -409,6 +411,7 @@ angular.module('oppia').directive('conversationSkin', [
             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
           // The minimum width, in pixels, needed to be able to show two cards
@@ -941,8 +944,8 @@ angular.module('oppia').directive('conversationSkin', [
                   }
                 }
                 if (!ExplorationPlayerStateService.isInQuestionMode()) {
-                  $rootScope.$broadcast(
-                    'playerStateChange', nextCard.getStateName());
+                  ExplorationPlayerStateService.onPlayerStateChange.emit(
+                    nextCard.getStateName());
                 } else {
                   QuestionPlayerStateService.answerSubmitted(
                     QuestionPlayerEngineService.getCurrentQuestion(),
@@ -1314,43 +1317,47 @@ angular.module('oppia').directive('conversationSkin', [
                   QuestionPlayerEngineService.getCurrentQuestion());
               });
             }
-            $rootScope.$on('playerStateChange', function(evt, newStateName) {
-              if (!newStateName) {
-                return;
-              }
-              // To restart the preloader for the new state if required.
-              if (!_editorPreviewMode) {
-                ImagePreloaderService.onStateChange(newStateName);
-              }
-              // Ensure the transition to a terminal state properly logs the end
-              // of the exploration.
-              if (
-                !_editorPreviewMode && $scope.nextCard.isTerminal()) {
-                StatsReportingService.recordExplorationCompleted(
-                  newStateName, LearnerParamsService.getAllParams());
+            ctrl.directiveSubscriptions.add(
+              ExplorationPlayerStateService.onPlayerStateChange.subscribe(
+                (newStateName) => {
+                  if (!newStateName) {
+                    return;
+                  }
+                  // To restart the preloader for the new state if required.
+                  if (!_editorPreviewMode) {
+                    ImagePreloaderService.onStateChange(newStateName);
+                  }
+                  // Ensure the transition to a terminal state properly logs
+                  // the end of the exploration.
+                  if (
+                    !_editorPreviewMode && $scope.nextCard.isTerminal()) {
+                    StatsReportingService.recordExplorationCompleted(
+                      newStateName, LearnerParamsService.getAllParams());
 
-                // If the user is a guest, has completed this exploration within
-                // the context of a collection, and the collection is
-                // whitelisted, record their temporary progress.
-                var collectionAllowsGuestProgress = (
-                  WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
-                    $scope.collectionId) !== -1);
-                if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
-                  GuestCollectionProgressService.
-                    recordExplorationCompletedInCollection(
-                      $scope.collectionId, $scope.explorationId);
-                }
+                    // If the user is a guest, has completed this exploration
+                    // within the context of a collection, and the collection is
+                    // whitelisted, record their temporary progress.
+                    var collectionAllowsGuestProgress = (
+                      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.
+                        indexOf($scope.collectionId) !== -1);
+                    if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
+                      GuestCollectionProgressService.
+                        recordExplorationCompletedInCollection(
+                          $scope.collectionId, $scope.explorationId);
+                    }
 
-                // For single state explorations, when the exploration reaches
-                // the terminal state and explorationActuallyStarted is false,
-                // record exploration actual start event.
-                if (!explorationActuallyStarted) {
-                  StatsReportingService.recordExplorationActuallyStarted(
-                    newStateName);
-                  explorationActuallyStarted = true;
+                    // For single state explorations, when the exploration
+                    // reachesthe terminal state and explorationActuallyStarted
+                    // is false, record exploration actual start event.
+                    if (!explorationActuallyStarted) {
+                      StatsReportingService.recordExplorationActuallyStarted(
+                        newStateName);
+                      explorationActuallyStarted = true;
+                    }
+                  }
                 }
-              }
-            });
+              )
+            );
             $scope.$on('ratingUpdated', function() {
               $scope.userRating = LearnerViewRatingService.getUserRating();
             });
