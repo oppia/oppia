@@ -587,6 +587,8 @@
 /core/storage/config/ @vinitamurthi
 # TODO(BenHenning): Reclaim ownership after 2020-08-16.
 /core/domain/platform_parameter*.py @vinitamurthi
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/core/templates/domain/platform_feature/ @vinitamurthi
 
 
 # Frontend unit tests
