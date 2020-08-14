@@ -88,6 +88,9 @@ describe('MultipleChoiceInputValidationService', () => {
           new SubtitledHtml('Option 1', ''),
           new SubtitledHtml('Option 2', '')
         ]
+      },
+      showChoicesInShuffledOrder: {
+        value: true
       }
     };
 
@@ -118,6 +121,11 @@ describe('MultipleChoiceInputValidationService', () => {
   it('should expect a choices customization argument', () => {
     expect(() => {
       validatorService.getAllWarnings(
+      // This throws "Argument of type '{}' is not assignable to
+      // parameter of type 'MultipleChoiceInputCustomizationArgs'." We are
+      // purposely assigning the wrong type of customization args in order
+      // to test validations.
+      // @ts-expect-error
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have property: choices');

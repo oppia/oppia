@@ -36,10 +36,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
   AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
 
-/* Called always when learner moves to a new card.
-   Also called when card is selected by clicking on progress dots */
-angular.module('oppia').constant(
-  'EVENT_ACTIVE_CARD_CHANGED', AppConstants.EVENT_ACTIVE_CARD_CHANGED);
 /* Called when the learner moves to a new card that they haven't seen before. */
 angular.module('oppia').constant(
   'EVENT_NEW_CARD_OPENED', AppConstants.EVENT_NEW_CARD_OPENED);

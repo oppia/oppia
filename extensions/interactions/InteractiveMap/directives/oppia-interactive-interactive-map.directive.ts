@@ -136,10 +136,6 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
               )
             );
 
-            $scope.$on('showInteraction', function() {
-              refreshMap();
-            });
-
             $scope.$on('leafletDirectiveMap.interactiveMap.mouseover',
               function() {
                 if (!ctrl.interactionIsActive) {
