@@ -39,63 +39,65 @@ describe('EditProfilePictureModalController', function() {
     });
   }));
 
-  it('should init the variables', function() {
-    expect($scope.uploadedImage).toBe(null);
-    expect($scope.croppedImageDataUrl).toBe('');
-    expect($scope.invalidImageWarningIsShown).toBe(false);
-  });
-
-  it('should get a file in onchange event and save it', function(done) {
-    spyOn(document, 'getElementById').and.callFake(function() {
-      return document.createElement('img');
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.uploadedImage).toBe(null);
+      expect($scope.croppedImageDataUrl).toBe('');
+      expect($scope.invalidImageWarningIsShown).toBe(false);
     });
 
-    var element = $(document.createElement('div'));
-
-    // This is just a mock base 64 in order to test the FileReader event.
-    var dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
-    const arrayBuffer = Uint8Array.from(
-      window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    var file = new File([arrayBuffer], 'filename.mp3');
-
-    spyOn(window, '$').withArgs('.oppia-profile-image-uploader').and
-      .returnValue(element);
-
-    $scope.onInvalidImageLoaded();
-
-    expect($scope.uploadedImage).toBe(null);
-    expect($scope.croppedImageDataUrl).toBe('');
-    expect($scope.invalidImageWarningIsShown).toBe(true);
-
-    $scope.onFileChanged(file);
-
-    // Function setTimeout is being used here to not conflict with
-    // $timeout.flush for fadeIn Jquery method. This first setTimeout is to wait
-    // the default time for fadeOut Jquery method to complete, which is 400
-    // miliseconds. 800ms is being used instead of 400ms just to be sure that
-    // fadeOut callbak is already executed.
-    // Ref: https://api.jquery.com/fadeout/
-    setTimeout(function() {
-      $timeout.flush();
-      done();
-
-      expect($scope.invalidImageWarningIsShown).toBe(false);
-      expect($scope.uploadedImage).toBe(
-        'data:application/octet-stream;base64,' + dataBase64Mock);
-
-      var mockUrl = 'mock-url';
-      // This throws "Argument of type '{ toDataURL: () => string; }' is
-      // not assignable to parameter of type 'HTMLCanvasElement'"". This
-      // is because 'HTMLCanvasElement' has around 250 more properties. We
-      // only need to define one for testing purposes.
-      // @ts-expect-error
-      spyOn(Cropper.prototype, 'getCroppedCanvas').and.returnValue({
-        toDataURL: () => mockUrl
+  it('should save new file and close the modal when file is changed',
+    function(done) {
+      spyOn(document, 'getElementById').and.callFake(function() {
+        return document.createElement('img');
       });
-      $scope.confirm();
 
-      expect($scope.croppedImageDataUrl).toBe(mockUrl);
-      expect($uibModalInstance.close).toHaveBeenCalledWith(mockUrl);
-    }, 800);
-  });
+      var element = $(document.createElement('div'));
+
+      // This is just a mock base 64 in order to test the FileReader event.
+      var dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
+      const arrayBuffer = Uint8Array.from(
+        window.atob(dataBase64Mock), c => c.charCodeAt(0));
+      var file = new File([arrayBuffer], 'filename.mp3');
+
+      spyOn(window, '$').withArgs('.oppia-profile-image-uploader').and
+        .returnValue(element);
+
+      $scope.onInvalidImageLoaded();
+
+      expect($scope.uploadedImage).toBe(null);
+      expect($scope.croppedImageDataUrl).toBe('');
+      expect($scope.invalidImageWarningIsShown).toBe(true);
+
+      $scope.onFileChanged(file);
+
+      // Function setTimeout is being used here to not conflict with
+      // $timeout.flush for fadeIn Jquery method. This first setTimeout is to
+      // wait the default time for fadeOut Jquery method to complete, which is
+      // 400 miliseconds. 800ms is being used instead of 400ms just to be sure
+      // that fadeOut callbak is already executed.
+      // Ref: https://api.jquery.com/fadeout/
+      setTimeout(function() {
+        $timeout.flush();
+        done();
+
+        expect($scope.invalidImageWarningIsShown).toBe(false);
+        expect($scope.uploadedImage).toBe(
+          'data:application/octet-stream;base64,' + dataBase64Mock);
+
+        var mockUrl = 'mock-url';
+        // This throws "Argument of type '{ toDataURL: () => string; }' is
+        // not assignable to parameter of type 'HTMLCanvasElement'"". This
+        // is because 'HTMLCanvasElement' has around 250 more properties. We
+        // only need to define one for testing purposes.
+        // @ts-expect-error
+        spyOn(Cropper.prototype, 'getCroppedCanvas').and.returnValue({
+          toDataURL: () => mockUrl
+        });
+        $scope.confirm();
+
+        expect($scope.croppedImageDataUrl).toBe(mockUrl);
+        expect($uibModalInstance.close).toHaveBeenCalledWith(mockUrl);
+      }, 800);
+    });
 });
