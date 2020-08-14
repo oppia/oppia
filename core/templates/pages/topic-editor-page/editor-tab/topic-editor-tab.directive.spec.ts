@@ -133,6 +133,7 @@ describe('Topic editor tab directive', function() {
     topic._canonicalStoryReferences = [story1, story2];
     topic.setName('New Name');
     topic.setUrlFragment('topic-url-fragment');
+    TopicEditorStateService.setTopic(topic);
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     ctrl.$onInit();
   }));
