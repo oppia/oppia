@@ -34,7 +34,7 @@ import utils
 ])
 
 
-class InvalidDraftConversion(Exception):
+class InvalidDraftConversionException(Exception):
     """Error class for invalid draft conversion. Should be raised in a draft
     conversion function if it is not possible to upgrade a draft, and indicates
     that try_upgrading_draft_to_exp_version should return None.
@@ -94,7 +94,7 @@ def try_upgrading_draft_to_exp_version(
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
         try:
             draft_change_list = conversion_fn(draft_change_list)
-        except InvalidDraftConversion:
+        except InvalidDraftConversionException:
             return None
         upgrade_times += 1
     return draft_change_list
@@ -269,7 +269,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
 
         Raises:
-            InvalidDraftConversion. Conversion cannot be completed.
+            InvalidDraftConversionException. Conversion cannot be completed.
         """
         for change in draft_change_list:
             if (change.property_name ==
@@ -281,7 +281,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.
-                raise InvalidDraftConversion('Conversion cannot be completed.')
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
@@ -300,7 +300,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
 
         Raises:
-            InvalidDraftConversion. Conversion cannot be completed.
+            InvalidDraftConversionException. Conversion cannot be completed.
         """
         for change in draft_change_list:
             # We don't want to migrate any changes that involve the
@@ -316,7 +316,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         'IsMathematicallyEquivalentTo')))
             if interaction_id_change_condition or (
                     answer_groups_change_condition):
-                raise InvalidDraftConversion('Conversion cannot be completed.')
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
 
         return draft_change_list
 
