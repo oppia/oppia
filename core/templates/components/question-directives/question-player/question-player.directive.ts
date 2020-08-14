@@ -121,7 +121,6 @@ require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 
 import { Subscription } from 'rxjs';
-import { result } from 'lodash';
 
 require('pages/interaction-specs.constants.ajs.ts');
 

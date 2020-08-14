@@ -1376,7 +1376,6 @@ export class UpgradedServices {
           upgradedServices['HttpClient'],
           upgradedServices['LearnerDashboardActivityIdsObjectFactory']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
-      upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
     upgradedServices['PlaythroughBackendApiService'] =
       new PlaythroughBackendApiService(
