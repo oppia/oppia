@@ -15,17 +15,26 @@
 /**
  * @fileoverview Unit tests for the subtopic viewer pre logo action
  */
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UrlService } from 'services/contextual/url.service';
 
-require('pages/subtopic-viewer-page/navbar-pre-logo-action/' +
-  'subtopic-viewer-navbar-pre-logo-action.component.ts');
+import { SubtopicViewerNavbarPreLogoAction } from
+  './subtopic-viewer-navbar-pre-logo-action.component';
 
+let component: SubtopicViewerNavbarPreLogoAction;
+let fixture: ComponentFixture<SubtopicViewerNavbarPreLogoAction>;
 describe('subtopic viewer pre logo action', function() {
-  let ctrl = null;
   let urlService: UrlService = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [SubtopicViewerNavbarPreLogoAction],
+      providers: [UrlService],
+    }).compileComponents();
+    fixture = TestBed.createComponent(SubtopicViewerNavbarPreLogoAction);
+    component = fixture.componentInstance;
+  });
+
   beforeEach(() => {
     urlService = TestBed.get(UrlService);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
@@ -33,19 +42,14 @@ describe('subtopic viewer pre logo action', function() {
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
       .and.returnValue('math');
   });
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController(
-      'subtopicViewerNavbarPreLogoAction',
-      { UrlService: urlService });
-  }));
 
   it('should set topic url fragment from the URL correctly', function() {
-    ctrl.$onInit();
-    expect(ctrl.topicUrlFragment).toEqual('url-fragment');
+    component.ngOnInit();
+    expect(component.topicUrlFragment).toEqual('url-fragment');
   });
 
   it('should set the topic url from the url fragment correctly', function() {
-    ctrl.$onInit();
-    expect(ctrl.topicUrl).toEqual('/learn/math/url-fragment/revision');
+    component.ngOnInit();
+    expect(component.topicUrl).toEqual('/learn/math/url-fragment/revision');
   });
 });

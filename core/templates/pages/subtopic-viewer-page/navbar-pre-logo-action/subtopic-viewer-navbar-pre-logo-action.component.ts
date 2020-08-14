@@ -17,30 +17,46 @@
  *  of the subtopic viewer.
  */
 
-require('domain/classroom/classroom-domain.constants.ajs.ts');
+
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+import { ClassroomDomainConstants } from
+  'domain/classroom/classroom-domain.constants.ts';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 
-angular.module('oppia').component('subtopicViewerNavbarPreLogoAction', {
-  template: require('./subtopic-viewer-navbar-pre-logo-action.component.html'),
-  controller: [
-    'UrlInterpolationService', 'UrlService',
-    'TOPIC_VIEWER_REVISION_URL_TEMPLATE',
-    function(
-        UrlInterpolationService, UrlService,
-        TOPIC_VIEWER_REVISION_URL_TEMPLATE) {
-      var ctrl = this;
+@Component({
+  selector: 'subtopic-viewer-navbar-pre-logo-action',
+  templateUrl: './subtopic-viewer-navbar-pre-logo-action.component.html',
+  styleUrls: []
+})
 
-      ctrl.$onInit = function() {
-        ctrl.topicUrlFragment = (
-          UrlService.getTopicUrlFragmentFromLearnerUrl());
+export class SubtopicViewerNavbarPreLogoAction implements OnInit {
+  topicUrlFragment: string;
+  topicUrl: string;
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService
+  ) {}
+  ngOnInit() {
+    this.topicUrlFragment =
+    (this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    this.topicUrl = this.urlInterpolationService.interpolateUrl(
+      ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE,
+      {
+        topic_url_fragment: this.topicUrlFragment,
+        classroom_url_fragment:
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl()
+      }
+    );
+  }
+}
 
-        ctrl.topicUrl = UrlInterpolationService.interpolateUrl(
-          TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
-            topic_url_fragment: ctrl.topicUrlFragment,
-            classroom_url_fragment: (
-              UrlService.getClassroomUrlFragmentFromLearnerUrl())
-          });
-      };
-    }]
-});
+
+angular.module('oppia').directive(
+  'subtopicViewerNavbarPreLogoAction', downgradeComponent(
+    {component: SubtopicViewerNavbarPreLogoAction}));
