@@ -1198,10 +1198,10 @@ angular.module('oppia').directive('conversationSkin', [
             } else {
               $scope.showUpcomingCard();
             }
-          }
+          };
 
           CommandExecutorService.registerCallback(
-            'CONTINUE', $scope.clickContinueButtonFn)
+            'CONTINUE', $scope.clickContinueButtonFn);
           var scrollToBottom = function() {
             $timeout(function() {
               var tutorCard = $('.conversation-skin-main-tutor-card');
