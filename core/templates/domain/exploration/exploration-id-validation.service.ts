@@ -16,19 +16,30 @@
  * @fileoverview Service to validate exploration id
  */
 
-require('domain/summary/exploration-summary-backend-api.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ExplorationIdValidationService', [
-  'ExplorationSummaryBackendApiService',
-  function(ExplorationSummaryBackendApiService) {
-    return {
-      isExpPublished: function(explorationId) {
-        return ExplorationSummaryBackendApiService.
-          loadPublicExplorationSummaries([explorationId]).then(
-            function(summaries) {
-              return (summaries.length === 1 && summaries[0] !== null);
-            });
-      }
-    };
+import { ExplorationSummaryBackendApiService } from
+  'domain/summary/exploration-summary-backend-api.service.ts';
+
+@Injectable({
+  providedIn: 'root'
+})
+
+export class ExplorationIdValidationService {
+  constructor(
+    private explorationSummartBackendApiService:
+      ExplorationSummaryBackendApiService) {}
+
+  isExpPublished(explorationId: string) {
+    return this.explorationSummartBackendApiService.
+      loadPublicExplorationSummaries([explorationId]).then(
+        function(summaries: Array<string>) {
+          return (summaries.length === 1 && summaries[0] !== null);
+        });
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'ExplorationIdValidationService',
+  downgradeInjectable(ExplorationIdValidationService));

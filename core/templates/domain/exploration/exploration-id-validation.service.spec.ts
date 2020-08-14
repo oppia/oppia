@@ -16,43 +16,29 @@
  * @fileoverview Unit Tests for ExplorationIdValidationService
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ExplorationSummaryBackendApiService } from
-  'domain/summary/exploration-summary-backend-api.service.ts';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { ExplorationIdValidationService } from
+  'domain/exploration/exploration-id-validation.service.ts';
 
-// ^^^ This block is to be removed.
-require('domain/exploration/exploration-id-validation.service.ts');
+describe('Exploration id validation service', function() {
+  let explorationIdValidationService:
+    ExplorationIdValidationService = null;
+  let httpTestingController: HttpTestingController;
+  let invalidExpResults = null;
+  let validExpResults = null;
 
-fdescribe('Exploration id validation service', function() {
-  var ExplorationIdValidationService = null;
-  var invalidExpResults = null;
-  var validExpResults = null;
-  var $httpBackend = null;
-
-  beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
+    explorationIdValidationService =
+      TestBed.get(ExplorationIdValidationService);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationSummaryBackendApiService',
-      TestBed.get(ExplorationSummaryBackendApiService));
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ExplorationIdValidationService = $injector.get(
-      'ExplorationIdValidationService');
-    $httpBackend = $injector.get('$httpBackend');
-
+  beforeEach(()=> {
     validExpResults = {
       summaries: [{
         id: '0',
@@ -79,62 +65,84 @@ fdescribe('Exploration id validation service', function() {
         title: 'Test of all interactions'
       }]
     };
-  }));
+  });
 
   afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    httpTestingController.verify();
   });
 
   it('should correctly validate the invalid exploration ids',
-    function() {
+    fakeAsync(()=> {
       // The service should respond false when the summaries array
       // is empty.
-      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
-        summaries: []
-      });
-      ExplorationIdValidationService.isExpPublished('0').then(
-        function(response) {
-          expect(response).toEqual(false);
-        });
-      $httpBackend.flush();
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let explorationIds = ['0'];
+      let requestUrl = '/explorationsummarieshandler/data?' +
+        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+        '&' + 'include_private_explorations=false';
+
+      explorationIdValidationService.isExpPublished('0')
+        .then(successHandler, failHandler);
+      let req = httpTestingController
+        .expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush({summaries: []});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(false);
+      expect(failHandler).not.toHaveBeenCalled();
 
       // The service should respond false when the summaries array
       // contains null.
-      ExplorationIdValidationService.isExpPublished('0').then(
-        function(response) {
-          expect(response).toEqual(false);
-        });
-      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
-        summaries: [null]
-      });
-      $httpBackend.flush();
+      explorationIdValidationService.isExpPublished('0')
+        .then(successHandler, failHandler);
+      req = httpTestingController
+        .expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush({summaries: [null]});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(false);
+      expect(failHandler).not.toHaveBeenCalled();
 
       // The service should respond false when the summaries array
       // contains more than one element.
-      ExplorationIdValidationService.isExpPublished('0').then(
-        function(response) {
-          expect(response).toEqual(false);
-        });
-      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
-        summaries: [
-          'exp_1',
-          'exp_2'
-        ]
-      });
-      $httpBackend.flush();
+      explorationIdValidationService.isExpPublished('0')
+        .then(successHandler, failHandler);
+      req = httpTestingController
+        .expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush({summaries: [
+        'exp1',
+        'exp2'
+      ]});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(false);
+      expect(failHandler).not.toHaveBeenCalled();
     }
-  );
+    ));
 
   it('should correctly validate the valid exploration id',
-    function() {
-      ExplorationIdValidationService.isExpPublished('0').then(
-        function(response) {
-          expect(response).toEqual(true);
-        });
-      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond(
-        validExpResults);
-      $httpBackend.flush();
+    fakeAsync(()=> {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let explorationIds = ['0'];
+      let requestUrl = '/explorationsummarieshandler/data?' +
+        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+        '&' + 'include_private_explorations=false';
+
+      explorationIdValidationService.isExpPublished('0')
+        .then(successHandler, failHandler);
+      const req = httpTestingController
+        .expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(validExpResults.summaries);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(true);
+      expect(failHandler).not.toHaveBeenCalled();
     }
-  );
+    ));
 });
