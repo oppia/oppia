@@ -47,7 +47,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         # Parameter names that might be used in following tests.
         parameter_names = ('parameter_a', 'parameter_b')
         caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_PLATFORM, None, parameter_names)
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            parameter_names)
 
     def tearDown(self):
         super(PlatformParameterRegistryTests, self).tearDown()

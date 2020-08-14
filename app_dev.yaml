@@ -246,10 +246,10 @@ libraries:
   version: "2.5.2"
 
 # This is an access connector that connects to the Google Cloud Redis instance
-# used for memory caching. Please replace with correct PROJECT_ID on the
-# production server.
+# used for memory caching. Please replace PROJECT_ID with correct project id for
+# oppia on the production server.
 vpc_access_connector:
-  name: projects/PROJECT_ID/locations/uscentral/connectors/oppia-redis-connector-1
+  name: projects/PROJECT_ID/locations/REGION/connectors/oppia-redis-connector-1
 
 env_variables:
   PYTHONHTTPSVERIFY: 1

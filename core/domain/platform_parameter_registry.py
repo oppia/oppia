@@ -144,7 +144,7 @@ class Registry(python_utils.OBJECT):
             raise Exception('Platform parameter not found: %s.' % name)
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_PLATFORM, None,
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             {
                 name: parameter,
             })
@@ -190,7 +190,7 @@ class Registry(python_utils.OBJECT):
         )
 
         caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_PLATFORM, None, [name])
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, [name])
 
     @classmethod
     def get_all_platform_parameter_names(cls):
@@ -277,7 +277,7 @@ class Registry(python_utils.OBJECT):
             in cache.
         """
         cached_parameter = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_PLATFORM, None, [name]
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, [name]
         ).get(name)
         return cached_parameter
 

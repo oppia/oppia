@@ -69,7 +69,7 @@ CACHE_NAMESPACE_TOPIC = 'topic'
 # version number of the topics within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Platform Parameter. This namespace does not support sub-namespaces.
-CACHE_NAMESPACE_PLATFORM = 'platform'
+CACHE_NAMESPACE_PLATFORM_PARAMETER = 'platform'
 # The value for each key in this namespace should be a serialized representation
 # of a ConfigPropertyModel value (the 'value' attribute of a ConfigPropertyModel
 # object). This namespace does not support sub-namespaces.
@@ -85,7 +85,7 @@ DESERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_SKILL: skill_domain.Skill.deserialize,
     CACHE_NAMESPACE_STORY: story_domain.Story.deserialize,
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
-    CACHE_NAMESPACE_PLATFORM: (
+    CACHE_NAMESPACE_PLATFORM_PARAMETER: (
         platform_parameter_domain.PlatformParameter.deserialize),
     CACHE_NAMESPACE_CONFIG: lambda x: x,
     CACHE_NAMESPACE_DEFAULT: lambda x: x
@@ -97,7 +97,7 @@ SERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_SKILL: lambda x: x.serialize(),
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
-    CACHE_NAMESPACE_PLATFORM: lambda x: x.serialize(),
+    CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),
     CACHE_NAMESPACE_CONFIG: lambda x: x,
     CACHE_NAMESPACE_DEFAULT: lambda x: x
 }
