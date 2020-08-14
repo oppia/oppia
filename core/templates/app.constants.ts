@@ -114,11 +114,11 @@ export class AppConstants {
   // change one of these, a state migration of all existing content ids is
   // required.
   public static COMPONENT_NAME_CONTENT = 'content';
-  public static COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS = 'ca';
-  public static COMPONENT_NAME_HINT = 'hint';
-  public static COMPONENT_NAME_SOLUTION = 'solution';
-  public static COMPONENT_NAME_FEEDBACK = 'feedback';
   public static COMPONENT_NAME_EXPLANATION = 'explanation';
+  public static COMPONENT_NAME_FEEDBACK = 'feedback';
+  public static COMPONENT_NAME_HINT = 'hint';
+  public static COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS = 'ca';
+  public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_WORKED_EXAMPLE = {
     QUESTION: 'worked_example_question',
     EXPLANATION: 'worked_example_explanation'
