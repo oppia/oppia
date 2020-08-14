@@ -43,7 +43,7 @@ describe('Profile test backend API service', () => {
     httpTestingController = TestBed.get(HttpTestingController);
 
     urlService = TestBed.get(UrlService);
-    spyOn(urlService, 'getPathname').and.returnValue( '/profile/testUsername');
+    spyOn(urlService, 'getPathname').and.returnValue('/profile/testUsername');
   });
 
   afterEach(() => {
