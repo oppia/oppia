@@ -93,7 +93,8 @@ describe('Preview Tab Component', function() {
         'EditableExplorationBackendApiService');
       explorationEngineService = $injector.get('ExplorationEngineService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
-      explorationPlayerStateService = $injector.get('ExplorationPlayerStateService');
+      explorationPlayerStateService = $injector.get(
+        'ExplorationPlayerStateService');
       learnerParamsService = $injector.get('LearnerParamsService');
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
