@@ -4,21 +4,20 @@
     <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
   </md-card>
   <div class="skill-selector-item-container">
-    <div class="list-group-item protractor-test-rte-skill-selector-item"
+    <div class="oppia-list-group-item-text list-group-item protractor-test-rte-skill-selector-item"
          ng-repeat="skill in $ctrl.skills | filter:skillFilterText"
          ng-click="$ctrl.selectSkill(skill.id, skill.description)"
-         ng-class="{'list-group-item-success': (skill.id === $ctrl.value)}"
-         style="color: black;">
+         ng-class="{'list-group-item-success': (skill.id === $ctrl.value)}">
       <label class="list-group-item-heading"><[skill.description]></label>
-      <div ng-if="skill.id === $ctrl.value" style="color: red;">
+      <div ng-if="skill.id === $ctrl.value" class="oppia-skill-summary-text">
         <strong> Explanation </strong>
-        <div style="padding-bottom: 10px; padding-top: 5px;">
+        <div class="skill-explanation-container">
           <angular-html-bind html-data="skill.skill_contents.explanation.html">
           </angular-html-bind>
         </div>
         <strong> Worked Examples </strong>
         <ul>
-          <li ng-repeat="example in skill.skill_contents.worked_examples" style="padding-top: 5px;">
+          <li ng-repeat="example in skill.skill_contents.worked_examples" class="example-questions-container">
             <b> Question: </b>
             <angular-html-bind html-data="example.question.html">
             </angular-html-bind>
@@ -34,11 +33,24 @@
   </div>
 </div>
 <style>
-  .worked-example-explanation-section {
+  skill-selector-editor .worked-example-explanation-section {
     margin-top: 1.5vh;
   }
-  .skill-selector-item-container {
+  skill-selector-editor .skill-selector-item-container {
     max-height: 50vh;
     overflow-y: auto;
+  }
+  skill-selector-editor .skill-explanation-container {
+    padding-bottom: 10px;
+    padding-top: 5px;
+  }
+  skill-selector-editor .example-questions-container {
+    padding-top: 5px;
+  }
+  skill-selector-editor .oppia-list-group-item-text {
+    color: black;
+  }
+  skill-selector-editor .oppia-skill-summary-text {
+    color: red;
   }
 </style>
