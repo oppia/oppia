@@ -117,11 +117,11 @@ export class Skill {
     return this._conceptCard;
   }
 
-  getMisconceptions(): Array<Misconception> {
+  getMisconceptions(): Misconception[] {
     return this._misconceptions.slice();
   }
 
-  getRubrics(): Array<Rubric> {
+  getRubrics(): Rubric[] {
     return this._rubrics.slice();
   }
 
@@ -189,7 +189,7 @@ export class Skill {
     return this._misconceptions[index].getId();
   }
 
-  updateRubricForDifficulty(difficulty: string, explanations: Array<string>) {
+  updateRubricForDifficulty(difficulty: string, explanations: string[]) {
     if (this.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
       throw new Error('Invalid difficulty value passed');
     }

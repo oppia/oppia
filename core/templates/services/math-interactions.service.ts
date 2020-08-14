@@ -277,8 +277,8 @@ export class MathInteractionsService {
     return modifiedExpressionList.join('');
   }
 
-  getTerms(expressionString: string, splitByAddition = true): Array<string> {
-    let listOfTerms: Array<string> = [];
+  getTerms(expressionString: string, splitByAddition = true): string[] {
+    let listOfTerms: string[] = [];
     let currentTerm: string = '';
     let bracketBalance: number = 0;
     let shouldModifyNextTerm: boolean = false;

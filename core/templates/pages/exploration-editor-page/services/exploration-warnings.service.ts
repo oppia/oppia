@@ -162,7 +162,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       var answerGroups = state.interaction.answerGroups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
-        if (group.rules.length === 0 &&
+        if (group.getRulesAsList().length === 0 &&
             group.trainingData.length === 0) {
           indexes.push(i);
         }
