@@ -1385,34 +1385,31 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': invalid_html_content2,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': invalid_html_content1,
                     'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [invalid_html_content1]
+                    ]
+                }, {
+                    'x': [
+                        [invalid_html_content2]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [invalid_html_content1]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1677,34 +1674,31 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content,
                     'y': valid_html_content
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1870,34 +1864,31 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content,
                     'y': valid_html_content
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2018,59 +2009,50 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content1]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content1,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content1]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content2,
                     'y': valid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content2]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [valid_html_content1]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content1]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content2]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
         item_selection_answer_group = {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
-                    'x': [valid_html_content3]
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'ContainsAtLeastOneOf': [{
                     'x': [valid_html_content1]
-                }
-            }, {
-                'rule_type': 'IsProperSubsetOf',
-                'inputs': {
-                    'x': [valid_html_content3]
-                }
-            }, {
-                'rule_type': 'DoesNotContainAtLeastOneOf',
-                'inputs': {
+                }],
+                'DoesNotContainAtLeastOneOf': [{
                     'x': [valid_html_content1]
-                }
-            }],
+                }],
+                'Equals': [{
+                    'x': [valid_html_content3]
+                }],
+                'IsProperSubsetOf': [{
+                    'x': [valid_html_content3]
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
