@@ -36,7 +36,7 @@ export class StorySummary {
   constructor(
     private _id: string,
     private _title: string,
-    private _nodeTitles: Array<string>,
+    private _nodeTitles: string[],
     private _thumbnailFilename: string,
     private _thumbnailBgColor: string,
     private _description: string,
@@ -53,7 +53,7 @@ export class StorySummary {
     return this._title;
   }
 
-  getNodeTitles(): Array<string> {
+  getNodeTitles(): string[] {
     return this._nodeTitles.slice();
   }
 
