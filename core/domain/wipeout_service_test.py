@@ -166,40 +166,25 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
-        self.user_details_change_object = user_domain.UserDetailsChange({
-            'cmd': user_domain.CMD_UPDATE_USER,
-            'user_id': self.user_1_id,
-            'display_alias': 'display_alias',
-            'last_agreed_to_terms': None,
-            'last_logged_in': None,
-            'user_bio': 'user_bio',
-            'subject_interests': ['subject_interests'],
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'pin': '12345'
-        })
-        self.new_user_details_change_object = user_domain.UserDetailsChange({
-            'cmd': user_domain.CMD_CREATE_NEW_USER,
-            'email': 'a@example.com',
-            'display_alias': 'display_alias',
-            'last_agreed_to_terms': None,
-            'last_logged_in': None,
-            'user_bio': 'user_bio',
-            'subject_interests': ['subject_interests'],
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'pin': '12345'
-        })
+        self.modifiable_user_data = user_domain.ModifiableUserData(
+            'display_alias', None, None, 'user_bio', '12345',
+            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+            None, None, self.user_1_id
+        )
+        self.modifiable_new_user_data = user_domain.ModifiableUserData(
+            'display_alias3', None, None, 'user_bio', '12345',
+            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+            None, None
+        )
 
         user_services.update_multiple_users_data(
-            [self.user_details_change_object])
-        self.new_user_details_change_object.email = self.USER_1_EMAIL
-        self.new_user_details_change_object.display_alias = 'name'
-        self.new_user_details_change_object.pin = '123'
+            [self.modifiable_user_data])
+        self.modifiable_user_data.email = self.USER_1_EMAIL
+        self.modifiable_user_data.display_alias = 'name'
+        self.modifiable_user_data.pin = '123'
         self.profile_user_id = user_services.create_new_profiles(
-            self.user_1_gae_id, [self.new_user_details_change_object]
+            self.user_1_gae_id, self.USER_1_EMAIL,
+            [self.modifiable_new_user_data]
         )[0].user_id
 
     def test_pre_delete_user_email_subscriptions(self):
@@ -1598,42 +1583,25 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         ).put()
 
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
-
-        self.user_details_change_object = user_domain.UserDetailsChange({
-            'cmd': 'update_user',
-            'user_id': self.user_1_id,
-            'display_alias': 'display_alias',
-            'last_agreed_to_terms': None,
-            'last_logged_in': None,
-            'user_bio': 'user_bio',
-            'subject_interests': ['subject_interests'],
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'pin': '12345'
-        })
-
+        self.modifiable_user_data = user_domain.ModifiableUserData(
+            'display_alias', None, None, 'user_bio', '12345',
+            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+            None, None, self.user_1_id
+        )
+        self.modifiable_new_user_data = user_domain.ModifiableUserData(
+            'display_alias3', None, None, 'user_bio', '12345',
+            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+            None, None
+        )
 
         user_services.update_multiple_users_data(
-            [self.user_details_change_object])
-        self.new_user_details_change_object = user_domain.UserDetailsChange({
-            'cmd': user_domain.CMD_CREATE_NEW_USER,
-            'email': 'a@example.com',
-            'display_alias': 'display_alias',
-            'last_agreed_to_terms': None,
-            'last_logged_in': None,
-            'user_bio': 'user_bio',
-            'subject_interests': ['subject_interests'],
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'pin': '12345'
-        })
-        self.new_user_details_change_object.email = self.USER_1_EMAIL
-        self.new_user_details_change_object.display_alias = 'name'
-        self.new_user_details_change_object.pin = '123'
+            [self.modifiable_user_data])
+
+        self.modifiable_new_user_data.display_alias = 'name'
+        self.modifiable_new_user_data.pin = '123'
         self.profile_user_id = user_services.create_new_profiles(
-            self.user_1_gae_id, [self.new_user_details_change_object]
+            self.user_1_gae_id, self.USER_1_EMAIL,
+            [self.modifiable_new_user_data]
         )[0].user_id
 
         user_models.CompletedActivitiesModel(
@@ -1897,39 +1865,25 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
-        self.user_details_change_object = user_domain.UserDetailsChange({
-            'cmd': 'update_user',
-            'user_id': self.user_1_id,
-            'display_alias': 'display_alias',
-            'last_agreed_to_terms': None,
-            'last_logged_in': None,
-            'user_bio': 'user_bio',
-            'subject_interests': ['subject_interests'],
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'pin': '12345'
-        })
+        self.modifiable_user_data = user_domain.ModifiableUserData(
+            'display_alias', None, None, 'user_bio', '12345',
+            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+            None, None, self.user_1_id
+        )
+        self.modifiable_new_user_data = user_domain.ModifiableUserData(
+            'display_alias3', None, None, 'user_bio', '12345',
+            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+            None, None
+        )
+
         user_services.update_multiple_users_data(
-            [self.user_details_change_object])
-        self.new_user_details_change_object = user_domain.UserDetailsChange({
-            'cmd': user_domain.CMD_CREATE_NEW_USER,
-            'email': 'a@example.com',
-            'display_alias': 'display_alias',
-            'last_agreed_to_terms': None,
-            'last_logged_in': None,
-            'user_bio': 'user_bio',
-            'subject_interests': ['subject_interests'],
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'pin': '12345'
-        })
-        self.new_user_details_change_object.email = self.USER_1_EMAIL
-        self.new_user_details_change_object.display_alias = 'name'
-        self.new_user_details_change_object.pin = '123'
+            [self.modifiable_user_data])
+
+        self.modifiable_new_user_data.display_alias = 'name'
+        self.modifiable_new_user_data.pin = '123'
         self.profile_user_id = user_services.create_new_profiles(
-            self.user_1_gae_id, [self.new_user_details_change_object]
+            self.user_1_gae_id, self.USER_1_EMAIL,
+            [self.modifiable_new_user_data]
         )[0].user_id
         wipeout_service.pre_delete_user(self.user_2_id)
 

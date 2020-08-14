@@ -1004,15 +1004,17 @@ def create_new_user(gae_id, email):
     return user_settings
 
 
-def create_new_profiles(gae_id, user_details_change_list):
+def create_new_profiles(gae_id, email, modifiable_user_data_list):
     """Creates new profiles for the users specified in the
-    user_details_change_list.
+    modifiable_user_data_list.
 
     Args:
         gae_id: str. The GAE ID of the full (parent) user trying to create new
             profiles.
-        user_details_change_list: list(UserDetailsChange). The list of
-            user details changes to use for creation of new profiles.
+        email: str. The email address of the full (parent) user trying to create
+            new profiles.
+        modifiable_user_data_list: list(ModifiableUserData). The list of
+            modifiable user data objects used for creation of new profiles.
 
     Returns:
         list(UserSettings). List of UserSettings objects created for the new
@@ -1021,132 +1023,118 @@ def create_new_profiles(gae_id, user_details_change_list):
     Raises:
         Exception. If the pin for parent user trying to create a new profile
             is not set.
+        Exception. If user_id is already set for any user in its corresponding
+            modifiable_user_data object.
         ValidationError. If a None or empty value is provided for display
             alias attribute.
     """
 
-    def _create_new_profiles_transactional(
-            user_settings_list, user_auth_details_list):
+    def _create_new_profile_transactional(
+            user_settings, user_auth_details):
         """Save user models for new users as a transaction.
 
         Args:
-            user_settings_list: list(UserSettings). The list of user settings
-                domain objects corresponding to the newly created list of users.
-            user_auth_details_list: list(UserAuthDetails). The list of user auth
-                details domain object corresponding to the newly created list
-                of users.
+            user_settings: UserSettings. The user settings domain object
+                corresponding to the newly created user.
+            user_auth_details: UserAuthDetails. The user auth details domain
+                object corresponding to the newly created list of users.
         """
-        _save_multiple_users_auth_details(user_auth_details_list)
-        _save_multiple_users_settings(user_settings_list)
+        _save_user_auth_details(user_auth_details)
+        _save_user_settings(user_settings)
 
-    # New profile creation is done by full (parent) user.
+    # As new profile user creation is done by a full (parent) user only.
     parent_user_auth_details = get_auth_details_by_gae_id(gae_id, strict=True)
     if parent_user_auth_details.pin is None:
         raise Exception(
             'Pin must be set for a full user before creating a profile.')
     parent_user_id = parent_user_auth_details.user_id
-
     user_settings_list = []
-    user_auth_details_list = []
-
-
-    received_display_aliases = []
-    for user_details_change in user_details_change_list:
-        if (not user_details_change.display_alias or
+    for modifiable_user_data in modifiable_user_data_list:
+        if modifiable_user_data.user_id:
+            raise Exception('User id cannot already exist for a new user.')
+        user_id = user_models.UserSettingsModel.get_new_id('')
+        user_settings = UserSettings(
+            user_id, gae_id, email, feconf.ROLE_ID_LEARNER,
+            preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
+        )
+        if (not modifiable_user_data.display_alias or
                 not isinstance(
-                    user_details_change.display_alias, python_utils.BASESTRING)
+                    modifiable_user_data.display_alias,
+                    python_utils.BASESTRING
+                )
            ):
             raise utils.ValidationError(
                 'Expected display alias to be a string, received %s' %
-                user_details_change.display_alias
+                modifiable_user_data.display_alias
             )
-        received_display_aliases.append(user_details_change.display_alias)
-
-    if len(received_display_aliases) != len(set(received_display_aliases)):
-        raise Exception('New users have duplicate display aliases.')
-
-    all_profiles_auth_details = get_all_profiles_auth_details_by_parent_user_id(
-        parent_user_id)
-    all_user_ids = [model.user_id for model in all_profiles_auth_details]
-    all_user_ids.append(parent_user_id)
-    existing_display_aliases = [
-        user.display_alias for user in get_users_settings(all_user_ids)
-        if user.display_alias is not None
-    ]
-
-    if set(received_display_aliases).intersection(
-            set(existing_display_aliases)):
-        raise Exception('New users have duplicate display aliases.')
-
-    for user_details_change in user_details_change_list:
-        user_id = user_models.UserSettingsModel.get_new_id('')
-        user_settings = UserSettings(
-            user_id, gae_id, user_details_change.email, feconf.ROLE_ID_LEARNER,
-            preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
-        user_settings.display_alias = user_details_change.display_alias
+        user_settings.display_alias = modifiable_user_data.display_alias
         user_settings.last_agreed_to_terms = (
-            user_details_change.last_agreed_to_terms)
-        user_settings.last_logged_in = user_details_change.last_logged_in
-        user_settings.user_bio = user_details_change.user_bio
-        user_settings.subject_interests = user_details_change.subject_interests
+            modifiable_user_data.last_agreed_to_terms)
+        user_settings.last_logged_in = modifiable_user_data.last_logged_in
+        user_settings.user_bio = modifiable_user_data.user_bio
+        user_settings.subject_interests = (
+            modifiable_user_data.subject_interests)
         user_settings.preferred_language_codes = (
-            user_details_change.preferred_language_codes)
+            modifiable_user_data.preferred_language_codes)
         user_settings.preferred_site_language_code = (
-            user_details_change.preferred_site_language_code)
+            modifiable_user_data.preferred_site_language_code)
         user_settings.preferred_audio_language_code = (
-            user_details_change.preferred_audio_language_code)
+            modifiable_user_data.preferred_audio_language_code)
 
         user_auth_details = UserAuthDetails(
-            user_id, None, user_details_change.pin, parent_user_id)
+            user_id, None, modifiable_user_data.pin, parent_user_id)
 
+        transaction_services.run_in_transaction(
+            _create_new_profile_transactional, user_settings,
+            user_auth_details
+        )
         user_settings_list.append(user_settings)
-        user_auth_details_list.append(user_auth_details)
-
-    transaction_services.run_in_transaction(
-        _create_new_profiles_transactional, user_settings_list,
-        user_auth_details_list
-    )
     return user_settings_list
 
 
-def update_multiple_users_data(user_details_change_list):
+def update_multiple_users_data(modifiable_user_data_list):
     """Updates user settings and user auth model details for the users
-    specified in the user_details_change_list.
+    specified in the modifiable_user_data_list.
 
-    Args: user_details_change_list: list(UserDetailsChange). The list of
-            user details changes to apply.
+    Args: user_details_change_list: list(ModifiableUserData). The list of
+            modifiable_user_data entries corresponding to the users whose
+            data has to be updated.
 
     Raises:
         ValidationError. If a None or empty value is provided for display
             alias attribute.
+        Exception. If a None or empty value is provided for user_id.
     """
     user_settings_list = []
     user_auth_details_list = []
-    for user_details_change in user_details_change_list:
-        user_id = user_details_change.user_id
+    for modifiable_user_data in modifiable_user_data_list:
+        user_id = modifiable_user_data.user_id
+        if not user_id:
+            raise Exception(
+                'A valid user id must exist for all the users to be updated.')
         user_settings = get_user_settings(user_id, strict=True)
-        if not user_details_change.display_alias:
+        if not modifiable_user_data.display_alias:
             raise utils.ValidationError(
                 'Expected display_alias to be a string, received %s.'
-                % (user_details_change.display_alias)
+                % (modifiable_user_data.display_alias)
             )
-        user_settings.display_alias = user_details_change.display_alias
+        user_settings.display_alias = modifiable_user_data.display_alias
         user_settings.last_agreed_to_terms = (
-            user_details_change.last_agreed_to_terms)
-        user_settings.last_logged_in = user_details_change.last_logged_in
-        user_settings.user_bio = user_details_change.user_bio
-        user_settings.subject_interests = user_details_change.subject_interests
+            modifiable_user_data.last_agreed_to_terms)
+        user_settings.last_logged_in = modifiable_user_data.last_logged_in
+        user_settings.user_bio = modifiable_user_data.user_bio
+        user_settings.subject_interests = modifiable_user_data.subject_interests
         user_settings.preferred_language_codes = (
-            user_details_change.preferred_language_codes)
+            modifiable_user_data.preferred_language_codes)
         user_settings.preferred_site_language_code = (
-            user_details_change.preferred_site_language_code)
+            modifiable_user_data.preferred_site_language_code)
         user_settings.preferred_audio_language_code = (
-            user_details_change.preferred_audio_language_code)
+            modifiable_user_data.preferred_audio_language_code)
 
         user_settings_list.append(user_settings)
 
         user_auth_details = get_auth_details_by_user_id(user_id, strict=True)
-        user_auth_details.pin = user_details_change.pin
+        user_auth_details.pin = modifiable_user_data.pin
 
         user_auth_details_list.append(user_auth_details)
 
@@ -1162,9 +1150,9 @@ def _save_multiple_users_settings(user_settings_list):
     """
     user_ids = [user.user_id for user in user_settings_list]
     user_settings_models_list = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
+        user_ids, include_deleted=True)
     final_user_settings_models_list = []
-    for user_model, user_settings in zip(
+    for user_model, user_settings in python_utils.ZIP(
             user_settings_models_list, user_settings_list):
         user_settings.validate()
         user_settings_dict = {
@@ -1220,7 +1208,7 @@ def _save_multiple_users_auth_details(user_auth_details_list):
     user_auth_models_list = user_models.UserAuthDetailsModel.get_multi(
         user_ids, include_deleted=True)
     final_user_auth_models_list = []
-    for user_auth_details_model, user_auth_details in zip(
+    for user_auth_details_model, user_auth_details in python_utils.ZIP(
             user_auth_models_list, user_auth_details_list):
         user_auth_details.validate()
         user_auth_details_dict = {
