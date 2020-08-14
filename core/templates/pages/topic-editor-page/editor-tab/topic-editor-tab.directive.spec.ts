@@ -57,7 +57,7 @@ describe('Topic editor tab directive', function() {
   var UndoRedoService = null;
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
-  var mockTasdReinitializedEventEmitter;
+  var mockTasdReinitializedEventEmitter = null;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
   var MockWindowDimensionsService = {
