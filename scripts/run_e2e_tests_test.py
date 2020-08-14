@@ -96,6 +96,9 @@ class MockProcessClass(python_utils.OBJECT):
         if signal_number == signal.SIGINT and self.clean_shutdown:
             self.poll_return = False
 
+    def wait(self):
+        return
+
 
 class RunE2ETestsTests(test_utils.GenericTestBase):
     """Test the run_e2e_tests methods."""
@@ -822,11 +825,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return ['commands']
 
         def mock_popen(unused_commands):
+            def mock_wait():
+                return
             def mock_communicate():
                 return
             result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
+            result.wait = mock_wait # pylint: disable=attribute-defined-outside-init
             return result
 
         def mock_exit(unused_code):
@@ -943,11 +949,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return ['commands']
 
         def mock_popen(unused_commands):
+            def mock_wait():
+                return
             def mock_communicate():
                 return
             result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
+            result.wait = mock_wait
             return result
 
         def mock_exit(unused_code):
@@ -1111,11 +1120,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return ['commands']
 
         def mock_popen(unused_commands):
+            def mock_wait():
+                return
             def mock_communicate():
                 return
             result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
+            result.wait = mock_wait # pylint: disable=attribute-defined-outside-init
             return result
 
         def mock_exit(unused_code):
@@ -1235,9 +1247,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_popen(unused_commands):
             def mock_communicate():
                 return
+            def mock_wait():
+                return
             result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
+            result.wait = mock_wait # pylint: disable=attribute-defined-outside-init
             return result
 
         def mock_exit(unused_code):
@@ -1364,16 +1379,3 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.KILL_PORTSERVER_TIMEOUT_SECS + 1
         )
         self.assertEqual(process.signals_received, [signal.SIGINT])
-
-    def test_windows_os_throws_exception(self):
-        def mock_is_windows_os():
-            return True
-        windows_not_supported_exception = self.assertRaisesRegexp(
-            Exception,
-            'Redis command line interface is not installed because your '
-            'machine is on the Windows operating system. Caching will '
-            'not work on a Windows machine.')
-        with self.swap(common, 'is_windows_os', mock_is_windows_os), (
-            windows_not_supported_exception):
-            run_e2e_tests.main(
-                args=['--skip-install', '--skip-build'])

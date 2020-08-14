@@ -630,15 +630,28 @@ def start_redis_server():
     python_utils.PRINT('Starting Redis development server.')
     # Start the redis local development server. Redis doesn't run on
     # Windows machines.
-    subprocess.call([
-        REDIS_SERVER_PATH, REDIS_CONF_PATH,
-        '--daemonize', 'yes'
-    ])
-
+    if not is_windows_os():
+        subprocess.call([
+            REDIS_SERVER_PATH, REDIS_CONF_PATH,
+            '--daemonize', 'yes'
+        ])
+    else:
+        raise Exception(
+            'Redis command line interface is not installed because your '
+            'machine is on the Windows operating system. The redis server '
+            'cannot start.')
 
 def stop_redis_server():
     """Stops the redis server by shutting it down."""
-    subprocess.call([REDIS_CLI_PATH, 'shutdown'])
+    if not is_windows_os():
+        python_utils.PRINT('Cleaning up the redis_servers.')
+        # Shutdown the redis server before exiting.
+        subprocess.call([REDIS_CLI_PATH, 'shutdown'])
+    else:
+        raise Exception(
+            'Redis command line interface is not installed because your '
+            'machine is on the Windows operating system. There is no redis '
+            'server to shutdown.')
 
 
 class CD(python_utils.OBJECT):

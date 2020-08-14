@@ -92,12 +92,7 @@ def cleanup():
     while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
     build.set_constants_to_default()
-
-    if not common.is_windows_os():
-        # Redis does not run on Windows machines.
-        python_utils.PRINT('Cleaning up the redis_servers.')
-        # Shutdown the redis server before exiting.
-        common.stop_redis_server()
+    common.stop_redis_server()
 
 
 def main(args=None):
@@ -148,13 +143,7 @@ def main(args=None):
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)
 
-        if not common.is_windows_os():
-            common.start_redis_server()
-        else:
-            raise Exception(
-                'Redis command line interface is not installed because your ' +
-                'machine is on the Windows operating system. Caching will ' +
-                'not work on a Windows machine.')
+        common.start_redis_server()
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(

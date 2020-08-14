@@ -380,8 +380,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             return True
         windows_not_supported_exception = self.assertRaisesRegexp(
             Exception,
-            'Redis command line interface is not installed because your '
-            'machine is on the Windows operating system.')
+            'The redis command line interface will not be installed because '
+            'your machine is on the Windows operating system.')
 
         with self.swap(common, 'is_windows_os', mock_is_windows_os), (
             windows_not_supported_exception):
@@ -419,12 +419,12 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             else:
                 return Ret()
 
-        call_swap = self.swap(
+        swap_call = self.swap(
             subprocess, 'call', mock_call)
         untar_files_swap = self.swap(
             install_third_party, 'download_and_untar_files',
             mock_download_and_untar_files)
-        with call_swap, untar_files_swap:
+        with swap_call, untar_files_swap:
             install_third_party.install_redis_cli()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)

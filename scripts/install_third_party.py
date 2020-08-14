@@ -403,15 +403,15 @@ def install_redis_cli():
 
 def main(args=None):
     """Installs all the third party libraries."""
+    if common.is_windows_os():
+        # The redis cli is not compatible with Windows machines.
+        raise Exception(
+            'The redis command line interface will not be installed because '
+            'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
     download_manifest_files(MANIFEST_FILE_PATH)
-    if not common.is_windows_os():
-        # Redis cli is not compatible with windows machines.
-        install_redis_cli()
-    else:
-        raise Exception(
-            'Redis command line interface is not installed because your '
-            'machine is on the Windows operating system.')
+
+    install_redis_cli()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
