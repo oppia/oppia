@@ -67,7 +67,7 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
           // preloader service beforehand.
           if (
             ImagePreloaderService.inExplorationPlayer() &&
-            !ContextService.getEntityType() === ENTITY_TYPE.SKILL) {
+            !(ContextService.getEntityType() === ENTITY_TYPE.SKILL)) {
             ImagePreloaderService.getImageUrl(ctrl.svgFilename)
               .then(function(objectUrl) {
                 ctrl.imageUrl = objectUrl;
