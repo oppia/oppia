@@ -291,7 +291,12 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         self.collection_model.owner_ids = [self.USER_ID_1, self.USER_ID_3]
         self.collection_model.save(
             self.USER_ID_COMMITTER, 'Add owner',
-            [{'cmd': rights_manager.CMD_CHANGE_ROLE}]
+            [{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_ID_3,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_OWNER
+            }]
         )
         self.allow_revert_swap = self.swap(
             collection_models.CollectionRightsModel, 'ALLOW_REVERT', True)

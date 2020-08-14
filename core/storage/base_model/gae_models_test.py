@@ -350,10 +350,10 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         self.assertTrue(
             base_models.BaseSnapshotMetadataModel
             .exists_for_user_id('committer_id'))
-        self.assertFalse(
+        self.assertTrue(
             base_models.BaseSnapshotMetadataModel
             .exists_for_user_id('mentioned_user_1_id'))
-        self.assertFalse(
+        self.assertTrue(
             base_models.BaseSnapshotMetadataModel
             .exists_for_user_id('mentioned_user_2_id'))
         self.assertFalse(
