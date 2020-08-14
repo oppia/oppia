@@ -71,5 +71,5 @@ export class ServicesConstants {
       require('rich_text_components_definitions.ts'));
 
   public static WHITELISTED_IFRAME_SECRETS = [
-    'testSecret','25b49a7f706348c29c5b3709ee4570bb'];
+    'testSecret'];
 }

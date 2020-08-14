@@ -692,7 +692,7 @@ angular.module('oppia').directive('conversationSkin', [
           var _addNewCard = function(newCard) {
             PlayerTranscriptService.addNewCard(newCard);
             CommandExecutorService.sendInteractionToOuterFrame(
-              newCard._interaction.id)
+              newCard._interaction.id);
 
             var totalNumCards = PlayerTranscriptService.getNumCards();
 
@@ -1192,19 +1192,16 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.showPendingCard();
           };
 
-          $scope.clickContinueButtonFn = function(interaction_id) {
-            console.log('in here')
-            console.log(interaction_id)
-            if (interaction_id === 'CONTINUE') {
-              console.log('continue state')
+          $scope.clickContinueButtonFn = function(interactionId) {
+            if (interactionId === 'CONTINUE') {
               CurrentInteractionService.submitAnswer();
             } else {
-              console.log('ill show upcoming card')
               $scope.showUpcomingCard();
             }
           }
 
-          CommandExecutorService.registerCallback('CONTINUE', $scope.clickContinueButtonFn)
+          CommandExecutorService.registerCallback(
+            'CONTINUE', $scope.clickContinueButtonFn)
           var scrollToBottom = function() {
             $timeout(function() {
               var tutorCard = $('.conversation-skin-main-tutor-card');

@@ -167,7 +167,7 @@ describe('Exploration player page', function() {
     WindowWrapperMessageService.getLocationHref =
     jasmine.createSpy('parentMessage spy').and.returnValue(
       'https://www.oppia.org/exploration/embed/fake?' +
-      'secret_hostname=25b49a7f706348c29c5b3709ee4570bb');
+      'secret_hostname=testSecret');
     CommandExecutorService.sendParentReadyState = jasmine.createSpy(
       'sendParentReadyState spy');
 

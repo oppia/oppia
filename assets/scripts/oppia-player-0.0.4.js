@@ -13,6 +13,8 @@
 // limitations under the License.
 
 /**
+ * @fileoverview
+ * JS file that pertains to using commandMessaging with embedded pages
  * Insert this script at the bottom of your web page. It will take all the
  * <oppia> tags and render them as iframes of Oppia explorations.
  */
