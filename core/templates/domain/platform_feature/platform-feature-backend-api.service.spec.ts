@@ -56,8 +56,7 @@ describe('PlatformFeatureBackendApiService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      const context = clientContextObjectFactory.create(
-        'Web', 'Chrome', null, 'en');
+      const context = clientContextObjectFactory.create('Web', 'Chrome', 'en');
       const responseDict = {
         feature_a: true,
         feature_b: false,

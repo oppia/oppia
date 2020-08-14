@@ -242,13 +242,12 @@ export class PlatformFeatureService {
    */
   private generateClientContext(): ClientContext {
     const clientType = 'Web';
-    const appVersion = null;
     const broswerType = this.detectBrowserType();
     const userLocale = (
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
 
     return this.clientContextObjectFactory.create(
-      clientType, broswerType, appVersion, userLocale);
+      clientType, broswerType, userLocale);
   }
 
   /**

@@ -29,6 +29,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { FeatureNames, FeatureStatusSummaryObjectFactory } from
   'domain/platform_feature/feature-status-summary-object.factory';
 
+
 describe('PlatformFeatureService', () => {
   let windowRef: WindowRef;
   let i18n: I18nLanguageCodeService;
@@ -41,6 +42,21 @@ describe('PlatformFeatureService', () => {
   let mockUserAgent: (ua: string) => void;
 
   let apiSpy: jasmine.Spy;
+
+  // TODO(#9154): Remove the following resetting code when migration is
+  // complete.
+  // Currently these properties are static, which are not automatically cleared
+  // after each test, so we need to manually clear the state of
+  // PlatformFeatureService.
+  const clearStaticProperties = () => {
+    PlatformFeatureService.featureStatusSummary = null;
+    PlatformFeatureService._initializedWithError = false;
+    PlatformFeatureService.initializationPromise = null;
+  };
+
+  beforeAll(() => {
+    clearStaticProperties();
+  });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -87,13 +103,7 @@ describe('PlatformFeatureService', () => {
   });
 
   afterEach(() => {
-    // TODO(#9154): Remove the following resetting code when migration is
-    // complete.
-    // Currently these two properties are static, which are not after each
-    // test, so we need to manually clear the state of PlatformFeatureService.
-    PlatformFeatureService.featureStatusSummary = null;
-    PlatformFeatureService._initializedWithError = false;
-    PlatformFeatureService.initializationPromise = null;
+    clearStaticProperties();
   });
 
   describe('.initialize', () => {
