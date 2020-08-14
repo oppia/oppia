@@ -29,7 +29,9 @@ from . import check_frontend_coverage
 from . import common
 from . import install_third_party_libs
 
-# This is a relative path from the oppia/ folder.
+# This is a relative path from the oppia/ folder. It is relative because the
+# dtslint command prepends the current working directory to the path, which in
+# this case is the oppia/ folder.
 DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH = os.path.join('typings', 'tests')
 
 _PARSER = argparse.ArgumentParser(
@@ -67,7 +69,7 @@ def run_dtslint_type_tests():
     python_utils.PRINT('Running dtslint type tests.')
 
     cmd = ['./node_modules/dtslint/bin/index.js',
-        DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH]
+           DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH]
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
     # Reads and prints realtime output from the subprocess until it terminates.
