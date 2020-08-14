@@ -324,7 +324,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
-    def test_get_user_settings_by_gae_id_for_exisitng_user_is_correct(self):
+    def test_get_user_settings_by_gae_id_for_existing_user_is_correct(self):
         gae_id = 'gae_id'
         email = 'user@example.com'
         user_id = 'user_id'
@@ -346,10 +346,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
-    def test_get_user_settings_by_gae_id_for_nonexistent_user_id_is_none(self):
-        self.assertIsNone(user_services.get_user_settings_by_gae_id('id_x'))
+    def test_get_user_settings_by_gae_id_for_nonexistent_gae_id_is_none(self):
+        self.assertIsNone(user_services.get_user_settings_by_gae_id('gae_id_x'))
 
-    def test_get_user_settings_by_gae_id_strict_exisitng_user_is_correct(self):
+    def test_get_auth_details_by_gae_id_for_nonexistent_gae_id_is_none(self):
+        self.assertIsNone(user_services.get_user_settings_by_gae_id('gae_id_x'))
+
+    def test_get_user_settings_by_gae_id_strict_existing_user_is_correct(self):
         non_existent_user_id = 'id_x'
         gae_id = 'gae_id'
         email = 'user@example.com'
@@ -1747,6 +1750,13 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.role = 'invalid_role'
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Role invalid_role does not exist.'):
+            self.user_settings.validate()
+
+    def test_validate_non_str_display_alias_raises_error(self):
+        self.user_settings.display_alias = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected display_alias to be a string,'
+            ' received %s' % self.user_settings.display_alias):
             self.user_settings.validate()
 
     def test_validate_non_str_creator_dashboard_display_pref_raises_error(self):
