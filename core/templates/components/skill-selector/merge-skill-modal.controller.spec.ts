@@ -41,23 +41,16 @@ describe('Merge Skill Modal Controller', function() {
     });
   }));
 
-  it('should check properties set after controller is initialized', function() {
-    expect($scope.skillSummaries).toBe(skillSummaries);
-    expect($scope.categorizedSkills).toBe(categorizedSkills);
-    expect($scope.allowSkillsFromOtherTopics).toBe(true);
-    expect($scope.selectedSkillId).toBe('');
-  });
-
-  it('should close modal on saving', function() {
-    $scope.save();
-    expect($uibModalInstance.close).toHaveBeenCalledWith({
-      skill: skill,
-      supersedingSkillId: ''
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.skillSummaries).toBe(skillSummaries);
+      expect($scope.categorizedSkills).toBe(categorizedSkills);
+      expect($scope.allowSkillsFromOtherTopics).toBe(true);
+      expect($scope.selectedSkillId).toBe('');
     });
-  });
 
-  it('should close modal on confirm', function() {
-    $scope.confirm();
+  it('should merge skill on closing modal', function() {
+    $scope.save();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       skill: skill,
       supersedingSkillId: ''
