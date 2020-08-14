@@ -30,7 +30,7 @@
                     start-card-change-animation="startCardChangeAnimation">
         </tutor-card>
         <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
-          <supplemental-card on-click-continue-button="showUpcomingCard()"
+          <supplemental-card on-click-continue-button="clickContinueButtonFn()"
                              displayed-card="displayedCard">
           </supplemental-card>
         </div>
@@ -38,13 +38,13 @@
                       submit-button-is-disabled="submitButtonIsDisabled()"
                       displayed-card="displayedCard"
                       submit-button-is-shown="!answerIsBeingProcessed"
-                      on-click-continue-button="showUpcomingCard()">
+                      on-click-continue-button="clickContinueButtonFn()">
         </progress-nav>
       </div>
 
       <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
            class="conversation-skin-supplemental-card-container">
-        <supplemental-card on-click-continue-button="showUpcomingCard()"
+        <supplemental-card on-click-continue-button="clickContinueButtonFn()"
                            displayed-card="displayedCard">
         </supplemental-card>
       </div>

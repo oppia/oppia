@@ -29,7 +29,6 @@ require(
 
 describe('Exploration Player State Service', () => {
   let ces = null;
-  let wrf = null;
   let spy = null;
   let wwms = null;
 
@@ -43,123 +42,12 @@ describe('Exploration Player State Service', () => {
 
   beforeEach(angular.mock.inject(function($injector) {
     ces = $injector.get('CommandExecutorService');
-    wrf = $injector.get('WindowRef');
     wwms = $injector.get('WindowWrapperMessageService');
-    setupWindowRef(wrf);
     spy = spyOn(wwms, 'addEventListener');
-    ces.initialize();
   }));
 
-  afterEach((done) => {
-    var suite =
-    wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
-    suite.remove();
-    done();
-  });
-
-  var continueBoolean = false;
-  var addBoolean = false;
-  var deleteBoolean = false;
-  var mcBoolean = false;
-  var secondaryContinueBoolean = false;
-  var itemSelectionBoolean = false;
-  var setupWindowRef = function(windowRef) {
-    continueBoolean = false;
-    addBoolean = false;
-    deleteBoolean = false;
-    mcBoolean = false;
-    secondaryContinueBoolean = false;
-    itemSelectionBoolean = false;
-    var testPage = windowRef.nativeWindow.document.createElement(
-      'TESTING_SUITE');
-    var continueButton = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    continueButton.classList.add(
-      'oppia-learner-confirm-button');
-    continueButton.onclick = function() {
-      continueBoolean = true;
-    };
-    var secondaryContinueButton =
-      windowRef.nativeWindow.document.createElement('BUTTON');
-    secondaryContinueButton.classList.add(
-      'protractor-test-next-card-button');
-    secondaryContinueButton.onclick = function() {
-      secondaryContinueBoolean = true;
-    };
-    var textbox = windowRef.nativeWindow.document.createElement(
-      'INPUT') as HTMLInputElement;
-    textbox.classList.add(
-      'form-control');
-    var secondaryTextbox = windowRef.nativeWindow.document.createElement(
-      'INPUT') as HTMLInputElement;
-    secondaryTextbox.classList.add(
-      'form-control');
-    var addButton = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    addButton.classList.add('oppia-add-list-entry');
-    addButton.onclick = function() {
-      addBoolean = true;
-    };
-    var deleteButton = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    deleteButton.classList.add('oppia-delete-list-entry-button');
-    deleteButton.onclick = function() {
-      deleteBoolean = true;
-    };
-    var fractionBox = windowRef.nativeWindow.document.createElement(
-      'TEXT');
-    fractionBox.classList.add('form-control');
-    fractionBox.classList.add(
-      'ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r');
-    var mc1 = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    mc1.classList.add('multiple-choice-outer-radio-button');
-    var mc2 = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    mc2.classList.add('multiple-choice-outer-radio-button');
-    mc2.onclick = function() {
-      mcBoolean = true;
-    };
-    var mc3 = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    mc3.classList.add('multiple-choice-outer-radio-button');
-    var mc4 = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    mc4.classList.add('multiple-choice-outer-radio-button');
-    var itemSelection1 = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    itemSelection1.classList.add('item-selection-input-checkbox');
-    var itemSelection2 = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    itemSelection2.classList.add('item-selection-input-checkbox');
-    itemSelection2.onclick = function() {
-      itemSelectionBoolean = true;
-    };
-    var itemSelection3 = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    itemSelection3.classList.add('item-selection-input-checkbox');
-    var itemSelection4 = windowRef.nativeWindow.document.createElement(
-      'BUTTON');
-    itemSelection4.classList.add('item-selection-input-checkbox');
-    testPage.appendChild(continueButton);
-    testPage.appendChild(textbox);
-    testPage.appendChild(secondaryTextbox);
-    testPage.appendChild(addButton);
-    testPage.appendChild(deleteButton);
-    testPage.appendChild(fractionBox);
-    testPage.appendChild(mc1);
-    testPage.appendChild(mc2);
-    testPage.appendChild(mc3);
-    testPage.appendChild(mc4);
-    testPage.appendChild(itemSelection1);
-    testPage.appendChild(itemSelection2);
-    testPage.appendChild(itemSelection3);
-    testPage.appendChild(itemSelection4);
-    testPage.appendChild(secondaryContinueButton);
-    wrf.nativeWindow.document.body.appendChild(testPage);
-  };
-
   it('should register the host', () => {
+    ces.initialize();
     expect(spy).toHaveBeenCalled();
     expect(spy.calls.mostRecent().args[0]).toEqual('message');
     var listener = spy.calls.mostRecent().args[1];
@@ -171,6 +59,7 @@ describe('Exploration Player State Service', () => {
   });
 
   it('should click continue', () => {
+    ces.initialize();
     expect(spy).toHaveBeenCalled();
     expect(spy.calls.mostRecent().args[0]).toEqual('message');
     var listener = spy.calls.mostRecent().args[1];
@@ -179,190 +68,25 @@ describe('Exploration Player State Service', () => {
     });
     listener(messageEvent);
     expect(ces.getHostname()).toEqual('mockWindow');
+    var ClickContinueButton = jasmine.createSpy('fakeClickContinueButton');
+    ces.registerCallback('CONTINUE', ClickContinueButton);
     var messageEvent = new MessageEvent('message', {
       data: 'CONTINUE'
     });
-    listener(messageEvent);
-    expect(continueBoolean).toEqual(true);
-  });
-
-  it('should enter text and click submit button after', () => {
-    expect(spy).toHaveBeenCalled();
-    expect(spy.calls.mostRecent().args[0]).toEqual('message');
-    var suite =
-    wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
-    suite.querySelector(
-      '.ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r').remove();
-    var listener = spy.calls.mostRecent().args[1];
-    var messageEvent = new MessageEvent('message', {
-      data: 'HOSTNAME mockWindow'
-    });
-    listener(messageEvent);
-    expect(ces.getHostname()).toEqual('mockWindow');
-    var messageEvent = new MessageEvent('message', {
-      data: 'ENTER_TEXT_NUMBER_UNITS testText'
-    });
-    listener(messageEvent);
-    var textbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control')[0] as HTMLInputElement;
-    expect(textbox.value).toEqual('testText');
-  });
-
-  it('should add to set by filling box', () => {
-    var suite =
-    wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
-    suite.querySelector(
-      '.ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r').remove();
-    expect(spy).toHaveBeenCalled();
-    expect(spy.calls.mostRecent().args[0]).toEqual('message');
-    var listener = spy.calls.mostRecent().args[1];
-    var messageEvent = new MessageEvent('message', {
-      data: 'HOSTNAME mockWindow'
-    });
-    listener(messageEvent);
-    expect(ces.getHostname()).toEqual('mockWindow');
-    var messageEvent = new MessageEvent('message', {
-      data: 'ADD_SET 1'
-    });
-    listener(messageEvent);
-    var textbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control')[0] as HTMLInputElement;
-  });
-
-  it('should add two elements to set', () => {
-    var suite =
-    wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
-    suite.querySelector(
-      '.ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r').remove();
-    expect(spy).toHaveBeenCalled();
-    expect(spy.calls.mostRecent().args[0]).toEqual('message');
-    var listener = spy.calls.mostRecent().args[1];
-    var messageEvent = new MessageEvent('message', {
-      data: 'HOSTNAME mockWindow'
-    });
-    listener(messageEvent);
-    expect(ces.getHostname()).toEqual('mockWindow');
-    expect(ces.getHostname()).toEqual('mockWindow');
-    var messageEvent = new MessageEvent('message', {
-      data: 'ADD_SET 1'
-    });
-    listener(messageEvent);
-    var textbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control')[0] as HTMLInputElement;
-    expect(textbox.value).toEqual('1');
-    expect(addBoolean).toEqual(false);
-    var messageEvent = new MessageEvent('message', {
-      data: 'ADD_SET 2'
-    });
-    listener(messageEvent);
-    var textboxes = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control');
-    var first = textboxes[0] as HTMLInputElement;
-    var second = textboxes[1] as HTMLInputElement;
-    expect(first.value).toEqual('1');
-    expect(second.value).toEqual('2');
-    expect(addBoolean).toEqual(true);
-  });
-
-  it('should enter a fraction', () => {
-    expect(spy).toHaveBeenCalled();
-    expect(spy.calls.mostRecent().args[0]).toEqual('message');
-    var listener = spy.calls.mostRecent().args[1];
-    var messageEvent = new MessageEvent('message', {
-      data: 'HOSTNAME mockWindow'
-    });
-    listener(messageEvent);
-    expect(ces.getHostname()).toEqual('mockWindow');
-    var messageEvent = new MessageEvent('message', {
-      data: 'ENTER_FRACTION 2/3'
-    });
-    listener(messageEvent);
-    var textbox = wrf.nativeWindow.document.getElementsByClassName(
-      'ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r'
-    )[0] as HTMLInputElement;
-    expect(textbox.value).toEqual('2/3');
-  });
-
-  it('should click 2nd multiple choice answer', () => {
-    expect(spy).toHaveBeenCalled();
-    expect(spy.calls.mostRecent().args[0]).toEqual('message');
-    var listener = spy.calls.mostRecent().args[1];
-    var messageEvent = new MessageEvent('message', {
-      data: 'HOSTNAME mockWindow'
-    });
-    listener(messageEvent);
-    expect(ces.getHostname()).toEqual('mockWindow');
-    var messageEvent = new MessageEvent('message', {
-      data: 'SELECT_ITEM_BULLET 2'
-    });
-    listener(messageEvent);
-    expect(mcBoolean).toEqual(true);
-  });
-
-  it('should click submit', () => {
-    expect(spy).toHaveBeenCalled();
-    expect(spy.calls.mostRecent().args[0]).toEqual('message');
-    var listener = spy.calls.mostRecent().args[1];
-    var messageEvent = new MessageEvent('message', {
-      data: 'HOSTNAME mockWindow'
-    });
-    listener(messageEvent);
-    expect(ces.getHostname()).toEqual('mockWindow');
-    var messageEvent = new MessageEvent('message', {
-      data: 'SUBMIT'
-    });
-    listener(messageEvent);
-    expect(continueBoolean).toEqual(true);
-  });
-
-  it('should delete the added element', () => {
-    expect(spy).toHaveBeenCalled();
-    expect(spy.calls.mostRecent().args[0]).toEqual('message');
-    var listener = spy.calls.mostRecent().args[1];
-    var messageEvent = new MessageEvent('message', {
-      data: 'HOSTNAME mockWindow'
-    });
-    listener(messageEvent);
-    expect(ces.getHostname()).toEqual('mockWindow');
-    var messageEvent = new MessageEvent('message', {
-      data: 'ADD_SET 1'
-    });
-    listener(messageEvent);
-    var messageEvent = new MessageEvent('message', {
-      data: 'REMOVE_SET 1'
-    });
-    listener(messageEvent);
-    expect(deleteBoolean).toEqual(true);
-  });
-
-  it('should click the second type of continue button', () => {
-    var suite =
-    wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
-    suite.querySelector(
-      '.oppia-learner-confirm-button').remove();
-    expect(spy).toHaveBeenCalled();
-    expect(spy.calls.mostRecent().args[0]).toEqual('message');
-    var listener = spy.calls.mostRecent().args[1];
-    var messageEvent = new MessageEvent('message', {
-      data: 'HOSTNAME mockWindow'
-    });
-    listener(messageEvent);
-    expect(ces.getHostname()).toEqual('mockWindow');
-    var messageEvent = new MessageEvent('message', {
-      data: 'CONTINUE'
-    });
-    listener(messageEvent);
-    expect(secondaryContinueBoolean).toEqual(true);
+    listener(messageEvent, 'CONTINUE');
+    expect(ClickContinueButton).toHaveBeenCalled();
   });
 
   it('should attempt to send parent ready state', () => {
+    ces.initialize();
     wwms.postMessageToParent = jasmine.createSpy('parentMessage spy');
-    ces.sendParentReadyState(wrf);
+    ces.sendParentReadyState();
     expect(wwms.postMessageToParent)
       .toHaveBeenCalled();
   });
 
   it('should mimic send state to outer frame', () => {
+    ces.initialize();
     expect(spy).toHaveBeenCalled();
     expect(spy.calls.mostRecent().args[0]).toEqual('message');
     var listener = spy.calls.mostRecent().args[1];
@@ -372,14 +96,15 @@ describe('Exploration Player State Service', () => {
     listener(messageEvent);
     wwms.postMessageToParent =
     jasmine.createSpy('parentMessage spy');
-    ces.sendStateToOuterFrame('Continue');
+    ces.sendInteractionToOuterFrame('Continue');
     expect(wwms.postMessageToParent)
       .toHaveBeenCalledWith('CONTINUE', 'mockWindow');
   });
 
   it('should send the cached message after hostname load',
     () => {
-      ces.sendStateToOuterFrame('SetInput');
+      ces.initialize();
+      ces.sendInteractionToOuterFrame('SetInput');
       expect(ces.getCachedOuterFrameMessage()).toEqual('SET_OPERATION');
       expect(spy).toHaveBeenCalled();
       expect(spy.calls.mostRecent().args[0]).toEqual('message');
@@ -396,34 +121,37 @@ describe('Exploration Player State Service', () => {
     });
 
   it('should not send any message', () => {
-    var emptyVal = ces.sendStateToOuterFrame('START_STATE');
+    ces.initialize();
+    var emptyVal = ces.sendInteractionToOuterFrame('START_STATE');
     expect(emptyVal).toEqual(undefined);
   });
 
   it('should do nothing because hostname not set', () => {
+    var clickedContinueButton = false;
+    ces.initialize();
     expect(spy).toHaveBeenCalled();
     expect(spy.calls.mostRecent().args[0]).toEqual('message');
     var listener = spy.calls.mostRecent().args[1];
+    var ClickContinueButton = jasmine.createSpy('fakeClickContinueButton',
+      function(interaction) {
+        clickedContinueButton = true;
+      });
+    ces.registerCallback('CONTINUE', ClickContinueButton);
     var messageEvent = new MessageEvent('message', {
       data: 'CONTINUE'
     });
-    var emptyVal = listener(messageEvent);
-    expect(emptyVal).toEqual(undefined);
+    listener(messageEvent);
+    expect(clickedContinueButton).toEqual(false);
   });
 
-  it('should select the box for item selection', () => {
-    expect(spy).toHaveBeenCalled();
-    expect(spy.calls.mostRecent().args[0]).toEqual('message');
-    var listener = spy.calls.mostRecent().args[1];
-    var messageEvent = new MessageEvent('message', {
-      data: 'HOSTNAME mockWindow'
-    });
-    listener(messageEvent);
-    expect(ces.getHostname()).toEqual('mockWindow');
-    var messageEvent = new MessageEvent('message', {
-      data: 'SELECT_ITEM_CHECKBOX 2'
-    });
-    listener(messageEvent);
-    expect(itemSelectionBoolean).toEqual(true);
+  it('should do nothing because it isn\'t initialized', () => {
+    var sentParentBool = false;
+    ces.sendInteractionToOuterFrame('CONTINUE');
+    wwms.postMessageToParent =
+    jasmine.createSpy('parentMessage spy',
+      function(interaction) {
+        sentParentBool = true;
+      });
+    expect(sentParentBool).toEqual(false);
   });
 });

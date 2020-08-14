@@ -102,6 +102,7 @@ require('services/stateful/focus-manager.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require('pages/exploration-player-page/services/command-executor.service.ts');
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -377,6 +378,7 @@ angular.module('oppia').directive('conversationSkin', [
         'STORY_VIEWER_URL_TEMPLATE',
         'SUPPORTED_SITE_LANGUAGES', 'TWO_CARD_THRESHOLD_PX',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
+        'CommandExecutorService',
         function(
             $http, $location, $rootScope, $scope, $timeout,
             $translate, $window, AlertsService,
@@ -409,7 +411,8 @@ angular.module('oppia').directive('conversationSkin', [
             INTERACTION_SPECS, REVIEW_TESTS_URL_TEMPLATE,
             STORY_VIEWER_URL_TEMPLATE,
             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
-            WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
+            WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
+            CommandExecutorService) {
           var ctrl = this;
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
@@ -689,8 +692,8 @@ angular.module('oppia').directive('conversationSkin', [
           };
           var _addNewCard = function(newCard) {
             PlayerTranscriptService.addNewCard(newCard);
-            $rootScope.$broadcast('newInteractionLoaded',
-              newCard._interaction.id);
+            CommandExecutorService.sendInteractionToOuterFrame(
+              newCard._interaction.id)
 
             var totalNumCards = PlayerTranscriptService.getNumCards();
 
@@ -1189,6 +1192,19 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.showPendingCard();
           };
 
+          $scope.clickContinueButtonFn = function(interaction_id) {
+            console.log('in here')
+            console.log(interaction_id)
+            if (interaction_id === 'CONTINUE') {
+              console.log('continue state')
+              CurrentInteractionService.submitAnswer();
+            } else {
+              console.log('ill show upcoming card')
+              $scope.showUpcomingCard();
+            }
+          }
+
+          CommandExecutorService.registerCallback('CONTINUE', $scope.clickContinueButtonFn)
           var scrollToBottom = function() {
             $timeout(function() {
               var tutorCard = $('.conversation-skin-main-tutor-card');

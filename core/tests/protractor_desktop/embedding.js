@@ -25,6 +25,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var workflow = require('../protractor_utils/workflow.js');
+const { browser } = require('protractor');
 
 describe('Embedding', function() {
   var explorationEditorPage = null;
@@ -35,6 +36,33 @@ describe('Embedding', function() {
   explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+
+  var createContinuePageExploration = async function() {
+    await explorationEditorMainTab.setContent(await forms.toRichText(
+      'hit continue'
+    ));
+    await explorationEditorMainTab.setInteraction('Continue');
+    defaultResponseEditor = await explorationEditorMainTab
+      .getResponseEditor('default');
+    await defaultResponseEditor.setDestination('End Exploration', true, null);
+
+    await explorationEditorMainTab.moveToState('End Exploration');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Congratulations, you have finished!'));
+    await explorationEditorMainTab.setInteraction('EndExploration');
+
+    var title = 'Protractor Test';
+    var category = 'Mathematics';
+    var objective = 'learn how to continue!';
+    await explorationEditorPage.navigateToSettingsTab();
+
+    await explorationEditorSettingsTab.setTitle(title);
+    await explorationEditorSettingsTab.setCategory(category);
+    await explorationEditorSettingsTab.setObjective(objective);
+    await explorationEditorPage.saveChanges('Done!');
+    // Publish changes.
+    await workflow.publishExploration();
+  };
 
   var createCountingExploration = async function() {
     // Intro.
@@ -338,5 +366,58 @@ describe('Embedding', function() {
         '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
         'locale=en#version=0.0.1&secret=';
       await general.checkForConsoleErrors([errorToIgnore]);
+    });
+
+  it('Should use the CommandExecutorService to continue to next page',
+    async function() {
+      var playContinueExploration = async function() {
+        // Protractor's waitForAngularEnabled does not work well inside
+        // iframes. see: https://github.com/angular/protractor/issues/4678
+        // Current, work-around is to use browser.sleep() before executing
+        // functions that require angular to be present inside the iframe.
+        await browser.sleep(5000);
+        await waitFor.pageToFullyLoad();
+        var script =
+          'console.log(document.getElementsByClassName(' +
+          '\'protractor-test-standard\')[0]); ' +
+          'var iframe = div.querySelectorAll(\'iframe\')[0]; ' +
+          'var hostname = window.origin; ' +
+          'var hostnameStr = \'HOSTNAME \' + hostname; ' +
+          'iframe.contentWindow.postMessage(hostnameStr, ' +
+          'iframe.contentWindow.origin); ' +
+          'iframe.contentWindow.postMessage(\'CONTINUE\',' +
+          ' iframe.contentWindow.origin);';
+        await browser.executeScript(script);
+        await explorationPlayerPage.expectExplorationToBeOver();
+      };
+
+      await users.createUser('embedder3@example.com', 'Embedder3');
+      await users.login('embedder3@example.com', true);
+      await workflow.createExploration();
+      var explorationId = await general.getExplorationIdFromEditor();
+      await createContinuePageExploration();
+      var TEST_PAGES = [{
+        filename: 'embedding_tests_dev_0.0.4.html',
+        isVersion1: true
+      }];
+      for (var i = 0; i < TEST_PAGES.length; i++) {
+        var driver = browser.driver;
+        await driver.get(
+          general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
+          TEST_PAGES[i].filename);
+        await (await driver.findElement(by.css(
+          '.protractor-test-exploration-id-input-field')
+        )).sendKeys(explorationId);
+
+        await (await driver.findElement(by.css(
+          '.protractor-test-exploration-id-submit-button')
+        )).click();
+        // Test of standard loading.
+        await browser.switchTo().frame(
+          await driver.findElement(
+            by.css('.protractor-test-standard > iframe')));
+        await playContinueExploration();
+        await browser.switchTo().defaultContent();
+      }
     });
 });

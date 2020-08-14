@@ -43,14 +43,15 @@ angular.module('oppia').component('explorationPlayerPage', {
     'ContextService', '$timeout', 'PageTitleService',
     'ReadOnlyExplorationBackendApiService',
     'CommandExecutorService', 'WindowWrapperMessageService',
-    'WindowRef', '$rootScope',
+    'WindowRef', 'CurrentInteractionService',
     function(
         ContextService, $timeout, PageTitleService,
         ReadOnlyExplorationBackendApiService,
         CommandExecutorService, WindowWrapperMessageService,
-        WindowRef, $rootScope) {
+        WindowRef, CurrentInteractionService) {
       var ctrl = this;
-      var keyword = 'secret';
+      var keyword = 'secret_hostname';
+      var numberOfSetEntries = 0;
       var getUrlParams = function() {
         var urlParams = {};
         var parts = WindowWrapperMessageService.getLocationHref().replace(
@@ -61,19 +62,12 @@ angular.module('oppia').component('explorationPlayerPage', {
       };
       ctrl.$onInit = function() {
         var urlParams = getUrlParams();
-        $rootScope.$on('newInteractionLoaded', function(state, id) {
-          if (urlParams[keyword] !== undefined &&
-            ServicesConstants.WHITELISTED_IFRAME_SECRETS.indexOf(
-              urlParams[keyword]) >= 0) {
-            CommandExecutorService.sendStateToOuterFrame(id);
-          }
-        });
 
         if (urlParams[keyword] !== undefined &&
           ServicesConstants.WHITELISTED_IFRAME_SECRETS.indexOf(
             urlParams[keyword]) >= 0) {
-          CommandExecutorService.initialize(WindowRef);
-          CommandExecutorService.sendParentReadyState(WindowRef);
+          CommandExecutorService.initialize();
+          CommandExecutorService.sendParentReadyState();
         }
 
         var explorationId = ContextService.getExplorationId();

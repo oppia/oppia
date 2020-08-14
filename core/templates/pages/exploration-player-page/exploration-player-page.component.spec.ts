@@ -150,7 +150,7 @@ describe('Exploration player page', function() {
       WindowWrapperMessageService.getLocationHref =
       jasmine.createSpy('parentMessage spy').and.returnValue(
         'https://www.oppia.org/exploration/embed/fake?' +
-        'secret=25b49a7f706348c29c5b3709ee4570bb');
+        'secret_hostname=testSecret');
       CommandExecutorService.initialize = jasmine.createSpy(
         'outerFrameEvents spy');
 
@@ -162,12 +162,12 @@ describe('Exploration player page', function() {
     });
 
   it('should indicate readiness for parent to send host state' +
-    ' through command executor sendStateToOuterFrame method',
+    ' through command executor sendParentReadyState method',
   function() {
     WindowWrapperMessageService.getLocationHref =
     jasmine.createSpy('parentMessage spy').and.returnValue(
       'https://www.oppia.org/exploration/embed/fake?' +
-      'secret=25b49a7f706348c29c5b3709ee4570bb');
+      'secret_hostname=25b49a7f706348c29c5b3709ee4570bb');
     CommandExecutorService.sendParentReadyState = jasmine.createSpy(
       'sendParentReadyState spy');
 
@@ -176,23 +176,5 @@ describe('Exploration player page', function() {
 
     expect(CommandExecutorService.sendParentReadyState)
       .toHaveBeenCalled();
-  });
-
-  it('should broadcast player state when newInteractionLoaded' +
-    'is received', function() {
-    WindowWrapperMessageService.getLocationHref =
-      jasmine.createSpy('parentMessage spy').and.returnValue(
-        'https://www.oppia.org/exploration/embed/fake?' +
-        'secret=25b49a7f706348c29c5b3709ee4570bb');
-    CommandExecutorService.sendStateToOuterFrame = jasmine.createSpy(
-      'sendStateToOuterFrame spy');
-
-    ctrl.$onInit();
-    $scope.$apply();
-
-    $rootScope.$broadcast('newInteractionLoaded', 'CONTINUE');
-    $rootScope.$apply();
-    $scope.$apply();
-    expect(CommandExecutorService.sendStateToOuterFrame).toHaveBeenCalled();
   });
 });
