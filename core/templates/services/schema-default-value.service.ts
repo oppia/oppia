@@ -34,21 +34,25 @@ interface BoolSchema {
 
 interface UnicodeSchema {
   type: 'unicode';
+  // 'choices' are optional because they may not be present in the schema.
   choices?: string[];
 }
 
 interface HtmlSchema {
   type: 'html';
+  // 'choices' are optional because they may not be present in the schema.
   choices?: string[];
 }
 
 interface IntSchema {
   type: 'int';
+  // 'choices' are optional because they may not be present in the schema.
   choices?: number[];
 }
 
 interface FloatSchema {
   type: 'float';
+  // 'choices' are optional because they may not be present in the schema.
   choices?: number[];
 }
 

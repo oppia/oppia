@@ -90,465 +90,6 @@ def run_job_for_deleted_exp(
         self.assertEqual(job_class.get_output(job_id), [])
 
 
-class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(DragAndDropSortInputInteractionOneOffJobTests, self).setUp()
-
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
-
-    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
-        """Checks output pairs are produced only for
-        desired interactions.
-        """
-        owner = user_services.UserActionsInfo(self.albert_id)
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1', 'State2'])
-
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-
-
-        customization_args_dict1 = {
-            'choices': {'value': [{
-                'html': '<p>This is value1 for DragAndDropSortInput</p>',
-                'content_id': 'ca_choices_0'
-            }, {
-                'html': '<p>This is value2 for DragAndDropSortInput</p>',
-                'content_id': 'ca_choices_1'
-            }]},
-            'allowMultipleItemsInSamePosition': {'value': True}
-        }
-
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [['a'], ['b']]}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback1',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        customization_args_dict2 = {
-            'choices': {'value': [{
-                'html': '<p>This is value1 for DragAndDropSortInput</p>',
-                'content_id': 'ca_choices_0'
-            }, {
-                'html': '<p>This is value2 for DragAndDropSortInput</p>',
-                'content_id': 'ca_choices_1'
-            }]},
-            'allowMultipleItemsInSamePosition': {'value': True}
-        }
-
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': []
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [['a']]}
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': '',
-                    'y': ''
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': []}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }, {
-            'rule_specs': [{
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': '',
-                    'y': 1
-                }
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': 'a',
-                    'y': 2
-                }
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback2',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state1.update_interaction_id('DragAndDropSortInput')
-        state1.update_interaction_customization_args(customization_args_dict1)
-        state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list1)
-        exp_services.save_new_exploration(self.albert_id, exploration)
-        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
-
-        # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
-        job_id = (
-            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
-            .create_new())
-        exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
-            .get_output(job_id))
-        self.assertEqual(actual_output, [])
-
-        state2.update_interaction_id('DragAndDropSortInput')
-        state2.update_interaction_customization_args(customization_args_dict2)
-        state2.update_next_content_id_index(2)
-        state2.update_interaction_answer_groups(answer_group_list2)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
-
-        # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
-        job_id = (
-            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
-            .create_new())
-        exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
-            .get_output(job_id))
-        expected_output = [(
-            u'[u\'exp_id0\', [u"[u\'State name: State2, AnswerGroup: 0, Rule '
-            'input x in rule with index 0 is empty. \', u\'State name: State2,'
-            ' AnswerGroup: 0, Rule input y in rule with index 2 is empty. \', '
-            'u\'State name: State2, AnswerGroup: 0, Rule input x in rule with '
-            'index 2 is empty. \', u\'State name: State2, AnswerGroup: 0, Rule'
-            ' input x in rule with index 3 is empty. \', u\'State name: State2'
-            ', AnswerGroup: 1, Rule input x in rule with index 0 is empty. \']'
-            '"]]'
-        )]
-        self.assertEqual(actual_output, expected_output)
-
-        rights_manager.unpublish_exploration(self.admin, self.VALID_EXP_ID)
-        # Start DragAndDropSortInputInteractionOneOffJob on private
-        # exploration.
-        job_id = (
-            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
-            .create_new())
-        exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-        actual_output = (
-            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
-            .get_output(job_id))
-        self.assertEqual(actual_output, [])
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        state1 = exploration.states['State1']
-
-        state1.update_interaction_id('DragAndDropSortInput')
-
-        customization_args_dict = {
-            'choices': {'value': [{
-                'html': '<p>This is value1 for DragAndDropSortInput</p>',
-                'content_id': 'ca_choices_0'
-            }, {
-                'html': '<p>This is value2 for DragAndDropSortInput</p>',
-                'content_id': 'ca_choices_1'
-            }]},
-            'allowMultipleItemsInSamePosition': {'value': True}
-        }
-
-        answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': []}
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': []}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state1.update_interaction_customization_args(customization_args_dict)
-        state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob)
-
-
-class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(MultipleChoiceInteractionOneOffJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
-
-    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
-        """Checks output pairs are produced only for
-        desired interactions.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1', 'State2'])
-
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-
-        customization_args_dict1 = {
-            'choices': {'value': [{
-                'html': '<p>This is value1 for MultipleChoiceInput</p>',
-                'content_id': 'ca_choices_0'
-            }, {
-                'html': '<p>This is value2 for MultipleChoiceInput</p>',
-                'content_id': 'ca_choices_1'
-            }]},
-            'showChoicesInShuffledOrder': {'value': True}
-        }
-
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': '1'}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state1.update_interaction_id('MultipleChoiceInput')
-        state1.update_interaction_customization_args(customization_args_dict1)
-        state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list1)
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start MultipleChoiceInteractionOneOffJob job on sample exploration.
-        job_id = exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.create_new(
-        )
-        exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.get_output(
-                job_id))
-        self.assertEqual(actual_output, [])
-
-        customization_args_dict2 = {
-            'choices': {'value': [{
-                'html': '<p>This is value1 for MultipleChoiceInput</p>',
-                'content_id': 'ca_choices_0'
-            }, {
-                'html': '<p>This is value2 for MultipleChoiceInput</p>',
-                'content_id': 'ca_choices_1'
-            }, {
-                'html': '<p>This is value3 for MultipleChoiceInput</p>',
-                'content_id': 'ca_choices_2'
-            }, {
-                'html': '<p>This is value4 for MultipleChoiceInput</p>',
-                'content_id': 'ca_choices_3'
-            }]},
-            'showChoicesInShuffledOrder': {'value': True}
-        }
-
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': '0'}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': '9007199254740991'}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state2.update_interaction_id('MultipleChoiceInput')
-        state2.update_interaction_customization_args(customization_args_dict2)
-        state2.update_next_content_id_index(4)
-        state2.update_interaction_answer_groups(answer_group_list2)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start MultipleChoiceInteractionOneOffJob job on sample exploration.
-        job_id = exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.create_new(
-        )
-        exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.get_output(
-                job_id))
-        expected_output = [(
-            u'[u\'exp_id0\', '
-            u'[u\'State name: State2, AnswerGroup: 0, Rule: 1 is invalid.' +
-            '(Indices here are 0-indexed.)\']]'
-        )]
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        state1 = exploration.states['State1']
-
-        state1.update_interaction_id('MultipleChoiceInput')
-
-        customization_args_dict = {
-            'choices': {'value': [{
-                'html': '<p>This is value1 for MultipleChoiceInput</p>',
-                'content_id': 'ca_choices_0'
-            }, {
-                'html': '<p>This is value2 for MultipleChoiceInput</p>',
-                'content_id': 'ca_choices_1'
-            }]},
-            'showChoicesInShuffledOrder': {'value': True}
-        }
-
-        answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': '0'}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': '9007199254740991'}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state1.update_interaction_customization_args(customization_args_dict)
-        state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.MultipleChoiceInteractionOneOffJob)
-
-
 class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -581,17 +122,14 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'IsMathematicallyEquivalentTo': [{
                     'x': 'x+y'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }, {
-                'inputs': {
+                }, {
                     'x': 'x=y'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
@@ -690,10 +228,12 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('MathExpressionInput')
 
         answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'y=mx+c\']'}
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'IsMathematicallyEquivalentTo': [{
+                    'x': u'[\'y=mx+c\']'
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -1440,213 +980,6 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
              % (self.VALID_EXP_ID)])
 
 
-class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(ItemSelectionInteractionOneOffJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
-
-    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
-        """Checks (exp, state) pairs are produced only for
-        desired interactions.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1', 'State2'])
-
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-
-        customization_args_dict1 = {
-            'choices': {'value': [{
-                'html': '<p>This is value1 for ItemSelection</p>',
-                'content_id': 'ca_choices_0'
-            }, {
-                'html': '<p>This is value2 for ItemSelection</p>',
-                'content_id': 'ca_choices_1'
-            }]},
-            'minAllowableSelectionCount': {'value': 0},
-            'maxAllowableSelectionCount': {'value': 1}
-        }
-
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value2 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state1.update_interaction_id('ItemSelectionInput')
-        state1.update_interaction_customization_args(customization_args_dict1)
-        state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list1)
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start ItemSelectionInteractionOneOff job on sample exploration.
-        job_id = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.create_new()
-        exp_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(
-                job_id))
-        self.assertEqual(actual_output, [])
-
-        customization_args_dict2 = {
-            'choices': {'value': [{
-                'html': '<p>This is value1 for ItemSelection</p>',
-                'content_id': 'ca_choices_0'
-            }, {
-                'html': '<p>This is value2 for ItemSelection</p>',
-                'content_id': 'ca_choices_1'
-            }]},
-            'minAllowableSelectionCount': {'value': 0},
-            'maxAllowableSelectionCount': {'value': 1}
-        }
-
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value3 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state2.update_interaction_id('ItemSelectionInput')
-        state2.update_interaction_customization_args(customization_args_dict2)
-        state2.update_next_content_id_index(2)
-        state2.update_interaction_answer_groups(answer_group_list2)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start ItemSelectionInteractionOneOff job on sample exploration.
-        job_id = exp_jobs_one_off.ItemSelectionInteractionOneOffJob.create_new()
-        exp_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ItemSelectionInteractionOneOffJob.get_output(
-                job_id))
-        expected_output = [(
-            u'[u\'exp_id0\', '
-            u'[u\'State2: <p>This is value3 for ItemSelection</p>\']]'
-        )]
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        state1 = exploration.states['State1']
-
-        state1.update_interaction_id('ItemSelectionInput')
-
-        customization_args_dict = {
-            'choices': {'value': [{
-                'html': '<p>This is value1 for ItemSelection</p>',
-                'content_id': 'ca_choices_0'
-            }, {
-                'html': '<p>This is value2 for ItemSelection</p>',
-                'content_id': 'ca_choices_1'
-            }]},
-            'minAllowableSelectionCount': {'value': 0},
-            'maxAllowableSelectionCount': {'value': 1}
-        }
-
-        answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value3 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state1.update_interaction_customization_args(customization_args_dict)
-        state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.ItemSelectionInteractionOneOffJob)
-
-
 class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -2143,168 +1476,6 @@ class ExplorationContentValidationJobForCKEditorTests(
         self.assertEqual(actual_output, expected_output)
 
 
-class InteractionCustomizationArgsValidationJobTests(
-        test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(
-            InteractionCustomizationArgsValidationJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
-
-    def test_for_customization_arg_validation_job(self):
-        """Validates customization args for rich text components."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exploration.add_states(['State1', 'State2', 'State3'])
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-        state3 = exploration.states['State3']
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-tabs tab_contents-with-value="'
-                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
-                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
-                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
-                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
-                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
-                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
-                '</oppia-noninteractive-tabs>'
-            )
-        }
-        default_outcome2 = state_domain.Outcome(
-            'State1',
-            state_domain.SubtitledHtml(
-                'default_outcome',
-                (
-                    '<p><oppia-noninteractive-link text-with-value="'
-                    '&amp;quot;What is a link?&amp;quot;" url-with-'
-                    'value="&amp;quot;htt://link.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>'
-                )
-            ), False, [], None, None
-        )
-        content3_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-                'circle divided into equal fifths.&amp;quot;" '
-                'caption-with-value="&amp;quot;Hello&amp;quot;" '
-                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-                '</oppia-noninteractive-image>'
-            )
-        }
-
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(
-                state_domain.SubtitledHtml.from_dict(content1_dict))
-            state2.update_interaction_default_outcome(default_outcome2)
-            state3.update_content(
-                state_domain.SubtitledHtml.from_dict(content3_dict))
-            exp_services.save_new_exploration(self.albert_id, exploration)
-
-            # Start CustomizationArgsValidation job on sample exploration.
-            job_id = (
-                exp_jobs_one_off
-                .InteractionCustomizationArgsValidationJob.create_new())
-            exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
-                job_id)
-            self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.get_output(job_id))
-
-        expected_output = [(
-            '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
-            'https://\'; received htt://link.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
-            'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
-            '&amp;quot;"></oppia-noninteractive-link></p>\', '
-            'u\'Exp Id: exp_id0\']]'
-        ), (
-            '[u\'Invalid filepath\', '
-            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-            'circle divided into equal fifths.&amp;quot;" caption-with-value'
-            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
-            'png&amp;quot;"></oppia-noninteractive-image>\', '
-            'u\'Exp Id: exp_id0\']]'
-        )]
-
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        content_dict = {
-            'html': (
-                '<p><oppia-noninteractive-link text-with-value="'
-                '&amp;quot;What is a link?&amp;quot;" url-with-'
-                'value="&amp;quot;htt://link.com&amp'
-                ';quot;"></oppia-noninteractive-link></p>'
-            ),
-            'content_id': 'content'
-        }
-
-        state1 = exploration.states['State1']
-
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(
-                state_domain.SubtitledHtml.from_dict(content_dict))
-            exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self,
-            exp_jobs_one_off.InteractionCustomizationArgsValidationJob)
-
-    def test_validation_job_fails_for_invalid_schema_version(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
-        exploration_model.states_schema_version = 100
-        exploration_model.commit(
-            self.albert_id, 'Changed states_schema_version.', [])
-        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
-
-        job_id = (
-            exp_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.create_new())
-        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.get_output(job_id))
-        expected_output = [
-            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
-            'exploration state schemas at present. when loading exploration\', '
-            '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
-
-        self.assertEqual(actual_output, expected_output)
-
-
 class ExplorationMathSvgFilenameValidationOneOffJobTests(
         test_utils.GenericTestBase):
 
@@ -2383,34 +1554,31 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': invalid_html_content2,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': invalid_html_content1,
                     'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [invalid_html_content1]
+                    ]
+                }, {
+                    'x': [
+                        [invalid_html_content2]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [invalid_html_content1]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2675,34 +1843,31 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content,
                     'y': valid_html_content
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2868,34 +2033,31 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content,
                     'y': valid_html_content
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -3016,59 +2178,50 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content1]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content1,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content1]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content2,
                     'y': valid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content2]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [valid_html_content1]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content1]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content2]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
         item_selection_answer_group = {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
-                    'x': [valid_html_content3]
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'ContainsAtLeastOneOf': [{
                     'x': [valid_html_content1]
-                }
-            }, {
-                'rule_type': 'IsProperSubsetOf',
-                'inputs': {
-                    'x': [valid_html_content3]
-                }
-            }, {
-                'rule_type': 'DoesNotContainAtLeastOneOf',
-                'inputs': {
+                }],
+                'DoesNotContainAtLeastOneOf': [{
                     'x': [valid_html_content1]
-                }
-            }],
+                }],
+                'Equals': [{
+                    'x': [valid_html_content3]
+                }],
+                'IsProperSubsetOf': [{
+                    'x': [valid_html_content3]
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -3351,4 +2504,305 @@ class ExplorationMathRichTextInfoModelDeletionOneOffJobTests(
 
         expected_output = (
             [u'[u\'model_deleted\', [u\'3 models successfully delelted.\']]'])
+        self.assertEqual(actual_output, expected_output)
+
+
+class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            RTECustomizationArgsValidationOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_customization_arg_validation_job_with_single_exp(self):
+        """Check expected errors are produced for invalid html strings in RTE
+        components for a single exploration.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-tabs tab_contents-with-value="'
+                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
+                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
+                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
+                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
+                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
+                '</oppia-noninteractive-tabs>'
+            )
+        }
+        default_outcome2 = state_domain.Outcome(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;What is a link?&amp;quot;" url-with-'
+                    'value="&amp;quot;htt://link.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>'
+                )
+            ), False, [], None, None
+        )
+        content3_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="&amp;quot;Hello&amp;quot;" '
+                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            )
+        }
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_interaction_default_outcome(default_outcome2)
+            state3.update_content(
+                state_domain.SubtitledHtml.from_dict(content3_dict))
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            # Start CustomizationArgsValidation job on sample exploration.
+            job_id = (
+                exp_jobs_one_off
+                .RTECustomizationArgsValidationOneOffJob.create_new(
+                    ))
+            (
+                exp_jobs_one_off
+                .RTECustomizationArgsValidationOneOffJob.enqueue(
+                    job_id))
+            self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .RTECustomizationArgsValidationOneOffJob.get_output(
+                job_id))
+        expected_output = [(
+            '[u\'Invalid filepath\', '
+            '[[u\'Exp ID: exp_id0\', u\'<oppia-noninteractive-image '
+            'alt-with-value="&amp;quot;A circle divided into equal fifths.'
+            '&amp;quot;" caption-with-value="&amp;quot;Hello&amp;quot;" '
+            'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+            '</oppia-noninteractive-image>\']]]'
+        ), (
+            '[u"Invalid URL: Sanitized URL should start with \'http://\' '
+            'or \'https://\'; received htt://link.com", '
+            '[[u\'Exp ID: exp_id0\', u\'<p><oppia-noninteractive-link '
+            'text-with-value="&amp;quot;What is a link?&amp;quot;" '
+            'url-with-value="&amp;quot;htt://link.com&amp;quot;">'
+            '</oppia-noninteractive-link></p>\']]]')]
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_for_customization_arg_validation_job_with_multiple_exp(self):
+        """Check expected errors are produced for invalid html strings in RTE
+        components for multiple explorations.
+        """
+
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration1.add_states(['State1', 'State2', 'State3'])
+        exp1_state1 = exploration1.states['State1']
+        exp1_state2 = exploration1.states['State2']
+        exp1_state3 = exploration1.states['State3']
+        exp1_content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-tabs tab_contents-with-value="'
+                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
+                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
+                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
+                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
+                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
+                '</oppia-noninteractive-tabs>'
+            )
+        }
+        exp1_default_outcome2 = state_domain.Outcome(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;What is a link?&amp;quot;" url-with-'
+                    'value="&amp;quot;htt://link.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>'
+                )
+            ), False, [], None, None
+        )
+        exp1_content3_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="&amp;quot;Hello&amp;quot;" '
+                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            )
+        }
+
+        exploration2 = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title='title', category='category')
+        exploration2.add_states(['State1', 'State2'])
+        exp2_state1 = exploration2.states['State1']
+        exp2_content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="&amp;quot;Hello&amp;quot;" '
+                'filepath-with-value="&amp;quot;123png&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            )
+        }
+        exp2_default_outcome1 = state_domain.Outcome(
+            'State2',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;Test link?&amp;quot;" url-with-'
+                    'value="&amp;quot;test.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>'
+                )
+            ), False, [], None, None
+        )
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            exp1_state1.update_content(
+                state_domain.SubtitledHtml.from_dict(exp1_content1_dict))
+            exp1_state2.update_interaction_default_outcome(
+                exp1_default_outcome2)
+            exp1_state3.update_content(
+                state_domain.SubtitledHtml.from_dict(exp1_content3_dict))
+            exp_services.save_new_exploration(self.albert_id, exploration1)
+
+            exp2_state1.update_content(
+                state_domain.SubtitledHtml.from_dict(exp2_content1_dict))
+            exp2_state1.update_interaction_default_outcome(
+                exp2_default_outcome1)
+            exp_services.save_new_exploration(self.albert_id, exploration2)
+
+            # Start CustomizationArgsValidation job on sample exploration.
+            job_id = (
+                exp_jobs_one_off
+                .RTECustomizationArgsValidationOneOffJob.create_new(
+                    ))
+            (
+                exp_jobs_one_off
+                .RTECustomizationArgsValidationOneOffJob.enqueue(
+                    job_id))
+            self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .RTECustomizationArgsValidationOneOffJob.get_output(
+                job_id))
+        expected_output = [(
+            '[u"Invalid URL: Sanitized URL should start with \'http://\' '
+            'or \'https://\'; received htt://link.com", '
+            '[[u\'Exp ID: exp_id0\', '
+            'u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;'
+            'What is a link?&amp;quot;" url-with-value="&amp;quot;htt://'
+            'link.com&amp;quot;"></oppia-noninteractive-link></p>\']]]'
+        ), (
+            '[u"Invalid URL: Sanitized URL should start with \'http://\' '
+            'or \'https://\'; received test.com", [[u\'Exp ID: exp_id1\', '
+            'u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
+            'link?&amp;quot;" url-with-value="&amp;quot;test.com&amp;quot;">'
+            '</oppia-noninteractive-link></p>\']]]'
+        ), (
+            '[u\'Invalid filepath\', [[u\'Exp ID: exp_id0\', '
+            'u\'<oppia-noninteractive-image alt-with-value="&amp;quot;'
+            'A circle divided into equal fifths.&amp;quot;" '
+            'caption-with-value="&amp;quot;Hello&amp;quot;" '
+            'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+            '</oppia-noninteractive-image>\'], '
+            '[u\'Exp ID: exp_id1\', '
+            'u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A circle '
+            'divided into equal fifths.&amp;quot;" caption-with-value='
+            '"&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;'
+            '123png&amp;quot;"></oppia-noninteractive-image>\']]]')]
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': (
+                '<p><oppia-noninteractive-link text-with-value="'
+                '&amp;quot;What is a link?&amp;quot;" url-with-'
+                'value="&amp;quot;htt://link.com&amp'
+                ';quot;"></oppia-noninteractive-link></p>'
+            ),
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content_dict))
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off
+            .RTECustomizationArgsValidationOneOffJob)
+
+    def test_validation_job_fails_for_invalid_schema_version(self):
+        """Test that invalid schema version results in job failure."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        exploration_model.states_schema_version = 100
+        exploration_model.commit(
+            self.albert_id, 'Changed states_schema_version.', [])
+        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+
+        job_id = (
+            exp_jobs_one_off
+            .RTECustomizationArgsValidationOneOffJob.create_new())
+        (
+            exp_jobs_one_off
+            .RTECustomizationArgsValidationOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .RTECustomizationArgsValidationOneOffJob.get_output(
+                job_id))
+        expected_output = [
+            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
+            'exploration state schemas at present. when loading exploration\', '
+            '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
+
         self.assertEqual(actual_output, expected_output)

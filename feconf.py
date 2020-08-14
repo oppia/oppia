@@ -210,7 +210,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 38
+CURRENT_STATE_SCHEMA_VERSION = 39
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -477,6 +477,9 @@ ENABLE_RECORDING_OF_SCORES = False
 
 # No. of pretest questions to display.
 NUM_PRETEST_QUESTIONS = 3
+
+# Maximum allowed commit message length for SnapshotMetadata models.
+MAX_COMMIT_MESSAGE_LENGTH = 1000
 
 # Whether to automatically accept suggestions after a threshold time.
 ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
