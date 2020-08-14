@@ -56,12 +56,19 @@ describe('MusicNotesInputValidationService', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     });
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      currentState, {
+        sequenceToGuess: {
+          value: []
+        },
+        initialSequence: {
+          value: []
+        }
+      }, goodAnswerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 });
