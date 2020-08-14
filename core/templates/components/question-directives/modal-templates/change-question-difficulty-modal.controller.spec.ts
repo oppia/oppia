@@ -39,9 +39,10 @@ describe('Change Question Difficulty Modal Controller', function() {
     });
   }));
 
-  it('should init the constiables', function() {
-    expect($scope.linkedSkillsWithDifficulty).toBe(
-      linkedSkillsWithDifficulty);
-    expect($scope.skillIdToRubricsObject).toBe(skillIdToRubricsObject);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.linkedSkillsWithDifficulty).toBe(
+        linkedSkillsWithDifficulty);
+      expect($scope.skillIdToRubricsObject).toBe(skillIdToRubricsObject);
+    });
 });

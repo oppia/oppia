@@ -117,7 +117,7 @@ describe('Param Changes Editor Component', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluate $scope properties after controller initialization',
+  it('should initialize $scope properties after controller is initialized',
     function() {
       expect($scope.isParamChangesEditorOpen).toBe(false);
       expect($scope.warningText).toBe('');

@@ -289,7 +289,8 @@ describe('Learner dashboard page', function() {
       $scope.$apply();
     }));
 
-    it('should evaluate information get from backend', function() {
+    it('should initialize correctly controller properties after its' +
+    ' initialization and get data from backend', function() {
       expect(ctrl.profilePictureDataUrl).toBe(profilePictureDataUrl);
       expect(ctrl.username).toBe(userInfo.getUsername());
 
@@ -298,7 +299,7 @@ describe('Learner dashboard page', function() {
       expect(ctrl.noActivity).toBe(false);
     });
 
-    it('should start collection playlist sortable options', function() {
+    it('should set ui height when sorting collection playlist ', function() {
       var mockedUi = {
         placeholder: {
           height: (setHeight) => {
@@ -318,20 +319,21 @@ describe('Learner dashboard page', function() {
       expect(mockedUi.placeholder.height).toHaveBeenCalled();
     });
 
-    it('should sort collection playlist sortable options', function() {
-      var mockedUi = {
-        helper: {
-          css: () => {}
-        }
-      };
-      spyOn(mockedUi.helper, 'css').and.callThrough();
+    it('should set ui top to 0 when stop collection playlist sorting',
+      function() {
+        var mockedUi = {
+          helper: {
+            css: () => {}
+          }
+        };
+        spyOn(mockedUi.helper, 'css').and.callThrough();
 
-      ctrl.collectionPlaylistSortableOptions.stop(null, null);
-      ctrl.collectionPlaylistSortableOptions.sort(null, mockedUi);
-      expect(mockedUi.helper.css).toHaveBeenCalledWith({top: '0 px'});
-    });
+        ctrl.collectionPlaylistSortableOptions.stop(null, null);
+        ctrl.collectionPlaylistSortableOptions.sort(null, mockedUi);
+        expect(mockedUi.helper.css).toHaveBeenCalledWith({top: '0 px'});
+      });
 
-    it('should update collection playlist sortable options', function() {
+    it('should sort collection playlist by index', function() {
       var mockedUi = {
         item: {
           sortable: {
@@ -349,31 +351,14 @@ describe('Learner dashboard page', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('should update exploration playlist sortable options', function() {
-      var mockedUi = {
-        item: {
-          sortable: {
-            index: 1
-          }
-        }
-      };
-      $httpBackend.expect(
-        'POST', '/learnerplaylistactivityhandler/exploration/' +
-        (mockedUi.item.sortable.index + 1)).respond(200);
-      ctrl.explorationPlaylistSortableOptions.update(null, mockedUi);
-      $httpBackend.flush();
-
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-    });
-
     it('should get static image url', function() {
       var imagePath = '/path/to/image.png';
       expect(ctrl.getStaticImageUrl(imagePath)).toBe(
         '/assets/images/path/to/image.png');
     });
 
-    it('should set active section successfully', function() {
+    it('should set a new section as active when fetching message summary' +
+      ' list from backend', function() {
       var threadStatus = 'open';
       var explorationId = 'exp1';
       var threadId = 'thread_1';
@@ -414,31 +399,34 @@ describe('Learner dashboard page', function() {
       expect(ctrl.feedbackThreadActive).toBe(false);
     });
 
-    it('should set active subsection successfully', function() {
-      // Active subsection is set as I18N_DASHBOARD_EXPLORATIONS when controller
-      // is initialized.
-      expect(ctrl.activeSubsection).toBe('I18N_DASHBOARD_EXPLORATIONS');
+    it('should toggle active subsection type when changing subsection type',
+      function() {
+        // Active subsection is set as I18N_DASHBOARD_EXPLORATIONS when
+        // controller is initialized.
+        expect(ctrl.activeSubsection).toBe('I18N_DASHBOARD_EXPLORATIONS');
 
-      var newActiveSubsection = 'I18N_DASHBOARD_COLLECTIONS';
-      ctrl.setActiveSubsection(newActiveSubsection);
-      expect(ctrl.activeSubsection).toBe(newActiveSubsection);
+        var newActiveSubsection = 'I18N_DASHBOARD_COLLECTIONS';
+        ctrl.setActiveSubsection(newActiveSubsection);
+        expect(ctrl.activeSubsection).toBe(newActiveSubsection);
 
-      var newActiveSubsection2 = 'I18N_DASHBOARD_EXPLORATIONS';
-      ctrl.setActiveSubsection(newActiveSubsection2);
-      expect(ctrl.activeSubsection).toBe(newActiveSubsection2);
-    });
+        var newActiveSubsection2 = 'I18N_DASHBOARD_EXPLORATIONS';
+        ctrl.setActiveSubsection(newActiveSubsection2);
+        expect(ctrl.activeSubsection).toBe(newActiveSubsection2);
+      });
 
-    it('should get exploration url', function() {
+    it('should get the correct exploration page URL corresponding to a given' +
+      ' exploration ID.', function() {
       expect(ctrl.getExplorationUrl('1')).toBe('/explore/1');
       expect(ctrl.getExplorationUrl()).toBe('/explore/undefined');
     });
 
-    it('should get collection url', function() {
+    it('should get the correct collection page URL corresponding to a given' +
+      ' collection ID.', function() {
       expect(ctrl.getCollectionUrl('1')).toBe('/collection/1');
       expect(ctrl.getCollectionUrl()).toBe('/collection/undefined');
     });
 
-    it('should check if application is being used on a mobile', function() {
+    it('should detect when application is being used on a mobile', function() {
       // This approach was choosen because spyOn() doesn't work on properties
       // that doesn't have a get access type.
       // Without this approach the test will fail because it'll throw
@@ -462,100 +450,120 @@ describe('Learner dashboard page', function() {
       expect(ctrl.showUsernamePopover('abc')).toBe('none');
     });
 
-    it('should go to through pages of incomplete explorations', function() {
-      var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
+    it('should change page when going through pages of incomplete explorations',
+      function() {
+        var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+        var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
 
-      expect(ctrl.startIncompleteExpIndex).toBe(0);
+        expect(ctrl.startIncompleteExpIndex).toBe(0);
 
-      ctrl.goToNextPage(section, subsection);
-      expect(ctrl.startIncompleteExpIndex).toBe(8);
+        ctrl.goToNextPage(section, subsection);
+        expect(ctrl.startIncompleteExpIndex).toBe(8);
 
-      ctrl.goToPreviousPage(section, subsection);
-      expect(ctrl.startIncompleteExpIndex).toBe(0);
+        ctrl.goToPreviousPage(section, subsection);
+        expect(ctrl.startIncompleteExpIndex).toBe(0);
+      });
+
+    it('should change page when going through pages of incomplete collections',
+      function() {
+        var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+        var subsection = 'I18N_DASHBOARD_COLLECTIONS';
+
+        expect(ctrl.startIncompleteCollectionIndex).toBe(0);
+
+        ctrl.goToNextPage(section, subsection);
+        expect(ctrl.startIncompleteCollectionIndex).toBe(8);
+
+        ctrl.goToPreviousPage(section, subsection);
+        expect(ctrl.startIncompleteCollectionIndex).toBe(0);
+      });
+
+    it('should change page when going through pages of complete explorations',
+      function() {
+        var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
+        var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
+
+        var completedExplorations = learnerDashboardData
+          .completed_explorations_list.map(
+            expSummary => learnerExplorationSummaryObjectFactory
+              .createFromBackendDict(expSummary));
+
+        expect(ctrl.startCompletedExpIndex).toBe(0);
+        expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
+          .toEqual(completedExplorations.slice(0, 8));
+
+        ctrl.goToNextPage(section, subsection);
+        expect(ctrl.startCompletedExpIndex).toBe(8);
+        expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
+          .toEqual(completedExplorations.slice(8));
+
+        ctrl.goToPreviousPage(section, subsection);
+        expect(ctrl.startCompletedExpIndex).toBe(0);
+        expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
+          .toEqual(completedExplorations.slice(0, 8));
+      });
+
+    it('should change page when going through pages of completed collections',
+      function() {
+        var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
+        var subsection = 'I18N_DASHBOARD_COLLECTIONS';
+
+        expect(ctrl.startCompletedCollectionIndex).toBe(0);
+
+        ctrl.goToNextPage(section, subsection);
+        expect(ctrl.startCompletedCollectionIndex).toBe(8);
+
+        ctrl.goToPreviousPage(section, subsection);
+        expect(ctrl.startCompletedCollectionIndex).toBe(0);
+      });
+
+    it('should change explorations sorting options by title when changing' +
+      ' sorting type', function() {
+      ctrl.setExplorationsSortingOptions('title');
+      expect(ctrl.currentExpSortType).toBe('title');
+      expect(ctrl.isCurrentExpSortDescending).toBe(true);
     });
 
-    it('should go to through pages of incomplete collections', function() {
-      var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      var subsection = 'I18N_DASHBOARD_COLLECTIONS';
-
-      expect(ctrl.startIncompleteCollectionIndex).toBe(0);
-
-      ctrl.goToNextPage(section, subsection);
-      expect(ctrl.startIncompleteCollectionIndex).toBe(8);
-
-      ctrl.goToPreviousPage(section, subsection);
-      expect(ctrl.startIncompleteCollectionIndex).toBe(0);
-    });
-
-    it('should go to through page of completed explorations', function() {
-      var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
-      var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
-
-      var completedExplorations = learnerDashboardData
-        .completed_explorations_list.map(
-          expSummary => learnerExplorationSummaryObjectFactory
-            .createFromBackendDict(expSummary));
-
-      expect(ctrl.startCompletedExpIndex).toBe(0);
-      expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
-        .toEqual(completedExplorations.slice(0, 8));
-
-      ctrl.goToNextPage(section, subsection);
-      expect(ctrl.startCompletedExpIndex).toBe(8);
-      expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
-        .toEqual(completedExplorations.slice(8));
-
-      ctrl.goToPreviousPage(section, subsection);
-      expect(ctrl.startCompletedExpIndex).toBe(0);
-      expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
-        .toEqual(completedExplorations.slice(0, 8));
-    });
-
-    it('should go to through page of completed collections', function() {
-      var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
-      var subsection = 'I18N_DASHBOARD_COLLECTIONS';
-
-      expect(ctrl.startCompletedCollectionIndex).toBe(0);
-
-      ctrl.goToNextPage(section, subsection);
-      expect(ctrl.startCompletedCollectionIndex).toBe(8);
-
-      ctrl.goToPreviousPage(section, subsection);
-      expect(ctrl.startCompletedCollectionIndex).toBe(0);
-    });
-
-    it('should set explorations sorting options', function() {
+    it('should change explorations sorting options by last played when' +
+      ' changing sorting type', function() {
       expect(ctrl.isCurrentExpSortDescending).toBe(true);
       expect(ctrl.currentExpSortType).toBe('last_played');
       ctrl.setExplorationsSortingOptions('last_played');
       expect(ctrl.isCurrentExpSortDescending).toBe(false);
-
-      ctrl.setExplorationsSortingOptions('title');
-      expect(ctrl.currentExpSortType).toBe('title');
     });
 
-    it('should set subscription sorting options', function() {
+    it('should change subscription sorting options by username when changing' +
+      ' sorting type', function() {
       expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
       expect(ctrl.currentSubscribersSortType).toBe('username');
       ctrl.setSubscriptionSortingOptions('username');
       expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
-
-      ctrl.setSubscriptionSortingOptions('impact');
-      expect(ctrl.currentSubscribersSortType).toBe('impact');
     });
 
-    it('should set feedback sorting options', function() {
+    it('should change subscription sorting options by impact when changing' +
+      ' sorting type', function() {
+      ctrl.setSubscriptionSortingOptions('impact');
+      expect(ctrl.currentSubscribersSortType).toBe('impact');
+      expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
+    });
+
+    it('should change feedback sorting options by last update msecs when' +
+      ' changing sorting type', function() {
       expect(ctrl.isCurrentFeedbackSortDescending).toBe(true);
       expect(ctrl.currentFeedbackThreadsSortType).toBe('lastUpdatedMsecs');
       ctrl.setFeedbackSortingOptions('lastUpdatedMsecs');
       expect(ctrl.isCurrentFeedbackSortDescending).toBe(false);
-
-      ctrl.setFeedbackSortingOptions('exploration');
-      expect(ctrl.currentFeedbackThreadsSortType).toBe('exploration');
     });
 
-    it('should get value of exploration sort key property', function() {
+    it('should change feedback sorting options by exploration when changing' +
+      ' sorting type', function() {
+      ctrl.setFeedbackSortingOptions('exploration');
+      expect(ctrl.currentFeedbackThreadsSortType).toBe('exploration');
+      expect(ctrl.isCurrentFeedbackSortDescending).toBe(true);
+    });
+
+    it('should evaluate value of exploration sort key property as null when' +
+      ' sorting option is last played', function() {
       // The default sort option is exploration last played.
       expect(ctrl.currentExpSortType).toBe('last_played');
 
@@ -564,7 +572,10 @@ describe('Learner dashboard page', function() {
       ctrl.completedExplorationsList.forEach(function(exploration) {
         expect(ctrl.getValueOfExplorationSortKey(exploration)).toBe(null);
       });
+    });
 
+    it('should evaluate value of exploration sort key property as string' +
+      ' when sorting option is title', function() {
       ctrl.setExplorationsSortingOptions('title');
       expect(ctrl.currentExpSortType).toBe('title');
       ctrl.completedExplorationsList.forEach(function(exploration, index) {
@@ -573,7 +584,8 @@ describe('Learner dashboard page', function() {
       });
     });
 
-    it('should get value of subscription sort key property', function() {
+    it('should evaluate value of subscription sort key property as string' +
+      ' when sorting option is username', function() {
       // The default sort option is exploration last played.
       expect(ctrl.currentSubscribersSortType).toBe('username');
 
@@ -591,7 +603,8 @@ describe('Learner dashboard page', function() {
       });
     });
 
-    it('should get messages from a thread', function() {
+    it('should get messages in the thread from the backend when a thread is' +
+      ' selected', function() {
       var threadStatus = 'open';
       var explorationId = 'exp1';
       var threadId = 'thread_1';
@@ -625,7 +638,7 @@ describe('Learner dashboard page', function() {
       expect(ctrl.messageSummaries.length).toBe(1);
     });
 
-    it('should show all threads when a thread is clicked', function() {
+    it('should show all threads when a thread is not selected', function() {
       var threadStatus = 'open';
       var explorationId = 'exp1';
       var threadId = 'thread_1';
@@ -655,61 +668,65 @@ describe('Learner dashboard page', function() {
 
       ctrl.showAllThreads();
       expect(ctrl.feedbackThreadActive).toBe(false);
+
+      expect(ctrl.numberOfUnreadThreads).toBe(9);
     });
 
-    it('should successfully add a new message in a thread', function() {
-      var threadStatus = 'open';
-      var explorationId = 'exp1';
-      var threadId = 'thread_1';
-      var explorationTitle = 'Exploration Title';
-      var threadMessages = [{
-        message_id: '1',
-        text: 'Feedback 1',
-        updated_status: 'open',
-        suggestion_html: 'An instead of a',
-        current_content_html: 'A orange',
-        description: 'Suggestion for english grammar',
-        author_username: 'username2',
-        author_picture_data_url: 'foo',
-        created_on_msecs: 1200
-      }];
+    it('should add a new message in a thread when there is a thread selected',
+      function() {
+        var threadStatus = 'open';
+        var explorationId = 'exp1';
+        var threadId = 'thread_1';
+        var explorationTitle = 'Exploration Title';
+        var threadMessages = [{
+          message_id: '1',
+          text: 'Feedback 1',
+          updated_status: 'open',
+          suggestion_html: 'An instead of a',
+          current_content_html: 'A orange',
+          description: 'Suggestion for english grammar',
+          author_username: 'username2',
+          author_picture_data_url: 'foo',
+          created_on_msecs: 1200
+        }];
 
-      $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-        .respond({
-          message_summary_list: threadMessages
-        });
-      ctrl.onClickThread(
-        threadStatus, explorationId, threadId, explorationTitle);
-      $httpBackend.flush();
+        $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
+          .respond({
+            message_summary_list: threadMessages
+          });
+        ctrl.onClickThread(
+          threadStatus, explorationId, threadId, explorationTitle);
+        $httpBackend.flush();
 
-      var threadId = 'thread_1';
-      var message = 'This is a new message';
-      $httpBackend.expect('POST', '/threadhandler/' + threadId).respond(200);
-      ctrl.addNewMessage(threadId, message);
+        var threadId = 'thread_1';
+        var message = 'This is a new message';
+        $httpBackend.expect('POST', '/threadhandler/' + threadId).respond(200);
+        ctrl.addNewMessage(threadId, message);
 
-      expect(ctrl.messageSendingInProgress).toBe(true);
+        expect(ctrl.messageSendingInProgress).toBe(true);
 
-      $httpBackend.flush();
-      expect(ctrl.messageSendingInProgress).toBe(false);
-    });
+        $httpBackend.flush();
+        expect(ctrl.messageSendingInProgress).toBe(false);
+      });
 
-    it('should show suggestion modal', function() {
-      spyOn(SuggestionModalForLearnerDashboardService, 'showSuggestionModal')
-        .and.callThrough();
-      var newContent = 'New content';
-      var oldContent = 'Old content';
-      var description = 'Description';
-      ctrl.showSuggestionModal(newContent, oldContent, description);
+    it('should show new and old content when opening suggestion modal',
+      function() {
+        spyOn(SuggestionModalForLearnerDashboardService, 'showSuggestionModal')
+          .and.callThrough();
+        var newContent = 'New content';
+        var oldContent = 'Old content';
+        var description = 'Description';
+        ctrl.showSuggestionModal(newContent, oldContent, description);
 
-      expect(SuggestionModalForLearnerDashboardService.showSuggestionModal)
-        .toHaveBeenCalledWith('edit_exploration_state_content', {
-          newContent: newContent,
-          oldContent: oldContent,
-          description: description
-        });
-    });
+        expect(SuggestionModalForLearnerDashboardService.showSuggestionModal)
+          .toHaveBeenCalledWith('edit_exploration_state_content', {
+            newContent: newContent,
+            oldContent: oldContent,
+            description: description
+          });
+      });
 
-    it('should open uib modal when removing activity', function() {
+    it('should open remove activity modal when removing activity', function() {
       spyOn($uibModal, 'open').and.callThrough();
 
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
@@ -720,7 +737,8 @@ describe('Learner dashboard page', function() {
       expect($uibModal.open).toHaveBeenCalled();
     });
 
-    it('should remove an incomplete exploration activity', function() {
+    it('should remove an activity from incomplete exploration when closing' +
+      ' remove activity modal', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
@@ -759,7 +777,8 @@ describe('Learner dashboard page', function() {
       expect(ctrl.incompleteExplorationsList.length).toBe(12);
     });
 
-    it('should remove an incomplete collection activity', function() {
+    it('should remove an activity from incomplete collection when closing' +
+    ' remove activity modal', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
@@ -773,13 +792,15 @@ describe('Learner dashboard page', function() {
       var activity = collectionSummaryObjectFactory.createFromBackendDict(
         learnerDashboardData.incomplete_collections_list[2]);
 
-      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
+      ctrl.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
       expect(ctrl.incompleteCollectionsList.length).toBe(7);
     });
 
-    it('should remove an activity from exploration playlist', function() {
+    it('should remove an activity from exploration playlist when closing' +
+      ' remove activity modal', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
@@ -794,13 +815,15 @@ describe('Learner dashboard page', function() {
         .createFromBackendDict(
           learnerDashboardData.exploration_playlist[1]);
 
-      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
+      ctrl.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
       expect(ctrl.explorationPlaylist.length).toBe(9);
     });
 
-    it('should remove an activity from collection playlist', function() {
+    it('should remove an activity from collection playlist when closing' +
+      ' remove activity modal', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
@@ -813,7 +836,8 @@ describe('Learner dashboard page', function() {
       var activity = collectionSummaryObjectFactory.createFromBackendDict(
         learnerDashboardData.collection_playlist[1]);
 
-      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
+      ctrl.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
       expect(ctrl.collectionPlaylist.length).toBe(7);
@@ -832,14 +856,15 @@ describe('Learner dashboard page', function() {
         'Not Actionable');
     });
 
-    it('should get locate date string', function() {
-      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-      var NOW_MILLIS = 1416563100000;
-      spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-        .withArgs(NOW_MILLIS).and.returnValue('11/21/2014');
-      expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
-        '11/21/2014');
-    });
+    it('should get formatted date string from the timestamp in milliseconds',
+      function() {
+        // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+        var NOW_MILLIS = 1416563100000;
+        spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
+          .withArgs(NOW_MILLIS).and.returnValue('11/21/2014');
+        expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
+          '11/21/2014');
+      });
   });
 
   describe('when fetching dashboard data fails', function() {

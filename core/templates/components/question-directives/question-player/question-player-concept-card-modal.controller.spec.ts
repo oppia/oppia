@@ -109,15 +109,17 @@ describe('Question Player Concept Card Modal Controller', function() {
     });
   }));
 
-  it('should check properties set after controller is initialized', function() {
-    expect($scope.skillIds).toEqual(skillIds);
-    expect($scope.skills).toEqual(skillsObject);
-    expect($scope.index).toBe(0);
-    expect($scope.modalHeader).toEqual(skillsObject[0]);
-    expect($scope.isInTestMode).toBe(true);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.skillIds).toEqual(skillIds);
+      expect($scope.skills).toEqual(skillsObject);
+      expect($scope.index).toBe(0);
+      expect($scope.modalHeader).toEqual(skillsObject[0]);
+      expect($scope.isInTestMode).toBe(true);
+    });
 
-  it('should go to next concept card', function() {
+  it('should go to next concept card, and identify when it is the last' +
+    ' concept card.', function() {
     expect($scope.isLastConceptCard()).toBe(false);
     $scope.goToNextConceptCard();
     expect($scope.index).toBe(1);
@@ -129,7 +131,7 @@ describe('Question Player Concept Card Modal Controller', function() {
     expect($scope.modalHeader).toBe(undefined);
   });
 
-  it('should retry test', function() {
+  it('should refresh page when retrying a practice test', function() {
     $scope.retryTest();
     expect(mockWindow.location.replace).toHaveBeenCalledWith('pathname');
   });

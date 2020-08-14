@@ -68,7 +68,7 @@ describe('ExplorationEmbedButtonModalComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should call the siteanalytics service when initialized', () => {
+  it('should call the site analytics service when initialized', () => {
     const registerOpenEmbedInfoEventSpy = spyOn(
       siteAnalyticsService, 'registerOpenEmbedInfoEvent'
     ).and.callThrough();

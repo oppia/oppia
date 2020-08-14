@@ -87,11 +87,13 @@ describe('Delete Misconception Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
-    expect($scope.skill).toEqual(skillObject);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.skill).toEqual(skillObject);
+    });
 
-  it('should close the modal and get misconception on confirm', function() {
+  it('should close the modal with misconception id when clicking on save' +
+    ' button', function() {
     $scope.confirm();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       id: '2'
