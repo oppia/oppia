@@ -79,10 +79,6 @@ export class ExplorationSummaryBackendApiService {
           errorCallback(errorResponse);
         }
       }
-    }, (errorResponse) =>{
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
     });
   }
 
