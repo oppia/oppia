@@ -16,8 +16,6 @@
  * @fileoverview Controller for the Tutor Card.
  */
 
-import { Subscription } from 'rxjs';
-
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/audio-bar.directive.ts');
@@ -115,9 +113,6 @@ angular.module('oppia').directive('tutorCard', [
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-
-          ctrl.directiveSubscriptions = new Subscription();
-
           var updateDisplayedCard = function() {
             $scope.arePreviousResponsesShown = false;
             $scope.lastAnswer = null;
