@@ -45,15 +45,15 @@ export enum ServerMode {
  */
 export interface PlatformParameterFilterBackendDict {
   'type': PlatformParameterFilterType;
-  'conditions': Array<[string, string]>;
+  'conditions': [string, string][];
 }
 
 export class PlatformParameterFilter {
   type: PlatformParameterFilterType;
-  conditions: Array<[string, string]>;
+  conditions: [string, string][];
 
   constructor(
-      type: PlatformParameterFilterType, conditions: Array<[string, string]>) {
+      type: PlatformParameterFilterType, conditions: [string, string][]) {
     this.type = type;
     this.conditions = conditions;
   }
