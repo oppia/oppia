@@ -1138,7 +1138,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
         return summary_messages
-    
+
     def _check_angular_services_index(self):
         """Finds all @Injectable classes and makes sure that they are added to
             Oppia root and Angular Services Index.
