@@ -70,8 +70,14 @@ def save_pending_deletion_requests(pending_deletion_requests):
         pending_deletion_requests: list(PendingDeletionRequest). List of pending
             deletion request objects to be saved in the datastore.
     """
-    pending_deletion_request_models = []
-    for deletion_request in pending_deletion_requests:
+    user_ids = [request.user_id for request in pending_deletion_requests]
+    pending_deletion_request_models = (
+        user_models.PendingDeletionRequestModel.get_multi(
+            user_ids, include_deleted=True)
+    )
+    final_pending_deletion_request_models = []
+    for deletion_request_model, deletion_request in zip(
+            pending_deletion_request_models, pending_deletion_requests):
         deletion_request.validate()
         deletion_request_dict = {
             'email': deletion_request.email,
@@ -80,9 +86,6 @@ def save_pending_deletion_requests(pending_deletion_requests):
             'collection_ids': deletion_request.collection_ids,
             'activity_mappings': deletion_request.activity_mappings
         }
-        deletion_request_model = (
-            user_models.PendingDeletionRequestModel.get_by_id(
-                deletion_request.user_id))
         if deletion_request_model is not None:
             deletion_request_model.populate(**deletion_request_dict)
         else:
@@ -90,10 +93,10 @@ def save_pending_deletion_requests(pending_deletion_requests):
             deletion_request_model = user_models.PendingDeletionRequestModel(
                 **deletion_request_dict
             )
-        pending_deletion_request_models.append(deletion_request_model)
+        final_pending_deletion_request_models.append(deletion_request_model)
 
     user_models.PendingDeletionRequestModel.put_multi(
-        pending_deletion_request_models)
+        final_pending_deletion_request_models)
 
 
 def delete_pending_deletion_request(user_id):

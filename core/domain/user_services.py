@@ -1160,8 +1160,12 @@ def _save_multiple_users_settings(user_settings_list):
     Args: user_settings_list. list(UserSettings). The list of UserSettings
             objects to be saved.
     """
-    user_settings_models_list = []
-    for user_settings in user_settings_list:
+    user_ids = [user.user_id for user in user_settings_list]
+    user_settings_models_list = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+    final_user_settings_models_list = []
+    for user_model, user_settings in zip(
+            user_settings_models_list, user_settings_list):
         user_settings.validate()
         user_settings_dict = {
             'gae_id': user_settings.gae_id,
@@ -1197,15 +1201,13 @@ def _save_multiple_users_settings(user_settings_list):
 
         # If user with the given user_id already exists, update that model
         # with the given user settings, otherwise, create a new one.
-        user_model = user_models.UserSettingsModel.get_by_id(
-            user_settings.user_id)
         if user_model is not None:
             user_model.populate(**user_settings_dict)
         else:
             user_settings_dict['id'] = user_settings.user_id
             user_model = user_models.UserSettingsModel(**user_settings_dict)
-        user_settings_models_list.append(user_model)
-    user_models.UserSettingsModel.put_multi(user_settings_models_list)
+        final_user_settings_models_list.append(user_model)
+    user_models.UserSettingsModel.put_multi(final_user_settings_models_list)
 
 
 def _save_multiple_users_auth_details(user_auth_details_list):
@@ -1214,8 +1216,12 @@ def _save_multiple_users_auth_details(user_auth_details_list):
     Args: user_auth_details_list. list(UserAuthDetails). The list of
             UserAuthDetails objects to be saved.
     """
-    user_auth_models_list = []
-    for user_auth_details in user_auth_details_list:
+    user_ids = [user.user_id for user in user_auth_details_list]
+    user_auth_models_list = user_models.UserAuthDetailsModel.get_multi(
+        user_ids, include_deleted=True)
+    final_user_auth_models_list = []
+    for user_auth_details_model, user_auth_details in zip(
+            user_auth_models_list, user_auth_details_list):
         user_auth_details.validate()
         user_auth_details_dict = {
             'gae_id': user_auth_details.gae_id,
@@ -1226,8 +1232,6 @@ def _save_multiple_users_auth_details(user_auth_details_list):
 
         # If user auth details entry with the given user_id does not exist,
         # create a new one.
-        user_auth_details_model = user_models.UserAuthDetailsModel.get_by_id(
-            user_auth_details.user_id)
         if user_auth_details_model is not None:
             user_auth_details_model.populate(**user_auth_details_dict)
 
@@ -1236,8 +1240,8 @@ def _save_multiple_users_auth_details(user_auth_details_list):
             user_auth_details_model = user_models.UserAuthDetailsModel(
                 **user_auth_details_dict)
 
-        user_auth_models_list.append(user_auth_details_model)
-    user_models.UserAuthDetailsModel.put_multi(user_auth_models_list)
+        final_user_auth_models_list.append(user_auth_details_model)
+    user_models.UserAuthDetailsModel.put_multi(final_user_auth_models_list)
 
 
 def _save_user_auth_details(user_auth_details):
