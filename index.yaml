@@ -209,6 +209,9 @@ indexes:
   - name: "skill_id"
   - name: "skill_difficulty"
     direction: desc
+
+- kind: QuestionSnapshotMetadataModel
+  properties:
   - name: committer_id
   - name: commit_message
   - name: commit_type
@@ -217,6 +220,7 @@ indexes:
   properties:
   - name: "realtime_layer"
   - name: "created_on"
+- kind: "SearchRankerRealtimeModel"
   properties:
   - name: "realtime_layer"
   - name: "created_on"
