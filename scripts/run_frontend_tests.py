@@ -30,8 +30,8 @@ from . import common
 from . import install_third_party_libs
 
 # This is a relative path from the oppia/ folder. It is relative because the
-# dtslint command prepends the current working directory to the path, which in
-# this case is the oppia/ folder.
+# dtslint command prepends the current working directory to the path, even if
+# the path is absolute.
 DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH = os.path.join('typings', 'tests')
 
 _PARSER = argparse.ArgumentParser(
