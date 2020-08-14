@@ -23,7 +23,7 @@ interface ImageUploaderCustomScope extends ng.IScope {
   errorMessage?: string;
   onFileChanged?: (file: File, fileName?: string) => void;
   fileInputClassName?: string;
-  allowedImageType?: string;
+  allowedImageFormats?: string;
 }
 
 angular.module('oppia').directive('imageUploader', [
@@ -36,7 +36,7 @@ angular.module('oppia').directive('imageUploader', [
         onFileChanged: '=',
         errorMessage: '@',
         width: '@',
-        allowedImageType: '@'
+        allowedImageFormats: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
@@ -60,34 +60,38 @@ angular.module('oppia').directive('imageUploader', [
             },
             jpg: {
               format: 'image/jpg',
-              condition: [/jp(e?)g$/, /\.jp(e?)g$/],
+              fileType: /jp(e?)g$/,
+              fileExtension: /\.jp(e?)g$/,
             },
             gif: {
               format: 'image/gif',
-              condition: [/gif$/, /\.gif$/],
+              fileType: /gif$/,
+              fileExtension: /\.gif$/,
             },
             png: {
               format: 'image/png',
-              condition: [/png$/, /\.png$/],
+              fileType: /png$/,
+              fileExtension: /\.png$/,
             },
             svg: {
               format: 'image/svg\\+xml',
-              condition: [/svg\+xml$/, /\.svg$/],
+              fileType: /svg\+xml$/,
+              fileExtension: /\.svg$/,
             }
           };
 
           var imageFormatCheck = true;
           var imageExtensionCheck = false;
-          var allowedImageType = JSON.parse(scope.allowedImageType);
-          for (var i = 0; i < allowedImageType.length; i++) {
-            var fileType = allowedImageType[i];
+          var allowedImageFormats = JSON.parse(scope.allowedImageFormats);
+          for (var i = 0; i < allowedImageFormats.length; i++) {
+            var fileType = allowedImageFormats[i];
             imageFormatCheck = (
               imageFormatCheck &&
               !file.type.match(imageTypeMapping[fileType].format));
             imageExtensionCheck = (
               imageExtensionCheck ||
-              (file.type.match(imageTypeMapping[fileType].condition[0]) &&
-              !file.name.match(imageTypeMapping[fileType].condition[1])));
+              (file.type.match(imageTypeMapping[fileType].fileType) &&
+              !file.name.match(imageTypeMapping[fileType].fileExtension)));
           }
 
           if (imageFormatCheck) {

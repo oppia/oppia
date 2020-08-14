@@ -15,7 +15,7 @@
         Note: The uploaded svg may not be rendered exactly.
       </div>
       <div ng-if="!$ctrl.isFileUploaded()">
-        <image-uploader on-file-changed="$ctrl.onFileChanged" allowed-image-type="<[$ctrl.imageType]>">
+        <image-uploader on-file-changed="$ctrl.onFileChanged" allowed-image-formats="<[$ctrl.imageType]>">
         </image-uploader>
       </div>
       <div ng-if="$ctrl.isFileUploaded()">
