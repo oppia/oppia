@@ -30,10 +30,10 @@ angular.module('oppia').factory('BaseUndoRedoService', [
 
     this._appliedChanges = [];
     this._undoneChanges = [];
-    this._undoRedoChangeEventEmitter = new EventEmitter();
+    var _undoRedoChangeEventEmitter = new EventEmitter();
 
     var _dispatchMutation = () => {
-      this._undoRedoChangeEventEmitter.emit();
+      _undoRedoChangeEventEmitter.emit();
     };
     var _applyChange = (changeObject, domainObject) => {
       changeObject.applyChange(domainObject);
@@ -50,7 +50,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
       /* eslint-enable dot-notation */
       this._appliedChanges = [];
       this._undoneChanges = [];
-      this._undoRedoChangeEventEmitter = new EventEmitter();
+      _undoRedoChangeEventEmitter = new EventEmitter();
     };
 
     /**
@@ -183,7 +183,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /* eslint-disable dot-notation */
     BaseUndoRedoService['onUndoRedoChangeApplied'] = function() {
       /* eslint-enable dot-notation */
-      return this._undoRedoChangeEventEmitter;
+      return _undoRedoChangeEventEmitter;
     };
 
     return BaseUndoRedoService;
