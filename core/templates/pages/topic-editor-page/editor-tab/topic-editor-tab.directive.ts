@@ -335,7 +335,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.getPreviewFooter = function() {
             var canonicalStoriesLength = (
               $scope.topic.getCanonicalStoryIds().length);
-            if ( canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
+            if (canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
               return canonicalStoriesLength + ' Stories';
             }
             return '1 Story';
