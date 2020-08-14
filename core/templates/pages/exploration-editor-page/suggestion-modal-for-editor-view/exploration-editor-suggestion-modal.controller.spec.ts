@@ -68,7 +68,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       });
     }));
 
-    it('should check properties set after controller is initialized',
+    it('should initialize $scope properties after controller is initialized',
       function() {
         expect($scope.isNotHandled).toEqual(false);
         expect($scope.canEdit).toBe(true);
@@ -82,26 +82,29 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
           'This suggestion has already been rejected.');
       });
 
-    it('should accept suggestion', function() {
+    it('should close modal when accepting suggestion', function() {
       spyOn(SuggestionModalService, 'acceptSuggestion').and.callThrough();
       $scope.acceptSuggestion();
 
       expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalled();
+      expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should reject suggestion', function() {
+    it('should close modal when rejecting suggestion', function() {
       spyOn(SuggestionModalService, 'rejectSuggestion').and.callThrough();
       $scope.rejectSuggestion();
 
       expect(SuggestionModalService.rejectSuggestion).toHaveBeenCalled();
+      expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should cancel review', function() {
+    it('should dismiss modal when canceling suggestion', function() {
       spyOn(SuggestionModalService, 'cancelSuggestion').and.callThrough();
       $scope.cancelReview();
 
       expect(SuggestionModalService.cancelSuggestion).toHaveBeenCalledWith(
         $uibModalInstance);
+      expect($uibModalInstance.dismiss).toHaveBeenCalled();
     });
   });
 
@@ -136,7 +139,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
         });
       }));
 
-      it('should check properties set after controller is initialized',
+      it('should initialize $scope properties after controller is initialized',
         function() {
           expect($scope.isNotHandled).toEqual(true);
           expect($scope.canEdit).toBe(true);
@@ -181,7 +184,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       });
     }));
 
-    it('should check properties set after controller is initialized',
+    it('should initialize $scope properties after controller is initialized',
       function() {
         expect($scope.isNotHandled).toEqual(true);
         expect($scope.canEdit).toBe(true);
@@ -231,7 +234,7 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       });
     }));
 
-    it('should check properties set after controller is initialized',
+    it('should initialize $scope properties after controller is initialized',
       function() {
         expect($scope.isNotHandled).toEqual(true);
         expect($scope.canEdit).toBe(true);
@@ -244,7 +247,8 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
         expect($scope.errorMessage).toBe('');
       });
 
-    it('should accept suggestion', function() {
+    it('should accept suggestion and close the modal on clicking the accept' +
+      ' suggestion button', function() {
       spyOn(SuggestionModalService, 'acceptSuggestion').and.callThrough();
       $scope.acceptSuggestion();
 
@@ -252,7 +256,8 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalled();
     });
 
-    it('should reject suggestion', function() {
+    it('should reject suggestion and close the modal on clicking the reject' +
+      ' suggestion button', function() {
       spyOn(SuggestionModalService, 'rejectSuggestion').and.callThrough();
       $scope.rejectSuggestion();
 
