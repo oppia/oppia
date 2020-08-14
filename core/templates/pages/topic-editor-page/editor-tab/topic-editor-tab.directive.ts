@@ -69,8 +69,9 @@ angular.module('oppia').directive('topicEditorTab', [
         'PageTitleService', 'SkillCreationService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
-        'WindowDimensionsService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
-        'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
+        'WindowDimensionsService', 'WindowRef',
+        'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
+        'EVENT_STORY_SUMMARIES_INITIALIZED',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $rootScope, $scope, $uibModal, AlertsService, ContextService,
@@ -78,8 +79,9 @@ angular.module('oppia').directive('topicEditorTab', [
             PageTitleService, SkillCreationService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicUpdateService, UndoRedoService, UrlInterpolationService,
-            WindowDimensionsService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
-            MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
+            WindowDimensionsService, WindowRef,
+            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
+            EVENT_STORY_SUMMARIES_INITIALIZED,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -103,6 +105,7 @@ angular.module('oppia').directive('topicEditorTab', [
               topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
             $scope.topicNameExists = false;
             $scope.topicUrlFragmentExists = false;
+            $scope.hostname = WindowRef.nativeWindow.location.hostname;
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -125,6 +128,10 @@ angular.module('oppia').directive('topicEditorTab', [
                   $scope.topic.getThumbnailFilename(),
                   ContextService.getEntityType(),
                   ContextService.getEntityId()));
+          };
+
+          $scope.getClassroomUrlFragment = function() {
+            return TopicEditorStateService.getClassroomUrlFragment();
           };
 
           var _initStorySummaries = function() {

@@ -18,7 +18,6 @@
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
@@ -26,7 +25,6 @@ require('domain/utilities/url-interpolation.service.ts');
 // is migrated to Angular.
 const subtopicConstants2 = require('constants.ts');
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/question-backend-api.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -44,16 +42,14 @@ angular.module('oppia').component('subtopicEditorTab', {
     '$scope', 'EntityCreationService', 'QuestionBackendApiService',
     'SubtopicValidationService', 'TopicEditorStateService',
     'TopicEditorRoutingService', 'TopicUpdateService',
-    'UndoRedoService',
-    'UrlInterpolationService', 'WindowDimensionsService',
+    'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
     'EVENT_SUBTOPIC_PAGE_LOADED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
         $scope, EntityCreationService, QuestionBackendApiService,
         SubtopicValidationService, TopicEditorStateService,
         TopicEditorRoutingService, TopicUpdateService,
-        UndoRedoService,
-        UrlInterpolationService, WindowDimensionsService,
+        UrlInterpolationService, WindowDimensionsService, WindowRef,
         EVENT_SUBTOPIC_PAGE_LOADED, MAX_CHARS_IN_SUBTOPIC_TITLE,
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT) {
       var ctrl = this;
@@ -63,7 +59,10 @@ angular.module('oppia').component('subtopicEditorTab', {
       ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
       ctrl.initEditor = function() {
+        ctrl.hostname = WindowRef.nativeWindow.location.hostname;
         ctrl.topic = TopicEditorStateService.getTopic();
+        ctrl.classroomUrlFragment = (
+          TopicEditorStateService.getClassroomUrlFragment());
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
         ctrl.errorMsg = null;

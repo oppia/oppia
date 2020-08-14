@@ -22,6 +22,7 @@ require(
 
 require('domain/topic/NewlyCreatedStoryObjectFactory.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
@@ -30,12 +31,12 @@ const newStoryConstants = require('constants.ts');
 angular.module('oppia').controller('CreateNewStoryModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance',
   'ImageLocalStorageService', 'NewlyCreatedStoryObjectFactory',
-  'StoryEditorStateService', 'MAX_CHARS_IN_STORY_TITLE',
-  'MAX_CHARS_IN_STORY_URL_FRAGMENT',
+  'TopicEditorStateService', 'StoryEditorStateService', 'WindowRef',
+  'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
   function($controller, $rootScope, $scope, $uibModalInstance,
       ImageLocalStorageService, NewlyCreatedStoryObjectFactory,
-      StoryEditorStateService, MAX_CHARS_IN_STORY_TITLE,
-      MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+      TopicEditorStateService, StoryEditorStateService, WindowRef,
+      MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -46,6 +47,11 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
     $scope.allowedBgColors = (
       newStoryConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
     $scope.storyUrlFragmentExists = false;
+    $scope.hostname = WindowRef.nativeWindow.location.hostname;
+    $scope.classroomUrlFragment = (
+      TopicEditorStateService.getClassroomUrlFragment());
+    $scope.topicUrlFragment = (
+      TopicEditorStateService.getTopic().getUrlFragment());
     $scope.onStoryUrlFragmentChange = function() {
       if (!$scope.story.urlFragment) {
         return;

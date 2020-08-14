@@ -207,6 +207,14 @@ describe('Topic editor tab directive', function() {
     expect($scope.selectedSkillEditOptionsIndex).toEqual({});
   });
 
+  it('should get the classroom URL fragment', function() {
+    expect($scope.getClassroomUrlFragment()).toEqual('staging');
+    spyOn(
+      TopicEditorStateService,
+      'getClassroomUrlFragment').and.returnValue('classroom-frag');
+    expect($scope.getClassroomUrlFragment()).toEqual('classroom-frag');
+  });
+
   it('should open save changes warning modal before creating skill',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);

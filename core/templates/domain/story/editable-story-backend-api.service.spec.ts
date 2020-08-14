@@ -89,7 +89,9 @@ describe('Editable story backend API service', function() {
       skill_summaries: [{
         id: 'skill_1',
         description: 'Skill Description'
-      }]
+      }],
+      topic_url_fragment: undefined,
+      classroom_url_fragment: undefined
     };
   }));
 
@@ -114,7 +116,9 @@ describe('Editable story backend API service', function() {
         story: sampleDataResults.story,
         topicName: sampleDataResults.topic_name,
         storyIsPublished: true,
-        skillSummaries: sampleDataResults.skill_summaries
+        skillSummaries: sampleDataResults.skill_summaries,
+        topicUrlFragment: sampleDataResults.topic_url_fragment,
+        classroomUrlFragment: sampleDataResults.classroom_url_fragment
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
