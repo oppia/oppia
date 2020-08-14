@@ -85,10 +85,8 @@ export class MathInteractionsService {
   }
 
   _validateExpression(
-      expressionString: string, validVariablesList: Array<string>,
-      algebraic): boolean {
+      expressionString: string, validVariablesList: Array<string>): boolean {
     expressionString = expressionString.replace(/\s/g, '');
-    let expressionObject;
     if (expressionString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
       return false;
@@ -110,40 +108,10 @@ export class MathInteractionsService {
     }
     try {
       expressionString = this.insertMultiplicationSigns(expressionString);
-      expressionObject = nerdamer(expressionString);
+      nerdamer(expressionString);
     } catch (err) {
       this.warningText = this.cleanErrorMessage(err.message, expressionString);
       return false;
-    }
-    if (algebraic) {
-      let variablesList = expressionObject.variables();
-      if (variablesList.length === 0) {
-        this.warningText = 'It looks like you have entered only ' +
-        'numbers. Make sure to include the necessary variables' +
-        ' mentioned in the question.';
-        return false;
-      } else if (validVariablesList.length !== 0) {
-        for (let variable of variablesList) {
-          if (validVariablesList.indexOf(variable) === -1) {
-            this.warningText = (
-              'You have entered an invalid character: ' + variable +
-              '. Please use only the characters ' + validVariablesList.join() +
-              ' in your answer.');
-            return false;
-          }
-        }
-      }
-    }
-    if (!algebraic) {
-      for (let functionName of this.mathFunctionNames) {
-        expressionString = expressionString.replace(
-          new RegExp(functionName, 'g'), '');
-      }
-      if (/[a-zA-Z]/.test(expressionString)) {
-        this.warningText = 'It looks like you have entered some variables. ' +
-          'Please enter numbers only.';
-        return false;
-      }
     }
     this.warningText = '';
     return true;
@@ -151,14 +119,45 @@ export class MathInteractionsService {
 
   validateAlgebraicExpression(
       expressionString: string, validVariablesList: Array<string>) {
-    if (validVariablesList === undefined) {
-      validVariablesList = [];
+    if (!this._validateExpression(expressionString, validVariablesList)) {
+      return false;
     }
-    return this._validateExpression(expressionString, validVariablesList, true);
+
+    let variablesList = nerdamer(this.insertMultiplicationSigns(
+      expressionString)).variables();
+    if (variablesList.length === 0) {
+      this.warningText = 'It looks like you have entered only ' +
+      'numbers. Make sure to include the necessary variables' +
+      ' mentioned in the question.';
+      return false;
+    } else if (validVariablesList.length !== 0) {
+      for (let variable of variablesList) {
+        if (validVariablesList.indexOf(variable) === -1) {
+          this.warningText = (
+            'You have entered an invalid character: ' + variable +
+            '. Please use only the characters ' + validVariablesList.join() +
+            ' in your answer.');
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   validateNumericExpression(expressionString: string) {
-    return this._validateExpression(expressionString, [], false);
+    if (!this._validateExpression(expressionString, [])) {
+      return false;
+    }
+    for (let functionName of this.mathFunctionNames) {
+      expressionString = expressionString.replace(
+        new RegExp(functionName, 'g'), '');
+    }
+    if (/[a-zA-Z]/.test(expressionString)) {
+      this.warningText = 'It looks like you have entered some variables. ' +
+        'Please enter numbers only.';
+      return false;
+    }
+    return true;
   }
 
   validateEquation(

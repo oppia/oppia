@@ -51,7 +51,7 @@ angular.module('oppia').component('algebraicExpressionEditor', {
         ctrl.currentValue = MathInteractionsService.replaceAbsSymbolWithText(
           ctrl.currentValue);
         var answerIsValid = MathInteractionsService.validateAlgebraicExpression(
-          ctrl.currentValue, GuppyInitializationService.customOskLetters);
+          ctrl.currentValue, GuppyInitializationService.getCustomOskLetters());
         if (GuppyInitializationService.findActiveGuppyObject() === undefined) {
           // The warnings should only be displayed when the editor is inactive
           // focus, i.e., the user is done typing.

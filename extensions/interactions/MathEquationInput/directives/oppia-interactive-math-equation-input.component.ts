@@ -59,7 +59,7 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
             ctrl.value);
           let answerIsValid = MathInteractionsService.validateEquation(
-            ctrl.value, GuppyInitializationService.customOskLetters);
+            ctrl.value, GuppyInitializationService.getCustomOskLetters());
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
         }
@@ -86,7 +86,7 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
         GuppyInitializationService.init(
           'guppy-div-learner',
           MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
-        GuppyInitializationService.customOskLetters = (
+        GuppyInitializationService.setCustomOskLetters(
           HtmlEscaperService.escapedJsonToObj(
             $attrs.customOskLettersWithValue));
         let eventType = (

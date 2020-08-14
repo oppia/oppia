@@ -60,7 +60,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
             ctrl.value);
           let answerIsValid = (
             MathInteractionsService.validateAlgebraicExpression(
-              ctrl.value, GuppyInitializationService.customOskLetters));
+              ctrl.value, GuppyInitializationService.getCustomOskLetters()));
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
         }
@@ -84,7 +84,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
-        GuppyInitializationService.customOskLetters = (
+        GuppyInitializationService.setCustomOskLetters(
           HtmlEscaperService.escapedJsonToObj(
             $attrs.customOskLettersWithValue));
         GuppyInitializationService.init(
