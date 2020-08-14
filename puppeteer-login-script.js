@@ -48,9 +48,8 @@ const login = async function(context, page) {
       page.click('#submit-login'),
     ]);
 
-    await page.waitForSelector('#username');
+    await page.waitFor(5000);
     await page.type('#username', 'username1');
-    await page.waitForSelector('#terms-checkbox');
     await page.click('#terms-checkbox');
 
     await Promise.all([
