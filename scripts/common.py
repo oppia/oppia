@@ -57,6 +57,13 @@ PILLOW_VERSION = '6.2.2'
 # there is a 'make test' bug in redis 6.0.6 where the solution has not been
 # released. This is explained in this issue:
 # https://github.com/redis/redis/issues/7540.
+# When upgrading the redis cli version, make sure to run 'make test' on the
+# new version to make sure that there are no issues with the program. To run
+# 'make test' download the newest version of the cli and extract it. Change
+# directories into the new folder you created titled redis-<new version>/
+# and from the top level directory of this folder, type 'make test'.
+# Make sure that ALL tests pass before making the upgrade official. If any tests
+# fail, do not upgrade to that version of the redis cli.
 REDIS_CLI_VERSION = '6.0.5'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
