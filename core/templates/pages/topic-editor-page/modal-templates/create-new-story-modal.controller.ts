@@ -31,11 +31,11 @@ const newStoryConstants = require('constants.ts');
 angular.module('oppia').controller('CreateNewStoryModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance',
   'ImageLocalStorageService', 'NewlyCreatedStoryObjectFactory',
-  'TopicEditorStateService', 'StoryEditorStateService', 'WindowRef',
+  'StoryEditorStateService', 'TopicEditorStateService', 'WindowRef',
   'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
   function($controller, $rootScope, $scope, $uibModalInstance,
       ImageLocalStorageService, NewlyCreatedStoryObjectFactory,
-      TopicEditorStateService, StoryEditorStateService, WindowRef,
+      StoryEditorStateService, TopicEditorStateService, WindowRef,
       MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,

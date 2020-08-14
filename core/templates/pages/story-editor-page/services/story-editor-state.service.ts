@@ -83,11 +83,11 @@ angular.module('oppia').factory('StoryEditorStateService', [
 
     var _setClassroomUrlFragment = function(classroomUrlFragment) {
       _classroomUrlFragment = classroomUrlFragment;
-    }
+    };
 
     var _setTopicUrlFragment = function(topicUrlFragment) {
       _topicUrlFragment = topicUrlFragment;
-    }
+    };
 
     return {
       /**
