@@ -22,7 +22,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export interface ClientContextBackendDict {
   'client_type': string;
   'browser_type': string;
-  'app_version'?: string;
   'user_locale': string;
 }
 
@@ -33,15 +32,12 @@ export interface ClientContextBackendDict {
 export class ClientContext {
   readonly clientType: string;
   readonly browserType: string;
-  readonly appVersion: string;
   readonly userLocale: string;
 
   constructor(
-      clientType: string, browserType: string, appVersion: string,
-      userLocale: string) {
+      clientType: string, browserType: string, userLocale: string) {
     this.clientType = clientType;
     this.browserType = browserType;
-    this.appVersion = appVersion;
     this.userLocale = userLocale;
   }
 
@@ -55,7 +51,6 @@ export class ClientContext {
     return {
       client_type: this.clientType,
       browser_type: this.browserType,
-      app_version: this.appVersion,
       user_locale: this.userLocale,
     };
   }
@@ -66,9 +61,9 @@ export class ClientContext {
 })
 export class ClientContextObjectFactory {
   create(
-      clientType: string, browserType: string, appVersion: string,
-      userLocale: string): ClientContext {
-    return new ClientContext(clientType, browserType, appVersion, userLocale);
+      clientType: string, browserType: string, userLocale: string
+  ): ClientContext {
+    return new ClientContext(clientType, browserType, userLocale);
   }
 }
 
