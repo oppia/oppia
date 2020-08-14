@@ -149,7 +149,7 @@ def main(args=None):
         time.sleep(10)
 
         if not common.is_windows_os():
-            background_processes.append(common.start_redis_server())
+            common.start_redis_server()
         else:
             raise Exception(
                 'Redis command line interface is not installed because your ' +

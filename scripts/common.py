@@ -625,15 +625,12 @@ def wait_for_port_to_be_open(port_number):
 def start_redis_server():
     """Start the redis server with the daemonize argument to prevent
     the redis-server from exiting on its own.
-
-    Returns:
-        subprocess.Popen. The process object of the redis server.
     """
     # Redis-cli is only required in a development environment.
     python_utils.PRINT('Starting Redis development server.')
     # Start the redis local development server. Redis doesn't run on
     # Windows machines.
-    return subprocess.Popen([
+    subprocess.call([
         REDIS_SERVER_PATH, REDIS_CONF_PATH,
         '--daemonize', 'yes'
     ])
