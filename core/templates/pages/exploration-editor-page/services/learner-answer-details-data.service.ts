@@ -22,9 +22,9 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationDataService } from
   'pages/exploration-editor-page/services/exploration-data.service';
-import { LearnerAnswerDetails } from
+import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
-import { LearnerAnswerInfo } from
+import { LearnerAnswerInfo, LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -53,7 +53,7 @@ export class LearnerAnswerDetailsDataService {
   public fetchLearnerAnswerInfoData() {
     return this.learnerAnswerDetailsBackendApiService._fetchLearnerAnswerInfoData().then(
       (response)=>{
-        this.learnerAnswerInfoData = response.learner_answer_info_data;
+        this.learnerAnswerInfoData = response.data.learner_answer_info_data;
         for (let i = 0;i < this.learnerAnswerInfoData.length;i++) {
           const stateName = this.learnerAnswerInfoData[i].state_name;
           const interactionId = this.learnerAnswerInfoData[i].interaction_id;
@@ -63,10 +63,10 @@ export class LearnerAnswerDetailsDataService {
             this.learnerAnswerInfoData[i].learner_answer_info_dicts
           );
           const learnerAnswerDetails = (
-            LearnerAnswerDetails.createDefaultLearnerAnswerDetails(
+            LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
               this._expId, stateName, interactionId, customizationArgs,
               learnerAnswerInfoDicts.map(
-                LearnerAnswerInfo.createFormBackendDict
+                LearnerAnswerInfoObjectFactory.createFormBackendDict
               )
             )
           );

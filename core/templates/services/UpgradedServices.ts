@@ -796,6 +796,7 @@ export class UpgradedServices {
       new LearnerAnswerDetailsDataService(
         upgradedServices['ExplorationDataService'],
         upgradedServices['HttpClient'],
+        upgradedServices['LearnerAnswerDetailsbackendApiService'],
         upgradedServices['UrlInterPolationService']
       );
     upgradedServices['LearnerExplorationSummaryObjectFactory'] =
