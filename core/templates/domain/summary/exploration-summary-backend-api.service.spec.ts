@@ -25,7 +25,7 @@ import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service.ts';
 
 
-fdescribe('Exploration Summary Backend Api Service', () => {
+describe('Exploration Summary Backend Api Service', () => {
   let explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -71,7 +71,7 @@ fdescribe('Exploration Summary Backend Api Service', () => {
     expect(failHandler).toHaveBeenCalledWith([null, null, null]);
   }));
 
-  fit('should use reject handler when server throws an error', fakeAsync(()=> {
+  it('should use reject handler when server throws an error', fakeAsync(()=> {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let explorationIds = ['12'];
