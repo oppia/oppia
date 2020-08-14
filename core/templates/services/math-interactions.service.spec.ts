@@ -220,6 +220,21 @@ describe('MathInteractionsService', () => {
       'The LHS of your equation is empty.');
 
     expect(mathInteractionsService.validateEquation(
+      'a=b=c', ['a', 'b', 'c'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your equation contains multiple = signs.');
+
+    expect(mathInteractionsService.validateEquation(
+      'a==b', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your equation contains multiple = signs.');
+
+    expect(mathInteractionsService.validateEquation(
+      'a+b=0=0', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your equation contains multiple = signs.');
+
+    expect(mathInteractionsService.validateEquation(
       'a/ = (-5)', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a variable/number after the "/".');

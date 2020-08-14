@@ -183,6 +183,10 @@ export class MathInteractionsService {
       return false;
     }
     let splitString = equationString.split('=');
+    if (splitString.length !== 2) {
+      this.warningText = 'Your equation contains multiple = signs.';
+      return false;
+    }
     let lhsString = splitString[0], rhsString = splitString[1];
     let lhsIsAlgebraicallyValid = this.validateAlgebraicExpression(
       lhsString, validVariablesList);
