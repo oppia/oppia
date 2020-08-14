@@ -30,6 +30,7 @@ require(
 describe('Exploration player page', function() {
   var ctrl = null;
   var $q = null;
+  var $rootScope = null;
   var $scope = null;
   var ContextService = null;
   var PageTitleService = null;
@@ -69,6 +70,7 @@ describe('Exploration player page', function() {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
+    $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
     PageTitleService = $injector.get('PageTitleService');
     CommandExecutorService = $injector.get('CommandExecutorService');
@@ -77,6 +79,7 @@ describe('Exploration player page', function() {
     ReadOnlyExplorationBackendApiService = $injector.get(
       'ReadOnlyExplorationBackendApiService');
 
+    $scope = $rootScope.$new();
     ctrl = $componentController('explorationPlayerPage', {
       $scope: $scope
     });
