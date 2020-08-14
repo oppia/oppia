@@ -191,7 +191,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           $log.info('Changes to this exploration were saved successfully.');
           ChangeListService.discardAllChanges();
           $rootScope.$broadcast('initExplorationPage');
-          $rootScope.$broadcast('refreshVersionHistory', {
+          RouterService.onRefreshVersionHistory.emit({
             forceRefresh: true
           });
           AlertsService.addSuccessMessage('Changes saved.');

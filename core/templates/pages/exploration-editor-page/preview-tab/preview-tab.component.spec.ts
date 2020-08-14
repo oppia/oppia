@@ -36,6 +36,7 @@ describe('Preview Tab Component', function() {
   var explorationEngineService = null;
   var explorationInitStateNameService = null;
   var explorationFeaturesService = null;
+  var explorationPlayerStateService = null;
   var learnerParamsService = null;
   var numberAttemptsService = null;
   var routerService = null;
@@ -43,6 +44,7 @@ describe('Preview Tab Component', function() {
   var paramChangeObjectFactory = null;
   var parameterMetadataService = null;
   var mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
+  var mockPlayerStateChangeEventEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var stateName = 'State1';
@@ -91,6 +93,7 @@ describe('Preview Tab Component', function() {
         'EditableExplorationBackendApiService');
       explorationEngineService = $injector.get('ExplorationEngineService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
+      explorationPlayerStateService = $injector.get('ExplorationPlayerStateService');
       learnerParamsService = $injector.get('LearnerParamsService');
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
@@ -104,6 +107,9 @@ describe('Preview Tab Component', function() {
       spyOnProperty(explorationEngineService,
         'onUpdateActiveStateIfInEditor').and.returnValue(
         mockUpdateActiveStateIfInEditorEventEmitter);
+      spyOnProperty(explorationPlayerStateService,
+        'onPlayerStateChange').and.returnValue(
+        mockPlayerStateChangeEventEmitter);
       $scope = $rootScope.$new();
       ctrl = $componentController('previewTab', {
         $scope: $scope,
@@ -139,7 +145,7 @@ describe('Preview Tab Component', function() {
         spyOn(learnerParamsService, 'getAllParams').and.returnValue({
           foo: []
         });
-        $rootScope.$broadcast('playerStateChange');
+        mockPlayerStateChangeEventEmitter.emit();
 
         expect(ctrl.allParams).toEqual({
           foo: []
@@ -154,8 +160,7 @@ describe('Preview Tab Component', function() {
       spyOn(learnerParamsService, 'getAllParams').and.returnValue({
         foo: []
       });
-
-      $rootScope.$broadcast('playerStateChange');
+      mockPlayerStateChangeEventEmitter.emit();
       expect(ctrl.showParameterSummary()).toBe(true);
     });
 
