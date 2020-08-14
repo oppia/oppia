@@ -133,8 +133,8 @@ describe('GraphInputValidationService', () => {
     expect(() => {
       validatorService.getAllWarnings(
         // This throws "Argument of type '{}' is not assignable to
-        // parameter of type 'GraphInputCustomizationArgs'." We did not
-        // assign the correct type of customization args in order to test
+        // parameter of type 'GraphInputCustomizationArgs'." We are purposely
+        // assigning the wrong type of customization args in order to test
         // validations.
         // @ts-expect-error
         currentState, {}, answerGroups, goodDefaultOutcome);
