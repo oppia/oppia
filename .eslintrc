@@ -238,6 +238,32 @@
     "unused-imports/no-unused-imports-ts": "error",
     "@typescript-eslint/no-explicit-any": ["error"],
     "@typescript-eslint/semi": ["error"],
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        "types": {
+          "String": {
+            "message": "Use string instead.",
+            "fixWith": "string"
+          },
+          "Number": {
+            "message": "Use number instead.",
+            "fixWith": "number"
+          },
+          "Boolean": {
+            "message": "Use boolean instead.",
+            "fixWith": "boolean"
+          }
+        },
+        "extendDefaults": false
+      }
+    ],
+    "@typescript-eslint/array-type": [
+      "error",
+      {
+        "default": "array"
+      }
+    ],
     "wrap-iife": [
       "error",
       "any"

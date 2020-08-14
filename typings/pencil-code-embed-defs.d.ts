@@ -3,24 +3,24 @@
 // only class exported by the library.
 
 interface SetupCode {
-  code: String,
-  type: String
+  code: string,
+  type: string
 }
 
 class PencilCodeEmbed {
   div: Object;
-  updatedCode: String;
+  updatedCode: string;
   callbacks: Object;
   requests: Object;
 
   // Hook up noop event handlers.
-  on: (tag: String, callback: Function) => void;
+  on: (tag: string, callback: Function) => void;
 
   // Send messages to the remote iframe.
   invokeRemote: (
-    method: String, args: Array<Object>, callback: Function) => PencilCodeEmbed;
+    method: string, args: Object[], callback: Function) => PencilCodeEmbed;
 
-  beginLoad: (code: String) => PencilCodeEmbed;
+  beginLoad: (code: string) => PencilCodeEmbed;
 
   // Used to define supplementary scripts to run in the preview pane:
   // script is an array of objects that may have "src" or
@@ -32,10 +32,10 @@ class PencilCodeEmbed {
   setupScript: (setup: SetupCode[]) => PencilCodeEmbed;
 
   // Sets code into the editor.
-  setCode: (code: String) => PencilCodeEmbed;
+  setCode: (code: string) => PencilCodeEmbed;
 
   // Gets code from the editor.
-  getCode: () => String;
+  getCode: () => string;
 
   // Starts running.
   beginRun: () => PencilCodeEmbed;
@@ -71,7 +71,7 @@ class PencilCodeEmbed {
   showToggleButton: () => PencilCodeEmbed;
 
   // Show butter bar notification.
-  showNotification: (message: String) => PencilCodeEmbed;
+  showNotification: (message: string) => PencilCodeEmbed;
 
   // Hides butter bar notification.
   hideNotification: () => PencilCodeEmbed;
@@ -82,7 +82,7 @@ class PencilCodeEmbed {
   // Shows block mode.
   setBlockOptions: (palette: Object, options: Object) => PencilCodeEmbed;
 
-  eval: (code: String, callback: Function, raw: Object) => PencilCodeEmbed;
+  eval: (code: string, callback: Function, raw: Object) => PencilCodeEmbed;
 
   constructor(div: Object);
 }

@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface TypeDefinitionObject {
-  'validate': (arg0: Object) => Boolean;
+  'validate': (arg0: Object) => boolean;
 
   // The default value is typed as Object because it's type could be anything.
   // It depends on the arguments passed to the constructor.
@@ -32,7 +32,7 @@ interface TypeDefinitionObject {
 
 export class ParamType {
   _name: string;
-  valueIsValid: (arg0: Object) => Boolean;
+  valueIsValid: (arg0: Object) => boolean;
   defaultValue: Object;
 
   /**

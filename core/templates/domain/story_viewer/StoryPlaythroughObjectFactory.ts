@@ -54,7 +54,7 @@ export class StoryPlaythrough {
     return this.nodes[0];
   }
 
-  getStoryNodeCount(): Number {
+  getStoryNodeCount(): number {
     return this.nodes.length;
   }
 

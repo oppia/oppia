@@ -29,7 +29,7 @@ import {
 
 export class TopicsAndSkillsDashboardFilter {
   classroom: string;
-  keywords: Array<string>;
+  keywords: string[];
   sort: ETopicSortOptions;
   status: ETopicPublishedOptions;
 

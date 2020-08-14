@@ -62,7 +62,7 @@ interface SkulptTokens {
 interface SkulptParseTables{
   dfas: Object;
   keywords: SkulptKeywords;
-  labels: Array<Object>;
+  labels: Object[];
   number2symbol: SkulptNumber2Symbol;
   start: number;
   states: Object;
@@ -173,8 +173,8 @@ interface Skulpt {
   python2: SkulptPython;
   python3: SkulptPython;
   SYMTAB_CONSTS: SYMTAB_CONSTS;
-  sysargv: Array<Object>;
-  syspath: Array<Obejct>;
+  sysargv: Object[];
+  syspath: Object[];
   sysmodules: Object;
   yieldLimit: number;
 
@@ -191,7 +191,7 @@ interface Skulpt {
   'exportSymbol': (name: string, object: Object) => Object;
   'fixReservedNames': (name: string) => string;
   'fixReservedWords': (name: string) => string;
-  'getSysArgv': () => Array<Object>;
+  'getSysArgv': () => Object[];
   'importBuiltinWithBody': (
     name: string, dumpJS: boolean, body: string, canSuspend: boolean) => Object;
   'importMain': (name: string, dumpJS: boolean, canSuspend: boolean) => Object;

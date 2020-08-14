@@ -64,7 +64,7 @@ export class LostChange {
   // object, then simply return that object. In case of an array, return
   // the last item.
   getStatePropertyValue(
-      statePropertyValue: Array<string> | Object): string | Object {
+      statePropertyValue: string[] | Object): string | Object {
     return Array.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   }

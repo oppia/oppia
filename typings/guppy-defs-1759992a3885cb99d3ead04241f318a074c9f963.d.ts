@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 // Code - third_party/static/guppy-175999/src/guppy.js
-// This guppy version corresponds to the commit on June 15 2020. 
+// This guppy version corresponds to the commit on June 15 2020.
 // For reference, visit:
 // https://github.com/daniel3735928559/guppy/tree/1759992a3885cb99d3ead04241f318a074c9f963
 
@@ -54,7 +54,7 @@ class Guppy {
   configure: () => void;
   deactivate: () => void;
   doc: () => Object;
-  equations: () => Array<Object>;
+  equations: () => Object[];
   evaluate: (evaluators?: Object) => Object;
   event: (name: string, handler: Function) => void;
   func: (evaluators?: Object) => Function;
@@ -68,7 +68,7 @@ class Guppy {
   render: (updated?: boolean) => void;
   render_node: (t: string) => string;
   select_to: (x: number, y: number, mouse: Object) => void;
-  symbols_used: (groups?: Array<String>) => string[];
+  symbols_used: (groups?: string[]) => string[];
   syntax_tree: () => Object;
   text: () => string;
   vars: () => string[];
