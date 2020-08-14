@@ -35,6 +35,9 @@ interface EnvDict {
 }
 
 export class ExpressionError extends Error {
+  // 'message' is optional beacuse it is optional in the actual 'Error'
+  // constructor object. Also, we may not want a custom error message
+  // while throwing 'ExpressionError'.
   constructor(message?: string) {
     super(message);
     // NOTE TO DEVELOPERS: In order to properly extend Error, we must manually
