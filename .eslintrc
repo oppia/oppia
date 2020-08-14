@@ -202,6 +202,7 @@
     // The following must be off so that we can enable
     // "@typescript-eslint/semi", which checks semicolons in TS files.
     "semi": "off",
+    "semi-spacing": "error",
     "space-before-blocks": [
       "error",
       "always"
