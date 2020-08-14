@@ -162,12 +162,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -407,12 +405,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -970,12 +966,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1342,12 +1336,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1495,12 +1487,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
