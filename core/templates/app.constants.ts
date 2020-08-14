@@ -110,10 +110,11 @@ export class AppConstants {
 
   // Do not modify these, for backwards-compatibility reasons.
   public static COMPONENT_NAME_CONTENT = 'content';
-  public static COMPONENT_NAME_HINT = 'hint';
-  public static COMPONENT_NAME_SOLUTION = 'solution';
-  public static COMPONENT_NAME_FEEDBACK = 'feedback';
   public static COMPONENT_NAME_EXPLANATION = 'explanation';
+  public static COMPONENT_NAME_FEEDBACK = 'feedback';
+  public static COMPONENT_NAME_HINT = 'hint';
+  public static COMPONENT_NAME_INTERACTION_RULE = 'rule';
+  public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_WORKED_EXAMPLE = {
     QUESTION: 'worked_example_question',
     EXPLANATION: 'worked_example_explanation'

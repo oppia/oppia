@@ -53,6 +53,8 @@ require(
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
+const RULE_TEMPLATES = require('interactions/rule_templates.json');
+
 angular.module('oppia').directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -67,22 +69,26 @@ angular.module('oppia').directive('stateTranslation', [
         '$filter', '$rootScope', '$scope', 'CkEditorCopyContentService',
         'ExplorationCorrectnessFeedbackService',
         'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
-        'ExplorationStatesService', 'RouterService', 'StateEditorService',
+        'ExplorationStatesService', 'RouterService', 'RuleObjectFactory',
+        'StateEditorService',
         'TranslationLanguageService', 'TranslationStatusService',
         'TranslationTabActiveContentIdService',
         'TranslationTabActiveModeService', 'COMPONENT_NAME_CONTENT',
         'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
+        'COMPONENT_NAME_INTERACTION_RULE',
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
             $filter, $rootScope, $scope, CkEditorCopyContentService,
             ExplorationCorrectnessFeedbackService,
             ExplorationInitStateNameService, ExplorationLanguageCodeService,
-            ExplorationStatesService, RouterService, StateEditorService,
+            ExplorationStatesService, RouterService, RuleObjectFactory,
+            StateEditorService,
             TranslationLanguageService, TranslationStatusService,
             TranslationTabActiveContentIdService,
             TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
+            COMPONENT_NAME_INTERACTION_RULE,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
             RULE_SUMMARY_WRAP_CHARACTER_COUNT
         ) {
@@ -237,6 +243,22 @@ angular.module('oppia').directive('stateTranslation', [
             return summary;
           };
 
+          $scope.summarizeRulesOfType = function(ruleType, ruleInputs) {
+            let summary = '';
+            ruleInputs.forEach((ruleInput, index) => {
+              if (index !== 0) {
+                const isLast = index === ruleInputs.length - 1;
+                summary += isLast ? ' or ' : ', ';
+              }
+              summary += $filter('convertToPlainText')(
+                $filter('parameterizeRuleDescription')(
+                  RuleObjectFactory.createNew(ruleType, ruleInput),
+                  $scope.stateInteractionId,
+                  $scope.answerChoices));
+            });
+            return summary;
+          };
+
           $scope.isDisabled = function(tabId) {
             if (tabId === $scope.TAB_ID_CONTENT) {
               return false;
@@ -335,6 +357,18 @@ angular.module('oppia').directive('stateTranslation', [
             return htmlAsPlainText;
           };
 
+          $scope.filterForTranslatableRules = function(ruleTypesToInputs) {
+            const interactionId = $scope.stateInteractionId;
+            const translatableRuleTypesToInputs = Object.keys(ruleTypesToInputs)
+              .filter(ruleType =>
+                RULE_TEMPLATES[interactionId][ruleType].translatable)
+              .reduce((obj, key) => {
+                obj[key] = ruleTypesToInputs[key];
+                return obj;
+              }, {});
+            return translatableRuleTypesToInputs;
+          };
+
           $scope.initStateTranslation = function() {
             $scope.stateName = StateEditorService.getActiveStateName();
             $scope.stateContent = ExplorationStatesService
@@ -349,6 +383,8 @@ angular.module('oppia').directive('stateTranslation', [
               .getInteractionDefaultOutcomeMemento($scope.stateName);
             $scope.stateInteractionId = ExplorationStatesService
               .getInteractionIdMemento($scope.stateName);
+            $scope.stateInteractionCustomizationArgs = ExplorationStatesService
+              .getInteractionCustomizationArgsMemento($scope.stateName);
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
             var currentCustomizationArgs = ExplorationStatesService
@@ -371,7 +407,8 @@ angular.module('oppia').directive('stateTranslation', [
             $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
             $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
             $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
-
+            $scope.TAB_ID_RULES = COMPONENT_NAME_INTERACTION_RULE;
+            $scope.INTERACTION_SPECS = INTERACTION_SPECS;
             $scope.ExplorationCorrectnessFeedbackService =
               ExplorationCorrectnessFeedbackService;
 

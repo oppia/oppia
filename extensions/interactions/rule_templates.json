@@ -1,267 +1,342 @@
 {
   "AlgebraicExpressionInput": {
     "MatchesExactlyWith": {
-      "description": "matches exactly with {{x|AlgebraicExpression}}"
+      "description": "matches exactly with {{x|AlgebraicExpression}}",
+      "translatable": false
     },
     "IsEquivalentTo": {
-      "description": "is equivalent to {{x|AlgebraicExpression}}"
+      "description": "is equivalent to {{x|AlgebraicExpression}}",
+      "translatable": false
     }
   },
   "CodeRepl": {
     "CodeEquals": {
-      "description": "has code equal to {{x|CodeString}}"
+      "description": "has code equal to {{x|CodeString}}",
+      "translatable": false
     },
     "CodeContains": {
-      "description": "has code that contains {{x|CodeString}}"
+      "description": "has code that contains {{x|CodeString}}",
+      "translatable": false
     },
     "CodeDoesNotContain": {
-      "description": "has code that does not contain {{x|CodeString}}"
+      "description": "has code that does not contain {{x|CodeString}}",
+      "translatable": false
     },
     "OutputEquals": {
-      "description": "has output equal to {{x|CodeString}}"
+      "description": "has output equal to {{x|CodeString}}",
+      "translatable": false
     },
     "OutputContains": {
-      "description": "has output that contains {{x|CodeString}}"
+      "description": "has output that contains {{x|CodeString}}",
+      "translatable": false
     },
     "ResultsInError": {
-      "description": "results in an error when run"
+      "description": "results in an error when run",
+      "translatable": false
     },
     "ErrorContains": {
-      "description": "has error message that contains {{x|UnicodeString}}"
+      "description": "has error message that contains {{x|UnicodeString}}",
+      "translatable": false
     }
   },
   "Continue": {},
   "DragAndDropSortInput": {
     "IsEqualToOrdering": {
-      "description": "is equal to ordering {{x|ListOfSetsOfHtmlStrings}}"
+      "description": "is equal to ordering {{x|ListOfSetsOfHtmlStrings}}",
+      "translatable": false
     },
     "IsEqualToOrderingWithOneItemAtIncorrectPosition": {
-      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfHtmlStrings}}"
+      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfHtmlStrings}}",
+      "translatable": false
     },
     "HasElementXAtPositionY": {
-      "description": "has element {{x|DragAndDropHtmlString}} at position {{y|DragAndDropPositiveInt}}"
+      "description": "has element {{x|DragAndDropHtmlString}} at position {{y|DragAndDropPositiveInt}}",
+      "translatable": false
     },
     "HasElementXBeforeElementY": {
-      "description": "has element {{x|DragAndDropHtmlString}} before element {{y|DragAndDropHtmlString}}"
+      "description": "has element {{x|DragAndDropHtmlString}} before element {{y|DragAndDropHtmlString}}",
+      "translatable": false
     }
   },
   "EndExploration": {},
   "FractionInput": {
     "IsExactlyEqualTo": {
-      "description": "exactly matches {{f|Fraction}}"
+      "description": "exactly matches {{f|Fraction}}",
+      "translatable": false
     },
     "IsEquivalentTo": {
-      "description": "is equivalent to {{f|Fraction}}"
+      "description": "is equivalent to {{f|Fraction}}",
+      "translatable": false
     },
     "IsEquivalentToAndInSimplestForm": {
-      "description": "is equivalent to {{f|Fraction}} and in simplest form"
+      "description": "is equivalent to {{f|Fraction}} and in simplest form",
+      "translatable": false
     },
     "IsLessThan": {
-      "description": "is less than {{f|Fraction}}"
+      "description": "is less than {{f|Fraction}}",
+      "translatable": false
     },
     "IsGreaterThan": {
-      "description": "is greater than {{f|Fraction}}"
+      "description": "is greater than {{f|Fraction}}",
+      "translatable": false
     },
     "HasNumeratorEqualTo": {
-      "description": "has numerator equal to {{x|Int}}"
+      "description": "has numerator equal to {{x|Int}}",
+      "translatable": false
     },
     "HasDenominatorEqualTo": {
-      "description": "has denominator equal to {{x|NonnegativeInt}}"
+      "description": "has denominator equal to {{x|NonnegativeInt}}",
+      "translatable": false
     },
     "HasIntegerPartEqualTo": {
-      "description": "has integer part equal to {{x|Int}}"
+      "description": "has integer part equal to {{x|Int}}",
+      "translatable": false
     },
     "HasNoFractionalPart": {
-      "description": "has no fractional part"
+      "description": "has no fractional part",
+      "translatable": false
     },
     "HasFractionalPartExactlyEqualTo": {
-      "description": "has fractional part exactly equal to {{f|Fraction}}"
+      "description": "has fractional part exactly equal to {{f|Fraction}}",
+      "translatable": false
     }
   },
   "GraphInput": {
     "IsIsomorphicTo": {
-      "description": "is isomorphic to {{g|Graph}}, including matching labels"
+      "description": "is isomorphic to {{g|Graph}}, including matching labels",
+      "translatable": false
     }
   },
   "ImageClickInput": {
     "IsInRegion": {
-      "description": "is in the region {{x|UnicodeString}}"
+      "description": "is in the region {{x|UnicodeString}}",
+      "translatable": false
     }
   },
   "InteractiveMap": {
     "Within": {
-      "description": "is within {{d|Real}} km of {{p|CoordTwoDim}}"
+      "description": "is within {{d|Real}} km of {{p|CoordTwoDim}}",
+      "translatable": false
     },
     "NotWithin": {
-      "description": "is not within {{d|Real}} km of {{p|CoordTwoDim}}"
+      "description": "is not within {{d|Real}} km of {{p|CoordTwoDim}}",
+      "translatable": false
     }
   },
   "ItemSelectionInput": {
     "Equals": {
-      "description": "is equal to {{x|SetOfHtmlString}}"
+      "description": "is equal to {{x|SetOfHtmlString}}",
+      "translatable": false
     },
     "ContainsAtLeastOneOf": {
-      "description": "contains at least one of {{x|SetOfHtmlString}}"
+      "description": "contains at least one of {{x|SetOfHtmlString}}",
+      "translatable": false
     },
     "DoesNotContainAtLeastOneOf": {
-      "description": "omits at least one of {{x|SetOfHtmlString}}"
+      "description": "omits at least one of {{x|SetOfHtmlString}}",
+      "translatable": false
     },
     "IsProperSubsetOf": {
-      "description": "is a proper subset of {{x|SetOfHtmlString}}"
+      "description": "is a proper subset of {{x|SetOfHtmlString}}",
+      "translatable": false
     }
   },
   "LogicProof": {
     "Correct": {
-      "description": "is correct"
+      "description": "is correct",
+      "translatable": false
     },
     "NotCorrect": {
-      "description": "is not correct"
+      "description": "is not correct",
+      "translatable": false
     },
     "NotCorrectByCategory": {
-      "description": "is not correct due to {{c|LogicErrorCategory}}"
+      "description": "is not correct due to {{c|LogicErrorCategory}}",
+      "translatable": false
     }
   },
   "MathEquationInput": {
     "MatchesExactlyWith": {
-      "description": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}"
+      "description": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}",
+      "translatable": false
     },
     "IsEquivalentTo": {
-      "description": "is equivalent to {{x|MathEquation}}"
+      "description": "is equivalent to {{x|MathEquation}}",
+      "translatable": false
     }
   },
   "MathExpressionInput": {
     "IsMathematicallyEquivalentTo": {
-      "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
+      "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}",
+      "translatable": false
     }
   },
   "MultipleChoiceInput": {
     "Equals": {
-      "description": "is equal to {{x|NonnegativeInt}}"
+      "description": "is equal to {{x|NonnegativeInt}}",
+      "translatable": false
     }
   },
   "MusicNotesInput": {
     "Equals": {
-      "description": "is equal to {{x|MusicPhrase}}"
+      "description": "is equal to {{x|MusicPhrase}}",
+      "translatable": false
     },
     "IsLongerThan": {
-      "description": "has more than {{k|NonnegativeInt}} notes"
+      "description": "has more than {{k|NonnegativeInt}} notes",
+      "translatable": false
     },
     "HasLengthInclusivelyBetween": {
-      "description": "has between {{a|NonnegativeInt}} and {{b|NonnegativeInt}} notes, inclusive"
+      "description": "has between {{a|NonnegativeInt}} and {{b|NonnegativeInt}} notes, inclusive",
+      "translatable": false
     },
     "IsEqualToExceptFor": {
-      "description": "is equal to {{x|MusicPhrase}} except for {{k|NonnegativeInt}} notes"
+      "description": "is equal to {{x|MusicPhrase}} except for {{k|NonnegativeInt}} notes",
+      "translatable": false
     },
     "IsTranspositionOf": {
-      "description": "is a transposition of {{x|MusicPhrase}} by {{y|Int}} semitones"
+      "description": "is a transposition of {{x|MusicPhrase}} by {{y|Int}} semitones",
+      "translatable": false
     },
     "IsTranspositionOfExceptFor": {
-      "description": "is a transposition of {{x|MusicPhrase}} by {{y|Int}} semitones except for {{k|NonnegativeInt}} notes"
+      "description": "is a transposition of {{x|MusicPhrase}} by {{y|Int}} semitones except for {{k|NonnegativeInt}} notes",
+      "translatable": false
     }
   },
   "NumberWithUnits": {
     "IsEqualTo": {
-        "description": "is equal to {{f|NumberWithUnits}}"
+        "description": "is equal to {{f|NumberWithUnits}}",
+        "translatable": false
     },
     "IsEquivalentTo": {
-        "description": "is equivalent to {{f|NumberWithUnits}}"
+        "description": "is equivalent to {{f|NumberWithUnits}}",
+        "translatable": false
     }
   },
   "NumericExpressionInput": {
     "MatchesExactlyWith": {
-      "description": "matches exactly with {{x|NumericExpression}}"
+      "description": "matches exactly with {{x|NumericExpression}}",
+      "translatable": false
     },
     "IsEquivalentTo": {
-      "description": "is equivalent to {{x|NumericExpression}}"
+      "description": "is equivalent to {{x|NumericExpression}}",
+      "translatable": false
     },
     "ContainsSomeOf": {
-      "description": "contains at least one of the terms present in {{x|NumericExpression}}"
+      "description": "contains at least one of the terms present in {{x|NumericExpression}}",
+      "translatable": false
     },
     "OmitsSomeOf": {
-      "description": "omits at least one of the terms present in {{x|NumericExpression}}"
+      "description": "omits at least one of the terms present in {{x|NumericExpression}}",
+      "translatable": false
     }
   },
   "NumericInput": {
     "Equals": {
-      "description": "is equal to {{x|Real}}"
+      "description": "is equal to {{x|Real}}",
+      "translatable": false
     },
     "IsLessThan": {
-      "description": "is less than {{x|Real}}"
+      "description": "is less than {{x|Real}}",
+      "translatable": false
     },
     "IsGreaterThan": {
-      "description": "is greater than {{x|Real}}"
+      "description": "is greater than {{x|Real}}",
+      "translatable": false
     },
     "IsLessThanOrEqualTo": {
-      "description": "is less than or equal to {{x|Real}}"
+      "description": "is less than or equal to {{x|Real}}",
+      "translatable": false
     },
     "IsGreaterThanOrEqualTo": {
-      "description": "is greater than or equal to {{x|Real}}"
+      "description": "is greater than or equal to {{x|Real}}",
+      "translatable": false
     },
     "IsInclusivelyBetween": {
-      "description": "is between {{a|Real}} and {{b|Real}}, inclusive"
+      "description": "is between {{a|Real}} and {{b|Real}}, inclusive",
+      "translatable": false
     },
     "IsWithinTolerance": {
-      "description": "is within {{tol|Real}} of {{x|Real}}"
+      "description": "is within {{tol|Real}} of {{x|Real}}",
+      "translatable": false
     }
   },
   "PencilCodeEditor": {
     "CodeEquals": {
-      "description": "has code equal to {{x|CodeString}}"
+      "description": "has code equal to {{x|CodeString}}",
+      "translatable": false
     },
     "CodeContains": {
-      "description": "has code that contains {{x|CodeString}}"
+      "description": "has code that contains {{x|CodeString}}",
+      "translatable": false
     },
     "CodeDoesNotContain": {
-      "description": "has code that does not contain {{x|CodeString}}"
+      "description": "has code that does not contain {{x|CodeString}}",
+      "translatable": false
     },
     "OutputEquals": {
-      "description": "has output equal to {{x|CodeString}}"
+      "description": "has output equal to {{x|CodeString}}",
+      "translatable": false
     },
     "OutputRoughlyEquals": {
-      "description": "has output equal to {{x|CodeString}}, ignoring spacing and case"
+      "description": "has output equal to {{x|CodeString}}, ignoring spacing and case",
+      "translatable": false
     },
     "ResultsInError": {
-      "description": "results in an error when run"
+      "description": "results in an error when run",
+      "translatable": false
     },
     "ErrorContains": {
-      "description": "has error message that contains {{x|UnicodeString}}"
+      "description": "has error message that contains {{x|UnicodeString}}",
+      "translatable": false
     }
   },
   "SetInput": {
     "Equals": {
-      "description": "is equal to {{x|SetOfUnicodeString}}"
+      "description": "is equal to {{x|SetOfUnicodeString}}",
+      "translatable": true
     },
     "IsSubsetOf": {
-      "description": "is a proper subset of {{x|SetOfUnicodeString}}"
+      "description": "is a proper subset of {{x|SetOfUnicodeString}}",
+      "translatable": true
     },
     "IsSupersetOf": {
-      "description": "is a proper superset of {{x|SetOfUnicodeString}}"
+      "description": "is a proper superset of {{x|SetOfUnicodeString}}",
+      "translatable": true
     },
     "HasElementsIn": {
-      "description": "has elements in common with {{x|SetOfUnicodeString}}"
+      "description": "has elements in common with {{x|SetOfUnicodeString}}",
+      "translatable": true
     },
     "HasElementsNotIn": {
-      "description": "has elements not in {{x|SetOfUnicodeString}}"
+      "description": "has elements not in {{x|SetOfUnicodeString}}",
+      "translatable": true
     },
     "OmitsElementsIn": {
-      "description": "omits some elements of {{x|SetOfUnicodeString}}"
+      "description": "omits some elements of {{x|SetOfUnicodeString}}",
+      "translatable": true
     },
     "IsDisjointFrom": {
-      "description": "has no elements in common with {{x|SetOfUnicodeString}}"
+      "description": "has no elements in common with {{x|SetOfUnicodeString}}",
+      "translatable": true
     }
   },
   "TextInput": {
     "Equals": {
-      "description": "is equal to {{x|NormalizedString}}, without taking case into account"
+      "description": "is equal to {{x|NormalizedString}}, without taking case into account",
+      "translatable": true
     },
     "StartsWith": {
-      "description": "starts with {{x|NormalizedString}}"
+      "description": "starts with {{x|NormalizedString}}",
+      "translatable": true
     },
     "Contains": {
-      "description": "contains {{x|NormalizedString}}"
+      "description": "contains {{x|NormalizedString}}",
+      "translatable": true
     },
     "FuzzyEquals": {
-      "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
+      "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character",
+      "translatable": true
     }
   }
 }

@@ -217,7 +217,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
 
         var newStateData = _states.getState(stateName);
         var accessorList = PROPERTY_REF_DATA[backendName];
-
         if (CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
           var oldContentIds = CONTENT_ID_EXTRACTORS[backendName](oldValue);
           var newContentIds = CONTENT_ID_EXTRACTORS[backendName](newValue);

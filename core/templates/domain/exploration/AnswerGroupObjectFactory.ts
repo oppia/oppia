@@ -32,7 +32,10 @@ export interface RuleInputs {
 
 interface RuleInputTranslations {
   [ruleType: string]: {
-    [languageCode: string]: InteractionRuleInputs[]
+    [languageCode: string]: {
+      'input': InteractionRuleInputs[],
+      'needs_update': boolean;
+    }
   }
 }
 

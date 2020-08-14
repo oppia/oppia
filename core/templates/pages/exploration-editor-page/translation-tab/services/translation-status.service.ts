@@ -37,13 +37,19 @@ require(
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
+const RULE_TEMPLATES = require('interactions/rule_templates.json');
+
 angular.module('oppia').factory('TranslationStatusService', [
-  'ExplorationStatesService', 'StateRecordedVoiceoversService',
+  'ExplorationStatesService', 'StateEditorService',
+  'StateRecordedVoiceoversService',
   'StateWrittenTranslationsService', 'TranslationLanguageService',
-  'TranslationTabActiveModeService', 'INTERACTION_SPECS', function(
-      ExplorationStatesService, StateRecordedVoiceoversService,
+  'TranslationTabActiveModeService', 'COMPONENT_NAME_INTERACTION_RULE',
+  'INTERACTION_SPECS', function(
+      ExplorationStatesService, StateEditorService,
+      StateRecordedVoiceoversService,
       StateWrittenTranslationsService, TranslationLanguageService,
-      TranslationTabActiveModeService, INTERACTION_SPECS) {
+      TranslationTabActiveModeService, COMPONENT_NAME_INTERACTION_RULE,
+      INTERACTION_SPECS) {
     var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var TRANSLATION_NEEDS_UPDATE_MESSAGE = ['Translation needs update!'];
     var ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
@@ -197,7 +203,54 @@ angular.module('oppia').factory('TranslationStatusService', [
       return contentIdList;
     };
 
+    const _getTranslatableRulesForAnswerGroup = function(answerGroup) {
+      const activeState = StateEditorService.getActiveStateName();
+      const interactionId = ExplorationStatesService
+        .getInteractionIdMemento(activeState);
+      const translatableRuleTypes = (
+        Object.keys(answerGroup.ruleTypesToInputs)
+          .filter(ruleType =>
+            RULE_TEMPLATES[interactionId][ruleType].translatable)
+      );
+      return translatableRuleTypes;
+    };
+
     var _getActiveStateComponentStatus = function(componentName) {
+      if (componentName === COMPONENT_NAME_INTERACTION_RULE) {
+        const activeState = StateEditorService.getActiveStateName();
+        const answerGroups = ExplorationStatesService
+          .getInteractionAnswerGroupsMemento(activeState);
+        langCode = TranslationLanguageService.getActiveLanguageCode();
+
+        let translatableRuleTypesCovered = 0;
+        let totalTranslatableRuleTypesCovered = 0;
+
+        answerGroups.forEach(answerGroup => {
+          const translatableRuleTypes = _getTranslatableRulesForAnswerGroup(
+            answerGroup);
+          totalTranslatableRuleTypesCovered += translatableRuleTypes.length;
+          translatableRuleTypes.forEach(translatableRuleType => {
+            const ruleInputTranslations = (
+              answerGroup.ruleInputTranslations[langCode]);
+            if (
+              ruleInputTranslations.hasOwnProperty(translatableRuleType) &&
+              ruleInputTranslations[translatableRuleType].length > 0
+            ) {
+              translatableRuleTypesCovered += 1;
+            }
+          });
+        });
+
+        if (
+          translatableRuleTypesCovered === totalTranslatableRuleTypesCovered
+        ) {
+          return ALL_ASSETS_AVAILABLE_COLOR;
+        } else if (translatableRuleTypesCovered === 0) {
+          return NO_ASSETS_AVAILABLE_COLOR;
+        }
+        return FEW_ASSETS_AVAILABLE_COLOR;
+      }
+
       var contentIdList = _getContentIdListRelatedToComponent(componentName);
       var availableAudioCount = 0;
       if (contentIdList) {
