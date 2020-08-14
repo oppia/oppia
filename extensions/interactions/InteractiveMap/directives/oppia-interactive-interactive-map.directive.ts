@@ -37,12 +37,12 @@ import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
   'InteractionAttributesExtractorService',
-  'InteractiveMapRulesService', 'UrlInterpolationService',
-  'PlayerPositionService',
+  'InteractiveMapRulesService', 'PlayerPositionService',
+  'UrlInterpolationService',
   function(
       InteractionAttributesExtractorService,
-      InteractiveMapRulesService, UrlInterpolationService,
-      PlayerPositionService) {
+      InteractiveMapRulesService, PlayerPositionService,
+      UrlInterpolationService,) {
     return {
       restrict: 'E',
       scope: {},

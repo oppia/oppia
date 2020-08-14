@@ -32,11 +32,11 @@ require('pages/exploration-editor-page/services/router.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
   '$log', '$rootScope', '$uibModal', 'ExplorationDataService',
-  'ExplorationStatesService', 'StateObjectFactory', 'RouterService',
+  'ExplorationStatesService', 'RouterService', 'StateObjectFactory',
   'SuggestionModalService', 'ThreadDataService', 'UrlInterpolationService',
   function(
       $log, $rootScope, $uibModal, ExplorationDataService,
-      ExplorationStatesService, StateObjectFactory, RouterService,
+      ExplorationStatesService, RouterService, StateObjectFactory,
       SuggestionModalService, ThreadDataService, UrlInterpolationService) {
     let showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
