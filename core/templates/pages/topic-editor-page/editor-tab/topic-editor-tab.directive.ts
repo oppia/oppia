@@ -447,7 +447,7 @@ angular.module('oppia').directive('topicEditorTab', [
                   }
                 )
             );
-            ctrl._initEditor();
+            ctrl.initEditor();
             _initStorySummaries();
           };
           ctrl.$onDestroy = function() {

@@ -58,7 +58,6 @@ describe('Topic editor tab directive', function() {
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
   var mockTasdReinitializedEventEmitter;
-  s;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
   var MockWindowDimensionsService = {
