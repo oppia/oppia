@@ -35,7 +35,7 @@ import { FeatureStage, PlatformParameterObjectFactory } from
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 
-fdescribe('Admin backend api service', () => {
+describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
   let cdof: ComputationDataObjectFactory;
   let jdof: JobDataObjectFactory;

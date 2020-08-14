@@ -33,7 +33,7 @@ import { PlatformParameterFilterType, ServerMode } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 
-fdescribe('Admin page feature tab', function() {
+describe('Admin page feature tab', function() {
   let component: AdminFeaturesTabComponent;
   let fixture: ComponentFixture<AdminFeaturesTabComponent>;
 
