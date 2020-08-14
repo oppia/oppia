@@ -22,7 +22,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { RatioExpressionInputValidationService } from
 // eslint-disable-next-line max-len
-  'interactions/RatioExpressionInput/directives/Ratio-expression-input-validation.service';
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from

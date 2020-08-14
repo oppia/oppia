@@ -99,7 +99,8 @@ export class InteractionRulesRegistryService {
         NumericExpressionInputRulesService,
       private numericInputRulesService: NumericInputRulesService,
       private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
-      private ratioExpressionRulesService: RatioExpressionInputRulesService,
+      private ratioExpressionInputRulesService:
+       RatioExpressionInputRulesService,
       private setInputRulesService: SetInputRulesService,
       private textInputRulesService: TextInputRulesService) {
     this.rulesServiceRegistry = new Map(Object.entries({
@@ -124,7 +125,7 @@ export class InteractionRulesRegistryService {
         this.numericExpressionInputRulesService,
       NumericInputRulesService: this.numericInputRulesService,
       PencilCodeEditorRulesService: this.pencilCodeEditorRulesService,
-      RatioExpressionRulesService: this.ratioExpressionRulesService,
+      RatioExpressionInputRulesService: this.ratioExpressionInputRulesService,
       SetInputRulesService: this.setInputRulesService,
       TextInputRulesService: this.textInputRulesService,
     }));

@@ -770,12 +770,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_values_with_error_messages = [
             (None, 'Expected unicode string, received None'),
             (2, 'Expected unicode string, received 2'),
-            (
-                'string',
-                'Received string which is not in the allowed range of choices'),
-            (
-                'item',
-                'Received item which is not in the allowed range of choices')]
+            ({'a': 1}, r'Expected unicode string, received \{u\'a\': 1\}'),
+            ([1, 2, 1], r'Expected unicode string, received \[1, 2, 1\]')]
 
         self.check_normalization(
             objects.RatioExpression, mappings,
