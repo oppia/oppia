@@ -19,12 +19,16 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import change_domain
 from core.platform import models
 import feconf
 import python_utils
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
+CMD_UPDATE_USER = 'update_user'
+CMD_CREATE_NEW_USER = 'create_new_user'
 
 
 class UserGlobalPrefs(python_utils.OBJECT):
@@ -345,3 +349,39 @@ class UserContributionRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected can_review_questions to be a boolean value, '
                 'found: %s' % type(self.can_review_questions))
+
+
+class UserDetailsChange(change_domain.BaseChange):
+    """Domain object class for a change in user details. This includes both
+    UserSettings and UserAuthDetails.
+
+    The allowed commands, together with the attributes:
+        - 'update_user' (with user_id, display_alias and last_agreed_to_terms,
+            last_logged_in, user_bio, subject_interests,
+            preferred_language_codes, preferred_site_language_code,
+            preferred_audio_language_code, pin).
+        - 'create_new_user' (with email, display_alias and last_agreed_to_terms,
+            last_logged_in, user_bio, subject_interests,
+            preferred_language_codes, preferred_site_language_code,
+            preferred_audio_language_code, pin).
+    """
+
+    ALLOWED_COMMANDS = [{
+        'name': CMD_UPDATE_USER,
+        'required_attribute_names': [
+            'user_id', 'display_alias', 'last_agreed_to_terms',
+            'last_logged_in', 'user_bio', 'subject_interests',
+            'preferred_language_codes', 'preferred_site_language_code',
+            'preferred_audio_language_code', 'pin'
+        ],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_CREATE_NEW_USER,
+        'required_attribute_names': ['email', 'display_alias'],
+        'optional_attribute_names': [
+            'last_agreed_to_terms', 'last_logged_in', 'user_bio',
+            'subject_interests', 'preferred_language_codes',
+            'preferred_site_language_code', 'preferred_audio_language_code',
+            'pin'
+        ]
+    }]

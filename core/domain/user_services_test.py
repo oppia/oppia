@@ -29,6 +29,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_domain
 from core.domain import user_jobs_continuous
 from core.domain import user_services
 from core.platform import models
@@ -67,6 +68,35 @@ class MockUserStatsMRJobManager(
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
+
+    def setUp(self):
+        super(UserServicesUnitTests, self).setUp()
+        self.user_details_change_dict = {
+            'cmd': user_domain.CMD_UPDATE_USER,
+            'user_id': 'user_id',
+            'display_alias': 'display_alias',
+            'last_agreed_to_terms': None,
+            'last_logged_in': None,
+            'user_bio': 'user_bio',
+            'subject_interests': ['subject_interests'],
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'pin': '12345'
+        }
+        self.new_user_details_change_dict = {
+            'cmd': user_domain.CMD_CREATE_NEW_USER,
+            'email': 'a@example.com',
+            'display_alias': 'display_alias3',
+            'last_agreed_to_terms': None,
+            'last_logged_in': None,
+            'user_bio': 'user_bio',
+            'subject_interests': ['subject_interests'],
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'pin': '12345'
+        }
 
     def test_is_user_id_correct(self):
         self.assertTrue(
@@ -189,24 +219,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gae_id = 'someUser'
         user_id = user_services.create_new_user(
             gae_id, 'user@example.com').user_id
-        user_settings = user_services.get_user_settings(user_id)
-        data = {
-            'subject_interests': ['es', 'el'],
-            'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                user_settings.preferred_audio_language_code),
-            'pin': None
-        }
         bad_display_aliases_with_expected_error = [
-            ('', 'Expected display alias to be a string, received '),
-            (0, 'Expected display alias to be a string, received 0')]
+            ('', 'Expected display_alias to be a string, received .'),
+            (0, 'Expected display_alias to be a string, received 0.'),
+            (None, 'Expected display_alias to be a string, received None.')
+        ]
+        self.user_details_change_dict['user_id'] = user_id
+        self.user_details_change_dict['pin'] = None
         for display_alias, error_msg in bad_display_aliases_with_expected_error:
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
-                data['display_alias'] = display_alias
-                user_services.update_user_settings_and_auth_data(
-                    user_id, data)
+                self.user_details_change_dict['display_alias'] = display_alias
+                user_details_change_object = user_domain.UserDetailsChange(
+                    self.user_details_change_dict)
+                user_services.update_multiple_users_data(
+                    [user_details_change_object])
 
     def test_update_user_settings_valid_display_alias_set_successfully(self):
         gae_id = 'someUser'
@@ -214,19 +240,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             gae_id, 'user@example.com').user_id
         display_alias = 'Name'
         user_settings = user_services.get_user_settings(user_id)
-        data = {
-            'subject_interests': ['es', 'el'],
-            'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                user_settings.preferred_audio_language_code),
-            'pin': None,
-            'display_alias': display_alias
-        }
         self.assertIsNone(user_settings.display_alias)
-        user_services.update_user_settings_and_auth_data(
-            user_id, data)
+        self.user_details_change_dict['user_id'] = user_id
+        self.user_details_change_dict['pin'] = None
+        self.user_details_change_dict['display_alias'] = display_alias
+        self.user_details_change_dict['last_agreed_to_terms'] = (
+            user_settings.last_agreed_to_terms)
+        self.user_details_change_dict['last_logged_in'] = (
+            user_settings.last_logged_in)
+        user_services.update_multiple_users_data(
+            [user_domain.UserDetailsChange(self.user_details_change_dict)]
+        )
         user_settings = user_services.get_user_settings(user_id)
         self.assertEqual(user_settings.display_alias, display_alias)
 
@@ -238,43 +262,25 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         display_alias = 'display_alias'
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_settings = user_services.get_user_settings(user_id)
-        data = {
-            'subject_interests': ['es', 'el'],
-            'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                user_settings.preferred_audio_language_code),
-            'pin': user_pin,
-            'display_alias': display_alias
-        }
-        user_services.update_user_settings_and_auth_data(user_id, data)
-        error_msg = 'Display alias display_alias already exists in the account.'
+        self.user_details_change_dict['user_id'] = user_id
+        self.user_details_change_dict['pin'] = user_pin
+        self.user_details_change_dict['display_alias'] = display_alias
+        self.user_details_change_dict['last_agreed_to_terms'] = (
+            user_settings.last_agreed_to_terms)
+        self.user_details_change_dict['last_logged_in'] = (
+            user_settings.last_logged_in)
+        user_services.update_multiple_users_data(
+            [user_domain.UserDetailsChange(self.user_details_change_dict)]
+        )
+        error_msg = 'New users have duplicate display aliases.'
         with self.assertRaisesRegexp(Exception, error_msg):
-            user_services.create_new_profile(
-                gae_id, user_email, display_alias, profile_pin=profile_pin)
-
-    def test_set_invalid_user_pin_raises_exception(self):
-        gae_id = 'someUser'
-        user_id = user_services.create_new_user(
-            gae_id, 'user@example.com').user_id
-        bad_pins_with_expected_error = [
-            ('', 'Expected PIN to be a string, received '),
-            (0, 'Expected PIN to be a string, received 0')]
-        user_settings = user_services.get_user_settings(user_id)
-        data = {
-            'subject_interests': ['es', 'el'],
-            'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                user_settings.preferred_audio_language_code),
-            'display_alias': None
-        }
-        for pin, error_msg in bad_pins_with_expected_error:
-            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
-                data['pin'] = pin
-                user_services.update_user_settings_and_auth_data(user_id, data)
+            self.new_user_details_change_dict['email'] = user_email
+            self.new_user_details_change_dict['display_alias'] = display_alias
+            self.new_user_details_change_dict['pin'] = profile_pin
+            user_services.create_new_profiles(
+                gae_id, [user_domain.UserDetailsChange(
+                    self.new_user_details_change_dict)]
+            )
 
     def test_create_new_user_with_invalid_emails_raises_exception(self):
         bad_email_addresses_with_expected_error_message = [
@@ -705,21 +711,29 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_pin = '12345'
         profile_pin = '123'
         display_alias = 'display_alias'
+        display_alias_2 = 'display_alias_2'
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_settings = user_services.get_user_settings(user_id)
-        data = {
-            'subject_interests': ['es', 'el'],
-            'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                user_settings.preferred_audio_language_code),
-            'pin': user_pin,
-            'display_alias': None
-        }
-        user_services.update_user_settings_and_auth_data(user_id, data)
-        user_services.create_new_profile(
-            gae_id, user_email, display_alias, profile_pin=profile_pin)
+
+        self.user_details_change_dict['user_id'] = user_id
+        self.user_details_change_dict['pin'] = user_pin
+        self.user_details_change_dict['display_alias'] = display_alias
+        self.user_details_change_dict['last_agreed_to_terms'] = (
+            user_settings.last_agreed_to_terms)
+        self.user_details_change_dict['last_logged_in'] = (
+            user_settings.last_logged_in)
+        user_services.update_multiple_users_data(
+            [user_domain.UserDetailsChange(self.user_details_change_dict)]
+        )
+        self.new_user_details_change_dict['display_alias'] = display_alias_2
+        self.new_user_details_change_dict['email'] = user_email
+        self.new_user_details_change_dict['pin'] = profile_pin
+
+        user_services.create_new_profiles(
+            gae_id, [
+                user_domain.UserDetailsChange(
+                    self.new_user_details_change_dict)]
+        )
         profile_user_id = (
             user_services.get_all_profiles_auth_details_by_parent_user_id(
                 user_id)[0].user_id
@@ -803,6 +817,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gae_id = 'gae_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
+        display_alias_2 = 'display_alias2'
         user_pin = '12345'
         profile_pin = '123'
         user_services.create_new_user(gae_id, email)
@@ -812,19 +827,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         user_id = user_auth_details_model.id
         user_settings = user_services.get_user_settings(user_id)
-        data = {
-            'subject_interests': ['es', 'el'],
-            'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                user_settings.preferred_audio_language_code),
-            'pin': user_pin,
-            'display_alias': None
-        }
-        user_services.update_user_settings_and_auth_data(user_id, data)
-        user_services.create_new_profile(
-            gae_id, email, display_alias, profile_pin=profile_pin)
+        self.user_details_change_dict['user_id'] = user_id
+        self.user_details_change_dict['pin'] = user_pin
+        self.user_details_change_dict['display_alias'] = display_alias
+        self.user_details_change_dict['last_agreed_to_terms'] = (
+            user_settings.last_agreed_to_terms)
+        self.user_details_change_dict['last_logged_in'] = (
+            user_settings.last_logged_in)
+        user_services.update_multiple_users_data(
+            [user_domain.UserDetailsChange(self.user_details_change_dict)]
+        )
+        self.new_user_details_change_dict['display_alias'] = display_alias_2
+        self.new_user_details_change_dict['email'] = email
+        self.new_user_details_change_dict['pin'] = profile_pin
+        user_services.create_new_profiles(
+            gae_id, [user_domain.UserDetailsChange(
+                self.new_user_details_change_dict)]
+        )
 
         user_auth_details_models = (
             user_services.get_all_profiles_auth_details_by_parent_user_id(
@@ -843,14 +862,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.create_new_user(gae_id, email)
         error_msg = 'Pin must be set for a full user before creating a profile.'
         with self.assertRaisesRegexp(Exception, error_msg):
-            user_services.create_new_profile(
-                gae_id, email, display_alias, profile_pin=profile_pin)
+            self.new_user_details_change_dict['display_alias'] = display_alias
+            self.new_user_details_change_dict['email'] = email
+            self.new_user_details_change_dict['pin'] = profile_pin
+            user_services.create_new_profiles(
+                gae_id, [user_domain.UserDetailsChange(
+                    self.new_user_details_change_dict)]
+            )
 
     def test_create_multiple_new_profiles_for_same_user_works_correctly(self):
         gae_id = 'gae_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
         display_alias_2 = 'display_alias2'
+        display_alias_3 = 'display_alias3'
         user_pin = '12345'
         profile_pin = '123'
         user_services.create_new_user(gae_id, email)
@@ -860,21 +885,44 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         user_id = user_auth_details_model.id
         user_settings = user_services.get_user_settings(user_id)
-        data = {
-            'subject_interests': ['es', 'el'],
-            'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                user_settings.preferred_audio_language_code),
-            'pin': user_pin,
-            'display_alias': None
+        self.user_details_change_dict['user_id'] = user_id
+        self.user_details_change_dict['pin'] = user_pin
+        self.user_details_change_dict['display_alias'] = display_alias
+        self.user_details_change_dict['last_agreed_to_terms'] = (
+            user_settings.last_agreed_to_terms)
+        self.user_details_change_dict['last_logged_in'] = (
+            user_settings.last_logged_in)
+        user_services.update_multiple_users_data(
+            [user_domain.UserDetailsChange(self.user_details_change_dict)]
+        )
+        self.new_user_details_change_dict['display_alias'] = display_alias_2
+        self.new_user_details_change_dict['email'] = email
+        self.new_user_details_change_dict['pin'] = profile_pin
+        new_user_details_change_dict_2 = {
+            'cmd': user_domain.CMD_CREATE_NEW_USER,
+            'email': 'a@example.com',
+            'display_alias': 'display_alias3',
+            'last_agreed_to_terms': None,
+            'last_logged_in': None,
+            'user_bio': 'user_bio',
+            'subject_interests': ['subject_interests'],
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'pin': None
         }
-        user_services.update_user_settings_and_auth_data(user_id, data)
-        profile_1_id = user_services.create_new_profile(
-            gae_id, email, display_alias, profile_pin=profile_pin).user_id
-        profile_2_id = user_services.create_new_profile(
-            gae_id, email, display_alias_2).user_id
+        new_user_details_change_dict_2['display_alias'] = display_alias_3
+        new_user_details_change_dict_2['email'] = email
+        user_settings_list = user_services.create_new_profiles(
+            gae_id, [
+                user_domain.UserDetailsChange(
+                    self.new_user_details_change_dict),
+                user_domain.UserDetailsChange(
+                    new_user_details_change_dict_2)
+            ]
+        )
+        profile_1_id = user_settings_list[0].user_id
+        profile_2_id = user_settings_list[1].user_id
 
         user_auth_details_models = [
             {
@@ -910,9 +958,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         display_alias = 'display_alias'
         error_msg = 'User not found.'
         with self.assertRaisesRegexp(Exception, error_msg):
-            user_services.create_new_profile(
-                non_existent_gae_id, non_existent_email,
-                display_alias, profile_pin=profile_pin)
+            self.new_user_details_change_dict['display_alias'] = display_alias
+            self.new_user_details_change_dict['email'] = non_existent_email
+            self.new_user_details_change_dict['pin'] = profile_pin
+            user_services.create_new_profiles(
+                non_existent_gae_id, [user_domain.UserDetailsChange(
+                    self.new_user_details_change_dict)]
+            )
 
     def test_mark_user_for_deletion_deletes_user_settings(self):
         gae_id = 'test_id'
@@ -1654,6 +1706,33 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
+        self.user_details_change_dict = {
+            'cmd': user_domain.CMD_UPDATE_USER,
+            'user_id': 'user_id',
+            'display_alias': 'display_alias',
+            'last_agreed_to_terms': None,
+            'last_logged_in': None,
+            'user_bio': 'user_bio',
+            'subject_interests': ['subject_interests'],
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'pin': 'pin'
+        }
+        self.new_user_details_change_dict = {
+            'cmd': user_domain.CMD_CREATE_NEW_USER,
+            'email': 'a@example.com',
+            'display_alias': 'display_alias3',
+            'last_agreed_to_terms': None,
+            'last_logged_in': None,
+            'user_bio': 'user_bio',
+            'subject_interests': ['subject_interests'],
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'pin': '12345'
+        }
+
     def test_validate_non_str_user_id_raises_exception(self):
         self.user_settings.user_id = 0
         with self.assertRaisesRegexp(
@@ -1727,23 +1806,28 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_validate_empty_display_alias_for_profiles_raises_error(self):
         user_settings = user_services.get_user_settings(self.owner_id)
-        data = {
-            'subject_interests': ['es', 'el'],
-            'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                user_settings.preferred_audio_language_code),
-            'pin': '12345',
-            'display_alias': None
-        }
-        user_services.update_user_settings_and_auth_data(self.owner_id, data)
+        self.user_details_change_dict['user_id'] = self.owner_id
+        self.user_details_change_dict['pin'] = '12345'
+        self.user_details_change_dict['display_alias'] = 'temp_name'
+        self.user_details_change_dict['last_agreed_to_terms'] = (
+            user_settings.last_agreed_to_terms)
+        self.user_details_change_dict['last_logged_in'] = (
+            user_settings.last_logged_in)
+        user_services.update_multiple_users_data(
+            [user_domain.UserDetailsChange(self.user_details_change_dict)]
+        )
+
         gae_id = self.get_gae_id_from_email(self.OWNER_EMAIL)
         profile_pin = '123'
         error_msg = 'Expected display alias to be a string, received'
         with self.assertRaisesRegexp(utils.ValidationError, error_msg):
-            user_services.create_new_profile(
-                gae_id, self.OWNER_EMAIL, '', profile_pin=profile_pin)
+            self.new_user_details_change_dict['email'] = self.OWNER_EMAIL
+            self.new_user_details_change_dict['display_alias'] = ''
+            self.new_user_details_change_dict['pin'] = profile_pin
+            user_services.create_new_profiles(
+                gae_id, [user_domain.UserDetailsChange(
+                    self.new_user_details_change_dict)]
+            )
 
     def test_has_not_fully_registered_for_guest_user_is_false(self):
         self.assertFalse(user_services.has_fully_registered_account(None))

@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import re
 
 from core.domain import takeout_domain
-from core.domain import user_services
 from core.platform import models
 
 (
@@ -45,32 +44,6 @@ def get_models_which_should_be_exported():
             models.Registry.get_all_storage_model_classes()
             if model_class.get_export_policy() ==
             base_models.EXPORT_POLICY.CONTAINS_USER_DATA]
-
-
-def export_all_profiles_data_by_parent_user(parent_user_id):
-    """Exports selected models according to model defined export_data functions
-        for all profile users linked to the parent_user of the given id.
-
-    Args:
-        parent_user_id: str. The user_id of the user whose associated profile
-            users' data has being exported.
-
-    Returns:
-        list. List of dictionaries containing all user data in the following
-        format:
-        {
-            <MODEL_NAME>_data: <dict of data in format as specified by
-                                model export policy>
-        }. List might be empty if no profiles are associated with the user
-        corresponding to the given parent_user_id.
-    """
-    all_profiles_user_ids = (
-        user.user_id for user in
-        user_services.get_all_profiles_auth_details_by_parent_user_id(
-            parent_user_id)
-    )
-    return [export_data_for_user(user_id) for user_id in
-            all_profiles_user_ids]
 
 
 def export_data_for_user(user_id):

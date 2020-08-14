@@ -1245,16 +1245,3 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_json = json.dumps(expected_profile_data)
         self.assertItemsEqual(
             json.loads(observed_json), json.loads(expected_json))
-
-    def test_export_all_profiles_data_for_user_with_profiles_is_correct(self):
-        pass
-
-    def test_export_all_profiles_data_user_with_no_profiles_is_correct(self):
-        pass
-
-    def test_export_all_profiles_data_for_nonexistent_user_raises_error(self):
-        non_existent_user_id = 'id_x'
-        error_msg = 'User not found.'
-        with self.assertRaisesRegexp(Exception, error_msg):
-            takeout_service.export_all_profiles_data_by_parent_user(
-                non_existent_user_id)

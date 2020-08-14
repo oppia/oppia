@@ -491,3 +491,223 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected can_review_questions to be a boolean value'):
             self.user_contribution_rights.validate()
+
+
+class UserDetailsChangeTests(test_utils.GenericTestBase):
+
+    def test_user_details_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            user_domain.UserDetailsChange({'invalid': 'data'})
+
+    def test_user_details_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            user_domain.UserDetailsChange({'cmd': 'invalid'})
+
+    def test_user_details_change_object_single_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'preferred_language_codes')):
+            user_domain.UserDetailsChange({
+                'cmd': user_domain.CMD_UPDATE_USER,
+                'user_id': 'user_id',
+                'display_alias': 'display_alias',
+                'last_agreed_to_terms': 'last_agreed_to_terms',
+                'last_logged_in': 'last_logged_in',
+                'user_bio': 'user_bio',
+                'subject_interests': 'subject_interests',
+                'preferred_site_language_code': 'preferred_site_language_code',
+                'preferred_audio_language_code': (
+                    'preferred_audio_language_code'),
+                'pin': 'pin'
+            })
+
+    def test_user_details_change_object_multiple_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'preferred_language_codes, subject_interests')):
+            user_domain.UserDetailsChange({
+                'cmd': user_domain.CMD_UPDATE_USER,
+                'user_id': 'user_id',
+                'display_alias': 'display_alias',
+                'last_agreed_to_terms': 'last_agreed_to_terms',
+                'last_logged_in': 'last_logged_in',
+                'user_bio': 'user_bio',
+                'preferred_site_language_code': 'preferred_site_language_code',
+                'preferred_audio_language_code': (
+                    'preferred_audio_language_code'),
+                'pin': 'pin'
+            })
+
+    def test_user_details_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            user_domain.UserDetailsChange({
+                'cmd': user_domain.CMD_UPDATE_USER,
+                'user_id': 'user_id',
+                'display_alias': 'display_alias',
+                'last_agreed_to_terms': 'last_agreed_to_terms',
+                'last_logged_in': 'last_logged_in',
+                'user_bio': 'user_bio',
+                'subject_interests': 'subject_interests',
+                'preferred_language_codes': 'preferred_language_codes',
+                'preferred_site_language_code': 'preferred_site_language_code',
+                'preferred_audio_language_code': (
+                    'preferred_audio_language_code'),
+                'pin': 'pin',
+                'invalid': 'invalid'
+            })
+
+    def test_user_details_change_object_with_update_user_value(self):
+        user_details_change_object = user_domain.UserDetailsChange({
+            'cmd': user_domain.CMD_UPDATE_USER,
+            'user_id': 'user_id',
+            'display_alias': 'display_alias',
+            'last_agreed_to_terms': 'last_agreed_to_terms',
+            'last_logged_in': 'last_logged_in',
+            'user_bio': 'user_bio',
+            'subject_interests': 'subject_interests',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'pin': 'pin'
+        })
+
+        self.assertEqual(
+            user_details_change_object.cmd, 'update_user')
+        self.assertEqual(
+            user_details_change_object.user_id, 'user_id')
+        self.assertEqual(
+            user_details_change_object.display_alias, 'display_alias')
+        self.assertEqual(
+            user_details_change_object.last_agreed_to_terms,
+            'last_agreed_to_terms'
+        )
+        self.assertEqual(
+            user_details_change_object.last_logged_in, 'last_logged_in')
+        self.assertEqual(
+            user_details_change_object.user_bio, 'user_bio')
+        self.assertEqual(
+            user_details_change_object.subject_interests, 'subject_interests')
+        self.assertEqual(
+            user_details_change_object.preferred_language_codes,
+            'preferred_language_codes'
+        )
+        self.assertEqual(
+            user_details_change_object.preferred_site_language_code,
+            'preferred_site_language_code'
+        )
+        self.assertEqual(
+            user_details_change_object.preferred_audio_language_code,
+            'preferred_audio_language_code'
+        )
+        self.assertEqual(user_details_change_object.pin, 'pin')
+
+    def test_user_details_change_object_with_create_new_user_value(self):
+        user_details_change_object = user_domain.UserDetailsChange({
+            'cmd': user_domain.CMD_CREATE_NEW_USER,
+            'email': 'user@example.com',
+            'display_alias': 'display_alias',
+            'last_agreed_to_terms': 'last_agreed_to_terms',
+            'last_logged_in': 'last_logged_in',
+            'user_bio': 'user_bio',
+            'subject_interests': 'subject_interests',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'pin': 'pin'
+        })
+
+        self.assertEqual(
+            user_details_change_object.cmd, user_domain.CMD_CREATE_NEW_USER)
+        self.assertEqual(
+            user_details_change_object.email, 'user@example.com')
+        self.assertEqual(
+            user_details_change_object.display_alias, 'display_alias')
+        self.assertEqual(
+            user_details_change_object.last_agreed_to_terms,
+            'last_agreed_to_terms'
+        )
+        self.assertEqual(
+            user_details_change_object.last_logged_in, 'last_logged_in')
+        self.assertEqual(
+            user_details_change_object.user_bio, 'user_bio')
+        self.assertEqual(
+            user_details_change_object.subject_interests, 'subject_interests')
+        self.assertEqual(
+            user_details_change_object.preferred_language_codes,
+            'preferred_language_codes'
+        )
+        self.assertEqual(
+            user_details_change_object.preferred_site_language_code,
+            'preferred_site_language_code'
+        )
+        self.assertEqual(
+            user_details_change_object.preferred_audio_language_code,
+            'preferred_audio_language_code'
+        )
+        self.assertEqual(user_details_change_object.pin, 'pin')
+
+    def test_to_dict_for_update_user(self):
+        user_details_change_dict = {
+            'cmd': user_domain.CMD_UPDATE_USER,
+            'user_id': 'user_id',
+            'display_alias': 'display_alias',
+            'last_agreed_to_terms': 'last_agreed_to_terms',
+            'last_logged_in': 'last_logged_in',
+            'user_bio': 'user_bio',
+            'subject_interests': 'subject_interests',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'pin': 'pin'
+        }
+        user_details_change_object = user_domain.UserDetailsChange(
+            user_details_change_dict)
+        self.assertEqual(
+            user_details_change_object.to_dict(),
+            user_details_change_dict)
+
+    def test_to_dict_for_create_new_user_optional_attributes_set(self):
+        user_details_change_dict = {
+            'cmd': user_domain.CMD_CREATE_NEW_USER,
+            'email': 'user@example.com',
+            'display_alias': 'display_alias',
+            'last_agreed_to_terms': 'last_agreed_to_terms',
+            'last_logged_in': 'last_logged_in',
+            'user_bio': 'user_bio',
+            'subject_interests': 'subject_interests',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'pin': 'pin'
+        }
+        user_details_change_object = user_domain.UserDetailsChange(
+            user_details_change_dict)
+        self.assertEqual(
+            user_details_change_object.to_dict(),
+            user_details_change_dict)
+
+    def test_to_dict_for_create_new_user_optional_attributes_not_set(self):
+        user_details_change_dict = {
+            'cmd': user_domain.CMD_CREATE_NEW_USER,
+            'email': 'user@example.com',
+            'display_alias': 'display_alias',
+            'last_agreed_to_terms': None,
+            'last_logged_in': None,
+            'user_bio': None,
+            'subject_interests': None,
+            'preferred_language_codes': None,
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'pin': None
+        }
+        user_details_change_object = user_domain.UserDetailsChange(
+            user_details_change_dict)
+        self.assertEqual(
+            user_details_change_object.to_dict(),
+            user_details_change_dict)

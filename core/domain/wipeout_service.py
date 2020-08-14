@@ -125,6 +125,26 @@ def pre_delete_user(user_id):
     pending_deletion_requests = []
     user_settings = user_services.get_user_settings(
         user_id, strict=True)
+
+    linked_profile_user_ids = [
+        user.user_id for user in
+        user_services.get_all_profiles_auth_details_by_parent_user_id(user_id)
+    ]
+    profile_users_settings_list = user_services.get_users_settings(
+        linked_profile_user_ids)
+    for profile_user_settings in profile_users_settings_list:
+        email = profile_user_settings.email
+        profile_id = profile_user_settings.user_id
+        user_services.mark_user_for_deletion(profile_id)
+        pending_deletion_requests.append(
+            wipeout_domain.PendingDeletionRequest.create_default(
+                profile_id,
+                email,
+                [],
+                []
+            )
+        )
+
     explorations_to_be_deleted_ids = []
     collections_to_be_deleted_ids = []
     if user_settings.role != feconf.ROLE_ID_LEARNER:
@@ -164,25 +184,6 @@ def pre_delete_user(user_id):
             collections_to_be_deleted_ids
         )
     )
-
-    linked_profile_user_ids = [
-        user.user_id for user in
-        user_services.get_all_profiles_auth_details_by_parent_user_id(user_id)
-    ]
-    profile_users_settings_list = user_services.get_users_settings(
-        linked_profile_user_ids)
-    for profile_user_settings in profile_users_settings_list:
-        email = profile_user_settings.email
-        profile_id = profile_user_settings.user_id
-        user_services.mark_user_for_deletion(profile_id)
-        pending_deletion_requests.append(
-            wipeout_domain.PendingDeletionRequest.create_default(
-                profile_id,
-                email,
-                [],
-                []
-            )
-        )
 
     save_pending_deletion_requests(pending_deletion_requests)
 
