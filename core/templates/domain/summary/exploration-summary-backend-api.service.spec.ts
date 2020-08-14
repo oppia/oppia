@@ -25,7 +25,7 @@ import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service.ts';
 
 
-describe('Exploration Summary Backend Api Service', () => {
+fdescribe('Exploration Summary Backend Api Service', () => {
   let explorationSummaryBackendApiService:
     ExplorationSummaryBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -69,6 +69,26 @@ describe('Exploration Summary Backend Api Service', () => {
       'Please enter a valid exploration ID.');
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith([null, null, null]);
+  }));
+
+  fit('should use reject handler when server throws an error', fakeAsync(()=> {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let explorationIds = ['12'];
+    let requestUrl = '/explorationsummarieshandler/data?' +
+    'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+    '&' + 'include_private_explorations=false';
+
+    explorationSummaryBackendApiService.loadPublicExplorationSummaries(
+      explorationIds).then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(requestUrl);
+    req.flush({error: 'Error Communicating with Server'},
+      {status: 400, statusText: ''});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error Communicating with Server');
   }));
 
   it('should load public exploration summaries from backend',
