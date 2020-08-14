@@ -119,7 +119,7 @@ export class SetInputValidationService {
     let previousRules: PreviousRule[] = [];
 
     for (let [answerGroupIndex, answerGroup] of answerGroups.entries()) {
-      for (let [ruleIndex, rule] of answerGroup.rules.entries()) {
+      for (let [ruleIndex, rule] of answerGroup.getRulesAsList().entries()) {
         for (let prevRule of previousRules) {
           if (this.areSameRule(prevRule.rule, rule)) {
             warningsList.push({

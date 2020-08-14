@@ -94,12 +94,14 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }]
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            }
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -112,22 +114,22 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 5
-              },
-              rule_type: 'Equals'
-            }, {
-              inputs: {
-                x: 7
-              },
-              rule_type: 'NotEquals'
-            }, {
-              inputs: {
-                x: 6
-              },
-              rule_type: 'Equals'
-            }]
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 5
+                },
+                {
+                  x: 6
+                }
+              ],
+              NotEquals: [
+                {
+                  x: 7
+                }
+              ]
+            }
           }],
           default_outcome: {
             dest: 'default',
@@ -174,7 +176,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 10, this.rules)
       ).toEqual(
         this.acrof.createNew(
-          this.oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
+          this.oof.createNew('outcome 1', 'feedback_1', '', []), 0,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
       expect(
@@ -182,7 +184,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 5, this.rules)
       ).toEqual(
         this.acrof.createNew(
-          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
+          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
       expect(
@@ -190,7 +192,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 6, this.rules)
       ).toEqual(
         this.acrof.createNew(
-          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
+          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
     });
 
@@ -202,7 +204,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 7, this.rules)
       ).toEqual(
         this.acrof.createNew(
-          this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
+          this.oof.createNew('default', 'default_outcome', '', []), 2,
           ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
     });
 
@@ -222,12 +224,14 @@ describe('Answer Classification Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_specs: [{
-            inputs: {
-              x: 10
-            },
-            rule_type: 'Equals'
-          }]
+          rule_input_translations: {},
+          rule_types_to_inputs: {
+            Equals: [
+              {
+                x: 10
+              }
+            ]
+          }
         }];
 
         const state = this.createStateFromBackendDict();
@@ -282,12 +286,14 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }]
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            }
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -300,17 +306,17 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 5
-              },
-              rule_type: 'Equals'
-            }, {
-              inputs: {
-                x: 7
-              },
-              rule_type: 'Equals'
-            }]
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 5
+                },
+                {
+                  x: 7
+                }
+              ]
+            }
           }],
           default_outcome: {
             dest: 'default',
@@ -351,7 +357,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 0, this.rules)
         ).toEqual(
           this.acrof.createNew(
-            state.interaction.answerGroups[1].outcome, 1, null,
+            state.interaction.answerGroups[1].outcome, 1,
             ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
       });
 
@@ -368,7 +374,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 0, this.rules)
         ).toEqual(
           this.acrof.createNew(
-            this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
+            this.oof.createNew('default', 'default_outcome', '', []), 2,
             ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
       });
   });
@@ -407,12 +413,14 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             training_data: ['abc', 'input'],
-            rule_specs: [{
-              inputs: {
-                x: 'equal'
-              },
-              rule_type: 'Equals'
-            }]
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 'equal'
+                }
+              ]
+            }
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -426,12 +434,14 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             training_data: ['xyz'],
-            rule_specs: [{
-              inputs: {
-                x: 'npu'
-              },
-              rule_type: 'Contains'
-            }]
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Contains: [
+                {
+                  x: 'npu'
+                }
+              ]
+            },
           }],
           default_outcome: {
             dest: 'default',
@@ -470,7 +480,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 'abc', this.rules)
         ).toEqual(
           this.acrof.createNew(
-            state.interaction.answerGroups[0].outcome, 0, null,
+            state.interaction.answerGroups[0].outcome, 0,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
 
         expect(
@@ -478,7 +488,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 'xyz', this.rules)
         ).toEqual(
           this.acrof.createNew(
-            state.interaction.answerGroups[1].outcome, 1, null,
+            state.interaction.answerGroups[1].outcome, 1,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
       });
 
@@ -493,7 +503,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 'input', this.rules)
         ).toEqual(
           this.acrof.createNew(
-            state.interaction.answerGroups[1].outcome, 1, 0,
+            state.interaction.answerGroups[1].outcome, 1,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });
   });

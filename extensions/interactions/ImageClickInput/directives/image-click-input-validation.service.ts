@@ -125,7 +125,7 @@ export class ImageClickInputValidationService {
 
     // Check that each rule refers to a valid region string.
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         if (rules[j].type === 'IsInRegion') {
           var label = <string> rules[j].inputs.x;

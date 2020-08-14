@@ -31,6 +31,7 @@ import { StateInteractionStats, StateInteractionStatsService } from
 import { VisualizationInfoObjectFactory } from
   'domain/exploration/visualization-info-object.factory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 describe('State Interaction Stats Service', () => {
   beforeEach(() => {
@@ -46,6 +47,7 @@ describe('State Interaction Stats Service', () => {
     });
 
     this.joC = jasmine.objectContaining;
+    this.sof = TestBed.get(StateObjectFactory);
     this.contextService = TestBed.get(ContextService);
     this.httpTestingController = TestBed.get(HttpTestingController);
     this.stateInteractionStatsService = (
@@ -58,27 +60,95 @@ describe('State Interaction Stats Service', () => {
 
   beforeEach(() => {
     this.expId = 'expid';
-    this.mockState = {
-      name: 'Hola',
+
+    const stateDict = {
+      content: {
+        content_id: 'content',
+        html: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {}
+      },
       interaction: {
-        id: 'TextInput',
-        answerGroups: [
+        answer_groups: [
           {
-            rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
-            outcome: {dest: 'Me Llamo'}
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [{x: 'hola!'}]
+            },
+            outcome: {
+              dest: 'Me Llamo',
+              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            training_data: null,
+            tagged_skill_misconception_id: null,
           },
           {
-            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Me Llamo'}
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Contains: [{x: 'hola'}]
+            },
+            outcome: {
+              dest: 'Me Llamo',
+              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            training_data: null,
+            tagged_skill_misconception_id: null,
           },
           {
-            rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Hola'}
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              FuzzyEquals: [{x: 'hola'}]
+            },
+            outcome: {
+              dest: 'Me Llamo',
+              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            training_data: null,
+            tagged_skill_misconception_id: null,
           }
         ],
-        defaultOutcome: {dest: 'Hola'}
-      }
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
+        default_outcome: {
+          dest: 'Hola',
+          feedback: {content_id: 'default_outcome', html: ''},
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        id: 'TextInput'
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {}
+      },
     };
+
+    this.mockState = this.sof.createFromBackendDict('Hola', stateDict);
   });
 
   it('should support improvements overview for states with text-input', () => {

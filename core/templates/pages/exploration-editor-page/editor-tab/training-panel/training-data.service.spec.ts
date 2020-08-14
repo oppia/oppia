@@ -196,12 +196,14 @@ describe('TrainingDataService', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            rule_specs: [{
-              rule_type: 'Contains',
-              inputs: {
-                x: 'Test'
-              }
-            }],
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Contains: [
+                {
+                  x: 'Test'
+                }
+              ]
+            },
             outcome: {
               dest: 'State',
               feedback: {

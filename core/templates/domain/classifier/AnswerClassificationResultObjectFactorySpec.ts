@@ -37,13 +37,12 @@ describe('Answer classification result object factory', () => {
 
   it('should create a new result', () => {
     var answerClassificationResult = acrof.createNew(
-      oof.createNew('default', '', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
+      oof.createNew('default', '', '', []), 1, DEFAULT_OUTCOME_CLASSIFICATION
     );
 
     expect(answerClassificationResult.outcome).toEqual(
       oof.createNew('default', '', '', []));
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
-    expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
       DEFAULT_OUTCOME_CLASSIFICATION);
   });

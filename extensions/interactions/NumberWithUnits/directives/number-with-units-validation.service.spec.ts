@@ -123,11 +123,9 @@ describe('NumberWithUnitsValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew(
-      [equalsTwoRule, equalsTwoByThreeRule],
-      goodDefaultOutcome,
-      false
-    )];
+    const answerGroup = agof.createNew(goodDefaultOutcome, false, null);
+    answerGroup.updateRuleTypesToInputs([equalsTwoRule, equalsTwoByThreeRule]);
+    answerGroups = [answerGroup];
   });
 
   it('should be able to perform basic validation', () => {
@@ -137,7 +135,7 @@ describe('NumberWithUnitsValidationService', () => {
   });
 
   it('should catch equals followed by equals same value', () => {
-    answerGroups[0].rules = [equalsTwoRule, equalsTwoRule];
+    answerGroups[0].updateRuleTypesToInputs([equalsTwoRule, equalsTwoRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -149,20 +147,8 @@ describe('NumberWithUnitsValidationService', () => {
 
   it('should not catch equals followed by equals with unequal values',
     () => {
-      answerGroups[0].rules = [equalsTwoRule, equalsTwoByThreeRule];
-      var warnings = validatorService.getAllWarnings(
-        currentState, {}, answerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([]);
-    });
-
-  it('should not catch equals followed by equivalent as redundant',
-    () => {
-      answerGroups[0].rules = [equalsTwoRule, equivalentToTwoThousandRule];
-      var warnings = validatorService.getAllWarnings(
-        currentState, {}, answerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([]);
-
-      answerGroups[0].rules = [equalsTwoRule, equivalentToTwoRule];
+      answerGroups[0].updateRuleTypesToInputs(
+        [equalsTwoRule, equalsTwoByThreeRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([]);
@@ -170,7 +156,8 @@ describe('NumberWithUnitsValidationService', () => {
 
   it('should catch equivalent followed by equals with equivalent values',
     () => {
-      answerGroups[0].rules = [equivalentToTwoThousandRule, equalsTwoRule];
+      answerGroups[0].updateRuleTypesToInputs(
+        [equivalentToTwoThousandRule, equalsTwoRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -182,7 +169,8 @@ describe('NumberWithUnitsValidationService', () => {
 
   it('should not catch equivalent followed by equals with non-equivalent' +
     ' values', () => {
-    answerGroups[0].rules = [equivalentToTwoThousandRule, equalsTwoByThreeRule];
+    answerGroups[0].updateRuleTypesToInputs(
+      [equivalentToTwoThousandRule, equalsTwoByThreeRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
@@ -190,8 +178,8 @@ describe('NumberWithUnitsValidationService', () => {
 
   it('should catch equivalent followed by equivalent with equivalent values',
     () => {
-      answerGroups[0].rules = [equivalentToTwoThousandRule,
-        equivalentToTwoRule];
+      answerGroups[0].updateRuleTypesToInputs(
+        [equivalentToTwoThousandRule, equivalentToTwoRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -203,8 +191,8 @@ describe('NumberWithUnitsValidationService', () => {
 
   it('should not catch equivalent followed by equivalent with non-equivalent' +
     ' values', () => {
-    answerGroups[0].rules = [equivalentToTwoByThreeRule,
-      equivalentToTwoThousandRule];
+    answerGroups[0].updateRuleTypesToInputs(
+      [equivalentToTwoByThreeRule, equivalentToTwoThousandRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);

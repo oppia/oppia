@@ -90,12 +90,12 @@ export class NumericInputValidationService {
       });
     };
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
           lb: null,
           ub: null,
           lbi: false,
@@ -138,14 +138,29 @@ export class NumericInputValidationService {
           default:
         }
         for (var k = 0; k < ranges.length; k++) {
-          if (isEnclosedBy(range, ranges[k])) {
+          // Rules inside an AnswerGroup do not have a set order. We should
+          // check for redundant rules in both directions if rules are in the
+          // same AnswerGroup.
+          const redundantWithinAnswerGroup = (
+            ranges[k].answerGroupIndex === i &&
+            (isEnclosedBy(range, ranges[k]) || isEnclosedBy(ranges[k], range))
+          );
+
+          // AnswerGroups do have a set order. If rules are not in the same
+          // AnswerGroup we only check in one direction.
+          const redundantBetweenAnswerGroups = (
+            ranges[k].answerGroupIndex !== i &&
+            isEnclosedBy(range, ranges[k])
+          );
+
+          if (redundantWithinAnswerGroup || redundantBetweenAnswerGroups) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
                 'Rule ' + (j + 1) + ' from answer group ' +
                 (i + 1) + ' will never be matched because it ' +
-                'is made redundant by rule ' + ranges[k].ruleIndex +
-                ' from answer group ' + ranges[k].answerGroupIndex + '.')
+                'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                ' from answer group ' + (ranges[k].answerGroupIndex + 1) + '.')
             });
           }
         }

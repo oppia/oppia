@@ -129,55 +129,41 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
                 'new_value': [{
-                    'rule_specs': [{
-                        'rule_type': 'Equals',
-                        'inputs': {
+                    'rule_input_translations': {},
+                    'rule_types_to_inputs': {
+                        'ContainsAtLeastOneOf': [{
                             'x': [html_content]
-                        }
-                    }, {
-                        'rule_type': 'ContainsAtLeastOneOf',
-                        'inputs': {
+                        }],
+                        'DoesNotContainAtLeastOneOf': [{
                             'x': [html_content]
-                        }
-                    }, {
-                        'rule_type': 'IsProperSubsetOf',
-                        'inputs': {
+                        }],
+                        'Equals': [{
                             'x': [html_content]
-                        }
-                    }, {
-                        'rule_type': 'DoesNotContainAtLeastOneOf',
-                        'inputs': {
-                            'x': [html_content]
-                        }
-                    }, {
-                        'rule_type': 'Equals',
-                        'inputs': {
+                        }, {
                             'x': 1
-                        }
-                    }, {
-                        'rule_type': 'HasElementXAtPositionY',
-                        'inputs': {
+                        }],
+                        'HasElementXAtPositionY': [{
                             'x': html_content,
                             'y': 2
-                        }
-                    }, {
-                        'rule_type': 'IsEqualToOrdering',
-                        'inputs': {
-                            'x': [[html_content]]
-                        }
-                    }, {
-                        'rule_type': 'HasElementXBeforeElementY',
-                        'inputs': {
+                        }],
+                        'HasElementXBeforeElementY': [{
                             'x': html_content,
                             'y': html_content
-                        }
-                    }, {
-                        'rule_type': (
-                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
-                        'inputs': {
-                            'x': [[html_content]]
-                        }
-                    }],
+                        }],
+                        'IsEqualToOrdering': [{
+                            'x': [
+                                [html_content]
+                            ]
+                        }],
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                            'x': [
+                                [html_content]
+                            ]
+                        }],
+                        'IsProperSubsetOf': [{
+                            'x': [html_content]
+                        }]
+                    },
                     'outcome': {
                         'dest': 'Introduction',
                         'feedback': {
@@ -377,6 +363,82 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v38_dict_to_v39_dict(self):
+        draft_change_list_v38 = [
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Intro',
+                'property_name': 'answer_groups',
+                'new_value': [{
+                    'rule_specs': [{
+                        'rule_type': 'CaseSensitiveEquals',
+                        'inputs': {
+                            'x': 'test'
+                        }
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': '<p>Content</p>'
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            })
+        ]
+        draft_change_list_v39 = [
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Intro',
+                'property_name': 'answer_groups',
+                'new_value': [{
+                    'rule_input_translations': {},
+                    'rule_types_to_inputs': {
+                        'CaseSensitiveEquals': [{
+                            'x': 'test'
+                        }]
+                    },
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': '<p>Content</p>'
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            })
+        ]
+
+        # Migrate exploration to state schema version 39.
+        self.create_and_migrate_new_exploration('38', '39')
+        migrated_draft_change_list_v39 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v38, 1, 2, self.EXP_ID))
+
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v39_dict_list = [
+            change.to_dict() for change in draft_change_list_v39
+        ]
+        migrated_draft_change_list_v39_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v39
+        ]
+        self.assertEqual(
+            draft_change_list_v39_dict_list,
+            migrated_draft_change_list_v39_dict_list)
+
     def test_convert_states_v37_dict_to_v38_dict(self):
         draft_change_list_v37 = [
             exp_domain.ExplorationChange({
@@ -446,7 +508,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         ]
         draft_change_list_v37 = [
             exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'cmd': 'edit_state_property',
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': 'new value'

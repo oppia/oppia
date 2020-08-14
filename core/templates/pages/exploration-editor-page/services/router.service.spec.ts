@@ -69,7 +69,8 @@ describe('Router Service', () => {
         param_changes: [],
         interaction: {
           answer_groups: [{
-            rule_specs: [],
+            rule_input_translations: {},
+            rule_types_to_inputs: {},
             outcome: {
               dest: 'Me Llamo',
               feedback: {
@@ -120,7 +121,8 @@ describe('Router Service', () => {
         param_changes: [],
         interaction: {
           answer_groups: [{
-            rule_specs: [],
+            rule_input_translations: {},
+            rule_types_to_inputs: {},
             outcome: {
               dest: 'Me Llamo',
               feedback: {

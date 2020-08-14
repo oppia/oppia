@@ -57,7 +57,7 @@
                                  on-delete-fn="deleteAnswerGroup"
                                  outcome="answerGroup.outcome"
                                  navigate-to-state="navigateToState"
-                                 num-rules="answerGroup.rules.length"
+                                 num-rules="answerGroup.getRulesAsList().length"
                                  is-response="true">
                 </response-header>
               </a>
@@ -65,7 +65,7 @@
               <div ng-if="activeAnswerGroupIndex === $index">
                 <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container protractor-test-response-body-<[$index]>">
-                    <answer-group-editor rules="answerGroup.rules"
+                    <answer-group-editor rules="answerGroup.getRulesAsList()"
                                          outcome="answerGroup.outcome"
                                          tagged-skill-misconception-id="answerGroup.taggedSkillMisconceptionId"
                                          on-save-answer-group-feedback="saveActiveAnswerGroupFeedback"

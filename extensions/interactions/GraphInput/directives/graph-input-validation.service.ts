@@ -92,7 +92,7 @@ export class GraphInputValidationService {
         answerGroups, defaultOutcome, stateName));
 
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var gInputs = (<GraphAnswer>rule.inputs.g);
