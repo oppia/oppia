@@ -1315,15 +1315,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
-    def test_get_all_topic_rights_of_user(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-        topic_rights = topic_services.get_topic_rights_with_user(self.user_id_a)
-        self.assertEqual(len(topic_rights), 1)
-        self.assertEqual(topic_rights[0].id, self.TOPIC_ID)
-        self.assertEqual(topic_rights[0].manager_ids, [self.user_id_a])
-
     def test_cannot_save_new_topic_with_existing_name(self):
         with self.assertRaisesRegexp(
             Exception, 'Topic with name \'Name\' already exists'):

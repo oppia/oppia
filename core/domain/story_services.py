@@ -362,7 +362,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
 
 
 def _save_story(
-        committer_id, story, commit_message, change_list, is_story_published):
+        committer_id, story, commit_message, change_list, story_is_published):
     """Validates a story and commits it to persistent storage. If
     successful, increments the version number of the incoming story domain
     object by 1.
@@ -372,7 +372,7 @@ def _save_story(
         story: Story. The story domain object to be saved.
         commit_message: str. The commit message.
         change_list: list(StoryChange). List of changes applied to a story.
-        is_story_published: bool. Whether the supplied story is published.
+        story_is_published: bool. Whether the supplied story is published.
 
     Raises:
         ValidationError. An invalid exploration was referenced in the
@@ -387,7 +387,7 @@ def _save_story(
 
     story.validate()
 
-    if is_story_published:
+    if story_is_published:
         exp_ids = []
         for node in story.story_contents.nodes:
             if not node.exploration_id:
@@ -449,12 +449,12 @@ def _is_story_published_and_present_in_topic(story):
             'Expected story to only belong to a valid topic, but found no '
             'topic with ID: %s' % story.corresponding_topic_id)
 
-    is_story_published = False
+    story_is_published = False
     story_is_present_in_topic = False
     for story_reference in topic.get_all_story_references():
         if story_reference.story_id == story.id:
             story_is_present_in_topic = True
-            is_story_published = story_reference.story_is_published
+            story_is_published = story_reference.story_is_published
 
     if not story_is_present_in_topic:
         raise Exception(
@@ -462,7 +462,7 @@ def _is_story_published_and_present_in_topic(story):
             'neither a part of the canonical stories or the additional '
             'stories of the topic.' % story.corresponding_topic_id)
 
-    return is_story_published
+    return story_is_published
 
 
 def update_story(
@@ -487,7 +487,7 @@ def update_story(
     old_story = story_fetchers.get_story_by_id(story_id)
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
-    is_story_published = _is_story_published_and_present_in_topic(new_story)
+    story_is_published = _is_story_published_and_present_in_topic(new_story)
 
     if (
             old_story.url_fragment != new_story.url_fragment and
@@ -496,9 +496,9 @@ def update_story(
             'Story Url Fragment is not unique across the site.')
     _save_story(
         committer_id, new_story, commit_message, change_list,
-        is_story_published)
+        story_is_published)
     create_story_summary(new_story.id)
-    if is_story_published and _is_story_topic_published(new_story):
+    if story_is_published and _is_topic_published(new_story):
         opportunity_services.update_exploration_opportunities(
             old_story, new_story)
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
@@ -529,7 +529,7 @@ def update_story(
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
 
 
-def _is_story_topic_published(story):
+def _is_topic_published(story):
     """Returns whether the story's corresponding topic is published.
 
     Args:
