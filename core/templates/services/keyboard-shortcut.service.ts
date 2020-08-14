@@ -19,6 +19,9 @@ import 'mousetrap';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
+
+const windowRef = new WindowRef();
 
 @Injectable({
   providedIn: 'root'
@@ -40,16 +43,11 @@ export class KeyboardShortcutService {
 
     Mousetrap.bind('j', function() {
       var nextButton = <HTMLElement>document.querySelector(
-        '.protractor-test-next-button');
-      var continueToNextCardButton = <HTMLElement>document.querySelector(
-        '.protractor-test-continue-to-next-card-button');
+        '.oppia-next-button');
       var continueButton = <HTMLElement>document.querySelector(
-        '.protractor-test-continue-button');
+        '.oppia-learner-confirm-button');
       if (nextButton !== null) {
         nextButton.focus();
-      }
-      if (continueToNextCardButton !== null) {
-        continueToNextCardButton.focus();
       }
       if (continueButton !== null) {
         continueButton.focus();
@@ -61,14 +59,14 @@ export class KeyboardShortcutService {
   bindLibraryPageShortcuts() {
     Mousetrap.bind('/', function() {
       var searchBar = <HTMLElement>document.querySelector(
-        '.protractor-test-search-input');
+        '.oppia-search-bar-text-input');
       searchBar.focus();
       return false;
     });
 
     Mousetrap.bind('c', function() {
       var categoryBar = <HTMLElement>document.querySelector(
-        '.protractor-test-search-bar-dropdown-toggle');
+        '.oppia-category-bar-dropdown-toggle');
       categoryBar.focus();
     });
 
@@ -78,7 +76,7 @@ export class KeyboardShortcutService {
   }
 
   setHref(href) {
-    window.location.href = href;
+    windowRef.nativeWindow.location.href = href;
   }
 
   bindNavigationShortcuts() {

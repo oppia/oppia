@@ -15,8 +15,6 @@
 /**
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
-import 'mousetrap';
-
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');

@@ -15,8 +15,6 @@
 /**
  * @fileoverview Component for the explaration player page.
  */
-import 'mousetrap';
-
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require('base-components/base-content.directive.ts');
 require(

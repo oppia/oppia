@@ -16,31 +16,30 @@
  * @fileoverview Unit tests for the keyboard shortcut service.
  */
 import 'mousetrap';
+import { TestBed } from '@angular/core/testing';
 
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 
 describe('Keyboard Shortcuts', () => {
   var skipButton = document.createElement('button');
   var nextButton = document.createElement('button');
-  var continueToNextCardButton = document.createElement('button');
   var continueButton = document.createElement('button');
   var backButton = document.createElement('button');
   var searchBar = document.createElement('input');
   var categoryBar = document.createElement('select');
 
-  const keyboardShortcutService = new KeyboardShortcutService();
+  const keyboardShortcutService = TestBed.get(KeyboardShortcutService);
 
   beforeAll(() => {
     skipButton.setAttribute('id', 'skipToMainContentId');
     backButton.setAttribute('id', 'backButtonId');
-    nextButton.setAttribute('class', 'protractor-test-next-button');
-    continueButton.setAttribute('class', 'protractor-test-continue-button');
-    continueToNextCardButton.setAttribute(
-      'class', 'protractor-test-continue-to-next-card-button');
+    nextButton.setAttribute('class', 'oppia-next-button');
+    continueButton.setAttribute('class', 'oppia-learner-confirm-button');
     searchBar.setAttribute(
-      'class', 'protractor-test-search-input');
+      'class', 'oppia-search-bar-text-input');
     categoryBar.setAttribute(
-      'class', 'protractor-test-search-bar-dropdown-toggle');
+      'class', 'oppia-category-bar-dropdown-toggle');
+      
     document.body.append(skipButton);
     document.body.append(continueButton);
     document.body.append(backButton);
@@ -103,10 +102,6 @@ describe('Keyboard Shortcuts', () => {
 
     Mousetrap.trigger('j');
     expect(continueButton.isEqualNode(document.activeElement));
-
-    document.body.append(continueToNextCardButton);
-    Mousetrap.trigger('j');
-    expect(continueToNextCardButton.isEqualNode(document.activeElement));
 
     document.body.append(nextButton);
     Mousetrap.trigger('j');

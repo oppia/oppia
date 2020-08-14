@@ -37,7 +37,6 @@ const { browser } = require('protractor');
 var backButton = element(by.css('#backButtonId'));
 var categoryBar = element(by.css(
   '.protractor-test-search-bar-dropdown-toggle'));
-
 var continueButton = element(by.css('.protractor-test-continue-button'));
 var mainContent = element(by.css('.protractor-test-main-content'));
 var nextButton = element(by.css('.protractor-test-next-button'));
