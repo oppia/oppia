@@ -160,7 +160,7 @@ def delete_user(pending_deletion_request):
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to delete or pseudonymize all the models.
     """
-    _delete_models(pending_deletion_request.user_id, models.NAMES.user,)
+    _delete_models(pending_deletion_request.user_id, models.NAMES.user)
     _hard_delete_explorations_and_collections(pending_deletion_request)
     _delete_models(pending_deletion_request.user_id, models.NAMES.improvements)
     _pseudonymize_feedback_models(pending_deletion_request)
@@ -240,16 +240,15 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
     }
 
 
-def _delete_models(user_id, category):
+def _delete_models(user_id, module_name):
     """Delete the improvements models for the user with user_id.
 
     Args:
         user_id: str. The id of the user to be deleted.
-        category: models.NAMES. The category of the models that are being
-            deleted.
+        module_name: models.NAMES. The name of the module containing the models
+        that are being deleted.
     """
-    for model_class in models.Registry.get_storage_model_classes(
-            [category]):
+    for model_class in models.Registry.get_storage_model_classes([module_name]):
         deletion_policy = model_class.get_deletion_policy()
         if deletion_policy == base_models.DELETION_POLICY.DELETE:
             model_class.apply_deletion_policy(user_id)
@@ -319,14 +318,13 @@ def _pseudonymize_activity_models(
             if isinstance(model, snapshot_model_class)]
         for metadata_model in metadata_models:
             metadata_model.committer_id = pseudonymized_user_id
-        snapshot_model_class.put_multi(metadata_models)
 
         commit_log_models = [
             model for model in activity_related_models
             if isinstance(model, commit_log_model_class)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_user_id
-        commit_log_model_class.put_multi(commit_log_models)
+        ndb.put_multi(metadata_models + commit_log_models)
 
     activity_mappings = (
         pending_deletion_request.activity_mappings[activity_category])
@@ -402,14 +400,12 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             if feedback_thread_model.last_nonempty_message_author_id == user_id:
                 feedback_thread_model.last_nonempty_message_author_id = (
                     pseudonymized_user_id)
-        feedback_thread_model_class.put_multi(feedback_thread_models)
 
         feedback_message_models = [
             model for model in feedback_related_models
             if isinstance(model, feedback_message_model_class)]
         for feedback_message_model in feedback_message_models:
             feedback_message_model.author_id = pseudonymized_user_id
-        feedback_message_model_class.put_multi(feedback_message_models)
 
         general_suggestion_models = [
             model for model in feedback_related_models
@@ -420,7 +416,12 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             if general_suggestion_model.final_reviewer_id == user_id:
                 general_suggestion_model.final_reviewer_id = (
                     pseudonymized_user_id)
-        feedback_thread_model_class.put_multi(general_suggestion_models)
+
+        ndb.put_multi(
+            feedback_thread_models +
+            feedback_message_models +
+            general_suggestion_models
+        )
 
     feedback_mappings = (
         pending_deletion_request.activity_mappings[models.NAMES.feedback])

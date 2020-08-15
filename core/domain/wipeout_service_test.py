@@ -33,6 +33,9 @@ from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
+
+from google.appengine.ext import ndb
 
 (
     base_models, collection_models, exp_models,
@@ -280,6 +283,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
     USER_1_USERNAME = 'username1'
     USER_2_EMAIL = 'some-other@email.com'
     USER_2_USERNAME = 'username2'
+    NUMBER_OF_MODELS = 150
 
     def setUp(self):
         super(WipeoutServiceDeleteFeedbackModelsTests, self).setUp()
@@ -378,39 +382,61 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         )
 
     def test_multiple_feedbacks_are_pseudonymized(self):
-        feedback_models.GeneralFeedbackThreadModel(
-            id=self.FEEDBACK_2_ID,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id=self.EXP_1_ID,
-            original_author_id=self.user_1_id,
-            subject='Too short exploration',
-            last_nonempty_message_text='Some text',
-            last_nonempty_message_author_id=self.user_2_id
-        ).put()
+        feedback_thread_models = []
+        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+            feedback_thread_models.append(
+                feedback_models.GeneralFeedbackThreadModel(
+                    id='feedback-%s' % i,
+                    entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    entity_id=self.EXP_1_ID,
+                    original_author_id=self.user_1_id,
+                    subject='Too short exploration',
+                    last_nonempty_message_text='Some text',
+                    last_nonempty_message_author_id=self.user_2_id
+                )
+            )
+        feedback_message_models = []
+        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+            feedback_message_models.append(
+                feedback_models.GeneralFeedbackMessageModel(
+                    id='message-%s' % i,
+                    thread_id='feedback-%s' % i,
+                    message_id=i,
+                    author_id=self.user_1_id,
+                    text='Some text'
+                )
+            )
+        ndb.put_multi(feedback_thread_models + feedback_message_models)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-        feedback_thread_model_1 = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                self.FEEDBACK_1_ID)
+        feedback_mappings = (
+            pending_deletion_model.activity_mappings[models.NAMES.feedback])
+
+        pseudonymized_feedback_thread_models = (
+            feedback_models.GeneralFeedbackThreadModel.get_multi(
+                [model.id for model in feedback_thread_models]
+            )
         )
-        self.assertEqual(
-            feedback_thread_model_1.original_author_id,
-            pending_deletion_model
-            .activity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
+        for feedback_thread_model in pseudonymized_feedback_thread_models:
+            self.assertEqual(
+                feedback_thread_model.original_author_id,
+                feedback_mappings[feedback_thread_model.id]
+            )
+
+        pseudonymized_feedback_message_models = (
+            feedback_models.GeneralFeedbackMessageModel.get_multi(
+                [model.id for model in feedback_message_models]
+            )
         )
-        feedback_thread_model_2 = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
-                self.FEEDBACK_2_ID)
-        )
-        self.assertEqual(
-            feedback_thread_model_2.original_author_id,
-            pending_deletion_model
-            .activity_mappings[models.NAMES.feedback][self.FEEDBACK_2_ID]
-        )
+        for feedback_message_model in pseudonymized_feedback_message_models:
+            self.assertEqual(
+                feedback_message_model.author_id,
+                feedback_mappings[feedback_message_model.thread_id]
+            )
 
     def test_one_feedback_with_multiple_users_is_pseudonymized(self):
 
