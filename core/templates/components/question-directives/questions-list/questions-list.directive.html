@@ -39,6 +39,15 @@
                 ng-click="$ctrl.createQuestion()">
           + ADD QUESTION
         </button>
+        <div class="list-group" ng-if="$ctrl.showDifficultyChoices">
+          <div class="list-group-item"  ng-repeat="skillWithDifficulty in $ctrl.linkedSkillsWithDifficulty track by $index">
+            <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty.getDescription()]></label>
+            <question-difficulty-selector skill-id-to-rubrics-object="$ctrl.skillIdToRubricsObject"
+                                          skill-with-difficulty="skillWithDifficulty">
+            </question-difficulty-selector>
+            <button class="btn btn-success" ng-click="$ctrl.initiateQuestionCreation($ctrl.linkedSkillsWithDifficulty)">Save Difficulty</button>
+          </div>
+        </div>
       </div>
     </md-card>
   </div>
