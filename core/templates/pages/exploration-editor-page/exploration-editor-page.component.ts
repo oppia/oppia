@@ -165,7 +165,8 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationFeaturesService', 'ExplorationImprovementsService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
-    'ExplorationParamSpecsService', 'ExplorationRightsService',
+    'ExplorationParamSpecsService', 'ExplorationPropertyService',
+    'ExplorationRightsService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
@@ -185,7 +186,8 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationFeaturesService, ExplorationImprovementsService,
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
-        ExplorationParamSpecsService, ExplorationRightsService,
+        ExplorationParamSpecsService, ExplorationPropertyService,
+        ExplorationRightsService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         PageTitleService, LoaderService, ParamChangesObjectFactory,
@@ -193,6 +195,7 @@ angular.module('oppia').component('explorationEditorPage', {
         StateClassifierMappingService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
+        UserEmailPreferencesService, UserExplorationPermissionsService) {
         UserEmailPreferencesService, UserExplorationPermissionsService,
         WindowDimensionsService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
@@ -501,7 +504,13 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.$onInit = function() {
-        $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
+        ctrl.directiveSubscriptions.add(
+          ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
+            () => {
+              setPageTitle();
+            }
+          )
+        );
         ctrl.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
         BottomNavbarStatusService.markBottomNavbarStatus(true);
 

@@ -64,6 +64,7 @@ describe('Exploration editor page component', function() {
   var eis = null;
   var ers = null;
   var es = null;
+  var eps = null;
   var ess = null;
   var ets = null;
   var ews = null;
@@ -212,6 +213,7 @@ describe('Exploration editor page component', function() {
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
+    eps = $injector.get('ExplorationPropertyService');
     ess = $injector.get('ExplorationStatesService');
     ets = $injector.get('ExplorationTitleService');
     ews = $injector.get('ExplorationWarningsService');
@@ -394,6 +396,8 @@ describe('Exploration editor page component', function() {
   });
 
   describe('when user permission is false and draft changes are true', () => {
+    var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
+
     beforeEach(() => {
       spyOnAllFunctions(sas);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
@@ -401,6 +405,8 @@ describe('Exploration editor page component', function() {
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
         .and.returnValue(Promise.resolve());
+      spyOnProperty(eps, 'onExplorationPropertyChanged').and.returnValue(
+        mockExplorationPropertyChangedEventEmitter);
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
       spyOn(pts, 'setPageTitle').and.callThrough();
@@ -409,6 +415,7 @@ describe('Exploration editor page component', function() {
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
       spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
+
 
       explorationData.is_version_of_draft_valid = true;
 
@@ -455,7 +462,7 @@ describe('Exploration editor page component', function() {
 
     it('should react when exploration property changes', () => {
       ets.init('Exploration Title');
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setPageTitle).toHaveBeenCalledWith(
         'Exploration Title - Oppia Editor');
@@ -463,7 +470,7 @@ describe('Exploration editor page component', function() {
 
     it('should react when untitled exploration property changes', () => {
       ets.init('');
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setPageTitle).toHaveBeenCalledWith(
         'Untitled Exploration - Oppia Editor');
@@ -845,6 +852,10 @@ describe('Exploration editor page component', function() {
 
       ctrl.$onInit();
     });
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     afterEach(() => {
       ctrl.$onDestroy();
     });
