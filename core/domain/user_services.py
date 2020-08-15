@@ -263,6 +263,46 @@ class UserSettings(python_utils.OBJECT):
         self.preferred_audio_language_code = (
             modifiable_user_data.preferred_audio_language_code)
 
+    def convert_to_dict(self):
+        """Convert the UserSettings domain instance into a dictionary form
+        with its keys as the attributes of this class.
+
+        Rerurns:
+            dict. A dictionary containing the UserSettings class information
+            in a dictionary form.
+        """
+        return {
+            'gae_id': self.gae_id,
+            'email': self.email,
+            'role': self.role,
+            'username': self.username,
+            'normalized_username': self.normalized_username,
+            'last_agreed_to_terms': self.last_agreed_to_terms,
+            'last_started_state_editor_tutorial': (
+                self.last_started_state_editor_tutorial),
+            'last_started_state_translation_tutorial': (
+                self.last_started_state_translation_tutorial),
+            'last_logged_in': self.last_logged_in,
+            'last_edited_an_exploration': (
+                self.last_edited_an_exploration),
+            'last_created_an_exploration': (
+                self.last_created_an_exploration),
+            'profile_picture_data_url': self.profile_picture_data_url,
+            'default_dashboard': self.default_dashboard,
+            'creator_dashboard_display_pref': (
+                self.creator_dashboard_display_pref),
+            'user_bio': self.user_bio,
+            'subject_interests': self.subject_interests,
+            'first_contribution_msec': self.first_contribution_msec,
+            'preferred_language_codes': self.preferred_language_codes,
+            'preferred_site_language_code': (
+                self.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                self.preferred_audio_language_code),
+            'display_alias': self.display_alias,
+            'deleted': self.deleted
+        }
+
     @property
     def truncated_email(self):
         """Returns truncated email by replacing last two characters before @
@@ -838,36 +878,7 @@ def _save_user_settings(user_settings):
     """
     user_settings.validate()
 
-    user_settings_dict = {
-        'gae_id': user_settings.gae_id,
-        'email': user_settings.email,
-        'role': user_settings.role,
-        'username': user_settings.username,
-        'normalized_username': user_settings.normalized_username,
-        'last_agreed_to_terms': user_settings.last_agreed_to_terms,
-        'last_started_state_editor_tutorial': (
-            user_settings.last_started_state_editor_tutorial),
-        'last_started_state_translation_tutorial': (
-            user_settings.last_started_state_translation_tutorial),
-        'last_logged_in': user_settings.last_logged_in,
-        'last_edited_an_exploration': user_settings.last_edited_an_exploration,
-        'last_created_an_exploration': (
-            user_settings.last_created_an_exploration),
-        'profile_picture_data_url': user_settings.profile_picture_data_url,
-        'default_dashboard': user_settings.default_dashboard,
-        'creator_dashboard_display_pref': (
-            user_settings.creator_dashboard_display_pref),
-        'user_bio': user_settings.user_bio,
-        'subject_interests': user_settings.subject_interests,
-        'first_contribution_msec': user_settings.first_contribution_msec,
-        'preferred_language_codes': user_settings.preferred_language_codes,
-        'preferred_site_language_code': (
-            user_settings.preferred_site_language_code),
-        'preferred_audio_language_code': (
-            user_settings.preferred_audio_language_code),
-        'display_alias': user_settings.display_alias,
-        'deleted': user_settings.deleted
-    }
+    user_settings_dict = user_settings.convert_to_dict()
 
     # If user with the given user_id already exists, update that model
     # with the given user settings, otherwise, create a new one.
@@ -1049,7 +1060,7 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
             profiles.
         email: str. The email address of the full (parent) user trying to create
             new profiles.
-        modifiable_user_data_list: list(ModifiableUserData). The list of
+        modifiable_user_data_list: list(ModifiableUserDataV1). The list of
             modifiable user data objects used for creation of new profiles.
 
     Returns:
@@ -1058,11 +1069,9 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
 
     Raises:
         Exception. The pin for parent user trying to create a new profile
-            is not set.
+            must be set.
         Exception. The user_id is already set for any user in its corresponding
             modifiable_user_data object.
-        ValidationError. None or empty value is provided for display alias
-            attribute.
     """
 
     def _create_new_profile_transactional(
@@ -1110,30 +1119,32 @@ def update_multiple_users_data(modifiable_user_data_list):
     """Updates user settings and user auth model details for the users
     specified in the modifiable_user_data_list.
 
-    Args: user_details_change_list: list(ModifiableUserData). The list of
+    Args: modifiable_user_data_list: list(ModifiableUserDataV1). The list of
             modifiable_user_data entries corresponding to the users whose
             data has to be updated.
 
     Raises:
-        ValidationError. None or empty value is provided for display
-            alias attribute.
-        Exception. None or empty value is provided for user_id.
+        Exception. A valid user id does not exist for the user to be updated.
+        Exception. UserSettings or UserAuthDetail for a given user_id is
+            not found.
     """
-    user_settings_list = []
-    user_auth_details_list = []
-    for modifiable_user_data in modifiable_user_data_list:
+    user_ids = [user.user_id for user in modifiable_user_data_list]
+    user_settings_list = get_users_settings(user_ids)
+    user_auth_details_list = get_multiple_user_auth_details(user_ids)
+    for (modifiable_user_data, user_settings, user_auth_details) in (
+            python_utils.ZIP(
+                modifiable_user_data_list, user_settings_list,
+                user_auth_details_list
+            )
+        ):
         user_id = modifiable_user_data.user_id
         if not user_id:
             raise Exception(
                 'A valid user id must exist for all the users to be updated.')
-        user_settings = get_user_settings(user_id, strict=True)
+        if not user_settings or not user_auth_details:
+            raise Exception('User not found.')
         user_settings.populate_from_user_data(modifiable_user_data)
-        user_settings_list.append(user_settings)
-
-        user_auth_details = get_auth_details_by_user_id(user_id, strict=True)
         user_auth_details.pin = modifiable_user_data.pin
-
-        user_auth_details_list.append(user_auth_details)
 
     _save_existing_users_settings(user_settings_list)
     _save_existing_users_auth_details(user_auth_details_list)
@@ -1142,51 +1153,18 @@ def update_multiple_users_data(modifiable_user_data_list):
 def _save_existing_users_settings(user_settings_list):
     """Commits a list of existing users' UserSettings objects to the datastore.
 
-    Args: user_settings_list. list(UserSettings). The list of UserSettings
+    Args:
+        user_settings_list: list(UserSettings). The list of UserSettings
             objects to be saved.
     """
     user_ids = [user.user_id for user in user_settings_list]
-    user_settings_models_list = user_models.UserSettingsModel.get_multi(
+    user_settings_models = user_models.UserSettingsModel.get_multi(
         user_ids, include_deleted=True)
-    final_user_settings_models_list = []
     for user_model, user_settings in python_utils.ZIP(
-            user_settings_models_list, user_settings_list):
+            user_settings_models, user_settings_list):
         user_settings.validate()
-        user_settings_dict = {
-            'gae_id': user_settings.gae_id,
-            'email': user_settings.email,
-            'role': user_settings.role,
-            'username': user_settings.username,
-            'normalized_username': user_settings.normalized_username,
-            'last_agreed_to_terms': user_settings.last_agreed_to_terms,
-            'last_started_state_editor_tutorial': (
-                user_settings.last_started_state_editor_tutorial),
-            'last_started_state_translation_tutorial': (
-                user_settings.last_started_state_translation_tutorial),
-            'last_logged_in': user_settings.last_logged_in,
-            'last_edited_an_exploration': (
-                user_settings.last_edited_an_exploration),
-            'last_created_an_exploration': (
-                user_settings.last_created_an_exploration),
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
-            'default_dashboard': user_settings.default_dashboard,
-            'creator_dashboard_display_pref': (
-                user_settings.creator_dashboard_display_pref),
-            'user_bio': user_settings.user_bio,
-            'subject_interests': user_settings.subject_interests,
-            'first_contribution_msec': user_settings.first_contribution_msec,
-            'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                user_settings.preferred_audio_language_code),
-            'display_alias': user_settings.display_alias,
-            'deleted': user_settings.deleted
-        }
-
-        user_model.populate(**user_settings_dict)
-        final_user_settings_models_list.append(user_model)
-    user_models.UserSettingsModel.put_multi(final_user_settings_models_list)
+        user_model.populate(**user_settings.convert_to_dict())
+    user_models.UserSettingsModel.put_multi(user_settings_models)
 
 
 def _save_existing_users_auth_details(user_auth_details_list):
@@ -1197,11 +1175,10 @@ def _save_existing_users_auth_details(user_auth_details_list):
             UserAuthDetails objects to be saved.
     """
     user_ids = [user.user_id for user in user_auth_details_list]
-    user_auth_models_list = user_models.UserAuthDetailsModel.get_multi(
+    user_auth_models = user_models.UserAuthDetailsModel.get_multi(
         user_ids, include_deleted=True)
-    final_user_auth_models_list = []
     for user_auth_details_model, user_auth_details in python_utils.ZIP(
-            user_auth_models_list, user_auth_details_list):
+            user_auth_models, user_auth_details_list):
         user_auth_details.validate()
         user_auth_details_dict = {
             'gae_id': user_auth_details.gae_id,
@@ -1209,10 +1186,8 @@ def _save_existing_users_auth_details(user_auth_details_list):
             'parent_user_id': user_auth_details.parent_user_id,
             'deleted': user_auth_details.deleted
         }
-
         user_auth_details_model.populate(**user_auth_details_dict)
-        final_user_auth_models_list.append(user_auth_details_model)
-    user_models.UserAuthDetailsModel.put_multi(final_user_auth_models_list)
+    user_models.UserAuthDetailsModel.put_multi(user_auth_models)
 
 
 def _save_user_auth_details(user_auth_details):
@@ -1241,6 +1216,26 @@ def _save_user_auth_details(user_auth_details):
     else:
         user_auth_details_dict['id'] = user_auth_details.user_id
         user_models.UserAuthDetailsModel(**user_auth_details_dict).put()
+
+
+def get_multiple_user_auth_details(user_ids):
+    """Gets domain objects representing the auth details
+    for the given user_ids.
+
+    Args:
+        user_ids: list(str). The list of user_ids for which we need to fetch
+            the user auth details.
+
+    Returns:
+        list(UserAuthDetails|None). The UserAuthDetails domain objects
+        corresponding to the given user ids. If the given user_id does not
+        exist, the corresponding entry in the returned list is None.
+    """
+    user_settings_models = user_models.UserAuthDetailsModel.get_multi(user_ids)
+    return [
+        _get_user_auth_details_from_model(model)
+        if model is not None else None for model in user_settings_models
+    ]
 
 
 def get_auth_details_by_user_id(user_id, strict=False):

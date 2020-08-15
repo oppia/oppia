@@ -22,7 +22,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import re
 
 from core.domain import takeout_domain
+from core.domain import user_services
 from core.platform import models
+import feconf
 
 (
     base_models, collection_models, email_models,
@@ -59,6 +61,13 @@ def export_data_for_user(user_id):
                                 model export policy>
         }.
     """
+    user_settings = user_services.get_user_settings(user_id)
+    # TODO(#10358): Remove this check and allow takeout for profiles (Learner
+    # Role) once well defined authentication flow for them is in place.
+    if user_settings is not None and (
+            user_settings.role == feconf.ROLE_ID_LEARNER):
+        raise NotImplementedError(
+            'Takeout for profile users is not yet supported.')
     exported_data = dict()
     models_to_export = get_models_which_should_be_exported()
     for model in models_to_export:

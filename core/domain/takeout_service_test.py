@@ -212,217 +212,22 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
             email=self.USER_1_EMAIL,
             role=self.PROFILE_1_ROLE
         ).put()
-        user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
-        user_models.UserSubscriptionsModel(id=self.PROFILE_ID_1).put()
 
-    def test_export_nonexistent_user_raises_error(self):
-        """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaisesRegexp(
-            user_models.UserSettingsModel.EntityNotFoundError,
-            'Entity for class UserSettingsModel with id fake_user_id '
-            'not found'):
-            takeout_service.export_data_for_user('fake_user_id')
-
-    def test_export_data_for_user_trivial_is_correct(self):
+    def test_export_data_for_profile_user_trivial_raises_error(self):
         """Trivial test of export_data functionality."""
+
         self.set_up_trivial()
+        error_msg = 'Takeout for profile users is not yet supported.'
+        with self.assertRaisesRegexp(NotImplementedError, error_msg):
+            takeout_service.export_data_for_user(self.PROFILE_ID_1)
 
-        # Generate expected output.
-        collection_rights_data = {
-            'editable_collection_ids': [],
-            'owned_collection_ids': [],
-            'viewable_collection_ids': [],
-            'voiced_collection_ids': []
-        }
-        exploration_rights_data = {
-            'editable_exploration_ids': [],
-            'owned_exploration_ids': [],
-            'viewable_exploration_ids': [],
-            'voiced_exploration_ids': []
-        }
-        profile_settings_data = {
-            'email': 'user1@example.com',
-            'role': feconf.ROLE_ID_LEARNER,
-            'username': None,
-            'normalized_username': None,
-            'last_agreed_to_terms': None,
-            'last_started_state_editor_tutorial': None,
-            'last_started_state_translation_tutorial': None,
-            'last_logged_in': None,
-            'last_edited_an_exploration': None,
-            'profile_picture_filename': None,
-            'default_dashboard': 'learner',
-            'creator_dashboard_display_pref': 'card',
-            'user_bio': None,
-            'subject_interests': [],
-            'first_contribution_msec': None,
-            'preferred_language_codes': [],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'display_alias': None
-        }
-        subscriptions_data = {
-            'activity_ids': [],
-            'collection_ids': [],
-            'creator_usernames': [],
-            'general_feedback_thread_ids': [],
-            'last_checked': None
-        }
-        task_entry_data = {
-            'task_ids_resolved_by_user': []
-        }
-        topic_rights_data = {
-            'managed_topic_ids': []
-        }
-
-        expected_profile_data = {
-            'user_stats': {},
-            'user_settings': profile_settings_data,
-            'user_subscriptions': subscriptions_data,
-            'user_skill_mastery': {},
-            'user_contributions': {},
-            'exploration_user_data': {},
-            'completed_activities': {},
-            'incomplete_activities': {},
-            'exp_user_last_playthrough': {},
-            'learner_playlist': {},
-            'task_entry': task_entry_data,
-            'topic_rights': topic_rights_data,
-            'collection_progress': {},
-            'story_progress': {},
-            'general_feedback_thread': {},
-            'general_feedback_thread_user': {},
-            'general_feedback_message': {},
-            'collection_rights': collection_rights_data,
-            'general_suggestion': {},
-            'exploration_rights': exploration_rights_data,
-            'general_feedback_email_reply_to_id': {},
-            'general_voiceover_application': {},
-            'user_contribution_scoring': {},
-            'user_contribution_rights': {},
-            'collection_rights_snapshot_metadata': {},
-            'collection_snapshot_metadata': {},
-            'skill_snapshot_metadata': {},
-            'subtopic_page_snapshot_metadata': {},
-            'topic_rights_snapshot_metadata': {},
-            'topic_snapshot_metadata': {},
-            'story_snapshot_metadata': {},
-            'question_snapshot_metadata': {},
-            'config_property_snapshot_metadata': {},
-            'exploration_rights_snapshot_metadata': {},
-            'exploration_snapshot_metadata': {},
-            'platform_parameter_snapshot_metadata': {},
-        }
-
-        # Perform export and compare.
-        profile_takeout_object = takeout_service.export_data_for_user(
-            self.PROFILE_ID_1)
-        observed_data = profile_takeout_object.user_data
-        self.assertItemsEqual(observed_data, expected_profile_data)
-        observed_json = json.dumps(observed_data)
-        expected_json = json.dumps(expected_profile_data)
-        self.assertItemsEqual(
-            json.loads(expected_json), json.loads(observed_json))
-
-    def test_export_data_for_user_nontrivial_is_correct(self):
+    def test_export_data_for_profile_user_nontrivial_raises_error(self):
         """Nontrivial test of export_data functionality."""
+
         self.set_up_non_trivial()
-
-        expected_profile_skill_data = {
-            self.SKILL_ID_1: self.DEGREE_OF_MASTERY
-        }
-        expected_completed_activities_data = {
-            'completed_exploration_ids': self.EXPLORATION_IDS,
-            'completed_collection_ids': self.COLLECTION_IDS
-        }
-        expected_incomplete_activities_data = {
-            'incomplete_exploration_ids': self.EXPLORATION_IDS,
-            'incomplete_collection_ids': self.COLLECTION_IDS
-        }
-        expected_last_playthrough_data = {
-            self.EXPLORATION_IDS[0]: {
-                'exp_version': self.EXP_VERSION,
-                'state_name': self.STATE_NAME
-            }
-        }
-        expected_learner_playlist_data = {
-            'playlist_exploration_ids': self.EXPLORATION_IDS,
-            'playlist_collection_ids': self.COLLECTION_IDS
-        }
-        expected_collection_progress_data = {
-            self.COLLECTION_IDS[0]: self.EXPLORATION_IDS
-        }
-        expected_story_progress_data = {
-            self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
-        }
-        expected_profile_settings_data = {
-            'email': self.USER_1_EMAIL,
-            'role': feconf.ROLE_ID_ADMIN,
-            'username': None,
-            'normalized_username': None,
-            'last_agreed_to_terms': self.GENERIC_EPOCH,
-            'last_started_state_editor_tutorial': None,
-            'last_started_state_translation_tutorial': None,
-            'last_logged_in': self.GENERIC_EPOCH,
-            'last_edited_an_exploration': None,
-            'profile_picture_filename': None,
-            'default_dashboard': 'learner',
-            'creator_dashboard_display_pref': 'card',
-            'user_bio': self.GENERIC_USER_BIO,
-            'subject_interests': self.GENERIC_SUBJECT_INTERESTS,
-            'first_contribution_msec': None,
-            'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
-            'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'display_alias': self.GENERIC_DISPLAY_ALIAS_2
-        }
-
-        expected_profile_data = {
-            'user_stats': {},
-            'user_settings': expected_profile_settings_data,
-            'user_subscriptions': {},
-            'user_skill_mastery': expected_profile_skill_data,
-            'user_contributions': {},
-            'exploration_user_data': {},
-            'completed_activities': expected_completed_activities_data,
-            'incomplete_activities': expected_incomplete_activities_data,
-            'exp_user_last_playthrough': expected_last_playthrough_data,
-            'learner_playlist': expected_learner_playlist_data,
-            'task_entry': {},
-            'topic_rights': {},
-            'collection_progress': expected_collection_progress_data,
-            'story_progress': expected_story_progress_data,
-            'general_feedback_thread': {},
-            'general_feedback_thread_user': {},
-            'general_feedback_message': {},
-            'collection_rights': {},
-            'general_suggestion': {},
-            'exploration_rights': {},
-            'general_feedback_email_reply_to_id': {},
-            'general_voiceover_application': {},
-            'user_contribution_scoring': {},
-            'user_contribution_rights': {},
-            'collection_rights_snapshot_metadata': {},
-            'collection_snapshot_metadata': {},
-            'skill_snapshot_metadata': {},
-            'subtopic_page_snapshot_metadata': {},
-            'topic_rights_snapshot_metadata': {},
-            'topic_snapshot_metadata': {},
-            'story_snapshot_metadata': {},
-            'question_snapshot_metadata': {},
-            'config_property_snapshot_metadata': {},
-            'exploration_rights_snapshot_metadata': {},
-            'exploration_snapshot_metadata': {},
-            'platform_parameter_snapshot_metadata': {}
-        }
-        profile_takeout_object = takeout_service.export_data_for_user(
-            self.PROFILE_ID_1)
-        observed_data = profile_takeout_object.user_data
-        self.assertItemsEqual(observed_data, expected_profile_data)
-        observed_json = json.dumps(observed_data)
-        expected_json = json.dumps(expected_profile_data)
-        self.assertItemsEqual(
-            json.loads(observed_json), json.loads(expected_json))
+        error_msg = 'Takeout for profile users is not yet supported.'
+        with self.assertRaisesRegexp(NotImplementedError, error_msg):
+            takeout_service.export_data_for_user(self.PROFILE_ID_1)
 
 
 class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
@@ -913,7 +718,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'not found'):
             takeout_service.export_data_for_user('fake_user_id')
 
-    def test_export_data_for_user_trivial_is_correct(self):
+    def test_export_data_for_full_user_trivial_is_correct(self):
         """Trivial test of export_data functionality."""
         self.set_up_trivial()
 
@@ -1057,7 +862,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_images = []
         self.assertEqual(expected_images, observed_images)
 
-    def test_export_data_for_user_nontrivial_is_correct(self):
+    def test_export_data_for_full_user_nontrivial_is_correct(self):
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
         # We set up the feedback_thread_model here so that we can easily
