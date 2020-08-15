@@ -42,7 +42,7 @@ export class ExplorationPermissionsBackendApiService {
 
   getPermissions(): Promise<ExplorationPermissions> {
     let explorationPermissionsUrl = this.urlInterpolationService
-      .interpolateUrl( '/createhandler/permissions/<exploration_id>', {
+      .interpolateUrl('/createhandler/permissions/<exploration_id>', {
         exploration_id: this.contextService.getExplorationId()
       });
 
