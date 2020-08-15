@@ -28,6 +28,7 @@ from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import image_validation_services
 from core.domain import suggestion_registry
+from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -351,7 +352,7 @@ def accept_suggestions(
     """Accepts the suggestions with the given suggestion_ids.
 
     Args:
-        suggestion_id: str. The id of the suggestion to be accepted.
+        suggestion_ids: list(str). The ids of the suggestions to be accepted.
         reviewer_id: str. The ID of the reviewer accepting the suggestions.
         commit_message: str. The commit message.
         review_message: str. The message provided by the reviewer while
@@ -402,22 +403,36 @@ def accept_suggestions(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
         None, review_message)
 
+    user_score_identifiers = [
+        user_domain.FullyQualifiedUserScoreIdentifier(
+            suggestion.author, suggestion.score_category)
+        for suggestion in suggestions
+    ]
     if feconf.ENABLE_RECORDING_OF_SCORES:
-        increment_score_for_user(
-            suggestion.author_id, suggestion.score_category,
+        increment_scores_for_users(
+            user_score_identifiers,
             suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
-            scores = get_all_scores_of_user(suggestion.author_id)
-            if (
-                    suggestion.score_category in scores and
-                    scores[suggestion.score_category] >=
-                    feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
-                if not check_if_email_has_been_sent_to_user(
-                        suggestion.author_id, suggestion.score_category):
-                    email_manager.send_mail_to_onboard_new_reviewers(
-                        suggestion.author_id, suggestion.score_category)
-                    mark_email_has_been_sent_to_user(
-                        suggestion.author_id, suggestion.score_category)
+            scores = get_scores_of_users_for_categories(user_score_identifiers)
+            user_score_identifiers_that_can_review = []
+            for index, score in enumerate(scores):
+                if score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
+                    user_score_identifiers_that_can_review.append(
+                        user_score_identifiers[index])
+            user_score_identifiers_to_send_emails_to = [
+
+            ]
+            emails_has_been_sent = check_if_email_has_been_sent_to_users(
+
+            )
+            for user_score_identifier in user_score_identifiers:
+
+                    if not check_if_email_has_been_sent_to_user(
+                            suggestion.author_id, suggestion.score_category):
+                        email_manager.send_mail_to_onboard_new_reviewers(
+                            suggestion.author_id, suggestion.score_category)
+                        mark_email_has_been_sent_to_user(
+                            suggestion.author_id, suggestion.score_category)
 
 
 def reject_suggestion(suggestion_id, reviewer_id, review_message):
@@ -666,37 +681,70 @@ def check_user_can_review_in_category(user_id, score_category):
     return score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
 
 
-def check_if_email_has_been_sent_to_user(user_id, score_category):
-    """Checks if user has already received an email.
+def get_scores_of_users_for_categories(user_score_identifiers):
+    """Gets the score for each user for the corresponding score category.
 
     Args:
-        user_id: str. The id of the user.
-        score_category: str. The score category.
+        user_score_identifiers: list(FullyQualifiedUserScoreIdentifier).
+            Contains unique (user_id, score_category) pairs that
+            correspond to the id of the user and the suggestion
+            score_category to retrieve the score for.
+    
+    Returns:
+        list(float). The scores of the user scoring models.
+
+    Raises:
+        Exception. A UserContributionScoringModel entry does not exist.
+    """
+    return (
+        user_models.UserContributionScoringModel
+        .get_scores_of_users_for_categories(user_score_identifiers)
+    )  
+
+
+def get_users_to_send_emails_to(cls, user_score_identifiers):
+    """Checks if the users have received an email.
+
+    Args:
+        user_score_identifiers: list(FullyQualifiedUserScoreIdentifier).
+            Contains unique (user_id, score_category) pairs to check if an
+            email has been sent to each user_id regarding their score_category.
 
     Returns:
-        bool. Whether the email has already been sent to the user.
+        list(bool). Whether the emails have already been sent to the users.
+
+    Raises:
+        Exception. A UserContributionScoringModel entry does not exist.
     """
-    scoring_model_instance = user_models.UserContributionScoringModel.get_by_id(
-        '%s.%s' % (score_category, user_id))
-    if scoring_model_instance is None:
-        return False
-    return scoring_model_instance.has_email_been_sent
+    return (
+        user_models.UserContributionScoringModel
+        .check_if_email_has_been_sent_to_users(user_score_identifiers)
+    )
 
 
-def mark_email_has_been_sent_to_user(user_id, score_category):
-    """Marks that the user has already received an email.
+def mark_email_has_been_sent_to_user(user_score_identifier):
+    """Marks that the user has received an email.
 
     Args:
-        user_id: str. The id of the user.
-        score_category: str. The score category.
+        user_score_identifier: FullyQualifiedUserScoreIdentifier. A
+            (user_id, score_category) pair that corresponds to the id of the
+            user and the suggestion score_category to mark the email as sent
+            for.
     """
-    scoring_model_instance = user_models.UserContributionScoringModel.get_by_id(
-        '%s.%s' % (score_category, user_id))
+    mark_email_has_been_sent_to_users([user_score_identifier])
 
-    if scoring_model_instance is None:
-        raise Exception('Expected user scoring model to exist for user')
-    scoring_model_instance.has_email_been_sent = True
-    scoring_model_instance.put()
+
+def mark_email_has_been_sent_to_users(user_score_identifiers):
+    """Marks that the users have received an email.
+
+    Args:
+        user_score_identifiers: list(FullyQualifiedUserScoreIdentifier).
+            Contains unique (user_id, score_category) pairs that
+            correspond to the id of the user and the suggestion
+            score_category to mark the email as sent for.
+    """
+    user_models.UserContributionScoringModel.mark_email_has_been_sent_to_users(
+        user_score_identifiers)
 
 
 def get_all_user_ids_who_are_allowed_to_review(score_category):
@@ -716,7 +764,7 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
     ]
 
 
-def increment_score_for_user(score_identifier, increment_by):
+def increment_score_for_user(user_score_identifier, increment_by):
     """Increments the score of the user in the category by the given amount.
 
     In the first version of the scoring system, the increment_by quantity will
@@ -724,15 +772,15 @@ def increment_score_for_user(score_identifier, increment_by):
     doesn't lose score in any way.
 
     Args:
-        score_identifier: FullyQualifiedScoreIdentifier. A
+        user_score_identifier: FullyQualifiedUserScoreIdentifier. A
             (user_id, score_category) pair that corresponds to which user
             score to update.
         increment_by: float. The amount to increase the score of the user by.
     """
-    increment_score_for_users([score_identifier], increment_by)
+    increment_score_for_users([user_score_identifier], increment_by)
 
 
-def increment_score_for_users(score_identifiers, increment_by):
+def increment_score_for_users(user_score_identifiers, increment_by):
     """Increments the score for each user in their corresponding category by
     the given amount.
 
@@ -741,26 +789,40 @@ def increment_score_for_users(score_identifiers, increment_by):
     doesn't lose score in any way.
 
     Args:
-        list(FullyQualifiedScoreIdentifier). A list of unique
-            (user_id, score_category) pairs that correspond to which user
-            scores to update.
+        user_score_identifiers: list(FullyQualifiedUserScoreIdentifier). A list
+            of unique (user_id, score_category) pairs that correspond to which
+            user scores to update.
+        increment_by: float. The amount to increase the scores of the users by.
     """
 
     user_models.UserContributionScoringModel.increment_score_for_users(
-        score_identifiers, increment_by)
+        user_score_identifiers, increment_by)
 
 
-def create_new_user_contribution_scoring_model(user_id, score_category, score):
+def create_new_user_contribution_scoring_model(user_score_identifier, score):
     """Create a new UserContributionScoringModel instance for the user and the
-    given category with a score of 0.
+    given category with the given score.
 
     Args:
-        user_id: str. The id of the user.
-        score_category: str. The category of the suggestion.
+        user_score_identifier: FullyQualifiedUserScoreIdentifier. A
+            (user_id, score_category) pair that corresponds to the user score
+            model to create.
         score: float. The score of the user for the given category.
     """
-    user_models.UserContributionScoringModel.create(
-        user_id, score_category, score)
+    create_new_user_contribution_scoring_models([user_score_identifier], score)
+
+def create_new_user_contribution_scoring_models(user_score_identifiers, score):
+    """Create new UserContributionScoringModel instances for the users and the
+    given categories with the given score.
+
+    Args:
+        user_score_identifiers: list(FullyQualifiedUserScoreIdentifier). A list
+            of unique (user_id, score_category) pairs that correspond to the
+            user score models to create.
+        score: float. The scores of the users for the given categories.
+    """
+    user_models.UserContributionScoringModel.create_multi(
+        user_score_identifier, score)
 
 
 def check_can_resubmit_suggestion(suggestion_id, user_id):

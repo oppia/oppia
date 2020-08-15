@@ -1976,6 +1976,127 @@ class UserContributionScoringModel(base_models.BaseModel):
         return model.score if model else None
 
     @classmethod
+    def get_scores_of_users_for_categories(cls, user_score_identifiers):
+        """Gets the score for each user for the corresponding score category.
+
+        Args:
+            user_score_identifiers: list(FullyQualifiedUserScoreIdentifier).
+                Contains unique (user_id, score_category) pairs that
+                correspond to the id of the user and the suggestion
+                score_category to retrieve the score for.
+        
+        Returns:
+            list(float). The scores of the user scoring models.
+
+        Raises:
+            Exception. A UserContributionScoringModel entry does not exist.
+        """
+        user_ids = [
+            user_score_identifier.user_id for user_score_identifier in
+            user_score_identifiers
+        ]
+        score_categories = [
+            user_score_identifier.score_category for user_score_identifier in
+            user_score_identifiers
+        ]
+        instance_ids = [
+            cls._get_instance_id(user_id, score_category)
+            for user_id, score_category in python_utils.ZIP(
+                user_ids, score_categories)
+        ]
+
+        user_scoring_models = cls.get_multi(instance_ids)
+        scores = []
+        for user_scoring_model in user_scoring_models:
+            if not user_scoring_model:
+                raise Exception(
+                    'Cannot get the score for user with user_id: %s and '
+                    'category: %s because the UserContributionScoringModel '
+                    'entry does not exist.' % (
+                        user_scoring_model.user_id,
+                        user_scoring_model.score_category
+                    )
+                )
+            scores.append(user_scoring_model.score)
+
+        return scores
+
+    @classmethod
+    def mark_email_has_been_sent_to_users(cls, user_score_identifiers):
+    """Marks that the users have received an email.
+
+    Args:
+        user_score_identifiers: list(FullyQualifiedUserScoreIdentifier).
+            Contains unique (user_id, score_category) pairs that
+            correspond to the id of the user and the suggestion
+            score_category to mark the email as sent for.
+    """
+    user_ids = [
+            user_score_identifier.user_id for user_score_identifier in
+            user_score_identifiers
+        ]
+    score_categories = [
+        user_score_identifier.score_category for user_score_identifier in
+        user_score_identifiers
+    ]
+    instance_ids = [
+        cls._get_instance_id(user_id, score_category)
+        for user_id, score_category in python_utils.ZIP(
+            user_ids, score_categories)
+    ]
+    user_scoring_models = cls.multi(instance_ids)
+
+    for user_scoring_model in user_scoring_models:
+        if user_scoring_moedl is None:
+            raise Exception(
+                'A UserContributionScoringModel entry with the given id: %s'
+                ' does not exist.' % instance_id
+            )
+        user_scoring_model.has_email_been_sent = True
+
+    cls.put_multi(user_scoring_models)
+
+    def check_if_email_has_been_sent_to_users(cls, user_score_identifiers):
+    """Checks if the users have received an email.
+
+    Args:
+        user_score_identifiers: list(FullyQualifiedUserScoreIdentifier).
+            Contains unique (user_id, score_category) pairs to check if an
+            email has been sent to each user_id regarding their score_category.
+
+    Returns:
+        list(bool). Whether the emails have already been sent to the users.
+    """
+    user_ids = [
+            user_score_identifier.user_id for user_score_identifier in
+            user_score_identifiers
+        ]
+    score_categories = [
+        user_score_identifier.score_category for user_score_identifier in
+        user_score_identifiers
+    ]
+    instance_ids = [
+        cls._get_instance_id(user_id, score_category)
+        for user_id, score_category in python_utils.ZIP(
+            user_ids, score_categories)
+    ]
+
+    user_scoring_models = cls.get_multi(instance_ids)
+    whether_emails_have_been_sent = []
+    for user_scoring_model in user_scoring_models:
+        if user_scoring_model:
+            raise Exception(
+                'Cannot check if email has been sent because the '
+                'UserContributionScoringModel entry with id: %s does not '
+                'exist.' % instance_id
+            )
+        whether_emails_have_been_sent.append(
+            user_scoring_model.has_email_been_sent)
+
+    return whether_emails_have_been_sent
+
+
+    @classmethod
     def create(cls, user_score_identifier, score):
         """Creates a new UserContributionScoringModel entry.
 

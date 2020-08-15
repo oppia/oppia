@@ -1025,12 +1025,26 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 [])), 0)
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
-        suggestion_services.create_new_user_contribution_scoring_model(
-            'user1', 'category1', 15)
-        suggestion_services.create_new_user_contribution_scoring_model(
-            'user1', 'category2', 15)
-        suggestion_services.create_new_user_contribution_scoring_model(
-            'user1', 'category3', 5)
+        user_score_identifiers_large_score = [
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category1'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category2')
+        ]
+        suggestion_services.create_new_user_contribution_scoring_models(
+            user_score_identifiers_large_score, 15)
+        user_score_identifiers_small_score = [
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category3'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user2', 'category1'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user2', 'category2'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user2', 'category3')
+        ]
+        suggestion_services.create_new_user_contribution_scoring_models(
+            user_score_identifiers_small_score, 5)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -1058,7 +1072,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_5')
         self.assertEqual(len(
             suggestion_services
-            .get_all_suggestions_that_can_be_reviewed_by_user('user1')), 3)
+            .get_all_suggestions_that_can_be_reviewed_by_user('user1')), 4)
         self.assertEqual(len(
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user('user2')), 0)
@@ -1382,12 +1396,16 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserContributionScoringUnitTests, self).setUp()
-        suggestion_services.create_new_user_contribution_scoring_model(
-            'user1', 'category1', 0)
-        suggestion_services.create_new_user_contribution_scoring_model(
-            'user1', 'category2', 0)
-        suggestion_services.create_new_user_contribution_scoring_model(
-            'user2', 'category1', 0)
+        user_score_identifiers = [
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category1'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user1', 'category2'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+            'user2', 'category1'),
+        ]
+        suggestion_services.create_new_user_contribution_scoring_models(
+            user_score_identifiers, 0)
 
         self.signup('user_a@example.com', 'userA')
         self.signup('user_b@example.com', 'userB')
@@ -1443,8 +1461,10 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
                     'invalid_user', 'category1'))
 
     def test_check_if_email_has_been_sent_to_user(self):
+        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
+            self.user_a_id, 'category_a')
         suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_a_id, 'category_a', 15)
+            user_score_identifier, 15)
         self.assertFalse(
             suggestion_services.check_if_email_has_been_sent_to_user(
                 self.user_a_id, 'category_a'))
