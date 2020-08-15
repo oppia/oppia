@@ -350,21 +350,18 @@ class UserContributionRights(python_utils.OBJECT):
                 'found: %s' % type(self.can_review_questions))
 
 
-class ModifiableUserData(python_utils.OBJECT):
-    """Domain object for the ModifiableUserData."""
+class ModifiableUserDataV1(python_utils.OBJECT):
+    """Domain object for the ModifiableUserDataV1."""
 
     def __init__(
-            self, display_alias, last_agreed_to_terms, last_logged_in, user_bio,
-            pin, subject_interests, preferred_language_codes,
+            self, display_alias, pin, preferred_language_codes,
             preferred_site_language_code, preferred_audio_language_code,
             user_id=None):
         self.display_alias = display_alias
-        self.last_agreed_to_terms = last_agreed_to_terms
-        self.last_logged_in = last_logged_in
-        self.user_bio = user_bio
         self.pin = pin
-        self.subject_interests = subject_interests
         self.preferred_language_codes = preferred_language_codes
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
+        # The user_id is not intended to be a modifiable attribute, it is just
+        # needed to identify the object.
         self.user_id = user_id

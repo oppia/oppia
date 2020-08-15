@@ -233,6 +233,34 @@ class UserSettings(python_utils.OBJECT):
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
 
+    def populate_from_user_data(self, modifiable_user_data):
+        """Populate the UserSettings domain object using the user data in
+            modifiable_user_data.
+            Args:
+                modifiable_user_data: ModifiableUserDataV1. The modifiable user
+                    data version_1 object with the data information to be updated.
+            Raises:
+                ValidationError. None or empty value is provided for display alias
+                    attribute.
+        """
+        if (not modifiable_user_data.display_alias or
+                not isinstance(
+                    modifiable_user_data.display_alias,
+                    python_utils.BASESTRING
+                )
+           ):
+            raise utils.ValidationError(
+                'Expected display_alias to be a string, received %s.' %
+                modifiable_user_data.display_alias
+            )
+        self.display_alias = modifiable_user_data.display_alias
+        self.preferred_language_codes = (
+            modifiable_user_data.preferred_language_codes)
+        self.preferred_site_language_code = (
+            modifiable_user_data.preferred_site_language_code)
+        self.preferred_audio_language_code = (
+            modifiable_user_data.preferred_audio_language_code)
+
     @property
     def truncated_email(self):
         """Returns truncated email by replacing last two characters before @
@@ -954,8 +982,14 @@ def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
         corresponding to the profiles linked to given parent_user_id. If that
         parent user does not have any profiles linked to it, the
         returned list will be empty.
+
+    Raises:
+        Exception. Parent user with the given parent_user_id not found.
     """
-    get_auth_details_by_user_id(parent_user_id, strict=True)
+    if user_models.UserAuthDetailsModel.has_reference_to_user_id(
+            parent_user_id) is False:
+        raise Exception('Parent user not found.')
+
     return [
         _get_user_auth_details_from_model(model) for model in
         user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
@@ -964,7 +998,7 @@ def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
 
 
 def create_new_user(gae_id, email):
-    """Creates a new user.
+    """Creates a new user and commits it to the datastore.
 
     Args:
         gae_id: str. The unique GAE user ID of the user.
@@ -974,7 +1008,7 @@ def create_new_user(gae_id, email):
         UserSettings. The newly-created user settings domain object.
 
     Raises:
-        Exception. If a user with the given gae_id already exists.
+        Exception. A user with the given gae_id already exists.
     """
     def _create_new_user_transactional(user_settings, user_auth_details):
         """Save user models for new users as a transaction.
@@ -1006,7 +1040,7 @@ def create_new_user(gae_id, email):
 
 def create_new_profiles(gae_id, email, modifiable_user_data_list):
     """Creates new profiles for the users specified in the
-    modifiable_user_data_list.
+    modifiable_user_data_list and commits them to the datastore.
 
     Args:
         gae_id: str. The GAE ID of the full (parent) user trying to create new
@@ -1021,12 +1055,12 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
         users.
 
     Raises:
-        Exception. If the pin for parent user trying to create a new profile
+        Exception. The pin for parent user trying to create a new profile
             is not set.
-        Exception. If user_id is already set for any user in its corresponding
+        Exception. The user_id is already set for any user in its corresponding
             modifiable_user_data object.
-        ValidationError. If a None or empty value is provided for display
-            alias attribute.
+        ValidationError. None or empty value is provided for display alias
+            attribute.
     """
 
     def _create_new_profile_transactional(
@@ -1057,29 +1091,7 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
             user_id, gae_id, email, feconf.ROLE_ID_LEARNER,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
         )
-        if (not modifiable_user_data.display_alias or
-                not isinstance(
-                    modifiable_user_data.display_alias,
-                    python_utils.BASESTRING
-                )
-           ):
-            raise utils.ValidationError(
-                'Expected display alias to be a string, received %s' %
-                modifiable_user_data.display_alias
-            )
-        user_settings.display_alias = modifiable_user_data.display_alias
-        user_settings.last_agreed_to_terms = (
-            modifiable_user_data.last_agreed_to_terms)
-        user_settings.last_logged_in = modifiable_user_data.last_logged_in
-        user_settings.user_bio = modifiable_user_data.user_bio
-        user_settings.subject_interests = (
-            modifiable_user_data.subject_interests)
-        user_settings.preferred_language_codes = (
-            modifiable_user_data.preferred_language_codes)
-        user_settings.preferred_site_language_code = (
-            modifiable_user_data.preferred_site_language_code)
-        user_settings.preferred_audio_language_code = (
-            modifiable_user_data.preferred_audio_language_code)
+        user_settings.populate_from_user_data(modifiable_user_data)
 
         user_auth_details = UserAuthDetails(
             user_id, None, modifiable_user_data.pin, parent_user_id)
@@ -1101,9 +1113,9 @@ def update_multiple_users_data(modifiable_user_data_list):
             data has to be updated.
 
     Raises:
-        ValidationError. If a None or empty value is provided for display
+        ValidationError. None or empty value is provided for display
             alias attribute.
-        Exception. If a None or empty value is provided for user_id.
+        Exception. None or empty value is provided for user_id.
     """
     user_settings_list = []
     user_auth_details_list = []
@@ -1113,24 +1125,7 @@ def update_multiple_users_data(modifiable_user_data_list):
             raise Exception(
                 'A valid user id must exist for all the users to be updated.')
         user_settings = get_user_settings(user_id, strict=True)
-        if not modifiable_user_data.display_alias:
-            raise utils.ValidationError(
-                'Expected display_alias to be a string, received %s.'
-                % (modifiable_user_data.display_alias)
-            )
-        user_settings.display_alias = modifiable_user_data.display_alias
-        user_settings.last_agreed_to_terms = (
-            modifiable_user_data.last_agreed_to_terms)
-        user_settings.last_logged_in = modifiable_user_data.last_logged_in
-        user_settings.user_bio = modifiable_user_data.user_bio
-        user_settings.subject_interests = modifiable_user_data.subject_interests
-        user_settings.preferred_language_codes = (
-            modifiable_user_data.preferred_language_codes)
-        user_settings.preferred_site_language_code = (
-            modifiable_user_data.preferred_site_language_code)
-        user_settings.preferred_audio_language_code = (
-            modifiable_user_data.preferred_audio_language_code)
-
+        user_settings.populate_from_user_data(modifiable_user_data)
         user_settings_list.append(user_settings)
 
         user_auth_details = get_auth_details_by_user_id(user_id, strict=True)
@@ -1274,7 +1269,7 @@ def get_auth_details_by_user_id(user_id, strict=False):
         UserAuthDetails domain object.
 
     Raises:
-        Exception. The value of strict is True and given user_id does not exist.
+        . The value of strict is True and given user_id does not exist.
     """
     user_auth_details_model = user_models.UserAuthDetailsModel.get_by_id(
         user_id)

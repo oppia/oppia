@@ -71,14 +71,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserServicesUnitTests, self).setUp()
-        self.modifiable_user_data = user_domain.ModifiableUserData(
-            'display_alias', None, None, 'user_bio', '12345',
-            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+        self.modifiable_user_data = user_domain.ModifiableUserDataV1(
+            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None, 'user_id'
         )
-        self.modifiable_new_user_data = user_domain.ModifiableUserData(
-            'display_alias3', None, None, 'user_bio', '12345',
-            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+        self.modifiable_new_user_data = user_domain.ModifiableUserDataV1(
+            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None
         )
 
@@ -226,10 +224,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = None
         self.modifiable_user_data.display_alias = display_alias
-        self.modifiable_user_data.last_agreed_to_terms = (
-            user_settings.last_agreed_to_terms)
-        self.modifiable_user_data.last_logged_in = (
-            user_settings.last_logged_in)
         user_services.update_multiple_users_data([self.modifiable_user_data])
         user_settings = user_services.get_user_settings(user_id)
         self.assertEqual(user_settings.display_alias, display_alias)
@@ -655,7 +649,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_profiles_auth_details_non_existent_id_raises_error(self):
         non_existent_user_id = 'id_x'
-        error_msg = 'User not found.'
+        error_msg = 'Parent user not found.'
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.get_all_profiles_auth_details_by_parent_user_id(
                 non_existent_user_id)
@@ -673,10 +667,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
-        self.modifiable_user_data.last_agreed_to_terms = (
-            user_settings.last_agreed_to_terms)
-        self.modifiable_user_data.last_logged_in = (
-            user_settings.last_logged_in)
         user_services.update_multiple_users_data([self.modifiable_user_data])
         self.modifiable_new_user_data.display_alias = display_alias_2
         self.modifiable_new_user_data.pin = profile_pin
@@ -760,7 +750,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_auth_details_by_gae_id_non_existing_user_returns_none(self):
         non_existent_user_id = 'id_x'
         self.assertIsNone(
-            user_services.get_auth_details_by_user_id(non_existent_user_id))
+            user_services.get_auth_details_by_gae_id(non_existent_user_id))
 
     def test_create_new_profile_with_parent_user_pin_set_is_success(self):
         gae_id = 'gae_id'
@@ -779,10 +769,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
-        self.modifiable_user_data.last_agreed_to_terms = (
-            user_settings.last_agreed_to_terms)
-        self.modifiable_user_data.last_logged_in = (
-            user_settings.last_logged_in)
         user_services.update_multiple_users_data([self.modifiable_user_data])
         self.modifiable_new_user_data.display_alias = display_alias_2
         self.modifiable_new_user_data.pin = profile_pin
@@ -830,16 +816,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
-        self.modifiable_user_data.last_agreed_to_terms = (
-            user_settings.last_agreed_to_terms)
-        self.modifiable_user_data.last_logged_in = (
-            user_settings.last_logged_in)
         user_services.update_multiple_users_data([self.modifiable_user_data])
         self.modifiable_new_user_data.display_alias = display_alias_2
         self.modifiable_new_user_data.pin = profile_pin
-        modifiable_new_user_data_2 = user_domain.ModifiableUserData(
-            display_alias_3, None, None, 'user_bio', None,
-            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+        modifiable_new_user_data_2 = user_domain.ModifiableUserDataV1(
+            display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
             None, None
         )
         user_settings_list = user_services.create_new_profiles(
@@ -908,10 +889,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
-        self.modifiable_user_data.last_agreed_to_terms = (
-            user_settings.last_agreed_to_terms)
-        self.modifiable_user_data.last_logged_in = (
-            user_settings.last_logged_in)
         user_services.update_multiple_users_data([self.modifiable_user_data])
         error_msg = 'User id cannot already exist for a new user.'
         with self.assertRaisesRegexp(Exception, error_msg):
@@ -922,7 +899,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 gae_id, email, [self.modifiable_new_user_data]
             )
 
-    def test_update_user_modifiable_object_user_id_not_set_raises_error(self):
+    def test_update_users_modifiable_object_user_id_not_set_raises_error(self):
         gae_id = 'gae_id'
         email = 'new@example.com'
         display_alias = 'display_alias2'
@@ -937,16 +914,103 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.user_id = None
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
-        self.modifiable_user_data.last_agreed_to_terms = (
-            user_settings.last_agreed_to_terms)
-        self.modifiable_user_data.last_logged_in = (
-            user_settings.last_logged_in)
 
         error_msg = (
             'A valid user id must exist for all the users to be updated.')
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.update_multiple_users_data(
                 [self.modifiable_user_data])
+
+    def test_updating_multiple_users_data_for_multiple_user_works_fine(self):
+        # Preparing for the test.
+        gae_id = 'gae_id'
+        email = 'new@example.com'
+        display_alias = 'display_alias'
+        display_alias_2 = 'display_alias2'
+        display_alias_3 = 'display_alias3'
+        user_pin = '12345'
+        profile_pin = '123'
+        user_services.create_new_user(gae_id, email)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id)
+        )
+        user_id = user_auth_details_model.id
+        user_settings = user_services.get_user_settings(user_id)
+        self.modifiable_user_data.user_id = user_id
+        self.modifiable_user_data.pin = user_pin
+        self.modifiable_user_data.display_alias = display_alias
+        user_services.update_multiple_users_data([self.modifiable_user_data])
+        self.modifiable_new_user_data.display_alias = display_alias_2
+        self.modifiable_new_user_data.pin = profile_pin
+        modifiable_new_user_data_2 = user_domain.ModifiableUserDataV1(
+            display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
+            None, None
+        )
+        user_settings_list = user_services.create_new_profiles(
+            gae_id, email, [
+                self.modifiable_new_user_data, modifiable_new_user_data_2
+            ]
+        )
+        profile_user_ids = [
+            user_settings_list[0].user_id, user_settings_list[1].user_id]
+        self.modifiable_new_user_data.user_id = profile_user_ids[0]
+        modifiable_new_user_data_2.user_id = profile_user_ids[1]
+
+        # Performing the actual action.
+        modifiable_new_user_data_2.pin = '345'
+        self.modifiable_new_user_data.display_alias = 'xyz'
+        user_services.update_multiple_users_data(
+            [self.modifiable_new_user_data, modifiable_new_user_data_2])
+
+        # Post-checking.
+        user_auth_details_models = [
+            {
+                'id': model.id,
+                'gae_id': model.gae_id,
+                'pin': model.pin,
+                'parent_user_id': model.parent_user_id
+            } for model in
+            user_models.UserAuthDetailsModel.get_multi(profile_user_ids)
+        ]
+
+        expected_auth_details_output = [
+            {
+                'id': profile_user_ids[0],
+                'gae_id': None,
+                'pin': profile_pin,
+                'parent_user_id': user_id
+            },
+            {
+                'id': profile_user_ids[1],
+                'gae_id': None,
+                'pin': '345',
+                'parent_user_id': user_id
+            }
+        ]
+        self.assertItemsEqual(
+            expected_auth_details_output, user_auth_details_models)
+        
+        user_settings_models = [
+            {
+                'id': model.id,
+                'display_alias': model.display_alias,
+            } for model in
+            user_models.UserSettingsModel.get_multi(profile_user_ids)
+        ]
+
+        expected_user_settings_output = [
+            {
+                'id': profile_user_ids[0],
+                'display_alias': 'xyz'
+            },
+            {
+                'id': profile_user_ids[1],
+                'display_alias': display_alias_3
+            }
+        ]
+        self.assertItemsEqual(
+            expected_user_settings_output, user_settings_models)
 
     def test_mark_user_for_deletion_deletes_user_settings(self):
         gae_id = 'test_id'
@@ -1688,14 +1752,12 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
-        self.modifiable_user_data = user_domain.ModifiableUserData(
-            'display_alias', None, None, 'user_bio', '12345',
-            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+        self.modifiable_user_data = user_domain.ModifiableUserDataV1(
+            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None, 'user_id'
         )
-        self.modifiable_new_user_data = user_domain.ModifiableUserData(
-            'display_alias3', None, None, 'user_bio', '12345',
-            ['subject_interests'], [constants.DEFAULT_LANGUAGE_CODE],
+        self.modifiable_new_user_data = user_domain.ModifiableUserDataV1(
+            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None
         )
 
@@ -1782,15 +1844,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.modifiable_user_data.user_id = self.owner_id
         self.modifiable_user_data.pin = '12345'
         self.modifiable_user_data.display_alias = 'temp_name'
-        self.modifiable_user_data.last_agreed_to_terms = (
-            user_settings.last_agreed_to_terms)
-        self.modifiable_user_data.last_logged_in = (
-            user_settings.last_logged_in)
         user_services.update_multiple_users_data([self.modifiable_user_data])
 
         gae_id = self.get_gae_id_from_email(self.OWNER_EMAIL)
         profile_pin = '123'
-        error_msg = 'Expected display alias to be a string, received'
+        error_msg = 'Expected display_alias to be a string, received'
         with self.assertRaisesRegexp(utils.ValidationError, error_msg):
             self.modifiable_new_user_data.display_alias = ''
             self.modifiable_new_user_data.pin = profile_pin

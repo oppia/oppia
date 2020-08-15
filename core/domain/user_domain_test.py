@@ -496,24 +496,18 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 class ModifiableUserDataTests(test_utils.GenericTestBase):
     """Testing domain object for modifiable user data."""
 
-    def test_initialization_with_none_user_id(self):
-        """Testing init method."""
+    def test_initialization_with_none_user_id_is_successful(self):
+        """Testing init method user id set None."""
         modifiable_user_data = (
-            user_domain.ModifiableUserData(
-                'display_alias', None, None, 'user_bio', '123', ['ed', 'el'],
-                'preferred_language_codes', 'preferred_site_language_code',
-                'preferred_audio_language_code'
+            user_domain.ModifiableUserDataV1(
+                'display_alias', '123', 'preferred_language_codes',
+                'preferred_site_language_code', 'preferred_audio_language_code'
             )
         )
 
         self.assertEqual(
             modifiable_user_data.display_alias, 'display_alias')
-        self.assertIsNone(modifiable_user_data.last_agreed_to_terms)
-        self.assertIsNone(modifiable_user_data.last_logged_in)
-        self.assertEqual(modifiable_user_data.user_bio, 'user_bio')
         self.assertEqual(modifiable_user_data.pin, '123')
-        self.assertEqual(
-            modifiable_user_data.subject_interests, ['ed', 'el'])
         self.assertEqual(
             modifiable_user_data.preferred_language_codes,
             'preferred_language_codes'
@@ -528,24 +522,19 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(modifiable_user_data.user_id)
 
-    def test_initialization_with_valid_user_id(self):
-        """Testing init method."""
+    def test_initialization_with_valid_user_id_is_successful(self):
+        """Testing init method with a valid user id set."""
         modifiable_user_data = (
-            user_domain.ModifiableUserData(
-                'display_alias', None, None, 'user_bio', '123', ['ed', 'el'],
-                'preferred_language_codes', 'preferred_site_language_code',
-                'preferred_audio_language_code', 'user_id'
+            user_domain.ModifiableUserDataV1(
+                'display_alias', '123', 'preferred_language_codes',
+                'preferred_site_language_code', 'preferred_audio_language_code',
+                'user_id'
             )
         )
 
         self.assertEqual(
             modifiable_user_data.display_alias, 'display_alias')
-        self.assertIsNone(modifiable_user_data.last_agreed_to_terms)
-        self.assertIsNone(modifiable_user_data.last_logged_in)
-        self.assertEqual(modifiable_user_data.user_bio, 'user_bio')
         self.assertEqual(modifiable_user_data.pin, '123')
-        self.assertEqual(
-            modifiable_user_data.subject_interests, ['ed', 'el'])
         self.assertEqual(
             modifiable_user_data.preferred_language_codes,
             'preferred_language_codes'
