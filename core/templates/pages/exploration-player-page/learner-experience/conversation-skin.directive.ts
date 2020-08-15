@@ -719,9 +719,7 @@ angular.module('oppia').directive('conversationSkin', [
             } else {
               PlayerPositionService.setDisplayedCardIndex(totalNumCards - 1);
             }
-
-            $rootScope.$broadcast(
-              'currentQuestionChanged',
+            PlayerPositionService.changeCurrentQuestion(
               PlayerPositionService.getDisplayedCardIndex());
 
             if ($scope.displayedCard.isTerminal()) {

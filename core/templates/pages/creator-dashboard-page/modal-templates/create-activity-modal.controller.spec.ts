@@ -61,22 +61,25 @@ describe('Create Activity Modal Controller', function() {
     $scope.$apply();
   }));
 
-  it('should check properties set after controller is initialized', function() {
-    expect($scope.canCreateCollections).toEqual(true);
-    expect($scope.explorationImgUrl).toBe(
-      '/assets/images/activity/exploration.svg');
-    expect($scope.collectionImgUrl).toBe(
-      '/assets/images/activity/collection.svg');
-  });
+  it('should evalute $scope properties after controller is initialized',
+    function() {
+      expect($scope.canCreateCollections).toEqual(true);
+      expect($scope.explorationImgUrl).toBe(
+        '/assets/images/activity/exploration.svg');
+      expect($scope.collectionImgUrl).toBe(
+        '/assets/images/activity/collection.svg');
+    });
 
-  it('should create new exploration', function() {
+  it('should create new exploration when choosing exploration as the new' +
+    ' activity', function() {
     spyOn(ExplorationCreationService, 'createNewExploration').and.callThrough();
     $scope.chooseExploration();
     expect(ExplorationCreationService.createNewExploration).toHaveBeenCalled();
     expect($uibModalInstance.close).toHaveBeenCalled();
   });
 
-  it('should create new collection', function() {
+  it('should create new collection when choosing collection as the new' +
+    ' activity', function() {
     spyOn(CollectionCreationService, 'createNewCollection').and.callThrough();
     $scope.chooseCollection();
     expect(CollectionCreationService.createNewCollection).toHaveBeenCalled();
