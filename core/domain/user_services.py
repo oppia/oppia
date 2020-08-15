@@ -236,10 +236,11 @@ class UserSettings(python_utils.OBJECT):
     def populate_from_user_data(self, modifiable_user_data):
         """Populate the UserSettings domain object using the user data in
             modifiable_user_data.
-        
+
         Args:
             modifiable_user_data: ModifiableUserDataV1. The modifiable user
                 data version_1 object with the data information to be updated.
+
         Raises:
             ValidationError. None or empty value is provided for display alias
                 attribute.
@@ -1270,7 +1271,7 @@ def get_auth_details_by_user_id(user_id, strict=False):
         UserAuthDetails domain object.
 
     Raises:
-        . The value of strict is True and given user_id does not exist.
+        Exception. The value of strict is True and given user_id does not exist.
     """
     user_auth_details_model = user_models.UserAuthDetailsModel.get_by_id(
         user_id)

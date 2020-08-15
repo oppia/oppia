@@ -901,11 +901,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         display_alias = 'display_alias2'
         user_pin = '12345'
         user_services.create_new_user(gae_id, email)
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, gae_id)
-        )
-        user_id = user_auth_details_model.id
         self.modifiable_user_data.user_id = None
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
