@@ -270,6 +270,9 @@ angular.module('oppia').directive('tutorCard', [
 
             updateDisplayedCard();
           };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          };
         }
       ]
     };

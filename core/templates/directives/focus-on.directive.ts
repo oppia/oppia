@@ -28,7 +28,7 @@ angular.module('oppia').directive('focusOn', [
   'FocusManagerService', 'LABEL_FOR_CLEARING_FOCUS',
   function(FocusManagerService, LABEL_FOR_CLEARING_FOCUS) {
     this.directiveSubscriptions = new Subscription();
-    return function(scope, elt, attrs) {
+    return (scope, elt, attrs) => {
       this.directiveSubscriptions.add(
         FocusManagerService.onFocus.subscribe(
           (name) => {
