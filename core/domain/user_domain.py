@@ -352,7 +352,8 @@ class UserContributionRights(python_utils.OBJECT):
 
 class ModifiableUserDataV1(python_utils.OBJECT):
     """Domain object to represent change in allowed attributes for UserSettings
-    and UserAuthDetails domain object."""
+    and UserAuthDetails domain object.
+    """
 
     def __init__(
             self, display_alias, pin, preferred_language_codes,
