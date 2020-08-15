@@ -801,7 +801,7 @@ class CommonTests(test_utils.GenericTestBase):
             return True
         windows_not_supported_exception = self.assertRaisesRegexp(
             Exception,
-            'Redis command line interface is not installed because your '
+            'The redis command line interface is not installed because your '
             'machine is on the Windows operating system. The redis server '
             'cannot start.')
         swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
@@ -814,7 +814,7 @@ class CommonTests(test_utils.GenericTestBase):
             return True
         windows_not_supported_exception = self.assertRaisesRegexp(
             Exception,
-            'Redis command line interface is not installed because your '
+            'The redis command line interface is not installed because your '
             'machine is on the Windows operating system. There is no redis '
             'server to shutdown.')
         swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)

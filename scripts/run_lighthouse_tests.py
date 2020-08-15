@@ -104,6 +104,7 @@ def main():
 
     enable_webpages()
     atexit.register(cleanup)
+
     python_utils.PRINT('Building files in production mode.')
     build.main(args=['--prod_env'])
     build.modify_constants(prod_env=True)

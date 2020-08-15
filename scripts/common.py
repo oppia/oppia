@@ -644,7 +644,7 @@ def start_redis_server():
         ])
     else:
         raise Exception(
-            'Redis command line interface is not installed because your '
+            'The redis command line interface is not installed because your '
             'machine is on the Windows operating system. The redis server '
             'cannot start.')
 
@@ -657,7 +657,7 @@ def stop_redis_server():
         subprocess.call([REDIS_CLI_PATH, 'shutdown'])
     else:
         raise Exception(
-            'Redis command line interface is not installed because your '
+            'The redis command line interface is not installed because your '
             'machine is on the Windows operating system. There is no redis '
             'server to shutdown.')
 

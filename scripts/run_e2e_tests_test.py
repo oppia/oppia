@@ -829,14 +829,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return ['commands']
 
         def mock_popen(unused_commands):
-            def mock_wait():
-                return
             def mock_communicate():
                 return
             result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
-            result.wait = mock_wait # pylint: disable=attribute-defined-outside-init
             return result
 
         def mock_exit(unused_code):
@@ -953,14 +950,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return ['commands']
 
         def mock_popen(unused_commands):
-            def mock_wait():
-                return
             def mock_communicate():
                 return
             result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
-            result.wait = mock_wait
             return result
 
         def mock_exit(unused_code):
@@ -1124,14 +1118,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return ['commands']
 
         def mock_popen(unused_commands):
-            def mock_wait():
-                return
             def mock_communicate():
                 return
             result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
-            result.wait = mock_wait # pylint: disable=attribute-defined-outside-init
             return result
 
         def mock_exit(unused_code):
@@ -1251,12 +1242,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_popen(unused_commands):
             def mock_communicate():
                 return
-            def mock_wait():
-                return
             result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
-            result.wait = mock_wait # pylint: disable=attribute-defined-outside-init
             return result
 
         def mock_exit(unused_code):
