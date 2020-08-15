@@ -31,14 +31,16 @@
                 <button class="btn btn-secondary" (click)="removeRule(featureFlag, ruleIndex)">x</button>
               </div>
               <div class="col-6" style="display: flex; flex-direction: column; justify-content: space-around; min-height: 100px;">
-                <button
-                    class="btn btn-secondary"
-                    *ngIf="ruleIndex > 0"
-                    (click)="moveRuleUp(featureFlag, ruleIndex)">↑</button>
-                <button
-                    class="btn btn-secondary"
-                    *ngIf="ruleIndex + 1 < featureFlag.rules.length"
-                    (click)="moveRuleDown(featureFlag, ruleIndex)">↓</button>
+                <button class="btn btn-secondary"
+                        *ngIf="ruleIndex > 0"
+                        (click)="moveRuleUp(featureFlag, ruleIndex)">
+                  ↑
+                </button>
+                <button class="btn btn-secondary"
+                        *ngIf="ruleIndex + 1 < featureFlag.rules.length"
+                        (click)="moveRuleDown(featureFlag, ruleIndex)">
+                  ↓
+                </button>
               </div>
             </div>
           </div>
@@ -46,7 +48,7 @@
             <div class="row">
               <div class="col-2"><b>If Matched:</b></div>
               <div class="col-10">
-                <select name="" id="" [(ngModel)]="rule.valueWhenMatched">
+                <select [(ngModel)]="rule.valueWhenMatched">
                   <option [ngValue]="true">Enabled</option>
                   <option [ngValue]="false">Disabled</option>
                 </select>
@@ -61,9 +63,7 @@
                 <div *ngIf="rule.filters.length === 0">No filter.</div>
                 <!-- Filters -->
                 <div *ngFor="let filter of rule.filters; index as filterIndex" class="container">
-                  <div
-                      *ngIf="filterIndex > 0"
-                      class="row">
+                  <div *ngIf="filterIndex > 0" class="row">
                     <div class="col-12 oppia-feature-tab-conjunction-indicator">
                       <div class="horizontal-line"></div>
                       AND
@@ -78,12 +78,10 @@
                       <div class="row">
                         <div class="col-2"><b>Type:</b></div>
                         <div class="col-10">
-                          <select
-                              [(ngModel)]="filter.type"
-                              (change)="onFilterTypeSelectionChanged(filter)">
-                            <option
-                                *ngFor="let filterType of availableFilterTypes"
-                                [value]="filterType.toString()">
+                          <select [(ngModel)]="filter.type"
+                                  (change)="onFilterTypeSelectionChanged(filter)">
+                            <option *ngFor="let filterType of availableFilterTypes"
+                                    [value]="filterType.toString()">
                               {{filterTypeToContext[filterType].displayName}}
                             </option>
                           </select>
@@ -97,9 +95,8 @@
                         <div class="col-8">
                           <!-- Conditions -->
                           <div *ngFor="let condition of filter.conditions; index as conditionIndex">
-                            <div
-                                *ngIf="conditionIndex > 0"
-                                class="oppia-feature-tab-conjunction-indicator">
+                            <div *ngIf="conditionIndex > 0"
+                                 class="oppia-feature-tab-conjunction-indicator">
                               <div class="horizontal-line"></div>
                               OR
                               <div class="horizontal-line"></div>
@@ -108,31 +105,27 @@
                               <button class="btn btn-secondary" (click)="removeCondition(filter, conditionIndex)" style="margin-right: 20px;">x</button>
                               <div>
                                 <select [(ngModel)]="filter.conditions[conditionIndex][0]" style="margin-right: 5px;">
-                                  <option
-                                      *ngFor="let op of filterTypeToContext[filter.type].operators"
-                                      [value]="op">
+                                  <option *ngFor="let op of filterTypeToContext[filter.type].operators"
+                                          [value]="op">
                                     {{op}}
-                                </option>
+                                  </option>
                                 </select>
-                                <select
-                                    *ngIf="!!filterTypeToContext[filter.type].options"
-                                    [(ngModel)]="filter.conditions[conditionIndex][1]">
+                                <select *ngIf="!!filterTypeToContext[filter.type].options"
+                                        [(ngModel)]="filter.conditions[conditionIndex][1]">
                                   <ng-container *ngFor="let option of filterTypeToContext[filter.type].options">
-                                    <option
-                                        *ngIf="!filterTypeToContext[filter.type].optionFilter || filterTypeToContext[filter.type].optionFilter(featureFlag, option)"
-                                        [value]="option">{{option}}</option>
+                                    <option *ngIf="!filterTypeToContext[filter.type].optionFilter || filterTypeToContext[filter.type].optionFilter(featureFlag, option)"
+                                            [value]="option">
+                                      {{option}}
+                                    </option>
                                   </ng-container>
                                 </select>
-                                <ng-container
-                                    *ngIf="!filterTypeToContext[filter.type].options">
-                                  <input
-                                      [(ngModel)]="filter.conditions[conditionIndex][1]"
-                                      [placeholder]="filterTypeToContext[filter.type].placeholder"
-                                      style="max-width: 100px;"/>
+                                <ng-container *ngIf="!filterTypeToContext[filter.type].options">
+                                  <input [(ngModel)]="filter.conditions[conditionIndex][1]"
+                                         [placeholder]="filterTypeToContext[filter.type].placeholder"
+                                         style="max-width: 100px;">
                                   <ng-container *ngIf="filterTypeToContext[filter.type].inputRegex">
-                                    <span
-                                        class="oppia-feature-tab-input-error"
-                                        *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">
+                                    <span class="oppia-feature-tab-input-error"
+                                          *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">
                                       <span>!</span>
                                       <div class="tooltip">
                                         Expected to match {{filterTypeToContext[filter.type].inputRegex}}
@@ -205,20 +198,20 @@
     display: flex;
     font-size: 12px;
     justify-content: space-between;
-    margin-top: 10px;
     margin-bottom: 10px;
+    margin-top: 10px;
     width: 100%;
   }
 
   .oppia-feature-tab-conjunction-indicator > .horizontal-line {
     border-bottom: 1px dotted #e5e5e5;
-    height: 0;
     flex-grow: 1;
+    height: 0;
   }
 
   .oppia-feature-tab-input-error {
-    position: relative;
     margin-left: 15px;
+    position: relative;
   }
 
   .oppia-feature-tab-input-error span {
@@ -227,14 +220,14 @@
   }
 
   .oppia-feature-tab-input-error .tooltip {
-    opacity: 0;
-    position: absolute;
-    left: -50%;
     background-color: #f5f5f5;
     border: 1px solid #ff6347;
-    font-size: 14px;
     border-radius: 3px;
+    font-size: 14px;
+    left: -50%;
+    opacity: 0;
     padding: 5px;
+    position: absolute;
     width: 200px;
   }
 

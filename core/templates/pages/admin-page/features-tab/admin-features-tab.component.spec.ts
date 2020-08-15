@@ -24,9 +24,11 @@ import { FormsModule } from '@angular/forms';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminFeaturesTabComponent } from './admin-features-tab.component';
 import { AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { AdminTaskManagerService } from
+  '../services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformParameterObjectFactory, FeatureStage } from
+import { PlatformParameterObjectFactory, FeatureStage, PlatformParameter } from
   'domain/platform_feature/platform-parameter-object.factory';
 import { PlatformParameterFilterType, ServerMode } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
@@ -40,9 +42,13 @@ describe('Admin page feature tab', function() {
   let paramFactory: PlatformParameterObjectFactory;
   let adminDataService: AdminDataService;
   let featureApiService: PlatformFeatureAdminBackendApiService;
+  let adminTaskManagerService: AdminTaskManagerService;
   let windowRef: WindowRef;
 
   let updateApiSpy: jasmine.Spy;
+
+  let mockConfirmResult: (val: boolean) => void;
+  let mockPromptResult: (msg: string) => void;
 
   beforeEach(async(() => {
     TestBed
@@ -52,15 +58,20 @@ describe('Admin page feature tab', function() {
       })
       .compileComponents();
 
-    paramFactory = TestBed.get( PlatformParameterObjectFactory);
+    paramFactory = TestBed.get(PlatformParameterObjectFactory);
     adminDataService = TestBed.get(AdminDataService);
-    featureApiService = TestBed.get( PlatformFeatureAdminBackendApiService);
+    featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
     windowRef = TestBed.get(WindowRef);
+    adminTaskManagerService = TestBed.get(AdminTaskManagerService);
 
+    let confirmResult = true;
+    let promptResult = 'mock msg';
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      confirm: () => true,
-      prompt: () => 'mock msg'
+      confirm: () => confirmResult,
+      prompt: () => promptResult
     });
+    mockConfirmResult = val => confirmResult = val;
+    mockPromptResult = msg => promptResult = msg;
 
     spyOn(adminDataService, 'getDataAsync').and.resolveTo(<AdminPageData>{
       featureFlags: [
@@ -101,114 +112,277 @@ describe('Admin page feature tab', function() {
     expect(component.featureFlags[0].name).toEqual('dummy_feature');
   });
 
-  it('should add new rule to top of rule list', () => {
-    const featureFlag = component.featureFlags[0];
+  describe('.addNewRuleToTop', () => {
+    it('should add new rule to top of rule list', () => {
+      const featureFlag = component.featureFlags[0];
 
-    expect(featureFlag.rules.length).toBe(1);
+      expect(featureFlag.rules.length).toBe(1);
 
-    component.addNewRuleToTop(featureFlag);
-    expect(featureFlag.rules.length).toBe(2);
-    expect(featureFlag.rules[0].valueWhenMatched).toBeFalse();
+      component.addNewRuleToTop(featureFlag);
+      expect(featureFlag.rules.length).toBe(2);
+      expect(featureFlag.rules[0].valueWhenMatched).toBeFalse();
+    });
   });
 
-  it('should add new rule to bottom of rule list', () => {
-    const featureFlag = component.featureFlags[0];
+  describe('.addNewRuleToBottom', () => {
+    it('should add new rule to bottom of rule list', () => {
+      const featureFlag = component.featureFlags[0];
 
-    expect(featureFlag.rules.length).toBe(1);
+      expect(featureFlag.rules.length).toBe(1);
 
-    component.addNewRuleToBottom(featureFlag);
-    expect(featureFlag.rules.length).toBe(2);
-    expect(featureFlag.rules[1].valueWhenMatched).toBeFalse();
+      component.addNewRuleToBottom(featureFlag);
+      expect(featureFlag.rules.length).toBe(2);
+      expect(featureFlag.rules[1].valueWhenMatched).toBeFalse();
+    });
   });
 
-  it('should remove rule', () => {
-    const featureFlag = component.featureFlags[0];
+  describe('.removeRule', () => {
+    it('should remove rule', () => {
+      const featureFlag = component.featureFlags[0];
 
-    expect(featureFlag.rules.length).toBe(1);
-    component.removeRule(featureFlag, 0);
-    expect(featureFlag.rules.length).toBe(0);
+      expect(featureFlag.rules.length).toBe(1);
+      component.removeRule(featureFlag, 0);
+      expect(featureFlag.rules.length).toBe(0);
+    });
   });
 
-  it('should move rule up', () => {
-    const featureFlag = component.featureFlags[0];
-    component.addNewRuleToBottom(featureFlag);
+  describe('.moveRuleUp', () => {
+    it('should move rule up', () => {
+      const featureFlag = component.featureFlags[0];
+      component.addNewRuleToBottom(featureFlag);
 
-    component.moveRuleUp(featureFlag, 1);
-    expect(featureFlag.rules[0].valueWhenMatched).toBeFalse();
+      component.moveRuleUp(featureFlag, 1);
+      expect(featureFlag.rules[0].valueWhenMatched).toBeFalse();
+    });
   });
 
-  it('should move rule down', () => {
-    const featureFlag = component.featureFlags[0];
-    component.addNewRuleToBottom(featureFlag);
+  describe('.moveRuleDown', () => {
+    it('should move rule down', () => {
+      const featureFlag = component.featureFlags[0];
+      component.addNewRuleToBottom(featureFlag);
 
-    component.moveRuleDown(featureFlag, 0);
-    expect(featureFlag.rules[1].valueWhenMatched).toBeTrue();
+      component.moveRuleDown(featureFlag, 0);
+      expect(featureFlag.rules[1].valueWhenMatched).toBeTrue();
+    });
   });
 
-  it('should add new filter', () => {
-    const rule = component.featureFlags[0].rules[0];
+  describe('.addNewFilter', () => {
+    it('should add new filter', () => {
+      const rule = component.featureFlags[0].rules[0];
 
-    expect(rule.filters.length).toBe(1);
-    component.addNewFilter(rule);
-    expect(rule.filters.length).toBe(2);
+      expect(rule.filters.length).toBe(1);
+      component.addNewFilter(rule);
+      expect(rule.filters.length).toBe(2);
+    });
   });
 
-  it('should remove filter', () => {
-    const rule = component.featureFlags[0].rules[0];
+  describe('.removeFilter', () => {
+    it('should remove filter', () => {
+      const rule = component.featureFlags[0].rules[0];
 
-    expect(rule.filters.length).toBe(1);
-    component.removeFilter(rule, 0);
-    expect(rule.filters.length).toBe(0);
+      expect(rule.filters.length).toBe(1);
+      component.removeFilter(rule, 0);
+      expect(rule.filters.length).toBe(0);
+    });
   });
 
-  it('should add new condition', () => {
-    const filter = component.featureFlags[0].rules[0].filters[0];
+  describe('.addNewCondition', () => {
+    it('should add new condition', () => {
+      const filter = component.featureFlags[0].rules[0].filters[0];
 
-    expect(filter.conditions.length).toBe(1);
-    component.addNewCondition(filter);
-    expect(filter.conditions.length).toBe(2);
+      expect(filter.conditions.length).toBe(1);
+      component.addNewCondition(filter);
+      expect(filter.conditions.length).toBe(2);
+    });
   });
 
-  it('should remove condition', () => {
-    const filter = component.featureFlags[0].rules[0].filters[0];
+  describe('.removeCondition', () => {
+    it('should remove condition', () => {
+      const filter = component.featureFlags[0].rules[0].filters[0];
 
-    expect(filter.conditions.length).toBe(1);
-    component.removeCondition(filter, 0);
-    expect(filter.conditions.length).toBe(0);
+      expect(filter.conditions.length).toBe(1);
+      component.removeCondition(filter, 0);
+      expect(filter.conditions.length).toBe(0);
+    });
   });
 
-  it('should clear existing conditions when changing filter type', () => {
-    const filter = component.featureFlags[0].rules[0].filters[0];
 
-    expect(filter.conditions.length).toBe(1);
-    component.onFilterTypeSelectionChanged(filter);
-    expect(filter.conditions.length).toBe(0);
+  describe('.onFilterTypeSelectionChanged', () => {
+    it('should clear existing conditions', () => {
+      const filter = component.featureFlags[0].rules[0].filters[0];
+
+      expect(filter.conditions.length).toBe(1);
+      component.onFilterTypeSelectionChanged(filter);
+      expect(filter.conditions.length).toBe(0);
+    });
   });
 
-  it('should clear changes', () => {
-    const featureFlag = component.featureFlags[0];
+  describe('.clearChanges', () => {
+    it('should clear changes', () => {
+      const featureFlag = component.featureFlags[0];
 
-    expect(featureFlag.rules.length).toBe(1);
+      expect(featureFlag.rules.length).toBe(1);
 
-    component.addNewRuleToTop(featureFlag);
-    component.clearChanges(featureFlag);
+      component.addNewRuleToTop(featureFlag);
+      component.clearChanges(featureFlag);
 
-    expect(featureFlag.rules.length).toBe(1);
+      expect(featureFlag.rules.length).toBe(1);
+    });
+
+    it('should not proceed if the user does\'t confirm', () => {
+      mockConfirmResult(false);
+      const featureFlag = component.featureFlags[0];
+
+      expect(featureFlag.rules.length).toBe(1);
+
+      component.addNewRuleToTop(featureFlag);
+      component.clearChanges(featureFlag);
+
+      expect(featureFlag.rules.length).toBe(2);
+    });
   });
 
-  it('should update feature rules', fakeAsync(() => {
-    const featureFlag = component.featureFlags[0];
+  describe('.updateFeatureRulesAsync', () => {
+    let setStatusSpy: jasmine.Spy;
 
-    const setStatusSpy = jasmine.createSpy();
-    component.setStatusMessage = setStatusSpy;
+    beforeEach(() => {
+      setStatusSpy = jasmine.createSpy();
+      component.setStatusMessage = setStatusSpy;
 
-    component.addNewRuleToTop(featureFlag);
-    component.updateFeatureRulesAsync(featureFlag);
+      adminTaskManagerService.finishTask();
+      mockConfirmResult(true);
+      mockPromptResult('mock msg');
+    });
 
-    flushMicrotasks();
+    it('should update feature rules', fakeAsync(() => {
+      const featureFlag = component.featureFlags[0];
 
-    expect(updateApiSpy).toHaveBeenCalledWith(
-      featureFlag.name, 'mock msg', featureFlag.rules);
-    expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
-  }));
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).toHaveBeenCalledWith(
+        featureFlag.name, 'mock msg', featureFlag.rules);
+      expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
+    }));
+
+    it('should not proceed if there is another task running', fakeAsync(() => {
+      adminTaskManagerService.startTask();
+
+      const featureFlag = component.featureFlags[0];
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).not.toHaveBeenCalled();
+      expect(setStatusSpy).not.toHaveBeenCalled();
+    }));
+
+    it('should not proceed if the user does\'t confirm', fakeAsync(() => {
+      mockConfirmResult(false);
+
+      const featureFlag = component.featureFlags[0];
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).not.toHaveBeenCalled();
+      expect(setStatusSpy).not.toHaveBeenCalled();
+    }));
+
+    it('should not proceed if the user does\'t cancels the prompt', fakeAsync(
+      () => {
+        mockPromptResult(null);
+
+        const featureFlag = component.featureFlags[0];
+
+        component.addNewRuleToTop(featureFlag);
+        component.updateFeatureRulesAsync(featureFlag);
+
+        flushMicrotasks();
+
+        expect(updateApiSpy).not.toHaveBeenCalled();
+        expect(setStatusSpy).not.toHaveBeenCalled();
+      })
+    );
+
+    it('should show error if the update fails', fakeAsync(() => {
+      updateApiSpy.and.rejectWith('unknown error');
+      const featureFlag = component.featureFlags[0];
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).toHaveBeenCalled();
+      expect(setStatusSpy).toHaveBeenCalledWith('Update failed.');
+    }));
+
+    it('should show error if the update fails', fakeAsync(() => {
+      updateApiSpy.and.rejectWith({
+        error: {
+          error: 'validation error.'
+        }
+      });
+      const featureFlag = component.featureFlags[0];
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).toHaveBeenCalled();
+      expect(setStatusSpy).toHaveBeenCalledWith(
+        'Update failed: validation error.');
+    }));
+  });
+
+  describe('server mode option filter', () => {
+    let options: string[];
+    let optionFilter: (feature: PlatformParameter, option: string) => boolean;
+
+    beforeEach(() => {
+      options = component
+        .filterTypeToContext[PlatformParameterFilterType.ServerMode]
+        .options;
+      optionFilter = component
+        .filterTypeToContext[PlatformParameterFilterType.ServerMode]
+        .optionFilter;
+    });
+
+    it('should return [\'dev\'] for feature in dev stage', () => {
+      expect(
+        options.filter(option => optionFilter(
+          <PlatformParameter>{featureStage: FeatureStage.DEV},
+          option))
+      )
+        .toEqual(['dev']);
+    });
+
+    it('should return [\'dev\', \'test\'] for feature in test stage', () => {
+      expect(
+        options.filter(option => optionFilter(
+          <PlatformParameter>{featureStage: FeatureStage.TEST},
+          option))
+      )
+        .toEqual(['dev', 'test']);
+    });
+
+    it('should return [\'dev\', \'test\', \'prod\'] for feature in prod stage',
+      () => {
+        expect(
+          options.filter(option => optionFilter(
+            <PlatformParameter>{featureStage: FeatureStage.PROD},
+            option))
+        )
+          .toEqual(['dev', 'test', 'prod']);
+      }
+    );
+  });
 });
