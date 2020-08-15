@@ -246,6 +246,11 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
         self.assertEqual(saved_model.voice_artist_ids, ['voice_artist_id'])
         self.assertEqual(saved_model.viewer_ids, ['viewer_id'])
+        self.assertEqual(
+            ['editor_id', 'owner_id', 'viewer_id', 'voice_artist_id'],
+            exp_models.ExplorationRightsSnapshotMetadataModel
+            .get_by_id('id_0-1').mentioned_user_ids
+        )
 
     def test_export_data_on_highly_involved_user(self):
         """Test export data on user involved in all datastore explorations."""

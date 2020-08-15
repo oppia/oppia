@@ -536,7 +536,8 @@ class TopicRightsModel(base_models.VersionedModel):
             elif commit_cmds[0]['cmd'] == feconf.CMD_REMOVE_MANAGER_ROLE:
                 mentioned_user_ids.add(
                     snapshot_metadata_model.commit_cmds[0]['removed_user_id'])
-        snapshot_metadata_model.mentioned_user_ids = list(mentioned_user_ids)
+        snapshot_metadata_model.mentioned_user_ids = list(
+            sorted(mentioned_user_ids))
         snapshot_metadata_model.put()
 
     @staticmethod

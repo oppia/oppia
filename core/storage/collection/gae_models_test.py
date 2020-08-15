@@ -194,6 +194,11 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                 [{'cmd': rights_manager.CMD_CREATE_NEW}])
         collection_model = collection_models.CollectionRightsModel.get('id')
         self.assertEqual('id', collection_model.id)
+        self.assertEqual(
+            ['editor_ids', 'owner_ids', 'viewer_ids', 'voice_artist_ids'],
+            collection_models.CollectionRightsSnapshotMetadataModel
+            .get_by_id('id-1').mentioned_user_ids
+        )
 
     def test_export_data_on_highly_involved_user(self):
         """Test export data on user involved in all datastore collections."""

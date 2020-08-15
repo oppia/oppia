@@ -513,7 +513,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ):
             mentioned_user_ids.add(
                 snapshot_metadata_model.commit_cmds[0]['assignee_id'])
-        snapshot_metadata_model.mentioned_user_ids = list(mentioned_user_ids)
+        snapshot_metadata_model.mentioned_user_ids = list(
+            sorted(mentioned_user_ids))
         snapshot_metadata_model.put()
 
     @classmethod
