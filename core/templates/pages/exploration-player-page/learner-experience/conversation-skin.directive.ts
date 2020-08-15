@@ -1193,7 +1193,7 @@ angular.module('oppia').directive('conversationSkin', [
           };
 
           $scope.clickContinueButtonFn = function(interactionId) {
-            // This is the processed interactionId from CommandExecutor
+            // This is the processed interactionId from CommandExecutor.
             if (interactionId === 'CONTINUE') {
               CurrentInteractionService.submitAnswer();
             } else {
