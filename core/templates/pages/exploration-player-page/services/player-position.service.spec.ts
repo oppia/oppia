@@ -19,6 +19,8 @@
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
+import { Subscription } from 'rxjs';
+
 import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
@@ -28,13 +30,23 @@ import { StateCardObjectFactory } from
 
 describe('Player position service', () => {
   let pts = null;
-  let pps = null;
+  let pps: PlayerPositionService = null;
   let scof = null;
+  let onQuestionChangeSpy: jasmine.Spy;
+  let subscriptions: Subscription;
 
   beforeEach(() => {
     pts = TestBed.get(PlayerTranscriptService);
     pps = TestBed.get(PlayerPositionService);
     scof = TestBed.get(StateCardObjectFactory);
+    onQuestionChangeSpy = jasmine.createSpy('onQuestionChangeSpy');
+    subscriptions = new Subscription();
+    subscriptions.add(pps.onCurrentQuestionChange.subscribe(
+      onQuestionChangeSpy));
+  });
+
+  afterEach(() => {
+    subscriptions.unsubscribe();
   });
 
   it('should record answer submission as true', () => {
@@ -84,6 +96,11 @@ describe('Player position service', () => {
     expect(pps.getDisplayedCardIndex()).toBe(4);
     pps.setDisplayedCardIndex(5);
     expect(pps.getDisplayedCardIndex()).toBe(5);
+  });
+
+  it('should emit the index of the question change', () => {
+    pps.changeCurrentQuestion(3);
+    expect(onQuestionChangeSpy).toHaveBeenCalledWith(3);
   });
 
   it('should fetch EventEmitter for changing active card', () => {
