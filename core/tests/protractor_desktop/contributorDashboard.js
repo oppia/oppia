@@ -69,10 +69,10 @@ describe('Contributor dashboard page', function() {
     // Create 2 topics and 2 skills. Link 1 skill to 1 topic.
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAMES[0], 'topic-for-community-one', 'Topic description 1', false);
+      TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAMES[1], 'topic-for-community-two', 'Topic description 2', false);
+      TOPIC_NAMES[1], 'community-topic-two', 'Topic description 2', false);
     await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
     await topicsAndSkillsDashboardPage.get();
