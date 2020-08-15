@@ -662,7 +662,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         display_alias = 'display_alias'
         display_alias_2 = 'display_alias_2'
         user_id = user_services.create_new_user(gae_id, user_email).user_id
-        user_settings = user_services.get_user_settings(user_id)
 
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
@@ -765,7 +764,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.AUTH_METHOD_GAE, gae_id)
         )
         user_id = user_auth_details_model.id
-        user_settings = user_services.get_user_settings(user_id)
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -812,7 +810,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.AUTH_METHOD_GAE, gae_id)
         )
         user_id = user_auth_details_model.id
-        user_settings = user_services.get_user_settings(user_id)
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -885,7 +882,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.AUTH_METHOD_GAE, gae_id)
         )
         user_id = user_auth_details_model.id
-        user_settings = user_services.get_user_settings(user_id)
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -910,7 +906,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.AUTH_METHOD_GAE, gae_id)
         )
         user_id = user_auth_details_model.id
-        user_settings = user_services.get_user_settings(user_id)
         self.modifiable_user_data.user_id = None
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -936,7 +931,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.AUTH_METHOD_GAE, gae_id)
         )
         user_id = user_auth_details_model.id
-        user_settings = user_services.get_user_settings(user_id)
         self.modifiable_user_data.user_id = user_id
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
@@ -990,7 +984,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         self.assertItemsEqual(
             expected_auth_details_output, user_auth_details_models)
-        
+
         user_settings_models = [
             {
                 'id': model.id,
@@ -1840,7 +1834,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_validate_empty_display_alias_for_profiles_raises_error(self):
-        user_settings = user_services.get_user_settings(self.owner_id)
         self.modifiable_user_data.user_id = self.owner_id
         self.modifiable_user_data.pin = '12345'
         self.modifiable_user_data.display_alias = 'temp_name'

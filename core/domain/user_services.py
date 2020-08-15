@@ -236,12 +236,13 @@ class UserSettings(python_utils.OBJECT):
     def populate_from_user_data(self, modifiable_user_data):
         """Populate the UserSettings domain object using the user data in
             modifiable_user_data.
-            Args:
-                modifiable_user_data: ModifiableUserDataV1. The modifiable user
-                    data version_1 object with the data information to be updated.
-            Raises:
-                ValidationError. None or empty value is provided for display alias
-                    attribute.
+        
+        Args:
+            modifiable_user_data: ModifiableUserDataV1. The modifiable user
+                data version_1 object with the data information to be updated.
+        Raises:
+            ValidationError. None or empty value is provided for display alias
+                attribute.
         """
         if (not modifiable_user_data.display_alias or
                 not isinstance(
