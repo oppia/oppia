@@ -25,11 +25,12 @@ describe('Training Data Editor Panel Service', function() {
   var RouterService = null;
   var $rootScope = null;
 
-  var mockExternalSaveEventEmitter = new EventEmitter();
+  var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('RouterService', {
       onExternalSave: mockExternalSaveEventEmitter
     });

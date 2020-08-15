@@ -25,7 +25,7 @@ describe('Rte Helper Modal Controller', function() {
   var $timeout = null;
   var routerService = null;
 
-  var mockExternalSaveEventEmitter = new EventEmitter();
+  var mockExternalSaveEventEmitter = null;
 
   describe('when customization args has a valid youtube video', function() {
     var customizationArgSpecs = [{
@@ -39,6 +39,7 @@ describe('Rte Helper Modal Controller', function() {
     beforeEach(angular.mock.module('oppia'));
 
     beforeEach(angular.mock.module('oppia', function($provide) {
+      mockExternalSaveEventEmitter = new EventEmitter();
       $provide.value('RouterService', {
         onExternalSave: mockExternalSaveEventEmitter
       });
@@ -105,6 +106,7 @@ describe('Rte Helper Modal Controller', function() {
     beforeEach(angular.mock.module('oppia'));
 
     beforeEach(angular.mock.module('oppia', function($provide) {
+      mockExternalSaveEventEmitter = new EventEmitter();
       $provide.value('RouterService', {
         onExternalSave: mockExternalSaveEventEmitter
       });
@@ -270,6 +272,7 @@ describe('Rte Helper Modal Controller', function() {
       beforeEach(angular.mock.module('oppia'));
 
       beforeEach(angular.mock.module('oppia', function($provide) {
+        mockExternalSaveEventEmitter = new EventEmitter();
         $provide.value('RouterService', {
           onExternalSave: mockExternalSaveEventEmitter
         });

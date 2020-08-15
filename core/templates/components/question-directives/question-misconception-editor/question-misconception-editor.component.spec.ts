@@ -52,7 +52,7 @@ describe('Question misconception editor component', function() {
   var routerService = null;
   var ses = null;
 
-  var mockExternalSaveEventEmitter = new EventEmitter();
+  var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -61,6 +61,7 @@ describe('Question misconception editor component', function() {
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
+    mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('RouterService', {
       onExternalSave: mockExternalSaveEventEmitter
     });

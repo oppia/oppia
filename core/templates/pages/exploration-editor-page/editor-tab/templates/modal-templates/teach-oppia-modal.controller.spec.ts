@@ -57,7 +57,7 @@ describe('Teach Oppia Modal Controller', function() {
   var trainingDataService = null;
   var trainingModalService = null;
 
-  var mockExternalSaveEventEmitter = new EventEmitter();
+  var mockExternalSaveEventEmitter = null;
 
   var explorationId = 'exp1';
   var stateName = 'Introduction';
@@ -144,6 +144,7 @@ describe('Teach Oppia Modal Controller', function() {
       'StateCustomizationArgsService', stateCustomizationArgsService);
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('RouterService', {
       onExternalSave: mockExternalSaveEventEmitter
     });

@@ -29,7 +29,7 @@ describe('Training Modal Service', function() {
   var AlertsService = null;
   var RouterService = null;
 
-  var mockExternalSaveEventEmitter = new EventEmitter();
+  var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -40,6 +40,7 @@ describe('Training Modal Service', function() {
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('RouterService', {
       onExternalSave: mockExternalSaveEventEmitter
     });

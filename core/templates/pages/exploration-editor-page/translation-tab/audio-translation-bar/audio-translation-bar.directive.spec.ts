@@ -86,7 +86,7 @@ describe('Audio translation bar directive', function() {
   var explorationId = 'exp1';
   var isTranslatableSpy = null;
 
-  var mockExternalSaveEventEmitter = new EventEmitter();
+  var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(function() {
@@ -108,6 +108,7 @@ describe('Audio translation bar directive', function() {
       TestBed.get(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('RouterService', {
       onExternalSave: mockExternalSaveEventEmitter
     });

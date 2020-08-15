@@ -37,7 +37,7 @@ describe('Unresolved Answers Overview Component', function() {
   var stateEditorService = null;
   var stateTopAnswersStatsService = null;
 
-  var mockExternalSaveEventEmitter = new EventEmitter();
+  var mockExternalSaveEventEmitter = null;
 
   var stateName = 'State1';
 
@@ -49,6 +49,7 @@ describe('Unresolved Answers Overview Component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('RouterService', {
       onExternalSave: mockExternalSaveEventEmitter
     });

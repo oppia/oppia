@@ -166,15 +166,7 @@ angular.module('oppia').factory('RouterService', [
     };
 
     var _savePendingChanges = function() {
-      try {
-        externalSaveEventEmitter.emit();
-      } catch (e) {
-        // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-        // null" error. To get around this we must use $apply().
-        $rootScope.$apply(function() {
-          externalSaveEventEmitter.emit();
-        });
-      }
+      externalSaveEventEmitter.emit();
     };
 
     var _getCurrentStateFromLocationPath = function() {

@@ -59,7 +59,7 @@ describe('Param Changes Editor Component', function() {
 
   var postSaveHookSpy = jasmine.createSpy('postSaveHook', () => {});
 
-  var mockExternalSaveEventEmitter = new EventEmitter();
+  var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -82,6 +82,7 @@ describe('Param Changes Editor Component', function() {
       TestBed.get(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('RouterService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
@@ -125,6 +126,10 @@ describe('Param Changes Editor Component', function() {
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should initialize $scope properties after controller is initialized',
     function() {
