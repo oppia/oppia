@@ -29,6 +29,7 @@ require(
 require('domain/learner_dashboard/learner-playlist.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require('services/keyboard-shortcut.service.ts');
 require('services/page-title.service.ts');
 require('services/search.service.ts');
 require('services/user.service.ts');

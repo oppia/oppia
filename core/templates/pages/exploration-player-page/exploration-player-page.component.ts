@@ -32,6 +32,8 @@ require(
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 
+require('services/keyboard-shortcut.service.ts');
+
 angular.module('oppia').component('explorationPlayerPage', {
   template: require('./exploration-player-page.component.html'),
   controller: [

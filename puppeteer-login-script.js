@@ -69,17 +69,13 @@ const setRoleAdmin = async function(context, page) {
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
     await page.waitForSelector('#update-role-username-input');
-    await page.waitFor(2000);
     await page.type('#update-role-username-input', 'username1');
     await page.select('#update-role-input', 'string:ADMIN');
-    await page.waitFor(2000);
     await page.waitForSelector('#update-button-id');
-    await page.waitFor(2000);
     await page.click('#update-button-id');
-    await page.waitFor(2000);
     await page.waitForSelector('.protractor-test-status-message');
     await page.waitForFunction(
-      'document.querySelector("body").innerText.includes(' +
+      'document.querySelector(".protractor-test-status-message").innerText.includes(' +
         '"successfully updated to")'
     );
     // eslint-disable-next-line no-console
