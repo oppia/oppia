@@ -405,8 +405,10 @@ describe('Translation tab component', function() {
 
       spyOn(angular, 'element').withArgs('#tutorialTranslationOverview')
         .and.returnValue({
-          // @ts-ignore is being used here because angular element have more
-          // properties than offset and top.
+          // This throws "Type '{ top: number; }' is not assignable to type
+          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // angular element have more properties than offset and top.
+          // @ts-expect-error
           offset: () => ({
             top: 210
           })
@@ -429,8 +431,10 @@ describe('Translation tab component', function() {
 
       spyOn(angular, 'element').withArgs('#tutorialTranslationLanguage')
         .and.returnValue({
-          // @ts-ignore is being used here because angular element have more
-          // properties than offset and top.
+          // This throws "Type '{ top: number; }' is not assignable to type
+          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // angular element have more properties than offset and top.
+          // @ts-expect-error
           offset: () => ({
             top: 250
           })
@@ -453,8 +457,10 @@ describe('Translation tab component', function() {
 
       spyOn(angular, 'element').withArgs('#tutorialTranslationState')
         .and.returnValue({
-          // @ts-ignore is being used here because angular element have more
-          // properties than offset and top.
+          // This throws "Type '{ top: number; }' is not assignable to type
+          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // angular element have more properties than offset and top.
+          // @ts-expect-error
           offset: () => ({
             top: 210
           })
@@ -477,8 +483,10 @@ describe('Translation tab component', function() {
 
       spyOn(angular, 'element').withArgs('#tutorialTranslationOverview')
         .and.returnValue({
-          // @ts-ignore is being used here because angular element have more
-          // properties than offset and top.
+          // This throws "Type '{ top: number; }' is not assignable to type
+          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // angular element have more properties than offset and top.
+          // @ts-expect-error
           offset: () => ({
             top: 250
           })

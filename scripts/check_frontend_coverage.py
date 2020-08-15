@@ -95,7 +95,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'contributions-and-review.directive.ts',
     'conversation-skin.directive.ts',
     'conversion.ts',
-    'convert-to-plain-text.filter.ts',
     'convert-to-plain-text.pipe.ts',
     'coord-two-dim-editor.directive.ts',
     'correctness-footer.directive.ts',

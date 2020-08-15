@@ -68,7 +68,7 @@ import { ContinueValidationService } from
 import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
 
-fdescribe('State translation component', function() {
+describe('State translation component', function() {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
