@@ -20,6 +20,8 @@ require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('collectionNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -31,16 +33,25 @@ angular.module('oppia').directive('collectionNavbar', [
         'collection-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ReadOnlyCollectionBackendApiService', 'UrlService',
+        'ReadOnlyCollectionBackendApiService', 'UrlService',
         function(
-            $scope, ReadOnlyCollectionBackendApiService, UrlService) {
+            ReadOnlyCollectionBackendApiService, UrlService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.$onInit = function() {
-            $scope.$on('collectionLoaded', function() {
-              ctrl.collectionTitle = (
-                ReadOnlyCollectionBackendApiService.getCollectionDetails(
-                  UrlService.getCollectionIdFromUrl()).title);
-            });
+            ctrl.collectionId = UrlService.getCollectionIdFromUrl();
+            ctrl.directiveSubscriptions.add(
+              ReadOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
+                () => {
+                  ctrl.collectionTitle = (
+                    ReadOnlyCollectionBackendApiService.getCollectionDetails(
+                      UrlService.getCollectionIdFromUrl()).title);
+                })
+            );
+
+            ctrl.$onDestroy = function() {
+              ctrl.directiveSubscriptions.unsubscribe();
+            };
           };
         }
       ]
