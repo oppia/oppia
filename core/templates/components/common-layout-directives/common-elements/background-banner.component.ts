@@ -29,7 +29,7 @@ export class BackgroundBannerComponent implements OnInit {
   constructor(private urlInterpolationService: UrlInterpolationService) {}
   bannerImageFileUrl: string = '';
   ngOnInit() {
-    const possibleBannerFilenames: Array<string> = [
+    const possibleBannerFilenames: string[] = [
       'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
     const bannerImageFilename: string = possibleBannerFilenames[
       Math.floor(Math.random() * possibleBannerFilenames.length)];
