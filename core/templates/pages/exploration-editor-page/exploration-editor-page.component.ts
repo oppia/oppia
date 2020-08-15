@@ -175,7 +175,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
-    'WindowDimensionsService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
+    'WindowDimensionsService',
     function(
         $q, $scope, $rootScope, $templateCache, $timeout, $uibModal,
         AutosaveInfoModalsService, BottomNavbarStatusService,
@@ -195,9 +195,8 @@ angular.module('oppia').component('explorationEditorPage', {
         StateClassifierMappingService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
-        UserEmailPreferencesService, UserExplorationPermissionsService) {
         UserEmailPreferencesService, UserExplorationPermissionsService,
-        WindowDimensionsService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
+        WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
