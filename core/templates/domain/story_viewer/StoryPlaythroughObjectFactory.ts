@@ -27,6 +27,7 @@ import {
 } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 
 export interface StoryPlaythroughBackendDict {
+  'story_id': string,
   'story_nodes': StoryNodeBackendDict[];
   'story_title': string;
   'story_description': string;
@@ -34,16 +35,19 @@ export interface StoryPlaythroughBackendDict {
 }
 
 export class StoryPlaythrough {
+  id: string;
   nodes: ReadOnlyStoryNode[];
   title: string;
   description: string;
   topicName: string;
 
   constructor(
+      id: string,
       nodes: ReadOnlyStoryNode[],
       title: string,
       description: string,
       topicName: string) {
+    this.id = id;
     this.nodes = nodes;
     this.title = title;
     this.description = description;
@@ -77,6 +81,10 @@ export class StoryPlaythrough {
   hasStartedStory(): boolean {
     return this.nodes[0].isCompleted();
   }
+
+  getStoryId(): string {
+    return this.id;
+  }
 }
 
 @Injectable({
@@ -94,6 +102,7 @@ export class StoryPlaythroughObjectFactory {
         .createFromBackendDict(storyNodeDict));
 
     return new StoryPlaythrough(
+      storyPlaythroughBackendDict.story_id,
       nodeObjects,
       storyPlaythroughBackendDict.story_title,
       storyPlaythroughBackendDict.story_description,
