@@ -17,7 +17,6 @@
  */
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
-var ThanksPage = require('../protractor_utils/ThanksPage.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
 describe('Oppia landing pages tour', function() {

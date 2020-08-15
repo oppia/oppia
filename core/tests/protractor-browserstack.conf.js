@@ -17,10 +17,6 @@
  */
 
 var browserstack = require('browserstack-local');
-var dotenv = require('dotenv');
-
-// eslint-disable-next-line angular/di
-var result = dotenv.config({path: 'core/tests/.browserstack.env'});
 
 // A reference configuration file.
 exports.config = {
@@ -182,7 +178,7 @@ exports.config = {
 
   // Code to stop browserstack local after end of test.
   afterLaunch: function() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve) {
       exports.bs_local.stop(resolve);
     });
   },
