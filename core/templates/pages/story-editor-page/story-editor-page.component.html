@@ -35,7 +35,7 @@
         </li>
 
         <li ng-if="!($ctrl.getActiveTab() === 'chapter_editor')" ng-class="{'navbar-tab-active': $ctrl.getActiveTab() === 'story_preview'}" class="nav-item icon nav-list-item" ng-click="$ctrl.navigateToStoryPreviewTab()">
-          <a class="nav-link navbar-tab" uib-tooltip="Preview" tooltip-placement="bottom">
+          <a class="nav-link navbar-tab" uib-tooltip="Preview" aria-label="Preview" tooltip-placement="bottom">
             <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTab() === 'story_preview'}">&#xE037;</i>
           </a>
         </li>
