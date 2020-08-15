@@ -59,13 +59,17 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           // Naturally MathJax works asynchronously, but we can add processes
           // which we want to happen synchronously into the MathJax Hub Queue.
           MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
+          ctrl.numberOfElementsInQueue++;
           MathJax.Hub.Queue(function() {
             if (outputElement[0].getElementsByTagName('svg')[0] !== undefined) {
               ctrl.svgString = (
                 outputElement[0].getElementsByTagName('svg')[0].outerHTML);
             }
-            ctrl.value.mathExpressionSvgIsBeingProcessed = false;
-            $scope.$apply();
+            if (ctrl.numberOfElementsInQueue <= 1) {
+              ctrl.value.mathExpressionSvgIsBeingProcessed = false;
+              $scope.$apply();
+            }
+            ctrl.numberOfElementsInQueue--;
           });
         };
         // This method cleans the SVG string and generates a filename before
@@ -107,6 +111,8 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           // Reset the component each time the value changes (e.g. if this is
           // part of an editable list).
           ctrl.svgString = '';
+          ctrl.numberOfElementsInQueue = 0;
+          ctrl.value.mathExpressionSvgIsBeingProcessed = true;
           $scope.$watch('$ctrl.value', function() {
             ctrl.localValue = {
               label: ctrl.value.raw_latex || '',
