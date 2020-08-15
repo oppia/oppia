@@ -105,7 +105,8 @@ describe('State translation component', function() {
           }
         },
         answer_groups: [{
-          rule_specs: [],
+          rule_types_to_inputs: {},
+          rule_input_translations: {},
           outcome: {
             dest: 'unused',
             feedback: {
@@ -114,7 +115,8 @@ describe('State translation component', function() {
             },
           }
         }, {
-          rule_specs: [],
+          rule_types_to_inputs: {},
+          rule_input_translations: {},
           outcome: {
             dest: 'unused',
             feedback: {
@@ -647,7 +649,7 @@ describe('State translation component', function() {
     it('should get summary answer group', function() {
       expect($scope.summarizeAnswerGroup(
         answerGroupObjectFactory.createNew(
-          [], outcomeObjectFactory.createNew('unused', '1', 'Feedback text'),
+          outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
           'Training data text', '0'), '1', {}, true))
         .toBe('[Answer] Feedback text');
     });
