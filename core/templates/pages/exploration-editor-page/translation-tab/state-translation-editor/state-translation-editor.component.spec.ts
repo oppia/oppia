@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for stateTranslationEditor.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -43,6 +44,8 @@ describe('State Translation Editor Component', function() {
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
   var writtenTranslationObjectFactory = null;
+
+  var mockExternalSaveEventEmitter = new EventEmitter();
 
   var stateName = 'State1';
   var state = {
@@ -126,6 +129,9 @@ describe('State Translation Editor Component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RouterService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
     $provide.value('StateRecordedVoiceoversService', TestBed.get(
       StateRecordedVoiceoversService));
     $provide.value('StateWrittenTranslationsService',
@@ -205,7 +211,7 @@ describe('State Translation Editor Component', function() {
         .returnValue('es');
       spyOn($uibModal, 'open');
 
-      $rootScope.$broadcast('externalSave');
+      mockExternalSaveEventEmitter.emit();
 
       expect($uibModal.open).not.toHaveBeenCalled();
     });
@@ -236,7 +242,7 @@ describe('State Translation Editor Component', function() {
         stateObj.recordedVoiceovers.getBindableVoiceovers('content_1')
           .en.needsUpdate).toBe(false);
 
-      $rootScope.$broadcast('externalSave');
+      mockExternalSaveEventEmitter.emit();
       $scope.$apply();
 
       expect(
@@ -270,7 +276,7 @@ describe('State Translation Editor Component', function() {
         stateObj.recordedVoiceovers.getBindableVoiceovers('content_1')
           .en.needsUpdate).toBe(false);
 
-      $rootScope.$broadcast('externalSave');
+      mockExternalSaveEventEmitter.emit();
       $scope.$apply();
 
       expect(

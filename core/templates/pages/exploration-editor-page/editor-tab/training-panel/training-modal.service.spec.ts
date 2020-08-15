@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for TrainingModalService.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -25,6 +27,9 @@ describe('Training Modal Service', function() {
   var $rootScope;
   var TrainingModalService = null;
   var AlertsService = null;
+  var RouterService = null;
+
+  var mockExternalSaveEventEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -34,21 +39,27 @@ describe('Training Modal Service', function() {
     }
   }));
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RouterService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     TrainingModalService = $injector.get(
       'TrainingModalService');
     AlertsService = $injector.get('AlertsService');
-
-    spyOn($rootScope, '$broadcast').and.callThrough();
+    RouterService = $injector.get('RouterService');
   }));
 
   it('should open $uibModal', function() {
+    spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
     var clearWarningsSpy = spyOn(AlertsService, 'clearWarnings')
       .and.callThrough();
     TrainingModalService.openTrainUnresolvedAnswerModal();
 
     expect(clearWarningsSpy).toHaveBeenCalled();
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('externalSave');
+    expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
   });
 });

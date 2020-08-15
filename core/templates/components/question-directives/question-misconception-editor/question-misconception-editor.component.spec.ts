@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the question misconception editor component.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-misconception-editor.component.ts is upgraded to Angular 8.
 /* eslint-disable max-len */
@@ -29,8 +31,7 @@ import { SolutionValidityService } from
 import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-/* eslint-enable max-len */
+  'domain/exploration/SubtitledHtmlObjectFactory';/* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
 require('directives/angular-html-bind.directive.ts');
@@ -48,7 +49,10 @@ describe('Question misconception editor component', function() {
   var ctrl = null;
   var misconceptionObjectFactory = null;
   var mockMisconceptionObject = null;
+  var routerService = null;
   var ses = null;
+
+  var mockExternalSaveEventEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -57,6 +61,9 @@ describe('Question misconception editor component', function() {
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
+    $provide.value('RouterService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
   }));
 
   beforeEach(angular.mock.inject(
@@ -66,6 +73,7 @@ describe('Question misconception editor component', function() {
       $q = _$q_;
       $rootScope = _$rootScope_;
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+      routerService = $injector.get('RouterService');
       ses = $injector.get('StateEditorService');
     }));
 

@@ -51,8 +51,8 @@ angular.module('oppia').component('paramChangesEditor', {
     'UrlInterpolationService', 'INVALID_PARAMETER_NAMES',
     function(
         $scope, EditabilityService, ExplorationParamSpecsService,
-        RouterService,
         AlertsService, ParamChangeObjectFactory, ExplorationStatesService,
+        RouterService,
         UrlInterpolationService, INVALID_PARAMETER_NAMES) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -205,12 +205,12 @@ angular.module('oppia').component('paramChangesEditor', {
           RandomSelector: 'to one of'
         };
         ctrl.directiveSubscriptions.add(
-          RouterService.onExternalSave.subscribe(() => {
-            if ($scope.isParamChangesEditorOpen) {
-              $scope.saveParamChanges();
-            }
-          })
-        );
+          RouterService.onExternalSave.subscribe(
+            () => {
+              if ($scope.isParamChangesEditorOpen) {
+                $scope.saveParamChanges();
+              }
+            }));
         $scope.getStaticImageUrl = function(imagePath) {
           return UrlInterpolationService.getStaticImageUrl(imagePath);
         };

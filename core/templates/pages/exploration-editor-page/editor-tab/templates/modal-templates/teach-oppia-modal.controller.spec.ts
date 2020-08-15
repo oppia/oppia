@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for TeachOppiaModalController.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
@@ -52,8 +53,11 @@ describe('Teach Oppia Modal Controller', function() {
   var stateObjectFactory = null;
   var explorationStatesService = null;
   var responsesService = null;
+  var routerService = null;
   var trainingDataService = null;
   var trainingModalService = null;
+
+  var mockExternalSaveEventEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var stateName = 'Introduction';
@@ -140,6 +144,9 @@ describe('Teach Oppia Modal Controller', function() {
       'StateCustomizationArgsService', stateCustomizationArgsService);
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value('RouterService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
   }));
 
   describe('when successfully fetching top unresolved answers', function() {
@@ -155,6 +162,7 @@ describe('Teach Oppia Modal Controller', function() {
       explorationStatesService = $injector.get('ExplorationStatesService');
       stateEditorService = $injector.get('StateEditorService');
       responsesService = $injector.get('ResponsesService');
+      routerService = $injector.get('RouterService');
       trainingDataService = $injector.get('TrainingDataService');
       trainingModalService = $injector.get('TrainingModalService');
 
@@ -272,6 +280,7 @@ describe('Teach Oppia Modal Controller', function() {
       explorationStatesService = $injector.get('ExplorationStatesService');
       stateEditorService = $injector.get('StateEditorService');
       responsesService = $injector.get('ResponsesService');
+      routerService = $injector.get('RouterService');
       trainingDataService = $injector.get('TrainingDataService');
       trainingModalService = $injector.get('TrainingModalService');
 

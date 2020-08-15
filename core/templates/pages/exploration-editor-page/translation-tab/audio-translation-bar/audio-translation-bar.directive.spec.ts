@@ -53,11 +53,12 @@ import { AlertsService } from 'services/alerts.service';
 
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
+import { EventEmitter } from '@angular/core';
 
 require('pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
 
-describe('State Graph Visualization directive', function() {
+describe('Audio translation bar directive', function() {
   var ctrl = null;
   var $interval = null;
   var $q = null;
@@ -71,6 +72,7 @@ describe('State Graph Visualization directive', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var recordedVoiceoversObjectFactory = null;
+  var routerService = null;
   var siteAnalyticsService = null;
   var stateEditorService = null;
   var stateRecordedVoiceoversService = null;
@@ -83,6 +85,8 @@ describe('State Graph Visualization directive', function() {
   var stateName = 'State1';
   var explorationId = 'exp1';
   var isTranslatableSpy = null;
+
+  var mockExternalSaveEventEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(function() {
@@ -104,6 +108,9 @@ describe('State Graph Visualization directive', function() {
       TestBed.get(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value('RouterService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
     $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
     $provide.value('StateEditorService', TestBed.get(StateEditorService));
     $provide.value(
@@ -129,6 +136,7 @@ describe('State Graph Visualization directive', function() {
     contextService = $injector.get('ContextService');
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     explorationStatesService = $injector.get('ExplorationStatesService');
+    routerService = $injector.get('RouterService');
     stateEditorService = $injector.get('StateEditorService');
     translationLanguageService = $injector.get('TranslationLanguageService');
     translationTabActiveContentIdService = $injector.get(
@@ -309,7 +317,7 @@ describe('State Graph Visualization directive', function() {
     $scope.checkAndStartRecording();
     $scope.$apply();
 
-    $rootScope.$broadcast('externalSave');
+    mockExternalSaveEventEmitter.emit();
 
     expect(voiceoverRecordingService.stopRecord).toHaveBeenCalled();
     expect(voiceoverRecordingService.closeRecorder).toHaveBeenCalled();
