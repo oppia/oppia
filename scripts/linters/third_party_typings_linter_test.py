@@ -38,8 +38,7 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
         self.manifest_file = python_utils.string_io(
             buffer_value='{\"dependencies\":{\"frontend\":{\"guppy\":'
             '{\"version\": \"0.1\"},\"skulpt-dist\":{\"version\": \"0.2\"}'
-            ',\"mathExpressions\":{\"version\": \"0.3\"},\"midiJs\":'
-            '{\"version\": \"0.4\"}}}}')
+            ',\"midiJs\":{\"version\": \"0.4\"}}}}')
         self.package_file = python_utils.string_io(
             buffer_value='{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [

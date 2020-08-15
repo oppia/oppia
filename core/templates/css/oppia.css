@@ -4367,25 +4367,6 @@ md-card.preview-conversation-skin-supplemental-card {
   right: -25px;
 }
 
-.oppia-mathexpression-input-mobile-overlay {
-  opacity: 0;
-  position: absolute;
-  z-index: 2;
-}
-
-.oppia-mathexpression-input-hidden-text {
-  /* In some versions of Chrome on Android, typing in a 0 input
-  field can cause the previous character to be selected.
-  Set to 1px and 0 opacity instead of 0 to prevent this issue. */
-  border: 0;
-  height: 1px;
-  margin: 0;
-  margin-left: -5px;
-  opacity: 0;
-  padding: 0;
-  width: 1px;
-}
-
 .oppia-rte-component-container {
   position: relative;
 }

@@ -881,26 +881,6 @@
       "HasLengthInclusivelyBetween": "has between {{a|NonnegativeInt}} and {{b|NonnegativeInt}} notes, inclusive"
     }
   },
-  "MathExpressionInput": {
-    "can_have_solution": true,
-    "show_generic_submit_button": true,
-    "instructions": null,
-    "is_trainable": false,
-    "narrow_instructions": null,
-    "description": "Allows learners to enter mathematical expressions.",
-    "needs_summary": false,
-    "name": "Math Expression Input",
-    "answer_type": "MathExpression",
-    "is_linear": false,
-    "display_mode": "inline",
-    "id": "MathExpressionInput",
-    "customization_arg_specs": [],
-    "is_terminal": false,
-    "default_outcome_heading": null,
-    "rule_descriptions": {
-      "IsMathematicallyEquivalentTo": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
-    }
-  },
   "AlgebraicExpressionInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,

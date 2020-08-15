@@ -155,9 +155,6 @@ interface RuleTemplates {
     MatchesExactlyWith: RuleDescription;
     IsEquivalentTo: RuleDescription;
   };
-  MathExpressionInput: {
-    IsMathematicallyEquivalentTo: RuleDescription;
-  };
   MultipleChoiceInput: {
     Equals: RuleDescription;
   };

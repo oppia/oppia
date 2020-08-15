@@ -87,13 +87,6 @@ describe('Solution object factory', () => {
         'This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
-        ascii: 'one',
-        latex: 'one'
-      });
-      expect(solution.getSummary('MathExpressionInput')).toEqual(
-        'One solution is "one". This is the explanation to the answer.');
-
-      solution.setCorrectAnswer({
         code: 'a=10',
         error: '',
         evaluation: '',

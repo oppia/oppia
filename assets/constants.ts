@@ -5136,7 +5136,6 @@ export = {
       "NumericExpressionInput",
       "AlgebraicExpressionInput",
       "MathEquationInput",
-      "MathExpressionInput",
       "NumberWithUnits"
     ]
   }, {

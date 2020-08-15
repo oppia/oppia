@@ -129,11 +129,6 @@
       "description": "is equivalent to {{x|MathEquation}}"
     }
   },
-  "MathExpressionInput": {
-    "IsMathematicallyEquivalentTo": {
-      "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
-    }
-  },
   "MultipleChoiceInput": {
     "Equals": {
       "description": "is equal to {{x|NonnegativeInt}}"

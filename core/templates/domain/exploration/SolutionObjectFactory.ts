@@ -36,7 +36,6 @@ import {
   FractionAnswer,
   InteractionAnswer,
   LogicProofAnswer,
-  MathExpressionAnswer,
   NumberWithUnitsAnswer,
   PencilCodeEditorAnswer
 } from 'interactions/answer-defs';
@@ -85,8 +84,6 @@ export class Solution {
     var correctAnswer = null;
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';
-    } else if (interactionId === 'MathExpressionInput') {
-      correctAnswer = (<MathExpressionAnswer> this.correctAnswer).latex;
     } else if (interactionId === 'CodeRepl' ||
       interactionId === 'PencilCodeEditor') {
       correctAnswer = (<PencilCodeEditorAnswer> this.correctAnswer).code;

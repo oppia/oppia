@@ -116,10 +116,6 @@ export type MathEquationRuleInputs = (
   MathEquationMatchesExactlyWithRuleInputs |
   MathEquationIsEquivalentToRuleInputs);
 
-export interface MathExpressionRuleInputs {
-  x: string;
-}
-
 export interface MultipleChoiceRuleInputs {
   x: number;
 }
@@ -217,7 +213,6 @@ export type InteractionRuleInputs = (
   ItemSelectionRuleInputs |
   LogicProofRuleInputs |
   MathEquationRuleInputs |
-  MathExpressionRuleInputs |
   MultipleChoiceRuleInputs |
   MusicNotesRuleInputs |
   NumericExpressionRuleInputs |

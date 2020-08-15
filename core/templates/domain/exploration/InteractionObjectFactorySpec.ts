@@ -302,21 +302,6 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set customization arguments for ' +
-     'MathExpressionInput', () => {
-    const testInteraction = iof.createFromBackendDict({
-      answer_groups: answerGroupsDict,
-      confirmed_unclassified_answers: [],
-      customization_args: {},
-      default_outcome: defaultOutcomeDict,
-      hints: hintsDict,
-      id: 'MathExpressionInput',
-      solution: solutionDict
-    });
-
-    expect(testInteraction.customizationArgs).toEqual({});
-  });
-
-  it('should correctly set customization arguments for ' +
      'MusicNotesInput', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
