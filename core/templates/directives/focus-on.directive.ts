@@ -25,12 +25,12 @@ require('services/stateful/focus-manager.service.ts');
 // When set as an attr of an <input> element, moves focus to that element
 // when a 'focusOn' event is broadcast.
 angular.module('oppia').directive('focusOn', [
-  'FocusManager', 'LABEL_FOR_CLEARING_FOCUS',
-  function(FocusManager, LABEL_FOR_CLEARING_FOCUS) {
+  'FocusManagerService', 'LABEL_FOR_CLEARING_FOCUS',
+  function(FocusManagerService, LABEL_FOR_CLEARING_FOCUS) {
     this.directiveSubscriptions = new Subscription();
     return function(scope, elt, attrs) {
       this.directiveSubscriptions.add(
-        FocusManager.onFocus.subscribe(
+        FocusManagerService.onFocus.subscribe(
           (name) => {
             if (name === attrs.focusOn) {
               elt[0].focus();

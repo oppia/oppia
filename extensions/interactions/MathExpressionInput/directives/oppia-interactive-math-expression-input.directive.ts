@@ -217,7 +217,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
             ctrl.directiveSubscriptions.add(
-              FocusManagerService.onFocus.subscribe((name) => {
+              FocusManagerService.onFocus.subscribe(name => {
                 if (!labelForFocusTarget) {
                   return;
                 }
