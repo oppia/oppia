@@ -96,6 +96,10 @@ angular.module('oppia').directive('topicEditorTab', [
               TopicEditorStateService.getSkillQuestionCountDict());
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
+            if (TopicEditorStateService.hasLoadedTopic()) {
+              $scope.topicDataHasLoaded = true;
+              $scope.$applyAsync();
+            }
             $scope.editableName = $scope.topic.getName();
             $scope.initialTopicName = $scope.topic.getName();
             $scope.initialTopicUrlFragment = $scope.topic.getUrlFragment();
@@ -338,7 +342,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.getPreviewFooter = function() {
             var canonicalStoriesLength = (
               $scope.topic.getCanonicalStoryIds().length);
-            if ( canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
+            if (canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
               return canonicalStoriesLength + ' Stories';
             }
             return '1 Story';
@@ -422,6 +426,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.SUBTOPIC_LIST = 'subtopic';
             $scope.SKILL_LIST = 'skill';
             $scope.STORY_LIST = 'story';
+            $scope.topicDataHasLoaded = false;
             $scope.subtopicCardSelectedIndexes = {};
             $scope.selectedSkillEditOptionsIndex = {};
             $scope.subtopicsListIsShown = (

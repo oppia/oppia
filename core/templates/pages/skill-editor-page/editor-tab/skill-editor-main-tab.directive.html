@@ -43,11 +43,13 @@
       <md-card class="skill-editor-helper-box">
         <div class="skill-details-container">
           <div class="misconception-count">
-            <div class="count-value"><[skill.getMisconceptions().length]></div>
+            <span class="count-value" ng-if="!hasLoadedSkill()"><loading-dots></loading-dots></span>
+            <div class="count-value" ng-if="hasLoadedSkill()"><[skill.getMisconceptions().length]></div>
             <div class="count-text">Misconceptions</div>
           </div>
           <div class="example-count">
-            <div class="count-value"><[skill.getConceptCard().getWorkedExamples().length]></div>
+            <span class="count-value" ng-if="!hasLoadedSkill()"><loading-dots></loading-dots></span>
+            <div class="count-value" ng-if="hasLoadedSkill()"><[skill.getConceptCard().getWorkedExamples().length]></div>
             <div class="count-text">Worked Examples</div>
           </div>
           <div class="create-question" ng-click="createQuestion()">

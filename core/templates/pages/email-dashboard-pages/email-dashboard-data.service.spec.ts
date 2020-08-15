@@ -90,7 +90,12 @@ describe('Email Dashboard Services', () => {
     it('should post correct data to backend',
       fakeAsync(() => {
         var data = {
-          hasNotLoggedInForNDays: 'value1'
+          hasNotLoggedInForNDays: 'value1',
+          inactiveInLastNDays: null,
+          createdAtLeastNExps: null,
+          createdFewerThanNExps: null,
+          editedAtLeastNExps: null,
+          editedFewerThanNExps: null
         };
         var queryData = emailDashboardQueryObjectFactory.createFromQueryDict({
           id: 'qnew',
@@ -197,7 +202,12 @@ describe('Email Dashboard Services', () => {
         expect(emailDashboardDataService.getCurrentPageIndex()).toEqual(0);
 
         var data = {
-          hasNotLoggedInForNDays: 'value1'
+          hasNotLoggedInForNDays: 'value1',
+          inactiveInLastNDays: null,
+          createdAtLeastNExps: null,
+          createdFewerThanNExps: null,
+          editedAtLeastNExps: null,
+          editedFewerThanNExps: null
         };
         // Maintain list of all submitted queries for cross checking.
         var totalQueries = [];

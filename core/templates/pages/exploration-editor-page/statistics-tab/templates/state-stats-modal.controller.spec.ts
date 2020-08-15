@@ -70,16 +70,17 @@ describe('State Stats Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
-    expect($scope.stateName).toBe(stateName);
-    expect($scope.numEnters).toEqual(stateStats.totalHitCount);
-    expect($scope.numQuits)
-      .toEqual(stateStats.totalHitCount - stateStats.numCompletions);
-    expect($scope.interactionArgs).toBe(interactionArgs);
-    expect($scope.visualizationsInfo).toEqual(visualizationsInfo);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.stateName).toBe(stateName);
+      expect($scope.numEnters).toEqual(stateStats.totalHitCount);
+      expect($scope.numQuits)
+        .toEqual(stateStats.totalHitCount - stateStats.numCompletions);
+      expect($scope.interactionArgs).toBe(interactionArgs);
+      expect($scope.visualizationsInfo).toEqual(visualizationsInfo);
+    });
 
-  it('should successfully navigate to state editor', function() {
+  it('should navigate to state editor', function() {
     spyOn(RouterService, 'navigateToMainTab').and.callThrough();
     $scope.navigateToStateEditor();
 
