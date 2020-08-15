@@ -246,7 +246,7 @@ def _delete_models(user_id, module_name):
     Args:
         user_id: str. The id of the user to be deleted.
         module_name: models.NAMES. The name of the module containing the models
-        that are being deleted.
+            that are being deleted.
     """
     for model_class in models.Registry.get_storage_model_classes([module_name]):
         deletion_policy = model_class.get_deletion_policy()
