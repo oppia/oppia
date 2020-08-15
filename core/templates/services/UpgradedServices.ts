@@ -93,6 +93,8 @@ import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ClassroomDataObjectFactory } from
   'domain/classroom/ClassroomDataObjectFactory';
+import { ClientContextObjectFactory } from
+  'domain/platform_feature/client-context-object.factory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
@@ -223,6 +225,8 @@ import { ExtractImageFilenamesFromStateService } from
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+import { FeatureStatusSummaryObjectFactory } from
+  'domain/platform_feature/feature-status-summary-object.factory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -398,6 +402,12 @@ import { PencilCodeEditorRulesService } from
 import { PencilCodeEditorValidationService } from
   // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformParameterFilterObjectFactory } from
+  'domain/platform_feature/platform-parameter-filter-object.factory';
+import { PlatformParameterObjectFactory } from
+  'domain/platform_feature/platform-parameter-object.factory';
+import { PlatformParameterRuleObjectFactory } from
+  'domain/platform_feature/platform-parameter-rule-object.factory';
 import { PlayerCorrectnessFeedbackEnabledService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
@@ -457,6 +467,8 @@ import { RubricObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SchemaDefaultValueService } from
   'services/schema-default-value.service';
+import { SchemaFormSubmittedService } from
+  'services/schema-form-submitted.service';
 import { SchemaUndefinedLastElementService } from
   'services/schema-undefined-last-element.service';
 import { SearchExplorationsBackendApiService } from
@@ -700,6 +712,8 @@ export class UpgradedServices {
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ChangeObjectFactory'] = new ChangeObjectFactory();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
+    upgradedServices['ClientContextObjectFactory'] =
+      new ClientContextObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['CollectionNodeObjectFactory'] =
       new CollectionNodeObjectFactory();
@@ -750,6 +764,8 @@ export class UpgradedServices {
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['FeaturedTranslationLanguageObjectFactory'] =
       new FeaturedTranslationLanguageObjectFactory();
+    upgradedServices['FeatureStatusSummaryObjectFactory'] =
+      new FeatureStatusSummaryObjectFactory();
     upgradedServices['FeedbackMessageSummaryObjectFactory'] =
       new FeedbackMessageSummaryObjectFactory();
     upgradedServices['FeedbackThreadSummaryObjectFactory'] =
@@ -826,6 +842,8 @@ export class UpgradedServices {
     upgradedServices['ParamMetadataObjectFactory'] =
       new ParamMetadataObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
+    upgradedServices['PlatformParameterFilterObjectFactory'] =
+      new PlatformParameterFilterObjectFactory();
     upgradedServices['PlayerCorrectnessFeedbackEnabledService'] =
       new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['PlaythroughIssueObjectFactory'] =
@@ -843,6 +861,8 @@ export class UpgradedServices {
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
+    upgradedServices['SchemaFormSubmittedService'] =
+      new SchemaFormSubmittedService();
     upgradedServices['SchemaUndefinedLastElementService'] =
       new SchemaUndefinedLastElementService();
     upgradedServices['SetInputRulesService'] = new SetInputRulesService();
@@ -1051,6 +1071,9 @@ export class UpgradedServices {
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['PlatformParameterRuleObjectFactory'] =
+      new PlatformParameterRuleObjectFactory(
+        upgradedServices['PlatformParameterFilterObjectFactory']);
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
     upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
@@ -1183,6 +1206,9 @@ export class UpgradedServices {
         upgradedServices['NormalizeWhitespacePipe'],
         upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
         upgradedServices['CodeNormalizerService']);
+    upgradedServices['PlatformParameterObjectFactory'] =
+      new PlatformParameterObjectFactory(
+        upgradedServices['PlatformParameterRuleObjectFactory']);
     upgradedServices['SidebarStatusService'] = new SidebarStatusService(
       upgradedServices['WindowDimensionsService']);
     upgradedServices['StateContentService'] = new StateContentService(
@@ -1414,7 +1440,8 @@ export class UpgradedServices {
       new ReviewTestBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['ReviewTestObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['UrlService']);
     upgradedServices['SearchExplorationsBackendApiService'] =
       new SearchExplorationsBackendApiService(
         upgradedServices['HttpClient'],

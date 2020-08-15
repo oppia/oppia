@@ -30,11 +30,11 @@ require('services/context.service.ts');
 angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
   'ContextService', 'TranslateTextService', 'TranslationLanguageService',
-  'opportunity', 'userIsLoggedIn', 'ENTITY_TYPE',
+  'opportunity', 'ENTITY_TYPE',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
       ContextService, TranslateTextService, TranslationLanguageService,
-      opportunity, userIsLoggedIn, ENTITY_TYPE) {
+      opportunity, ENTITY_TYPE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -43,7 +43,6 @@ angular.module('oppia').controller('TranslationModalController', [
     // images for the given ENTITY_TYPE and targetId.
     ContextService.setCustomEntityContext(
       ENTITY_TYPE.EXPLORATION, opportunity.id);
-    $scope.userIsLoggedIn = userIsLoggedIn;
     $scope.uploadingTranslation = false;
     $scope.activeWrittenTranslation = {};
     $scope.activeWrittenTranslation.html = '';

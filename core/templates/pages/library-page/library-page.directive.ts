@@ -36,6 +36,7 @@ require('services/search.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/i18n-language-code.service.ts');
 
 require('pages/library-page/library-page.constants.ajs.ts');
 
@@ -51,7 +52,7 @@ angular.module('oppia').directive('libraryPage', [
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
         '$window', 'AlertsService', 'ClassroomBackendApiService',
-        'LearnerDashboardActivityIdsObjectFactory',
+        'I18nLanguageCodeService', 'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'LoaderService', 'PageTitleService', 'SearchService',
         'UrlInterpolationService', 'UrlService', 'UserService',
@@ -61,7 +62,7 @@ angular.module('oppia').directive('libraryPage', [
         function(
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
             $window, AlertsService, ClassroomBackendApiService,
-            LearnerDashboardActivityIdsObjectFactory,
+            I18nLanguageCodeService, LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             LoaderService, PageTitleService, SearchService,
             UrlInterpolationService, UrlService, UserService,
@@ -239,7 +240,10 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
               '/library/' + ctrl.bannerImageFilename);
 
-            ClassroomBackendApiService.fetchClassroomPageIsShownStatus().then(
+            var classroomPageIsShownPromise = (
+              ClassroomBackendApiService.fetchClassroomPageIsShownStatusAsync()
+            );
+            classroomPageIsShownPromise.then(
               function(classroomIsShown) {
                 ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
               });
@@ -278,8 +282,7 @@ angular.module('oppia').directive('libraryPage', [
 
                   ctrl.groupHeaderI18nId = response.data.header_i18n_id;
 
-                  $rootScope.$broadcast(
-                    'preferredLanguageCodesLoaded',
+                  I18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
                     response.data.preferred_language_codes);
 
                   LoaderService.hideLoadingScreen();
@@ -343,8 +346,7 @@ angular.module('oppia').directive('libraryPage', [
                   }
                 });
 
-                $rootScope.$broadcast(
-                  'preferredLanguageCodesLoaded',
+                I18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
                   response.data.preferred_language_codes);
 
                 // Initialize the carousel(s) on the library index page.

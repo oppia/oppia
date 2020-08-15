@@ -27,6 +27,7 @@ import inspect
 import itertools
 import json
 import os
+import time
 import unittest
 
 from constants import constants
@@ -1356,8 +1357,9 @@ tags: []
         )
         exp_summary_model.put()
 
-    def save_new_exp_with_states_schema_v34(self, exp_id, user_id, states_dict):
-        """Saves a new default exploration with a default version 34 states
+    def save_new_exp_with_custom_states_schema_version(
+            self, exp_id, user_id, states_dict, version):
+        """Saves a new default exploration with the given version of states
         dictionary.
 
         This function should only be used for creating explorations in tests
@@ -1373,6 +1375,7 @@ tags: []
             exp_id: str. The exploration ID.
             user_id: str. The user_id of the creator.
             states_dict: dict. The dict representation of all the states.
+            version: int. Custom states schema version.
         """
         exp_model = exp_models.ExplorationModel(
             id=exp_id,
@@ -1383,67 +1386,7 @@ tags: []
             tags=[],
             blurb='',
             author_notes='',
-            states_schema_version=34,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=states_dict,
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'title\'.'
-        exp_model.commit(
-            user_id, commit_message, [{
-                'cmd': 'create_new',
-                'title': 'title',
-                'category': 'category',
-            }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id,
-            title='title',
-            category='category',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids,
-            contributor_ids=[],
-            contributors_summary={},
-        )
-        exp_summary_model.put()
-
-    def save_new_exp_with_states_schema_v35(self, exp_id, user_id, states_dict):
-        """Saves a new default exploration with a default version 35 states
-        dictionary.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            states_dict: dict. The dict representation of all the states.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id,
-            category='category',
-            title='title',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            states_schema_version=35,
+            states_schema_version=version,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=states_dict,
             param_specs={},
@@ -1666,7 +1609,8 @@ tags: []
             self, story_id, thumbnail_filename, thumbnail_bg_color,
             owner_id, title, description,
             notes, corresponding_topic_id,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='story-frag'):
         """Saves a new story with a default version 1 story contents
         data dictionary.
 
@@ -1693,6 +1637,7 @@ tags: []
                 belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
+            url_fragment: str. The URL fragment for the story.
         """
         story_model = story_models.StoryModel(
             id=story_id,
@@ -1704,7 +1649,8 @@ tags: []
             story_contents_schema_version=1,
             notes=notes,
             corresponding_topic_id=corresponding_topic_id,
-            story_contents=self.VERSION_1_STORY_CONTENTS_DICT
+            story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
+            url_fragment=url_fragment
         )
         commit_message = (
             'New story created with title \'%s\'.' % title)
@@ -1716,6 +1662,7 @@ tags: []
 
     def save_new_topic(
             self, topic_id, owner_id, name='topic', abbreviated_name='topic',
+            url_fragment='topic',
             thumbnail_filename='topic.svg',
             thumbnail_bg_color=(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
@@ -1730,6 +1677,7 @@ tags: []
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
+            url_fragment: str. The url fragment of the topic.
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
@@ -1760,7 +1708,7 @@ tags: []
         uncategorized_skill_ids = (uncategorized_skill_ids or [])
         subtopics = (subtopics or [])
         topic = topic_domain.Topic(
-            topic_id, name, abbreviated_name,
+            topic_id, name, abbreviated_name, url_fragment,
             thumbnail_filename, thumbnail_bg_color,
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
@@ -1771,7 +1719,7 @@ tags: []
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(
-            self, topic_id, owner_id, name, abbreviated_name,
+            self, topic_id, owner_id, name, abbreviated_name, url_fragment,
             canonical_name, description, thumbnail_filename,
             thumbnail_bg_color, canonical_story_references,
             additional_story_references,
@@ -1794,6 +1742,7 @@ tags: []
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
+            url_fragment: str. The url fragment of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The description of the topic.
             thumbnail_filename: str. The thumbnail file name of the topic.
@@ -1820,6 +1769,7 @@ tags: []
             id=topic_id,
             name=name,
             abbreviated_name=abbreviated_name,
+            url_fragment=url_fragment,
             thumbnail_filename=thumbnail_filename,
             thumbnail_bg_color=thumbnail_bg_color,
             canonical_name=canonical_name,
@@ -2304,6 +2254,13 @@ class AppEngineTestBase(TestBase):
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
 
+        # Set the timezone to be UTC.
+        # Retrieve the current timezone, accounting for daylight savings
+        # as necessary.
+        self.initial_timezone = time.tzname[time.daylight]
+        os.environ['TZ'] = 'UTC'
+        time.tzset()
+
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
@@ -2312,6 +2269,11 @@ class AppEngineTestBase(TestBase):
     def tearDown(self):
         self.logout()
         self._delete_all_models()
+
+        # Set the timezone back to the original timezone.
+        os.environ['TZ'] = self.initial_timezone
+        time.tzset()
+
         self.testbed.deactivate()
 
     def _get_all_queue_names(self):

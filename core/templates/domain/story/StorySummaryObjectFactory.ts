@@ -28,19 +28,21 @@ export interface StorySummaryBackendDict {
   'thumbnail_bg_color': string;
   'description': string;
   'story_is_published': boolean;
-  'completed_node_titles': string[]
+  'completed_node_titles': string[],
+  'url_fragment': string
 }
 
 export class StorySummary {
   constructor(
     private _id: string,
     private _title: string,
-    private _nodeTitles: Array<string>,
+    private _nodeTitles: string[],
     private _thumbnailFilename: string,
     private _thumbnailBgColor: string,
     private _description: string,
     private _storyIsPublished: boolean,
-    private _completedNodeTitles: string[]
+    private _completedNodeTitles: string[],
+    private _urlFragment: string,
   ) {}
 
   getId(): string {
@@ -51,7 +53,7 @@ export class StorySummary {
     return this._title;
   }
 
-  getNodeTitles(): Array<string> {
+  getNodeTitles(): string[] {
     return this._nodeTitles.slice();
   }
 
@@ -74,6 +76,10 @@ export class StorySummary {
   isStoryPublished(): boolean {
     return this._storyIsPublished;
   }
+
+  getUrlFragment(): string {
+    return this._urlFragment;
+  }
 }
 
 @Injectable({
@@ -90,7 +96,8 @@ export class StorySummaryObjectFactory {
       storySummaryBackendDict.thumbnail_bg_color,
       storySummaryBackendDict.description,
       storySummaryBackendDict.story_is_published,
-      storySummaryBackendDict.completed_node_titles
+      storySummaryBackendDict.completed_node_titles,
+      storySummaryBackendDict.url_fragment
     );
   }
 }

@@ -25,13 +25,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 # interactions or remove existing ones.
 VALID_INTERACTION_IDS = [
     'Continue', 'DragAndDropSortInput', 'EndExploration', 'FractionInput',
-    'ItemSelectionInput', 'MultipleChoiceInput', 'NumericInput',
-    'NumberWithUnits', 'TextInput'
+    'ImageClickInput', 'ItemSelectionInput', 'MultipleChoiceInput',
+    'NumericInput', 'NumberWithUnits', 'TextInput'
 ]
 
 SUPPORTED_LANGUAGES = ['en']
 
-VALID_RTE_COMPONENTS = ['image', 'link', 'skillreview']
+VALID_RTE_COMPONENTS = ['image', 'link', 'math', 'skillreview']
 
 # If any of the following values are changed, edit the corresponding value in
 # app.constants.ts as well.

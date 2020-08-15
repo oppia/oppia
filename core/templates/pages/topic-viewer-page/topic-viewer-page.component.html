@@ -4,7 +4,7 @@
       <ul class="topic-viewer-tabs">
         <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'info'}">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('info')">
-            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
+            <img alt="info about the topic icon" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
             <a class="tab-title"
                translate="I18N_TOPIC_VIEWER_INFO">
             </a>
@@ -12,7 +12,7 @@
         </li>
         <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')">
-            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
+            <img alt="play story icon" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
             <a class="tab-title"
                translate="I18N_TOPIC_VIEWER_LESSONS">
             </a>
@@ -48,7 +48,10 @@
       </topic-info-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'story'">
-      <stories-list [canonical-story-summaries]="$ctrl.canonicalStorySummaries"></stories-list>
+      <stories-list [canonical-story-summaries]="$ctrl.canonicalStorySummaries"
+                    [classroom-url-fragment]="$ctrl.classroomUrlFragment"
+                    [topic-url-fragment]="$ctrl.topicUrlFragment">
+      </stories-list>
     </div>
     <div ng-if="$ctrl.activeTab === 'practice'">
       <practice-tab [subtopics-list]="$ctrl.subtopics"
@@ -56,9 +59,10 @@
       </practice-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'subtopics'">
-      <subtopics-list [subtopics-list]="$ctrl.subtopics"
-                      [topic-name]="$ctrl.topicName"
-                      [topic-id]="$ctrl.topicId">
+      <subtopics-list [classroom-url-fragment]="$ctrl.classroomUrlFragment"
+                      [subtopics-list]="$ctrl.subtopics"
+                      [topic-id]="$ctrl.topicId"
+                      [topic-url-fragment]="$ctrl.topicUrlFragment">
       </subtopics-list>
     </div>
   </div>
