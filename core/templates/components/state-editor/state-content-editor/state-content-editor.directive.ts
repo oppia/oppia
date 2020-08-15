@@ -28,6 +28,9 @@ require(
   'state-property.service.ts');
 require('services/context.service.ts');
 require('services/editability.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -52,13 +55,14 @@ angular.module('oppia').directive('stateContentEditor', [
         'state-content-editor.directive.html'),
       controller: [
         '$scope', 'ContextService', 'EditabilityService',
-        'EditorFirstTimeEventsService', 'StateContentService',
-        'StateEditorService',
+        'EditorFirstTimeEventsService', 'ExplorationSaveService',
+        'StateContentService', 'StateEditorService',
         function(
             $scope, ContextService, EditabilityService,
-            EditorFirstTimeEventsService, StateContentService,
-            StateEditorService) {
+            EditorFirstTimeEventsService, ExplorationSaveService,
+            StateContentService, StateEditorService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.isCardHeightLimitReached = function() {
             var shadowPreviewCard = $(
               '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
@@ -118,12 +122,19 @@ angular.module('oppia').directive('stateContentEditor', [
             $scope.contentEditorIsOpen = false;
             $scope.isEditable = EditabilityService.isEditable;
             $scope.cardHeightLimitWarningIsShown = true;
-            $scope.$on('externalSave', function() {
-              if ($scope.contentEditorIsOpen) {
-                saveContent();
-              }
-            });
+            ctrl.directiveSubscriptions.add(
+              ExplorationSaveService.onExternalSave.subscribe(
+                () => {
+                  if ($scope.contentEditorIsOpen) {
+                    saveContent();
+                  }
+                }
+              )
+            );
             StateEditorService.updateStateContentEditorInitialised();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

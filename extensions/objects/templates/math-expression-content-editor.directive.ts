@@ -20,7 +20,9 @@ require('mathjaxConfig.ts');
 require('directives/mathjax-bind.directive.ts');
 require('services/image-upload-helper.service.ts');
 require('services/alerts.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 
+import { Subscription } from 'rxjs';
 
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
@@ -40,6 +42,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
+        ctrl.directiveSubscriptions = new Subscription();
         // TODO(#10197): Upgrade to MathJax 3, after proper investigation
         // and testing. MathJax 3 provides a faster and more cleaner way to
         // convert a LaTeX string to an SVG.
@@ -112,15 +115,17 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
               label: ctrl.value.raw_latex || '',
             };
           }, true);
-          $scope.$on('externalSave', function() {
-            processAndSaveSvg();
-            if (ctrl.active) {
-              ctrl.replaceValue(ctrl.localValue.label);
-              // The $scope.$apply() call is needed to propagate the replaced
-              // value.
-              $scope.$apply();
-            }
-          });
+          ctrl.directiveSubscriptions.add(
+            ExplorationSaveService.onExternalSave.subscribe(() => {
+              processAndSaveSvg();
+              if (ctrl.active) {
+                ctrl.replaceValue(ctrl.localValue.label);
+                // The $scope.$apply() call is needed to propagate the replaced
+                // value.
+                $scope.$apply();
+              }
+            })
+          );
           ctrl.placeholderText = '\\frac{x}{y}';
           ctrl.alwaysEditable = ctrl.getAlwaysEditable();
 
@@ -149,6 +154,9 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
 
             ctrl.closeEditor();
           }
+        };
+        ctrl.$onDestroy = function() {
+          ctrl.directiveSubscriptions.unsubscribe();
         };
       }]
     };

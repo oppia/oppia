@@ -20,6 +20,10 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
+
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('unicodeStringEditor', [
   function() {
     return {
@@ -32,60 +36,67 @@ angular.module('oppia').directive('unicodeStringEditor', [
       },
       template: require('./unicode-string-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', function($scope) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          $scope.$watch('$ctrl.initArgs', function(newValue) {
-            ctrl.largeInput = false;
-            if (newValue && newValue.largeInput) {
-              ctrl.largeInput = newValue.largeInput;
-            }
-          });
-
-          // Reset the component each time the value changes (e.g. if this is
-          // part of an editable list).
-          $scope.$watch('$ctrl.value', function() {
-            ctrl.localValue = {
-              label: ctrl.value || ''
-            };
-          }, true);
-          ctrl.alwaysEditable = ctrl.getAlwaysEditable();
-          ctrl.initArgs = ctrl.getInitArgs();
-          ctrl.largeInput = false;
-
-          if (ctrl.alwaysEditable) {
-            $scope.$watch('$ctrl.localValue.label', function(newValue) {
-              ctrl.value = newValue;
-            });
-          } else {
-            ctrl.openEditor = function() {
-              ctrl.active = true;
-            };
-
-            ctrl.closeEditor = function() {
-              ctrl.active = false;
-            };
-
-            ctrl.replaceValue = function(newValue) {
-              ctrl.localValue = {
-                label: newValue
-              };
-              ctrl.value = newValue;
-              ctrl.closeEditor();
-            };
-
-            $scope.$on('externalSave', function() {
-              if (ctrl.active) {
-                ctrl.replaceValue(ctrl.localValue.label);
-                // The $scope.$apply() call is needed to propagate the replaced
-                // value.
-                $scope.$apply();
+      controller: ['$scope', 'ExplorationSaveService',
+        function($scope, ExplorationSaveService) {
+          var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
+          ctrl.$onInit = function() {
+            $scope.$watch('$ctrl.initArgs', function(newValue) {
+              ctrl.largeInput = false;
+              if (newValue && newValue.largeInput) {
+                ctrl.largeInput = newValue.largeInput;
               }
             });
 
-            ctrl.closeEditor();
-          }
-        };
-      }]
+            // Reset the component each time the value changes (e.g. if this is
+            // part of an editable list).
+            $scope.$watch('$ctrl.value', function() {
+              ctrl.localValue = {
+                label: ctrl.value || ''
+              };
+            }, true);
+            ctrl.alwaysEditable = ctrl.getAlwaysEditable();
+            ctrl.initArgs = ctrl.getInitArgs();
+            ctrl.largeInput = false;
+
+            if (ctrl.alwaysEditable) {
+              $scope.$watch('$ctrl.localValue.label', function(newValue) {
+                ctrl.value = newValue;
+              });
+            } else {
+              ctrl.openEditor = function() {
+                ctrl.active = true;
+              };
+
+              ctrl.closeEditor = function() {
+                ctrl.active = false;
+              };
+
+              ctrl.replaceValue = function(newValue) {
+                ctrl.localValue = {
+                  label: newValue
+                };
+                ctrl.value = newValue;
+                ctrl.closeEditor();
+              };
+
+              ctrl.directiveSubscriptions.add(
+                ExplorationSaveService.onExternalSave.subscribe(() => {
+                  if (ctrl.active) {
+                    ctrl.replaceValue(ctrl.localValue.label);
+                    // The $scope.$apply() call is needed to propagate
+                    // the replaced value.
+                    $scope.$apply();
+                  }
+                })
+              );
+
+              ctrl.closeEditor();
+            }
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          };
+        }]
     };
   }]);

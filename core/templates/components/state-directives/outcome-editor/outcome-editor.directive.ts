@@ -31,6 +31,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -55,11 +56,13 @@ angular.module('oppia').directive('outcomeEditor', [
         'outcome-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'StateEditorService', 'StateInteractionIdService',
-        'ENABLE_PREREQUISITE_SKILLS', 'INTERACTION_SPECS',
+        '$scope', 'ExplorationSaveService', 'StateEditorService',
+        'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
+        'INTERACTION_SPECS',
         function(
-            $scope, StateEditorService, StateInteractionIdService,
-            ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
+            $scope, ExplorationSaveService, StateEditorService,
+            StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
+            INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.isInQuestionMode = function() {
@@ -212,11 +215,14 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on('externalSave', function() {
-              onExternalSave();
-            });
             ctrl.directiveSubscriptions.add(
-              () => onExternalSave()
+              ExplorationSaveService.onExternalSave.subscribe(
+                () => onExternalSave()
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                () => onExternalSave())
             );
             ctrl.editOutcomeForm = {};
             ctrl.canAddPrerequisiteSkill = (

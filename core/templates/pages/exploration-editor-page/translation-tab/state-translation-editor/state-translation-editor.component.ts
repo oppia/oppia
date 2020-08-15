@@ -19,25 +19,31 @@
 import { WRITTEN_TRANSLATION_TYPE_HTML } from
   'domain/exploration/WrittenTranslationObjectFactory';
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
-    '$scope', '$uibModal', 'EditabilityService', 'ExplorationStatesService',
+    '$scope', '$uibModal', 'EditabilityService',
+    'ExplorationSaveService', 'ExplorationStatesService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService', 'UrlInterpolationService',
     'WrittenTranslationObjectFactory',
     function(
-        $scope, $uibModal, EditabilityService, ExplorationStatesService,
+        $scope, $uibModal, EditabilityService,
+        ExplorationSaveService, ExplorationStatesService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
         TranslationTabActiveContentIdService, UrlInterpolationService,
         WrittenTranslationObjectFactory) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var showMarkAudioAsNeedingUpdateModalIfRequired = function(
           contentId, languageCode) {
         var stateName = StateEditorService.getActiveStateName();
@@ -164,11 +170,15 @@ angular.module('oppia').component('stateTranslationEditor', {
           initEditor();
         });
         initEditor();
-        $scope.$on('externalSave', function() {
-          if ($scope.translationEditorIsOpen) {
-            saveTranslation();
-          }
-        });
+        ctrl.directiveSubscriptions.add(
+          ExplorationSaveService.onExternalSave.subscribe(()=> {
+            if ($scope.translationEditorIsOpen) {
+              saveTranslation();
+            }
+          }));
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

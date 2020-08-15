@@ -24,17 +24,18 @@ require(
   'exploration-init-state-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/exploration-improvements.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$q', '$rootScope', '$timeout', '$window',
   'ExplorationImprovementsService', 'ExplorationInitStateNameService',
-  'ExplorationStatesService', 'StateEditorService',
+  'ExplorationSaveService', 'ExplorationStatesService', 'StateEditorService',
   function(
       $interval, $location, $q, $rootScope, $timeout, $window,
       ExplorationImprovementsService, ExplorationInitStateNameService,
-      ExplorationStatesService, StateEditorService) {
+      ExplorationSaveService, ExplorationStatesService, StateEditorService) {
     var TABS = {
       MAIN: {name: 'main', path: '/main'},
       TRANSLATION: {name: 'translation', path: '/translation'},
@@ -88,7 +89,7 @@ angular.module('oppia').factory('RouterService', [
 
       // TODO(oparry): Determine whether this is necessary, since
       // _savePendingChanges() is called by each of the navigateTo... functions.
-      $rootScope.$broadcast('externalSave');
+      ExplorationSaveService.onExternalSave.emit();
 
       if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
         activeTabName = TABS.TRANSLATION.name;
@@ -163,12 +164,12 @@ angular.module('oppia').factory('RouterService', [
 
     var _savePendingChanges = function() {
       try {
-        $rootScope.$broadcast('externalSave');
+        ExplorationSaveService.onExternalSave.emit();
       } catch (e) {
         // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
         // null" error. To get around this we must use $apply().
         $rootScope.$apply(function() {
-          $rootScope.$broadcast('externalSave');
+          ExplorationSaveService.onExternalSave.emit();
         });
       }
     };

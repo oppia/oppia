@@ -43,6 +43,7 @@ require(
   'state-property.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -78,14 +79,14 @@ angular.module('oppia').directive('answerGroupEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'INTERACTION_SPECS',
-        'StateEditorService', 'RuleObjectFactory',
+        'AlertsService', 'ContextService', 'ExplorationSaveService',
+        'INTERACTION_SPECS', 'StateEditorService', 'RuleObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'ResponsesService',
         function(
             $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, INTERACTION_SPECS,
-            StateEditorService, RuleObjectFactory,
+            AlertsService, ContextService, ExplorationSaveService,
+            INTERACTION_SPECS, StateEditorService, RuleObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
           var ctrl = this;
@@ -294,11 +295,14 @@ angular.module('oppia').directive('answerGroupEditor', [
             $scope.$on('updateAnswerChoices', function() {
               ctrl.answerChoices = ctrl.getAnswerChoices();
             });
-            $scope.$on('externalSave', function() {
-              if (ctrl.isRuleEditorOpen()) {
-                ctrl.saveRules();
-              }
-            });
+
+            ctrl.directiveSubscriptions.add(
+              ExplorationSaveService.onExternalSave.subscribe(() => {
+                if (ctrl.isRuleEditorOpen()) {
+                  ctrl.saveRules();
+                }
+              })
+            );
             ctrl.directiveSubscriptions.add(
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 () => {

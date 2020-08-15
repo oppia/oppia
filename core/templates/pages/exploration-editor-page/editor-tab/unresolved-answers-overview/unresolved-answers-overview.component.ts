@@ -44,14 +44,14 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
   template: require('./unresolved-answers-overview.component.html'),
   controller: [
     '$rootScope', '$scope', '$uibModal', 'EditabilityService',
-    'ExplorationStatesService',
+    'ExplorationSaveService', 'ExplorationStatesService',
     'ImprovementsService', 'StateEditorService',
     'StateInteractionIdService', 'StateTopAnswersStatsService',
     'UrlInterpolationService', 'INTERACTION_SPECS',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
     function(
         $rootScope, $scope, $uibModal, EditabilityService,
-        ExplorationStatesService,
+        ExplorationSaveService, ExplorationStatesService,
         ImprovementsService, StateEditorService,
         StateInteractionIdService, StateTopAnswersStatsService,
         UrlInterpolationService, INTERACTION_SPECS,
@@ -91,7 +91,7 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
       };
 
       $scope.openTeachOppiaModal = function() {
-        $rootScope.$broadcast('externalSave');
+        ExplorationSaveService.onExternalSave.emit();
 
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

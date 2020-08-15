@@ -62,6 +62,7 @@ require('services/exploration-html-formatter.service.ts');
 
 require('components/state-editor/state-editor.constants.ajs.ts');
 require('services/contextual/window-dimensions.service');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 
 angular.module('oppia').directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -76,23 +77,23 @@ angular.module('oppia').directive('stateSolutionEditor', [
         '/components/state-editor/state-solution-editor/' +
         'state-solution-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$filter', 'StateEditorService',
+        '$scope', '$uibModal', '$filter', 'StateEditorService',
         'AlertsService', 'INTERACTION_SPECS', 'StateSolutionService',
         'SolutionVerificationService', 'SolutionValidityService',
-        'ExplorationHtmlFormatterService', 'StateInteractionIdService',
-        'StateHintsService', 'UrlInterpolationService',
-        'StateCustomizationArgsService', 'EditabilityService',
-        'WindowDimensionsService',
+        'ExplorationHtmlFormatterService', 'ExplorationSaveService',
+        'StateInteractionIdService', 'StateHintsService',
+        'UrlInterpolationService', 'StateCustomizationArgsService',
+        'EditabilityService', 'WindowDimensionsService',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
         function(
-            $scope, $rootScope, $uibModal, $filter, StateEditorService,
+            $scope, $uibModal, $filter, StateEditorService,
             AlertsService, INTERACTION_SPECS, StateSolutionService,
             SolutionVerificationService, SolutionValidityService,
-            ExplorationHtmlFormatterService, StateInteractionIdService,
-            StateHintsService, UrlInterpolationService,
-            StateCustomizationArgsService, EditabilityService,
-            WindowDimensionsService,
+            ExplorationHtmlFormatterService, ExplorationSaveService,
+            StateInteractionIdService, StateHintsService,
+            UrlInterpolationService, StateCustomizationArgsService,
+            EditabilityService, WindowDimensionsService,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION) {
           var ctrl = this;
@@ -145,7 +146,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
 
           $scope.openAddOrUpdateSolutionModal = function() {
             AlertsService.clearWarnings();
-            $rootScope.$broadcast('externalSave');
+            ExplorationSaveService.onExternalSave.emit();
             $scope.inlineSolutionEditorIsActive = false;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

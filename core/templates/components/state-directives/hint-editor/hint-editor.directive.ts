@@ -26,6 +26,9 @@ require(
   'state-property.service.ts');
 require('services/context.service.ts');
 require('services/editability.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('hintEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -42,10 +45,13 @@ angular.module('oppia').directive('hintEditor', [
         '/components/state-directives/hint-editor/hint-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ContextService', 'EditabilityService', 'StateHintsService',
+        '$scope', 'ContextService', 'EditabilityService',
+        'ExplorationSaveService', 'StateHintsService',
         function(
-            $scope, ContextService, EditabilityService, StateHintsService) {
+            $scope, ContextService, EditabilityService,
+            ExplorationSaveService, StateHintsService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.openHintEditor = function() {
             if (ctrl.isEditable) {
               ctrl.hintMemento = angular.copy(ctrl.hint);
@@ -75,12 +81,13 @@ angular.module('oppia').directive('hintEditor', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on('externalSave', function() {
-              if (ctrl.hintEditorIsOpen &&
-                  ctrl.editHintForm.$valid) {
-                ctrl.saveThisHint();
-              }
-            });
+            ctrl.directiveSubscriptions.add(
+              ExplorationSaveService.onExternalSave.subscribe(() => {
+                if (ctrl.hintEditorIsOpen &&
+                      ctrl.editHintForm.$valid) {
+                  ctrl.saveThisHint();
+                }
+              }));
             ctrl.isEditable = EditabilityService.isEditable();
             ctrl.StateHintsService = StateHintsService;
             ctrl.editHintForm = {};
@@ -95,6 +102,9 @@ angular.module('oppia').directive('hintEditor', [
             };
 
             ctrl.hintMemento = null;
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
