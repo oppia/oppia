@@ -16,8 +16,6 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
-import { EventEmitter } from '@angular/core';
-
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -100,8 +98,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
     var modalIsOpen = false;
 
     var diffData = null;
-
-    var _externalSaveEventEmitter = new EventEmitter();
 
     var isAdditionalMetadataNeeded = function() {
       return (
@@ -232,7 +228,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           AlertsService.clearWarnings();
-          _externalSaveEventEmitter.emit();
+          RouterService.onExternalSave.emit();
 
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -427,10 +423,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
           });
         });
         return whenModalClosed.promise;
-      },
-
-      get onExternalSave() {
-        return _externalSaveEventEmitter;
       }
     };
   }

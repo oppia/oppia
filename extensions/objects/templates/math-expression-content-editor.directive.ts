@@ -20,7 +20,7 @@ require('mathjaxConfig.ts');
 require('directives/mathjax-bind.directive.ts');
 require('services/image-upload-helper.service.ts');
 require('services/alerts.service.ts');
-require('pages/exploration-editor-page/services/exploration-save.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -116,7 +116,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
             };
           }, true);
           ctrl.directiveSubscriptions.add(
-            ExplorationSaveService.onExternalSave.subscribe(() => {
+            RouterService.onExternalSave.subscribe(() => {
               processAndSaveSvg();
               if (ctrl.active) {
                 ctrl.replaceValue(ctrl.localValue.label);

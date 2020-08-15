@@ -31,7 +31,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/exploration-save.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -56,11 +56,11 @@ angular.module('oppia').directive('outcomeEditor', [
         'outcome-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ExplorationSaveService', 'StateEditorService',
+        '$scope', 'RouterService', 'StateEditorService',
         'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
         'INTERACTION_SPECS',
         function(
-            $scope, ExplorationSaveService, StateEditorService,
+            $scope, RouterService, StateEditorService,
             StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
             INTERACTION_SPECS) {
           var ctrl = this;
@@ -216,7 +216,7 @@ angular.module('oppia').directive('outcomeEditor', [
 
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
-              ExplorationSaveService.onExternalSave.subscribe(
+              RouterService.onExternalSave.subscribe(
                 () => onExternalSave()
               )
             );

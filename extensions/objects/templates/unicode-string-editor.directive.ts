@@ -20,7 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-require('pages/exploration-editor-page/services/exploration-save.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -36,8 +36,8 @@ angular.module('oppia').directive('unicodeStringEditor', [
       },
       template: require('./unicode-string-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', 'ExplorationSaveService',
-        function($scope, ExplorationSaveService) {
+      controller: ['$scope', 'RouterService',
+        function($scope, RouterService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.$onInit = function() {
@@ -81,7 +81,7 @@ angular.module('oppia').directive('unicodeStringEditor', [
               };
 
               ctrl.directiveSubscriptions.add(
-                ExplorationSaveService.onExternalSave.subscribe(() => {
+                RouterService.onExternalSave.subscribe(() => {
                   if (ctrl.active) {
                     ctrl.replaceValue(ctrl.localValue.label);
                     // The $scope.$apply() call is needed to propagate

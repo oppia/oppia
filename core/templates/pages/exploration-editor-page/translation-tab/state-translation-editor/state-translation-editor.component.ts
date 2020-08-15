@@ -24,20 +24,20 @@ import { Subscription } from 'rxjs';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require('pages/exploration-editor-page/services/exploration-save.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
     '$scope', '$uibModal', 'EditabilityService',
-    'ExplorationSaveService', 'ExplorationStatesService',
+    'RouterService', 'ExplorationStatesService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService', 'UrlInterpolationService',
     'WrittenTranslationObjectFactory',
     function(
         $scope, $uibModal, EditabilityService,
-        ExplorationSaveService, ExplorationStatesService,
+        RouterService, ExplorationStatesService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
         TranslationTabActiveContentIdService, UrlInterpolationService,
@@ -171,7 +171,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         });
         initEditor();
         ctrl.directiveSubscriptions.add(
-          ExplorationSaveService.onExternalSave.subscribe(()=> {
+          RouterService.onExternalSave.subscribe(()=> {
             if ($scope.translationEditorIsOpen) {
               saveTranslation();
             }

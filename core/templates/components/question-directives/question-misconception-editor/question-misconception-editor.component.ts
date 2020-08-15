@@ -28,7 +28,7 @@ require(
 require(
   'components/question-directives/question-misconception-editor/' +
   'tag-misconception-modal.controller.ts');
-require('pages/exploration-editor-page/services/exploration-save.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 angular.module('oppia').component('questionMisconceptionEditor', {
   bindings: {
@@ -41,10 +41,10 @@ angular.module('oppia').component('questionMisconceptionEditor', {
   },
   template: require('./question-misconception-editor.component.html'),
   controller: [
-    '$rootScope', '$uibModal', 'ExplorationSaveService', 'StateEditorService',
+    '$rootScope', '$uibModal', 'RouterService', 'StateEditorService',
     'UrlInterpolationService',
     function(
-        $rootScope, $uibModal, ExplorationSaveService, StateEditorService,
+        $rootScope, $uibModal, RouterService, StateEditorService,
         UrlInterpolationService) {
       var ctrl = this;
 
@@ -95,7 +95,7 @@ angular.module('oppia').component('questionMisconceptionEditor', {
           outcome.feedback.setHtml(
             ctrl.selectedMisconception.getFeedback());
           ctrl.getOnSaveAnswerGroupFeedbackFn()(outcome);
-          ExplorationSaveService.onExternalSave.emit();
+          RouterService.onExternalSave.emit();
         }
         ctrl.misconceptionEditorIsOpen = false;
       };

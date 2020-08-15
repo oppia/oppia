@@ -58,7 +58,7 @@ require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/id-generation.service.ts');
 require('services/user.service.ts');
-require('pages/exploration-editor-page/services/exploration-save.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 import WaveSurfer from 'wavesurfer.js';
 import { Subscription } from 'rxjs';
@@ -138,7 +138,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         '$filter', '$interval', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService',
-        'ExplorationSaveService', 'ExplorationStatesService',
+        'RouterService', 'ExplorationStatesService',
         'IdGenerationService', 'SiteAnalyticsService',
         'StateEditorService', 'StateRecordedVoiceoversService',
         'TranslationLanguageService', 'TranslationStatusService',
@@ -148,7 +148,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             $filter, $interval, $rootScope, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService,
-            ExplorationSaveService, ExplorationStatesService,
+            RouterService, ExplorationStatesService,
             IdGenerationService, SiteAnalyticsService,
             StateEditorService, StateRecordedVoiceoversService,
             TranslationLanguageService, TranslationStatusService,
@@ -541,7 +541,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             });
 
             ctrl.directiveSubscriptions.add(
-              ExplorationSaveService.onExternalSave.subscribe(() => {
+              RouterService.onExternalSave.subscribe(() => {
                 if ($scope.voiceoverRecorder.status().isRecording) {
                   $scope.voiceoverRecorder.stopRecord();
                   $scope.voiceoverRecorder.closeRecorder();

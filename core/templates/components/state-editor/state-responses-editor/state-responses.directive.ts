@@ -85,7 +85,7 @@ require('services/exploration-html-formatter.service.ts');
 require('services/generate-content-id.service.ts');
 require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('pages/exploration-editor-page/services/exploration-save.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -111,7 +111,7 @@ angular.module('oppia').directive('stateResponses', [
       controller: [
         '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'AnswerGroupObjectFactory', 'ContextService',
-        'EditabilityService', 'ExplorationSaveService', 'ResponsesService',
+        'EditabilityService', 'RouterService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolicitAnswerDetailsService',
@@ -123,7 +123,7 @@ angular.module('oppia').directive('stateResponses', [
         function(
             $filter, $rootScope, $scope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService,
-            EditabilityService, ExplorationSaveService, ResponsesService,
+            EditabilityService, RouterService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
             StateSolicitAnswerDetailsService,
@@ -253,7 +253,7 @@ angular.module('oppia').directive('stateResponses', [
           };
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
-            ExplorationSaveService.onExternalSave.emit();
+            RouterService.onExternalSave.emit();
             ResponsesService.changeActiveAnswerGroupIndex(newIndex);
             $scope.activeAnswerGroupIndex = (
               ResponsesService.getActiveAnswerGroupIndex());
@@ -306,7 +306,7 @@ angular.module('oppia').directive('stateResponses', [
 
           $scope.openAddAnswerGroupModal = function() {
             AlertsService.clearWarnings();
-            ExplorationSaveService.onExternalSave.emit();
+            RouterService.onExternalSave.emit();
             var stateName = StateEditorService.getActiveStateName();
             var addState = $scope.addState;
             var currentInteractionId = $scope.getCurrentInteractionId();
@@ -557,7 +557,7 @@ angular.module('oppia').directive('stateResponses', [
 
                 $scope.activeAnswerGroupIndex = (
                   ResponsesService.getActiveAnswerGroupIndex());
-                ExplorationSaveService.onExternalSave.emit();
+                RouterService.onExternalSave.emit();
               })
             );
 
@@ -568,7 +568,7 @@ angular.module('oppia').directive('stateResponses', [
             ctrl.directiveSubscriptions.add(
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 (newInteractionId) => {
-                  ExplorationSaveService.onExternalSave.emit();
+                  RouterService.onExternalSave.emit();
                   ResponsesService.onInteractionIdChanged(newInteractionId,
                     function(newAnswerGroups, newDefaultOutcome) {
                       $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
@@ -632,7 +632,7 @@ angular.module('oppia').directive('stateResponses', [
               revert: 100,
               tolerance: 'pointer',
               start: function(e, ui) {
-                ExplorationSaveService.onExternalSave.emit();
+                RouterService.onExternalSave.emit();
                 $scope.changeActiveAnswerGroupIndex(-1);
                 ui.placeholder.height(ui.item.height());
               },

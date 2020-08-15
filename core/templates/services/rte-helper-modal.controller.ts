@@ -20,14 +20,14 @@ angular.module('oppia').controller('RteHelperModalController', [
   '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
   'AssetsBackendApiService', 'ContextService', 'FocusManagerService',
   'ImageLocalStorageService', 'ImageUploadHelperService',
-  'ExplorationSaveService',
+  'RouterService',
   'attrsCustomizationArgsDict', 'customizationArgSpecs',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $scope, $timeout, $uibModalInstance, AlertsService,
       AssetsBackendApiService, ContextService, FocusManagerService,
       ImageLocalStorageService, ImageUploadHelperService,
-      ExplorationSaveService,
+      RouterService,
       attrsCustomizationArgsDict, customizationArgSpecs,
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     var extractVideoIdFromVideoUrl = function(videoUrl) {
@@ -98,7 +98,7 @@ angular.module('oppia').controller('RteHelperModalController', [
       }
     };
     $scope.save = function() {
-      ExplorationSaveService.onExternalSave.emit();
+      RouterService.onExternalSave.emit();
 
       var customizationArgsDict = {};
       // For the case of the math rich text components, we need to handle the

@@ -29,7 +29,7 @@ require(
   'state-name.service.ts');
 require('services/editability.service.ts');
 require('services/stateful/focus-manager.service.ts');
-require('pages/exploration-editor-page/services/exploration-save.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -52,12 +52,10 @@ angular.module('oppia').directive('stateNameEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$rootScope', 'EditabilityService',
-        'ExplorationSaveService',
         'StateEditorService', 'StateNameService', 'FocusManagerService',
         'ExplorationStatesService', 'RouterService',
         function(
             $scope, $filter, $rootScope, EditabilityService,
-            ExplorationSaveService,
             StateEditorService, StateNameService, FocusManagerService,
             ExplorationStatesService, RouterService) {
           var ctrl = this;
@@ -91,7 +89,7 @@ angular.module('oppia').directive('stateNameEditor', [
                 StateEditorService.getActiveStateName(), normalizedNewName);
               StateNameService.setStateNameEditorVisibility(false);
               // Save the contents of other open fields.
-              ExplorationSaveService.onExternalSave.emit();
+              RouterService.onExternalSave.emit();
               ctrl.initStateNameEditor();
               return true;
             }
@@ -119,7 +117,7 @@ angular.module('oppia').directive('stateNameEditor', [
           };
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
-              ExplorationSaveService.onExternalSave.subscribe(
+              RouterService.onExternalSave.subscribe(
                 () => {
                   if (StateNameService.isStateNameEditorShown()) {
                     ctrl.saveStateName(ctrl.tmpStateName);

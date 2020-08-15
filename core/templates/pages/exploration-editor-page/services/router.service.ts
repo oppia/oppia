@@ -31,11 +31,11 @@ import { EventEmitter } from '@angular/core';
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$q', '$rootScope', '$timeout', '$window',
   'ExplorationImprovementsService', 'ExplorationInitStateNameService',
-  'ExplorationSaveService', 'ExplorationStatesService', 'StateEditorService',
+  'ExplorationStatesService', 'StateEditorService',
   function(
       $interval, $location, $q, $rootScope, $timeout, $window,
       ExplorationImprovementsService, ExplorationInitStateNameService,
-      ExplorationSaveService, ExplorationStatesService, StateEditorService) {
+      ExplorationStatesService, StateEditorService) {
     var TABS = {
       MAIN: {name: 'main', path: '/main'},
       TRANSLATION: {name: 'translation', path: '/translation'},
@@ -73,6 +73,9 @@ angular.module('oppia').factory('RouterService', [
     var refreshStatisticsTabEventEmitter = new EventEmitter();
     /** @private */
     var refreshTranslationTabEventEmitter = new EventEmitter();
+    /** @private */
+    var externalSaveEventEmitter = new EventEmitter();
+
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -89,7 +92,7 @@ angular.module('oppia').factory('RouterService', [
 
       // TODO(oparry): Determine whether this is necessary, since
       // _savePendingChanges() is called by each of the navigateTo... functions.
-      ExplorationSaveService.onExternalSave.emit();
+      externalSaveEventEmitter.emit();
 
       if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
         activeTabName = TABS.TRANSLATION.name;
@@ -164,12 +167,12 @@ angular.module('oppia').factory('RouterService', [
 
     var _savePendingChanges = function() {
       try {
-        ExplorationSaveService.onExternalSave.emit();
+        externalSaveEventEmitter.emit();
       } catch (e) {
         // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
         // null" error. To get around this we must use $apply().
         $rootScope.$apply(function() {
-          ExplorationSaveService.onExternalSave.emit();
+          externalSaveEventEmitter.emit();
         });
       }
     };
@@ -278,6 +281,9 @@ angular.module('oppia').factory('RouterService', [
       },
       get onRefreshTranslationTab() {
         return refreshTranslationTabEventEmitter;
+      },
+      get onExternalSave() {
+        return externalSaveEventEmitter;
       }
     };
 

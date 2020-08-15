@@ -26,7 +26,7 @@ require(
   'state-property.service.ts');
 require('services/context.service.ts');
 require('services/editability.service.ts');
-require('pages/exploration-editor-page/services/exploration-save.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -46,10 +46,10 @@ angular.module('oppia').directive('hintEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'ContextService', 'EditabilityService',
-        'ExplorationSaveService', 'StateHintsService',
+        'RouterService', 'StateHintsService',
         function(
             $scope, ContextService, EditabilityService,
-            ExplorationSaveService, StateHintsService) {
+            RouterService, StateHintsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.openHintEditor = function() {
@@ -82,7 +82,7 @@ angular.module('oppia').directive('hintEditor', [
 
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
-              ExplorationSaveService.onExternalSave.subscribe(() => {
+              RouterService.onExternalSave.subscribe(() => {
                 if (ctrl.hintEditorIsOpen &&
                       ctrl.editHintForm.$valid) {
                   ctrl.saveThisHint();
