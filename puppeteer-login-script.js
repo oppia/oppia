@@ -75,7 +75,8 @@ const setRoleAdmin = async function(context, page) {
     await page.click('#update-button-id');
     await page.waitForSelector('.protractor-test-status-message');
     await page.waitForFunction(
-      'document.querySelector(".protractor-test-status-message").innerText.includes(' +
+      'document.querySelector(' +
+        '".protractor-test-status-message").innerText.includes(' +
         '"successfully updated to")'
     );
     // eslint-disable-next-line no-console
