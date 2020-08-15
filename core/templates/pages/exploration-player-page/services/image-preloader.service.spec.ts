@@ -653,6 +653,12 @@ describe('Image preloader service', function() {
         'sol_height_ds_width_60.png');
     }).toThrowError(
       /it does not contain dimensions/);
+    var mathSvgDimensions = ips.getDimensionsOfMathSvgs(
+      'mathImg_20207261338r3ir43lmfd_height_2d456_width_6d124_vertical_0' +
+      'd231.svg');
+    expect(mathSvgDimensions.height).toBe('2.456');
+    expect(mathSvgDimensions.width).toBe('6.124');
+    expect(mathSvgDimensions.verticalPadding).toBe('0.231');
   });
 
   it('should get image url', function() {
