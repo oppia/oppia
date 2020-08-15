@@ -69,6 +69,6 @@ describe('Skill Difficulty object factory', () => {
       skillDifficulty.setDifficulty(0.5);
       expect(skillDifficulty.getDifficulty()).toEqual(0.5);
     });
-
+    
   });
 });
