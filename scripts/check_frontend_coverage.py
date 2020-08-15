@@ -92,7 +92,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'contribution-and-review.service.ts',
     'contribution-opportunities-backend-api.service.ts',
     'contribution-opportunities.service.ts',
-    'contributions-and-review.directive.ts',
     'conversation-skin.directive.ts',
     'conversion.ts',
     'convert-to-plain-text.filter.ts',

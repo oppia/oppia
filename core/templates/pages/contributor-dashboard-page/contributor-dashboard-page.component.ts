@@ -25,7 +25,7 @@ require(
   'lazy-loading.component.ts');
 require(
   'pages/contributor-dashboard-page/contributions-and-review/' +
-  'contributions-and-review.directive.ts');
+  'contributions-and-review.component.ts');
 require(
   'pages/contributor-dashboard-page/translation-language-selector/' +
   'translation-language-selector.component.ts');
