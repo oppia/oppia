@@ -23,7 +23,7 @@ interface ImageUploaderCustomScope extends ng.IScope {
   errorMessage?: string;
   onFileChanged?: (file: File, fileName?: string) => void;
   fileInputClassName?: string;
-  getAllowedImageFormats?: () => Array<string>;
+  getAllowedImageFormats?: () => string[];
 }
 
 angular.module('oppia').directive('imageUploader', [
