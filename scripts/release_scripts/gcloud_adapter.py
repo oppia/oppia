@@ -134,6 +134,10 @@ def switch_version(app_name, version_to_switch_to):
         common.GCLOUD_PATH, 'app', 'services', 'set-traffic',
         'default', '--splits', '%s=1' % version_to_switch_to,
         '--project=%s' % app_name])
+    subprocess.check_output([
+        common.GCLOUD_PATH, 'app', 'services', 'set-traffic',
+        'cloud-datastore-admin', '--splits', '%s=1' % version_to_switch_to,
+        '--project=%s' % app_name])
 
 
 def deploy_application(app_yaml_path, app_name, version=None):
