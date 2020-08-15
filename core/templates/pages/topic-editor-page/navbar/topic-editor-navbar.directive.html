@@ -25,7 +25,7 @@
         </span>
       </button>
       <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle dropdown-toggle"
-              ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
+              ng-disabled="!getChangeListLength()" aria-label="Dropdown toggle" uib-dropdown-toggle>
       </button>
       <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && topicRights.isPublished() ? '150px' : '120px' }">
         <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item">Discard Draft</a></li>
