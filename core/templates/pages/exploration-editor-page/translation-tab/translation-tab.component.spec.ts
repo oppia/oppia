@@ -90,8 +90,6 @@ describe('Translation tab component', function() {
       TestBed.get(ExplorationImprovementsTaskRegistryService));
     $provide.value('ExplorationStatsService',
       TestBed.get(ExplorationStatsService));
-    // $provide.value()
-    // $provide.value('GenerateContentIdService', generateContentIdService);
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
@@ -506,11 +504,6 @@ describe('Translation tab component', function() {
       expect(elementMock.animate).toHaveBeenCalledWith({
         scrollTop: 0
       }, 1000);
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[3].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[5].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[7].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[9].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[11].fn();
     });
 
     it('should animate html and body to 20px top when calling function' +
@@ -541,11 +534,6 @@ describe('Translation tab component', function() {
       expect(elementMock.animate).toHaveBeenCalledWith({
         scrollTop: 0
       }, 1000);
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[3].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[5].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[7].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[9].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[11].fn();
     });
 
     it('should animate html and body to 20px top when calling function' +
@@ -576,11 +564,6 @@ describe('Translation tab component', function() {
       expect(elementMock.animate).toHaveBeenCalledWith({
         scrollTop: 0
       }, 1000);
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[3].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[5].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[7].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[9].fn();
-      // $scope.TRANSLATION_TUTORIAL_OPTIONS[11].fn();
     });
 
     it('should animate html and body to 20px top when calling function' +

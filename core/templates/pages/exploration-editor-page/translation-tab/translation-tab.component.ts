@@ -21,7 +21,7 @@ require(
   'attribution-guide.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
-  'state-translation.directive.ts');
+  'state-translation.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/modal-templates/' +
   'welcome-translation-modal.controller.ts');
