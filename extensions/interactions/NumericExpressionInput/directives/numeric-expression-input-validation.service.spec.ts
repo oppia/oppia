@@ -85,7 +85,7 @@ describe('NumericExpressionInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -96,7 +96,8 @@ describe('NumericExpressionInputValidationService', () => {
 
   it('should catch redundancy of rules with matching inputs', () => {
     // The second rule will never get matched.
-    answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
+    answerGroups[0].updateRuleTypesToInputs(
+      [isEquivalentTo, matchesExactlyWith]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -121,7 +122,7 @@ describe('NumericExpressionInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
+    answerGroups[0].updateRuleTypesToInputs([isEquivalentTo1, isEquivalentTo2]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -146,7 +147,8 @@ describe('NumericExpressionInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
+    answerGroups[0].updateRuleTypesToInputs(
+      [matchesExactlyWith1, matchesExactlyWith2]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -158,13 +160,6 @@ describe('NumericExpressionInputValidationService', () => {
   });
 
   it('should not catch redundancy of rules with non-matching inputs', () => {
-    answerGroups[0].rules = [matchesExactlyWith, isEquivalentTo];
-
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
-
-
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
@@ -178,7 +173,8 @@ describe('NumericExpressionInputValidationService', () => {
       }
     });
 
-    answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
+    answerGroups[0].updateRuleTypesToInputs(
+      [isEquivalentTo, matchesExactlyWith]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);

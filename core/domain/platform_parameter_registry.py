@@ -19,7 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import core.domain.platform_parameter_domain as param_domain
+from core.domain import platform_parameter_domain
 from core.platform import models
 import feconf
 import python_utils
@@ -29,7 +29,7 @@ import python_utils
     [models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
 
-DATA_TYPES = param_domain.DATA_TYPES # pylint: disable=invalid-name
+DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
 
 class Registry(python_utils.OBJECT):
@@ -143,7 +143,8 @@ class Registry(python_utils.OBJECT):
         else:
             raise Exception('Platform parameter not found: %s.' % name)
 
-        memcache_key = param_domain.PlatformParameter.get_memcache_key(name)
+        memcache_key = (
+            platform_parameter_domain.PlatformParameter.get_memcache_key(name))
         memcache_services.set_multi({
             memcache_key: parameter,
         })
@@ -174,7 +175,7 @@ class Registry(python_utils.OBJECT):
         model_instance = cls._to_platform_parameter_model(param)
 
         new_rules = [
-            param_domain.PlatformParameterRule.from_dict(rule_dict)
+            platform_parameter_domain.PlatformParameterRule.from_dict(rule_dict)
             for rule_dict in new_rule_dicts]
         param.set_rules(new_rules)
 
@@ -183,13 +184,15 @@ class Registry(python_utils.OBJECT):
             committer_id,
             commit_message,
             [{
-                'cmd': param_domain.PlatformParameterChange.CMD_EDIT_RULES,
+                'cmd': (
+                    platform_parameter_domain
+                    .PlatformParameterChange.CMD_EDIT_RULES),
                 'new_rules': new_rule_dicts
             }]
         )
 
         memcache_services.delete(
-            param_domain.PlatformParameter.get_memcache_key(name))
+            platform_parameter_domain.PlatformParameter.get_memcache_key(name))
 
     @classmethod
     def get_all_platform_parameter_names(cls):
@@ -229,7 +232,8 @@ class Registry(python_utils.OBJECT):
         Returns:
             PlatformParameter. The created platform parameter.
         """
-        parameter = param_domain.PlatformParameter.from_dict(parameter_dict)
+        parameter = platform_parameter_domain.PlatformParameter.from_dict(
+            parameter_dict)
 
         cls.init_platform_parameter(parameter.name, parameter)
 
@@ -251,7 +255,7 @@ class Registry(python_utils.OBJECT):
 
         if parameter_model:
             param_with_init_settings = cls.parameter_registry.get(name)
-            return param_domain.PlatformParameter.from_dict({
+            return platform_parameter_domain.PlatformParameter.from_dict({
                 'name': param_with_init_settings.name,
                 'description': param_with_init_settings.description,
                 'data_type': param_with_init_settings.data_type,
@@ -275,7 +279,8 @@ class Registry(python_utils.OBJECT):
             PlatformParameter|None. The loaded instance, None if it's not found
             in cache.
         """
-        memcache_key = param_domain.PlatformParameter.get_memcache_key(name)
+        memcache_key = (
+            platform_parameter_domain.PlatformParameter.get_memcache_key(name))
         cached_parameter = memcache_services.get_multi([memcache_key]).get(
             memcache_key)
         return cached_parameter
