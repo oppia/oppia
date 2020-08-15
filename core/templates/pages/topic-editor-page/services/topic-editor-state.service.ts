@@ -108,10 +108,11 @@ angular.module('oppia').factory('TopicEditorStateService', [
       // Reset the subtopic pages list after setting new topic.
       _cachedSubtopicPages.length = 0;
       if (_topicIsInitialized) {
+        _topicIsInitialized = true;
         _topicReinitializedEventEmitter.emit();
       } else {
-        _topicInitializedEventEmitter.emit();
         _topicIsInitialized = true;
+        _topicInitializedEventEmitter.emit();
       }
     };
     var _getSubtopicPageIndex = function(subtopicPageId) {
