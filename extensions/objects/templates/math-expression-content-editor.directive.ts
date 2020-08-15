@@ -65,11 +65,11 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
               ctrl.svgString = (
                 outputElement[0].getElementsByTagName('svg')[0].outerHTML);
             }
-            if (ctrl.numberOfElementsInQueue <= 1) {
+            ctrl.numberOfElementsInQueue--;
+            if (ctrl.numberOfElementsInQueue === 0) {
               ctrl.value.mathExpressionSvgIsBeingProcessed = false;
               $scope.$apply();
             }
-            ctrl.numberOfElementsInQueue--;
           });
         };
         // This method cleans the SVG string and generates a filename before
