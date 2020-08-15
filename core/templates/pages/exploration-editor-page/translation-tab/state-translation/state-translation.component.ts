@@ -209,10 +209,11 @@ angular.module('oppia').component('stateTranslation', {
         var outcome = answerGroup.outcome;
         var hasFeedback = outcome.hasNonemptyFeedback();
 
-        if (answerGroup.rules) {
+        if (answerGroup.getRulesAsList()) {
           var firstRule = $filter('convertToPlainText')(
             $filter('parameterizeRuleDescription')(
-              answerGroup.rules[0], interactionId, answerChoices));
+              answerGroup.getRulesAsList()[0],
+              interactionId, answerChoices));
           summary = 'Answer ' + firstRule;
 
           if (hasFeedback && shortenRule) {

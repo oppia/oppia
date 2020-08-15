@@ -50,7 +50,7 @@ describe('Skill editor page', function() {
     ctrl = $componentController('skillEditorPage');
   }));
 
-  it('should load skill based on its id on url when component is initialized',
+  it('should load skill based on its id in url when component is initialized',
     function() {
       spyOn(SkillEditorStateService, 'loadSkill').and.stub();
       spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
@@ -59,37 +59,36 @@ describe('Skill editor page', function() {
       expect(SkillEditorStateService.loadSkill).toHaveBeenCalledWith('skill_1');
     });
 
-  it('should get active tab name', function() {
-    spyOn(SkillEditorRoutingService, 'getActiveTabName').and.returnValue(
-      'questions');
-    expect(ctrl.getActiveTabName()).toBe('questions');
+  it('should get active tab name from skill editor routing service',
+    function() {
+      spyOn(SkillEditorRoutingService, 'getActiveTabName').and.returnValue(
+        'questions');
+      expect(ctrl.getActiveTabName()).toBe('questions');
+    });
+
+  it('should go to main tab when selecting main tab', function() {
+    var routingSpy = spyOn(
+      SkillEditorRoutingService, 'navigateToMainTab');
+    ctrl.selectMainTab();
+    expect(routingSpy).toHaveBeenCalled();
   });
 
-  it('should call SkillEditorRoutingService to navigate to main tab',
-    function() {
-      var routingSpy = spyOn(
-        SkillEditorRoutingService, 'navigateToMainTab');
-      ctrl.selectMainTab();
-      expect(routingSpy).toHaveBeenCalled();
-    });
+  it('should go to preview tab when selecting preview tab', function() {
+    var routingSpy = spyOn(
+      SkillEditorRoutingService, 'navigateToPreviewTab');
+    ctrl.selectPreviewTab();
+    expect(routingSpy).toHaveBeenCalled();
+  });
 
-  it('should call SkillEditorRoutingService to navigate to preview tab',
-    function() {
-      var routingSpy = spyOn(
-        SkillEditorRoutingService, 'navigateToPreviewTab');
-      ctrl.selectPreviewTab();
-      expect(routingSpy).toHaveBeenCalled();
-    });
+  it('should open save changes modal with $uibModal when unsaved changes are' +
+    ' present', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    ctrl.selectQuestionsTab();
+    expect(modalSpy).toHaveBeenCalled();
+  });
 
-  it('should call open save changes modal if unsaved changes are present',
-    function() {
-      spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
-      ctrl.selectQuestionsTab();
-      expect(modalSpy).toHaveBeenCalled();
-    });
-
-  it('should call open save changes modal if unsaved changes are present',
+  it('should navigate to questions tab when unsaved changes are not present',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
       var routingSpy = spyOn(
