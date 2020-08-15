@@ -34,10 +34,10 @@ class GuppyObject {
   providedIn: 'root'
 })
 export class GuppyInitializationService {
-  private guppyInstances: Array<GuppyObject> = [];
+  private guppyInstances: GuppyObject[] = [];
   private onScreenKeyboardShown = false;
   static interactionType: string;
-  static customOskLetters: Array<string> = [];
+  static customOskLetters: string[] = [];
 
   init(guppyDivClassName: string, placeholderText: string, initialValue = ''):
       void {
