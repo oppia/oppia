@@ -29,8 +29,8 @@ import { Subscription } from 'rxjs';
 // in via initArgs.
 
 angular.module('oppia').directive('mathExpressionContentEditor', [
-  'AlertsService', 'ImageUploadHelperService',
-  function(AlertsService, ImageUploadHelperService) {
+  'AlertsService', 'ImageUploadHelperService', 'RouterService',
+  function(AlertsService, ImageUploadHelperService, RouterService) {
     return {
       restrict: 'E',
       scope: {},
