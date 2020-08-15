@@ -1413,6 +1413,9 @@ angular.module('oppia').directive('conversationSkin', [
               );
             }
           };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          };
         }
       ]
     };
