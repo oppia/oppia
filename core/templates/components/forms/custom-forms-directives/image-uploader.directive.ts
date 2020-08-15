@@ -23,7 +23,7 @@ interface ImageUploaderCustomScope extends ng.IScope {
   errorMessage?: string;
   onFileChanged?: (file: File, fileName?: string) => void;
   fileInputClassName?: string;
-  allowedImageFormats?: string;
+  getAllowedImageFormats?: () => Array<string>;
 }
 
 angular.module('oppia').directive('imageUploader', [
@@ -36,7 +36,7 @@ angular.module('oppia').directive('imageUploader', [
         onFileChanged: '=',
         errorMessage: '@',
         width: '@',
-        allowedImageFormats: '@'
+        getAllowedImageFormats: '&allowedImageFormats'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
@@ -56,12 +56,12 @@ angular.module('oppia').directive('imageUploader', [
           var imageTypeMapping = {
             jpeg: {
               format: 'image/jpeg',
-              condition: [/jp(e?)g$/, /\.jp(e?)g$/],
+              condition: [/jpeg$/, /\.jpeg$/],
             },
             jpg: {
               format: 'image/jpg',
-              fileType: /jp(e?)g$/,
-              fileExtension: /\.jp(e?)g$/,
+              fileType: /jpg$/,
+              fileExtension: /\.jpg$/,
             },
             gif: {
               format: 'image/gif',
@@ -79,26 +79,27 @@ angular.module('oppia').directive('imageUploader', [
               fileExtension: /\.svg$/,
             }
           };
-
-          var imageFormatCheck = true;
-          var imageExtensionCheck = false;
-          var allowedImageFormats = JSON.parse(scope.allowedImageFormats);
-          for (var i = 0; i < allowedImageFormats.length; i++) {
-            var fileType = allowedImageFormats[i];
-            imageFormatCheck = (
-              imageFormatCheck &&
+          var imageHasValidFormat = true;
+          var imageHasValidExtension = false;
+          for (var i = 0; i < scope.getAllowedImageFormats().length; i++) {
+            var fileType = scope.getAllowedImageFormats()[i];
+            if (!(fileType in imageTypeMapping)) {
+              return 'Unknown image format in allowed image formats.';
+            }
+            imageHasValidFormat = (
+              imageHasValidFormat &&
               !file.type.match(imageTypeMapping[fileType].format));
-            imageExtensionCheck = (
-              imageExtensionCheck ||
+            imageHasValidExtension = (
+              imageHasValidExtension ||
               (file.type.match(imageTypeMapping[fileType].fileType) &&
               !file.name.match(imageTypeMapping[fileType].fileExtension)));
           }
 
-          if (imageFormatCheck) {
+          if (imageHasValidFormat) {
             return 'This image format is not supported.';
           }
 
-          if (imageExtensionCheck) {
+          if (imageHasValidExtension) {
             return 'This image format does not match the filename extension.';
           }
 

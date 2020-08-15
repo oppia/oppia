@@ -33,7 +33,7 @@
        ng-attr-style="<[$ctrl.getImageContainerDynamicStyles()]>">
     <div ng-if="$ctrl.isNoImageUploaded()">
       <image-uploader on-file-changed="$ctrl.onFileChanged"
-                      allowed-image-formats="<[$ctrl.allowedImageFormats]>">
+                      allowed-image-formats="$ctrl.allowedImageFormats">
       </image-uploader>
     </div>
     <div ng-if="$ctrl.isImageUploaded()"
