@@ -31,6 +31,7 @@ describe('Story viewer backend API service', () => {
   let httpTestingController: HttpTestingController;
 
   let sampleDataResults = {
+    story_id: 'qwerty',
     story_title: 'Story title',
     story_description: 'Story description',
     story_nodes: [],

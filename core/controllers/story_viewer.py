@@ -80,6 +80,7 @@ class StoryPageDataHandler(base.BaseHandler):
             node['exp_summary_dict'] = exp_summary_dicts[ind]
 
         self.values.update({
+            'story_id': story.id,
             'story_title': story.title,
             'story_description': story.description,
             'story_nodes': ordered_node_dicts,

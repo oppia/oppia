@@ -222,6 +222,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
                 '%s/staging/topic/%s'
                 % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT))
             expected_dict = {
+                'story_id': self.STORY_ID,
                 'story_title': 'Title',
                 'story_description': 'Description',
                 'story_nodes': [self.node_2, self.node_1, self.node_3],
