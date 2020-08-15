@@ -27,6 +27,7 @@ describe('Skill Difficulty object factory', () => {
       skillDifficultyObjectFactory = new SkillDifficultyObjectFactory();
     });
 
+
     it('should create a new skill difficulty instance', () => {
       var skillDifficulty =
         skillDifficultyObjectFactory.create('1', 'test skill', 0.3);
@@ -34,6 +35,7 @@ describe('Skill Difficulty object factory', () => {
       expect(skillDifficulty.getDescription()).toEqual('test skill');
       expect(skillDifficulty.getDifficulty()).toEqual(0.3);
     });
+
 
     it('should convert to a backend dictionary', () => {
       var skillDifficulty =
@@ -46,6 +48,7 @@ describe('Skill Difficulty object factory', () => {
       expect(skillDifficulty.toBackendDict()).toEqual(skillDifficultyDict);
     });
 
+
     it('should set the description of the skill difficulty instance', () => {
       var skillDifficulty = skillDifficultyObjectFactory.create(
         '1', 'test skill', 0.3);
@@ -56,6 +59,7 @@ describe('Skill Difficulty object factory', () => {
       expect(skillDifficulty.getDescription()).toEqual('new test skill');
     });
 
+
     it('should set the difficulty of the skill difficulty instance', () => {
       var skillDifficulty =
         skillDifficultyObjectFactory.create('1', 'test skill', 0.3);
@@ -65,5 +69,6 @@ describe('Skill Difficulty object factory', () => {
       skillDifficulty.setDifficulty(0.5);
       expect(skillDifficulty.getDifficulty()).toEqual(0.5);
     });
+
   });
 });
