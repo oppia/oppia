@@ -97,11 +97,11 @@ export class GuppyInitializationService {
     this.onScreenKeyboardShown = value;
   }
 
-  getCustomOskLetters(): Array<string> {
+  getCustomOskLetters(): string[] {
     return GuppyInitializationService.customOskLetters;
   }
 
-  setCustomOskLetters(customOskLetters: Array<string>): void {
+  setCustomOskLetters(customOskLetters: string[]): void {
     GuppyInitializationService.customOskLetters = customOskLetters;
   }
 }

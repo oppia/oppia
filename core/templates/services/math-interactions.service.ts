@@ -85,7 +85,7 @@ export class MathInteractionsService {
   }
 
   _validateExpression(
-      expressionString: string, validVariablesList: Array<string>): boolean {
+      expressionString: string, validVariablesList: string[]): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     if (expressionString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -118,7 +118,7 @@ export class MathInteractionsService {
   }
 
   validateAlgebraicExpression(
-      expressionString: string, validVariablesList: Array<string>) {
+      expressionString: string, validVariablesList: string[]) {
     if (!this._validateExpression(expressionString, validVariablesList)) {
       return false;
     }
@@ -161,7 +161,7 @@ export class MathInteractionsService {
   }
 
   validateEquation(
-      equationString: string, validVariablesList: Array<string>): boolean {
+      equationString: string, validVariablesList: string[]): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
