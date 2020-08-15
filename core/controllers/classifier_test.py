@@ -279,7 +279,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=200)
         self.assertEqual(
-            response['gcs_file_name'],
+            response['gcs_filename'],
             classifier_training_job.classifier_data_filename)
 
     def test_error_on_incorrect_exploration_id_for_retrieving_model(self):

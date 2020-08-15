@@ -159,8 +159,10 @@ class TrainedClassifierHandler(base.BaseHandler):
             interaction_id = exploration.states[state_name].interaction.id
         except:
             raise self.InvalidInputException(
-                'Entity for exploration with id %s and version %s not found.'
-                % (exploration_id, self.request.get('exploration_version')))
+                'Entity for exploration with id %s, version %s and state %s '
+                'not found.' % (
+                    exploration_id, self.request.get('exploration_version'),
+                    state_name))
 
         if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
             raise self.PageNotFoundException(
@@ -208,7 +210,7 @@ class TrainedClassifierHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         return self.render_json({
-            'gcs_file_name': training_job.classifier_data_filename
+            'gcs_filename': training_job.classifier_data_filename
         })
 
 

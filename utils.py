@@ -796,7 +796,7 @@ def compress_to_zlib(data):
 
 
 def decompress_from_zlib(data):
-    """Decompress the data to zlib format.
+    """Decompress the zlib compressed data.
 
     Args:
         data: str. Data to be decompressed.

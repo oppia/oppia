@@ -417,12 +417,14 @@ def get_state_training_jobs_mapping(exp_id, exp_version, state_name):
     state_training_jobs_mapping_model = (
         classifier_models.StateTrainingJobsMappingModel.get_model(
             exp_id, exp_version, state_name))
-    if state_training_jobs_mapping_model:
-        return classifier_domain.StateTrainingJobsMapping(
-            state_training_jobs_mapping_model.exp_id,
-            state_training_jobs_mapping_model.exp_version,
-            state_training_jobs_mapping_model.state_name,
-            state_training_jobs_mapping_model.algorithm_ids_to_job_ids)
+    if state_training_jobs_mapping_model is None:
+        return None
+
+    return classifier_domain.StateTrainingJobsMapping(
+        state_training_jobs_mapping_model.exp_id,
+        state_training_jobs_mapping_model.exp_version,
+        state_training_jobs_mapping_model.state_name,
+        state_training_jobs_mapping_model.algorithm_ids_to_job_ids)
 
 
 def migrate_state_training_jobs(state_training_jobs_mapping):
