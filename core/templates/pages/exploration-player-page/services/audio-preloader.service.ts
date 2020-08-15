@@ -82,7 +82,7 @@ angular.module('oppia').factory('AudioPreloaderService', [
         if (_audioLoadedCallback) {
           _audioLoadedCallback(loadedAudio.filename);
         }
-      });
+      }, () => {});
     };
 
     var _kickOffAudioPreloader = function(sourceStateName) {
