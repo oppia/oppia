@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { EventEmitter } from '@angular/core';
+
 /**
  * @fileoverview Service for setting focus. This broadcasts a 'focusOn' event
  * which sets focus to the element in the page with the corresponding focusOn
@@ -23,12 +25,15 @@
 require('services/contextual/device-info.service.ts');
 require('services/id-generation.service.ts');
 angular.module('oppia').factory('FocusManagerService', [
-  '$rootScope', '$timeout', 'DeviceInfoService', 'IdGenerationService',
+  '$timeout', 'DeviceInfoService', 'IdGenerationService',
   'LABEL_FOR_CLEARING_FOCUS',
   function(
-      $rootScope, $timeout, DeviceInfoService, IdGenerationService,
+      $timeout, DeviceInfoService, IdGenerationService,
       LABEL_FOR_CLEARING_FOCUS) {
     var _nextLabelToFocusOn = null;
+
+    var _focusEventEmitter = new EventEmitter();
+
     return {
       clearFocus: function() {
         this.setFocus(LABEL_FOR_CLEARING_FOCUS);
@@ -40,7 +45,7 @@ angular.module('oppia').factory('FocusManagerService', [
 
         _nextLabelToFocusOn = name;
         $timeout(function() {
-          $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
+          _focusEventEmitter.emit(_nextLabelToFocusOn);
           _nextLabelToFocusOn = null;
         });
       },
@@ -52,6 +57,10 @@ angular.module('oppia').factory('FocusManagerService', [
       // Generates a random string (to be used as a focus label).
       generateFocusLabel: function() {
         return IdGenerationService.generateNewId();
+      },
+
+      get onFocus() {
+        return _focusEventEmitter;
       }
     };
   }

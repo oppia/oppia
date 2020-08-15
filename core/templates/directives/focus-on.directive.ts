@@ -18,21 +18,34 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
+import { Subscription } from 'rxjs';
+
+require('services/stateful/focus-manager.service.ts');
+
 // When set as an attr of an <input> element, moves focus to that element
 // when a 'focusOn' event is broadcast.
 angular.module('oppia').directive('focusOn', [
-  'LABEL_FOR_CLEARING_FOCUS', function(LABEL_FOR_CLEARING_FOCUS) {
+  'FocusManager', 'LABEL_FOR_CLEARING_FOCUS',
+  function(FocusManager, LABEL_FOR_CLEARING_FOCUS) {
+    this.directiveSubscriptions = new Subscription();
     return function(scope, elt, attrs) {
-      scope.$on('focusOn', function(e, name) {
-        if (name === attrs.focusOn) {
-          elt[0].focus();
-        }
+      this.directiveSubscriptions.add(
+        FocusManager.onFocus.subscribe(
+          (name) => {
+            if (name === attrs.focusOn) {
+              elt[0].focus();
+            }
 
-        // If the purpose of the focus switch was to clear focus, blur the
-        // element.
-        if (name === LABEL_FOR_CLEARING_FOCUS) {
-          elt[0].blur();
-        }
+            // If the purpose of the focus switch was to clear focus, blur the
+            // element.
+            if (name === LABEL_FOR_CLEARING_FOCUS) {
+              elt[0].blur();
+            }
+          }
+        )
+      );
+      scope.$on('$destroy', function() {
+        this.directiveSubscriptions.unsubscribe();
       });
     };
   }
