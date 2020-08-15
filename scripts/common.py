@@ -63,10 +63,12 @@ CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
-GOOGLE_APP_ENGINE_HOME = os.path.join(
-    OPPIA_TOOLS_DIR_ABS_PATH, 'google_appengine_1.9.67', 'google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
+GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
+    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
+GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
+GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
 PYCODESTYLE_PATH = os.path.join(
@@ -329,7 +331,14 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
                 'git@github.com:oppia/release-scripts.git'])
 
     with CD(release_scripts_dirpath):
+        ask_user_to_confirm(
+            'Please make sure that the ../release-scripts repo is clean and '
+            'you are on master branch in ../release-scripts repo.')
+        python_utils.PRINT('Verifying that ../release-scripts repo is clean...')
         verify_local_repo_is_clean()
+        python_utils.PRINT(
+            'Verifying that user is on master branch in '
+            '../release-scripts repo...')
         verify_current_branch_name('master')
 
         # Update the local repo.

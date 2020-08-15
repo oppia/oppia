@@ -66,7 +66,7 @@ interface InteractiveMusicNotesInputCustomScope extends ng.IScope {
   playCurrentSequence?: (() => void);
   playSequenceToGuess?: (() => void);
   reinitStaff?: (() => void);
-  sequenceToGuess?: Array<Object>;
+  sequenceToGuess?: Object[];
   staffBottom?: number;
   staffTop?: number;
   submitAnswer?: (() => void);
@@ -194,13 +194,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
             scope.init();
           }, 20);
         };
-
-        // When page is in the smaller one card format, reinitialize staff after
-        // the user navigates to the Interaction Panel. Otherwise the dimensions
-        // for the staff will be incorrectly calculated.
-        scope.$on('showInteraction', function() {
-          scope.reinitStaff();
-        });
 
         // Creates draggable notes and droppable staff.
         scope.init = function() {
