@@ -1135,12 +1135,12 @@ def update_multiple_users_data(modifiable_user_data_list):
 
         user_auth_details_list.append(user_auth_details)
 
-    _save_multiple_users_settings(user_settings_list)
-    _save_multiple_users_auth_details(user_auth_details_list)
+    _save_existing_users_settings(user_settings_list)
+    _save_existing_users_auth_details(user_auth_details_list)
 
 
-def _save_multiple_users_settings(user_settings_list):
-    """Commits a list of UserSettings object to the datastore.
+def _save_existing_users_settings(user_settings_list):
+    """Commits a list of existing users' UserSettings objects to the datastore.
 
     Args: user_settings_list. list(UserSettings). The list of UserSettings
             objects to be saved.
@@ -1184,19 +1184,14 @@ def _save_multiple_users_settings(user_settings_list):
             'deleted': user_settings.deleted
         }
 
-        # If user with the given user_id already exists, update that model
-        # with the given user settings, otherwise, create a new one.
-        if user_model is not None:
-            user_model.populate(**user_settings_dict)
-        else:
-            user_settings_dict['id'] = user_settings.user_id
-            user_model = user_models.UserSettingsModel(**user_settings_dict)
+        user_model.populate(**user_settings_dict)
         final_user_settings_models_list.append(user_model)
     user_models.UserSettingsModel.put_multi(final_user_settings_models_list)
 
 
-def _save_multiple_users_auth_details(user_auth_details_list):
-    """Commits a list of UserAuthDetails object to the datastore.
+def _save_existing_users_auth_details(user_auth_details_list):
+    """Commits a list of existing users' UserAuthDetails objects to the
+    datastore.
 
     Args: user_auth_details_list. list(UserAuthDetails). The list of
             UserAuthDetails objects to be saved.
@@ -1215,16 +1210,7 @@ def _save_multiple_users_auth_details(user_auth_details_list):
             'deleted': user_auth_details.deleted
         }
 
-        # If user auth details entry with the given user_id does not exist,
-        # create a new one.
-        if user_auth_details_model is not None:
-            user_auth_details_model.populate(**user_auth_details_dict)
-
-        else:
-            user_auth_details_dict['id'] = user_auth_details.user_id
-            user_auth_details_model = user_models.UserAuthDetailsModel(
-                **user_auth_details_dict)
-
+        user_auth_details_model.populate(**user_auth_details_dict)
         final_user_auth_models_list.append(user_auth_details_model)
     user_models.UserAuthDetailsModel.put_multi(final_user_auth_models_list)
 

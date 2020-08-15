@@ -911,7 +911,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.update_multiple_users_data(
                 [self.modifiable_user_data])
 
-    def test_updating_multiple_users_data_for_multiple_user_works_fine(self):
+    def test_update_multiple_users_data_for_multiple_users_works_correctly(self):
         # Preparing for the test.
         gae_id = 'gae_id'
         email = 'new@example.com'
