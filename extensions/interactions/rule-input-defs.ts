@@ -27,7 +27,7 @@ import {
 // rule type.
 export interface AlgebraicExpressionRuleInputsWithPlaceholder {
   x: string;
-  y: Array<string>;
+  y: string[];
 }
 
 export interface AlgebraicExpressionRuleInputsWithoutPlaceholder {
@@ -121,7 +121,7 @@ export interface MathEquationRuleInputsWithSide {
 
 export interface MathEquationRuleInputsWithPlaceholder {
   x: string;
-  y: Array<string>;
+  y: string[];
 }
 
 export interface MathEquationRuleInputsWithoutSide {

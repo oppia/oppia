@@ -377,7 +377,7 @@ export class MathInteractionsService {
 
   expressionMatchWithPlaceholders(
       expressionWithPlaceholders: string, expressionWithoutPlaceholders: string,
-      placeholders: Array<string>): boolean {
+      placeholders: string[]): boolean {
     // Check if expressionWithoutPlaceholders contains any placeholders.
     for (let variable of nerdamer(expressionWithoutPlaceholders).variables()) {
       if (placeholders.includes(variable)) {
