@@ -18,6 +18,8 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
+require('domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/image-local-storage.service.ts');
 
@@ -29,14 +31,14 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
   'create-new-skill-modal.controller.ts');
 angular.module('oppia').factory('SkillCreationService', [
-  '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
+  '$timeout', '$uibModal', '$window', 'AlertsService',
   'ImageLocalStorageService', 'SkillCreationBackendApiService',
-  'UrlInterpolationService', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+  'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
   'SKILL_DESCRIPTION_STATUS_VALUES',
   function(
-      $rootScope, $timeout, $uibModal, $window, AlertsService,
+      $timeout, $uibModal, $window, AlertsService,
       ImageLocalStorageService, SkillCreationBackendApiService,
-      UrlInterpolationService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+      TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
       SKILL_DESCRIPTION_STATUS_VALUES) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
@@ -94,8 +96,8 @@ angular.module('oppia').factory('SkillCreationService', [
             result.description, rubrics, result.explanation,
             topicIds || [], imagesData).then(function(response) {
             $timeout(function() {
-              $rootScope.$broadcast(
-                EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, true);
+              TopicsAndSkillsDashboardBackendApiService.
+                onTopicsAndSkillsDashboardReinitialized.emit(true);
               skillCreationInProgress = false;
               ImageLocalStorageService.flushStoredImagesData();
               newTab.location.href = UrlInterpolationService.interpolateUrl(
