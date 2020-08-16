@@ -115,7 +115,7 @@ angular.module('oppia').component('onScreenKeyboard', {
           guppyInstance = activeGuppyObject.guppyInstance;
           engine = guppyInstance.engine;
           ctrl.interactionType = GuppyInitializationService.interactionType;
-          ctrl.customLetters = GuppyInitializationService.customOskLetters;
+          ctrl.customLetters = GuppyInitializationService.getCustomOskLetters();
           return true;
         }
         return false;

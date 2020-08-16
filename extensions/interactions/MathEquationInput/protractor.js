@@ -57,13 +57,13 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'MathEquation';
 
 var testSuite = [{
-  interactionArguments: [['y', 'm', 'x', 'c']],
+  interactionArguments: [['y', 'm', 'x', 'c', 'b']],
   ruleArguments: ['IsEquivalentTo', 'y=m*x+c'],
   expectedInteractionDetails: [],
   wrongAnswers: ['x=m*y+c', 'y+m*x+c=0', 'y=m*x+b', 'y=m*x'],
   correctAnswers: ['y=m*x+c', 'y=c+m*x', 'm*x+c=y', 'y-m*x=c', 'y-m*x-c=0']
 }, {
-  interactionArguments: [['x']],
+  interactionArguments: [['x', 'y']],
   ruleArguments: ['IsEquivalentTo', '(2*x+1)*(x-3)=0'],
   expectedInteractionDetails: [],
   wrongAnswers: ['x-y=x-y', 'x=3', '2*x+1=0', 'x=-1/2'],

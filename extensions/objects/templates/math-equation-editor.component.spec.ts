@@ -106,6 +106,8 @@ describe('MathEquationEditor', function() {
     expect(ctrl.warningText).toBe('Please enter an answer before submitting.');
 
     ctrl.currentValue = 'x=y';
+    spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
+      ['x', 'y']);
     expect(ctrl.isCurrentAnswerValid()).toBeTrue();
     expect(ctrl.warningText).toBe('');
   });
