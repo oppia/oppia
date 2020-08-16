@@ -26,7 +26,7 @@ module.exports = merge(common, {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'webpack_bundles')
   },
-  devtool: 'inline-source-map',
+  devtool: 'eval',
   watchOptions: {
     aggregateTimeout: 500,
     poll: 1000
