@@ -156,7 +156,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'learner-local-nav.directive.ts',
     'learner-view-info.directive.ts',
     'learner-view-rating.service.ts',
-    'library-page.directive.ts',
     'list-of-sets-of-html-strings-editor.directive.ts',
     'list-of-tabs-editor.directive.ts',
     'list-of-unicode-string-editor.directive.ts',

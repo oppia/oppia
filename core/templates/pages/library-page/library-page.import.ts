@@ -25,6 +25,6 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
-require('pages/library-page/library-page.directive.ts');
+require('pages/library-page/library-page.component.ts');
 require('pages/library-page/library-footer/library-footer.component.ts');
 require('pages/library-page/search-bar/search-bar.directive.ts');
