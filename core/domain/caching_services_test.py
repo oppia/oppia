@@ -538,7 +538,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
     def test_topics_with_unicode_characters_are_set_and_get_correctly(
             self):
-        """Test to make sure that a default topics initialized with unicode
+        """Test to make sure that a default topic initialized with unicode
         characters is get and set to the cache without errors.
         """
         topic_id = 'id'
