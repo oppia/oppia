@@ -24,10 +24,12 @@ from core.domain import caching_domain
 from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import exp_domain
+from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import skill_domain
 from core.domain import story_domain
 from core.domain import topic_domain
 from core.tests import test_utils
+import feconf
 
 
 class CachingServicesUnitTests(test_utils.GenericTestBase):
@@ -420,10 +422,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'c': '😃😄'
             })
 
-    def test_objects_with_unicode_characters_are_set_and_get_correctly(
+    def test_explorations_with_unicode_characters_are_set_and_get_correctly(
             self):
-        # Test to make sure that a default exploration initialized with unicode
-        # characters is get and set to the cache without errors.
+        """Test to make sure that a default exploration initialized with unicode
+        characters is get and set to the cache without errors.
+        """
         exploration_id = 'id'
 
         self.assertEqual(
@@ -456,8 +459,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             default_exploration.to_dict(),
             exp_ids_to_explorations[exploration_id].to_dict())
 
-        # Test to make sure that a default collection initialized with unicode
-        # characters is get and set to the cache without errors.
+    def test_collections_with_unicode_characters_are_set_and_get_correctly(
+            self):
+        """Test to make sure that a default collection initialized with unicode
+        characters is get and set to the cache without errors.
+        """
         collection_id = 'id 😍'
 
         self.assertEqual(
@@ -486,8 +492,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             default_collection.to_dict(),
             collections[collection_id].to_dict())
 
-        # Test to make sure that a default skill initialized with unicode
-        # characters is get and set to the cache without errors.
+    def test_skills_with_unicode_characters_are_set_and_get_correctly(
+            self):
+        """Test to make sure that a default skill initialized with unicode
+        characters is get and set to the cache without errors.
+        """
         skill_id = 'id'
 
         self.assertEqual(
@@ -527,8 +536,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             default_skill.to_dict(),
             skills[skill_id].to_dict())
 
-        # Test to make sure that a default topic initialized with unicode
-        # characters is get and set to the cache without errors.
+    def test_topics_with_unicode_characters_are_set_and_get_correctly(
+            self):
+        """Test to make sure that a default topics initialized with unicode
+        characters is get and set to the cache without errors.
+        """
         topic_id = 'id'
 
         self.assertEqual(
@@ -558,9 +570,13 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             default_topic.to_dict(),
             topics[topic_id].to_dict())
 
-        # Test to make sure that a default story initialized with unicode
-        # characters is get and set to the cache without errors.
+    def test_stories_with_unicode_characters_are_set_and_get_correctly(
+            self):
+        """Test to make sure that a default story initialized with unicode
+        characters is get and set to the cache without errors.
+        """
         story_id = 'id'
+        topic_id = 'topic_id'
 
         self.assertEqual(
             caching_services.get_multi(
@@ -589,3 +605,50 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             default_story.to_dict(),
             stories[story_id].to_dict())
+
+    def test_platform_parameters_with_unicode_are_set_and_get_correctly(
+            self):
+        """Test to make sure that a default platform parameter initialized with
+        unicode characters is get and set to the cache without errors.
+        """
+        platform_parameter_id = 'id'
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER,
+                '0',
+                [platform_parameter_id]),
+            {})
+
+        default_parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a 😍',
+            'description': '😍😍😍😍',
+            'data_type': 'bool',
+            'rules': [
+                {
+                    'filters': [
+                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
+                    'value_when_matched': True
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
+            'is_feature': True,
+            'feature_stage': 'test 😍',
+        })
+
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER,
+            '0',
+            {
+                platform_parameter_id: default_parameter
+            })
+
+        platform_parameters = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER,
+            '0', [platform_parameter_id])
+
+        self.assertEqual(
+            default_parameter.to_dict(),
+            platform_parameters[platform_parameter_id].to_dict())

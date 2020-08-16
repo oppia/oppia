@@ -28,6 +28,7 @@ import subprocess
 import sys
 import time
 
+import feconf
 import python_utils
 import release_constants
 
@@ -69,8 +70,8 @@ PILLOW_VERSION = '6.2.2'
 #    run 'make test'.
 # 5. All of the tests should pass with an [ok] status with no error codes. The
 #    final output should be 'All tests pass.'
-# 6. Make sure all of the tests pass before committing the upgrade to develop.
-#    Be sure to indicate in your PR that all of the 'make test' tests pass.
+# 6. Be sure to leave a note in the PR description to confirm that you have read
+#    this message, and that all of the make test tests pass.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.0.5'
 
@@ -655,6 +656,7 @@ def start_redis_server():
         REDIS_SERVER_PATH, REDIS_CONF_PATH,
         '--daemonize', 'yes'
     ])
+    wait_for_port_to_be_open(int(feconf.REDISPORT))
 
 
 def stop_redis_server():

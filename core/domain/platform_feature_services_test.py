@@ -24,7 +24,6 @@ from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
-from core.platform import models
 from core.tests import test_utils
 import utils
 
