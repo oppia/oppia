@@ -98,6 +98,11 @@ describe('Player position service', () => {
     expect(pps.getDisplayedCardIndex()).toBe(5);
   });
 
+  it('should get onNewCardOpened EventEmitter', () => {
+    let mockNewCardOpenedEventEmitter = new EventEmitter();
+    expect(pps.onNewCardOpened).toEqual(mockNewCardOpenedEventEmitter);
+  });
+
   it('should emit the index of the question change', () => {
     pps.changeCurrentQuestion(3);
     expect(onQuestionChangeSpy).toHaveBeenCalledWith(3);

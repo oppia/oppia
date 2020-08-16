@@ -144,7 +144,6 @@ class EditorTests(BaseEditorControllerTests):
         # by validating it.
         exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
 
-
     def test_that_default_exploration_cannot_be_published(self):
         """Test that publishing a default exploration raises an error
         due to failing strict validation.
@@ -2241,7 +2240,6 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         }
-
 
     def test_resolve_issue_handler(self):
         """Test that resolving an issue deletes associated playthroughs."""

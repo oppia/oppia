@@ -63,7 +63,6 @@ class LatexStringSvgImageDimensionsTests(test_utils.GenericTestBase):
                 '1d245', '4d345', 0)
 
 
-
 class LatexStringSvgImageDataTests(test_utils.GenericTestBase):
 
     def test_create_latex_string_svg_image_dimensions(self):

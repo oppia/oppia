@@ -36,9 +36,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
   AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
 
-/* Called when the learner moves to a new card that they haven't seen before. */
-angular.module('oppia').constant(
-  'EVENT_NEW_CARD_OPENED', AppConstants.EVENT_NEW_CARD_OPENED);
 angular.module('oppia').constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   AppConstants.EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE);
@@ -150,10 +147,6 @@ angular.module('oppia').constant(
   'DEFAULT_PROFILE_IMAGE_PATH', AppConstants.DEFAULT_PROFILE_IMAGE_PATH);
 
 angular.module('oppia').constant('LOGOUT_URL', AppConstants.LOGOUT_URL);
-
-angular.module('oppia').constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED',
-  AppConstants.EVENT_QUESTION_SUMMARIES_INITIALIZED);
 
 // TODO(vojtechjelinek): Move these to separate file later, after we establish
 // process to follow for Angular constants (#6731).
