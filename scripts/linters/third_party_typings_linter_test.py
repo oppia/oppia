@@ -63,7 +63,6 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
         self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
-
     def test_check_third_party_libs_type_defs(self):
         expected_summary_messages = [
             '%s Third party type defs check passed' % (
