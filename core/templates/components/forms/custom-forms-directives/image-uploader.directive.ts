@@ -56,7 +56,8 @@ angular.module('oppia').directive('imageUploader', [
           var imageTypeMapping = {
             jpeg: {
               format: 'image/jpeg',
-              condition: [/jpeg$/, /\.jpeg$/],
+              fileType: /jpeg$/,
+              fileExtension: /\.jpeg$/,
             },
             jpg: {
               format: 'image/jpg',
@@ -79,27 +80,27 @@ angular.module('oppia').directive('imageUploader', [
               fileExtension: /\.svg$/,
             }
           };
-          var imageHasValidFormat = true;
-          var imageHasValidExtension = false;
+          var imageHasInValidFormat = true;
+          var imageHasInValidExtension = false;
           for (var i = 0; i < scope.getAllowedImageFormats().length; i++) {
             var fileType = scope.getAllowedImageFormats()[i];
             if (!(fileType in imageTypeMapping)) {
               return 'Unknown image format in allowed image formats.';
             }
-            imageHasValidFormat = (
-              imageHasValidFormat &&
+            imageHasInValidFormat = (
+              imageHasInValidFormat &&
               !file.type.match(imageTypeMapping[fileType].format));
-            imageHasValidExtension = (
-              imageHasValidExtension ||
+            imageHasInValidExtension = (
+              imageHasInValidExtension ||
               (file.type.match(imageTypeMapping[fileType].fileType) &&
               !file.name.match(imageTypeMapping[fileType].fileExtension)));
           }
 
-          if (imageHasValidFormat) {
+          if (imageHasInValidFormat) {
             return 'This image format is not supported.';
           }
 
-          if (imageHasValidExtension) {
+          if (imageHasInValidExtension) {
             return 'This image format does not match the filename extension.';
           }
 
