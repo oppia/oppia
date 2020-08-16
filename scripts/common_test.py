@@ -808,6 +808,7 @@ class CommonTests(test_utils.GenericTestBase):
         with swap_os_check, windows_not_supported_exception:
             common.start_redis_server()
 
+
     def test_windows_os_throws_exception_when_stopping_redis_server(self):
         def mock_is_windows_os():
             return True
@@ -820,6 +821,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         with swap_os_check, windows_not_supported_exception:
             common.stop_redis_server()
+
 
     def test_start_and_stop_server_calls_are_called(self):
         # Test that starting the server calls subprocess.call().
@@ -842,9 +844,14 @@ class CommonTests(test_utils.GenericTestBase):
                     return '', ''
             return Ret()
 
-        swap_call = self.swap(subprocess, 'call', mock_call)
+        def mock_wait_for_port_to_be_open(*args):
+            return
 
-        with swap_call:
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        swap_wait_for_port_to_be_open = self.swap(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open)
+        with swap_call, swap_wait_for_port_to_be_open:
             common.start_redis_server()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -858,7 +865,6 @@ class CommonTests(test_utils.GenericTestBase):
         }
 
         swap_call = self.swap(subprocess, 'call', mock_call)
-
         with swap_call:
             common.stop_redis_server()
 

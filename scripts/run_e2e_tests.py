@@ -188,6 +188,7 @@ def cleanup():
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
     build.set_constants_to_default()
+    common.stop_redis_server()
 
 
 def is_oppia_server_already_running():
@@ -535,7 +536,6 @@ def cleanup_portserver(portserver_process):
             break
     if portserver_process.poll():
         portserver_process.kill()
-    common.stop_redis_server()
 
 
 def main(args=None):

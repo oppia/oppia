@@ -28,6 +28,7 @@ import sys
 import time
 
 from core.tests import test_utils
+import feconf
 import python_utils
 
 from scripts import build
@@ -276,7 +277,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_windows_os', mock_is_windows_os)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
-        with swap_kill_process, subprocess_swap, swap_is_windows:
+        windows_exception = self.assertRaisesRegexp(
+            Exception, 'The redis command line interface is not installed '
+            'because your machine is on the Windows operating system. There is '
+            'no redis server to shutdown.'
+        )
+        with swap_kill_process, subprocess_swap, swap_is_windows, (
+            windows_exception):
             with swap_set_constants_to_default:
                 run_e2e_tests.cleanup()
 
@@ -914,6 +921,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
+                (int(feconf.REDISPORT),),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
@@ -1032,6 +1040,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
+                (int(feconf.REDISPORT),),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
@@ -1204,6 +1213,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
+                (int(feconf.REDISPORT),),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
@@ -1327,6 +1337,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
+                (int(feconf.REDISPORT),),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
