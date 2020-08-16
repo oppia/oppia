@@ -256,8 +256,8 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _add_collection_user_ids(snapshot_content_model):
-        """Merge the user ids from the snapshot and put them in the parent
-        collection rights model.
+        """Merge the user ids from the snapshot content and put them in
+        the snapshot metadata mentioned_user_ids field.
         """
         content_dict = (
             collection_models.CollectionRightsModel.convert_to_valid_dict(
@@ -267,17 +267,17 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
         snapshot_metadata_model = (
             collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
                 snapshot_content_model.id))
-        snapshot_metadata_model.mentioned_user_ids = list(
+        snapshot_metadata_model.mentioned_user_ids = list(sorted(
             set(reconstituted_rights_model.owner_ids) |
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
-            set(reconstituted_rights_model.viewer_ids))
+            set(reconstituted_rights_model.viewer_ids)))
         snapshot_metadata_model.put(update_last_updated_time=False)
 
     @staticmethod
     def _add_exploration_user_ids(snapshot_content_model):
-        """Merge the user ids from the snapshot and put them in the parent
-        exploration rights model.
+        """Merge the user ids from the snapshot content and put them in
+        the snapshot metadata mentioned_user_ids field.
         """
         content_dict = (
             exp_models.ExplorationRightsModel.convert_to_valid_dict(
@@ -287,25 +287,25 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
         snapshot_metadata_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
                 snapshot_content_model.id))
-        snapshot_metadata_model.mentioned_user_ids = list(
+        snapshot_metadata_model.mentioned_user_ids = list(sorted(
             set(reconstituted_rights_model.owner_ids) |
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
-            set(reconstituted_rights_model.viewer_ids))
+            set(reconstituted_rights_model.viewer_ids)))
         snapshot_metadata_model.put(update_last_updated_time=False)
 
     @staticmethod
     def _add_topic_user_ids(snapshot_content_model):
-        """Merge the user ids from the snapshot and put them in the parent
-        topic rights model.
+        """Merge the user ids from the snapshot content and put them in
+        the snapshot metadata mentioned_user_ids field.
         """
         reconstituted_rights_model = topic_models.TopicRightsModel(
             **snapshot_content_model.content)
         snapshot_metadata_model = (
             topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
                 snapshot_content_model.id))
-        snapshot_metadata_model.mentioned_user_ids = set(
-            reconstituted_rights_model.manager_ids)
+        snapshot_metadata_model.mentioned_user_ids = list(sorted(set(
+            reconstituted_rights_model.manager_ids)))
         snapshot_metadata_model.put(update_last_updated_time=False)
 
     @classmethod
@@ -356,50 +356,31 @@ class AddMentionedUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
     """
 
     @staticmethod
-    def are_commit_cmds_role_change(commit_cmds):
-        """Check if commit_cmds are of a role change type and there is just one
-        commit.
-
-        Args:
-            commit_cmds: list(dict(str, str)). List of commit commands.
-
-        Returns:
-            bool. True when there is one command and it is of role_change type.
-        """
-        role_change_cmds = (
-            feconf.CMD_CHANGE_ROLE,
-            feconf.CMD_REMOVE_MANAGER_ROLE)
-        return (
-            len(commit_cmds) == 1 and commit_cmds[0]['cmd'] in role_change_cmds)
-
-    @staticmethod
     def _add_col_and_exp_user_ids(snapshot_model):
-        """Merge the user ids from the snapshot and put them in the parent
-        collection rights model.
+        """Merge the user ids from the commit_cmds and put them in the
+        mentioned_user_ids field.
         """
-        if AddMentionedUserIdsMetadataJob.are_commit_cmds_role_change(
-                snapshot_model.commit_cmds):
-            mentioned_user_ids = set(snapshot_model.mentioned_user_ids)
-            mentioned_user_ids.add(snapshot_model.commit_cmds[0]['assignee_id'])
-            snapshot_model.mentioned_user_ids = list(mentioned_user_ids)
-            snapshot_model.put(update_last_updated_time=False)
+        mentioned_user_ids = set(snapshot_model.mentioned_user_ids)
+        for commit_cmd in snapshot_model.commit_cmds:
+            if commit_cmd['cmd'] == feconf.CMD_CHANGE_ROLE:
+                mentioned_user_ids.add(commit_cmd['assignee_id'])
+                snapshot_model.mentioned_user_ids = list(
+                    sorted(mentioned_user_ids))
+                snapshot_model.put(update_last_updated_time=False)
 
     @staticmethod
     def _add_topic_user_ids(snapshot_model):
-        """Merge the user ids from the snapshot and put them in the parent
-        topic rights model.
+        """Merge the user ids from the commit_cmds and put them in the
+        mentioned_user_ids field.
         """
-        commit_cmds = snapshot_model.commit_cmds
-        if AddMentionedUserIdsMetadataJob.are_commit_cmds_role_change(
-                commit_cmds):
-            mentioned_user_ids = set(snapshot_model.mentioned_user_ids)
-            if commit_cmds[0]['cmd'] == feconf.CMD_CHANGE_ROLE:
-                mentioned_user_ids.add(
-                    snapshot_model.commit_cmds[0]['assignee_id'])
-            elif commit_cmds[0]['cmd'] == feconf.CMD_REMOVE_MANAGER_ROLE:
-                mentioned_user_ids.add(
-                    snapshot_model.commit_cmds[0]['removed_user_id'])
-            snapshot_model.mentioned_user_ids = list(mentioned_user_ids)
+        mentioned_user_ids = set(snapshot_model.mentioned_user_ids)
+        for commit_cmd in snapshot_model.commit_cmds:
+            if commit_cmd['cmd'] == feconf.CMD_CHANGE_ROLE:
+                mentioned_user_ids.add(commit_cmd['assignee_id'])
+            elif commit_cmd['cmd'] == feconf.CMD_REMOVE_MANAGER_ROLE:
+                mentioned_user_ids.add(commit_cmd['removed_user_id'])
+            snapshot_model.mentioned_user_ids = list(
+                sorted(mentioned_user_ids))
             snapshot_model.put(update_last_updated_time=False)
 
     @classmethod
@@ -440,3 +421,55 @@ class AddMentionedUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, ids):
         """Implements the reduce function for this job."""
         yield (key, len(ids))
+
+
+class AuditSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits commit_cmds field of the snapshot metadata models. We log
+    the length of the commit_cmd, the possible 'cmd' values, and all the other
+    keys.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over three types of entity class.
+        super(AuditSnapshotMetadataModelsJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [collection_models.CollectionRightsSnapshotMetadataModel,
+                exp_models.ExplorationRightsSnapshotMetadataModel,
+                topic_models.TopicRightsSnapshotMetadataModel]
+
+    @staticmethod
+    def map(snapshot_model):
+        """Implements the map function for this job."""
+        if isinstance(
+                snapshot_model,
+                collection_models.CollectionRightsSnapshotMetadataModel):
+            model_type_name = 'collection'
+        elif isinstance(
+                snapshot_model,
+                exp_models.ExplorationRightsSnapshotMetadataModel):
+            model_type_name = 'exploration'
+        elif isinstance(
+                snapshot_model,
+                topic_models.TopicRightsSnapshotMetadataModel):
+            model_type_name = 'topic'
+        yield (
+            '%s-length-%s' % (model_type_name, len(snapshot_model.commit_cmds)),
+            1
+        )
+        for commit_cmd in snapshot_model.commit_cmds:
+            for cmd_key, cmd_value in commit_cmd.items():
+                if cmd_key == 'cmd':
+                    yield ('%s-cmd-%s' % (model_type_name, cmd_value), 1)
+                else:
+                    yield ('%s-field-%s' % (model_type_name, cmd_key), 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))

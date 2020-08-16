@@ -527,13 +527,11 @@ class TopicRightsModel(base_models.VersionedModel):
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
         mentioned_user_ids = set(self.manager_ids)
-        if len(commit_cmds) == 1:
-            if commit_cmds[0]['cmd'] == feconf.CMD_CHANGE_ROLE:
-                mentioned_user_ids.add(
-                    snapshot_metadata_model.commit_cmds[0]['assignee_id'])
-            elif commit_cmds[0]['cmd'] == feconf.CMD_REMOVE_MANAGER_ROLE:
-                mentioned_user_ids.add(
-                    snapshot_metadata_model.commit_cmds[0]['removed_user_id'])
+        for commit_cmd in commit_cmds:
+            if commit_cmd['cmd'] == feconf.CMD_CHANGE_ROLE:
+                mentioned_user_ids.add(commit_cmd['assignee_id'])
+            elif commit_cmd['cmd'] == feconf.CMD_REMOVE_MANAGER_ROLE:
+                mentioned_user_ids.add(commit_cmd['removed_user_id'])
         snapshot_metadata_model.mentioned_user_ids = list(
             sorted(mentioned_user_ids))
         snapshot_metadata_model.put()

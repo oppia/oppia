@@ -379,12 +379,9 @@ class CollectionRightsModel(base_models.VersionedModel):
             set(self.voice_artist_ids) |
             set(self.viewer_ids)
         )
-        if (
-                len(commit_cmds) == 1 and
-                commit_cmds[0]['cmd'] == feconf.CMD_CHANGE_ROLE
-        ):
-            mentioned_user_ids.add(
-                snapshot_metadata_model.commit_cmds[0]['assignee_id'])
+        for commit_cmd in commit_cmds:
+            if commit_cmd['cmd'] == feconf.CMD_CHANGE_ROLE:
+                mentioned_user_ids.add(commit_cmd['assignee_id'])
         snapshot_metadata_model.mentioned_user_ids = list(
             sorted(mentioned_user_ids))
         snapshot_metadata_model.put()
