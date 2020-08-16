@@ -26,6 +26,8 @@ require('domain/topics_and_skills_dashboard/' +
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+require('domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
     'create-new-topic-modal.controller.ts');
@@ -35,15 +37,13 @@ require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
-  '$rootScope', '$uibModal', '$window', 'AlertsService', 'ContextService',
+  '$uibModal', '$window', 'AlertsService', 'ContextService',
   'ImageLocalStorageService', 'TopicCreationBackendApiService',
-  'UrlInterpolationService',
-  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+  'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
   function(
-      $rootScope, $uibModal, $window, AlertsService, ContextService,
+      $uibModal, $window, AlertsService, ContextService,
       ImageLocalStorageService, TopicCreationBackendApiService,
-      UrlInterpolationService,
-      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+      TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
 
@@ -78,8 +78,8 @@ angular.module('oppia').factory('TopicCreationService', [
           TopicCreationBackendApiService.createTopic(
             newlyCreatedTopic, imagesData, bgColor).then(
             function(response) {
-              $rootScope.$broadcast(
-                EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+              TopicsAndSkillsDashboardBackendApiService.
+                onTopicsAndSkillsDashboardReinitialized.emit();
               topicCreationInProgress = false;
               ImageLocalStorageService.flushStoredImagesData();
               ContextService.resetImageSaveDestination();
