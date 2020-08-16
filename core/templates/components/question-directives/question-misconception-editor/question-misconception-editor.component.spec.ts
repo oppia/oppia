@@ -31,7 +31,8 @@ import { SolutionValidityService } from
 import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';/* eslint-enable max-len */
+  'domain/exploration/SubtitledHtmlObjectFactory';
+/* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
 require('directives/angular-html-bind.directive.ts');
