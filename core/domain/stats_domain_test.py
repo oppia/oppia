@@ -887,7 +887,6 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             self.exp_issue.validate()
 
 
-
 class LearnerActionTests(test_utils.GenericTestBase):
     """Tests the LearnerAction domain object."""
 

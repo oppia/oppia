@@ -66,7 +66,6 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.exp_id, 'new_exp_id')
         self.assertEqual(exploration_stats.state_stats_mapping, {})
 
-
     def test_update_stats_method(self):
         """Test the update_stats method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -1054,7 +1053,6 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             exp_issues.unresolved_issues[0].issue_customization_args[
                 'state_names']['value'], ['Home', 'End', 'Home'])
-
 
         playthrough_instance = stats_models.PlaythroughModel.get(
             playthrough_id)

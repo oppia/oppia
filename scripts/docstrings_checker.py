@@ -152,7 +152,6 @@ def possible_exc_types(node):
                 exc.name for exc in inferred_excs
                 if exc is not astroid.Uninferable)
 
-
     try:
         return set(
             exc for exc in excs if not utils.node_ignores_exception(

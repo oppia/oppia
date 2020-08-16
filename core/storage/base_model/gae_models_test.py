@@ -247,7 +247,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             model = base_models.BaseModel.get_by_id(model_id)
             self.assertNotEqual(model.last_updated, last_updated)
 
-
     def test_get_multi(self):
         model1 = base_models.BaseModel()
         model2 = base_models.BaseModel()

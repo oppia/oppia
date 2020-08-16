@@ -390,7 +390,6 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
             user_a = user_services.UserActionsInfo(user_a_id)
 
-
             # User A creates an exploration.
             self.save_new_valid_exploration(
                 EXP_ID, user_a_id, title=EXP_TITLE, category='Category')

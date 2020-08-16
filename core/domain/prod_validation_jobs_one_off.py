@@ -2891,7 +2891,6 @@ class JobModelValidator(BaseModelValidator):
                 'Entity id %s: error for job is empty but '
                 'job status is %s' % (item.id, item.status_code))
 
-
     @classmethod
     def _validate_output(cls, item):
         """Validate output for entity is present only if status is

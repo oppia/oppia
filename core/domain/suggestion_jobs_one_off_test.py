@@ -1296,7 +1296,6 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             SuggestionMathMigrationOneOffJob.get_output(job_id))
         self.assertEqual(len(actual_output), 0)
 
-
     def test_migration_skips_suggestions_failing_validation(self):
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'

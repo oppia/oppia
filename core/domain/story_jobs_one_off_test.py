@@ -418,7 +418,6 @@ class StoryMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
 
-
     def setUp(self):
         super(StoryMathRteAuditOneOffJobTests, self).setUp()
 

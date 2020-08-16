@@ -157,7 +157,6 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                     'exp_id_%s' % exp_id), {},
                 csrf_token=csrf_token)
 
-
         # Now if we try and add an activity we should get a message saying we
         # are exceeding the limit.
         response = self.post_json(

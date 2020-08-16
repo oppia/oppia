@@ -265,7 +265,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             self._create_example_context(
                 app_version=version)))
 
-
     def test_create_from_dict_returns_correct_instance(self):
         filter_dict = {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
         filter_domain = (

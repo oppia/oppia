@@ -199,7 +199,6 @@ class GcsFileSystem(GeneralFileSystem):
         except cloudstorage.NotFoundError:
             raise IOError('Image does not exist: %s' % filepath)
 
-
     def listdir(self, dir_name):
         """Lists all files in a directory.
 

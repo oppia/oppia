@@ -1101,7 +1101,6 @@ class UserStatsModelTest(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-
     def test_export_data_on_existing_user(self):
         """Test if export_data works when user is in data store."""
         user_data = user_models.UserStatsModel.export_data(self.USER_ID_1)
@@ -2286,7 +2285,6 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     PROFILE_PIN = '123'
     PROFILE_2_ID = 'profile2_id'
     PROFILE_2_PIN = None
-
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""

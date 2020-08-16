@@ -71,7 +71,6 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
         for skill in skills:
             skill_descriptions[skill.id] = skill.description
 
-
         self.values.update({
             'skill_descriptions': skill_descriptions,
             'story_name': story.title

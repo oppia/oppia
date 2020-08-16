@@ -181,7 +181,6 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         self.assertTrue(
             'pre-commit hook file is now executable!'in self.print_arr)
 
-
     def test_start_subprocess_for_result(self):
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)

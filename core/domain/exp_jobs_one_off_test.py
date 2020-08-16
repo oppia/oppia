@@ -957,7 +957,6 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -2402,7 +2401,6 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             sorted(expected_latex_strings))
         self.assertEqual(
             exp_models.ExplorationMathRichTextInfoModel.get_all().count(), 1)
-
 
     def test_one_off_job_fails_with_invalid_exploration(self):
         """Test the audit job fails when there is an invalid exploration."""
