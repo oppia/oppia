@@ -58,9 +58,10 @@ PILLOW_VERSION = '6.2.2'
 # there is a 'make test' bug in redis 6.0.6 where the solution has not been
 # released. This is explained in this issue:
 # https://github.com/redis/redis/issues/7540.
-# IMPORTANT STEPS TO DEVELOPERS FOR UPGRADING REDIS:
+# IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
-# 2. Extract it in the folder it was downloaded, most likely Downloads/.
+# 2. Extract the cli in the folder that it was downloaded, most likely
+#    Downloads/.
 # 3. Change directories into the folder you extracted, titled
 #    redis-<new version>/ and change into that directory:
 #    cd redis-<new version>/
