@@ -20,16 +20,16 @@ require('services/external-save.service.ts');
 
 angular.module('oppia').controller('RteHelperModalController', [
   '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
-  'AssetsBackendApiService', 'ContextService', 'FocusManagerService',
+  'AssetsBackendApiService', 'ContextService',
+  'ExternalSaveService', 'FocusManagerService',
   'ImageLocalStorageService', 'ImageUploadHelperService',
-  'ExternalSaveService',
   'attrsCustomizationArgsDict', 'customizationArgSpecs',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $scope, $timeout, $uibModalInstance, AlertsService,
-      AssetsBackendApiService, ContextService, FocusManagerService,
+      AssetsBackendApiService, ContextService,
+      ExternalSaveService, FocusManagerService,
       ImageLocalStorageService, ImageUploadHelperService,
-      ExternalSaveService,
       attrsCustomizationArgsDict, customizationArgSpecs,
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     var extractVideoIdFromVideoUrl = function(videoUrl) {
