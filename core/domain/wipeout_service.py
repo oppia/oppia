@@ -241,7 +241,7 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
 
 
 def _delete_models(user_id, module_name):
-    """Delete the improvements models for the user with user_id.
+    """Delete the models for one user from one module.
 
     Args:
         user_id: str. The id of the user to be deleted.
@@ -307,6 +307,9 @@ def _pseudonymize_activity_models(
     def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
 
+        This function is run in a transaction, with the maximum number of
+        activity_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
+
         Args:
             activity_related_models: list(BaseModel). Models whose user IDs
                 should be pseudonymized.
@@ -326,15 +329,16 @@ def _pseudonymize_activity_models(
             commit_log_model.user_id = pseudonymized_user_id
         ndb.put_multi(metadata_models + commit_log_models)
 
-    activity_mappings = (
+    activity_ids_to_pids = (
         pending_deletion_request.activity_mappings[activity_category])
-    for activity_id, pseudonymized_user_id in activity_mappings.items():
+    for activity_id, pseudonymized_user_id in activity_ids_to_pids.items():
         activity_related_models = [
             model for model in metadata_models
-            if model.get_unversioned_instance_id() == activity_id]
-        activity_related_models += [
+            if model.get_unversioned_instance_id() == activity_id
+        ] + [
             model for model in commit_log_models
-            if getattr(model, commit_log_model_field_name) == activity_id]
+            if getattr(model, commit_log_model_field_name) == activity_id
+        ]
         for i in python_utils.RANGE(
                 0,
                 len(activity_related_models),
@@ -354,6 +358,12 @@ def _pseudonymize_feedback_models(pending_deletion_request):
     """
     user_id = pending_deletion_request.user_id
 
+    # We want to preserve the same pseudonymous user ID on all the models
+    # related to one feedback thread. So we collect all the users' feedback
+    # thread models, feedback thread message models, and suggestion models; then
+    # we for each collection (for example thread with few messages and related
+    # suggestion) of these models we pick pseudonymous user ID and replace
+    # the user ID with that pseudonymous user ID in all the models.
     feedback_thread_model_class = feedback_models.GeneralFeedbackThreadModel
     feedback_thread_models = feedback_thread_model_class.query(ndb.OR(
         feedback_thread_model_class.original_author_id == user_id,
@@ -384,6 +394,9 @@ def _pseudonymize_feedback_models(pending_deletion_request):
 
     def _pseudonymize_models(feedback_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
+
+        This function is run in a transaction, with the maximum number of
+        feedback_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
         Args:
             feedback_related_models: list(BaseModel). Models whose user IDs
@@ -423,18 +436,19 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             general_suggestion_models
         )
 
-    feedback_mappings = (
+    feedback_ids_to_pids = (
         pending_deletion_request.activity_mappings[models.NAMES.feedback])
-    for feedback_id, pseudonymized_user_id in feedback_mappings.items():
+    for feedback_id, pseudonymized_user_id in feedback_ids_to_pids.items():
         feedback_related_models = [
             model for model in feedback_thread_models
-            if model.id == feedback_id]
-        feedback_related_models += [
+            if model.id == feedback_id
+        ] + [
             model for model in feedback_message_models
-            if model.thread_id == feedback_id]
-        feedback_related_models += [
+            if model.thread_id == feedback_id
+        ] + [
             model for model in general_suggestion_models
-            if model.id == feedback_id]
+            if model.id == feedback_id
+        ]
         for i in python_utils.RANGE(
                 0,
                 len(feedback_related_models),
@@ -472,11 +486,14 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         )
         save_pending_deletion_request(pending_deletion_request)
 
-    suggestion_mappings = (
+    suggestion_ids_to_pids = (
         pending_deletion_request.activity_mappings[models.NAMES.suggestion])
 
     def _pseudonymize_models(voiceover_application_models):
         """Pseudonymize user ID fields in the models.
+
+        This function is run in a transaction, with the maximum number of
+        voiceover_application_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
         Args:
             voiceover_application_models:
@@ -486,11 +503,11 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         for voiceover_application_model in voiceover_application_models:
             if voiceover_application_model.author_id == user_id:
                 voiceover_application_model.author_id = (
-                    suggestion_mappings[voiceover_application_model.id]
+                    suggestion_ids_to_pids[voiceover_application_model.id]
                 )
             if voiceover_application_model.final_reviewer_id == user_id:
                 voiceover_application_model.final_reviewer_id = (
-                    suggestion_mappings[voiceover_application_model.id]
+                    suggestion_ids_to_pids[voiceover_application_model.id]
                 )
         voiceover_application_class.put_multi(voiceover_application_models)
 
