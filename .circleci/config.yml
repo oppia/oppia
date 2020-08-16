@@ -256,6 +256,10 @@ jobs:
           name: Run e2e file upload extensions test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"            
+      - run:
+          name: Run e2e admin misc tab test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminMiscTab"
 
 notify:
   webhooks:
