@@ -46,7 +46,7 @@ angular.module('oppia').component('subtopicEditorTab', {
     'TopicEditorRoutingService', 'TopicUpdateService',
     'UndoRedoService',
     'UrlInterpolationService', 'WindowDimensionsService',
-    'EVENT_SUBTOPIC_PAGE_LOADED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
+    'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
         $scope, EntityCreationService, QuestionBackendApiService,
@@ -54,11 +54,11 @@ angular.module('oppia').component('subtopicEditorTab', {
         TopicEditorRoutingService, TopicUpdateService,
         UndoRedoService,
         UrlInterpolationService, WindowDimensionsService,
-        EVENT_SUBTOPIC_PAGE_LOADED, MAX_CHARS_IN_SUBTOPIC_TITLE,
+        MAX_CHARS_IN_SUBTOPIC_TITLE,
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT) {
       var ctrl = this;
-      var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
       ctrl.directiveSubscriptions = new Subscription();
+      var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
       ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
@@ -277,7 +277,16 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.subtopicPreviewCardIsShown = false;
         ctrl.subtopicEditorCardIsShown = true;
         ctrl.schemaEditorIsShown = false;
-
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onSubtopicPageLoaded.subscribe(
+            () => {
+              ctrl.subtopicPage = (
+                TopicEditorStateService.getSubtopicPage());
+              var pageContents = ctrl.subtopicPage.getPageContents();
+              ctrl.htmlData = pageContents.getHtml();
+            }
+          )
+        );
         ctrl.directiveSubscriptions.add(
           TopicEditorStateService.onTopicInitialized.subscribe(
             () => ctrl.initEditor()
@@ -287,17 +296,8 @@ angular.module('oppia').component('subtopicEditorTab', {
             () => ctrl.initEditor()
           ));
 
-        $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
-          ctrl.subtopicPage = (
-            TopicEditorStateService.getSubtopicPage());
-          var pageContents = ctrl.subtopicPage.getPageContents();
-          ctrl.htmlData = pageContents.getHtml();
-        });
-
         ctrl.initEditor();
       };
-
-
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
       };
