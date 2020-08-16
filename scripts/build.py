@@ -80,7 +80,10 @@ YUICOMPRESSOR_DIR = os.path.join(
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
+WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
+WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.soucemap.config.ts'
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
+WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
 WEBPACK_TERSER_CONFIG = 'webpack.terser.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
@@ -162,6 +165,12 @@ _PARSER.add_argument(
         'meaning that only super admins can access the site.'
     )
 )
+_PARSER.add_argument(
+    '--source_maps',
+    action='store_true',
+    default=False,
+    dest='source_maps',
+    help='Build webpack with source maps.')
 
 
 def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
@@ -1186,7 +1195,6 @@ def _verify_hashes(output_dirnames, file_hashes):
     hash_final_filename = _insert_hash(
         HASHES_JSON_FILENAME, file_hashes[HASHES_JSON_FILENAME])
 
-
     # The path in hashes.json (generated via file_hashes) file is in posix
     # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_js_final_filename = _insert_hash(
@@ -1331,7 +1339,13 @@ def main(args=None):
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
         if options.deparallelize_terser:
+            if options.source_maps:
+                raise Exception(
+                    'source_maps flag shouldn\'t be used with '
+                    'deparallelize_terser flag.')
             build_using_webpack(WEBPACK_TERSER_CONFIG)
+        elif options.source_maps:
+            build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
         else:
             build_using_webpack(WEBPACK_PROD_CONFIG)
         generate_app_yaml(

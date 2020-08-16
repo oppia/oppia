@@ -188,7 +188,6 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertNotIn('<script>', ts_file_content)
             self.assertNotIn('</script>', ts_file_content)
 
-
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
             for item, item_type in _COMPONENT_CONFIG_SCHEMA:

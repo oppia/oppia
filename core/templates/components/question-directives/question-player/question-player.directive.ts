@@ -143,22 +143,22 @@ angular.module('oppia').directive('questionPlayer', [
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$uibModal', '$window',
         'AlertsService', 'ExplorationPlayerStateService', 'HtmlEscaperService',
-        'QuestionBackendApiService', 'SkillMasteryBackendApiService',
-        'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
-        'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
-        'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
-        'VIEW_HINT_PENALTY_FOR_MASTERY',
+        'PlayerPositionService', 'QuestionBackendApiService',
+        'SkillMasteryBackendApiService', 'UrlService', 'UserService',
+        'COLORS_FOR_PASS_FAIL_MODE', 'MAX_MASTERY_GAIN_PER_QUESTION',
+        'MAX_MASTERY_LOSS_PER_QUESTION', 'QUESTION_PLAYER_MODE',
+        'VIEW_HINT_PENALTY', 'VIEW_HINT_PENALTY_FOR_MASTERY',
         'WRONG_ANSWER_PENALTY', 'WRONG_ANSWER_PENALTY_FOR_MASTERY',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $uibModal, $window,
             AlertsService, ExplorationPlayerStateService, HtmlEscaperService,
-            QuestionBackendApiService, SkillMasteryBackendApiService,
-            UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
-            MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
-            QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
-            VIEW_HINT_PENALTY_FOR_MASTERY,
+            PlayerPositionService, QuestionBackendApiService,
+            SkillMasteryBackendApiService, UrlService, UserService,
+            COLORS_FOR_PASS_FAIL_MODE, MAX_MASTERY_GAIN_PER_QUESTION,
+            MAX_MASTERY_LOSS_PER_QUESTION, QUESTION_PLAYER_MODE,
+            VIEW_HINT_PENALTY, VIEW_HINT_PENALTY_FOR_MASTERY,
             WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -538,15 +538,15 @@ angular.module('oppia').directive('questionPlayer', [
           };
 
           ctrl.$onInit = function() {
-            $rootScope.$on('currentQuestionChanged', function(event, result) {
-              updateCurrentQuestion(result + 1);
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onCurrentQuestionChange.subscribe(
+                result => updateCurrentQuestion(result + 1)
+              )
+            );
 
             ctrl.directiveSubscriptions.add(
               ExplorationPlayerStateService.onTotalQuestionsReceived.subscribe(
-                (result) => {
-                  updateTotalQuestions(result);
-                }
+                result => updateTotalQuestions(result)
               )
             );
 
