@@ -16,8 +16,6 @@
  * @fileoverview Directive for hint and solution buttons.
  */
 
-import { Subscription } from 'rxjs';
-
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
@@ -38,6 +36,8 @@ require('services/contextual/device-info.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('hintAndSolutionButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -52,15 +52,16 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
         '$scope', '$rootScope', 'HintsAndSolutionManagerService',
         'PlayerTranscriptService', 'ExplorationPlayerStateService',
         'HintAndSolutionModalService', 'DeviceInfoService', 'ContextService',
-        'PlayerPositionService', 'EVENT_NEW_CARD_OPENED', 'INTERACTION_SPECS',
+        'PlayerPositionService', 'INTERACTION_SPECS',
         'StatsReportingService',
         function(
             $scope, $rootScope, HintsAndSolutionManagerService,
             PlayerTranscriptService, ExplorationPlayerStateService,
             HintAndSolutionModalService, DeviceInfoService, ContextService,
-            PlayerPositionService, EVENT_NEW_CARD_OPENED, INTERACTION_SPECS,
+            PlayerPositionService, INTERACTION_SPECS,
             StatsReportingService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -71,7 +72,6 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
               ctrl.hintIndexes.push(index);
             }
           };
-          ctrl.directiveSubscriptions = new Subscription();
 
           ctrl.isHintButtonVisible = function(index) {
             return (
@@ -143,13 +143,17 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.solutionModalIsActive = false;
             ctrl.currentlyOnLatestCard = true;
             resetLocalHintsArray();
-            $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
-              ctrl.displayedCard = newCard;
-              HintsAndSolutionManagerService.reset(
-                newCard.getHints(), newCard.getSolution()
-              );
-              resetLocalHintsArray();
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardOpened.subscribe(
+                (newCard) => {
+                  ctrl.displayedCard = newCard;
+                  HintsAndSolutionManagerService.reset(
+                    newCard.getHints(), newCard.getSolution()
+                  );
+                  resetLocalHintsArray();
+                }
+              )
+            );
             ctrl.directiveSubscriptions.add(
               PlayerPositionService.onActiveCardChanged.subscribe(
                 () => {
