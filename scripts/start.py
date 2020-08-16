@@ -78,6 +78,11 @@ _PARSER.add_argument(
         'optional; if specified, does not automatically restart when files are '
         'changed.'),
     action='store_true')
+_PARSER.add_argument(
+    '--source_maps',
+    help=(
+        'optional; if specified, build webpack with source maps.'),
+    action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
@@ -123,6 +128,8 @@ def main(args=None):
     build_args = ['--prod_env'] if parsed_args.prod_env else []
     if parsed_args.maintenance_mode:
         build_args.append('--maintenance_mode')
+    if parsed_args.source_maps:
+        build_args.append('--source_maps')
     build.main(args=build_args)
     app_yaml_filepath = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
 
@@ -135,11 +142,15 @@ def main(args=None):
     if not parsed_args.prod_env:
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
+        webpack_config_file = (
+            build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if parsed_args.source_maps
+            else build.WEBPACK_DEV_CONFIG)
         background_processes.append(subprocess.Popen([
             common.NODE_BIN_PATH,
             os.path.join(
                 common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
-            '--config', 'webpack.dev.config.ts', '--watch']))
+            '--config', webpack_config_file, '--watch']))
+
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)
 

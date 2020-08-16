@@ -272,12 +272,12 @@ skip_files:
 - ^core/(.*/)?.*\.ts$
 # Typescript output log file
 - ^(.*/)tsc_output_log.txt$
+# Python test files
+- ^(.*/)?.*_test\.py$
 # Other folders to ignore
-- tests/
-- scripts/
-- integrations/
-- integrations_dev/
+- core/tests/
 - node_modules/
+- scripts/
 # Some third_party static scripts are directly imported, namely: jquery,
 # jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
