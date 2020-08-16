@@ -582,7 +582,9 @@ class DeployTests(test_utils.GenericTestBase):
             deploy.build_scripts(False)
         self.assertEqual(
             cmd_tokens,
-            ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
+            [
+                'python', '-m', 'scripts.build', '--prod_env',
+                '--source_maps', '--deploy_mode'])
 
     def test_build_with_maintenance_mode(self):
         process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
@@ -596,7 +598,8 @@ class DeployTests(test_utils.GenericTestBase):
             cmd_tokens,
             [
                 'python', '-m', 'scripts.build',
-                '--prod_env', '--deploy_mode', '--maintenance_mode'
+                '--prod_env', '--source_maps', '--deploy_mode',
+                '--maintenance_mode'
             ]
         )
 
@@ -612,7 +615,9 @@ class DeployTests(test_utils.GenericTestBase):
             deploy.build_scripts(False)
         self.assertEqual(
             cmd_tokens,
-            ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
+            [
+                'python', '-m', 'scripts.build', '--prod_env',
+                '--source_maps', '--deploy_mode'])
 
     def test_deploy_application(self):
         check_function_calls = {
