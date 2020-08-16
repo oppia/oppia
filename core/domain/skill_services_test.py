@@ -414,6 +414,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='topic1',
+            abbreviated_name='topic-one', url_fragment='topic-one',
             description='Description',
             canonical_story_ids=[],
             additional_story_ids=[],
@@ -457,6 +458,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='topic1',
+            abbreviated_name='topic-two', url_fragment='topic-two',
             description='Description',
             canonical_story_ids=[],
             additional_story_ids=[],
@@ -465,6 +467,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         config_services.set_property(
             self.user_id_admin, 'classroom_pages_data', [{
+                'url_fragment': 'math',
                 'name': 'math',
                 'topic_ids': [topic_id],
                 'topic_list_intro': 'Topics Covered',
@@ -559,6 +562,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
+            abbreviated_name='topic-three', url_fragment='topic-three',
             description='Description',
             canonical_story_ids=[],
             additional_story_ids=[],
@@ -575,6 +579,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         })
         self.save_new_topic(
             topic_id_1, self.USER_ID, name='Topic2',
+            abbreviated_name='topic-four', url_fragment='topic-four',
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
@@ -600,6 +605,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
+            abbreviated_name='topic-five', url_fragment='topic-five',
             description='Description',
             canonical_story_ids=[],
             additional_story_ids=[],
@@ -616,6 +622,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         })
         self.save_new_topic(
             topic_id_1, self.USER_ID, name='Topic2',
+            abbreviated_name='topic-six', url_fragment='topic-six',
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
@@ -740,7 +747,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.all_questions_merged, True)
-
 
     def test_get_merged_skill_ids(self):
         skill_ids = skill_services.get_merged_skill_ids()

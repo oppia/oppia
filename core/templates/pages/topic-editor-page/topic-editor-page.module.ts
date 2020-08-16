@@ -43,8 +43,6 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 import { AppConstants } from 'app.constants';
-import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -58,6 +56,12 @@ import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { TopicEditorPageConstants } from
   'pages/topic-editor-page/topic-editor-page.constants';
+import { PracticeTabComponent } from
+  'pages/topic-viewer-page/practice-tab/practice-tab.component';
+import { StoriesListComponent } from
+  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
+import { SubtopicsListComponent } from
+  'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 
 @NgModule({
   imports: [
@@ -66,15 +70,20 @@ import { TopicEditorPageConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    PracticeTabComponent,
+    StoriesListComponent,
+    SubtopicsListComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    PracticeTabComponent,
+    StoriesListComponent,
+    SubtopicsListComponent,
   ],
   providers: [
     AppConstants,
     InteractionsExtensionsConstants,
-    EditorDomainConstants,
     ObjectsDomainConstants,
     QuestionDomainConstants,
     QuestionsListConstants,

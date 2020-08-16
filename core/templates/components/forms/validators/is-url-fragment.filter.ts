@@ -13,14 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for editor domain.
+ * @fileoverview Validator to check if input is a valid URL fragment.
  */
 
-// TODO(#7092): Delete this file once migration is complete and these AngularJS
-// equivalents of the Angular constants are no longer needed.
-import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants';
+import { AppConstants } from 'app.constants';
 
-angular.module('oppia').constant(
-  'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
-  EditorDomainConstants.EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
+angular.module('oppia').filter('isUrlFragment', [function() {
+  const VALID_URL_FRAGMENT_REGEX = new RegExp(
+    // TODO(#7434): Use dot notation after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    // eslint-disable-next-line dot-notation
+    AppConstants['VALID_URL_FRAGMENT_REGEX']);
+  return function(input, args) {
+    return (
+      VALID_URL_FRAGMENT_REGEX.test(input) &&
+      input.length <= args.charLimit);
+  };
+}]);

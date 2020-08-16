@@ -33,9 +33,9 @@
                      ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
                      placeholder="Enter a title for the story." maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" ng-trim="false">
               <span class="oppia-input-box-subtitle">
-                <i>
+                <em>
                   Story title should be at most <[MAX_CHARS_IN_STORY_TITLE]> characters.
-                </i>
+                </em>
               </span>
             </div>
             <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">
@@ -57,14 +57,14 @@
                      placeholder="Enter url fragment for the story." maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>" ng-trim="true"
                      ng-class="{'is-invalid': storyUrlFragmentExists}">
               <span class="oppia-input-box-subtitle">
-                <i>
+                <em>
                   The story URL fragment is used to uniquely access the story viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_STORY_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
-                </i>
+                </em>
               </span>
               <div ng-if="storyUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
-                <i>
+                <em>
                   This story URL fragment already exists.
-                </i>
+                </em>
               </div>
             </div>
             <div class="story-thumbnail">
@@ -191,7 +191,7 @@
                       <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
                     </div>
                     <div class="edit-options-container">
-                      <i class="fa fa-ellipsis-v chapter-edit-toggle-button protractor-test-edit-options" ng-click="toggleChapterEditOptions($index);$event.stopPropagation()"></i>
+                      <i class="fa fa-ellipsis-v chapter-edit-toggle-button protractor-test-edit-options" ng-click="toggleChapterEditOptions($index);$event.stopPropagation()" aria-label="Chapter edit"></i>
                     </div>
                     <div class="chapter-option-box" ng-if="selectedChapterIndex === $index" ng-mouseleave="toggleChapterEditOptions(-1)" ng-click="toggleChapterEditOptions(-1);$event.stopPropagation()">
                       <div class="chapter-edit-option protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())">

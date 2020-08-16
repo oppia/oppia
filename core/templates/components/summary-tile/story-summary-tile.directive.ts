@@ -27,7 +27,9 @@ angular.module('oppia').directive('storySummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        storySummary: '<'
+        classroomUrlFragment: '<',
+        storySummary: '<',
+        topicUrlFragment: '<'
       },
       template: require('./story-summary-tile.directive.html'),
       controllerAs: '$ctrl',
@@ -39,9 +41,16 @@ angular.module('oppia').directive('storySummaryTile', [
             ENTITY_TYPE, STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getStoryLink = function() {
+            // This component is being used in the topic editor as well and
+            // we want to disable the linking in this case.
+            if (!ctrl.classroomUrlFragment || !ctrl.topicUrlFragment) {
+              return '#';
+            }
             return UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_URL_TEMPLATE, {
-                story_id: ctrl.storySummary.getId()
+                classroom_url_fragment: ctrl.classroomUrlFragment,
+                story_url_fragment: ctrl.storySummary.getUrlFragment(),
+                topic_url_fragment: ctrl.topicUrlFragment
               });
           };
 
@@ -99,7 +108,9 @@ import { UpgradeComponent } from '@angular/upgrade/static';
   selector: 'story-summary-tile'
 })
 export class StorySummaryTileDirective extends UpgradeComponent {
+  @Input() classroomUrlFragment;
   @Input() storySummary;
+  @Input() topicUrlFragment;
   constructor(elementRef: ElementRef, injector: Injector) {
     super('storySummaryTile', elementRef, injector);
   }

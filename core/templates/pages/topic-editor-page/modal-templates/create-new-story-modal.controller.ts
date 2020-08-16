@@ -47,7 +47,10 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
       newStoryConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
     $scope.storyUrlFragmentExists = false;
     $scope.onStoryUrlFragmentChange = function() {
-      StoryEditorStateService.changeStoryWithUrlFragmentExists(
+      if (!$scope.story.urlFragment) {
+        return;
+      }
+      StoryEditorStateService.updateExistenceOfStoryUrlFragment(
         $scope.story.urlFragment, function() {
           $scope.storyUrlFragmentExists = (
             StoryEditorStateService.getStoryWithUrlFragmentExists());

@@ -51,8 +51,6 @@ import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants';
 import { CollectionSummaryTileConstants } from
   'components/summary-tile/collection-summary-tile.constants';
-import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -86,7 +84,6 @@ import { ExplorationEditorPageConstants } from
     ClassifiersExtensionConstants,
     CollectionSummaryTileConstants,
     InteractionsExtensionsConstants,
-    EditorDomainConstants,
     ObjectsDomainConstants,
     QuestionDomainConstants,
     ServicesConstants,

@@ -296,7 +296,7 @@ angular.module('oppia').directive('adminMiscTab', [
               for (var i = 0; i < latexStrings.length; i++) {
                 LoggerService.info(
                   'Trying to generate SVG for Latex: ' +
-                  latexStrings[i] + '  Exploration: ' + expId );
+                  latexStrings[i] + '  Exploration: ' + expId);
                 var svgFile = await convertLatexToSvgFile(latexStrings[i]);
                 countOfSvgsGenerated++;
                 LoggerService.info(
@@ -342,6 +342,79 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.stopGeneration = function() {
           ctrl.generateSvgs = false;
+        };
+
+        // TODO(#10045): Remove this function once all the math-rich text
+        // components in suggestions have a valid math SVG stored in the
+        // datastore.
+        var suggestionLatexMapping;
+        var suggestionIdToLatexMapping = null;
+        var numberOfSuggestionLatexStrings = 0;
+        ctrl.generateSvgsForSuggestions = async function() {
+          var countOfSvgsGenerated = 0;
+          suggestionLatexMapping = {};
+          for (var suggestionId in suggestionIdToLatexMapping) {
+            var latexStrings = suggestionIdToLatexMapping[suggestionId];
+            suggestionLatexMapping[suggestionId] = {};
+            for (var i = 0; i < latexStrings.length; i++) {
+              LoggerService.info(
+                'Trying to generate SVG for Latex: ' +
+                latexStrings[i] + '  suggestion: ' + suggestionId);
+              var svgFile = await convertLatexToSvgFile(latexStrings[i]);
+              countOfSvgsGenerated++;
+              LoggerService.info(
+                'generated ' + countOfSvgsGenerated.toString() + ' SVGs' +
+                ' out of ' + numberOfSuggestionLatexStrings.toString());
+              suggestionLatexMapping[suggestionId][latexStrings[i]] = svgFile;
+            }
+          }
+          ctrl.setStatusMessage(
+            'SVGs generated for ' + countOfSvgsGenerated.toString() +
+            ' LaTeX strings .');
+          $scope.$apply();
+        };
+
+        // TODO(#10045): Remove this function once all the math-rich text
+        // components in suggestions have a valid math SVG stored in the
+        // datastore.
+        ctrl.fetchAndGenerateSvgsForSuggestions = function() {
+          $http.get('/suggestionslatexsvghandler').then(
+            function(response) {
+              var numberOfSuggestionsFetched = 0;
+              numberOfSuggestionLatexStrings = 0;
+              suggestionIdToLatexMapping = (
+                response.data.latex_strings_to_suggestion_ids_mapping);
+              for (var suggestionId in suggestionIdToLatexMapping) {
+                numberOfSuggestionsFetched++;
+                numberOfSuggestionLatexStrings += Object.keys(
+                  suggestionIdToLatexMapping[suggestionId]).length;
+              }
+              ctrl.setStatusMessage(
+                numberOfSuggestionLatexStrings.toString() +
+                ' LaTeX strings fetched from backend for ' +
+                numberOfSuggestionsFetched.toString() + ' suggestions.' +
+                ' Generating SVGs.....');
+              ctrl.generateSvgsForSuggestions();
+            });
+        };
+        // TODO(#10045): Remove this function once all the math-rich text
+        // components in explorations have a valid math SVG stored in the
+        // datastore.
+        ctrl.saveSuggestionSvgsToBackend = function() {
+          AdminDataService.sendSuggestionMathSvgsToBackendAsync(
+            suggestionLatexMapping).then(
+            function(response) {
+              var numberOfSuggestionsUpdated = (
+                response.number_of_suggestions_updated);
+              ctrl.setStatusMessage(
+                'Successfully updated ' + numberOfSuggestionsUpdated +
+                ' suggestions');
+              $scope.$apply();
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error:' + errorResponse.data.error);
+              $scope.$apply();
+            });
         };
 
         ctrl.updateUsername = function() {

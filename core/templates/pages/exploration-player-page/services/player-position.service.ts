@@ -16,20 +16,20 @@
  * @fileoverview Service for keeping track of the learner's position.
  */
 
+import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
-import { ContextService } from 'services/context.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayerPositionService {
-  constructor(private contextService: ContextService,
-              private playerTranscriptService: PlayerTranscriptService) {}
+  constructor(private playerTranscriptService: PlayerTranscriptService) {}
+
+  private _activeCardChangedEventEmitter = new EventEmitter();
+  private _currentQuestionChangedEventEmitter = new EventEmitter<number>();
 
   displayedCardIndex = null;
   onChangeCallback = null;
@@ -93,6 +93,18 @@ export class PlayerPositionService {
    */
   hasLearnerJustSubmittedAnAnswer(): boolean {
     return this.learnerJustSubmittedAnAnswer;
+  }
+
+  changeCurrentQuestion(index: number) {
+    this._currentQuestionChangedEventEmitter.emit(index);
+  }
+
+  get onActiveCardChanged() {
+    return this._activeCardChangedEventEmitter;
+  }
+
+  get onCurrentQuestionChange() {
+    return this._currentQuestionChangedEventEmitter;
   }
 }
 

@@ -84,6 +84,7 @@ require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/generate-content-id.service.ts');
 require('services/html-escaper.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -112,7 +113,8 @@ angular.module('oppia').directive('stateResponses', [
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolicitAnswerDetailsService',
-        'UrlInterpolationService', 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
+        'UrlInterpolationService', 'WindowDimensionsService',
+        'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
@@ -123,7 +125,8 @@ angular.module('oppia').directive('stateResponses', [
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
             StateSolicitAnswerDetailsService,
-            UrlInterpolationService, ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
+            UrlInterpolationService, WindowDimensionsService,
+            ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
             SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
@@ -157,8 +160,9 @@ angular.module('oppia').directive('stateResponses', [
               // Collect all answers which have been handled by at least one
               // answer group.
               for (var i = 0; i < answerGroups.length; i++) {
-                for (var j = 0; j < answerGroups[i].rules.length; j++) {
-                  handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
+                const rules = answerGroups[i].getRulesAsList();
+                for (var j = 0; j < rules.length; j++) {
+                  handledAnswersArray.push(rules[j].inputs.x);
                 }
               }
               for (var i = 0; i < numChoices; i++) {
@@ -189,7 +193,7 @@ angular.module('oppia').directive('stateResponses', [
                 });
 
                 answerGroups.forEach(function(answerGroup) {
-                  var rules = answerGroup.rules;
+                  var rules = answerGroup.getRulesAsList();
                   rules.forEach(function(rule) {
                     var ruleInputs = rule.inputs.x;
                     ruleInputs.forEach(function(ruleInput) {
@@ -318,9 +322,11 @@ angular.module('oppia').directive('stateResponses', [
               controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {
               // Create a new answer group.
-              $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-                [result.tmpRule], result.tmpOutcome, [],
-                result.tmpTaggedSkillMisconceptionId));
+              const newAnswerGroup = AnswerGroupObjectFactory.createNew(
+                result.tmpOutcome, [],
+                result.tmpTaggedSkillMisconceptionId);
+              newAnswerGroup.addRule(result.tmpRule);
+              $scope.answerGroups.push(newAnswerGroup);
               ResponsesService.save(
                 $scope.answerGroups, $scope.defaultOutcome,
                 function(newAnswerGroups, newDefaultOutcome) {
@@ -455,10 +461,11 @@ angular.module('oppia').directive('stateResponses', [
             var outcome = answerGroup.outcome;
             var hasFeedback = outcome.hasNonemptyFeedback();
 
-            if (answerGroup.rules) {
+            if (answerGroup.ruleTypesToInputs) {
               var firstRule = $filter('convertToPlainText')(
                 $filter('parameterizeRuleDescription')(
-                  answerGroup.rules[0], interactionId, answerChoices));
+                  answerGroup.getRulesAsList()[0],
+                  interactionId, answerChoices));
               summary = 'Answer ' + firstRule;
 
               if (hasFeedback && shortenRule) {
@@ -515,10 +522,16 @@ angular.module('oppia').directive('stateResponses', [
             return outcome && (outcome.dest === activeStateName);
           };
 
+          $scope.toggleResponseCard = function() {
+            $scope.responseCardIsShown = !$scope.responseCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
               SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
             $scope.EditabilityService = EditabilityService;
+            $scope.responseCardIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.stateName = StateEditorService.getActiveStateName();
             $scope.enableSolicitAnswerDetailsFeature = (
               ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);

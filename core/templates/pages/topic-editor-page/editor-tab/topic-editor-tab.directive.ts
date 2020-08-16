@@ -49,7 +49,11 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('services/page-title.service.ts');
 require('domain/question/question-backend-api.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 
+import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -63,40 +67,49 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
         'CsrfTokenService', 'EntityCreationService', 'ImageUploadHelperService',
         'PageTitleService', 'SkillCreationService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
         'WindowDimensionsService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
-            $scope, $uibModal, AlertsService, ContextService,
+            $rootScope, $scope, $uibModal, AlertsService, ContextService,
             CsrfTokenService, EntityCreationService, ImageUploadHelperService,
             PageTitleService, SkillCreationService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
+            TopicsAndSkillsDashboardBackendApiService,
             TopicUpdateService, UndoRedoService, UrlInterpolationService,
             WindowDimensionsService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
-            MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
+          $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
+            topicConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT);
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
-          var _initEditor = function() {
+          ctrl.initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.skillQuestionCountDict = (
               TopicEditorStateService.getSkillQuestionCountDict());
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
+            if (TopicEditorStateService.hasLoadedTopic()) {
+              $scope.topicDataHasLoaded = true;
+              $scope.$applyAsync();
+            }
             $scope.editableName = $scope.topic.getName();
-            $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
+            $scope.initialTopicName = $scope.topic.getName();
+            $scope.initialTopicUrlFragment = $scope.topic.getUrlFragment();
+            $scope.editableTopicUrlFragment = $scope.topic.getUrlFragment();
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.allowedBgColors = (
               topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
+            $scope.topicNameExists = false;
+            $scope.topicUrlFragmentExists = false;
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -155,7 +168,7 @@ angular.module('oppia').directive('topicEditorTab', [
               controllerAs: '$ctrl',
               size: 'xl'
             }).result.then(function() {
-              _initEditor();
+              ctrl.initEditor();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -209,11 +222,43 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicName = function(newName) {
-            if (newName === $scope.topic.getName()) {
+            if (newName === $scope.initialTopicName) {
+              $scope.topicNameExists = false;
               return;
             }
-            TopicUpdateService.setTopicName($scope.topic, newName);
-            $scope.topicNameEditorIsShown = false;
+            if (newName) {
+              TopicEditorStateService.updateExistenceOfTopicName(
+                newName, function() {
+                  $scope.topicNameExists = (
+                    TopicEditorStateService.getTopicWithNameExists());
+                  TopicUpdateService.setTopicName($scope.topic, newName);
+                  $scope.topicNameEditorIsShown = false;
+                  $rootScope.$applyAsync();
+                });
+            } else {
+              TopicUpdateService.setTopicName($scope.topic, newName);
+              $scope.topicNameEditorIsShown = false;
+            }
+          };
+
+          $scope.updateTopicUrlFragment = function(newTopicUrlFragment) {
+            if (newTopicUrlFragment === $scope.initialTopicUrlFragment) {
+              $scope.topicUrlFragmentExists = false;
+              return;
+            }
+            if (newTopicUrlFragment) {
+              TopicEditorStateService.updateExistenceOfTopicUrlFragment(
+                newTopicUrlFragment, function() {
+                  $scope.topicUrlFragmentExists = (
+                    TopicEditorStateService.getTopicWithUrlFragmentExists());
+                  TopicUpdateService.setTopicUrlFragment(
+                    $scope.topic, newTopicUrlFragment);
+                  $rootScope.$applyAsync();
+                });
+            } else {
+              TopicUpdateService.setTopicUrlFragment(
+                $scope.topic, newTopicUrlFragment);
+            }
           };
 
           $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {
@@ -242,14 +287,14 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
             TopicUpdateService.removeUncategorizedSkill(
               $scope.topic, skillSummary);
-            _initEditor();
+            ctrl.initEditor();
           };
 
           $scope.removeSkillFromSubtopic = function(subtopicId, skillSummary) {
             $scope.selectedSkillEditOptionsIndex = {};
             TopicUpdateService.removeSkillFromSubtopic(
               $scope.topic, subtopicId, skillSummary);
-            _initEditor();
+            ctrl.initEditor();
           };
 
           $scope.removeSkillFromTopic = function(subtopicId, skillSummary) {
@@ -267,7 +312,7 @@ angular.module('oppia').directive('topicEditorTab', [
             TopicEditorStateService.deleteSubtopicPage(
               $scope.topic.getId(), subtopicId);
             TopicUpdateService.deleteSubtopic($scope.topic, subtopicId);
-            _initEditor();
+            ctrl.initEditor();
           };
 
           $scope.navigateToSubtopic = function(subtopicId, subtopicName) {
@@ -293,7 +338,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.getPreviewFooter = function() {
             var canonicalStoriesLength = (
               $scope.topic.getCanonicalStoryIds().length);
-            if ( canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
+            if (canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
               return canonicalStoriesLength + ' Stories';
             }
             return '1 Story';
@@ -358,7 +403,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.rearrangeSubtopic(
               $scope.topic, $scope.fromIndex, toIndex);
-            _initEditor();
+            ctrl.initEditor();
           };
 
           $scope.showSkillEditOptions = function(subtopicIndex, skillIndex) {
@@ -377,21 +422,36 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.SUBTOPIC_LIST = 'subtopic';
             $scope.SKILL_LIST = 'skill';
             $scope.STORY_LIST = 'story';
+            $scope.topicDataHasLoaded = false;
             $scope.subtopicCardSelectedIndexes = {};
             $scope.selectedSkillEditOptionsIndex = {};
             $scope.subtopicsListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.storiesListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicInitialized.subscribe(
+                () => ctrl.initEditor()
+              ));
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicReinitialized.subscribe(
+                () => ctrl.initEditor()
+              ));
             $scope.mainTopicCardIsShown = true;
-            $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-            $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
-            $scope.$on(
-              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-              $scope.refreshTopic);
-            _initEditor();
+            ctrl.directiveSubscriptions.add(
+              TopicsAndSkillsDashboardBackendApiService.
+                onTopicsAndSkillsDashboardReinitialized.subscribe(
+                  () => {
+                    $scope.refreshTopic();
+                  }
+                )
+            );
+            ctrl.initEditor();
             _initStorySummaries();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

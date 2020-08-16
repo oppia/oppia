@@ -122,7 +122,8 @@ describe('Story editor page', function() {
       version: 1,
       corresponding_topic_id: '2',
       thumbnail_bg_color: null,
-      thumbnail_filename: null
+      thumbnail_filename: null,
+      url_fragment: 'story-url-fragment'
     });
     var MockEditableStoryBackendApiService = {
       validateExplorations: () => Promise.resolve([])
@@ -214,6 +215,31 @@ describe('Story editor page', function() {
     expect(ctrl.getTotalWarningsCount()).toEqual(0);
   });
 
+  it('should report if story fragment already exists', () => {
+    let storyInitializedEventEmitter = new EventEmitter();
+    let storyReinitializedEventEmitter = new EventEmitter();
+    spyOn(StoryEditorStateService, 'loadStory').and.callFake(function() {
+      storyInitializedEventEmitter.emit();
+      storyReinitializedEventEmitter.emit();
+    });
+    spyOnProperty(StoryEditorStateService,
+      'onStoryInitialized').and.returnValue(
+      storyInitializedEventEmitter);
+    spyOnProperty(StoryEditorStateService,
+      'onStoryReinitialized').and.returnValue(
+      storyReinitializedEventEmitter);
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(
+      StoryEditorStateService,
+      'getStoryWithUrlFragmentExists').and.returnValue(true);
+    MockStoryEditorNavigationService.checkIfPresentInChapterEditor = () => true;
+    ctrl.$onInit();
+    expect(ctrl.validationIssues).toEqual(
+      ['Story URL fragment already exists.']);
+    ctrl.$onDestroy();
+  });
+
   it('should toggle the display of warnings', function() {
     ctrl.toggleWarnings();
     expect(ctrl.warningsAreShown).toEqual(true);
@@ -277,5 +303,17 @@ describe('Story editor page', function() {
     MockStoryEditorNavigationService.activeTab = 'story_editor';
     MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
     expect(ctrl.getNavbarText()).toEqual('Story Editor');
+  });
+
+  it('should init page on undo redo change applied', () => {
+    let mockUndoRedoChangeEventEmitter = new EventEmitter();
+    spyOn(UndoRedoService, 'onUndoRedoChangeApplied').and.returnValue(
+      mockUndoRedoChangeEventEmitter);
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setPageTitle');
+    ctrl.$onInit();
+    mockUndoRedoChangeEventEmitter.emit();
+    expect(PageTitleService.setPageTitle).toHaveBeenCalled();
+    ctrl.$onDestroy();
   });
 });
