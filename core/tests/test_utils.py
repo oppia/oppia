@@ -2504,7 +2504,7 @@ class LinterTestBase(GenericTestBase):
 
 
 class AuditJobsTestBase(GenericTestBase):
-    """Base class for linter tests."""
+    """Base class for audit jobs tests."""
 
     @contextlib.contextmanager
     def mock_datetime_for_audit(self, mocked_datetime):
