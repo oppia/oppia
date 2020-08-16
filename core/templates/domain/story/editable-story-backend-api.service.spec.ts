@@ -90,8 +90,8 @@ describe('Editable story backend API service', function() {
         id: 'skill_1',
         description: 'Skill Description'
       }],
-      topic_url_fragment: undefined,
-      classroom_url_fragment: undefined
+      topic_url_fragment: 'topic-frag',
+      classroom_url_fragment: 'math'
     };
   }));
 
