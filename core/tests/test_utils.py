@@ -245,7 +245,6 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
         return number_of_deleted_keys
 
 
-
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
     """Mock for google.appengine.api.urlfetch."""
 

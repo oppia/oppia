@@ -589,4 +589,3 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             default_story.to_dict(),
             stories[story_id].to_dict())
-

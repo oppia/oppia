@@ -587,7 +587,6 @@ class Topic(python_utils.OBJECT):
 
         return json.dumps(topic_dict).encode('utf-8')
 
-
     @classmethod
     def from_dict(
             cls, topic_dict, topic_version=0, topic_created_on=None,

@@ -808,7 +808,6 @@ class CommonTests(test_utils.GenericTestBase):
         with swap_os_check, windows_not_supported_exception:
             common.start_redis_server()
 
-
     def test_windows_os_throws_exception_when_stopping_redis_server(self):
         def mock_is_windows_os():
             return True
@@ -821,7 +820,6 @@ class CommonTests(test_utils.GenericTestBase):
 
         with swap_os_check, windows_not_supported_exception:
             common.stop_redis_server()
-
 
     def test_start_and_stop_server_calls_are_called(self):
         # Test that starting the server calls subprocess.call().
