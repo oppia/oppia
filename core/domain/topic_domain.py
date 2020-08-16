@@ -340,7 +340,6 @@ class Subtopic(python_utils.OBJECT):
         self.thumbnail_bg_color = thumbnail_bg_color
         self.url_fragment = url_fragment
 
-
     def to_dict(self):
         """Returns a dict representing this Subtopic domain object.
 

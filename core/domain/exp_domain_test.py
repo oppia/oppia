@@ -8368,7 +8368,6 @@ title: Title
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
-
     def test_cannot_load_from_yaml_with_no_schema_version(self):
         sample_yaml_content = (
             """author_notes: ''
@@ -9062,7 +9061,6 @@ tags: []
 title: title
 """)
 
-
     YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION = (
         """author_notes: ''
 auto_tts_enabled: true
@@ -9450,7 +9448,6 @@ title: Title
 """)
 # pylint: enable=line-too-long, single-line-pragma
 
-
     def test_load_from_v26_textangular(self):
         """Test direct loading from a v26 yaml file."""
         mock_get_filename_with_dimensions_context = self.swap(
@@ -9462,7 +9459,6 @@ title: Title
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V44_IMAGE_DIMENSIONS)
-
 
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
