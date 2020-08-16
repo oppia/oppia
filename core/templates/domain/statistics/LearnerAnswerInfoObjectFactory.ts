@@ -69,7 +69,7 @@ export class LearnerAnswerInfoObjectFactory {
       null, answer, answerDetails, null);
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
       learnerAnswerInfoDict: LearnerAnswerInfoBackendDict): LearnerAnswerInfo {
     return new LearnerAnswerInfo(
       learnerAnswerInfoDict.id,

@@ -66,7 +66,7 @@ export class LearnerAnswerDetailsDataService {
             LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
               this._expId, stateName, interactionId, customizationArgs,
               learnerAnswerInfoDicts.map(
-                LearnerAnswerInfoObjectFactory.createFormBackendDict
+                LearnerAnswerInfoObjectFactory.createFromBackendDict
               )
             )
           );
