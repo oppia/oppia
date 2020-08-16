@@ -15402,7 +15402,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             self.run_job_and_get_output(), list(expected_outputs))
 
     def test_no_models(self):
-        self.self.run_job_and_check_output()
+        self.run_job_and_check_output()
 
     def test_valid_model_check(self):
         improvements_models.TaskEntryModel.create(
@@ -15422,7 +15422,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
             improvements_models.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME)
-        self.self.run_job_and_check_output(
+        self.run_job_and_check_output(
             ['failed validation check for entity_ids field check of '
              'TaskEntryModel',
              ['Entity id %s: based on field entity_ids having value '
@@ -15441,7 +15441,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
             improvements_models.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME)
-        self.self.run_job_and_check_output(
+        self.run_job_and_check_output(
             ['failed validation check for target_id field check of '
              'TaskEntryModel',
              ['Entity id %s: exploration with id "exp_id" does not exist at '
@@ -15459,7 +15459,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             status=improvements_models.TASK_STATUS_RESOLVED,
             resolver_id='invalid_user_id',
             resolved_on=CURRENT_DATETIME)
-        self.self.run_job_and_check_output(
+        self.run_job_and_check_output(
             ['failed validation check for resolver_ids field check of '
              'TaskEntryModel',
              ['Entity id %s: based on field resolver_ids having value '
@@ -15477,7 +15477,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             target_type=improvements_models.TASK_TARGET_TYPE_STATE,
             target_id=feconf.DEFAULT_INIT_STATE_NAME,
             status=improvements_models.TASK_STATUS_OPEN).put()
-        self.self.run_job_and_check_output(
+        self.run_job_and_check_output(
             ['failed validation check for model id check of TaskEntryModel',
              ['Entity id bad_id: Entity id does not match regex pattern']])
 
@@ -15499,7 +15499,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             target_type=improvements_models.TASK_TARGET_TYPE_STATE,
             target_id=feconf.DEFAULT_INIT_STATE_NAME,
             status=improvements_models.TASK_STATUS_OPEN).put()
-        self.self.run_job_and_check_output(
+        self.run_job_and_check_output(
             ['failed validation check for composite_entity_id field check of '
              'TaskEntryModel',
              ['Entity id %s: composite_entity_id "bad_composite_id" should be '
@@ -15517,7 +15517,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             issue_description='issue description',
             status=improvements_models.TASK_STATUS_OPEN,
             resolver_id=self.user_id)
-        self.self.run_job_and_check_output(
+        self.run_job_and_check_output(
             ['failed validation check for status field check of TaskEntryModel',
              ['Entity id %s: status is open but resolver_id is "%s", should be '
               'empty.' % (task_id, self.user_id)]])
@@ -15533,7 +15533,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             issue_description='issue description',
             status=improvements_models.TASK_STATUS_OPEN,
             resolved_on=CURRENT_DATETIME)
-        self.self.run_job_and_check_output(
+        self.run_job_and_check_output(
             ['failed validation check for status field check of TaskEntryModel',
              ['Entity id %s: status is open but resolved_on is "%s", should be '
               'empty.' % (task_id, CURRENT_DATETIME)]])
@@ -15550,7 +15550,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             status=improvements_models.TASK_STATUS_RESOLVED,
             resolver_id=None,
             resolved_on=CURRENT_DATETIME)
-        self.self.run_job_and_check_output(
+        self.run_job_and_check_output(
             ['failed validation check for status field check of TaskEntryModel',
              ['Entity id %s: status is resolved but resolver_id is not set' % (
                  task_id,)]])
@@ -15567,7 +15567,7 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             status=improvements_models.TASK_STATUS_RESOLVED,
             resolver_id=self.user_id,
             resolved_on=None)
-        self.self.run_job_and_check_output(
+        self.run_job_and_check_output(
             ['failed validation check for status field check of TaskEntryModel',
              ['Entity id %s: status is resolved but resolved_on is not set' % (
                  task_id,)]])
