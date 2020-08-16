@@ -294,7 +294,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 break
 
             if states_schema_version == current_state_schema_version:
-                yield ('SUCCESS', None)
+                yield ('SUCCESS', 1)
 
     @staticmethod
     def reduce(key, values):
