@@ -47,12 +47,12 @@ angular.module('oppia').directive('progressNav', [
       },
       template: require('./progress-nav.directive.html'),
       controller: [
-        '$rootScope', '$scope', 'BrowserCheckerService',
+        '$scope', 'BrowserCheckerService',
         'ExplorationEngineService', 'ExplorationPlayerStateService',
         'PlayerPositionService', 'PlayerTranscriptService', 'UrlService',
         'WindowDimensionsService', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'INTERACTION_SPECS', 'TWO_CARD_THRESHOLD_PX',
-        function($rootScope, $scope, BrowserCheckerService,
+        function($scope, BrowserCheckerService,
             ExplorationEngineService, ExplorationPlayerStateService,
             PlayerPositionService, PlayerTranscriptService, UrlService,
             WindowDimensionsService, CONTINUE_BUTTON_FOCUS_LABEL,
@@ -125,7 +125,7 @@ angular.module('oppia').directive('progressNav', [
               PlayerPositionService.setDisplayedCardIndex(index);
               ExplorationEngineService.onUpdateActiveStateIfInEditor.emit(
                 PlayerPositionService.getCurrentStateName());
-              $rootScope.$broadcast('currentQuestionChanged', index);
+              PlayerPositionService.changeCurrentQuestion(index);
             } else {
               throw new Error('Target card index out of bounds.');
             }

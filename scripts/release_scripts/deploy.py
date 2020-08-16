@@ -220,7 +220,8 @@ def build_scripts(maintenance_mode):
     # Do a build, while outputting to the terminal.
     python_utils.PRINT('Building and minifying scripts...')
     build_command = [
-        'python', '-m', 'scripts.build', '--prod_env', '--deploy_mode']
+        'python', '-m', 'scripts.build', '--prod_env',
+        '--source_maps', '--deploy_mode']
     if maintenance_mode:
         build_command.append('--maintenance_mode')
     build_process = subprocess.Popen(build_command, stdout=subprocess.PIPE)
