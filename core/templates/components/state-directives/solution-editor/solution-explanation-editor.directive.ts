@@ -22,7 +22,7 @@ require(
   'state-property.service.ts');
 require('services/context.service.ts');
 require('services/editability.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
+require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -42,10 +42,10 @@ angular.module('oppia').directive('solutionExplanationEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'ContextService', 'EditabilityService',
-        'RouterService', 'StateSolutionService',
+        'ExternalSaveService', 'StateSolutionService',
         function(
             $scope, ContextService, EditabilityService,
-            RouterService, StateSolutionService) {
+            ExternalSaveService, StateSolutionService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.openExplanationEditor = function() {
@@ -75,7 +75,7 @@ angular.module('oppia').directive('solutionExplanationEditor', [
 
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
-              RouterService.onExternalSave.subscribe(() => {
+              ExternalSaveService.onExternalSave.subscribe(() => {
                 if (ctrl.explanationEditorIsOpen &&
                   ctrl.editSolutionForm.$valid) {
                   ctrl.saveThisExplanation();

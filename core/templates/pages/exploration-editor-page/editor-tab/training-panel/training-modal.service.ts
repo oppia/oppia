@@ -45,12 +45,12 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-modal.controller');
-require('pages/exploration-editor-page/services/router.service.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').factory('TrainingModalService', [
-  '$uibModal', 'AlertsService', 'RouterService',
+  '$uibModal', 'AlertsService', 'ExternalSaveService',
   'UrlInterpolationService',
-  function($uibModal, AlertsService, RouterService,
+  function($uibModal, AlertsService, ExternalSaveService,
       UrlInterpolationService) {
     return {
       /**
@@ -78,7 +78,7 @@ angular.module('oppia').factory('TrainingModalService', [
           controller: 'TrainingModalController'
         });
         // Save the modified training data externally in state content.
-        RouterService.onExternalSave.emit();
+        ExternalSaveService.onExternalSave.emit();
       }
     };
   }

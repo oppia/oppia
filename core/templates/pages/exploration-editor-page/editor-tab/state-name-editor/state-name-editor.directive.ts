@@ -29,7 +29,7 @@ require(
   'state-name.service.ts');
 require('services/editability.service.ts');
 require('services/stateful/focus-manager.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
+require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -53,11 +53,11 @@ angular.module('oppia').directive('stateNameEditor', [
       controller: [
         '$scope', '$filter', '$rootScope', 'EditabilityService',
         'StateEditorService', 'StateNameService', 'FocusManagerService',
-        'ExplorationStatesService', 'RouterService',
+        'ExplorationStatesService', 'ExternalSaveService',
         function(
             $scope, $filter, $rootScope, EditabilityService,
             StateEditorService, StateNameService, FocusManagerService,
-            ExplorationStatesService, RouterService) {
+            ExplorationStatesService, ExternalSaveService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
 
@@ -89,7 +89,7 @@ angular.module('oppia').directive('stateNameEditor', [
                 StateEditorService.getActiveStateName(), normalizedNewName);
               StateNameService.setStateNameEditorVisibility(false);
               // Save the contents of other open fields.
-              RouterService.onExternalSave.emit();
+              ExternalSaveService.onExternalSave.emit();
               ctrl.initStateNameEditor();
               return true;
             }
@@ -112,12 +112,12 @@ angular.module('oppia').directive('stateNameEditor', [
               ctrl._getNormalizedStateName(newStateName);
             var valid = ctrl.saveStateName(normalizedStateName);
             if (valid) {
-              RouterService.navigateToMainTab(normalizedStateName);
+              ExternalSaveService.navigateToMainTab(normalizedStateName);
             }
           };
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
-              RouterService.onExternalSave.subscribe(
+              ExternalSaveService.onExternalSave.subscribe(
                 () => {
                   if (StateNameService.isStateNameEditorShown()) {
                     ctrl.saveStateName(ctrl.tmpStateName);

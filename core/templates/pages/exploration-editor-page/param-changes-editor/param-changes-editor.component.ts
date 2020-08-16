@@ -33,7 +33,7 @@ require(
   'state-editor.service.ts');
 require('services/alerts.service.ts');
 require('services/editability.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
+require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -47,12 +47,12 @@ angular.module('oppia').component('paramChangesEditor', {
   controller: [
     '$scope', 'EditabilityService', 'ExplorationParamSpecsService',
     'AlertsService', 'ParamChangeObjectFactory', 'ExplorationStatesService',
-    'RouterService',
+    'ExternalSaveService',
     'UrlInterpolationService', 'INVALID_PARAMETER_NAMES',
     function(
         $scope, EditabilityService, ExplorationParamSpecsService,
         AlertsService, ParamChangeObjectFactory, ExplorationStatesService,
-        RouterService,
+        ExternalSaveService,
         UrlInterpolationService, INVALID_PARAMETER_NAMES) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -205,7 +205,7 @@ angular.module('oppia').component('paramChangesEditor', {
           RandomSelector: 'to one of'
         };
         ctrl.directiveSubscriptions.add(
-          RouterService.onExternalSave.subscribe(
+          ExternalSaveService.onExternalSave.subscribe(
             () => {
               if ($scope.isParamChangesEditorOpen) {
                 $scope.saveParamChanges();

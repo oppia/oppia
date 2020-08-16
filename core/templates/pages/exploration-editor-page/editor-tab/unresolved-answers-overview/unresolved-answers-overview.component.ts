@@ -36,6 +36,7 @@ require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require('services/editability.service.ts');
 require('services/improvements.service.ts');
 require('services/state-top-answers-stats.service.ts');
+require('services/external-save.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -44,14 +45,14 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
   template: require('./unresolved-answers-overview.component.html'),
   controller: [
     '$rootScope', '$scope', '$uibModal', 'EditabilityService',
-    'RouterService', 'ExplorationStatesService',
+    'ExternalSaveService', 'ExplorationStatesService',
     'ImprovementsService', 'StateEditorService',
     'StateInteractionIdService', 'StateTopAnswersStatsService',
     'UrlInterpolationService', 'INTERACTION_SPECS',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
     function(
         $rootScope, $scope, $uibModal, EditabilityService,
-        RouterService, ExplorationStatesService,
+        ExternalSaveService, ExplorationStatesService,
         ImprovementsService, StateEditorService,
         StateInteractionIdService, StateTopAnswersStatsService,
         UrlInterpolationService, INTERACTION_SPECS,
@@ -91,7 +92,7 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
       };
 
       $scope.openTeachOppiaModal = function() {
-        RouterService.onExternalSave.emit();
+        ExternalSaveService.onExternalSave.emit();
 
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

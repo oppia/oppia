@@ -28,7 +28,7 @@ require(
   'state-property.service.ts');
 require('services/context.service.ts');
 require('services/editability.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
+require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -55,11 +55,11 @@ angular.module('oppia').directive('stateContentEditor', [
         'state-content-editor.directive.html'),
       controller: [
         '$scope', 'ContextService', 'EditabilityService',
-        'EditorFirstTimeEventsService', 'RouterService',
+        'EditorFirstTimeEventsService', 'ExternalSaveService',
         'StateContentService', 'StateEditorService',
         function(
             $scope, ContextService, EditabilityService,
-            EditorFirstTimeEventsService, RouterService,
+            EditorFirstTimeEventsService, ExternalSaveService,
             StateContentService, StateEditorService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -123,7 +123,7 @@ angular.module('oppia').directive('stateContentEditor', [
             $scope.isEditable = EditabilityService.isEditable;
             $scope.cardHeightLimitWarningIsShown = true;
             ctrl.directiveSubscriptions.add(
-              RouterService.onExternalSave.subscribe(
+              ExternalSaveService.onExternalSave.subscribe(
                 () => {
                   if ($scope.contentEditorIsOpen) {
                     saveContent();

@@ -49,12 +49,12 @@ require('services/exploration-html-formatter.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-data-editor-panel-modal.controller.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').factory('TrainingDataEditorPanelService', [
-  '$uibModal', 'AlertsService', 'RouterService',
+  '$uibModal', 'AlertsService', 'ExternalSaveService',
   'UrlInterpolationService',
-  function($uibModal, AlertsService, RouterService,
+  function($uibModal, AlertsService, ExternalSaveService,
       UrlInterpolationService) {
     return {
       /**
@@ -70,7 +70,7 @@ angular.module('oppia').factory('TrainingDataEditorPanelService', [
           controller: 'TrainingDataEditorPanelServiceModalController'
         });
         // Save the modified training data externally in state content.
-        RouterService.onExternalSave.emit();
+        ExternalSaveService.onExternalSave.emit();
       }
     };
   }

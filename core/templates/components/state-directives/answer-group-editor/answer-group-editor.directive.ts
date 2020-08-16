@@ -43,7 +43,7 @@ require(
   'state-property.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
+require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -79,13 +79,13 @@ angular.module('oppia').directive('answerGroupEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'RouterService',
+        'AlertsService', 'ContextService', 'ExternalSaveService',
         'INTERACTION_SPECS', 'StateEditorService', 'RuleObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'ResponsesService',
         function(
             $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, RouterService,
+            AlertsService, ContextService, ExternalSaveService,
             INTERACTION_SPECS, StateEditorService, RuleObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
@@ -297,7 +297,7 @@ angular.module('oppia').directive('answerGroupEditor', [
             });
 
             ctrl.directiveSubscriptions.add(
-              RouterService.onExternalSave.subscribe(() => {
+              ExternalSaveService.onExternalSave.subscribe(() => {
                 if (ctrl.isRuleEditorOpen()) {
                   ctrl.saveRules();
                 }

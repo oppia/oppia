@@ -66,6 +66,7 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
@@ -75,7 +76,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
   'ExplorationRightsService', 'ExplorationStatesService',
   'ExplorationTagsService', 'ExplorationTitleService',
-  'ExplorationWarningsService', 'FocusManagerService', 'RouterService',
+  'ExplorationWarningsService', 'ExternalSaveService',
+  'FocusManagerService', 'RouterService',
   'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
   'DEFAULT_LANGUAGE_CODE',
   function(
@@ -86,7 +88,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
       ExplorationLanguageCodeService, ExplorationObjectiveService,
       ExplorationRightsService, ExplorationStatesService,
       ExplorationTagsService, ExplorationTitleService,
-      ExplorationWarningsService, FocusManagerService, RouterService,
+      ExplorationWarningsService, ExternalSaveService,
+      FocusManagerService, RouterService,
       SiteAnalyticsService, StatesObjectFactory, UrlInterpolationService,
       DEFAULT_LANGUAGE_CODE) {
     // Whether or not a save action is currently in progress
@@ -228,7 +231,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           AlertsService.clearWarnings();
-          RouterService.onExternalSave.emit();
+          ExternalSaveService.onExternalSave.emit();
 
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

@@ -18,7 +18,7 @@
 
 // This is a copy of the UnicodeStringEditor.
 
-require('pages/exploration-editor-page/services/router.service.ts');
+require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -34,8 +34,8 @@ angular.module('oppia').directive('normalizedStringEditor', [
       },
       template: require('./unicode-string-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', 'RouterService',
-        function($scope, RouterService) {
+      controller: ['$scope', 'ExternalSaveService',
+        function($scope, ExternalSaveService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.$onInit = function() {
@@ -54,7 +54,7 @@ angular.module('oppia').directive('normalizedStringEditor', [
               };
             }, true);
             ctrl.directiveSubscriptions.add(
-              RouterService.onExternalSave.subscribe(() => {
+              ExternalSaveService.onExternalSave.subscribe(() => {
                 if (ctrl.active) {
                   ctrl.replaceValue(ctrl.localValue.label);
                   // The $scope.$apply() call is needed to propagate

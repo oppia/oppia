@@ -50,7 +50,7 @@ require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/generate-content-id.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -67,7 +67,7 @@ angular.module('oppia').directive('stateHintsEditor', [
         'state-hints-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter', 'AlertsService',
-        'EditabilityService', 'RouterService',
+        'EditabilityService', 'ExternalSaveService',
         'StateEditorService', 'StateHintsService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolutionService',
@@ -75,7 +75,7 @@ angular.module('oppia').directive('stateHintsEditor', [
         'INTERACTION_SPECS',
         function(
             $scope, $rootScope, $uibModal, $filter, AlertsService,
-            EditabilityService, RouterService,
+            EditabilityService, ExternalSaveService,
             StateEditorService, StateHintsService,
             StateInteractionIdService, StateNextContentIdIndexService,
             StateSolutionService,
@@ -133,7 +133,7 @@ angular.module('oppia').directive('stateHintsEditor', [
               return;
             }
             AlertsService.clearWarnings();
-            RouterService.onExternalSave.emit();
+            ExternalSaveService.onExternalSave.emit();
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -243,7 +243,7 @@ angular.module('oppia').directive('stateHintsEditor', [
               revert: 100,
               tolerance: 'pointer',
               start: function(e, ui) {
-                RouterService.onExternalSave.emit();
+                ExternalSaveService.onExternalSave.emit();
                 StateHintsService.setActiveHintIndex(null);
                 ui.placeholder.height(ui.item.height());
               },

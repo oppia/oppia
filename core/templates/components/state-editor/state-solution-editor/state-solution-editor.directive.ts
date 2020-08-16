@@ -62,7 +62,7 @@ require('services/exploration-html-formatter.service.ts');
 
 require('components/state-editor/state-editor.constants.ajs.ts');
 require('services/contextual/window-dimensions.service');
-require('pages/exploration-editor-page/services/router.service.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -80,7 +80,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
         '$scope', '$uibModal', '$filter', 'StateEditorService',
         'AlertsService', 'INTERACTION_SPECS', 'StateSolutionService',
         'SolutionVerificationService', 'SolutionValidityService',
-        'ExplorationHtmlFormatterService', 'RouterService',
+        'ExplorationHtmlFormatterService', 'ExternalSaveService',
         'StateInteractionIdService', 'StateHintsService',
         'UrlInterpolationService', 'StateCustomizationArgsService',
         'EditabilityService', 'WindowDimensionsService',
@@ -90,7 +90,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
             $scope, $uibModal, $filter, StateEditorService,
             AlertsService, INTERACTION_SPECS, StateSolutionService,
             SolutionVerificationService, SolutionValidityService,
-            ExplorationHtmlFormatterService, RouterService,
+            ExplorationHtmlFormatterService, ExternalSaveService,
             StateInteractionIdService, StateHintsService,
             UrlInterpolationService, StateCustomizationArgsService,
             EditabilityService, WindowDimensionsService,
@@ -146,7 +146,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
 
           $scope.openAddOrUpdateSolutionModal = function() {
             AlertsService.clearWarnings();
-            RouterService.onExternalSave.emit();
+            ExternalSaveService.onExternalSave.emit();
             $scope.inlineSolutionEditorIsActive = false;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
