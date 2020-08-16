@@ -25,7 +25,7 @@ from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
 
-base_models = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class MockModel(base_models.BaseModel):
