@@ -49,7 +49,7 @@ describe('Question misconception editor component', function() {
   var ctrl = null;
   var misconceptionObjectFactory = null;
   var mockMisconceptionObject = null;
-  var routerService = null;
+  var externalSaveService = null;
   var ses = null;
 
   var mockExternalSaveEventEmitter = null;
@@ -62,7 +62,7 @@ describe('Question misconception editor component', function() {
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
     mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('RouterService', {
+    $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
   }));
@@ -74,7 +74,7 @@ describe('Question misconception editor component', function() {
       $q = _$q_;
       $rootScope = _$rootScope_;
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
-      routerService = $injector.get('RouterService');
+      externalSaveService = $injector.get('ExternalSaveService');
       ses = $injector.get('StateEditorService');
     }));
 

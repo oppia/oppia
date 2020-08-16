@@ -54,7 +54,7 @@ describe('Param Changes Editor Component', function() {
   var explorationStatesService = null;
   var paramChangeObjectFactory = null;
   var paramSpecsObjectFactory = null;
-  var routerService = null;
+  var externalSaveService = null;
   var stateParamChangesService = null;
 
   var postSaveHookSpy = jasmine.createSpy('postSaveHook', () => {});
@@ -83,7 +83,7 @@ describe('Param Changes Editor Component', function() {
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('RouterService', {
+    $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value(
@@ -100,7 +100,7 @@ describe('Param Changes Editor Component', function() {
     explorationParamSpecsService = $injector.get(
       'ExplorationParamSpecsService');
     explorationStatesService = $injector.get('ExplorationStatesService');
-    routerService = $injector.get('RouterService');
+    externalSaveService = $injector.get('ExternalSaveService');
 
     explorationParamSpecsService.init(
       paramSpecsObjectFactory.createFromBackendDict({
@@ -118,7 +118,7 @@ describe('Param Changes Editor Component', function() {
       $scope: $scope,
       AlertsService: alertsService,
       ParamChangeObjectFactory: paramChangeObjectFactory,
-      RouterService: routerService
+      ExternalSaveService: externalSaveService
     }, {
       paramChangesService: stateParamChangesService,
       postSaveHook: postSaveHookSpy,

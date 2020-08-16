@@ -131,7 +131,7 @@ describe('State Translation Editor Component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('RouterService', {
+    $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value('StateRecordedVoiceoversService', TestBed.get(

@@ -72,7 +72,7 @@ describe('Audio translation bar directive', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var recordedVoiceoversObjectFactory = null;
-  var routerService = null;
+  var externalSaveService = null;
   var siteAnalyticsService = null;
   var stateEditorService = null;
   var stateRecordedVoiceoversService = null;
@@ -109,7 +109,7 @@ describe('Audio translation bar directive', function() {
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('RouterService', {
+    $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
@@ -137,7 +137,7 @@ describe('Audio translation bar directive', function() {
     contextService = $injector.get('ContextService');
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     explorationStatesService = $injector.get('ExplorationStatesService');
-    routerService = $injector.get('RouterService');
+    externalSaveService = $injector.get('ExternalSaveService');
     stateEditorService = $injector.get('StateEditorService');
     translationLanguageService = $injector.get('TranslationLanguageService');
     translationTabActiveContentIdService = $injector.get(

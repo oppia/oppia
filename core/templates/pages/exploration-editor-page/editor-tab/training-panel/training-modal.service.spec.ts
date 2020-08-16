@@ -16,20 +16,21 @@
  * @fileoverview Unit tests for TrainingModalService.
  */
 
-import { EventEmitter } from '@angular/core';
-
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { Subscription } from 'rxjs';
+
 describe('Training Modal Service', function() {
   var $rootScope;
   var TrainingModalService = null;
   var AlertsService = null;
-  var RouterService = null;
+  var ExternalSaveService = null;
 
-  var mockExternalSaveEventEmitter = null;
+  var testSubscriptions = null;
+  var externalSaveSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -39,28 +40,31 @@ describe('Training Modal Service', function() {
     }
   }));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('RouterService', {
-      onExternalSave: mockExternalSaveEventEmitter
-    });
-  }));
-
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     TrainingModalService = $injector.get(
       'TrainingModalService');
     AlertsService = $injector.get('AlertsService');
-    RouterService = $injector.get('RouterService');
+    ExternalSaveService = $injector.get('ExternalSaveService');
   }));
 
+  beforeEach(() => {
+    externalSaveSpy = jasmine.createSpy('externalSave');
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(ExternalSaveService.onExternalSave.subscribe(
+      externalSaveSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   it('should open $uibModal', function() {
-    spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
     var clearWarningsSpy = spyOn(AlertsService, 'clearWarnings')
       .and.callThrough();
     TrainingModalService.openTrainUnresolvedAnswerModal();
 
     expect(clearWarningsSpy).toHaveBeenCalled();
-    expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
+    expect(externalSaveSpy).toHaveBeenCalled();
   });
 });

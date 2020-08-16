@@ -27,6 +27,7 @@ describe('Router Service', () => {
   var ExplorationStatesService = null;
   var ExplorationImprovementsService = null;
   var ExplorationInitStateNameService = null;
+  var ExternalSaveService = null;
   var $rootScope = null;
   var $location = null;
   var $timeout = null, $interval = null;
@@ -49,6 +50,7 @@ describe('Router Service', () => {
       'ExplorationImprovementsService');
     ExplorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
+    ExternalSaveService = $injector.get('ExternalSaveService');
     $rootScope = $injector.get('$rootScope');
     $location = $injector.get('$location');
     $timeout = $injector.get('$timeout');
@@ -177,7 +179,7 @@ describe('Router Service', () => {
       RouterService.onRefreshTranslationTab.subscribe(
         refreshTranslationTabSpy));
     testSubscriptions.add(
-      RouterService.onExternalSave.subscribe(externalSaveSpy));
+      ExternalSaveService.onExternalSave.subscribe(externalSaveSpy));
   });
 
   afterEach(() => {

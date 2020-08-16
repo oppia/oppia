@@ -32,7 +32,7 @@ describe('Unresolved Answers Overview Component', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var improvementsService = null;
-  var routerService = null;
+  var externalSaveService = null;
   var stateInteractionIdService = null;
   var stateEditorService = null;
   var stateTopAnswersStatsService = null;
@@ -50,7 +50,7 @@ describe('Unresolved Answers Overview Component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('RouterService', {
+    $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
   }));
@@ -61,7 +61,7 @@ describe('Unresolved Answers Overview Component', function() {
     $uibModal = $injector.get('$uibModal');
     explorationStatesService = $injector.get('ExplorationStatesService');
     improvementsService = $injector.get('ImprovementsService');
-    routerService = $injector.get('RouterService');
+    externalSaveService = $injector.get('ExternalSaveService');
     stateEditorService = $injector.get('StateEditorService');
     stateTopAnswersStatsService = $injector.get('StateTopAnswersStatsService');
 

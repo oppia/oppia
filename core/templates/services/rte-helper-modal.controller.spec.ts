@@ -23,7 +23,7 @@ describe('Rte Helper Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var $timeout = null;
-  var routerService = null;
+  var externalSaveService = null;
 
   var mockExternalSaveEventEmitter = null;
 
@@ -40,7 +40,7 @@ describe('Rte Helper Modal Controller', function() {
 
     beforeEach(angular.mock.module('oppia', function($provide) {
       mockExternalSaveEventEmitter = new EventEmitter();
-      $provide.value('RouterService', {
+      $provide.value('ExternalSaveService', {
         onExternalSave: mockExternalSaveEventEmitter
       });
     }));
@@ -52,7 +52,7 @@ describe('Rte Helper Modal Controller', function() {
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
-      routerService = $injector.get('RouterService');
+      externalSaveService = $injector.get('ExternalSaveService');
 
       $scope = $rootScope.$new();
       $controller(
@@ -107,7 +107,7 @@ describe('Rte Helper Modal Controller', function() {
 
     beforeEach(angular.mock.module('oppia', function($provide) {
       mockExternalSaveEventEmitter = new EventEmitter();
-      $provide.value('RouterService', {
+      $provide.value('ExternalSaveService', {
         onExternalSave: mockExternalSaveEventEmitter
       });
     }));
@@ -120,7 +120,7 @@ describe('Rte Helper Modal Controller', function() {
       AssetsBackendApiService = $injector.get('AssetsBackendApiService');
       ImageUploadHelperService = $injector.get('ImageUploadHelperService');
       ImageLocalStorageService = $injector.get('ImageLocalStorageService');
-      routerService = $injector.get('RouterService');
+      externalSaveService = $injector.get('ExternalSaveService');
       ContextService = $injector.get('ContextService');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -273,7 +273,7 @@ describe('Rte Helper Modal Controller', function() {
 
       beforeEach(angular.mock.module('oppia', function($provide) {
         mockExternalSaveEventEmitter = new EventEmitter();
-        $provide.value('RouterService', {
+        $provide.value('ExternalSaveService', {
           onExternalSave: mockExternalSaveEventEmitter
         });
       }));
@@ -285,7 +285,7 @@ describe('Rte Helper Modal Controller', function() {
         $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);
 
-        routerService = $injector.get('RouterService');
+        externalSaveService = $injector.get('ExternalSaveService'); externalSaveService;
 
         $scope = $rootScope.$new();
         $controller(

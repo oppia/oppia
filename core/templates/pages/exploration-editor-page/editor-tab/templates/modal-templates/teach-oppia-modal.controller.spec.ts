@@ -52,8 +52,8 @@ describe('Teach Oppia Modal Controller', function() {
   var stateInteractionIdService = null;
   var stateObjectFactory = null;
   var explorationStatesService = null;
+  var externalSaveService = null;
   var responsesService = null;
-  var routerService = null;
   var trainingDataService = null;
   var trainingModalService = null;
 
@@ -145,7 +145,7 @@ describe('Teach Oppia Modal Controller', function() {
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('RouterService', {
+    $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
   }));
@@ -163,7 +163,7 @@ describe('Teach Oppia Modal Controller', function() {
       explorationStatesService = $injector.get('ExplorationStatesService');
       stateEditorService = $injector.get('StateEditorService');
       responsesService = $injector.get('ResponsesService');
-      routerService = $injector.get('RouterService');
+      externalSaveService = $injector.get('ExternalSaveService');
       trainingDataService = $injector.get('TrainingDataService');
       trainingModalService = $injector.get('TrainingModalService');
 
@@ -281,7 +281,7 @@ describe('Teach Oppia Modal Controller', function() {
       explorationStatesService = $injector.get('ExplorationStatesService');
       stateEditorService = $injector.get('StateEditorService');
       responsesService = $injector.get('ResponsesService');
-      routerService = $injector.get('RouterService');
+      externalSaveService = $injector.get('ExternalSaveService');
       trainingDataService = $injector.get('TrainingDataService');
       trainingModalService = $injector.get('TrainingModalService');
 
