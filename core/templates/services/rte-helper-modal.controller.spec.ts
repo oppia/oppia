@@ -285,7 +285,7 @@ describe('Rte Helper Modal Controller', function() {
         $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);
 
-        externalSaveService = $injector.get('ExternalSaveService'); externalSaveService;
+        externalSaveService = $injector.get('ExternalSaveService');
 
         $scope = $rootScope.$new();
         $controller(
