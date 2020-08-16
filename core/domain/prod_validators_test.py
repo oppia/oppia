@@ -38,6 +38,7 @@ from core.domain import html_validation_service
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
+from core.domain import prod_validators
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rating_services
@@ -4981,7 +4982,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
                 'type exploration is not allowed\']]'
             ) % self.model_instance.id]
         with self.swap(
-            prod_validation_jobs_one_off, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
+            prod_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
@@ -9471,7 +9472,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'type exploration is not allowed\']]'
             ) % self.model_instance.id]
         with self.swap(
-            prod_validation_jobs_one_off, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
+            prod_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
