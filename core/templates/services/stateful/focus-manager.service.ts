@@ -58,7 +58,7 @@ angular.module('oppia').factory('FocusManagerService', [
       generateFocusLabel: function() {
         return IdGenerationService.generateNewId();
       },
-
+      // Getter for emitter used to propogate focus label.
       get onFocus() {
         return _focusEventEmitter;
       }
