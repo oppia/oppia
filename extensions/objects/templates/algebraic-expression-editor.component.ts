@@ -50,8 +50,8 @@ angular.module('oppia').component('algebraicExpressionEditor', {
         // is not compatible with nerdamer or with the backend validations.
         ctrl.currentValue = MathInteractionsService.replaceAbsSymbolWithText(
           ctrl.currentValue);
-        var answerIsValid = MathInteractionsService.validateExpression(
-          ctrl.currentValue);
+        var answerIsValid = MathInteractionsService.validateAlgebraicExpression(
+          ctrl.currentValue, GuppyInitializationService.getCustomOskLetters());
         if (GuppyInitializationService.findActiveGuppyObject() === undefined) {
           // The warnings should only be displayed when the editor is inactive
           // focus, i.e., the user is done typing.

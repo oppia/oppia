@@ -370,7 +370,7 @@ angular.module('oppia').directive('conversationSkin', [
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
-        'EVENT_NEW_CARD_AVAILABLE', 'EVENT_NEW_CARD_OPENED',
+        'EVENT_NEW_CARD_AVAILABLE',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'FEEDBACK_POPOVER_PATH',
         'INTERACTION_SPECS', 'REVIEW_TESTS_URL_TEMPLATE',
         'STORY_VIEWER_URL_TEMPLATE',
@@ -402,7 +402,7 @@ angular.module('oppia').directive('conversationSkin', [
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
-            EVENT_NEW_CARD_AVAILABLE, EVENT_NEW_CARD_OPENED,
+            EVENT_NEW_CARD_AVAILABLE,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, FEEDBACK_POPOVER_PATH,
             INTERACTION_SPECS, REVIEW_TESTS_URL_TEMPLATE,
             STORY_VIEWER_URL_TEMPLATE,
@@ -717,9 +717,7 @@ angular.module('oppia').directive('conversationSkin', [
             } else {
               PlayerPositionService.setDisplayedCardIndex(totalNumCards - 1);
             }
-
-            $rootScope.$broadcast(
-              'currentQuestionChanged',
+            PlayerPositionService.changeCurrentQuestion(
               PlayerPositionService.getDisplayedCardIndex());
 
             if ($scope.displayedCard.isTerminal()) {
@@ -844,7 +842,7 @@ angular.module('oppia').directive('conversationSkin', [
             // The timeout is needed in order to give the recipient of the
             // broadcast sufficient time to load.
             $timeout(function() {
-              $rootScope.$broadcast(EVENT_NEW_CARD_OPENED, initialCard);
+              PlayerPositionService.onNewCardOpened.emit(initialCard);
             });
           };
           $scope.initializePage = function() {
@@ -1135,7 +1133,7 @@ angular.module('oppia').directive('conversationSkin', [
 
             var index = PlayerPositionService.getDisplayedCardIndex();
             var displayedCard = PlayerTranscriptService.getCard(index);
-            $rootScope.$broadcast(EVENT_NEW_CARD_OPENED, $scope.nextCard);
+            PlayerPositionService.onNewCardOpened.emit($scope.nextCard);
           };
 
           $scope.showUpcomingCard = function() {
