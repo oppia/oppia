@@ -53,17 +53,24 @@ YARN_VERSION = '1.22.4'
 
 # Versions of libraries used in backend.
 PILLOW_VERSION = '6.2.2'
+
 # We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
 # there is a 'make test' bug in redis 6.0.6 where the solution has not been
 # released. This is explained in this issue:
 # https://github.com/redis/redis/issues/7540.
-# When upgrading the redis cli version, make sure to run 'make test' on the
-# new version to make sure that there are no issues with the program. To run
-# 'make test' download the newest version of the cli and extract it. Change
-# directories into the new folder you created titled redis-<new version>/
-# and from the top level directory of this folder, type 'make test'.
-# Make sure that ALL tests pass before making the upgrade official. If any tests
-# fail, do not upgrade to that version of the redis cli.
+# IMPORTANT STEPS TO DEVELOPERS FOR UPGRADING REDIS:
+# 1. Download the new version of the redis cli.
+# 2. Extract it in the folder it was downloaded, most likely Downloads/.
+# 3. Change directories into the folder you extracted, titled
+#    redis-<new version>/ and change into that directory:
+#    cd redis-<new version>/
+# 4. From the top level of the redis-<new version> directory,
+#    run 'make test'.
+# 5. All of the tests should pass with an [ok] status with no error codes. The
+#    final output should be 'All tests pass.'
+# 6. Make sure all of the tests pass before committing the upgrade to develop.
+#    Be sure to indicate in your PR that all of the 'make test' tests pass.
+# 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.0.5'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
@@ -633,33 +640,33 @@ def start_redis_server():
     """Start the redis server with the daemonize argument to prevent
     the redis-server from exiting on its own.
     """
-    # Redis-cli is only required in a development environment.
-    python_utils.PRINT('Starting Redis development server.')
-    # Start the redis local development server. Redis doesn't run on
-    # Windows machines.
-    if not is_windows_os():
-        subprocess.call([
-            REDIS_SERVER_PATH, REDIS_CONF_PATH,
-            '--daemonize', 'yes'
-        ])
-    else:
+    if is_windows_os():
         raise Exception(
             'The redis command line interface is not installed because your '
             'machine is on the Windows operating system. The redis server '
             'cannot start.')
 
+    # Redis-cli is only required in a development environment.
+    python_utils.PRINT('Starting Redis development server.')
+    # Start the redis local development server. Redis doesn't run on
+    # Windows machines.
+    subprocess.call([
+        REDIS_SERVER_PATH, REDIS_CONF_PATH,
+        '--daemonize', 'yes'
+    ])
+
 
 def stop_redis_server():
     """Stops the redis server by shutting it down."""
-    if not is_windows_os():
-        python_utils.PRINT('Cleaning up the redis_servers.')
-        # Shutdown the redis server before exiting.
-        subprocess.call([REDIS_CLI_PATH, 'shutdown'])
-    else:
+    if is_windows_os():
         raise Exception(
             'The redis command line interface is not installed because your '
             'machine is on the Windows operating system. There is no redis '
             'server to shutdown.')
+
+    python_utils.PRINT('Cleaning up the redis_servers.')
+    # Shutdown the redis server before exiting.
+    subprocess.call([REDIS_CLI_PATH, 'shutdown'])
 
 
 class CD(python_utils.OBJECT):

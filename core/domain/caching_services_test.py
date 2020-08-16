@@ -19,9 +19,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import caching_domain
 from core.domain import caching_services
+from core.domain import collection_domain
 from core.domain import exp_domain
+from core.domain import skill_domain
+from core.domain import story_domain
+from core.domain import topic_domain
 from core.tests import test_utils
 
 
@@ -127,14 +132,21 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         """Testing that querying the cache for elements where either all of the
         ids exist or don't exist in the cache returns reasonable output.
         """
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        # Key value mapping tests that strings, numbers, booleans, floats,
+        # lists, and Nonetypes are all correctly set and get from the cache.
+        key_value_mapping = {
+            'a': '1', 'b': 2, 'c': [True, None],
+            'd': {
+                'd.1': 1.2,
+                'd.2': 30
+            }}
 
         exploration_id = 'id'
 
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_DEFAULT, None,
-                ['a', 'b', 'c']), {})
+                ['a', 'b', 'c', 'd']), {})
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -157,12 +169,12 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_DEFAULT, None,
-                ['a', 'b', 'c']),
+                ['a', 'b', 'c', 'd']),
             key_value_mapping)
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None, ['d', 'e']),
+                caching_services.CACHE_NAMESPACE_DEFAULT, None, ['e', 'f']),
             {})
 
         exp_ids_to_explorations = caching_services.get_multi(
@@ -381,3 +393,200 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         # dictionary.
         for namespace in caching_services.SERIALIZATION_FUNCTIONS:
             self.assertNotIn(caching_services.MEMCACHE_KEY_DELIMITER, namespace)
+
+    def test_unicode_characters_are_set_and_get_correctly_in_default_namespace(
+            self):
+        # Test to make sure that unicode characters are still inserted and
+        # deleted correctly from the cache.
+        key_value_mapping = {
+            'a': '%#$', 'b': '\t',
+            'c': '😃😄'
+        }
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                ['a', 'b', 'c']),
+            {})
+        cache_strings_response = caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
+        self.assertTrue(cache_strings_response)
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                ['a', 'b', 'c']),
+            {
+                'a': '%#$', 'b': '\t',
+                'c': '😃😄'
+            })
+
+    def test_objects_with_unicode_characters_are_set_and_get_correctly(
+            self):
+        # Test to make sure that a default exploration initialized with unicode
+        # characters is get and set to the cache without errors.
+        exploration_id = 'id'
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                '0',
+                [exploration_id]),
+            {})
+
+        default_exploration = (
+            exp_domain.Exploration.create_default_exploration(
+                exploration_id, title='A title',
+                category='A category 😍',
+                objective='Objective',
+                language_code=['en', 'zh']
+            ))
+
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION,
+            '0',
+            {
+                exploration_id: default_exploration
+            })
+
+        exp_ids_to_explorations = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION,
+            '0', [exploration_id])
+
+        self.assertEqual(
+            default_exploration.to_dict(),
+            exp_ids_to_explorations[exploration_id].to_dict())
+
+        # Test to make sure that a default collection initialized with unicode
+        # characters is get and set to the cache without errors.
+        collection_id = 'id 😍'
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_COLLECTION,
+                '0',
+                [collection_id]),
+            {})
+
+        default_collection = (
+            collection_domain.Collection.create_default_collection(
+                collection_id))
+
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_COLLECTION,
+            '0',
+            {
+                collection_id: default_collection
+            })
+
+        collections = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_COLLECTION,
+            '0', [collection_id])
+
+        self.assertEqual(
+            default_collection.to_dict(),
+            collections[collection_id].to_dict())
+
+        # Test to make sure that a default skill initialized with unicode
+        # characters is get and set to the cache without errors.
+        skill_id = 'id'
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_SKILL,
+                '0',
+                [skill_id]),
+            {})
+
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0],
+                ['<p>[NOTE: Creator should fill this in]</p> 😍']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1],
+                ['<p>[NOTE: Creator should fill this in]</p> 😍']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2],
+                ['<p>[NOTE: Creator should fill this in]</p> 😍'])]
+
+        default_skill = (
+            skill_domain.Skill.create_default_skill(
+                skill_id, 'Description 😍', rubrics))
+
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_SKILL,
+            '0',
+            {
+                skill_id: default_skill
+            })
+
+        skills = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_SKILL,
+            '0', [skill_id])
+
+        self.assertEqual(
+            default_skill.to_dict(),
+            skills[skill_id].to_dict())
+
+        # Test to make sure that a default topic initialized with unicode
+        # characters is get and set to the cache without errors.
+        topic_id = 'id'
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_TOPIC,
+                '0',
+                [topic_id]),
+            {})
+
+        default_topic = (
+            topic_domain.Topic.create_default_topic(
+                topic_id, 'Name 😍', 'abbrev 😍',
+                'description 😍'))
+
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_TOPIC,
+            '0',
+            {
+                topic_id: default_topic
+            })
+
+        topics = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_TOPIC,
+            '0', [topic_id])
+
+        self.assertEqual(
+            default_topic.to_dict(),
+            topics[topic_id].to_dict())
+
+        # Test to make sure that a default story initialized with unicode
+        # characters is get and set to the cache without errors.
+        story_id = 'id'
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_STORY,
+                '0',
+                [story_id]),
+            {})
+
+        default_story = (
+            story_domain.Story.create_default_story(
+                story_id, 'Title 😍',
+                'Description 😍', topic_id,
+                'title 😍'))
+
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_STORY,
+            '0',
+            {
+                story_id: default_story
+            })
+
+        stories = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_STORY,
+            '0', [story_id])
+
+        self.assertEqual(
+            default_story.to_dict(),
+            stories[story_id].to_dict())
+

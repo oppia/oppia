@@ -586,7 +586,7 @@ class Topic(python_utils.OBJECT):
             topic_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
-        return json.dumps(topic_dict)
+        return json.dumps(topic_dict).encode('utf-8')
 
 
     @classmethod
@@ -646,7 +646,7 @@ class Topic(python_utils.OBJECT):
         Returns:
             Topic. The corresponding Topic domain object.
         """
-        topic_dict = json.loads(json_string)
+        topic_dict = json.loads(json_string.decode('utf-8'))
 
         created_on = (
             utils.convert_string_to_naive_datetime_object(

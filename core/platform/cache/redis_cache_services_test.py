@@ -33,17 +33,13 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
 
     @classmethod
     def setUpClass(cls):
-        super(RedisCacheServicesUnitTests, cls).setUpClass()
         common.start_redis_server()
-
-    def setUp(self):
-        super(RedisCacheServicesUnitTests, self).setUp()
-        redis_cache_services.flush_cache()
+        super(RedisCacheServicesUnitTests, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        common.stop_redis_server()
         super(RedisCacheServicesUnitTests, cls).tearDownClass()
+        common.stop_redis_server()
 
     def test_memory_stats_returns_dict(self):
         memory_stats = redis_cache_services.get_memory_cache_stats()
@@ -52,6 +48,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         self.assertIsNotNone(memory_stats.total_number_of_keys_stored)
 
     def test_flush_cache_wipes_cache_clean(self):
+        redis_cache_services.flush_cache()
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
@@ -61,6 +58,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             redis_cache_services.get_multi(['a', 'b', 'c']), [None, None, None])
 
     def test_get_multi_retrieves_cache_elements(self):
+        redis_cache_services.flush_cache()
         self.assertEqual(
             redis_cache_services.get_multi(['a', 'b', 'c']), [None, None, None])
         self.assertEqual(
@@ -72,11 +70,13 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             redis_cache_services.get_multi(['a', 'b', 'c']), ['1', '2', '3'])
 
     def test_set_multi_sets_elements(self):
+        redis_cache_services.flush_cache()
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         response = redis_cache_services.set_multi(key_value_mapping)
         self.assertTrue(response)
 
     def test_delete_multi_deletes_cache_elements(self):
+        redis_cache_services.flush_cache()
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
@@ -92,6 +92,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         self.assertEqual(return_number_of_keys_set, 0)
 
     def test_partial_fetches_returns_reasonable_output(self):
+        redis_cache_services.flush_cache()
         self.assertEqual(
             redis_cache_services.get_multi(['a', 'b', 'c']), [None, None, None])
 
@@ -104,7 +105,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             redis_cache_services.get_multi(['x', 'b', 'd']), [None, '2', None])
 
     def test_partial_deletes_deletes_correct_elements(self):
-
+        redis_cache_services.flush_cache()
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
@@ -114,9 +115,9 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         self.assertEqual(
             redis_cache_services.get_multi(['a', 'b', 'c']), [None, '2', '3'])
 
-    def test_redis_configuration_is_valid(self):
+    def test_redis_configuration_file_matches_feconf_redis_configuration(self):
         """Tests that the redis configuration file and feconf variables have
-        the same port configuration.
+        the same port definition.
         """
         self.assertTrue(os.path.exists(
             os.path.join(common.CURR_DIR, 'redis.conf')))

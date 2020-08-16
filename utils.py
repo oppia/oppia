@@ -38,9 +38,9 @@ import python_utils
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
 
-DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
-
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
+
+DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 
 
 class InvalidInputException(Exception):

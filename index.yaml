@@ -33,18 +33,6 @@ indexes:
   - name: commit_message
   - name: commit_type
 
-- kind: DeleteExpCopiesRealtimeModel
-  properties:
-  - name: deleted
-  - name: status
-  - name: scaled_average_rating
-    direction: desc
-
-- kind: DeleteExpCopiesRealtimeModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
-
 - kind: ExpCopiesRealtimeModel
   properties:
   - name: realtime_layer

@@ -89,8 +89,8 @@ DESERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
     CACHE_NAMESPACE_PLATFORM_PARAMETER: (
         platform_parameter_domain.PlatformParameter.deserialize),
-    CACHE_NAMESPACE_CONFIG: lambda x: json.loads(x.encode('utf-8')),
-    CACHE_NAMESPACE_DEFAULT: lambda x: json.loads(x.encode('utf-8'))
+    CACHE_NAMESPACE_CONFIG: lambda x: json.loads(x.decode('utf-8')),
+    CACHE_NAMESPACE_DEFAULT: lambda x: json.loads(x.decode('utf-8'))
 }
 
 SERIALIZATION_FUNCTIONS = {
