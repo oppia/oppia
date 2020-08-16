@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 
-require('directives/mathjax-bind.directive.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
@@ -44,14 +43,12 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
         ctrl.$onInit = function() {
-          ctrl.rawLatex = '';
           var mathExpressionContent = HtmlEscaperService.escapedJsonToObj(
             $attrs.mathContentWithValue);
           if (mathExpressionContent.hasOwnProperty('raw_latex')) {
-            ctrl.rawLatex = mathExpressionContent.raw_latex;
-            ctrl.svgFilename = mathExpressionContent.svg_filename;
+            var svgFilename = mathExpressionContent.svg_filename;
             var dimensions = ImagePreloaderService.getDimensionsOfMathSvgs(
-              ctrl.svgFilename);
+              svgFilename);
             ctrl.imageContainerStyle = {
               height: dimensions.height + 'ex',
               width: dimensions.width + 'ex',
@@ -68,7 +65,7 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
           if (
             ImagePreloaderService.inExplorationPlayer() &&
             !(ContextService.getEntityType() === ENTITY_TYPE.SKILL)) {
-            ImagePreloaderService.getImageUrl(ctrl.svgFilename)
+            ImagePreloaderService.getImageUrl(svgFilename)
               .then(function(objectUrl) {
                 ctrl.imageUrl = objectUrl;
               });
@@ -81,17 +78,17 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
                 ContextService.getImageSaveDestination() ===
                 IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
                 ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
-                  ctrl.svgFilename);
+                  svgFilename);
               } else {
                 ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
                   ContextService.getEntityType(), ContextService.getEntityId(),
-                  ctrl.svgFilename);
+                  svgFilename);
               }
             } catch (e) {
               var additionalInfo = (
                 '\nEntity type: ' + ContextService.getEntityType() +
                 '\nEntity ID: ' + ContextService.getEntityId() +
-                '\nFilepath: ' + ctrl.svgFilename);
+                '\nFilepath: ' + svgFilename);
               e.message += additionalInfo;
               throw e;
             }

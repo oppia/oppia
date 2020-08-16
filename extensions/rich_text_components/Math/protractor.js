@@ -87,22 +87,19 @@ const SVGTAGS = {
     '1T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 55' +
     '0Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"/></g' +
     '></g></g></svg>')
-
-
 };
 
 var expectComponentDetailsToMatch = async function(elem, rawLatex) {
   // TODO(Jacob): Check that the actual latex being displayed is correct.
   var mathComponent = await elem.getAttribute('math_content-with-value');
   expect(escapedJsonToObj(mathComponent).raw_latex).toBe(rawLatex);
-  var mathSvgImage = elem.element(by.css(
-    '.protractor-test-math-svg'));
+  var mathSvgImage = elem.element(by.css('.protractor-test-math-svg'));
   await waitFor.visibilityOf(
     mathSvgImage,
     'Math SVG takes too long to load.');
   var src = await mathSvgImage.getAttribute('src');
   await request(src, function(error, response, body) {
-    expect(body.replace(/(\r\n|\n|\r|\t)/gm, '')).toBe(SVGTAGS[rawLatex]);
+    expect(body).toBe(SVGTAGS[rawLatex]);
   });
 };
 
