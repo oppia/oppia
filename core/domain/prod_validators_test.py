@@ -89,7 +89,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 
 
-class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
+class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ActivityReferencesModelValidatorTests, self).setUp()
@@ -215,7 +215,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
+class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(RoleQueryAuditModelValidatorTests, self).setUp()
@@ -307,7 +307,7 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
+class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UsernameChangeAuditModelValidatorTests, self).setUp()
@@ -398,7 +398,7 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
+class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ClassifierTrainingJobModelValidatorTests, self).setUp()
@@ -538,7 +538,7 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
 
 
 class TrainingJobExplorationMappingModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TrainingJobExplorationMappingModelValidatorTests, self).setUp()
@@ -657,7 +657,7 @@ class TrainingJobExplorationMappingModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class CollectionModelValidatorTests(test_utils.GenericTestBase):
+class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionModelValidatorTests, self).setUp()
@@ -858,7 +858,7 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
 
 
 class CollectionSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionSnapshotMetadataModelValidatorTests, self).setUp()
@@ -1040,7 +1040,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class CollectionSnapshotContentModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionSnapshotContentModelValidatorTests, self).setUp()
@@ -1168,7 +1169,7 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
+class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionRightsModelValidatorTests, self).setUp()
@@ -1375,7 +1376,7 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
 
 
 class CollectionRightsSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionRightsSnapshotMetadataModelValidatorTests, self).setUp(
@@ -1556,7 +1557,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
 
 
 class CollectionRightsSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionRightsSnapshotContentModelValidatorTests, self).setUp(
@@ -1680,7 +1681,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionCommitLogEntryModelValidatorTests, self).setUp()
@@ -1949,7 +1950,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
+class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionSummaryModelValidatorTests, self).setUp()
@@ -2217,7 +2218,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
 
 
 class ExplorationOpportunitySummaryModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationOpportunitySummaryModelValidatorTests, self).setUp()
@@ -2451,7 +2452,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
+class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillOpportunityModelValidatorTests, self).setUp()
@@ -2584,7 +2585,7 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
+class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ConfigPropertyModelValidatorTests, self).setUp()
@@ -2675,7 +2676,7 @@ class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
 
 
 class ConfigPropertySnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ConfigPropertySnapshotMetadataModelValidatorTests, self).setUp()
@@ -2819,7 +2820,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
 
 
 class ConfigPropertySnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ConfigPropertySnapshotContentModelValidatorTests, self).setUp()
@@ -2926,7 +2927,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class SentEmailModelValidatorTests(test_utils.GenericTestBase):
+class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SentEmailModelValidatorTests, self).setUp()
@@ -3088,7 +3089,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
+class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(BulkEmailModelValidatorTests, self).setUp()
@@ -3235,7 +3236,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
 
 
 class GeneralFeedbackEmailReplyToIdModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(GeneralFeedbackEmailReplyToIdModelValidatorTests, self).setUp()
@@ -3338,7 +3339,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
 
-class ExplorationModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationModelValidatorTests, self).setUp()
@@ -3509,7 +3510,7 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
 
 
 class ExplorationSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationSnapshotMetadataModelValidatorTests, self).setUp()
@@ -3676,7 +3677,8 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationSnapshotContentModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationSnapshotContentModelValidatorTests, self).setUp()
@@ -3791,7 +3793,7 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationRightsModelValidatorTests, self).setUp()
@@ -3998,7 +4000,7 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
 
 
 class ExplorationRightsSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationRightsSnapshotMetadataModelValidatorTests, self).setUp(
@@ -4164,7 +4166,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
 
 
 class ExplorationRightsSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationRightsSnapshotContentModelValidatorTests, self).setUp(
@@ -4275,7 +4277,8 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationCommitLogEntryModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationCommitLogEntryModelValidatorTests, self).setUp()
@@ -4533,7 +4536,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
+class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExpSummaryModelValidatorTests, self).setUp()
@@ -4819,7 +4822,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
+class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(GeneralFeedbackThreadModelValidatorTests, self).setUp()
@@ -4983,7 +4986,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
                 expected_output, sort=True, literal_eval=False)
 
 
-class GeneralFeedbackMessageModelValidatorTests(test_utils.GenericTestBase):
+class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(GeneralFeedbackMessageModelValidatorTests, self).setUp()
@@ -5093,7 +5096,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class GeneralFeedbackThreadUserModelValidatorTests(test_utils.GenericTestBase):
+class GeneralFeedbackThreadUserModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(GeneralFeedbackThreadUserModelValidatorTests, self).setUp()
@@ -5185,7 +5189,7 @@ class GeneralFeedbackThreadUserModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class FeedbackAnalyticsModelValidatorTests(test_utils.GenericTestBase):
+class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(FeedbackAnalyticsModelValidatorTests, self).setUp()
@@ -5257,7 +5261,7 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
+class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UnsentFeedbackEmailModelValidatorTests, self).setUp()
@@ -5443,7 +5447,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class JobModelValidatorTests(test_utils.GenericTestBase):
+class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(JobModelValidatorTests, self).setUp()
@@ -5595,7 +5599,7 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
+class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ContinuousComputationModelValidatorTests, self).setUp()
@@ -5705,7 +5709,7 @@ class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class QuestionModelValidatorTests(test_utils.GenericTestBase):
+class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionModelValidatorTests, self).setUp()
@@ -5893,7 +5897,7 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
+class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionSkillLinkModelValidatorTests, self).setUp()
@@ -6027,7 +6031,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationContextModelValidatorTests, self).setUp()
@@ -6138,7 +6142,7 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
 
 
 class ExplorationMathRichTextInfoModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationMathRichTextInfoModelValidatorTests, self).setUp()
@@ -6366,7 +6370,7 @@ class ExplorationMathRichTextInfoModelValidatorTests(
 
 
 class QuestionSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionSnapshotMetadataModelValidatorTests, self).setUp()
@@ -6555,7 +6559,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class QuestionSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionSnapshotContentModelValidatorTests, self).setUp()
@@ -6690,7 +6694,7 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionCommitLogEntryModelValidatorTests, self).setUp()
@@ -6919,7 +6923,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
+class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionSummaryModelValidatorTests, self).setUp()
@@ -7062,7 +7066,8 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationRecommendationsModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationRecommendationsModelValidatorTests, self).setUp()
@@ -7163,7 +7168,7 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
+class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicSimilaritiesModelValidatorTests, self).setUp()
@@ -7353,7 +7358,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class SkillModelValidatorTests(test_utils.GenericTestBase):
+class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillModelValidatorTests, self).setUp()
@@ -7593,7 +7598,7 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
 
 
 class SkillSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillSnapshotMetadataModelValidatorTests, self).setUp()
@@ -7803,7 +7808,7 @@ class SkillSnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillSnapshotContentModelValidatorTests, self).setUp()
@@ -7960,7 +7965,7 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillCommitLogEntryModelValidatorTests, self).setUp()
@@ -8210,7 +8215,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
+class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillSummaryModelValidatorTests, self).setUp()
@@ -8387,7 +8392,7 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class StoryModelValidatorTests(test_utils.GenericTestBase):
+class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StoryModelValidatorTests, self).setUp()
@@ -8608,7 +8613,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
 
 
 class StorySnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StorySnapshotMetadataModelValidatorTests, self).setUp()
@@ -8784,7 +8789,7 @@ class StorySnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StorySnapshotContentModelValidatorTests, self).setUp()
@@ -8909,7 +8914,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StoryCommitLogEntryModelValidatorTests, self).setUp()
@@ -9146,7 +9151,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
+class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StorySummaryModelValidatorTests, self).setUp()
@@ -9273,7 +9278,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
+class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(GeneralSuggestionModelValidatorTests, self).setUp()
 
@@ -9566,7 +9571,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
 
 
 class GeneralVoiceoverApplicationModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
     def setUp(self):
         super(GeneralVoiceoverApplicationModelValidatorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -9695,7 +9700,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
 
-class TopicModelValidatorTests(test_utils.GenericTestBase):
+class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicModelValidatorTests, self).setUp()
@@ -10006,7 +10011,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
 
 
 class TopicSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicSnapshotMetadataModelValidatorTests, self).setUp()
@@ -10210,7 +10215,7 @@ class TopicSnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicSnapshotContentModelValidatorTests, self).setUp()
@@ -10362,7 +10367,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
+class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicRightsModelValidatorTests, self).setUp()
@@ -10559,7 +10564,7 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
 
 
 class TopicRightsSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicRightsSnapshotMetadataModelValidatorTests, self).setUp()
@@ -10776,7 +10781,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
 
 
 class TopicRightsSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicRightsSnapshotContentModelValidatorTests, self).setUp()
@@ -10939,7 +10944,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicCommitLogEntryModelValidatorTests, self).setUp()
@@ -11241,7 +11246,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
+class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicSummaryModelValidatorTests, self).setUp()
@@ -11477,7 +11482,7 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
+class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SubtopicPageModelValidatorTests, self).setUp()
@@ -11697,7 +11702,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
 
 
 class SubtopicPageSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SubtopicPageSnapshotMetadataModelValidatorTests, self).setUp()
@@ -11912,7 +11917,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
 
 class SubtopicPageSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SubtopicPageSnapshotContentModelValidatorTests, self).setUp()
@@ -12085,7 +12090,8 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
 
-class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class SubtopicPageCommitLogEntryModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SubtopicPageCommitLogEntryModelValidatorTests, self).setUp()
@@ -12366,7 +12372,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
+class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserSettingsModelValidatorTests, self).setUp()
@@ -12379,7 +12385,7 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
 
         # Note: There will a total of 3 UserSettingsModel even though
         # only two users signup in the test since superadmin signup
-        # is also done in test_utils.GenericTestBase.
+        # is also done in test_utils.AuditJobsTestBase.
         self.model_instance_0 = user_models.UserSettingsModel.get_by_id(
             self.user_id)
         self.model_instance_1 = user_models.UserSettingsModel.get_by_id(
@@ -12495,7 +12501,7 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class UserNormalizedNameAuditOneOffJobTests(test_utils.GenericTestBase):
+class UserNormalizedNameAuditOneOffJobTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserNormalizedNameAuditOneOffJobTests, self).setUp()
@@ -12508,7 +12514,7 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.GenericTestBase):
 
         # Note: There will a total of 3 UserSettingsModel even though
         # only two users signup in the test since superadmin signup
-        # is also done in test_utils.GenericTestBase.
+        # is also done in test_utils.AuditJobsTestBase.
         self.model_instance_0 = user_models.UserSettingsModel.get_by_id(
             self.user_id)
         self.model_instance_1 = user_models.UserSettingsModel.get_by_id(
@@ -12535,7 +12541,7 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=True)
 
 
-class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
+class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CompletedActivitiesModelValidatorTests, self).setUp()
@@ -12734,7 +12740,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
+class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(IncompleteActivitiesModelValidatorTests, self).setUp()
@@ -12935,7 +12941,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
 
 
 class ExpUserLastPlaythroughModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExpUserLastPlaythroughModelValidatorTests, self).setUp()
@@ -13104,7 +13110,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
 
-class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
+class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(LearnerPlaylistModelValidatorTests, self).setUp()
@@ -13331,7 +13337,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
+class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserContributionsModelValidatorTests, self).setUp()
@@ -13464,7 +13470,7 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class UserAuthDetailsModelValidatorTests(test_utils.GenericTestBase):
+class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     USER_PIN = '123'
 
@@ -13478,7 +13484,7 @@ class UserAuthDetailsModelValidatorTests(test_utils.GenericTestBase):
         # Note: There will be a total of 2 UserSettingsModels (hence 2
         # UserAuthDetailsModels too) even though only one user signs up in the
         # test since superadmin signup is also done in
-        # test_utils.GenericTestBase.
+        # test_utils.AuditJobsTestBase.
         self.model_instance = user_models.UserAuthDetailsModel.get_by_id(
             self.user_id)
         self.job_class = (
@@ -13538,7 +13544,7 @@ class UserAuthDetailsModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
+class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserEmailPreferencesModelValidatorTests, self).setUp()
@@ -13605,7 +13611,7 @@ class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
+class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserSubscriptionsModelValidatorTests, self).setUp()
@@ -13758,7 +13764,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class UserSubscribersModelValidatorTests(test_utils.GenericTestBase):
+class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserSubscribersModelValidatorTests, self).setUp()
@@ -13876,7 +13882,7 @@ class UserSubscribersModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserRecentChangesBatchModelValidatorTests(test_utils.GenericTestBase):
+class UserRecentChangesBatchModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserRecentChangesBatchModelValidatorTests, self).setUp()
@@ -13955,7 +13961,7 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserStatsModelValidatorTests(test_utils.GenericTestBase):
+class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserStatsModelValidatorTests, self).setUp()
@@ -14139,7 +14145,7 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationUserDataModelValidatorTests, self).setUp()
@@ -14328,7 +14334,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
+class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionProgressModelValidatorTests, self).setUp()
@@ -14515,7 +14521,7 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
+class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StoryProgressModelValidatorTests, self).setUp()
@@ -14702,7 +14708,7 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserQueryModelValidatorTests(test_utils.GenericTestBase):
+class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserQueryModelValidatorTests, self).setUp()
@@ -14836,7 +14842,7 @@ class UserQueryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserBulkEmailsModelValidatorTests(test_utils.GenericTestBase):
+class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserBulkEmailsModelValidatorTests, self).setUp()
@@ -14952,7 +14958,7 @@ class UserBulkEmailsModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
+class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserSkillMasteryModelValidatorTests, self).setUp()
@@ -15057,7 +15063,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
+class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserContributionScoringModelValidatorTests, self).setUp()
@@ -15137,7 +15143,7 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserContributionRightsModelValidatorTests(test_utils.GenericTestBase):
+class UserContributionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     TRANSLATOR_EMAIL = 'translator@community.org'
     TRANSLATOR_USERNAME = 'translator'
@@ -15209,7 +15215,7 @@ class UserContributionRightsModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
+class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(PendingDeletionRequestModelValidatorTests, self).setUp()
@@ -15358,7 +15364,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
+class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TaskEntryModelValidatorTests, self).setUp()
@@ -15712,7 +15718,7 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             ])
 
 
-class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
+class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(PlaythroughModelValidatorTests, self).setUp()
         self.exp = self.save_new_valid_exploration('EXP_ID', 'owner_id')
@@ -15906,7 +15912,7 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
+class PseudonymizedUserModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(PseudonymizedUserModelValidatorTests, self).setUp()
@@ -15975,7 +15981,7 @@ class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
+class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(PlatformParameterModelValidatorTests, self).setUp()
@@ -16065,7 +16071,7 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
 
 
 class PlatformParameterSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(
@@ -16209,7 +16215,7 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
 
 
 class PlatformParameterSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(

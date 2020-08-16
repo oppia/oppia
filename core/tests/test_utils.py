@@ -64,7 +64,6 @@ from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import datastore_types
 from google.appengine.api import mail
-from google.appengine.ext import db
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -2053,68 +2052,6 @@ tags: []
             setattr(datetime, 'datetime', original_datetime_type)
 
     @contextlib.contextmanager
-    def mock_datetime_for_audit(self, mocked_datetime):
-        """Mocks response from datetime.datetime.utcnow method for audit jobs.
-
-        Example usage:
-            import datetime
-            mocked_datetime_utcnow = datetime.datetime.utcnow() -
-                datetime.timedelta(days=1)
-            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-                print datetime.datetime.utcnow() # prints time reduced by 1 day
-            print datetime.datetime.utcnow()  # prints current time.
-
-        Args:
-            mocked_datetime: datetime.datetime. The datetime which will be used
-                instead of the current UTC datetime.
-
-        Yields:
-            None. Empty yield statement.
-        """
-        if not isinstance(mocked_datetime, datetime.datetime):
-            raise utils.ValidationError(
-                'Expected mocked_datetime to be datetime.datetime, got %s' % (
-                    type(mocked_datetime)))
-
-        original_datetime_type = datetime.datetime
-
-        class PatchedDatetimeType(type):
-            """Validates the datetime instances."""
-
-            def __instancecheck__(cls, other):
-                """Validates whether the given instance is datetime
-                instance.
-                """
-                return isinstance(other, original_datetime_type)
-
-        class MockDatetime( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
-            @classmethod
-            def utcnow(cls):
-                """Returns the mocked datetime."""
-
-                return mocked_datetime
-
-        setattr(datetime, 'datetime', MockDatetime)
-        setattr(db.DateTimeProperty, 'data_type', MockDatetime)
-
-        # Updates datastore types for MockDatetime to ensure that
-        # validation of ndb datetime properties does not fail.
-        datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
-            datastore_types.ValidatePropertyNothing)
-        datastore_types._PACK_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
-            datastore_types.PackDatetime)
-        datastore_types._PROPERTY_MEANINGS[MockDatetime] = (  # pylint: disable=protected-access
-            datastore_types.entity_pb.Property.GD_WHEN)
-
-        try:
-            yield
-        finally:
-            setattr(datetime, 'datetime', original_datetime_type)
-            setattr(datetime, 'datetime', datetime.datetime)
-
-    @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a
         'with' statement. The object can be anything that supports
@@ -2279,52 +2216,6 @@ tags: []
         return super(TestBase, self).assertRaisesRegexp(
             expected_exception, expected_regexp,
             callable_obj=callable_obj, *args, **kwargs)
-
-    def run_job_and_check_output(
-            self, expected_output, sort=False, literal_eval=False):
-        """Helper function to run job and compare output.
-
-        Args:
-            expected_output: list(*). The expected result of the job.
-            sort: bool. Whether to sort the outputs before comparison.
-            literal_eval: bool. Whether to use ast.literal_eval before
-                comparison.
-        """
-        job_id = self.job_class.create_new()
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-        self.job_class.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        actual_output = self.job_class.get_output(job_id)
-        if literal_eval:
-            actual_output_dict = {}
-            expected_output_dict = {}
-
-            for item in [ast.literal_eval(value) for value in actual_output]:
-                value = item[1]
-                if isinstance(value, list):
-                    value = sorted(value)
-                actual_output_dict[item[0]] = value
-
-            for item in [ast.literal_eval(value) for value in expected_output]:
-                value = item[1]
-                if isinstance(value, list):
-                    value = sorted(value)
-                expected_output_dict[item[0]] = value
-            self.assertEqual(
-                sorted(actual_output_dict.keys()),
-                sorted(expected_output_dict.keys()))
-            for key in actual_output_dict:
-                self.assertEqual(
-                    actual_output_dict[key], expected_output_dict[key])
-        elif sort:
-            self.assertEqual(sorted(actual_output), sorted(expected_output))
-        else:
-            self.assertEqual(actual_output, expected_output)
 
 
 class AppEngineTestBase(TestBase):
@@ -2610,6 +2501,120 @@ class LinterTestBase(GenericTestBase):
         """
         failed_count = sum(msg.startswith('FAILED') for msg in stdout)
         self.assertEqual(failed_count, expected_failed_count)
+
+
+class AuditJobsTestBase(GenericTestBase):
+    """Base class for linter tests."""
+
+    @contextlib.contextmanager
+    def mock_datetime_for_audit(self, mocked_datetime):
+        """Mocks response from datetime.datetime.utcnow method for audit jobs.
+
+        Example usage:
+            import datetime
+            mocked_datetime_utcnow = datetime.datetime.utcnow() -
+                datetime.timedelta(days=1)
+            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+                print datetime.datetime.utcnow() # prints time reduced by 1 day
+            print datetime.datetime.utcnow()  # prints current time.
+
+        Args:
+            mocked_datetime: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
+
+        Yields:
+            None. Empty yield statement.
+        """
+        from google.appengine.ext import ndb
+
+        if not isinstance(mocked_datetime, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected mocked_datetime to be datetime.datetime, got %s' % (
+                    type(mocked_datetime)))
+
+        original_datetime_type = datetime.datetime
+
+        class PatchedDatetimeType(type):
+            """Validates the datetime instances."""
+
+            def __instancecheck__(cls, other):
+                """Validates whether the given instance is datetime
+                instance.
+                """
+                return isinstance(other, original_datetime_type)
+
+        class MockDatetime( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
+            @classmethod
+            def utcnow(cls):
+                """Returns the mocked datetime."""
+
+                return mocked_datetime
+
+        setattr(datetime, 'datetime', MockDatetime)
+        setattr(ndb.DateTimeProperty, 'data_type', MockDatetime)
+
+        # Updates datastore types for MockDatetime to ensure that
+        # validation of ndb datetime properties does not fail.
+        datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.ValidatePropertyNothing)
+        datastore_types._PACK_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.PackDatetime)
+        datastore_types._PROPERTY_MEANINGS[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.entity_pb.Property.GD_WHEN)
+
+        try:
+            yield
+        finally:
+            setattr(datetime, 'datetime', original_datetime_type)
+            setattr(ndb.DateTimeProperty, 'data_type', datetime.datetime)
+
+    def run_job_and_check_output(
+            self, expected_output, sort=False, literal_eval=False):
+        """Helper function to run job and compare output.
+
+        Args:
+            expected_output: list(*). The expected result of the job.
+            sort: bool. Whether to sort the outputs before comparison.
+            literal_eval: bool. Whether to use ast.literal_eval before
+                comparison.
+        """
+        job_id = self.job_class.create_new()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        self.job_class.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        actual_output = self.job_class.get_output(job_id)
+        if literal_eval:
+            actual_output_dict = {}
+            expected_output_dict = {}
+
+            for item in [ast.literal_eval(value) for value in actual_output]:
+                value = item[1]
+                if isinstance(value, list):
+                    value = sorted(value)
+                actual_output_dict[item[0]] = value
+
+            for item in [ast.literal_eval(value) for value in expected_output]:
+                value = item[1]
+                if isinstance(value, list):
+                    value = sorted(value)
+                expected_output_dict[item[0]] = value
+            self.assertEqual(
+                sorted(actual_output_dict.keys()),
+                sorted(expected_output_dict.keys()))
+            for key in actual_output_dict:
+                self.assertEqual(
+                    actual_output_dict[key], expected_output_dict[key])
+        elif sort:
+            self.assertEqual(sorted(actual_output), sorted(expected_output))
+        else:
+            self.assertEqual(actual_output, expected_output)
 
 
 class EmailMessageMock(python_utils.OBJECT):

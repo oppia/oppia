@@ -87,7 +87,7 @@ class MockBaseUserModelValidator(
         ]
 
 
-class BaseValidatorTests(test_utils.GenericTestBase):
+class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
