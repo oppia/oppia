@@ -183,11 +183,13 @@ describe('Library controller', function() {
     it('should focus on search input element when using shortcut /',
       function() {
         var focusSpy = jasmine.createSpy('focus', () => {});
-        document.querySelector = jasmine.createSpy('HTMLElement').and
-          .returnValue({
-            focus: focusSpy
+        spyOn(document, 'querySelector')
+          .withArgs('.protractor-test-search-input').and
+          .callFake(function() {
+            return {
+              focus: focusSpy
+            };
           });
-
         Mousetrap.trigger('/');
 
         expect(focusSpy).toHaveBeenCalled();
