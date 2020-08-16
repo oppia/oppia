@@ -1,7 +1,8 @@
 {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
   "extends": [
     "eslint:recommended"
@@ -140,6 +141,7 @@
         "allowEmptyCatch": true
       }
     ],
+    "no-extra-semi": "off",
     "no-multi-spaces": [
       "error"
     ],
@@ -171,6 +173,7 @@
     "no-undef": [
       "off"
     ],
+    "no-use-before-define": "off",
     "no-unused-vars": [
       "off"
     ],
@@ -269,6 +272,18 @@
         "default": "array"
       }
     ],
+    "@typescript-eslint/await-thenable": "error",
+    "@typescript-eslint/adjacent-overload-signatures": "error",
+    "@typescript-eslint/ban-tslint-comment": "error",
+    "@typescript-eslint/no-extra-non-null-assertion": "error",
+    "@typescript-eslint/no-implied-eval": "error",
+    "@typescript-eslint/no-misused-new": "error",
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/no-unsafe-return": "error",
+    "@typescript-eslint/no-useless-constructor": "error",
+    "@typescript-eslint/no-use-before-define": "error",
+    "@typescript-eslint/no-loss-of-precision": "error",
+    "@typescript-eslint/no-extra-semi": "error",
     "wrap-iife": [
       "error",
       "any"
