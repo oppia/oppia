@@ -653,7 +653,7 @@ describe('Image preloader service', function() {
         'sol_height_ds_width_60.png');
     }).toThrowError(
       /it does not contain dimensions/);
-    var mathSvgDimensions = ips.getDimensionsOfMathSvgs(
+    var mathSvgDimensions = ips.getDimensionsOfMathSvg(
       'mathImg_20207261338r3ir43lmfd_height_2d456_width_6d124_vertical_0' +
       'd231.svg');
     expect(mathSvgDimensions.height).toBe('2.456');

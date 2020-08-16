@@ -258,7 +258,7 @@ angular.module('oppia').factory('ImagePreloaderService', [
     * @param {string} filename - The string from which the dimensions of the
     *                           math SVGs should be extracted.
     */
-    var getDimensionsOfMathSvgs = function(filename) {
+    var getDimensionsOfMathSvg = function(filename) {
       var filenameComponents = filename.split('_');
       var indexOfHeightString = filenameComponents.indexOf('height') + 1;
       var indexOfWidthString = filenameComponents.indexOf('width') + 1;
@@ -277,7 +277,7 @@ angular.module('oppia').factory('ImagePreloaderService', [
       init: _init,
       kickOffImagePreloader: _kickOffImagePreloader,
       getDimensionsOfImage: getDimensionsOfImage,
-      getDimensionsOfMathSvgs: getDimensionsOfMathSvgs,
+      getDimensionsOfMathSvg: getDimensionsOfMathSvg,
       onStateChange: _onStateChange,
       isInFailedDownload: _isInFailedDownload,
       isLoadingImageFile: function(filename) {

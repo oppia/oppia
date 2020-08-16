@@ -47,7 +47,7 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
             $attrs.mathContentWithValue);
           if (mathExpressionContent.hasOwnProperty('raw_latex')) {
             var svgFilename = mathExpressionContent.svg_filename;
-            var dimensions = ImagePreloaderService.getDimensionsOfMathSvgs(
+            var dimensions = ImagePreloaderService.getDimensionsOfMathSvg(
               svgFilename);
             ctrl.imageContainerStyle = {
               height: dimensions.height + 'ex',
