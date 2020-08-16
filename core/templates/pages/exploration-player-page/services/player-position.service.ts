@@ -35,6 +35,8 @@ export class PlayerPositionService {
   onChangeCallback = null;
   learnerJustSubmittedAnAnswer = false;
 
+  private _newCardOpenedEventEmitter = new EventEmitter();
+
   init(callback: Function): void {
     this.displayedCardIndex = null;
     this.onChangeCallback = callback;
@@ -93,6 +95,10 @@ export class PlayerPositionService {
    */
   hasLearnerJustSubmittedAnAnswer(): boolean {
     return this.learnerJustSubmittedAnAnswer;
+  }
+
+  get onNewCardOpened() {
+    return this._newCardOpenedEventEmitter;
   }
 
   changeCurrentQuestion(index: number) {

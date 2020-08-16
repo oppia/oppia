@@ -19,7 +19,4 @@
 export class TopicEditorPageConstants {
   public static TOPIC_NAME_INPUT_FOCUS_LABEL =
     'topicNameInputFocusLabel';
-
-  public static EVENT_SUBTOPIC_PAGE_LOADED = 'subtopicPageLoaded';
-  public static EVENT_STORY_SUMMARIES_INITIALIZED = 'storySummariesInitialized';
 }

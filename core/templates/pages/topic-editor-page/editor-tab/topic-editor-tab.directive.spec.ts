@@ -57,6 +57,8 @@ describe('Topic editor tab directive', function() {
   var UndoRedoService = null;
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
+  var mockStorySummariesInitializedEventEmitter = new EventEmitter();
+
   var mockTasdReinitializedEventEmitter = null;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
@@ -144,6 +146,9 @@ describe('Topic editor tab directive', function() {
     topic.setUrlFragment('topic-url-fragment');
     TopicEditorStateService.setTopic(topic);
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOnProperty(TopicEditorStateService,
+      'onStorySummariesInitialized').and.returnValue(
+      mockStorySummariesInitializedEventEmitter);
     ctrl.$onInit();
   }));
 
@@ -508,6 +513,13 @@ describe('Topic editor tab directive', function() {
       spyOn(TopicUpdateService, 'rearrangeSubtopic'));
     $scope.onRearrangeSubtopicEnd(0);
     expect(moveSubtopicSpy).not.toHaveBeenCalled();
+  });
+
+  it('should react to event when story summaries are initialized', () => {
+    spyOn(TopicEditorStateService, 'getCanonicalStorySummaries');
+    mockStorySummariesInitializedEventEmitter.emit();
+    expect(
+      TopicEditorStateService.getCanonicalStorySummaries).toHaveBeenCalled();
   });
 
   it('should call initEditor on initialization of topic', function() {
