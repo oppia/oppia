@@ -49,71 +49,79 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
 
     def test_flush_cache_wipes_cache_clean(self):
         redis_cache_services.flush_cache()
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {'a1': '1', 'b1': '2', 'c1': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
-            redis_cache_services.get_multi(['a', 'b', 'c']), ['1', '2', '3'])
+            redis_cache_services.get_multi(['a1', 'b1', 'c1']), ['1', '2', '3'])
         redis_cache_services.flush_cache()
         self.assertEqual(
-            redis_cache_services.get_multi(['a', 'b', 'c']), [None, None, None])
+            redis_cache_services.get_multi(['a1', 'b1', 'c1']),
+            [None, None, None])
 
     def test_get_multi_retrieves_cache_elements(self):
         redis_cache_services.flush_cache()
         self.assertEqual(
-            redis_cache_services.get_multi(['a', 'b', 'c']), [None, None, None])
+            redis_cache_services.get_multi(['a2', 'b2', 'c2']),
+            [None, None, None])
         self.assertEqual(
-            redis_cache_services.get_multi(['d', 'e']), [None, None])
+            redis_cache_services.get_multi(['d2', 'e2']), [None, None])
 
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {'a2': '1', 'b2': '2', 'c2': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
-            redis_cache_services.get_multi(['a', 'b', 'c']), ['1', '2', '3'])
+            redis_cache_services.get_multi(['a2', 'b2', 'c2']), ['1', '2', '3'])
 
     def test_set_multi_sets_elements(self):
         redis_cache_services.flush_cache()
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {'a3': '1', 'b3': '2', 'c3': '3'}
         response = redis_cache_services.set_multi(key_value_mapping)
         self.assertTrue(response)
 
     def test_delete_multi_deletes_cache_elements(self):
         redis_cache_services.flush_cache()
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {'a4': '1', 'b4': '2', 'c4': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
-            redis_cache_services.get_multi(['a', 'b', 'c']), ['1', '2', '3'])
+            redis_cache_services.get_multi(['a4', 'b4', 'c4']), ['1', '2', '3'])
         return_number_of_keys_set = redis_cache_services.delete_multi(
-            ['a', 'b', 'c'])
+            ['a4', 'b4', 'c4'])
         self.assertEqual(
-            redis_cache_services.get_multi(['a', 'b', 'c']), [None, None, None])
+            redis_cache_services.get_multi(['a4', 'b4', 'c4']),
+            [None, None, None])
         self.assertEqual(return_number_of_keys_set, 3)
 
         return_number_of_keys_set = redis_cache_services.delete_multi(
-            ['d', 'e', 'f'])
+            ['d4', 'e4', 'f4'])
         self.assertEqual(return_number_of_keys_set, 0)
 
     def test_partial_fetches_returns_reasonable_output(self):
         redis_cache_services.flush_cache()
         self.assertEqual(
-            redis_cache_services.get_multi(['a', 'b', 'c']), [None, None, None])
+            redis_cache_services.get_multi(['a5', 'b5', 'c5']),
+            [None, None, None])
 
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {'a5': '1', 'b5': '2', 'c5': '3'}
         redis_cache_services.set_multi(key_value_mapping)
 
         self.assertEqual(
-            redis_cache_services.get_multi(['a', 'z', 'd']), ['1', None, None])
+            redis_cache_services.get_multi(['a5', 'z5', 'd5']),
+            ['1', None, None])
         self.assertEqual(
-            redis_cache_services.get_multi(['x', 'b', 'd']), [None, '2', None])
+            redis_cache_services.get_multi(['x5', 'b5', 'd5']),
+            [None, '2', None])
 
     def test_partial_deletes_deletes_correct_elements(self):
         redis_cache_services.flush_cache()
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {'a6': '1', 'b6': '2', 'c6': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
-            redis_cache_services.get_multi(['a', 'b', 'c']), ['1', '2', '3'])
+            redis_cache_services.get_multi(['a6', 'b6', 'c6']),
+            ['1', '2', '3'])
         self.assertEqual(
-            redis_cache_services.delete_multi(['a', 'd', 'e']), 1)
+            redis_cache_services.delete_multi(['a6', 'd6', 'e6']), 1)
         self.assertEqual(
-            redis_cache_services.get_multi(['a', 'b', 'c']), [None, '2', '3'])
+            redis_cache_services.get_multi(['a6', 'b6', 'c6']),
+            [None, '2', '3'])
 
     def test_redis_configuration_file_matches_feconf_redis_configuration(self):
         """Tests that the redis configuration file and feconf variables have
