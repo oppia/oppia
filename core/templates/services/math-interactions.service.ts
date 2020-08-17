@@ -84,9 +84,9 @@ export class MathInteractionsService {
     return errorMessage;
   }
 
-  validateExpression(expressionString: string, algebraic = true): boolean {
+  _validateExpression(
+      expressionString: string, validVariablesList: string[]): boolean {
     expressionString = expressionString.replace(/\s/g, '');
-    let expressionObject;
     if (expressionString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
       return false;
@@ -107,33 +107,61 @@ export class MathInteractionsService {
       return false;
     }
     try {
-      expressionObject = nerdamer(expressionString);
+      expressionString = this.insertMultiplicationSigns(expressionString);
+      nerdamer(expressionString);
     } catch (err) {
       this.warningText = this.cleanErrorMessage(err.message, expressionString);
       return false;
-    }
-    if (algebraic && expressionObject.variables().length === 0) {
-      this.warningText = 'It looks like you have entered only ' +
-        'numbers. Make sure to include the necessary variables' +
-        ' mentioned in the question.';
-      return false;
-    }
-    if (!algebraic) {
-      for (let functionName of this.mathFunctionNames) {
-        expressionString = expressionString.replace(
-          new RegExp(functionName, 'g'), '');
-      }
-      if (/[a-zA-Z]/.test(expressionString)) {
-        this.warningText = 'It looks like you have entered some variables. ' +
-          'Please enter numbers only.';
-        return false;
-      }
     }
     this.warningText = '';
     return true;
   }
 
-  validateEquation(equationString: string): boolean {
+  validateAlgebraicExpression(
+      expressionString: string, validVariablesList: string[]) {
+    if (!this._validateExpression(expressionString, validVariablesList)) {
+      return false;
+    }
+
+    let variablesList = nerdamer(this.insertMultiplicationSigns(
+      expressionString)).variables();
+    if (variablesList.length === 0) {
+      this.warningText = 'It looks like you have entered only ' +
+      'numbers. Make sure to include the necessary variables' +
+      ' mentioned in the question.';
+      return false;
+    } else if (validVariablesList.length !== 0) {
+      for (let variable of variablesList) {
+        if (validVariablesList.indexOf(variable) === -1) {
+          this.warningText = (
+            'You have entered an invalid character: ' + variable +
+            '. Please use only the characters ' + validVariablesList.join() +
+            ' in your answer.');
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  validateNumericExpression(expressionString: string) {
+    if (!this._validateExpression(expressionString, [])) {
+      return false;
+    }
+    for (let functionName of this.mathFunctionNames) {
+      expressionString = expressionString.replace(
+        new RegExp(functionName, 'g'), '');
+    }
+    if (/[a-zA-Z]/.test(expressionString)) {
+      this.warningText = 'It looks like you have entered some variables. ' +
+        'Please enter numbers only.';
+      return false;
+    }
+    return true;
+  }
+
+  validateEquation(
+      equationString: string, validVariablesList: string[]): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -155,11 +183,17 @@ export class MathInteractionsService {
       return false;
     }
     let splitString = equationString.split('=');
+    if (splitString.length !== 2) {
+      this.warningText = 'Your equation contains multiple = signs.';
+      return false;
+    }
     let lhsString = splitString[0], rhsString = splitString[1];
-    let lhsIsAlgebraicallyValid = this.validateExpression(lhsString);
-    let rhsIsAlgebraicallyValid = this.validateExpression(rhsString);
-    let lhsIsNumericallyValid = this.validateExpression(lhsString, false);
-    let rhsIsNumericallyValid = this.validateExpression(rhsString, false);
+    let lhsIsAlgebraicallyValid = this.validateAlgebraicExpression(
+      lhsString, validVariablesList);
+    let rhsIsAlgebraicallyValid = this.validateAlgebraicExpression(
+      rhsString, validVariablesList);
+    let lhsIsNumericallyValid = this.validateNumericExpression(lhsString);
+    let rhsIsNumericallyValid = this.validateNumericExpression(rhsString);
 
     // At least one side must be algebraic. Purely numeric equations are
     // considered as invalid.
@@ -175,7 +209,10 @@ export class MathInteractionsService {
     }
     // Neither side is algebraically valid. Calling validation functions again
     // to appropriately update the warningText.
-    this.validateExpression(lhsString);
+    this.validateAlgebraicExpression(lhsString, validVariablesList);
+    if (this.getWarningText().length === 0) {
+      this.validateAlgebraicExpression(rhsString, validVariablesList);
+    }
     return false;
   }
 
@@ -184,6 +221,36 @@ export class MathInteractionsService {
   }
 
   insertMultiplicationSigns(expressionString: string): string {
+    // TODO(#7434): Use dot notation after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    /* eslint-disable dot-notation */
+    let greekLetters = Object.keys(
+      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+    let greekSymbols = Object.values(
+      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+    /* eslint-enable dot-notation */
+    let greekLettersAndSymbols = [];
+    for (let i = 0; i < greekLetters.length; i++) {
+      greekLettersAndSymbols.push([greekLetters[i], greekSymbols[i]]);
+    }
+    // Sorting by length in descending order so that longer letters get replaced
+    // before shorted ones. For eg. 'alphabeta' should have variables list as
+    // ['alpha', 'beta'] and not ['alpha', 'b', 'eta'].
+    greekLettersAndSymbols.sort((a, b) => b[0].length - a[0].length);
+
+    let greekLetterToSymbol = {};
+    let greekSymbolToLetter = {};
+    for (let letterAndSymbol of greekLettersAndSymbols) {
+      greekLetterToSymbol[letterAndSymbol[0]] = letterAndSymbol[1];
+      greekSymbolToLetter[letterAndSymbol[1]] = letterAndSymbol[0];
+    }
+
+    // Temporarily replacing letters with symbols.
+    for (let letter in greekLetterToSymbol) {
+      expressionString = expressionString.replace(
+        new RegExp(letter, 'g'), greekLetterToSymbol[letter]);
+    }
+
     expressionString = expressionString.replace(/\s/g, '');
     // Assumes that given expressionString is valid.
     // Nerdamer allows multi-character variables so, 'ax+b' will be considered
@@ -193,16 +260,16 @@ export class MathInteractionsService {
     // each other. So, 'ax+b' would be transformed to 'a*x+b' via this function.
     let variables = nerdamer(expressionString).variables();
     for (let variable of variables) {
-      // We wouldn't want to interpolate '*' signs between valid greek letters.
-      // TODO(#7434): Use dot notation after we find a way to get
-      // rid of the TS2339 error on AppConstants.
-      // eslint-disable-next-line dot-notation
-      if (AppConstants['GREEK_LETTERS'].indexOf(variable) === -1) {
-        let separatedVariables = variable.split('').join('*');
-        expressionString = expressionString.replace(
-          variable, separatedVariables);
-      }
+      let separatedVariables = variable.split('').join('*');
+      expressionString = expressionString.replace(
+        new RegExp(variable, 'g'), separatedVariables);
     }
+    // Reverting the temporary replacement of letters.
+    for (let symbol in greekSymbolToLetter) {
+      expressionString = expressionString.replace(
+        new RegExp(symbol, 'g'), greekSymbolToLetter[symbol]);
+    }
+
     // Inserting multiplication signs before functions. For eg. 5sqrt(x) should
     // be treated as 5*sqrt(x).
     for (let functionName of this.mathFunctionNames) {
@@ -247,8 +314,8 @@ export class MathInteractionsService {
     return modifiedExpressionList.join('');
   }
 
-  getTerms(expressionString: string, splitByAddition = true): Array<string> {
-    let listOfTerms: Array<string> = [];
+  getTerms(expressionString: string, splitByAddition = true): string[] {
+    let listOfTerms: string[] = [];
     let currentTerm: string = '';
     let bracketBalance: number = 0;
     let shouldModifyNextTerm: boolean = false;

@@ -51,7 +51,7 @@ angular.module('oppia').component('mathEquationEditor', {
         ctrl.currentValue = MathInteractionsService.replaceAbsSymbolWithText(
           ctrl.currentValue);
         var answerIsValid = MathInteractionsService.validateEquation(
-          ctrl.currentValue);
+          ctrl.currentValue, GuppyInitializationService.getCustomOskLetters());
         if (GuppyInitializationService.findActiveGuppyObject() === undefined) {
           // The warnings should only be displayed when the editor is inactive
           // focus, i.e., the user is done typing.
@@ -78,6 +78,7 @@ angular.module('oppia').component('mathEquationEditor', {
 
       ctrl.showOSK = function() {
         GuppyInitializationService.setShowOSK(true);
+        GuppyInitializationService.interactionType = 'MathEquationInput';
       };
 
       ctrl.$onInit = function() {

@@ -2891,7 +2891,6 @@ class JobModelValidator(BaseModelValidator):
                 'Entity id %s: error for job is empty but '
                 'job status is %s' % (item.id, item.status_code))
 
-
     @classmethod
     def _validate_output(cls, item):
         """Validate output for entity is present only if status is
@@ -5974,7 +5973,8 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
         """Validates that explorations for model are marked as deleted.
 
         Args:
-            item: ndb.Model. BaseUserModel to validate.
+            item: PendingDeletionRequestModel. Pending deletion request model
+                to validate.
         """
         user_model = user_models.UserSettingsModel.get_by_id(item.id)
         if user_model is None or not user_model.deleted:
@@ -5988,7 +5988,8 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
         """Validates that explorations for model are marked as deleted.
 
         Args:
-            item: ndb.Model. BaseUserModel to validate.
+            item: PendingDeletionRequestModel. Pending deletion request model
+                to validate.
         """
         exp_ids = item.exploration_ids
         not_marked_exp_ids = []
@@ -6008,7 +6009,8 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
         """Validates that collections for model are marked as deleted.
 
         Args:
-            item: ndb.Model. BaseUserModel to validate.
+            item: PendingDeletionRequestModel. Pending deletion request model
+                to validate.
         """
         col_ids = item.collection_ids
         not_marked_col_ids = []
@@ -6024,11 +6026,32 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
                 'deleted' % (item.id, not_marked_col_ids))
 
     @classmethod
+    def _validate_activity_mapping_contains_only_allowed_keys(cls, item):
+        """Validates that activity_mappings keys are only from
+        the core.platform.models.NAMES enum.
+
+        Args:
+            item: PendingDeletionRequestModel. Pending deletion request model
+                to validate.
+        """
+        incorrect_keys = []
+        for key in item.activity_mappings.keys():
+            if key not in [name for name in models.NAMES.__dict__]:
+                incorrect_keys.append(key)
+
+        if incorrect_keys:
+            cls._add_error(
+                'correct activity_mappings check',
+                'Entity id %s: activity_mappings contains keys %s that are not '
+                'allowed' % (item.id, incorrect_keys))
+
+    @classmethod
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_user_settings_are_marked_deleted,
             cls._validate_explorations_are_marked_deleted,
-            cls._validate_collections_are_marked_deleted]
+            cls._validate_collections_are_marked_deleted,
+            cls._validate_activity_mapping_contains_only_allowed_keys]
 
 
 class TaskEntryModelValidator(BaseModelValidator):
@@ -6332,8 +6355,8 @@ class PseudonymizedUserModelValidator(BaseUserModelValidator):
         return [cls._validate_user_settings_with_same_id_not_exist]
 
 
-class UserAuthModelValidator(BaseUserModelValidator):
-    """Class for validating UserAuthModels."""
+class UserAuthDetailsModelValidator(BaseUserModelValidator):
+    """Class for validating UserAuthDetailsModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -6565,7 +6588,7 @@ MODEL_TO_VALIDATOR_MAPPING = {
         PendingDeletionRequestModelValidator),
     stats_models.PlaythroughModel: PlaythroughModelValidator,
     user_models.PseudonymizedUserModel: PseudonymizedUserModelValidator,
-    user_models.UserAuthModel: UserAuthModelValidator
+    user_models.UserAuthDetailsModel: UserAuthDetailsModelValidator
 }
 
 
@@ -7440,12 +7463,12 @@ class PseudonymizedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.PseudonymizedUserModel]
 
 
-class UserAuthModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates UserAuthModel."""
+class UserAuthDetailsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserAuthDetailsModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserAuthModel]
+        return [user_models.UserAuthDetailsModel]
 
 
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
