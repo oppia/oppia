@@ -292,15 +292,16 @@ angular.module('oppia').directive('answerGroupEditor', [
             // choice interaction's customization arguments.
             // TODO(sll): Remove the need for this watcher, or make it less
             // ad hoc.
-            $scope.$on('updateAnswerChoices', function() {
-              ctrl.answerChoices = ctrl.getAnswerChoices();
-            });
-
             ctrl.directiveSubscriptions.add(
               ExternalSaveService.onExternalSave.subscribe(() => {
                 if (ctrl.isRuleEditorOpen()) {
                   ctrl.saveRules();
                 }
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onUpdateAnswerChoices.subscribe(() => {
+                ctrl.answerChoices = ctrl.getAnswerChoices();
               })
             );
             ctrl.directiveSubscriptions.add(
