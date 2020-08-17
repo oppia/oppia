@@ -75,7 +75,6 @@ angular.module('oppia').directive('topicEditorTab', [
         'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
         'WindowDimensionsService', 'WindowRef',
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
-        'EVENT_STORY_SUMMARIES_INITIALIZED',
         function(
             $rootScope, $scope, $uibModal, AlertsService, ContextService,
             CsrfTokenService, EntityCreationService, ImageUploadHelperService,
@@ -84,8 +83,7 @@ angular.module('oppia').directive('topicEditorTab', [
             TopicsAndSkillsDashboardBackendApiService,
             TopicUpdateService, UndoRedoService, UrlInterpolationService,
             WindowDimensionsService, WindowRef,
-            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
-            EVENT_STORY_SUMMARIES_INITIALIZED) {
+            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -445,7 +443,12 @@ angular.module('oppia').directive('topicEditorTab', [
                 () => ctrl.initEditor()
               ));
             $scope.mainTopicCardIsShown = true;
-            $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
+
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onStorySummariesInitialized.subscribe(
+                () => _initStorySummaries()
+              )
+            );
             ctrl.directiveSubscriptions.add(
               TopicsAndSkillsDashboardBackendApiService.
                 onTopicsAndSkillsDashboardReinitialized.subscribe(
