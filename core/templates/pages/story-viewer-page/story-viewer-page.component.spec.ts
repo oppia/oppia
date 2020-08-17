@@ -214,7 +214,8 @@ describe('Story Viewer Page component', function() {
         'node_id=1');
     });
 
-  it('should get static image url', function() {
+  it('should get complete image path corresponding to a given' +
+   ' relative path', function() {
     var imagePath = '/path/to/image.png';
     expect(ctrl.getStaticImageUrl(imagePath)).toBe(
       '/assets/images/path/to/image.png');
