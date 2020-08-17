@@ -719,7 +719,16 @@ module.exports = {
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'node_modules'),
       ],
-      use: ['cache-loader', 'style-loader', 'css-loader']
+      use: [
+        'cache-loader',
+        'style-loader',
+        {
+          loader: 'css-loader',
+          options: {
+            url: false,
+          }
+        }
+      ]
     }]
   },
   externals: {

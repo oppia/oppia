@@ -5,13 +5,26 @@
 # are allowed. For information about supported glob patterns please refer
 # https://docs.python.org/2/library/glob.html.
 
-# IMPORTANT NOTE TO DEVELOPERS:
+# IMPORTANT NOTES FOR DEVELOPERS:
+#
 # - When assigning codeowners for new files, please do so by picking an
 #   appropriate team lead from this page:
-#   https://github.com/oppia/oppia/projects
-# - You do not need to assign yourself as a codeowner (unless you are a project
+#
+#       https://github.com/oppia/oppia/projects
+#
+#   You do not need to assign yourself as a codeowner (unless you are a project
 #   lead listed on the page above).
 
+# IMPORTANT NOTES FOR CODEOWNERS:
+#
+# - If you will be unavailable for more than 24 hours, please replace your
+#   ownership with a delegate, file an issue, and add a todo above the owner
+#   line like so:
+#
+#     TODO(#ISSUE_NUMBER): Revert ownership to @USERNAME after YYYY-MM-DD.
+#
+#   (See #10250 for an example.) Please make sure to restore ownership after
+#   the above date passes.
 
 # Blanket codeowners
 # This is for the case when new files are created in any directories that aren't
@@ -31,7 +44,8 @@
 
 
 # Android team
-/core/domain/android_validation_constants*.py @BenHenning
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/core/domain/android_validation_constants*.py @seanlip
 
 
 # Angular Migration team
@@ -86,12 +100,13 @@
 
 
 # Contributor Dashboard project
-/core/controllers/contributor_dashboard*.py @sagangwee
-/core/domain/opportunity*.py @sagangwee
-/core/domain/voiceover_services*.py @sagangwee
-/core/storage/opportunity/ @sagangwee
-/core/templates/domain/opportunity/ @sagangwee
-/core/templates/pages/contributor-dashboard-page/ @sagangwee
+# TODO(#10250): Revert ownership to @sagangwee after 2020-09-08.
+/core/controllers/contributor_dashboard*.py @DubeySandeep
+/core/domain/opportunity*.py @DubeySandeep
+/core/domain/voiceover_services*.py @DubeySandeep
+/core/storage/opportunity/ @DubeySandeep
+/core/templates/domain/opportunity/ @DubeySandeep
+/core/templates/pages/contributor-dashboard-page/ @DubeySandeep
 
 
 # Core documentation
@@ -128,7 +143,8 @@
 
 
 # Dev workflow team.
-/.circleci/ @BenHenning @vinitamurthi @U8NWXD @kevintab95
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/.circleci/ @vinitamurthi @U8NWXD @kevintab95
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -138,7 +154,8 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/.travis.yml @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -543,11 +560,7 @@
 /.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
 /puppeteer-login-script.js @jimbyo
 /scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
-/webpack.common.config.ts @jameesjohn @vojtechjelinek
-/webpack.common.macros.ts @jameesjohn @vojtechjelinek
-/webpack.dev.config.ts @jameesjohn @vojtechjelinek
-/webpack.prod.config.ts @jameesjohn @vojtechjelinek
-/webpack.terser.config.ts @nishantwrp @vojtechjelinek
+/webpack.*.ts @nishantwrp @vojtechjelinek
 
 
 # Typings.
@@ -570,8 +583,16 @@
 
 
 # Dynamic Feature Gating project
-/core/storage/config/ @BenHenning @vinitamurthi
-/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/core/domain/platform_feature_services*.py @vinitamurthi
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/core/domain/platform_parameter*.py @vinitamurthi
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/core/platform_feature*.py @vinitamurthi
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/core/storage/config/ @vinitamurthi
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/core/templates/domain/platform_feature/ @vinitamurthi
 
 
 # Frontend unit tests
@@ -624,4 +645,5 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
-/.github/workflows/ @BenHenning @vinitamurthi
+# TODO(BenHenning): Reclaim ownership after 2020-08-16.
+/.github/workflows/ @vinitamurthi

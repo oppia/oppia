@@ -16,7 +16,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 /**
- * @fileoverview Directive for the main page of the story viewer.
+ * @fileoverview Component for the main page of the story viewer.
  */
 
 require(
@@ -125,20 +125,20 @@ angular.module('oppia').component('storyViewerPage', {
       ctrl.$onInit = function() {
         ctrl.storyIsLoaded = false;
         LoaderService.showLoadingScreen('Loading');
-        var abbreviatedTopicName = (
+        var topicUrlFragment = (
           UrlService.getTopicUrlFragmentFromLearnerUrl());
         var classroomUrlFragment = (
           UrlService.getClassroomUrlFragmentFromLearnerUrl());
         var storyUrlFragment = (
           UrlService.getStoryUrlFragmentFromLearnerUrl());
         ctrl.storyViewerBackendApiService.fetchStoryData(
-          abbreviatedTopicName,
+          topicUrlFragment,
           classroomUrlFragment,
           storyUrlFragment).then(
           function(storyDataDict) {
             ctrl.storyIsLoaded = true;
             ctrl.storyPlaythroughObject = storyDataDict;
-            ctrl.storyId = storyDataDict.id;
+            ctrl.storyId = ctrl.storyPlaythroughObject.getStoryId();
             PageTitleService.setPageTitle(
               storyDataDict.title + ' - Oppia');
             ctrl.storyTitle = storyDataDict.title;

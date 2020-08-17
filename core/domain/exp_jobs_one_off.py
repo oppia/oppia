@@ -38,35 +38,6 @@ import utils
     models.NAMES.exploration])
 
 
-class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of explorations that use the MathExpressionInput
-    along with the validity and type (expression/equation) of the inputs present
-    in the exploration.
-
-    This validation is done by the validator functions present in schema_utils.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if not item.deleted:
-            try:
-                exp_fetchers.get_exploration_from_model(item)
-            except Exception:
-                yield (
-                    exp_domain.TYPE_INVALID_EXPRESSION,
-                    'The exploration with ID: %s had some issues during '
-                    'migration. This is most likely due to the exploration '
-                    'having invalid solution(s).' % item.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that finds first published time in milliseconds for all
     explorations.
@@ -171,7 +142,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 break
 
             if states_schema_version == current_state_schema_version:
-                yield ('SUCCESS', None)
+                yield ('SUCCESS', 1)
 
     @staticmethod
     def reduce(key, values):

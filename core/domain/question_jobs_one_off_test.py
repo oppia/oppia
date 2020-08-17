@@ -54,7 +54,6 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.QUESTION_ID, self.albert_id,
             self._create_valid_question_data('ABC'), [self.skill_id])
 
-
     def test_migration_job_does_not_convert_up_to_date_question(self):
         """Tests that the question migration job does not convert a
         question that is already the latest schema version.
@@ -200,7 +199,6 @@ class QuestionsMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
-
     def test_job_when_question_has_math_rich_text_components(self):
         valid_html_1 = (
             '<oppia-noninteractive-math math_content-with-value="{&amp;q'
@@ -233,7 +231,6 @@ class QuestionsMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_question(
             'question_id2', self.albert_id,
             question_data2, ['skill_id1'])
-
 
         job_id = (
             question_jobs_one_off.QuestionsMathRteAuditOneOffJob.create_new())
@@ -320,7 +317,6 @@ class QuestionsMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_question(
             'question_id2', self.albert_id,
             question_data2, ['skill_id1'])
-
 
         job_id = (
             question_jobs_one_off.QuestionsMathRteAuditOneOffJob.create_new())

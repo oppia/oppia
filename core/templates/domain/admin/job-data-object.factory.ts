@@ -25,11 +25,14 @@ export interface JobDataBackendDict {
   'job_type': string;
   'status_code': string;
   'error': string;
-  'can_be_canceled'?: boolean;
   'is_cancelable': boolean;
   'id': string;
   'time_started_msec': number;
   'human_readable_time_started': string;
+  // This property is optional because this object factory is used for
+  // both 'recent_job_data' and 'unfinished_job_data' in admin page.
+  // 'recent_job_data' doesn't have this property.
+  'can_be_canceled'?: boolean;
 }
 
 export class Job {
