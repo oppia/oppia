@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Hints/Solution Manager service.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // hints-and-solution-manager.service.spec.ts is upgraded to Angular 8.
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -294,5 +296,16 @@ describe('HintsAndSolutionManager service', function() {
     expect(hasms.isSolutionViewable()).toBe(false);
 
     $timeout.verifyNoPendingTasks();
+  });
+
+  it('should send the solution viewed event emitter', () => {
+    let mockSolutionViewedEventEmitter = new EventEmitter();
+    expect(hasms.onSolutionViewedEventEmitter).toEqual(
+      mockSolutionViewedEventEmitter);
+  });
+
+  it('should fetch EventEmitter for consumption of hint', () => {
+    let mockHintConsumedEvent = new EventEmitter();
+    expect(hasms.onHintConsumed).toEqual(mockHintConsumedEvent);
   });
 });

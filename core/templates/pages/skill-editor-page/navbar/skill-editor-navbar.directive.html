@@ -2,7 +2,7 @@
     ng-if="!isLoadingSkill()">
   <li class="oppia-publish-button-container">
     <div uib-dropdown>
-      <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button oppia-save-publish-skill-button protractor-test-save-or-publish-skill"
+      <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable()}"
               ng-click="saveChanges()"
               ng-disabled="!isSkillSaveable()">
@@ -93,10 +93,6 @@
     margin-right: 5px;
     margin-top: 8px;
   }
-  skill-editor-navbar .oppia-save-publish-skill-button {
-    float: left;
-    width: 155px;
-  }
   skill-editor-navbar .oppia-changes-count-text {
     margin-left: 2px;
     opacity: 0.5;
@@ -107,6 +103,10 @@
   skill-editor-navbar .oppia-discard-draft-button-container {
     min-width: 125px;
     right: inherit;
+  }
+  skill-editor-navbar .oppia-save-publish-changes-button {
+    float: left;
+    width: 158px;
   }
 
   @media screen and (max-width: 768px) {

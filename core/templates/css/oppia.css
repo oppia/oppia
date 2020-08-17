@@ -2977,14 +2977,7 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-bottom: 5px;
 }
 
-.oppia-feedback-card .form-horizontal label {
-  float: left;
-  height: 73px;
-  padding-right: 0;
-  width: 665px;
-}
 .oppia-settings-container .form-group > label {
-  min-height: 35px;
   padding-left: 0;
   padding-right: 0;
 }
@@ -4282,7 +4275,6 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-settings-container .form-text {
   color: #737373;
   display: inline-block;
-  margin-bottom: 15px;
   margin-top: 5px;
 }
 
