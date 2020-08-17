@@ -1312,10 +1312,13 @@ angular.module('oppia').directive('conversationSkin', [
                 )
               );
 
-              $rootScope.$on('solutionViewed', function(evt, timestamp) {
-                QuestionPlayerStateService.solutionViewed(
-                  QuestionPlayerEngineService.getCurrentQuestion());
-              });
+              ctrl.directiveSubscriptions.add(
+                HintsAndSolutionManagerService.onSolutionViewedEventEmitter
+                  .subscribe(() => {
+                    QuestionPlayerStateService.solutionViewed(
+                      QuestionPlayerEngineService.getCurrentQuestion());
+                  })
+              );
             }
             $rootScope.$on('playerStateChange', function(evt, newStateName) {
               if (!newStateName) {
