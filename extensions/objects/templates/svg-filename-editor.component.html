@@ -15,7 +15,7 @@
         Note: The uploaded svg may not be rendered exactly.
       </div>
       <div ng-if="!$ctrl.isFileUploaded()">
-        <image-uploader on-file-changed="$ctrl.onFileChanged" allowed-image-formats="$ctrl.allowedImageFormat">
+        <image-uploader on-file-changed="$ctrl.onFileChanged" allowed-image-formats="$ctrl.allowedImageFormats">
         </image-uploader>
       </div>
       <div ng-if="$ctrl.isFileUploaded()">
@@ -181,7 +181,7 @@
     </div>
     <div class="horizontal-toolbar top-toolbar">
       <div class="info-tag" ng-if="$ctrl.isDrawModeSvgUpload()">
-        Click the svg upload button to load the svg.
+        Click the SVG upload button to load the SVG.
       </div>
       <div class="info-tag" ng-if="$ctrl.isDrawModePieChart()">
         Click the PieChart button once the data is entered.

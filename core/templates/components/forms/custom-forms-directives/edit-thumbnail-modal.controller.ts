@@ -28,13 +28,11 @@ angular.module('oppia').controller('EditThumbnailModalController', [
   'dimensions', 'getPreviewDescription', 'getPreviewDescriptionBgColor',
   'getPreviewFooter', 'getPreviewTitle', 'openInUploadMode',
   'tempBgColor', 'uploadedImage', 'uploadedImageMimeType',
-  'ALLOWED_IMAGE_FORMATS',
   function($controller, $scope, $timeout, $uibModalInstance,
       ImageUploadHelperService, allowedBgColors, aspectRatio,
       dimensions, getPreviewDescription, getPreviewDescriptionBgColor,
       getPreviewFooter, getPreviewTitle, openInUploadMode,
-      tempBgColor, uploadedImage, uploadedImageMimeType,
-      ALLOWED_IMAGE_FORMATS) {
+      tempBgColor, uploadedImage, uploadedImageMimeType) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -45,7 +43,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
       tags: [],
       attrs: []
     };
-    $scope.allowedImageFormats = ALLOWED_IMAGE_FORMATS;
+    $scope.allowedImageFormats = ['svg'];
 
     $scope.allowedBgColors = allowedBgColors;
     $scope.aspectRatio = aspectRatio;
