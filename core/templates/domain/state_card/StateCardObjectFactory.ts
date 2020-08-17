@@ -222,7 +222,7 @@ export class StateCard {
 })
 export class StateCardObjectFactory {
   constructor(private audioTranslationLanguageService:
-                  AudioTranslationLanguageService ) {}
+                  AudioTranslationLanguageService) {}
 
   /**
    * @param {string} stateName - The state name for the current card.
