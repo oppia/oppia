@@ -28,8 +28,6 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { EventEmitter } from '@angular/core';
-
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require(
