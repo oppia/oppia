@@ -23,10 +23,10 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').factory('HintsAndSolutionManagerService', [
-  '$rootScope', '$timeout', 'PlayerPositionService',
+  '$timeout', 'PlayerPositionService',
   'WAIT_FOR_FIRST_HINT_MSEC', 'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
   function(
-      $rootScope, $timeout, PlayerPositionService,
+      $timeout, PlayerPositionService,
       WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
     var timeout = null;
     var ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
