@@ -83,8 +83,8 @@ var submitAnswer = async function(elem, answer) {
 
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
-  await waitFor.elementToBeClickable(submitAnswerButton,
-    'Submit Answer button is not clickable');
+  await waitFor.elementToBeClickable(
+    submitAnswerButton, 'Submit Answer button is not clickable');
   await submitAnswerButton.click();
 };
 

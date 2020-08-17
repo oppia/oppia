@@ -104,19 +104,22 @@ describe('screenreader and keyboard user accessibility features', function() {
     if (await elementToFocus.getAttribute('id') === '') {
       // Should move the focus to the elementToFocus.
       await browser.actions().sendKeys(key).perform();
-      expect(await browser.driver.switchTo().activeElement()
+      expect(
+        await browser.driver.switchTo().activeElement()
         .getAttribute('class')).toEqual(
         await (await elementToFocus.getAttribute('class')));
 
       // Should move the focus away from the elementToFocus.
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
-      expect(await browser.driver.switchTo().activeElement()
+      expect(
+        await browser.driver.switchTo().activeElement()
         .getAttribute('class')).not.toEqual(
         await (await elementToFocus.getAttribute('class')));
 
       // Should move the focus back to the elementToFocus.
       await browser.actions().sendKeys(key).perform();
-      expect(await browser.driver.switchTo().activeElement()
+      expect(
+        await browser.driver.switchTo().activeElement()
         .getAttribute('class')).toEqual(
         await (await elementToFocus.getAttribute('class')));
     } else {

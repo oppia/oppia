@@ -89,14 +89,14 @@ var ExplorationPlayerPage = function() {
   var pauseButton = element(by.css('.protractor-test-pause-circle'));
 
   this.expandAudioBar = async function() {
-    await waitFor.elementToBeClickable(audioBarExpandButton,
-      'Audio bar taking too long to be clickable');
+    await waitFor.elementToBeClickable(
+      audioBarExpandButton, 'Audio bar taking too long to be clickable');
     await audioBarExpandButton.click();
   };
 
   this.pressPlayButton = async function() {
-    await waitFor.elementToBeClickable(playButton,
-      'Play button taking too long to be clickable');
+    await waitFor.elementToBeClickable(
+      playButton, 'Play button taking too long to be clickable');
     await playButton.click();
   };
 
@@ -105,8 +105,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.pressPauseButton = async function() {
-    await waitFor.elementToBeClickable(pauseButton,
-      'Pause button taking too long to be clickable');
+    await waitFor.elementToBeClickable(
+      pauseButton, 'Pause button taking too long to be clickable');
     await pauseButton.click();
   };
 
@@ -115,8 +115,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.changeVoiceoverLanguage = async function(language) {
-    await waitFor.visibilityOf(voiceoverLanguageSelector,
-      'Language selector takes too long to appear.');
+    await waitFor.visibilityOf(
+      voiceoverLanguageSelector, 'Language selector takes too long to appear.');
     await voiceoverLanguageSelector.element(
       by.cssContainingText('option', language)).click();
   };
@@ -128,8 +128,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickSuggestChangesButton = async function() {
-    await waitFor.elementToBeClickable(suggestionPopupLink,
-      'Suggest changes button taking too long to appear');
+    await waitFor.elementToBeClickable(
+      suggestionPopupLink, 'Suggest changes button taking too long to appear');
     await suggestionPopupLink.click();
   };
 
@@ -142,8 +142,8 @@ var ExplorationPlayerPage = function() {
       suggestionTitle, suggestionDescription) {
     var suggestionModal = element(
       by.css('.protractor-test-exploration-suggestion-modal'));
-    await waitFor.visibilityOf(suggestionModal,
-      'Suggestion Modal is taking too long to appear.');
+    await waitFor.visibilityOf(
+      suggestionModal, 'Suggestion Modal is taking too long to appear.');
     var suggestionHeader = element(by.css('.oppia-rte'));
     await suggestionHeader.click();
     await suggestionHeader.sendKeys(suggestionTitle);
@@ -163,7 +163,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.reportExploration = async function() {
-    await waitFor.elementToBeClickable(reportExplorationButton,
+    await waitFor.elementToBeClickable(
+      reportExplorationButton,
       'Report Exploration Button takes too long to be clickable');
     await reportExplorationButton.click();
     let radioButton = await element.all(by.tagName('input')).get(0);

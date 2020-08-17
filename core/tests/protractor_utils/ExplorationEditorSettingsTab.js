@@ -68,13 +68,16 @@ var ExplorationEditorSettingsTab = function() {
    * Workflows
    */
   this.deleteExploration = async function() {
-    await waitFor.elementToBeClickable(deleteExplorationButton,
+    await waitFor.elementToBeClickable(
+      deleteExplorationButton,
       'Delete Exploration button is not clickable');
     await deleteExplorationButton.click();
-    await waitFor.elementToBeClickable(confirmDeleteExplorationButton,
+    await waitFor.elementToBeClickable(
+      confirmDeleteExplorationButton,
       'Confirm Delete Exploration button is not clickable');
     await confirmDeleteExplorationButton.click();
-    await waitFor.invisibilityOf(confirmDeleteExplorationButton,
+    await waitFor.invisibilityOf(
+      confirmDeleteExplorationButton,
       'Delete Exploration modal takes too long to disappear');
     // Returning to /creator-dashboard.
     await waitFor.pageToFullyLoad();
@@ -82,7 +85,8 @@ var ExplorationEditorSettingsTab = function() {
 
   this.enableCorrectnessFeedback = async function() {
     expect(await enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
-    await waitFor.elementToBeClickable(enableCorrectnessFeedbackButton,
+    await waitFor.elementToBeClickable(
+      enableCorrectnessFeedbackButton,
       'Enable correctness feedback button is not clickable.');
     await enableCorrectnessFeedbackButton.click();
   };
@@ -97,11 +101,12 @@ var ExplorationEditorSettingsTab = function() {
 
   this.openAndClosePreviewSummaryTile = async function() {
     await openPreviewSummaryButton.click();
-    await waitFor.visibilityOf(explorationSummaryTile,
-      'Summary Tile takes too long to appear');
+    await waitFor.visibilityOf(
+      explorationSummaryTile, 'Summary Tile takes too long to appear');
     expect(await explorationSummaryTile.isPresent()).toBeTruthy();
     await closePreviewSummaryButton.click();
-    await waitFor.invisibilityOf(explorationSummaryTile,
+    await waitFor.invisibilityOf(
+      explorationSummaryTile,
       'Summary Tile takes too long to disappear');
     expect(await explorationSummaryTile.isPresent()).toBeFalsy();
   };

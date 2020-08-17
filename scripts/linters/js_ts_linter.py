@@ -1278,7 +1278,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
 
         num_js_and_ts_files = len(files_to_lint)
         python_utils.PRINT('Total js and ts files: ', num_js_and_ts_files)
-        eslint_cmd_args = [node_path, eslint_path, '--quiet']
+        eslint_cmd_args = [node_path, eslint_path, '--fix']
         result_list = []
         python_utils.PRINT('Linting JS and TS files.')
         for _, filepath in enumerate(files_to_lint):

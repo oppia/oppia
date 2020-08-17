@@ -31,7 +31,7 @@ module.exports = {
       category: 'Stylistic Issues',
       recommended: false
     },
-    fixable: null,
+    fixable: "whitespace",
     schema: ['always'],
     messages: {
       expectedAfter: 'Expected newline after \'(\'.'
@@ -71,7 +71,7 @@ module.exports = {
             return true;
           }
           if (line.startsWith('if') || line.startsWith('else if') ||
-            line.startsWith('while')) {
+            line.startsWith('while') || line.startsWith('for')) {
             excluded = true;
           }
           if (excluded && line.endsWith(') {')) {
@@ -94,11 +94,16 @@ module.exports = {
                 parensCount = 0;
                 return true;
               }
-              context.report({
-                node,
-                loc: paren.loc,
-                messageId: 'expectedAfter'
-              });
+              if (paren.value === '(') {
+                context.report({
+                  node,
+                  loc: paren.loc,
+                  messageId: 'expectedAfter',
+                  fix(fixer) {
+                    return fixer.insertTextAfter(paren, '\n');
+                  }
+                });
+              }
             }
           }
         });

@@ -139,18 +139,19 @@ var TopicsAndSkillsDashboardPage = function() {
   // Only use this if the skills count is not zero. This is supposed to be used
   // for actions being performed on the skills like deleting, assigning etc.
   this.waitForSkillsToLoad = async function() {
-    await waitFor.visibilityOf(skillsTable,
-      'Skills table taking too long to appear.');
-    await waitFor.invisibilityOf(noSkillsPresentMessage,
-      'Skills list taking too long to appear.');
+    await waitFor.visibilityOf(
+      skillsTable, 'Skills table taking too long to appear.');
+    await waitFor.invisibilityOf(
+      noSkillsPresentMessage, 'Skills list taking too long to appear.');
   };
 
   // Only use this if the topics count is not zero. This is supposed to be used
   // for actions being performed on the topics like editing, deleting etc.
   this.waitForTopicsToLoad = async function() {
-    await waitFor.visibilityOf(topicsTable,
-      'Topics table taking too long to appear');
-    await waitFor.visibilityOf(topicsListItems.first(),
+    await waitFor.visibilityOf(
+      topicsTable, 'Topics table taking too long to appear');
+    await waitFor.visibilityOf(
+      topicsListItems.first(),
       'Topics list taking too long to appear');
   };
 

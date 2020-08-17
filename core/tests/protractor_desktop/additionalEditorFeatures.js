@@ -267,8 +267,8 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('You must be happy!'),
       null, false, 'Equals', 'happy');
-    await explorationEditorMainTab.addResponse('TextInput',
-      await forms.toRichText('No being sad!'),
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('No being sad!'),
       null, false, 'Contains', 'sad');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
@@ -309,8 +309,8 @@ describe('Full exploration editor', function() {
     await libraryPage.findExploration('Testing multiple rules');
     await libraryPage.playExploration('Testing multiple rules');
     var explorationId = await general.getExplorationIdFromPlayer();
-    await browser.get(general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
-        explorationId);
+    await browser.get(
+      general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId);
     await explorationEditorMainTab.exitTutorial();
 
     // Verify nothing can change with this user.

@@ -30,13 +30,13 @@ var customizeComponent = async function(modal, rawLatex) {
 // from the Math rich text component is in escaped format and we need to
 // convert it to unescaped format.
 var escapedJsonToObj = function(json) {
-  return (
-    JSON.parse((json.toString())
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, '\'')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')));
+  return (JSON.parse((
+    json.toString())
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, '\'')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')));
 };
 
 var expectComponentDetailsToMatch = async function(elem, rawLatex) {

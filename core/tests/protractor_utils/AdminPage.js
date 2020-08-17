@@ -181,7 +181,8 @@ var AdminPage = function() {
   };
 
   this._startOneOffJob = async function(jobName, i) {
-    await waitFor.visibilityOf(await oneOffJobRows.first(),
+    await waitFor.visibilityOf(
+      await oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
     var text = await (await oneOffJobRows.get(i)).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
@@ -248,8 +249,8 @@ var AdminPage = function() {
   };
 
   this.getUsersAsssignedToRole = async function(role) {
-    await waitFor.visibilityOf(roleDropdown,
-      'View role dropdown taking too long to be visible');
+    await waitFor.visibilityOf(
+      roleDropdown, 'View role dropdown taking too long to be visible');
     await roleDropdown.sendKeys('By Role');
 
     await roleValueOption.click();
@@ -259,8 +260,8 @@ var AdminPage = function() {
   };
 
   this.viewRolesbyUsername = async function(username) {
-    await waitFor.visibilityOf(roleDropdown,
-      'View role dropdown taking too long to be visible');
+    await waitFor.visibilityOf(
+      roleDropdown, 'View role dropdown taking too long to be visible');
     await roleDropdown.sendKeys('By Username');
 
     await roleUsernameOption.click();
