@@ -34,10 +34,8 @@ describe('Keyboard Shortcuts', () => {
     backButton.setAttribute('id', 'backButtonId');
     nextButton.setAttribute('class', 'oppia-next-button');
     continueButton.setAttribute('class', 'oppia-learner-confirm-button');
-    searchBar.setAttribute(
-      'class', 'oppia-search-bar-text-input');
-    categoryBar.setAttribute(
-      'class', 'oppia-category-bar-dropdown-toggle');
+    searchBar.setAttribute('class', 'oppia-search-bar-text-input');
+    categoryBar.setAttribute('class', 'oppia-category-bar-dropdown-toggle');
     document.body.append(skipButton);
     document.body.append(continueButton);
     document.body.append(backButton);

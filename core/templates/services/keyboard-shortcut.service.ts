@@ -30,7 +30,6 @@ export class KeyboardShortcutService {
   bindExplorationPlayerShortcuts() {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
-      return false;
     });
 
     Mousetrap.bind('k', function() {
@@ -38,7 +37,6 @@ export class KeyboardShortcutService {
       if (previousButton !== null) {
         previousButton.focus();
       }
-      return false;
     });
 
     Mousetrap.bind('j', function() {
@@ -52,7 +50,6 @@ export class KeyboardShortcutService {
       if (continueButton !== null) {
         continueButton.focus();
       }
-      return false;
     });
   }
 
