@@ -16,6 +16,8 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
@@ -37,6 +39,8 @@ angular.module('oppia').factory('HintsAndSolutionManagerService', [
     var solutionForLatestCard = null;
     var wrongAnswersSinceLastHintConsumed = 0;
     var correctAnswerSubmitted = false;
+
+    var _hintConsumedEventEmitter = new EventEmitter();
 
     // Variable tooltipIsOpen is a flag which says that the tooltip is currently
     // visible to the learner.
@@ -96,7 +100,7 @@ angular.module('oppia').factory('HintsAndSolutionManagerService', [
       if (tooltipTimeout) {
         $timeout.cancel(tooltipTimeout);
       }
-      $rootScope.$broadcast('hintConsumed');
+      _hintConsumedEventEmitter.emit();
       numHintsConsumed++;
       wrongAnswersSinceLastHintConsumed = 0;
 
@@ -188,6 +192,9 @@ angular.module('oppia').factory('HintsAndSolutionManagerService', [
             accelerateHintRelease();
           }
         }
+      },
+      get onHintConsumed() {
+        return _hintConsumedEventEmitter;
       }
     };
   }
