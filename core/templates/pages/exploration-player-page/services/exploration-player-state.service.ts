@@ -68,6 +68,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     StatsReportingService = (
       OppiaAngularRootComponent.statsReportingService);
     var _totalQuestionsReceivedEventEmitter = new EventEmitter();
+    var _oppiaFeedbackAvailableEventEmitter = new EventEmitter();
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -276,6 +277,9 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       },
       get onPlayerStateChange() {
         return _playerStateChangeEventEmitter;
+      },
+      get onOppiaFeedbackAvailable() {
+        return _oppiaFeedbackAvailableEventEmitter;
       }
     };
   }]);

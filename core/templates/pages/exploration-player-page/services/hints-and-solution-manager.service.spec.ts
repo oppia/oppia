@@ -303,6 +303,12 @@ describe('HintsAndSolutionManager service', function() {
     $timeout.verifyNoPendingTasks();
   });
 
+  it('should send the solution viewed event emitter', () => {
+    let mockSolutionViewedEventEmitter = new EventEmitter();
+    expect(hasms.onSolutionViewedEventEmitter).toEqual(
+      mockSolutionViewedEventEmitter);
+  });
+
   it('should fetch EventEmitter for consumption of hint', () => {
     let mockHintConsumedEvent = new EventEmitter();
     expect(hasms.onHintConsumed).toEqual(mockHintConsumedEvent);

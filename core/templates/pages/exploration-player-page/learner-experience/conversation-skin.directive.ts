@@ -870,7 +870,7 @@ angular.module('oppia').directive('conversationSkin', [
               FatigueDetectionService.recordSubmissionTimestamp();
               if (FatigueDetectionService.isSubmittingTooFast()) {
                 FatigueDetectionService.displayTakeBreakMessage();
-                $scope.$broadcast('oppiaFeedbackAvailable');
+                ExplorationPlayerStateService.onOppiaFeedbackAvailable.emit();
                 return;
               }
             }
@@ -956,7 +956,7 @@ angular.module('oppia').directive('conversationSkin', [
                   1.0));
 
                 $timeout(function() {
-                  $scope.$broadcast('oppiaFeedbackAvailable');
+                  ExplorationPlayerStateService.onOppiaFeedbackAvailable.emit();
                   var pairs = (
                     PlayerTranscriptService.getLastCard().
                       getInputResponsePairs());
@@ -1147,8 +1147,7 @@ angular.module('oppia').directive('conversationSkin', [
               return;
             }
             if ($scope.questionSessionCompleted) {
-              $rootScope.$broadcast(
-                'questionSessionCompleted',
+              QuestionPlayerStateService.onQuestionSessionCompleted.emit(
                 QuestionPlayerStateService.getQuestionPlayerStateData());
               return;
             }
@@ -1311,10 +1310,13 @@ angular.module('oppia').directive('conversationSkin', [
                 )
               );
 
-              $rootScope.$on('solutionViewed', function(evt, timestamp) {
-                QuestionPlayerStateService.solutionViewed(
-                  QuestionPlayerEngineService.getCurrentQuestion());
-              });
+              ctrl.directiveSubscriptions.add(
+                HintsAndSolutionManagerService.onSolutionViewedEventEmitter
+                  .subscribe(() => {
+                    QuestionPlayerStateService.solutionViewed(
+                      QuestionPlayerEngineService.getCurrentQuestion());
+                  })
+              );
             }
             ctrl.directiveSubscriptions.add(
               ExplorationPlayerStateService.onPlayerStateChange.subscribe(
@@ -1357,10 +1359,11 @@ angular.module('oppia').directive('conversationSkin', [
                 }
               )
             );
-            $scope.$on('ratingUpdated', function() {
-              $scope.userRating = LearnerViewRatingService.getUserRating();
-            });
-
+            ctrl.directiveSubscriptions.add(
+              LearnerViewRatingService.onRatingUpdated.subscribe(() => {
+                $scope.userRating = LearnerViewRatingService.getUserRating();
+              })
+            );
             $window.addEventListener('beforeunload', function(e) {
               if ($scope.redirectToRefresherExplorationConfirmed) {
                 return;

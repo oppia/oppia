@@ -249,23 +249,26 @@ angular.module('oppia').directive('tutorCard', [
               )
             );
 
-            $scope.$on('oppiaFeedbackAvailable', function() {
-              $scope.waitingForOppiaFeedback = false;
+            ctrl.directiveSubscriptions.add(
+              ExplorationPlayerStateService.onOppiaFeedbackAvailable.subscribe(
+                () => {
+                  $scope.waitingForOppiaFeedback = false;
 
-              // Auto scroll to the new feedback on mobile device.
-              if (DeviceInfoService.isMobileDevice()) {
-                var latestFeedbackIndex = (
-                  $scope.getDisplayedCard().getInputResponsePairs().length - 1);
-                /* Reference: https://stackoverflow.com/questions/40134381
-                  $anchorScroll() without changing actual hash value of url
-                  works only when written inside a timeout of 0 ms. */
-                $anchorScroll.yOffset = 80;
-                $location.hash(
-                  $scope.getInputResponsePairId(latestFeedbackIndex));
-                $anchorScroll();
-              }
-            });
-
+                  // Auto scroll to the new feedback on mobile device.
+                  if (DeviceInfoService.isMobileDevice()) {
+                    var latestFeedbackIndex = (
+                      $scope.getDisplayedCard()
+                        .getInputResponsePairs().length - 1);
+                    /* Reference: https://stackoverflow.com/questions/40134381
+                      $anchorScroll() without changing actual hash value of url
+                      works only when written inside a timeout of 0 ms. */
+                    $anchorScroll.yOffset = 80;
+                    $location.hash(
+                      $scope.getInputResponsePairId(latestFeedbackIndex));
+                    $anchorScroll();
+                  }
+                })
+            );
             updateDisplayedCard();
           };
           ctrl.$onDestroy = function() {
