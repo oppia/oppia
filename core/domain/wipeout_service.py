@@ -22,18 +22,23 @@ import logging
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_domain
 from core.platform import models
 import python_utils
 
+from google.appengine.ext import ndb
+
 current_user_services = models.Registry.import_current_user_services()
 (
     base_models, improvements_models, question_models,
-    skill_models, story_models, user_models
+    skill_models, story_models, topic_models,
+    user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.improvements, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.user
+    models.NAMES.skill, models.NAMES.story, models.NAMES.topic,
+    models.NAMES.user
 ])
 transaction_services = models.Registry.import_transaction_services()
 
@@ -130,6 +135,9 @@ def pre_delete_user(user_id):
         col_summary.is_solely_owned_by_user(user_id)]
     collection_services.delete_collections(
         user_id, collections_to_be_deleted_ids)
+
+    topic_services.deassign_user_from_all_topics(
+        user_services.get_system_user(), user_id)
 
     # Set all the user's email preferences to False in order to disable all
     # ordinary emails that could be sent to the users.
@@ -247,12 +255,151 @@ def _delete_improvements_models(user_id):
             model_class.apply_deletion_policy(user_id)
 
 
+def _collect_activity_ids_from_snapshots_and_commit(
+        user_id,
+        activity_category,
+        snapshot_metadata_model_classes,
+        commit_log_model_class,
+        commit_log_model_field_name):
+    """Collect the activity IDs that for the user with user_id. Verify that each
+    snapshot has corresponding commit log.
+
+    Args:
+        user_id: str. The id of the user for which to collect the activity IDs.
+        activity_category: models.NAMES. The category of the models that are
+            that contain the activity IDs.
+        snapshot_model_classes: list(class). The snapshot metadata model classes
+            that contain the activity IDs.
+        commit_log_model_class: class. The metadata model classes that
+            contains the activity IDs.
+        commit_log_model_field_name: str. The name of the field holding the
+            activity ID in the corresponding commit log model.
+
+    Returns:
+        (
+            set(str),
+            list(BaseSnapshotMetadataModel),
+            list(BaseCommitLogEntryModel)
+        ). The activity IDs.
+    """
+    snapshot_metadata_models = []
+    for snapshot_model_class in snapshot_metadata_model_classes:
+        snapshot_metadata_models.extend(
+            snapshot_model_class.query(ndb.OR(
+                snapshot_model_class.committer_id == user_id,
+                snapshot_model_class.mentioned_user_ids == user_id
+            )).fetch()
+        )
+    snapshot_metadata_ids = set(
+        model.get_unversioned_instance_id()
+        for model in snapshot_metadata_models
+    )
+
+    commit_log_models = commit_log_model_class.query(
+        commit_log_model_class.user_id == user_id
+    ).fetch()
+    commit_log_ids = set(
+        getattr(model, commit_log_model_field_name)
+        for model in commit_log_models
+    )
+    if snapshot_metadata_ids != commit_log_ids:
+        logging.error(
+            'The commit log and snapshot %s IDs differ. '
+            'Snapshots without commit logs: %s, '
+            'Commit logs without snapshots: %s.',
+            activity_category,
+            list(snapshot_metadata_ids - commit_log_ids),
+            list(commit_log_ids - snapshot_metadata_ids))
+
+    return (
+        (snapshot_metadata_ids | commit_log_ids),
+        snapshot_metadata_models,
+        commit_log_models
+    )
+
+
 def _delete_activity_models(
         pending_deletion_request,
         activity_category,
         snapshot_model_class,
         commit_log_model_class,
         commit_log_model_field_name):
+    """Pseudonymize the activity models for the user with user_id.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to be saved in the datastore.
+        activity_category: models.NAMES. The category of the models that are
+            being pseudonymized.
+        snapshot_model_class: class. The metadata model class that is being
+            pseudonymized.
+        commit_log_model_class: class. The commit log model class that is being
+            pseudonymized.
+        commit_log_model_field_name: str. The name of the field holding the
+            activity id in the corresponding commit log model.
+    """
+    user_id = pending_deletion_request.user_id
+    activity_ids, snapshot_metadata_models, commit_log_models = (
+        _collect_activity_ids_from_snapshots_and_commit(
+            user_id,
+            activity_category,
+            [snapshot_model_class],
+            commit_log_model_class,
+            commit_log_model_field_name
+        )
+    )
+
+    # The activity_mappings field might have only been partially generated, so
+    # we fill in the missing part for this activity category.
+    if activity_category not in pending_deletion_request.activity_mappings:
+        pending_deletion_request.activity_mappings[activity_category] = (
+            _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
+        save_pending_deletion_request(pending_deletion_request)
+
+    def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
+        """Pseudonymize user ID fields in the models.
+
+        Args:
+            activity_related_models: list(BaseModel). Models whose user IDs
+                should be pseudonymized.
+            pseudonymized_user_id: str. New pseudonymized user ID to be used for
+                the models.
+        """
+        metadata_models = [
+            model for model in activity_related_models
+            if isinstance(model, snapshot_model_class)]
+        for metadata_model in metadata_models:
+            metadata_model.committer_id = pseudonymized_user_id
+        snapshot_model_class.put_multi(metadata_models)
+
+        commit_log_models = [
+            model for model in activity_related_models
+            if isinstance(model, commit_log_model_class)]
+        for commit_log_model in commit_log_models:
+            commit_log_model.user_id = pseudonymized_user_id
+        commit_log_model_class.put_multi(commit_log_models)
+
+    activity_mappings = (
+        pending_deletion_request.activity_mappings[activity_category])
+    for activity_id, pseudonymized_user_id in activity_mappings.items():
+        activity_related_models = [
+            model for model in snapshot_metadata_models
+            if model.get_unversioned_instance_id() == activity_id]
+        activity_related_models += [
+            model for model in commit_log_models
+            if getattr(model, commit_log_model_field_name) == activity_id]
+        for i in python_utils.RANGE(
+                0,
+                len(activity_related_models),
+                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+            transaction_services.run_in_transaction(
+                _pseudonymize_models,
+                activity_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                pseudonymized_user_id)
+
+
+def _pseudonymize_topic_models(
+        pending_deletion_request):
     """Pseudonymize the activity models for the user with user_id.
 
     Args:
@@ -268,32 +415,23 @@ def _delete_activity_models(
             activity id in the corresponding commit log model.
     """
     user_id = pending_deletion_request.user_id
-    metadata_models = snapshot_model_class.query(
-        snapshot_model_class.committer_id == user_id
-    ).fetch()
-    activity_ids = set([
-        model.get_unversioned_instance_id() for model in metadata_models])
 
-    commit_log_models = commit_log_model_class.query(
-        commit_log_model_class.user_id == user_id
-    ).fetch()
-    commit_log_ids = set(
-        getattr(model, commit_log_model_field_name)
-        for model in commit_log_models)
-    if activity_ids != commit_log_ids:
-        logging.error(
-            'The commit log and snapshot %s IDs differ. '
-            'Snapshots without commit logs: %s, '
-            'Commit logs without snapshots: %s.',
-            activity_category,
-            list(activity_ids - commit_log_ids),
-            list(commit_log_ids - activity_ids))
-
-    activity_ids |= commit_log_ids
+    activity_ids, snapshot_metadata_models, commit_log_models = (
+        _collect_activity_ids_from_snapshots_and_commit(
+            user_id,
+            models.NAMES.topic,
+            [
+                topic_models.TopicSnapshotMetadataModel,
+                topic_models.TopicRightsSnapshotMetadataModel
+            ],
+            topic_models.TopicCommitLogEntryModel,
+            topic_models.TopicCommitLogEntryModel.topic_id
+        )
+    )
     # The activity_mappings field might have only been partially generated, so
     # we fill in the missing part for this activity category.
-    if activity_category not in pending_deletion_request.activity_mappings:
-        pending_deletion_request.activity_mappings[activity_category] = (
+    if models.NAMES.topic not in pending_deletion_request.activity_mappings:
+        pending_deletion_request.activity_mappings[models.NAMES.topic] = (
             _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
         save_pending_deletion_request(pending_deletion_request)
 
