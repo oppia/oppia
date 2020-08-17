@@ -62,7 +62,6 @@ angular.module('oppia').directive('supplementalCard', [
             CurrentInteractionService, OPPIA_AVATAR_LINK_URL) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-
           var updateDisplayedCard = function() {
             $scope.displayedCard = $scope.getDisplayedCard();
             $scope.clearHelpCard();
@@ -135,10 +134,14 @@ angular.module('oppia').directive('supplementalCard', [
               )
             );
 
-            $scope.$on('helpCardAvailable', function(event, helpCard) {
-              $scope.helpCardHtml = helpCard.helpCardHtml;
-              $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onHelpCardAvailable.subscribe(
+                (helpCard) => {
+                  $scope.helpCardHtml = helpCard.helpCardHtml;
+                  $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
+                }
+              )
+            );
             updateDisplayedCard();
           };
           ctrl.$onDestroy = function() {
