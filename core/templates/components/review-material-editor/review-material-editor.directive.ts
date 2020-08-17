@@ -44,8 +44,8 @@ angular.module('oppia').directive('reviewMaterialEditor', [
         '/components/review-material-editor/' +
         'review-material-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['SubtitledHtmlObjectFactory',
-        'COMPONENT_NAME_SOLUTION_EXPLANATION',
+      controller: [
+        'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_SOLUTION_EXPLANATION',
         function(
             SubtitledHtmlObjectFactory, COMPONENT_NAME_SOLUTION_EXPLANATION) {
           var ctrl = this;
