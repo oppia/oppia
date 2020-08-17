@@ -67,6 +67,9 @@ module.exports = {
         parens.forEach((paren, i) => {
           const line = lines[paren.loc.start.line - 1].trim();
           const nextParen = parens[i + 1];
+          if (line.startsWith('it') || line.startsWith('describe')) {
+            return true;
+          }
           if (line.startsWith('if') || line.startsWith('else if') ||
             line.startsWith('while')) {
             excluded = true;
