@@ -21,6 +21,7 @@ import { AdminPageConstants } from
 
 export class PlatformFeatureDomainConstants {
   public static PLATFORM_FEATURE_HANDLER_URL = '/platformfeaturehandler';
+  public static DUMMY_HANDLER_URL = '/platformfeaturedummyhandler';
   public static ADMIN_HANDLER_URL = AdminPageConstants.ADMIN_HANDLER_URL;
   public static UPDATE_FEATURE_FLAG_RULES_ACTION = 'update_feature_flag_rules';
 }

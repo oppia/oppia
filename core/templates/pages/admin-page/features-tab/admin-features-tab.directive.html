@@ -1,5 +1,5 @@
-<div *ngFor="let featureFlag of featureFlags; index as featureIndex;" class="container oppia-page-card oppia-long-text">
-  <h2 style="border-bottom: 1px solid #e5e5e5;">{{featureFlag.name}}</h2>
+<div *ngFor="let featureFlag of featureFlags; index as featureIndex;" class="container oppia-page-card oppia-long-text protractor-test-feature-flag">
+  <h2 style="border-bottom: 1px solid #e5e5e5;" class="feature-name">{{featureFlag.name}}</h2>
   <div class="row" style="margin-top: 5px">
     <div class="col-2"><b>Description:</b></div>
     <div class="col-10" style="overflow-wrap: anywhere;">{{featureFlag.description}}</div>
@@ -16,10 +16,10 @@
     <div class="col-2" style="display: flex; flex-direction: column;">
       <b>Rules:</b>
       <button class="btn btn-secondary" style="margin-top: 5;" (click)="addNewRuleToTop(featureFlag)">Add To Top</button>
-      <button class="btn btn-secondary" style="margin-top: 5;" (click)="addNewRuleToBottom(featureFlag)">Add To Bottom</button>
+      <button class="btn btn-secondary protractor-test-feature-add-rule-button" style="margin-top: 5;" (click)="addNewRuleToBottom(featureFlag)">Add To Bottom</button>
     </div>
     <div class="col-10">
-      <div *ngIf="featureFlag.rules.length === 0">
+      <div *ngIf="featureFlag.rules.length === 0" class="protractor-test-no-rule-indicator">
         No rule.
       </div>
       <!-- Rules -->
@@ -165,9 +165,14 @@
   </div>
 </div>
 
-<div *ngIf="featureFlags.length === 0" class="oppia-page-card oppia-long-text" style="max-width: 1050px">
+<div *ngIf="featureFlags.length === 0" class="oppia-page-card oppia-long-text protractor-test-no-feature" style="max-width: 1050px">
   No platform features are available.
 </div>
+
+<div *ngIf="isDummyFeatureEnabled" class="oppia-dev-mode protractor-test-angular-dummy-feature-indicator" style="bottom: 10px;">
+  Angular: Dummy Feature Enabled
+</div>
+
 
 <style>
   .oppia-feature-tab-center {

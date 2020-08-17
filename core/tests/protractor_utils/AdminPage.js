@@ -154,6 +154,11 @@ var AdminPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.getFeaturesTab = async function() {
+    await browser.get(ADMIN_URL_SUFFIX + '#/features');
+    await waitFor.pageToFullyLoad();
+  };
+
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
     await this.get();

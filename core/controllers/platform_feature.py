@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import platform_feature_services
+from core import platform_feature_list
 import utils
 
 
@@ -50,3 +51,18 @@ class PlatformFeatureHandler(base.BaseHandler):
             .evaluate_all_feature_flag_values_for_client(context))
 
         self.render_json(result_dict)
+
+
+class DummyHandler(base.BaseHandler):
+    """Dummy handler for testing feature gating flow."""
+
+    @acl_decorators.open_access
+    def get(self):
+        # This handler is gated by the dummy_feature flag, i.e. it's only
+        # visible when the dummy_feature is enabled.
+        if not platform_feature_services.is_feature_enabled(
+                platform_feature_list.PARAM_NAMES.dummy_feature):
+            raise self.PageNotFoundException()
+        self.render_json({
+            'msg': 'ok'
+        })

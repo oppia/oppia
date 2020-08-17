@@ -30,10 +30,6 @@ import { PlatformParameter, FeatureStage } from
   'domain/platform_feature/platform-parameter-object.factory';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-
-import cloneDeep from 'lodash/cloneDeep';
-
-
 import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule-object.factory';
 import {
@@ -42,6 +38,9 @@ import {
   PlatformParameterFilter,
   ServerMode,
 } from 'domain/platform_feature/platform-parameter-filter-object.factory';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'admin-features-tab',
@@ -118,6 +117,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     private apiService: PlatformFeatureAdminBackendApiService,
     private ruleFactory: PlatformParameterRuleObjectFactory,
     private filterFactory: PlatformParameterFilterObjectFactory,
+    private featureService: PlatformFeatureService
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
@@ -240,6 +240,10 @@ export class AdminFeaturesTabComponent implements OnInit {
 
   onFilterTypeSelectionChanged(filter: PlatformParameterFilter): void {
     filter.conditions.splice(0);
+  }
+
+  get isDummyFeatureEnabled(): boolean {
+    return this.featureService.featureSummary.DummyFeature.isEnabled;
   }
 
   ngOnInit() {

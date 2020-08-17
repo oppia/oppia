@@ -402,6 +402,8 @@ import { PencilCodeEditorRulesService } from
 import { PencilCodeEditorValidationService } from
   // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -1410,6 +1412,9 @@ export class UpgradedServices {
       );
     upgradedServices['PlatformFeatureAdminBackendApiService'] =
       new PlatformFeatureAdminBackendApiService(
+        upgradedServices['HttpClient']);
+    upgradedServices['PlatformFeatureDummyBackendApiService'] =
+      new PlatformFeatureDummyBackendApiService(
         upgradedServices['HttpClient']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],

@@ -446,6 +446,8 @@ import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { PencilCodeEditorValidationService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlatformParameterFilterObjectFactory } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
@@ -908,6 +910,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static pencilCodeEditorRulesService: PencilCodeEditorRulesService;
   static pencilCodeEditorValidationService: PencilCodeEditorValidationService;
   static playerCorrectnessFeedbackEnabledService: PlayerCorrectnessFeedbackEnabledService;
+  static platformFeatureDummyBackendApiService: PlatformFeatureDummyBackendApiService;
   static platformFeatureService: PlatformFeatureService;
   static platformParameterFilterObjectFactory: PlatformParameterFilterObjectFactory;
   static platformParameterObjectFactory: PlatformParameterObjectFactory;
@@ -1237,6 +1240,7 @@ private paramSpecsObjectFactory: ParamSpecsObjectFactory,
 private paramTypeObjectFactory: ParamTypeObjectFactory,
 private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
 private pencilCodeEditorValidationService: PencilCodeEditorValidationService,
+private platformFeatureDummyBackendApiService: PlatformFeatureDummyBackendApiService,
 private platformFeatureService: PlatformFeatureService,
 private platformParameterFilterObjectFactory: PlatformParameterFilterObjectFactory,
 private platformParameterObjectFactory: PlatformParameterObjectFactory,
@@ -1568,6 +1572,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.paramTypeObjectFactory = this.paramTypeObjectFactory;
     OppiaAngularRootComponent.pencilCodeEditorRulesService = this.pencilCodeEditorRulesService;
     OppiaAngularRootComponent.pencilCodeEditorValidationService = this.pencilCodeEditorValidationService;
+    OppiaAngularRootComponent.platformFeatureDummyBackendApiService = this.platformFeatureDummyBackendApiService;
     OppiaAngularRootComponent.platformFeatureService = this.platformFeatureService;
     OppiaAngularRootComponent.platformParameterFilterObjectFactory = this.platformParameterFilterObjectFactory;
     OppiaAngularRootComponent.platformParameterObjectFactory = this.platformParameterObjectFactory;

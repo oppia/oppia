@@ -51,8 +51,10 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
       controller: [
         '$http', '$location', '$rootScope', '$scope', 'AdminDataService',
         'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
+        'PlatformFeatureService',
         function($http, $location, $rootScope, $scope, AdminDataService,
-            AdminRouterService, CsrfTokenService, DEV_MODE) {
+            AdminRouterService, CsrfTokenService, DEV_MODE,
+            PlatformFeatureService) {
           var ctrl = this;
           ctrl.isActivitiesTabOpen = function() {
             return AdminRouterService.isActivitiesTabOpen();
@@ -74,6 +76,10 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
           };
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;
+          };
+
+          ctrl.isDummyFeatureEnabled = function() {
+            return PlatformFeatureService.featureSummary.DummyFeature.isEnabled;
           };
 
           ctrl.$onInit = function() {

@@ -21,6 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import platform_parameter_list as params
 
+
+PARAM_NAMES = params.PARAM_NAMES
+
 # Names of feature objects defined in domain/platform_parameter_list.py
 # should be added to one of the following lists:
 #   - DEV_FEATURES_LIST
