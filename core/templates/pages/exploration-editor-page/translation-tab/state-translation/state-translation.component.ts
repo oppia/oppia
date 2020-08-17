@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive containing the exploration material to be translated.
+ * @fileoverview Component containing the exploration material to be translated.
  */
 
 require(
@@ -53,6 +53,8 @@ require(
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('stateTranslation', {
   bindings: {
     isTranslationTabBusy: '='
@@ -82,6 +84,7 @@ angular.module('oppia').component('stateTranslation', {
         RULE_SUMMARY_WRAP_CHARACTER_COUNT
     ) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       $scope.isVoiceoverModeActive = (
         TranslationTabActiveModeService.isVoiceoverModeActive);
       var isTranslatedTextRequired = function() {
@@ -381,10 +384,15 @@ angular.module('oppia').component('stateTranslation', {
         $scope.stateDefaultOutcome = null;
         $scope.stateHints = [];
         $scope.stateSolution = null;
-        $scope.$on('refreshStateTranslation', function() {
-          $scope.initStateTranslation();
-        });
+        ctrl.directiveSubscriptions.add(
+          StateEditorService.onRefreshStateTranslation.subscribe(
+            () => $scope.initStateTranslation())
+        );
         $scope.initStateTranslation();
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

@@ -67,6 +67,7 @@ import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
 import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
+import { EventEmitter } from '@angular/core';
 
 describe('State translation component', function() {
   var ctrl = null;
@@ -352,6 +353,7 @@ describe('State translation component', function() {
       solution_1: {}
     }
   };
+  var refreshStateTranslationEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
@@ -397,9 +399,15 @@ describe('State translation component', function() {
     recordedVoiceoversObjectFactory = TestBed.get(
       RecordedVoiceoversObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
+    spyOnProperty(stateEditorService, 'onRefreshStateTranslation').and
+      .returnValue(refreshStateTranslationEmitter);
     stateRecordedVoiceoversService = TestBed.get(
       StateRecordedVoiceoversService);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+  });
+
+  afterEach(function() {
+    ctrl.$onDestroy();
   });
 
   describe('when translation tab is not busy and voiceover mode is' +
@@ -443,7 +451,8 @@ describe('State translation component', function() {
 
     it('should init state translation when refreshing page', function() {
       spyOn(translationTabActiveContentIdService, 'setActiveContentId');
-      $rootScope.$broadcast('refreshStateTranslation');
+      // $rootScope.$broadcast('refreshStateTranslation');
+      refreshStateTranslationEmitter.emit();
 
       expect($scope.isActive('content')).toBe(true);
       expect($scope.isDisabled('content')).toBe(false);
