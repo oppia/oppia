@@ -234,6 +234,87 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 ],
             )
 
+    def test_update_dev_feature_with_rule_enabled_for_test_raises_exception(
+            self):
+        parameter_name = 'parameter_a'
+        registry.Registry.create_feature_flag(
+            parameter_name, 'dev feature', FEATURE_STAGES.dev)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Feature in dev stage cannot be enabled in test or production '
+            'environment.'):
+            registry.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [('=', FEATURE_STAGES.test)]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }
+                ],
+            )
+
+    def test_update_dev_feature_with_rule_enabled_for_prod_raises_exception(
+            self):
+        parameter_name = 'parameter_a'
+        registry.Registry.create_feature_flag(
+            parameter_name, 'dev feature', FEATURE_STAGES.dev)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Feature in dev stage cannot be enabled in test or production '
+            'environment.'):
+            registry.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [('=', FEATURE_STAGES.prod)]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }
+                ],
+            )
+
+    def test_update_test_feature_with_rule_enabled_for_prod_raises_exception(
+            self):
+        parameter_name = 'parameter_a'
+        registry.Registry.create_feature_flag(
+            parameter_name, 'dev feature', FEATURE_STAGES.test)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Feature in test stage cannot be enabled in production '
+            'environment.'):
+            registry.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [('=', FEATURE_STAGES.prod)]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }
+                ],
+            )
+
     def test_updated_parameter_is_saved_in_storage(self):
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
