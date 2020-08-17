@@ -30,6 +30,8 @@ export class PlayerPositionService {
 
   private _activeCardChangedEventEmitter = new EventEmitter();
   private _currentQuestionChangedEventEmitter = new EventEmitter<number>();
+  private _helpCardAvailableEventEmitter = new EventEmitter();
+  private _newCardOpenedEventEmitter = new EventEmitter();
 
   displayedCardIndex = null;
   onChangeCallback = null;
@@ -93,6 +95,14 @@ export class PlayerPositionService {
    */
   hasLearnerJustSubmittedAnAnswer(): boolean {
     return this.learnerJustSubmittedAnAnswer;
+  }
+
+  get onHelpCardAvailable() {
+    return this._helpCardAvailableEventEmitter;
+  }
+
+  get onNewCardOpened() {
+    return this._newCardOpenedEventEmitter;
   }
 
   changeCurrentQuestion(index: number) {

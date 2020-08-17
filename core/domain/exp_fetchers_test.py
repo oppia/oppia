@@ -658,7 +658,6 @@ title: Old Title
                 'MatchesExactlyWith': [{'x': 'x=y', 'y': 'both'}]
             })
 
-
         answer_groups_2 = [{
             'outcome': {
                 'dest': 'Introduction',
@@ -770,7 +769,6 @@ title: Old Title
             answer_groups[0].rule_types_to_inputs, {
                 'MatchesExactlyWith': [{'x': 'x+y'}]
             })
-
 
         answer_groups_3 = [{
             'outcome': {
@@ -961,7 +959,6 @@ title: Old Title
 
         self.save_new_exp_with_states_schema_v34(
             'exp_id_4', 'owner_id', states_dict)
-
 
         # Ensure the exploration was converted.
         exploration = exp_fetchers.get_exploration_by_id('exp_id_4')
