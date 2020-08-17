@@ -21,8 +21,8 @@ require('pages/exploration-player-page/services/exploration-engine.service.ts');
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('LearnerViewRatingService', [
-  '$http', '$rootScope', 'ExplorationEngineService',
-  function($http, $rootScope, ExplorationEngineService) {
+  '$http', 'ExplorationEngineService',
+  function($http, ExplorationEngineService) {
     var explorationId = ExplorationEngineService.getExplorationId();
     var ratingsUrl = '/explorehandler/rating/' + explorationId;
     var userRating;
