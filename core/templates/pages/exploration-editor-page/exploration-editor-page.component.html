@@ -31,13 +31,13 @@
         </div>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'translation'}" class="nav-item icon nav-list-item protractor-test-translation-tab" ng-click="$ctrl.selectTranslationTab()">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'translation'}" id="tutorialTranslationTab" class="nav-item icon nav-list-item protractor-test-translation-tab" ng-click="$ctrl.selectTranslationTab()">
         <a class="nav-link navbar-tab" uib-tooltip="Translations" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'translation'}">&#xE029;</i>
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview'}" class="nav-item icon nav-list-item protractor-test-preview-tab" ng-click="$ctrl.selectPreviewTab()">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview'}" id="tutorialPreviewTab" class="nav-item icon nav-list-item protractor-test-preview-tab" ng-click="$ctrl.selectPreviewTab()">
         <a class="nav-link  navbar-tab" uib-tooltip="Preview" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}">&#xE037;</i>
         </a>
