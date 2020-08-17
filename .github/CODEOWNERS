@@ -560,11 +560,7 @@
 /.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
 /puppeteer-login-script.js @jimbyo
 /scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
-/webpack.common.config.ts @jameesjohn @vojtechjelinek
-/webpack.common.macros.ts @jameesjohn @vojtechjelinek
-/webpack.dev.config.ts @jameesjohn @vojtechjelinek
-/webpack.prod.config.ts @jameesjohn @vojtechjelinek
-/webpack.terser.config.ts @nishantwrp @vojtechjelinek
+/webpack.*.ts @nishantwrp @vojtechjelinek
 
 
 # Typings.
@@ -587,18 +583,12 @@
 
 
 # Dynamic Feature Gating project
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/controllers/platform_feature*.py @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/domain/platform_feature_services*.py @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/domain/platform_parameter*.py @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/platform_feature*.py @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/storage/config/ @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/templates/domain/platform_feature/ @vinitamurthi
+/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
+/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
+/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+/core/platform_feature*.py @BenHenning @vinitamurthi
+/core/storage/config/ @BenHenning @vinitamurthi
+/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
 
 
 # Frontend unit tests

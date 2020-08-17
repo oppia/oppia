@@ -558,7 +558,6 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
             collection.get_next_exploration_id_in_sequence(exploration_id),
             None)
 
-
         collection.add_node('exp_id_1')
         collection.add_node('exp_id_2')
         self.assertEqual(
@@ -665,7 +664,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             'present.'):
             collection_domain.Collection.from_yaml(
                 self.COLLECTION_ID, yaml_content)
-
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
