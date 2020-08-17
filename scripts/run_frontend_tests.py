@@ -29,10 +29,11 @@ from . import check_frontend_coverage
 from . import common
 from . import install_third_party_libs
 
-# This is a relative path from the oppia/ folder. It is relative because the
+# These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if
-# the path is absolute.
+# the given path is absolute.
 DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH = os.path.join('typings', 'tests')
+TYPESCRIPT_DIR_RELATIVE_PATH = os.path.join('node_modules', 'typescript', 'lib')
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -68,8 +69,12 @@ def run_dtslint_type_tests():
     """Runs the dtslint type tests in typings/tests."""
     python_utils.PRINT('Running dtslint type tests.')
 
+    # Pass the local version of typescript. Otherwise, dtslint will download and
+    # install all versions of typescript.
     cmd = ['./node_modules/dtslint/bin/index.js',
-           DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH]
+           DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
+           '--localTs',
+           TYPESCRIPT_DIR_RELATIVE_PATH]
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
     # Reads and prints realtime output from the subprocess until it terminates.

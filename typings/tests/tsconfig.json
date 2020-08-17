@@ -8,13 +8,9 @@
     "noImplicitThis": true,
     "strictNullChecks": false,
     "strictFunctionTypes": true,
-    "noEmit": true,
     "baseUrl": ".",
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "experimentalDecorators": true,
-    "typeRoots": ["../../node_modules/@types", "../."],
     "paths": {
       "app.constants": ["../../core/templates/app.constants"],
       "app-type.constants": ["../../core/templates/app-type.constants"],
