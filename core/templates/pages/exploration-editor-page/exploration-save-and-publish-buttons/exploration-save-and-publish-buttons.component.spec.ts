@@ -44,6 +44,9 @@ import { StateCustomizationArgsService } from
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { ExplorationImprovementsTaskRegistryService } from
+  'services/exploration-improvements-task-registry.service';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
 
 describe('Exploration save and publish buttons component', function() {
   var ctrl = null;
@@ -77,6 +80,10 @@ describe('Exploration save and publish buttons component', function() {
       'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
     $provide.value('ExplorationDiffService',
       TestBed.get(ExplorationDiffService));
+    $provide.value('ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value('ExplorationStatsService',
+      TestBed.get(ExplorationStatsService));
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));

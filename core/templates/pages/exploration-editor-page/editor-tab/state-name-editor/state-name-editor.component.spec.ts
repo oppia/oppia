@@ -23,6 +23,10 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateNameService } from
   'components/state-editor/state-editor-properties-services/state-name.service';
+import { ExplorationImprovementsTaskRegistryService } from
+  'services/exploration-improvements-task-registry.service';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Sidebar state name controller', function() {
   var ctrl = null;
@@ -48,6 +52,10 @@ describe('Sidebar state name controller', function() {
   beforeEach(angular.mock.module('directiveTemplates'));
 
   beforeEach(function() {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
     editabilityService = TestBed.get(EditabilityService);
     stateEditorService = TestBed.get(StateEditorService);
     stateNameService = TestBed.get(StateNameService);
@@ -55,6 +63,10 @@ describe('Sidebar state name controller', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ExplorationDataService', mockExplorationData);
+    $provide.value('ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value('ExplorationStatsService',
+      TestBed.get(ExplorationStatsService));
     $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
   }));
 
