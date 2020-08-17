@@ -53,6 +53,8 @@ export class StateEditorService {
   private _stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
   private _interactionEditorInitializedEventEmitter = new EventEmitter();
   private _showTranslationTabBusyModalEventEmitter = new EventEmitter();
+  private _refreshStateTranslationEventEmitter = new EventEmitter();
+  private _updateAnswerChoicesEventEmitter = new EventEmitter();
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter();
 
   activeStateName: string = null;
@@ -260,6 +262,14 @@ export class StateEditorService {
 
   get onShowTranslationTabBusyModal() {
     return this._showTranslationTabBusyModalEventEmitter;
+  }
+
+  get onRefreshStateTranslation() {
+    return this._refreshStateTranslationEventEmitter;
+  }
+
+  get onUpdateAnswerChoices() {
+    return this._updateAnswerChoicesEventEmitter;
   }
 
   get onSaveOutcomeDestDetails() {

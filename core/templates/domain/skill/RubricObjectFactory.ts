@@ -19,7 +19,7 @@
 
 export interface RubricBackendDict {
   difficulty: string,
-  explanations: Array<string>
+  explanations: string[]
 }
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -29,9 +29,9 @@ import { Injectable } from '@angular/core';
 
 export class Rubric {
   _difficulty: string;
-  _explanations: Array<string>;
+  _explanations: string[];
 
-  constructor(difficulty: string, explanations: Array<string>) {
+  constructor(difficulty: string, explanations: string[]) {
     this._difficulty = difficulty;
     this._explanations = explanations;
   }
@@ -47,11 +47,11 @@ export class Rubric {
     return this._difficulty;
   }
 
-  getExplanations(): Array<string> {
+  getExplanations(): string[] {
     return this._explanations.slice();
   }
 
-  setExplanations(newExplanations: Array<string>): void {
+  setExplanations(newExplanations: string[]): void {
     this._explanations = cloneDeep(newExplanations);
   }
 }
@@ -65,7 +65,7 @@ export class RubricObjectFactory {
       rubricBackendDict.difficulty,
       rubricBackendDict.explanations);
   }
-  create(difficulty: string, explanations: Array<string>): Rubric {
+  create(difficulty: string, explanations: string[]): Rubric {
     return new Rubric(difficulty, explanations);
   }
 }
