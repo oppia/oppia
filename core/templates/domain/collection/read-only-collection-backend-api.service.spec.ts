@@ -20,6 +20,8 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { Subscription } from 'rxjs';
+
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { CollectionObjectFactory } from
@@ -38,7 +40,31 @@ describe('Read only collection backend API service', () => {
       objective: 'To pass',
       schema_version: 1,
       nodes: [{
-        exploration_id: '0'
+        exploration_id: '0',
+        exploration_summary: {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Test Title'
+        }
       }],
       playthrough_dict: {
         next_exploration_id: 'expId',
@@ -49,6 +75,8 @@ describe('Read only collection backend API service', () => {
       version: null
     }
   };
+  let onCollectionLoadSpy: jasmine.Spy;
+  let subscriptions: Subscription;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -58,9 +86,17 @@ describe('Read only collection backend API service', () => {
       ReadOnlyCollectionBackendApiService);
     collectionObjectFactory = TestBed.get(CollectionObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
+    onCollectionLoadSpy = jasmine.createSpy('onCollectionLoadSpy');
+    subscriptions = new Subscription();
+    subscriptions.add(
+      readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
+        onCollectionLoadSpy
+      )
+    );
   });
 
   afterEach(() => {
+    subscriptions.unsubscribe();
     httpTestingController.verify();
   });
 
@@ -103,6 +139,7 @@ describe('Read only collection backend API service', () => {
 
       expect(successHandler).toHaveBeenCalledWith(collectionObject);
       expect(failHandler).not.toHaveBeenCalled();
+      expect(onCollectionLoadSpy).toHaveBeenCalled();
 
       // Loading a collection the second time should not fetch it.
       readOnlyCollectionBackendApiService.loadCollection('0').then(
@@ -110,6 +147,7 @@ describe('Read only collection backend API service', () => {
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
+      expect(onCollectionLoadSpy).toHaveBeenCalled();
     })
   );
 
@@ -163,6 +201,8 @@ describe('Read only collection backend API service', () => {
     // The collection should be loadable from the cache.
     readOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
+
+    expect(onCollectionLoadSpy).toHaveBeenCalled();
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
 

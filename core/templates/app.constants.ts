@@ -40,12 +40,8 @@ export class AppConstants {
 
   public static RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
 
-  /* Called always when learner moves to a new card.
-     Also called when card is selected by clicking on progress dots */
-  public static EVENT_ACTIVE_CARD_CHANGED = 'activeCardChanged';
   /* Called when the learner moves to a new card that they haven't seen
      before. */
-  public static EVENT_NEW_CARD_OPENED = 'newCardOpened';
   public static EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE =
     '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>';
   public static EDITABLE_EXPLORATION_DATA_URL_TEMPLATE =
@@ -152,9 +148,6 @@ export class AppConstants {
   public static DEFAULT_PROFILE_IMAGE_PATH = '/avatar/user_blue_72px.webp';
 
   public static LOGOUT_URL = '/logout';
-
-  public static EVENT_QUESTION_SUMMARIES_INITIALIZED =
-    'questionSummariesInitialized';
 
   // TODO(vojtechjelinek): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).

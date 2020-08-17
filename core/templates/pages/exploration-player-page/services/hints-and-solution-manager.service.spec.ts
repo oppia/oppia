@@ -303,4 +303,9 @@ describe('HintsAndSolutionManager service', function() {
     expect(hasms.onSolutionViewedEventEmitter).toEqual(
       mockSolutionViewedEventEmitter);
   });
+
+  it('should fetch EventEmitter for consumption of hint', () => {
+    let mockHintConsumedEvent = new EventEmitter();
+    expect(hasms.onHintConsumed).toEqual(mockHintConsumedEvent);
+  });
 });

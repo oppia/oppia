@@ -54,6 +54,7 @@ export class StateEditorService {
   private _interactionEditorInitializedEventEmitter = new EventEmitter();
   private _refreshStateTranslationEventEmitter = new EventEmitter();
   private _updateAnswerChoicesEventEmitter = new EventEmitter();
+  private _saveOutcomeDestDetailsEventEmitter = new EventEmitter();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -264,6 +265,10 @@ export class StateEditorService {
 
   get onUpdateAnswerChoices() {
     return this._updateAnswerChoicesEventEmitter;
+  }
+
+  get onSaveOutcomeDestDetails() {
+    return this._saveOutcomeDestDetailsEventEmitter;
   }
 }
 
