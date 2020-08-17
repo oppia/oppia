@@ -44,11 +44,12 @@ describe('Welcome Translation Modal Controller', function() {
     });
   }));
 
-  it('should init the constiables', function() {
-    expect($scope.explorationId).toBe(explorationId);
-    expect(SiteAnalyticsService.registerTutorialModalOpenEvent)
-      .toHaveBeenCalledWith(explorationId);
-    expect($scope.translationWelcomeImgUrl).toBe(
-      '/assets/images/general/editor_welcome.svg');
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.explorationId).toBe(explorationId);
+      expect(SiteAnalyticsService.registerTutorialModalOpenEvent)
+        .toHaveBeenCalledWith(explorationId);
+      expect($scope.translationWelcomeImgUrl).toBe(
+        '/assets/images/general/editor_welcome.svg');
+    });
 });

@@ -29,6 +29,7 @@ import { AlgebraicExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { AlgebraicExpressionInputRulesService } from
   './algebraic-expression-input-rules.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
@@ -66,8 +67,8 @@ export class AlgebraicExpressionInputValidationService {
       customizationArgs: AlgebraicExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     let warningsList = [];
-    let algebraicRulesService = (
-      new AlgebraicExpressionInputRulesService());
+    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
+    let mathInteractionsService = new MathInteractionsService();
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
@@ -87,9 +88,12 @@ export class AlgebraicExpressionInputValidationService {
     let seenVariables = [];
 
     for (let i = 0; i < answerGroups.length; i++) {
-      let rules = answerGroups[i].rules;
+      let rules = answerGroups[i].getRulesAsList();
       for (let j = 0; j < rules.length; j++) {
         let currentInput = <string> rules[j].inputs.x;
+        // Explicitly inserting '*' signs wherever necessary.
+        currentInput = mathInteractionsService.insertMultiplicationSigns(
+          currentInput);
         let currentRuleType = <string> rules[j].type;
 
         for (let variable of nerdamer(currentInput).variables()) {

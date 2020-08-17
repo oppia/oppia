@@ -434,7 +434,6 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-
     def test_multiline_class_argument_with_correct_style(self):
         node_multiline_class_argument_with_correct_style = (
             astroid.scoped_nodes.Module(
@@ -839,7 +838,6 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 node_single_newline_above_args)
 
-
     def test_no_newline_above_raises(self):
         node_single_newline_above_raises = astroid.extract_node(
             u"""def func(): #@
@@ -899,7 +897,6 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_functiondef(
                 node_newline_above_args_raises)
-
 
         node_newline_above_args_returns = astroid.extract_node(
             u"""def func(arg): #@
@@ -2295,106 +2292,6 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
             node=node_no_spaces_after_yield_file)
 
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-
-class ExcessiveEmptyLinesCheckerTests(unittest.TestCase):
-
-    def test_checks_excessive_empty_lines(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.ExcessiveEmptyLinesChecker)
-        checker_test_object.setup_method()
-        node_excessive_empty_lines = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func1():
-                        returns_something
-
-
-
-                    def func2():
-                        \"\"\"This is a comment.\"\"\"
-                        returns_something
-                """)
-        node_excessive_empty_lines.file = filename
-        node_excessive_empty_lines.path = filename
-
-        checker_test_object.checker.process_module(node_excessive_empty_lines)
-
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='excessive-new-lines',
-                line=5
-            ),
-        ):
-            temp_file.close()
-
-        node_method_with_decorator = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func0():
-                        returns_something
-
-
-
-                    @something
-                    def func1():
-                        \"\"\"This is a multiline
-                        comment.\"\"\"
-                        returns_something
-                """)
-        node_method_with_decorator.file = filename
-        node_method_with_decorator.path = filename
-
-        checker_test_object.checker.process_module(node_method_with_decorator)
-
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='excessive-new-lines',
-                line=5
-            ),
-        ):
-            temp_file.close()
-
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func0():
-                        returns_something
-
-                    def func1():
-                        returns_something
-
-
-                    def func2():
-                        returns_something
-
-                    @something
-                    def func3():
-                        returns_something
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        checker_test_object.checker.process_module(node_with_no_error_message)
-
-        with checker_test_object.assertNoMessages():
             temp_file.close()
 
 

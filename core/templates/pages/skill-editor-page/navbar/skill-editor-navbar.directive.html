@@ -5,7 +5,6 @@
       <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable()}"
               ng-click="saveChanges()"
-              style="float: left; width: 155px;"
               ng-disabled="!isSkillSaveable()">
         <span ng-if="!isSaveInProgress()">
           <span title="Publish Changes">
@@ -27,7 +26,7 @@
         </span>
       </button>
       <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle dropdown-toggle"
-              ng-disabled="!getChangeListCount()" uib-dropdown-toggle>
+              ng-disabled="!getChangeListCount()" aria-label="Dropdown toggle" uib-dropdown-toggle>
       </button>
       <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListCount() ? '150px' : '120px' }">
         <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListCount()}" class="dropdown-item">Discard Draft</a></li>
@@ -89,6 +88,10 @@
 <style>
   skill-editor-navbar .skill-editor-nav-mobile {
     display: none;
+  }
+  skill-editor-navbar .oppia-save-publish-changes-button {
+    float: left;
+    width: 158px;
   }
 
   @media screen and (max-width: 768px) {

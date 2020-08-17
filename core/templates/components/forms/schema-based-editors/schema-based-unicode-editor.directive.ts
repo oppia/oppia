@@ -26,6 +26,7 @@ require(
 
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('services/contextual/device-info.service.ts');
+require('services/schema-form-submitted.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -47,15 +48,17 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$sce', '$timeout', '$translate',
-        'DeviceInfoService', 'StateCustomizationArgsService',
+        'DeviceInfoService', 'SchemaFormSubmittedService',
+        'StateCustomizationArgsService',
         function(
             $scope, $filter, $sce, $timeout, $translate,
-            DeviceInfoService, StateCustomizationArgsService) {
+            DeviceInfoService, SchemaFormSubmittedService,
+            StateCustomizationArgsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
-              $scope.$emit('submittedSchemaBasedUnicodeForm');
+              SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
             }
           };
 
