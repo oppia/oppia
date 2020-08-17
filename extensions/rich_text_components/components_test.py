@@ -131,19 +131,21 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         self.check_validation(
             components.Link, valid_items, invalid_items_with_error_messages)
 
-    # TODO(#9379): Add validations for svg_filename field and add proper
-    # values in the tests.
     def test_math_validation(self):
         """Tests collapsible component validation."""
         valid_items = [{
             'math_content-with-value': {
                 u'raw_latex': u'123456',
-                u'svg_filename': u''
+                u'svg_filename': (
+                    u'mathImg_20207261338_r3ir43lmfd_height_2d456_width_6d1'
+                    '24_vertical_0d231.svg')
             }
         }, {
             'math_content-with-value': {
                 u'raw_latex': u'\\frac{x}{y}',
-                u'svg_filename': u''
+                u'svg_filename': (
+                    u'mathImg_20207261338_imzlvnf23a_height_4d123_width_23d'
+                    '122_vertical_2d123.svg')
             }
         }]
         invalid_items_with_error_messages = [
@@ -166,7 +168,29 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                     u'raw_latex': 123,
                     u'svg_filename': 11
                 }
-            }, 'Expected unicode string, received 123')]
+            }, 'Expected unicode string, received 123'),
+            ({
+                'math_content-with-value': {
+                    u'raw_latex': 'x^2',
+                    u'svg_filename': 'img.svg'
+                }
+            }, 'Invalid filename'),
+            ({
+                'math_content-with-value': {
+                    u'raw_latex': 'x^3',
+                    u'svg_filename': (
+                        u'mathImg_20207s61338_imzlvnf23a_height_4d123_width_23d'
+                        '122_vertical_2d123.svg')
+                }
+            }, 'Invalid filename'),
+            ({
+                'math_content-with-value': {
+                    u'raw_latex': 'x^3',
+                    u'svg_filename': (
+                        u'mathImg_20207361338_imzlvnf23a_invalid_4d123_width_2'
+                        '3d122_vertical_2d123.svg')
+                }
+            }, 'Invalid filename')]
 
         self.check_validation(
             components.Math, valid_items, invalid_items_with_error_messages)
