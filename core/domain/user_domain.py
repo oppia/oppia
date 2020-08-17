@@ -26,9 +26,6 @@ import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-CMD_UPDATE_USER = 'update_user'
-CMD_CREATE_NEW_USER = 'create_new_user'
-
 
 class UserGlobalPrefs(python_utils.OBJECT):
     """Domain object for user global email preferences.
@@ -359,6 +356,22 @@ class ModifiableUserDataV1(python_utils.OBJECT):
             self, display_alias, pin, preferred_language_codes,
             preferred_site_language_code, preferred_audio_language_code,
             user_id=None):
+        """Constructs a ModifiableUserDataV1 domain object.
+
+        Args:
+            display_alias: str. Display alias of the user shown on Android.
+            pin: str or None. PIN of the user used for PIN based authentication
+                on Android. None if it hasn't been set till now.
+            preferred_language_codes: list(str) or None. Exploration language
+                preferences specified by the user.
+            preferred_site_language_code: str or None. System language
+                preference.
+            preferred_audio_language_code: str or None. Audio language
+                preference.
+            user_id: str or None. User ID of the user whose data is being
+                updated. None if request did not have a user_id for the user
+                yet and expects the backend to create a new user entry for it.
+        """
         self.display_alias = display_alias
         self.pin = pin
         self.preferred_language_codes = preferred_language_codes

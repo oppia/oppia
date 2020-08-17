@@ -263,7 +263,7 @@ class UserSettings(python_utils.OBJECT):
         self.preferred_audio_language_code = (
             modifiable_user_data.preferred_audio_language_code)
 
-    def convert_to_dict(self):
+    def to_dict(self):
         """Convert the UserSettings domain instance into a dictionary form
         with its keys as the attributes of this class.
 
@@ -878,7 +878,7 @@ def _save_user_settings(user_settings):
     """
     user_settings.validate()
 
-    user_settings_dict = user_settings.convert_to_dict()
+    user_settings_dict = user_settings.to_dict()
 
     # If user with the given user_id already exists, update that model
     # with the given user settings, otherwise, create a new one.
@@ -1095,7 +1095,7 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
     parent_user_id = parent_user_auth_details.user_id
     user_settings_list = []
     for modifiable_user_data in modifiable_user_data_list:
-        if modifiable_user_data.user_id:
+        if modifiable_user_data.user_id is not None:
             raise Exception('User id cannot already exist for a new user.')
         user_id = user_models.UserSettingsModel.get_new_id('')
         user_settings = UserSettings(
@@ -1107,6 +1107,11 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
         user_auth_details = UserAuthDetails(
             user_id, None, modifiable_user_data.pin, parent_user_id)
 
+        # Each new profile user must be written to the datastore first and
+        # because if we convert it into a batch write request, then calling
+        # get_new_id() in a loop can possibly create same user_id for 2 users
+        # because it internally uses UserSettingsModel.get_by_id method to
+        # check if user_id does not exist already.
         transaction_services.run_in_transaction(
             _create_new_profile_transactional, user_settings,
             user_auth_details
@@ -1119,12 +1124,13 @@ def update_multiple_users_data(modifiable_user_data_list):
     """Updates user settings and user auth model details for the users
     specified in the modifiable_user_data_list.
 
-    Args: modifiable_user_data_list: list(ModifiableUserDataV1). The list of
+    Args:
+        modifiable_user_data_list: list(ModifiableUserDataV1). The list of
             modifiable_user_data entries corresponding to the users whose
             data has to be updated.
 
     Raises:
-        Exception. A valid user id does not exist for the user to be updated.
+        Exception. A user id is None.
         Exception. UserSettings or UserAuthDetail for a given user_id is
             not found.
     """
@@ -1138,9 +1144,9 @@ def update_multiple_users_data(modifiable_user_data_list):
             )
         ):
         user_id = modifiable_user_data.user_id
-        if not user_id:
+        if user_id is None:
             raise Exception(
-                'A valid user id must exist for all the users to be updated.')
+                'Missing user ID.')
         if not user_settings or not user_auth_details:
             raise Exception('User not found.')
         user_settings.populate_from_user_data(modifiable_user_data)
@@ -1163,7 +1169,7 @@ def _save_existing_users_settings(user_settings_list):
     for user_model, user_settings in python_utils.ZIP(
             user_settings_models, user_settings_list):
         user_settings.validate()
-        user_model.populate(**user_settings.convert_to_dict())
+        user_model.populate(**user_settings.to_dict())
     user_models.UserSettingsModel.put_multi(user_settings_models)
 
 

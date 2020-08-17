@@ -905,8 +905,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.pin = user_pin
         self.modifiable_user_data.display_alias = display_alias
 
-        error_msg = (
-            'A valid user id must exist for all the users to be updated.')
+        error_msg = 'Missing user ID.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.update_multiple_users_data(
+                [self.modifiable_user_data])
+
+    def test_update_users_for_user_with_non_existent_id_raises_error(self):
+        gae_id = 'gae_id'
+        non_existent_user_id = 'id_x'
+        email = 'new@example.com'
+        display_alias = 'display_alias2'
+        user_pin = '12345'
+        user_services.create_new_user(gae_id, email)
+        self.modifiable_user_data.user_id = non_existent_user_id
+        self.modifiable_user_data.pin = user_pin
+        self.modifiable_user_data.display_alias = display_alias
+
+        error_msg = 'User not found.'
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.update_multiple_users_data(
                 [self.modifiable_user_data])

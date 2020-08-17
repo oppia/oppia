@@ -62,8 +62,6 @@ def export_data_for_user(user_id):
         }.
     """
     user_settings = user_services.get_user_settings(user_id)
-    # TODO(#10358): Remove this check and allow takeout for profiles (Learner
-    # Role) once well defined authentication flow for them is in place.
     if user_settings is not None and (
             user_settings.role == feconf.ROLE_ID_LEARNER):
         raise NotImplementedError(
