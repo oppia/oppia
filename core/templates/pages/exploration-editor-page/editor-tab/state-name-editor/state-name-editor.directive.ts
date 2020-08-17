@@ -53,11 +53,11 @@ angular.module('oppia').directive('stateNameEditor', [
       controller: [
         '$scope', '$filter', '$rootScope', 'EditabilityService',
         'StateEditorService', 'StateNameService', 'FocusManagerService',
-        'ExplorationStatesService', 'ExternalSaveService',
+        'ExplorationStatesService', 'ExternalSaveService', 'RouterService',
         function(
             $scope, $filter, $rootScope, EditabilityService,
             StateEditorService, StateNameService, FocusManagerService,
-            ExplorationStatesService, ExternalSaveService) {
+            ExplorationStatesService, ExternalSaveService, RouterService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
 
@@ -112,7 +112,7 @@ angular.module('oppia').directive('stateNameEditor', [
               ctrl._getNormalizedStateName(newStateName);
             var valid = ctrl.saveStateName(normalizedStateName);
             if (valid) {
-              ExternalSaveService.navigateToMainTab(normalizedStateName);
+              RouterService.navigateToMainTab(normalizedStateName);
             }
           };
           ctrl.$onInit = function() {
