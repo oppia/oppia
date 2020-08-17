@@ -1,0 +1,11 @@
+<input type="text" ng-model="$ctrl.value" class="form-control" ui-validate="'$ctrl.isValidRatio($value)'">
+
+<div class="oppia-form-error oppia-ratio-error">
+  <[$ctrl.warningText]>
+</div>
+
+<style>
+  .oppia-ratio-error {
+    position: absolute;
+  }
+</style>

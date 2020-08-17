@@ -30,3 +30,6 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant(
   'CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);
+
+angular.module('oppia').constant(
+  'RATIO_PARSING_ERRORS', ObjectsDomainConstants.RATIO_PARSING_ERRORS);
