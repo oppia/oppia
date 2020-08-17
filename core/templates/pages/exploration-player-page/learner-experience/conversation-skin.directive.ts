@@ -18,6 +18,7 @@
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { Subscription } from 'rxjs';
 
 require(
   'components/question-directives/question-player/services/' +
@@ -370,7 +371,7 @@ angular.module('oppia').directive('conversationSkin', [
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
-        'EVENT_NEW_CARD_AVAILABLE', 'EVENT_NEW_CARD_OPENED',
+        'EVENT_NEW_CARD_AVAILABLE',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'FEEDBACK_POPOVER_PATH',
         'INTERACTION_SPECS', 'REVIEW_TESTS_URL_TEMPLATE',
         'STORY_VIEWER_URL_TEMPLATE',
@@ -402,13 +403,14 @@ angular.module('oppia').directive('conversationSkin', [
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
-            EVENT_NEW_CARD_AVAILABLE, EVENT_NEW_CARD_OPENED,
+            EVENT_NEW_CARD_AVAILABLE,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, FEEDBACK_POPOVER_PATH,
             INTERACTION_SPECS, REVIEW_TESTS_URL_TEMPLATE,
             STORY_VIEWER_URL_TEMPLATE,
             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
           // The minimum width, in pixels, needed to be able to show two cards
@@ -842,7 +844,7 @@ angular.module('oppia').directive('conversationSkin', [
             // The timeout is needed in order to give the recipient of the
             // broadcast sufficient time to load.
             $timeout(function() {
-              $rootScope.$broadcast(EVENT_NEW_CARD_OPENED, initialCard);
+              PlayerPositionService.onNewCardOpened.emit(initialCard);
             });
           };
           $scope.initializePage = function() {
@@ -896,7 +898,7 @@ angular.module('oppia').directive('conversationSkin', [
                 PlayerTranscriptService.addNewResponse(
                   LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion());
                 $scope.answerIsBeingProcessed = false;
-                $scope.$broadcast('helpCardAvailable', {
+                PlayerPositionService.onHelpCardAvailable.emit({
                   helpCardHtml: (
                     LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion()),
                   hasContinueButton: false
@@ -979,7 +981,7 @@ angular.module('oppia').directive('conversationSkin', [
                     }
 
                     if (helpCardAvailable) {
-                      $scope.$broadcast('helpCardAvailable', {
+                      PlayerPositionService.onHelpCardAvailable.emit({
                         helpCardHtml: feedbackHtml,
                         hasContinueButton: false
                       });
@@ -991,7 +993,7 @@ angular.module('oppia').directive('conversationSkin', [
                       ).then(function(conceptCardObject) {
                         $scope.conceptCard = conceptCardObject;
                         if (helpCardAvailable) {
-                          $scope.$broadcast('helpCardAvailable', {
+                          PlayerPositionService.onHelpCardAvailable.emit({
                             helpCardHtml: feedbackHtml,
                             hasContinueButton: true
                           });
@@ -1052,7 +1054,7 @@ angular.module('oppia').directive('conversationSkin', [
                         PlayerTranscriptService.addNewResponse(feedbackHtml);
                         if (
                           !$scope.displayedCard.isInteractionInline()) {
-                          $scope.$broadcast('helpCardAvailable', {
+                          PlayerPositionService.onHelpCardAvailable.emit({
                             helpCardHtml: feedbackHtml,
                             hasContinueButton: true
                           });
@@ -1082,7 +1084,7 @@ angular.module('oppia').directive('conversationSkin', [
                       }
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
                       if (!$scope.displayedCard.isInteractionInline()) {
-                        $scope.$broadcast('helpCardAvailable', {
+                        PlayerPositionService.onHelpCardAvailable.emit({
                           helpCardHtml: feedbackHtml,
                           hasContinueButton: true
                         });
@@ -1133,7 +1135,7 @@ angular.module('oppia').directive('conversationSkin', [
 
             var index = PlayerPositionService.getDisplayedCardIndex();
             var displayedCard = PlayerTranscriptService.getCard(index);
-            $rootScope.$broadcast(EVENT_NEW_CARD_OPENED, $scope.nextCard);
+            PlayerPositionService.onNewCardOpened.emit($scope.nextCard);
           };
 
           $scope.showUpcomingCard = function() {
@@ -1302,10 +1304,14 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.lastRequestedHeight = 0;
             $scope.lastRequestedScroll = false;
             if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
-              $rootScope.$on('hintConsumed', function(evt) {
-                QuestionPlayerStateService.hintUsed(
-                  QuestionPlayerEngineService.getCurrentQuestion());
-              });
+              ctrl.directiveSubscriptions.add(
+                HintsAndSolutionManagerService.onHintConsumed.subscribe(
+                  () => {
+                    QuestionPlayerStateService.hintUsed(
+                      QuestionPlayerEngineService.getCurrentQuestion());
+                  }
+                )
+              );
 
               $rootScope.$on('solutionViewed', function(evt, timestamp) {
                 QuestionPlayerStateService.solutionViewed(
@@ -1405,6 +1411,10 @@ angular.module('oppia').directive('conversationSkin', [
                 }
               );
             }
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
