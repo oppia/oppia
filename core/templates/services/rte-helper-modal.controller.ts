@@ -16,19 +16,19 @@
  * @fileoverview Controller for RteHelperService.
  */
 
-require('services/external-save.service.ts');
+require('services/external-rte-save.service.ts');
 
 angular.module('oppia').controller('RteHelperModalController', [
   '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
   'AssetsBackendApiService', 'ContextService',
-  'ExternalSaveService', 'FocusManagerService',
+  'ExternalRteSaveService', 'FocusManagerService',
   'ImageLocalStorageService', 'ImageUploadHelperService',
   'attrsCustomizationArgsDict', 'customizationArgSpecs',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $scope, $timeout, $uibModalInstance, AlertsService,
       AssetsBackendApiService, ContextService,
-      ExternalSaveService, FocusManagerService,
+      ExternalRteSaveService, FocusManagerService,
       ImageLocalStorageService, ImageUploadHelperService,
       attrsCustomizationArgsDict, customizationArgSpecs,
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
@@ -100,7 +100,7 @@ angular.module('oppia').controller('RteHelperModalController', [
       }
     };
     $scope.save = function() {
-      ExternalSaveService.onExternalSave.emit();
+      ExternalRteSaveService.onExternalRteSave.emit();
 
       var customizationArgsDict = {};
       // For the case of the math rich text components, we need to handle the
