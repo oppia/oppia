@@ -77,6 +77,7 @@ require(
 require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-features.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 
 require(
@@ -103,7 +104,8 @@ angular.module('oppia').component('settingsTab', {
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
     'RouterService', 'UrlInterpolationService', 'UserEmailPreferencesService',
-    'UserExplorationPermissionsService', 'WindowRef', 'ALL_CATEGORIES',
+    'UserExplorationPermissionsService', 'WindowDimensionsService',
+    'WindowRef', 'ALL_CATEGORIES',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
         $http, $rootScope, $scope, $uibModal,
@@ -118,7 +120,8 @@ angular.module('oppia').component('settingsTab', {
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
         RouterService, UrlInterpolationService, UserEmailPreferencesService,
-        UserExplorationPermissionsService, WindowRef, ALL_CATEGORIES,
+        UserExplorationPermissionsService, WindowDimensionsService,
+        WindowRef, ALL_CATEGORIES,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
       var ctrl = this;
       var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
@@ -361,6 +364,25 @@ angular.module('oppia').component('settingsTab', {
         return ExplorationTitleService.savedMemento.length > 0;
       };
 
+      ctrl.toggleCards = function(card) {
+        if (!WindowDimensionsService.isWindowNarrow()) {
+          return;
+        }
+        if (card === 'settings') {
+          ctrl.basicSettingIsShown = !ctrl.basicSettingIsShown;
+        } else if (card === 'advanced_features') {
+          ctrl.advancedFeaturesIsShown = !ctrl.advancedFeaturesIsShown;
+        } else if (card === 'roles') {
+          ctrl.rolesCardIsShown = !ctrl.rolesCardIsShown;
+        } else if (card === 'permissions') {
+          ctrl.permissionsCardIsShown = !ctrl.permissionsCardIsShown;
+        } else if (card === 'feedback') {
+          ctrl.feedbackCardIsShown = !ctrl.feedbackCardIsShown;
+        } else if (card === 'controls') {
+          ctrl.controlsCardIsShown = !ctrl.controlsCardIsShown;
+        }
+      };
+
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshSettingsTab.subscribe(
@@ -379,8 +401,14 @@ angular.module('oppia').component('settingsTab', {
             text: ALL_CATEGORIES[i]
           });
         }
-
         ctrl.isRolesFormOpen = false;
+        ctrl.basicSettingIsShown = !WindowDimensionsService.isWindowNarrow();
+        ctrl.advancedFeaturesIsShown = (
+          !WindowDimensionsService.isWindowNarrow());
+        ctrl.rolesCardIsShown = !WindowDimensionsService.isWindowNarrow();
+        ctrl.permissionsCardIsShown = !WindowDimensionsService.isWindowNarrow();
+        ctrl.feedbackCardIsShown = !WindowDimensionsService.isWindowNarrow();
+        ctrl.controlsCardIsShown = !WindowDimensionsService.isWindowNarrow();
 
         ctrl.TAG_REGEX = TAG_REGEX;
         ctrl.canDelete = false;
