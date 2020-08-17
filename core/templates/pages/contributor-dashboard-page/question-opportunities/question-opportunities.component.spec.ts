@@ -237,7 +237,7 @@ describe('Question opportunities component', function() {
       expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     });
 
-  it('should create a question when dismissing create question modal',
+  it('should suggest a question when dismissing create question modal',
     function() {
       alertsService.clearWarnings();
       var openSpy = spyOn($uibModal, 'open');
