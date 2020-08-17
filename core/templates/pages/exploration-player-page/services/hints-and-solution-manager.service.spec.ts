@@ -26,6 +26,8 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { EventEmitter } from '@angular/core';
+
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require(
@@ -294,5 +296,10 @@ describe('HintsAndSolutionManager service', function() {
     expect(hasms.isSolutionViewable()).toBe(false);
 
     $timeout.verifyNoPendingTasks();
+  });
+
+  it('should fetch EventEmitter for consumption of hint', () => {
+    let mockHintConsumedEvent = new EventEmitter();
+    expect(hasms.onHintConsumed).toEqual(mockHintConsumedEvent);
   });
 });
