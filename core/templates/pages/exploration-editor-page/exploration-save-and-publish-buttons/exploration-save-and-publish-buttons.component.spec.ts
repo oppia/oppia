@@ -151,7 +151,7 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.loadingDotsAreShown).toBe(false);
   });
 
-  it('should publish exploration when show publish exploraion shows',
+  it('should publish exploration when show publish exploration is shown',
     function() {
       $scope.showPublishExplorationModal();
 
@@ -183,8 +183,8 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.getSaveButtonTooltip()).toBe('Publish Changes');
   });
 
-  it('should resolve the warnings before publishing exploration when' +
-    ' exploration has warnings', function() {
+  it('should ask user to resolve the warnings before publishing' +
+    ' exploration when exploration has warnings', function() {
     spyOn(explorationWarningsService, 'countWarnings').and.returnValue(1);
     expect($scope.getPublishExplorationButtonTooltip()).toBe(
       'Please resolve the warnings before publishing.');
@@ -213,7 +213,7 @@ describe('Exploration save and publish buttons component', function() {
     expect(explorationSaveService.discardChanges).toHaveBeenCalled();
   });
 
-  it('should save exploration when it is saveable', function() {
+  it('should get whether exploration is saveable', function() {
     spyOn(explorationSaveService, 'isExplorationSaveable')
       .and.returnValue(true);
     expect($scope.isExplorationSaveable()).toBe(true);
