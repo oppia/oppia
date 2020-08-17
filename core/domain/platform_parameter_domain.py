@@ -750,7 +750,7 @@ class PlatformParameter(python_utils.OBJECT):
                             SERVER_MODES.prod in server_modes):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
-                            ' production environment.')
+                            ' production environments.')
                 elif self._feature_stage == FEATURE_STAGES.test:
                     if SERVER_MODES.prod in server_modes:
                         raise utils.ValidationError(

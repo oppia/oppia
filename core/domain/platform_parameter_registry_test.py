@@ -243,7 +243,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
-            'environment.'):
+            'environments.'):
             registry.Registry.update_platform_parameter(
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
@@ -270,7 +270,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Feature in dev stage cannot be enabled in test or production '
-            'environment.'):
+            'environments.'):
             registry.Registry.update_platform_parameter(
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
