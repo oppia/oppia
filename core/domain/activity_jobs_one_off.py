@@ -245,3 +245,85 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
         else:
             yield (key, len(values))
+
+
+class AuditSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits commit_cmds field of the snapshot metadata models. We log
+    the length of the commit_cmd, the possible 'cmd' values, and all the other
+    keys.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over three types of entity class.
+        super(AuditSnapshotMetadataModelsJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [collection_models.CollectionRightsSnapshotMetadataModel,
+                exp_models.ExplorationRightsSnapshotMetadataModel,
+                topic_models.TopicRightsSnapshotMetadataModel]
+
+    @staticmethod
+    def map(snapshot_model):
+        """Implements the map function for this job."""
+        if isinstance(
+                snapshot_model,
+                collection_models.CollectionRightsSnapshotMetadataModel):
+            model_type_name = 'collection'
+        elif isinstance(
+                snapshot_model,
+                exp_models.ExplorationRightsSnapshotMetadataModel):
+            model_type_name = 'exploration'
+        elif isinstance(
+                snapshot_model,
+                topic_models.TopicRightsSnapshotMetadataModel):
+            model_type_name = 'topic'
+
+        if snapshot_model.deleted:
+            yield ('%s-deleted' % model_type_name, 1)
+            return
+
+        first_commit_cmd = None
+        for commit_cmd in snapshot_model.commit_cmds:
+            if 'cmd' in commit_cmd:
+                cmd_name = commit_cmd['cmd']
+                yield ('%s-cmd-%s' % (model_type_name, cmd_name), 1)
+            else:
+                cmd_name = 'missing_cmd'
+                yield ('%s-missing-cmd' % model_type_name, 1)
+
+            if first_commit_cmd is None:
+                first_commit_cmd = cmd_name
+
+            for field_key in commit_cmd.keys():
+                if field_key != 'cmd':
+                    yield (
+                        '%s-%s-field-%s' % (
+                            model_type_name, cmd_name, field_key
+                        ),
+                        1
+                    )
+
+        if first_commit_cmd is not None:
+            yield (
+                '%s-%s-length-%s' % (
+                    model_type_name,
+                    first_commit_cmd,
+                    len(snapshot_model.commit_cmds)),
+                1
+            )
+        else:
+            yield (
+                '%s-length-%s' % (
+                    model_type_name, len(snapshot_model.commit_cmds)),
+                1
+            )
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
