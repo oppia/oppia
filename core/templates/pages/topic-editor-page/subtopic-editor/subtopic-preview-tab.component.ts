@@ -33,6 +33,8 @@ require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
 require('services/contextual/window-dimensions.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('subtopicPreviewTab', {
   template: require('./subtopic-preview-tab.component.html'),
   controller: [
@@ -41,17 +43,14 @@ angular.module('oppia').component('subtopicPreviewTab', {
     'TopicEditorRoutingService', 'TopicUpdateService',
     'UndoRedoService', 'UrlInterpolationService', 'UrlService',
     'WindowDimensionsService',
-    'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-    'EVENT_SUBTOPIC_PAGE_LOADED',
     function(
         $location, $scope, $uibModal, SubtopicPageObjectFactory,
         EntityCreationService, TopicEditorStateService,
         TopicEditorRoutingService, TopicUpdateService,
         UndoRedoService, UrlInterpolationService, UrlService,
-        WindowDimensionsService,
-        EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
-        EVENT_SUBTOPIC_PAGE_LOADED) {
+        WindowDimensionsService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var _initEditor = function() {
         $scope.topic = TopicEditorStateService.getTopic();
         $scope.subtopicId = (
@@ -81,11 +80,15 @@ angular.module('oppia').component('subtopicPreviewTab', {
           $scope.subtopicId);
       };
 
-      $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
-        $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
-        $scope.pageContents = $scope.subtopicPage.getPageContents();
-        $scope.htmlData = $scope.pageContents.getHtml();
-      });
+      ctrl.directiveSubscriptions.add(
+        TopicEditorStateService.onSubtopicPageLoaded.subscribe(
+          () => {
+            $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
+            $scope.pageContents = $scope.subtopicPage.getPageContents();
+            $scope.htmlData = $scope.pageContents.getHtml();
+          }
+        )
+      );
 
       $scope.changeContent = function(itemToDisplay) {
         if (itemToDisplay === $scope.THUMBNAIL) {
@@ -95,14 +98,25 @@ angular.module('oppia').component('subtopicPreviewTab', {
         $scope.thumbnailIsShown = false;
       };
 
-      $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-      $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+      ctrl.directiveSubscriptions.add(
+        TopicEditorStateService.onTopicInitialized.subscribe(
+          () => _initEditor()
+        ));
+      ctrl.directiveSubscriptions.add(
+        TopicEditorStateService.onTopicReinitialized.subscribe(
+          () => _initEditor()
+        ));
+
       ctrl.$onInit = function() {
         $scope.THUMBNAIL = 'thumbnail';
         $scope.CONTENT = 'content';
         $scope.thumbnailIsShown = (
           !WindowDimensionsService.isWindowNarrow());
         _initEditor();
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

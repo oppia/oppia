@@ -176,6 +176,13 @@ class EditableSkillDataHandler(base.BaseHandler):
         _require_valid_version(version, skill.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if (commit_message is not None and
+                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+
         change_dicts = self.payload.get('change_dicts')
         change_list = [
             skill_domain.SkillChange(change_dict)

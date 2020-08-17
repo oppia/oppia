@@ -32,7 +32,6 @@ angular.module('oppia').factory('LearnerViewRatingService', [
         $http.get(ratingsUrl).then(function(response) {
           successCallback(response.data.user_rating);
           userRating = response.data.user_rating;
-          $rootScope.$broadcast('ratingServiceInitialized');
         });
       },
       submitUserRating: function(ratingValue) {

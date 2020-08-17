@@ -117,12 +117,14 @@ describe('Question player state service', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            },
             tagged_skill_misconception_id: 'skill_id_1-0'
           }],
           confirmed_unclassified_answers: [],

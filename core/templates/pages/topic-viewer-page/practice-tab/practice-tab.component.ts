@@ -33,10 +33,10 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class PracticeTabComponent implements OnInit {
   @Input() topicName: string;
-  @Input() subtopicsList: Array<Subtopic>;
-  selectedSubtopics: Array<Subtopic> = [];
-  availableSubtopics: Array<Subtopic> = [];
-  selectedSubtopicIndices: Array<Boolean> = [];
+  @Input() subtopicsList: Subtopic[];
+  selectedSubtopics: Subtopic[] = [];
+  availableSubtopics: Subtopic[] = [];
+  selectedSubtopicIndices: boolean[] = [];
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,

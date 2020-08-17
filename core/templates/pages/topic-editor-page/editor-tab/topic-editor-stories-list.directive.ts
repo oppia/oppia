@@ -26,7 +26,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/contextual/url.service.ts');
 
-angular.module('oppia').directive('storiesList', [
+angular.module('oppia').directive('topicEditorStoriesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -41,12 +41,10 @@ angular.module('oppia').directive('storiesList', [
         '$scope', '$rootScope', '$uibModal', '$window',
         'EditableTopicBackendApiService', 'UrlService', 'UndoRedoService',
         'UrlInterpolationService', 'TopicUpdateService',
-        'EVENT_STORY_SUMMARIES_INITIALIZED',
         function(
             $scope, $rootScope, $uibModal, $window,
             EditableTopicBackendApiService, UrlService, UndoRedoService,
-            UrlInterpolationService, TopicUpdateService,
-            EVENT_STORY_SUMMARIES_INITIALIZED) {
+            UrlInterpolationService, TopicUpdateService) {
           var ctrl = this;
           var topicId = UrlService.getTopicIdFromUrl();
           var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
