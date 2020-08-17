@@ -20,6 +20,8 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { Subscription } from 'rxjs';
+
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { CollectionObjectFactory } from
@@ -73,6 +75,8 @@ describe('Read only collection backend API service', () => {
       version: null
     }
   };
+  let onCollectionLoadSpy: jasmine.Spy;
+  let subscriptions: Subscription;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -82,9 +86,17 @@ describe('Read only collection backend API service', () => {
       ReadOnlyCollectionBackendApiService);
     collectionObjectFactory = TestBed.get(CollectionObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
+    onCollectionLoadSpy = jasmine.createSpy('onCollectionLoadSpy');
+    subscriptions = new Subscription();
+    subscriptions.add(
+      readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
+        onCollectionLoadSpy
+      )
+    );
   });
 
   afterEach(() => {
+    subscriptions.unsubscribe();
     httpTestingController.verify();
   });
 
@@ -127,6 +139,7 @@ describe('Read only collection backend API service', () => {
 
       expect(successHandler).toHaveBeenCalledWith(collectionObject);
       expect(failHandler).not.toHaveBeenCalled();
+      expect(onCollectionLoadSpy).toHaveBeenCalled();
 
       // Loading a collection the second time should not fetch it.
       readOnlyCollectionBackendApiService.loadCollection('0').then(
@@ -134,6 +147,7 @@ describe('Read only collection backend API service', () => {
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
+      expect(onCollectionLoadSpy).toHaveBeenCalled();
     })
   );
 
@@ -187,6 +201,8 @@ describe('Read only collection backend API service', () => {
     // The collection should be loadable from the cache.
     readOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
+
+    expect(onCollectionLoadSpy).toHaveBeenCalled();
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
 
