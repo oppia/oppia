@@ -31,12 +31,12 @@ export class PlayerPositionService {
   private _activeCardChangedEventEmitter = new EventEmitter();
   private _currentQuestionChangedEventEmitter = new EventEmitter<number>();
   private _newCardAvailableEventEmitter = new EventEmitter();
+  private _helpCardAvailableEventEmitter = new EventEmitter();
   private _newCardOpenedEventEmitter = new EventEmitter();
 
   displayedCardIndex = null;
   onChangeCallback = null;
   learnerJustSubmittedAnAnswer = false;
-
 
   init(callback: Function): void {
     this.displayedCardIndex = null;
@@ -100,6 +100,10 @@ export class PlayerPositionService {
 
   get onNewCardAvailable() {
     return this._newCardAvailableEventEmitter;
+  }
+
+  get onHelpCardAvailable() {
+    return this._helpCardAvailableEventEmitter;
   }
 
   get onNewCardOpened() {
