@@ -518,7 +518,7 @@ describe('Customize Interaction Modal Controller', function() {
     stateCustomizationArgsService.displayed = {};
   });
 
-  it('should correctly call showMarkAllAudioAsNeedingUpdateModalIfRequired ' +
+  it('should call showMarkAllAudioAsNeedingUpdateModalIfRequired ' +
      'on updated customization arguments when saving', () => {
     const mockShowMarkAllAudioAsNeedingUpdateModalIfRequired = (
       jasmine.createSpy());

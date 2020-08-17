@@ -25,13 +25,13 @@ require('services/image-local-storage.service.ts');
 angular.module('oppia').controller('CreateNewSkillModalController', [
   '$scope', '$uibModalInstance', 'ContextService', 'ImageLocalStorageService',
   'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
-  'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
+  'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_SOLUTION_EXPLANATION',
   'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
   'SKILL_DIFFICULTIES',
   function(
       $scope, $uibModalInstance, ContextService, ImageLocalStorageService,
       RubricObjectFactory, SkillCreationService, SkillObjectFactory,
-      SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION,
+      SubtitledHtmlObjectFactory, COMPONENT_NAME_SOLUTION_EXPLANATION,
       MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
       SKILL_DIFFICULTIES) {
     var rubrics = [
@@ -74,7 +74,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     $scope.saveConceptCardExplanation = function() {
       var explanationObject = SubtitledHtmlObjectFactory.createDefault(
         $scope.bindableDict.displayedConceptCardExplanation,
-        COMPONENT_NAME_EXPLANATION);
+        COMPONENT_NAME_SOLUTION_EXPLANATION);
       $scope.newExplanationObject = explanationObject.toBackendDict();
       $scope.bindableDict.displayedConceptCardExplanation = (
         explanationObject.getHtml());

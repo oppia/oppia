@@ -298,8 +298,11 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
     };
 
-    // This function is used to keep track if the html or unicode field of a
-    // SubtitledHtml or SubtitledUnicode has changed.
+    /**
+     * Extracts a mapping of content ids to the html or unicode content found
+     * in the customization arguments.
+     * @returns {Object} A Mapping of content ids (string) to content (string).
+     */
     $scope.getContentIdToContent = function() {
       const interactionId = $scope.StateInteractionIdService.displayed;
       const contentIdToContent = {};
@@ -350,14 +353,6 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       return contentIdToContent;
     };
 
-    $scope.originalContentIdToContent = {};
-    if (StateInteractionIdService.savedMemento) {
-      // We track the original html or unicode for each content id so that we
-      // can detect changes in $scope.save().
-      $scope.originalContentIdToContent = $scope.getContentIdToContent(
-        StateCustomizationArgsService.displayed);
-    }
-
     $scope.save = function() {
       const updatedContentIdToContent = $scope.getContentIdToContent(
         StateCustomizationArgsService.displayed);
@@ -379,5 +374,17 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       EditorFirstTimeEventsService.registerFirstSaveInteractionEvent();
       $uibModalInstance.close();
     };
+
+    $scope.init = function() {
+      $scope.originalContentIdToContent = {};
+      if (StateInteractionIdService.savedMemento) {
+        // We track the original html or unicode for each content id so that we
+        // can detect changes in $scope.save().
+        $scope.originalContentIdToContent = $scope.getContentIdToContent(
+          StateCustomizationArgsService.displayed);
+      }
+    };
+
+    $scope.init();
   }
 ]);

@@ -202,10 +202,17 @@ angular.module('oppia').directive('questionEditor', [
               }).result.then(function() {
                 updateQuestion(function() {
                   contentIds.forEach(contentId => {
-                    recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                      contentId);
-                    writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                      contentId);
+                    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+                      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+                        contentId);
+                    }
+                    if (
+                      writtenTranslations.hasUnflaggedWrittenTranslations(
+                        contentId)
+                    ) {
+                      writtenTranslations.markAllTranslationsAsNeedingUpdate(
+                        contentId);
+                    }
                   });
                 });
               }, function() {

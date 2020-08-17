@@ -110,11 +110,11 @@ export class AppConstants {
 
   // Do not modify these, for backwards-compatibility reasons. These strings are
   // used to identify components, to generate content ids, and to determine what
-  // type of content a given content id is associated with. If you wush to
+  // type of content a given content id is associated with. If you wish to
   // change one of these, a state migration of all existing content ids is
   // required.
   public static COMPONENT_NAME_CONTENT = 'content';
-  public static COMPONENT_NAME_EXPLANATION = 'explanation';
+  public static COMPONENT_NAME_SOLUTION_EXPLANATION = 'explanation';
   public static COMPONENT_NAME_FEEDBACK = 'feedback';
   public static COMPONENT_NAME_HINT = 'hint';
   public static COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS = 'ca';

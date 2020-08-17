@@ -23,7 +23,7 @@ describe('Create new skill modal', function() {
   var $uibModalInstance = null;
   var skillDifficulties = null;
   var RubricObjectFactory = null;
-  var COMPONENT_NAME_EXPLANATION = null;
+  var COMPONENT_NAME_SOLUTION_EXPLANATION = null;
   var SubtitledHtmlObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -38,7 +38,8 @@ describe('Create new skill modal', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
     skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
-    COMPONENT_NAME_EXPLANATION = $injector.get('COMPONENT_NAME_EXPLANATION');
+    COMPONENT_NAME_SOLUTION_EXPLANATION = $injector.get(
+      'COMPONENT_NAME_SOLUTION_EXPLANATION');
     RubricObjectFactory = $injector.get('RubricObjectFactory');
     SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
     $scope = $rootScope.$new();
@@ -126,7 +127,7 @@ describe('Create new skill modal', function() {
       RubricObjectFactory.create(skillDifficulties[2], [])];
     var explanationObject = SubtitledHtmlObjectFactory.createDefault(
       $scope.bindableDict.displayedConceptCardExplanation,
-      COMPONENT_NAME_EXPLANATION);
+      COMPONENT_NAME_SOLUTION_EXPLANATION);
     var newExplanationObject = explanationObject.toBackendDict();
 
     $scope.newSkillDescription = 'Large addition';

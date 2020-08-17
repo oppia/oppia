@@ -108,7 +108,8 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'COMPONENT_NAME_CONTENT', AppConstants.COMPONENT_NAME_CONTENT);
 angular.module('oppia').constant(
-  'COMPONENT_NAME_EXPLANATION', AppConstants.COMPONENT_NAME_EXPLANATION);
+  'COMPONENT_NAME_SOLUTION_EXPLANATION',
+  AppConstants.COMPONENT_NAME_SOLUTION_EXPLANATION);
 angular.module('oppia').constant(
   'COMPONENT_NAME_FEEDBACK', AppConstants.COMPONENT_NAME_FEEDBACK);
 angular.module('oppia').constant(
