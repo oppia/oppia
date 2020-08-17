@@ -104,8 +104,6 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
-import { Subscription } from 'rxjs';
-
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
 var TIME_FADEOUT_MSEC = 100;
@@ -813,8 +811,8 @@ angular.module('oppia').directive('conversationSkin', [
               initialCard, focusLabel) {
             _addNewCard(initialCard);
             $scope.nextCard = initialCard;
-            $rootScope.$broadcast(
-              'playerStateChange', $scope.nextCard.getStateName());
+            ExplorationPlayerStateService.onPlayerStateChange.emit(
+              $scope.nextCard.getStateName());
             FocusManagerService.setFocusIfOnDesktop(focusLabel);
             LoaderService.hideLoadingScreen();
             $scope.hasFullyLoaded = true;
