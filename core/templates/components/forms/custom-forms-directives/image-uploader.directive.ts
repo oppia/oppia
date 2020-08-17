@@ -84,7 +84,8 @@ angular.module('oppia').directive('imageUploader', [
           for (var i = 0; i < scope.getAllowedImageFormats().length; i++) {
             var imageType = scope.getAllowedImageFormats()[i];
             if (!imageTypeMapping.hasOwnProperty(imageType)) {
-              return 'Unknown image format in allowed image formats.';
+              return (
+                imageType + ' is not in the list of allowed image formats.');
             }
             if (file.type.match(imageTypeMapping[imageType].format)) {
               imageHasInvalidFormat = false;
