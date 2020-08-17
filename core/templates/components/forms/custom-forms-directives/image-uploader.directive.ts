@@ -56,13 +56,13 @@ angular.module('oppia').directive('imageUploader', [
           var imageTypeMapping = {
             jpeg: {
               format: 'image/jpeg',
-              fileType: /jpeg$/,
-              fileExtension: /\.jpeg$/,
+              fileType: /jp(e?)g$/,
+              fileExtension: /\.jp(e?)g$/,
             },
             jpg: {
               format: 'image/jpg',
-              fileType: /jpg$/,
-              fileExtension: /\.jpg$/,
+              fileType: /jp(e?)g$/,
+              fileExtension: /\.jp(e?)g$/,
             },
             gif: {
               format: 'image/gif',
@@ -80,27 +80,27 @@ angular.module('oppia').directive('imageUploader', [
               fileExtension: /\.svg$/,
             }
           };
-          var imageHasInValidFormat = true;
-          var imageHasInValidExtension = false;
+          var imageHasInvalidFormat = true;
+          var imageHasInvalidExtension = false;
           for (var i = 0; i < scope.getAllowedImageFormats().length; i++) {
             var fileType = scope.getAllowedImageFormats()[i];
             if (!(fileType in imageTypeMapping)) {
               return 'Unknown image format in allowed image formats.';
             }
-            imageHasInValidFormat = (
-              imageHasInValidFormat &&
+            imageHasInvalidFormat = (
+              imageHasInvalidFormat &&
               !file.type.match(imageTypeMapping[fileType].format));
-            imageHasInValidExtension = (
-              imageHasInValidExtension ||
+            imageHasInvalidExtension = (
+              imageHasInvalidExtension ||
               (file.type.match(imageTypeMapping[fileType].fileType) &&
               !file.name.match(imageTypeMapping[fileType].fileExtension)));
           }
 
-          if (imageHasInValidFormat) {
+          if (imageHasInvalidFormat) {
             return 'This image format is not supported.';
           }
 
-          if (imageHasInValidExtension) {
+          if (imageHasInvalidExtension) {
             return 'This image format does not match the filename extension.';
           }
 
