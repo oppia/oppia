@@ -112,6 +112,7 @@ require(
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -166,7 +167,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationPropertyService',
-    'ExplorationRightsService',
+    'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
@@ -187,7 +188,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationPropertyService,
-        ExplorationRightsService,
+        ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         PageTitleService, LoaderService, ParamChangesObjectFactory,
@@ -513,6 +514,13 @@ angular.module('oppia').component('explorationEditorPage', {
         ctrl.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
         BottomNavbarStatusService.markBottomNavbarStatus(true);
 
+        ctrl.directiveSubscriptions.add(
+          ExplorationSaveService.onInitExplorationPage.subscribe(
+            (successCallback) => {
+              ctrl.initExplorationPage().then(successCallback);
+            }
+          )
+        );
         ctrl.directiveSubscriptions.add(
           ExplorationStatesService.onRefreshGraph.subscribe(() => {
             GraphDataService.recompute();
