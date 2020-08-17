@@ -430,7 +430,7 @@ export class MathInteractionsService {
     // terms in the input expression. Two terms are said to be matched iff
     // upon subtracting or dividing them, the resultant contains only
     // placeholders. This would imply that the input term matches with the
-    // general form(the term with placeholders).  
+    // general form(the term with placeholders).
     for (let i = termsWithPlaceholders.length - 1; i >= 0; i--) {
       for (let j = 0; j < inputTerms.length; j++) {
         let termWithPlaceholders = termsWithPlaceholders[i];
