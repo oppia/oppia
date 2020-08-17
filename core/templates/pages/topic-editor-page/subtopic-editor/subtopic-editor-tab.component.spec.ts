@@ -218,12 +218,6 @@ describe('Subtopic editor tab', function() {
     expect(ctrl.isSkillDeleted(skillSummary)).toEqual(false);
   });
 
-  it('should call SkillCreationService to create skill', function() {
-    var skillSpy = spyOn(EntityCreationService, 'createSkill');
-    ctrl.createSkill();
-    expect(skillSpy).toHaveBeenCalled();
-  });
-
   it('should call TopicUpdateService when skill is rearranged',
     function() {
       var removeSkillSpy = spyOn(

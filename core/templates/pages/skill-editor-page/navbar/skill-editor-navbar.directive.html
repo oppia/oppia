@@ -5,7 +5,6 @@
       <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable()}"
               ng-click="saveChanges()"
-              style="float: left; width: 155px;"
               ng-disabled="!isSkillSaveable()">
         <span ng-if="!isSaveInProgress()">
           <span title="Publish Changes">
@@ -89,6 +88,10 @@
 <style>
   skill-editor-navbar .skill-editor-nav-mobile {
     display: none;
+  }
+  skill-editor-navbar .oppia-save-publish-changes-button {
+    float: left;
+    width: 158px;
   }
 
   @media screen and (max-width: 768px) {

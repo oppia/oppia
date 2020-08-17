@@ -57,7 +57,7 @@
               Delete
             </button>
             <button type="button"
-                    class="btn btn-default"
+                    class="btn btn-outline-secondary rubric-cancel-button"
                     ng-click="$ctrl.cancelEditExplanation($ctrl.rubric.getDifficulty(), $index)">
               Cancel
             </button>
@@ -70,7 +70,7 @@
         </div>
       </div>
     </div>
-    <button class="btn add-explanation-button protractor-test-add-explanation-button-<[$ctrl.rubric.getDifficulty()]>"
+    <button class="btn add-explanation-button skill-editor-add-btn protractor-test-add-explanation-button-<[$ctrl.rubric.getDifficulty()]>"
             type="button"
             ng-click="$ctrl.addExplanationForDifficulty($ctrl.rubric.getDifficulty())"
             ng-disabled="$ctrl.isAnyExplanationEmptyForDifficulty($ctrl.rubric.getDifficulty())">
@@ -87,7 +87,6 @@
   rubrics-editor .helper-text {
     color: #595959;
     font-size: 13px;
-    padding-bottom: 12px;
   }
 
   rubrics-editor .dropdown {
@@ -111,5 +110,8 @@
 
   rubrics-editor .oppia-rule-save-cancel-buttons {
     text-align: right;
+  }
+  rubrics-editor .oppia-rule-save-cancel-buttons .rubric-cancel-button {
+    border: 1px solid #999;
   }
 </style>
