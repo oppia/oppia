@@ -31,7 +31,7 @@ describe('External Rte Save Service', () => {
 
   it('should fetch externalRteSave event emitter', () => {
     let sampleExternalRteSaveEventEmitter = new EventEmitter();
-    expect(externalRteSaveService.onExternalSave).toEqual(
+    expect(externalRteSaveService.onExternalRteSave).toEqual(
       sampleExternalRteSaveEventEmitter);
   });
 });
