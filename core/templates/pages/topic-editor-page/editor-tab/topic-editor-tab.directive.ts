@@ -379,6 +379,7 @@ angular.module('oppia').directive('topicEditorTab', [
               TopicUpdateService.moveSkillToSubtopic(
                 $scope.topic, oldSubtopicId, newSubtopicId,
                 skillSummary);
+              ctrl.initEditor();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
