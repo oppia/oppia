@@ -17,6 +17,8 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { Subscription } from 'rxjs';
+
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -38,6 +40,9 @@ describe('State Translation Status Graph Component', function() {
   var stateRecordedVoiceoversService = null;
   var stateWrittenTranslationsService = null;
   var translationStatusService = null;
+  var testSubscriptions: Subscription;
+  const refreshStateTranslationSpy = jasmine.createSpy(
+    'refreshStateTranslationSpy');
 
   var stateName = 'State1';
   var state = {
@@ -62,6 +67,17 @@ describe('State Translation Status Graph Component', function() {
       StateRecordedVoiceoversService);
     stateWrittenTranslationsService = TestBed.get(
       StateWrittenTranslationsService);
+  });
+
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      stateEditorService.onRefreshStateTranslation.subscribe(
+        refreshStateTranslationSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
   });
 
   describe('when translation tab is not busy', function() {
@@ -121,7 +137,7 @@ describe('State Translation Status Graph Component', function() {
 
       expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
         'State2');
-      expect(broadcastSpy).toHaveBeenCalledWith('refreshStateTranslation');
+      expect(refreshStateTranslationSpy).toHaveBeenCalled();
     });
   });
 

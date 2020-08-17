@@ -605,10 +605,12 @@ angular.module('oppia').directive('stateResponses', [
                   ResponsesService.getActiveAnswerGroupIndex();
                 }
               ));
-
-            $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-              ResponsesService.updateAnswerChoices(newAnswerChoices);
-            });
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onUpdateAnswerChoices.subscribe(
+                (newAnswerChoices) => {
+                  ResponsesService.updateAnswerChoices(newAnswerChoices);
+                })
+            );
             $scope.$on(
               'handleCustomArgsUpdate',
               function(evt, newAnswerChoices) {
