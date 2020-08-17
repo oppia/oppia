@@ -1,8 +1,7 @@
 {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "sourceType": "module",
-    "project": "./tsconfig.json"
+    "sourceType": "module"
   },
   "extends": [
     "eslint:recommended"
@@ -272,10 +271,8 @@
         "default": "array"
       }
     ],
-    "@typescript-eslint/await-thenable": ["error"],
     "@typescript-eslint/adjacent-overload-signatures": ["error"],
     "@typescript-eslint/no-extra-non-null-assertion": ["error"],
-    "@typescript-eslint/no-implied-eval": ["error"],
     "@typescript-eslint/no-misused-new": ["error"],
     "wrap-iife": [
       "error",
