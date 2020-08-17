@@ -370,7 +370,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATE).put()
 
-
         # Setup for UserContributionsModel.
         self.save_new_valid_exploration(
             self.EXPLORATION_IDS[0], self.USER_ID_1, end_state_name='End')
