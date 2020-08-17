@@ -81,14 +81,12 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
                 '/learn/staging/public-topic-name/practice/session?'
                 'selected_subtopic_ids=1,2')
 
-
     def test_no_user_can_access_unpublished_topic_practice_session_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
                 '/learn/staging/private-topic-name/practice/session?'
                 'selected_subtopic_ids=1,2',
                 expected_status_int=404)
-
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):

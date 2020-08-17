@@ -290,7 +290,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         with python_utils.open_file(temp_pq_config_file, 'r') as f:
             self.assertEqual(f.read(), pq_expected_text)
 
-
     def test_function_calls_on_windows(self):
         check_function_calls = {
             'ensure_pip_library_is_installed_is_called': False,
