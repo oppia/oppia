@@ -28,7 +28,7 @@
           <div class="col-2 oppia-feature-tab-center">
             <div class="row">
               <div class="col-6 oppia-feature-tab-vertical-center">
-                <button class="btn btn-secondary" (click)="removeRule(featureFlag, ruleIndex)">x</button>
+                <button class="btn btn-secondary protractor-test-remove-rule-button" (click)="removeRule(featureFlag, ruleIndex)">x</button>
               </div>
               <div class="col-6" style="display: flex; flex-direction: column; justify-content: space-around; min-height: 100px;">
                 <button
@@ -46,7 +46,7 @@
             <div class="row">
               <div class="col-2"><b>If Matched:</b></div>
               <div class="col-10">
-                <select name="" id="" [(ngModel)]="rule.valueWhenMatched">
+                <select name="" id="" [(ngModel)]="rule.valueWhenMatched" class="protractor-test-value-selector">
                   <option [ngValue]="true">Enabled</option>
                   <option [ngValue]="false">Disabled</option>
                 </select>
@@ -160,7 +160,7 @@
   </div>
   <div class="row oppia-feature-tab-control-buttons-container" style="margin-top: 10px;">
     <!-- Control Buttons -->
-    <button class="btn btn-primary" (click)="updateFeatureRulesAsync(featureFlag)">Save</button>
+    <button class="btn btn-primary protractor-test-save-button" (click)="updateFeatureRulesAsync(featureFlag)">Save</button>
     <button class="btn btn-secondary" (click)="clearChanges(featureFlag)" style="margin-left: 5px;">Clear Changes</button>
   </div>
 </div>
@@ -171,6 +171,7 @@
 
 <div *ngIf="isDummyFeatureEnabled" class="oppia-dev-mode protractor-test-angular-dummy-feature-indicator" style="bottom: 10px;">
   Angular: Dummy Feature Enabled
+  <span *ngIf="isDummyApiEnabled" class="protractor-test-angular-dummy-handler-indicator">, Dummy Handler Enabled.</span>
 </div>
 
 

@@ -256,6 +256,12 @@ jobs:
           name: Run e2e file upload extensions test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
+      # Feature Gating test suites must run in non-production environment because
+      # the dummy_feature being used cannot be enabled in production environment.
+      - run:
+          name: Run e2e feature gating test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="featureGating"
 
 notify:
   webhooks:

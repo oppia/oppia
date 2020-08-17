@@ -13,25 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests to login, check various pages
- * and then logout.
+ * @fileoverview End-to-end tests to login, enable feature and re-login.
  */
 
-const { AdminPage } = require(
-  '../protractor_utils/AdminPage.js');
+const { AdminPage } = require('../protractor_utils/AdminPage.js');
 const general = require('../protractor_utils/general.js');
 const users = require('../protractor_utils/users.js');
-const waitFor = require('../protractor_utils/waitFor.js');
 
 describe('Feature Gating Flow', function() {
-  const ADMIN_USER_EMAIL = 'admin@featureGatingFlow.com';
-  const ADMIN_USERNAME = 'featuregating';
+  const ADMIN_USER1_EMAIL = 'admin1@featureGatingFlow.com';
+  const ADMIN_USERNAME1 = 'featuregating1';
+  const ADMIN_USER2_EMAIL = 'admin2@featureGatingFlow.com';
+  const ADMIN_USERNAME2 = 'featuregating2';
+
+  const indicator = element(
+    by.css('.protractor-test-angular-dummy-feature-indicator'));
+  const indicatorAjs = element(
+    by.css('.protractor-test-angularjs-dummy-feature-indicator'));
 
   let adminPage = null;
 
   beforeAll(async function() {
     adminPage = new AdminPage();
-    await users.createAdmin(ADMIN_USER_EMAIL, ADMIN_USERNAME);
+    await users.createUser(ADMIN_USER1_EMAIL, ADMIN_USERNAME1);
+    await users.createUser(ADMIN_USER2_EMAIL, ADMIN_USERNAME2);
   });
 
   afterEach(async function() {
@@ -40,55 +45,38 @@ describe('Feature Gating Flow', function() {
   });
 
   it('should not show indicators gated by dummy feature', async() => {
-    await users.login(ADMIN_USER_EMAIL, true);
-    await adminPage.get();
-    expect(
-      await element(by.css('.protractor-test-angular-dummy-feature-indicator'))
-        .isPresent()
-    ).toBe(false);
-    expect(
-      await element(by.css(
-        '.protractor-test-angularjs-dummy-feature-indicator'))
-        .isPresent()
-    ).toBe(false);
+    await users.login(ADMIN_USER1_EMAIL, true);
+    await adminPage.getFeaturesTab();
+
+    expect(await indicator.isPresent()).toBe(false);
+    expect(await indicatorAjs.isPresent()).toBe(false);
   });
 
-  it('should show dummy in the features tab', async() => {
-    await users.login(ADMIN_USER_EMAIL, true);
+  it('should show dummy feature in the features tab', async() => {
+    await users.login(ADMIN_USER1_EMAIL, true);
 
     await adminPage.getFeaturesTab();
-    await waitFor.invisibilityOf(
-      element(by.css('.protractor-test-no-feature')));
 
-    const dummyFeatureElement = element.all(
-      by.css('.protractor-test-feature-flag')
-    )
-      .filter(async elem => {
-        return (await elem.element(by.css('h2.feature-name')).getText()) ===
-          'dummy_feature';
-      })
-      .first();
+    const dummy = await adminPage.getDummyFeatureElement();
 
-
-    const addRuleButton = dummyFeatureElement.element(
-      by.css('.protractor-test-feature-add-rule-button')
-    );
-
-
-    expect(element(by.css('.protractor-test-no-rule-indicator')).isPresent())
-      .toBe(true);
-
-    await addRuleButton.click();
-    await waitFor.pageToFullyLoad();
-
-    expect(
-      await element(by.css('.protractor-test-no-rule-indicator')).isPresent()
-    )
-      .toBe(false);
+    expect(await dummy.isPresent()).toBe(true);
   });
-  // it('should land on the learner dashboard after successful login',
-  //   async function() {
-  //     expect(await browser.getCurrentUrl()).toEqual(
-  //       'http://localhost:9001/learner-dashboard');
-  //   });
+
+  it('should show indicators after enabling dummy_feature', async() => {
+    await users.login(ADMIN_USER1_EMAIL, true);
+
+    await adminPage.getFeaturesTab();
+    const dummy = await adminPage.getDummyFeatureElement();
+    await adminPage.enableFeatureForDev(dummy);
+
+    await users.logout();
+    await users.login(ADMIN_USER2_EMAIL, true);
+
+    await adminPage.getFeaturesTab();
+
+    expect(await indicator.isPresent()).toBe(true);
+    expect(await indicatorAjs.isPresent()).toBe(true);
+    expect(await indicator.isElementPresent(
+      by.css('.protractor-test-angular-dummy-handler-indicator'))).toBe(true);
+  });
 });

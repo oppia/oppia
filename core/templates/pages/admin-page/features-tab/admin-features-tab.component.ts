@@ -30,6 +30,8 @@ import { PlatformParameter, FeatureStage } from
   'domain/platform_feature/platform-parameter-object.factory';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule-object.factory';
 import {
@@ -110,6 +112,8 @@ export class AdminFeaturesTabComponent implements OnInit {
   featureFlags: PlatformParameter[] = [];
   featureFlagNameToBackupMap: Map<string, PlatformParameter>;
 
+  isDummyApiEnabled: boolean = false;
+
   constructor(
     private windowRef: WindowRef,
     private adminDataService: AdminDataService,
@@ -117,7 +121,8 @@ export class AdminFeaturesTabComponent implements OnInit {
     private apiService: PlatformFeatureAdminBackendApiService,
     private ruleFactory: PlatformParameterRuleObjectFactory,
     private filterFactory: PlatformParameterFilterObjectFactory,
-    private featureService: PlatformFeatureService
+    private featureService: PlatformFeatureService,
+    private dummyApiService: PlatformFeatureDummyBackendApiService,
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
@@ -199,12 +204,9 @@ export class AdminFeaturesTabComponent implements OnInit {
     if (this.adminTaskManager.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
-      return;
-    }
     const updateMessage = this.windowRef.nativeWindow.prompt(
-      'Please enter message for the update',
+      'This action is irreversible. If you insist to proceed, please enter' +
+      ' message for the update:',
       `Update feature '${feature.name}'.`
     );
     if (!updateMessage) {
@@ -246,8 +248,15 @@ export class AdminFeaturesTabComponent implements OnInit {
     return this.featureService.featureSummary.DummyFeature.isEnabled;
   }
 
+  async reloadDummyHandlerStatusAsync(): Promise<void> {
+    if (this.isDummyFeatureEnabled) {
+      this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
+    }
+  }
+
   ngOnInit() {
     this.reloadFeatureFlagsAsync();
+    this.reloadDummyHandlerStatusAsync();
   }
 }
 

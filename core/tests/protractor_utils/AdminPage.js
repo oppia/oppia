@@ -155,8 +155,51 @@ var AdminPage = function() {
   };
 
   this.getFeaturesTab = async function() {
-    await browser.get(ADMIN_URL_SUFFIX + '#/features');
-    await waitFor.pageToFullyLoad();
+    await this.get();
+    const featuresTab = element(by.css('.protractor-test-admin-features-tab'));
+    await waitFor.elementToBeClickable(
+      featuresTab, 'Features tab is not clickable');
+    await featuresTab.click();
+    const featureFlagElements = element.all(
+      by.css('.protractor-test-feature-flag'));
+    await waitFor.visibilityOf(
+      featureFlagElements.first(), 'Feature flags not showing up');
+  };
+
+  this.getDummyFeatureElement = async function() {
+    const featureFlagElements = element.all(
+      by.css('.protractor-test-feature-flag'));
+    return featureFlagElements
+      .filter(async elem => {
+        return (await elem.element(by.css('h2.feature-name')).getText()) ===
+          'dummy_feature';
+      })
+      .first();
+  };
+
+  this.removeAllRulesOfFeature = async function(featureElement) {
+    while (!await featureElement.isElementPresent(
+      by.css('.protractor-test-no-rule-indicator'))) {
+      await featureElement
+        .element(by.css('.protractor-test-remove-rule-button'))
+        .click();
+    }
+  };
+
+  this.enableFeatureForDev = async function(featureElement) {
+    await this.removeAllRulesOfFeature(featureElement);
+    await featureElement
+      .element(by.css('.protractor-test-feature-add-rule-button'))
+      .click();
+    await featureElement
+      .element(by.css('.protractor-test-value-selector'))
+      .sendKeys('Enabled');
+    await featureElement
+      .element(by.css('.protractor-test-save-button'))
+      .click();
+
+    await general.acceptAlert();
+    await waitFor.visibilityOf(statusMessage);
   };
 
   this.editConfigProperty = async function(
