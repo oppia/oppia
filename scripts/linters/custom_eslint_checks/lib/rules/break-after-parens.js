@@ -88,7 +88,7 @@ module.exports = {
             if (paren.loc.start.line !== nextParen.loc.start.line &&
               parensCount > 0) {
               if (separators.includes(line[line.length - 1])) {
-                parensCount -= 1;
+                parensCount = 0;
                 return true;
               }
               context.report({
