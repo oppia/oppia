@@ -17,7 +17,6 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { Subscription } from 'rxjs';
 
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -30,6 +29,7 @@ import { StateWrittenTranslationsService } from
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
+
 import { Subscription } from 'rxjs';
 
 describe('State Translation Status Graph Component', function() {
