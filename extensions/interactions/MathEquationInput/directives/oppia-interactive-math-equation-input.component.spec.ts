@@ -119,6 +119,8 @@ describe('MathEquationInputInteractive', function() {
     // Invalid answer.
     ctrl.value = '(x + y) = 3';
 
+    spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
+      ['x', 'y']);
     spyOn(mockCurrentInteractionService, 'onSubmit');
     ctrl.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();

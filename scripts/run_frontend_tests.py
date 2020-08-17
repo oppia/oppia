@@ -103,7 +103,6 @@ def main(args=None):
         'on your filesystem.',
         'Running test in development environment'])
 
-
     if parsed_args.run_minified_tests:
         python_utils.PRINT('Running test in production environment')
 
