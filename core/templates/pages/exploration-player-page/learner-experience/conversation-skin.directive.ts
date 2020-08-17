@@ -115,8 +115,6 @@ interface ConversationSkinCustomScope extends ng.IScope {
   directiveTemplate?: string;
 }
 
-import { Subscription } from 'rxjs';
-
 angular.module('oppia').animation(
   '.conversation-skin-animate-tutor-card-on-narrow', function() {
     var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
