@@ -147,7 +147,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         color: '#00ff00',
         angle: 0
       }];
-      ctrl.imageType = ['svg'];
+      ctrl.allowedImageFormat = ['svg'];
       ctrl.uploadedSvgDataUrl = null;
       ctrl.loadType = 'group';
 

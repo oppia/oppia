@@ -81,27 +81,24 @@ angular.module('oppia').directive('imageUploader', [
             }
           };
           var imageHasInvalidFormat = true;
-          var imageHasInvalidExtension = false;
           for (var i = 0; i < scope.getAllowedImageFormats().length; i++) {
-            var fileType = scope.getAllowedImageFormats()[i];
-            if (!(fileType in imageTypeMapping)) {
+            var imageType = scope.getAllowedImageFormats()[i];
+            if (!imageTypeMapping.hasOwnProperty(imageType)) {
               return 'Unknown image format in allowed image formats.';
             }
-            imageHasInvalidFormat = (
-              imageHasInvalidFormat &&
-              !file.type.match(imageTypeMapping[fileType].format));
-            imageHasInvalidExtension = (
-              imageHasInvalidExtension ||
-              (file.type.match(imageTypeMapping[fileType].fileType) &&
-              !file.name.match(imageTypeMapping[fileType].fileExtension)));
+            if (file.type.match(imageTypeMapping[imageType].format)) {
+              imageHasInvalidFormat = false;
+              if (
+                file.type.match(imageTypeMapping[imageType].fileType) &&
+                !file.name.match(imageTypeMapping[imageType].fileExtension)) {
+                return (
+                  'This image format does not match the filename extension.');
+              }
+            }
           }
 
           if (imageHasInvalidFormat) {
             return 'This image format is not supported.';
-          }
-
-          if (imageHasInvalidExtension) {
-            return 'This image format does not match the filename extension.';
           }
 
           const HUNDRED_KB_IN_BYTES = 100 * 1024;
