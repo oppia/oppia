@@ -41,7 +41,9 @@ describe('Admin misc tab', function() {
     await users.createAndLoginAdminUser(
       'miscTabTester@miscTab.com', 'miscTabTester');
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(topicName, 'admin-misc-tab-test', 'A topic to test the Admin Page\'s Misc Tab', false);
+    await topicsAndSkillsDashboardPage.createTopic(topicName,
+      'admin-misc-tab-test', 'A topic to test the Admin Page\'s Misc Tab',
+      false);
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4].substring(0, 12);
     await adminPage.get();
