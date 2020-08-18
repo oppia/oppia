@@ -76,8 +76,9 @@ angular.module('oppia').component('topicViewerPage', {
           function(readOnlyTopic) {
             ctrl.topicId = readOnlyTopic.getTopicId();
             ctrl.topicName = readOnlyTopic.getTopicName();
-            PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
             ctrl.topicDescription = readOnlyTopic.getTopicDescription();
+            PageTitleService.setPageTitle(
+              `Learn ${ctrl.topicName} | ${ctrl.topicDescription} | Oppia`);
             ctrl.canonicalStorySummaries = (
               readOnlyTopic.getCanonicalStorySummaries());
             ctrl.chapterCount = 0;

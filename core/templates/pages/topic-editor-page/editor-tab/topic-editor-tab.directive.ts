@@ -73,8 +73,8 @@ angular.module('oppia').directive('topicEditorTab', [
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
-        'WindowDimensionsService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
-        'MAX_CHARS_IN_TOPIC_NAME',
+        'WindowDimensionsService', 'WindowRef',
+        'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
         function(
             $rootScope, $scope, $uibModal, AlertsService, ContextService,
             CsrfTokenService, EntityCreationService, ImageUploadHelperService,
@@ -82,8 +82,8 @@ angular.module('oppia').directive('topicEditorTab', [
             TopicEditorRoutingService, TopicEditorStateService,
             TopicsAndSkillsDashboardBackendApiService,
             TopicUpdateService, UndoRedoService, UrlInterpolationService,
-            WindowDimensionsService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
-            MAX_CHARS_IN_TOPIC_NAME) {
+            WindowDimensionsService, WindowRef,
+            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -110,6 +110,7 @@ angular.module('oppia').directive('topicEditorTab', [
               topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
             $scope.topicNameExists = false;
             $scope.topicUrlFragmentExists = false;
+            $scope.hostname = WindowRef.nativeWindow.location.hostname;
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -132,6 +133,10 @@ angular.module('oppia').directive('topicEditorTab', [
                   $scope.topic.getThumbnailFilename(),
                   ContextService.getEntityType(),
                   ContextService.getEntityId()));
+          };
+
+          $scope.getClassroomUrlFragment = function() {
+            return TopicEditorStateService.getClassroomUrlFragment();
           };
 
           var _initStorySummaries = function() {

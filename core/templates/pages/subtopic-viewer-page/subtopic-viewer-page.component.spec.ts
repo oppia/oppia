@@ -112,7 +112,7 @@ describe('Subtopic viewer page', function() {
     expect(ctrl.pageContents.getHtml()).toBe('This is a html');
     expect(ctrl.subtopicTitle).toBe(subtopicTitle);
     expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-      subtopicTitle + ' - Oppia');
+      `Review ${subtopicTitle} | Oppia`);
     expect(ContextService.setCustomEntityContext).toHaveBeenCalledWith(
       'topic', topicId);
 

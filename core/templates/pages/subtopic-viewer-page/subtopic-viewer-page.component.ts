@@ -69,7 +69,8 @@ angular.module('oppia').component('subtopicViewerPage', {
             ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
             ContextService.setCustomEntityContext(
               ENTITY_TYPE.TOPIC, ctrl.parentTopicId);
-            PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
+            PageTitleService.setPageTitle(
+              `Review ${ctrl.subtopicTitle} | Oppia`);
 
             let nextSubtopic = (
               subtopicDataObject.getNextSubtopic());
