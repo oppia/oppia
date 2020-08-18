@@ -138,8 +138,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             task.start()
             task.join()
-        expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
-        self.assertTrue(len(expected_output) == 2)
+        expected_output = [s for s in self.linter_stdout if 'Printing' in s]
+        self.assertTrue(len(expected_output) == 1)
 
     def test_task_thread_with_no_test_name(self):
         class HelperTests(python_utils.OBJECT):
