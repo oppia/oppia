@@ -28,6 +28,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import subscription_services
 from core.platform import models
@@ -35,7 +36,6 @@ import feconf
 import python_utils
 import utils
 
-memcache_services = models.Registry.import_memcache_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
@@ -121,25 +121,6 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
             'schema version.'
             % (exp_id, ', '.join(python_utils.MAP(str, error_versions))))
     return explorations
-
-
-def get_exploration_memcache_key(exploration_id, version=None):
-    """Returns a memcache key for an exploration.
-
-    Args:
-        exploration_id: str. The id of the exploration whose memcache key
-            is to be returned.
-        version: int or None. If specified, the version of the exploration
-            whose memcache key is to be returned.
-
-    Returns:
-        str. Memcache key for the given exploration (or exploration version).
-    """
-
-    if version:
-        return 'exploration-version:%s:%s' % (exploration_id, version)
-    else:
-        return 'exploration:%s' % exploration_id
 
 
 def get_exploration_from_model(exploration_model, run_conversion=True):
@@ -311,21 +292,26 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
     Returns:
         Exploration. The domain object corresponding to the given exploration.
     """
+    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    cached_exploration = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION,
+        sub_namespace,
+        [exploration_id]
+    ).get(exploration_id)
 
-    exploration_memcache_key = get_exploration_memcache_key(
-        exploration_id, version=version)
-    memcached_exploration = memcache_services.get_multi(
-        [exploration_memcache_key]).get(exploration_memcache_key)
-
-    if memcached_exploration is not None:
-        return memcached_exploration
+    if cached_exploration is not None:
+        return cached_exploration
     else:
         exploration_model = exp_models.ExplorationModel.get(
             exploration_id, strict=strict, version=version)
         if exploration_model:
             exploration = get_exploration_from_model(exploration_model)
-            memcache_services.set_multi({
-                exploration_memcache_key: exploration})
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                sub_namespace,
+                {
+                    exploration_id: exploration
+                })
             return exploration
         else:
             return None
@@ -349,11 +335,10 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         ValueError. When strict is True and at least one of the given exp_ids
             is invalid.
     """
-    exp_ids = set(exp_ids)
     result = {}
     uncached = []
-    memcache_keys = [get_exploration_memcache_key(i) for i in exp_ids]
-    cache_result = memcache_services.get_multi(memcache_keys)
+    cache_result = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None, exp_ids)
 
     for exp_obj in cache_result.values():
         result[exp_obj.id] = exp_obj
@@ -387,7 +372,8 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     }
 
     if cache_update:
-        memcache_services.set_multi(cache_update)
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, cache_update)
 
     result.update(db_results_dict)
     return result

@@ -347,7 +347,6 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         learner_playlist.insert_collection_id_at_given_position(
             'collect_id2', 1)
 
-
         self.assertListEqual(
             learner_playlist.collection_ids,
             ['collect_id0', 'collect_id2', 'collect_id1'])

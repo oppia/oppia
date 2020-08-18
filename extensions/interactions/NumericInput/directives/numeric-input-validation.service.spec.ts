@@ -85,22 +85,22 @@ describe('NumericInputValidationService', () => {
         x: 1
       }
     });
-    answerGroups = [agof.createNew(
-      [equalsZeroRule, betweenNegativeOneAndOneRule],
-      goodDefaultOutcome,
-      null,
-      null
-    )];
+    const answerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    answerGroup.updateRuleTypesToInputs(
+      [equalsZeroRule, betweenNegativeOneAndOneRule]);
+    answerGroups = [answerGroup];
   });
 
   it('should be able to perform basic validation', () => {
+    const answerGroup = agof.createNew(goodDefaultOutcome, null, null);
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, {}, [answerGroup], goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
   it('should catch redundant rules', () => {
-    answerGroups[0].rules = [betweenNegativeOneAndOneRule, equalsZeroRule];
+    answerGroups[0].updateRuleTypesToInputs(
+      [betweenNegativeOneAndOneRule, equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -111,7 +111,7 @@ describe('NumericInputValidationService', () => {
   });
 
   it('should catch identical rules as redundant', () => {
-    answerGroups[0].rules = [equalsZeroRule, equalsZeroRule];
+    answerGroups[0].updateRuleTypesToInputs([equalsZeroRule, equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -123,8 +123,8 @@ describe('NumericInputValidationService', () => {
 
   it('should catch redundant rules in separate answer groups', () => {
     answerGroups[1] = cloneDeep(answerGroups[0]);
-    answerGroups[0].rules = [betweenNegativeOneAndOneRule];
-    answerGroups[1].rules = [equalsZeroRule];
+    answerGroups[0].updateRuleTypesToInputs([betweenNegativeOneAndOneRule]);
+    answerGroups[1].updateRuleTypesToInputs([equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -136,7 +136,8 @@ describe('NumericInputValidationService', () => {
 
   it('should catch redundant rules caused by greater/less than range',
     () => {
-      answerGroups[0].rules = [lessThanOneRule, equalsZeroRule];
+      answerGroups[0].updateRuleTypesToInputs(
+        [lessThanOneRule, equalsZeroRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{

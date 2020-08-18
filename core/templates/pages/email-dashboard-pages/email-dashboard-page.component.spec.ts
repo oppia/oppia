@@ -85,7 +85,7 @@ describe('Email Dashboard Page', function() {
     }
   });
 
-  it('should reset form', function() {
+  it('should clear form when form is reset', function() {
     // Mock some values.
     ctrl.hasNotLoggedInForNDays = true;
     ctrl.inactiveInLastNDays = true;
@@ -104,7 +104,7 @@ describe('Email Dashboard Page', function() {
     expect(ctrl.editedFewerThanNExps).toBe(null);
   });
 
-  it('should submit query', function() {
+  it('should submit query when submitting form', function() {
     // Mock some values.
     ctrl.hasNotLoggedInForNDays = true;
     ctrl.inactiveInLastNDays = true;
@@ -156,7 +156,6 @@ describe('Email Dashboard Page', function() {
     expect(ctrl.currentPageOfQueries).toEqual(firstPageQueries);
   });
 
-
   it('should evaluate when next button is displayed', function() {
     expect(ctrl.showNextButton()).toBe(true);
   });
@@ -166,7 +165,7 @@ describe('Email Dashboard Page', function() {
   });
 
   describe('recheckStatus', function() {
-    it('should get existing query from backend to check its content',
+    it('should fetch query page again when getting next page of queries',
       function() {
         spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(
           function() {
@@ -194,45 +193,34 @@ describe('Email Dashboard Page', function() {
         expect(ctrl.currentPageOfQueries[0]).toEqual(updatedQuery);
       });
 
-    it('should not get query backend for rechecking its content when' +
-      ' it does not exist', function() {
+    it('should not get query page again when it does not exist', function() {
       expect(ctrl.currentPageOfQueries).toBe(undefined);
       ctrl.recheckStatus(0);
       expect(ctrl.currentPageOfQueries).toBe(undefined);
     });
   });
 
-  it('should show link to result page', function() {
-    expect(ctrl.showLinkToResultPage('username', 'completed')).toBe(false);
-    expect(ctrl.username).toBe(undefined);
+  it('should get user info and next queries after controller initialization',
+    function() {
+      spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(
+        function() {
+          var deferred = $q.defer();
+          deferred.resolve(secondPageQueries);
+          return deferred.promise;
+        });
 
-    ctrl.$onInit();
-    $scope.$apply();
+      ctrl.$onInit();
+      expect(loadingMessage).toBe('Loading');
+      expect(ctrl.currentPageOfQueries).toEqual([]);
+      // For UserService.
+      $scope.$apply();
+      // For EmailDashboardDataService.
+      $scope.$apply();
 
-    expect(ctrl.username).toBe('username');
-    expect(ctrl.showLinkToResultPage('username', 'completed')).toBe(true);
-  });
+      expect(ctrl.username).toBe('username');
+      expect(loadingMessage).toBe('');
+      expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
 
-  it('should get user info and next queries', function() {
-    spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(
-      function() {
-        var deferred = $q.defer();
-        deferred.resolve(secondPageQueries);
-        return deferred.promise;
-      });
-
-    ctrl.$onInit();
-    expect(loadingMessage).toBe('Loading');
-    expect(ctrl.currentPageOfQueries).toEqual([]);
-    // For UserService.
-    $scope.$apply();
-    // For EmailDashboardDataService.
-    $scope.$apply();
-
-    expect(ctrl.username).toBe('username');
-    expect(loadingMessage).toBe('');
-    expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
-
-    expect(ctrl.showLinkToResultPage('username', 'completed')).toBe(true);
-  });
+      expect(ctrl.showLinkToResultPage('username', 'completed')).toBe(true);
+    });
 });

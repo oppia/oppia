@@ -30,13 +30,7 @@ indexes:
   - name: commit_message
   - name: commit_type
 
-- kind: DeleteExpCopiesRealtimeModel
-  properties:
-  - name: "deleted"
-  - name: "status"
-  - name: "scaled_average_rating"
-    direction: desc
-- kind: "UserContributionScoringModel"
+- kind: ExpCopiesRealtimeModel
   properties:
   - name: "deleted"
   - name: "user_id"
@@ -157,10 +151,38 @@ indexes:
     direction: desc
 - kind: "GeneralSuggestionModel"
   properties:
-  - name: "author_id"
-  - name: "deleted"
-  - name: "suggestion_type"
-  - name: "created_on"
+  - name: deleted
+  - name: score_category
+  - name: status
+  - name: author_id
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: last_updated
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: suggestion_type
+  - name: author_id
+
+- kind: InteractionAnswerSummariesRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: JobModel
+  properties:
+  - name: status
+  - name: next_scheduled_check_time
+
+- kind: JobModel
+  properties:
+  - name: status_code
+  - name: time_queued_msec
     direction: desc
 - kind: "GeneralSuggestionModel"
   properties:
@@ -275,9 +297,16 @@ indexes:
 
 - kind: UserContributionScoringModel
   properties:
-  - name: "realtime_layer"
-  - name: "created_on"
-- kind: "UserStatsRealtimeModel"
+  - name: deleted
+  - name: user_id
+  - name: score
+
+- kind: UserContributionScoringModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: UserStatsRealtimeModel
   properties:
   - name: "realtime_layer"
   - name: "created_on"

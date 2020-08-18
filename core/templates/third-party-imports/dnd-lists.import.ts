@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for editor domain.
+ * @fileoverview This file imports the dndLists library.
  */
 
-export class EditorDomainConstants {
-  public static EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED =
-    'undoRedoServiceChangeApplied';
-}
+require(
+  'static/angular-drag-and-drop-lists-2.1.0/' +
+  'angular-drag-and-drop-lists.min.js');

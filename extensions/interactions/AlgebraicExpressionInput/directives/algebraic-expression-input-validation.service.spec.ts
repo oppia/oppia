@@ -89,7 +89,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -100,7 +100,8 @@ describe('AlgebraicExpressionInputValidationService', () => {
 
   it('should catch redundancy of rules with matching inputs', () => {
     // The second rule will never get matched.
-    answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
+    answerGroups[0].updateRuleTypesToInputs(
+      [isEquivalentTo, matchesExactlyWith]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -125,7 +126,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
+    answerGroups[0].updateRuleTypesToInputs([isEquivalentTo1, isEquivalentTo2]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -150,7 +151,8 @@ describe('AlgebraicExpressionInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
+    answerGroups[0].updateRuleTypesToInputs(
+      [matchesExactlyWith1, matchesExactlyWith2]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -162,13 +164,6 @@ describe('AlgebraicExpressionInputValidationService', () => {
   });
 
   it('should not catch redundancy of rules with non-matching inputs', () => {
-    answerGroups[0].rules = [matchesExactlyWith, isEquivalentTo];
-
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
-
-
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
@@ -182,7 +177,8 @@ describe('AlgebraicExpressionInputValidationService', () => {
       }
     });
 
-    answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
+    answerGroups[0].updateRuleTypesToInputs(
+      [isEquivalentTo, matchesExactlyWith]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -190,14 +186,14 @@ describe('AlgebraicExpressionInputValidationService', () => {
   });
 
   it('should warn if there are missing custom variables', function() {
-    answerGroups[0].rules = [
+    answerGroups[0].updateRuleTypesToInputs([
       rof.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
           x: 'x^2 + alpha - y/b'
         }
       })
-    ];
+    ]);
     customizationArgs = {
       customOskLetters: {
         value: ['y', 'a', 'b']
@@ -215,14 +211,14 @@ describe('AlgebraicExpressionInputValidationService', () => {
   });
 
   it('should warn if there are too many custom variables', function() {
-    answerGroups[0].rules = [
+    answerGroups[0].updateRuleTypesToInputs([
       rof.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
           x: 'x+y'
         }
       })
-    ];
+    ]);
     customizationArgs = {
       customOskLetters: {
         value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']

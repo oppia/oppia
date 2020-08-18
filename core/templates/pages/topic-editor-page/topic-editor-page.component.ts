@@ -59,13 +59,11 @@ angular.module('oppia').directive('topicEditorPage', [
         '$scope', '$window', 'AlertsService', 'BottomNavbarStatusService',
         'ContextService', 'PageTitleService', 'EntityCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService',
-        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED', 'TOPIC_VIEWER_URL_TEMPLATE',
+        'UndoRedoService', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
         function($scope, $window, AlertsService, BottomNavbarStatusService,
             ContextService, PageTitleService, EntityCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService,
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, TOPIC_VIEWER_URL_TEMPLATE) {
+            UndoRedoService, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {
@@ -194,8 +192,11 @@ angular.module('oppia').directive('topicEditorPage', [
             ctrl.prepublishValidationIssues = [];
             ctrl.warningsAreShown = false;
             BottomNavbarStatusService.markBottomNavbarStatus(true);
-            $scope.$on(
-              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, setPageTitle);
+            ctrl.directiveSubscriptions.add(
+              UndoRedoService.onUndoRedoChangeApplied().subscribe(
+                () => setPageTitle()
+              )
+            );
           };
 
           ctrl.$onDestroy = function() {

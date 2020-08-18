@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the question player state service.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-player-state.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
@@ -115,12 +117,14 @@ describe('Question player state service', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            },
             tagged_skill_misconception_id: 'skill_id_1-0'
           }],
           confirmed_unclassified_answers: [],
@@ -266,4 +270,10 @@ describe('Question player state service', function() {
       expect(stateData[questionId].linkedSkillIds).toEqual(
         ['skill_id1', 'skill_id2']);
     });
+
+  it('should emit the question session completed event correctly', () => {
+    let mockquestionSessionEventEmitter = new EventEmitter();
+    expect(qpservice.onQuestionSessionCompleted).toEqual(
+      mockquestionSessionEventEmitter);
+  });
 });

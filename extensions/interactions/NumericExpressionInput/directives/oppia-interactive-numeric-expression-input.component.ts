@@ -55,8 +55,8 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
           // is not compatible with nerdamer or with the backend validations.
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
             ctrl.value);
-          let answerIsValid = MathInteractionsService.validateExpression(
-            ctrl.value, false);
+          let answerIsValid = MathInteractionsService.validateNumericExpression(
+            ctrl.value);
           if (answerIsValid) {
             // Explicitly inserting '*' signs wherever necessary.
             ctrl.value = MathInteractionsService.insertMultiplicationSigns(
