@@ -44,8 +44,7 @@
 
 
 # Android team
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/domain/android_validation_constants*.py @seanlip
+/core/domain/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
@@ -143,8 +142,7 @@
 
 
 # Dev workflow team.
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/.circleci/ @vinitamurthi @U8NWXD @kevintab95
+/.circleci/ @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -154,8 +152,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/.travis.yml @vinitamurthi @U8NWXD @kevintab95
+/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -583,16 +580,11 @@
 
 
 # Dynamic Feature Gating project
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/domain/platform_feature_services*.py @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/domain/platform_parameter*.py @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/platform_feature*.py @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/storage/config/ @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/templates/domain/platform_feature/ @vinitamurthi
+/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
+/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+/core/platform_feature*.py @BenHenning @vinitamurthi
+/core/storage/config/ @BenHenning @vinitamurthi
+/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
 
 
 # Frontend unit tests
@@ -645,5 +637,4 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/.github/workflows/ @vinitamurthi
+/.github/workflows/ @BenHenning @vinitamurthi

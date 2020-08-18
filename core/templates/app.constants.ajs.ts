@@ -49,11 +49,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
   AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE);
-/* New card is available but user hasn't gone to it yet (when oppia
-   gives a feedback and waits for user to press 'continue').
-   Not called when a card is selected by clicking progress dots */
-angular.module('oppia').constant(
-  'EVENT_NEW_CARD_AVAILABLE', AppConstants.EVENT_NEW_CARD_AVAILABLE);
 
 angular.module('oppia').constant('WARNING_TYPES', AppConstants.WARNING_TYPES);
 

@@ -52,6 +52,7 @@ export class StateEditorService {
   private _stateEditorInitializedEventEmitter = new EventEmitter();
   private _stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
   private _interactionEditorInitializedEventEmitter = new EventEmitter();
+  private _showTranslationTabBusyModalEventEmitter = new EventEmitter();
   private _refreshStateTranslationEventEmitter = new EventEmitter();
   private _updateAnswerChoicesEventEmitter = new EventEmitter();
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter();
@@ -257,6 +258,10 @@ export class StateEditorService {
 
   get onInteractionEditorInitialized() {
     return this._interactionEditorInitializedEventEmitter;
+  }
+
+  get onShowTranslationTabBusyModal() {
+    return this._showTranslationTabBusyModalEventEmitter;
   }
 
   get onRefreshStateTranslation() {

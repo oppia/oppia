@@ -29,18 +29,21 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require(
   'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
   'AssetsBackendApiService', 'ContextService',
   'ImageClickInputRulesService', 'ImagePreloaderService',
-  'InteractionAttributesExtractorService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE', 'EXPLORATION_EDITOR_TAB_CONTEXT',
+  'InteractionAttributesExtractorService', 'PlayerPositionService',
+  'UrlInterpolationService', 'EXPLORATION_EDITOR_TAB_CONTEXT',
   'LOADING_INDICATOR_URL',
   function(
       AssetsBackendApiService, ContextService,
       ImageClickInputRulesService, ImagePreloaderService,
-      InteractionAttributesExtractorService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE, EXPLORATION_EDITOR_TAB_CONTEXT,
+      InteractionAttributesExtractorService, PlayerPositionService,
+      UrlInterpolationService, EXPLORATION_EDITOR_TAB_CONTEXT,
       LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
@@ -54,7 +57,7 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
         '$element', '$attrs', '$scope', 'CurrentInteractionService',
         function($element, $attrs, $scope, CurrentInteractionService) {
           var ctrl = this;
-
+          ctrl.directiveSubscriptions = new Subscription();
           const {
             imageAndRegions,
             highlightRegionsOnHover
@@ -140,12 +143,16 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
               answer, ImageClickInputRulesService);
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-              ctrl.lastAnswer = {
-                clickPosition: [ctrl.mouseX, ctrl.mouseY]
-              };
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => {
+                  ctrl.interactionIsActive = false;
+                  ctrl.lastAnswer = {
+                    clickPosition: [ctrl.mouseX, ctrl.mouseY]
+                  };
+                }
+              )
+            );
             ctrl.highlightRegionsOnHover = highlightRegionsOnHover;
             ctrl.filepath = imageAndRegions.imagePath;
             ctrl.imageUrl = '';
@@ -206,7 +213,7 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             if (!ctrl.interactionIsActive) {
               /* The following lines highlight the learner's last answer for
                 this card. This need only be done at the beginning as if he
-                submits an answer, based on EVENT_NEW_CARD_AVAILABLE, the image
+                submits an answer, based on newCardAvailable, the image
                 is made inactive, so his last selection would be higlighted.*/
               ctrl.mouseX = ctrl.getLastAnswer().clickPosition[0];
               ctrl.mouseY = ctrl.getLastAnswer().clickPosition[1];
@@ -214,6 +221,9 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             }
 
             CurrentInteractionService.registerCurrentInteraction(null, null);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

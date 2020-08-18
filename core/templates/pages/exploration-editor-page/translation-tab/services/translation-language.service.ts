@@ -17,14 +17,17 @@
  * in the translation tab is currently active.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require('domain/utilities/language-util.service.ts');
 
 angular.module('oppia').factory('TranslationLanguageService', [
-  '$log', '$rootScope', 'LanguageUtilService',
-  function($log, $rootScope, LanguageUtilService) {
+  '$log', 'LanguageUtilService',
+  function($log, LanguageUtilService) {
     var activeLanguageCode = null;
     var allAudioLanguageCodes = (
       LanguageUtilService.getAllVoiceoverLanguageCodes());
+    var _activeLanguageChangedEventEmitter = new EventEmitter();
     return {
       getActiveLanguageCode: function() {
         return activeLanguageCode;
@@ -35,7 +38,7 @@ angular.module('oppia').factory('TranslationLanguageService', [
           return;
         }
         activeLanguageCode = newActiveLanguageCode;
-        $rootScope.$broadcast('activeLanguageChanged');
+        _activeLanguageChangedEventEmitter.emit();
       },
       getActiveLanguageDescription: function() {
         if (!activeLanguageCode) {
@@ -43,6 +46,9 @@ angular.module('oppia').factory('TranslationLanguageService', [
         }
         return LanguageUtilService.getAudioLanguageDescription(
           activeLanguageCode);
+      },
+      get onActiveLanguageChanged() {
+        return _activeLanguageChangedEventEmitter;
       }
     };
   }]);
