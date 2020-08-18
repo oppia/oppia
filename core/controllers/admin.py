@@ -25,6 +25,7 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import caching_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -1081,6 +1082,26 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             self.render_json({})
         else:
             raise self.InvalidInputException('This app cannot send emails.')
+
+
+class MemoryCacheAdminHandler(base.BaseHandler):
+    """Handler for memory cache functions used in the Misc Page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        cache_stats = caching_services.get_memory_cache_stats()
+        self.render_json({
+            'total_allocation': cache_stats.total_allocated_in_bytes,
+            'peak_allocation': cache_stats.peak_memory_usage_in_bytes,
+            'total_keys_stored': cache_stats.total_number_of_keys_stored
+        })
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        caching_services.flush_memory_cache()
+        self.render_json({})
 
 
 class UpdateUsernameHandler(base.BaseHandler):
