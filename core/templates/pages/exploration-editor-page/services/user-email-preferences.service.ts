@@ -19,8 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { HttpClient } from '@angular/common/http';
-
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 import { ExplorationDataService } from
@@ -30,9 +28,12 @@ import { AlertsService } from 'services/alerts.service.ts';
 import { UserEmailPreferencesBackendApiService } from
   'domain/user/user-email-preferences-backend-api.service';
 
-// require('domain/utilities/url-interpolation.service.ts')
-// require('pages/exploration-editor-page/services/exploration-data.service.ts')
-// require('services/alerts.service.ts')
+// Needs to be fixed for this issue; 
+// File 'exploration-data.service.ts' is not a module.
+// Further tweaks on the file is needed to after this file is refactored.
+require('domain/utilities/url-interpolation.service.ts')
+require('pages/exploration-editor-page/services/exploration-data.service.ts')
+require('services/alerts.service.ts')
 
 
 
@@ -108,7 +109,7 @@ export class UserEmailPreferencesService {
 
     return this.userEmailPreferencesBackendApiService
       .saveChangeToBackend(requestParams).then(
-        (response:any) => {
+        (response) => {
           let data = response.data;
           this.alertsService.clearWarnings();
           that.init(
