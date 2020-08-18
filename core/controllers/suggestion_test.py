@@ -509,7 +509,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         # by 1. Therefore, by setting that increment to the minimum score
         # required to review, we can ensure that the author of this suggestion
         # has a high enough score to review suggestions in this category. This
-        # will be used in a test following this one.
+        # will be used to test whether the author can review a suggestion in
+        # the same category because of the author's high score in a later test.
         enable_recording_of_scores_swap = self.swap(
             feconf, 'ENABLE_RECORDING_OF_SCORES', True)
         increment_score_of_author_swap = self.swap(
@@ -526,10 +527,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'commit_message': u'commit message',
                     'review_message': u'Accepted'
                 }, csrf_token=csrf_token)
-            suggestion_post_accept = self.get_json(
-                '%s?author_id=%s' % (
-                    feconf.SUGGESTION_LIST_URL_PREFIX,
-                    self.author_id))['suggestions'][0]
+        suggestion_post_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id))['suggestions'][0]
         self.assertEqual(
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)

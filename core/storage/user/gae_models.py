@@ -2034,7 +2034,6 @@ class UserContributionScoringModel(base_models.BaseModel):
         user_scoring_model.put()
         return user_scoring_model
 
-
     @classmethod
     def create_multi(cls, user_score_identifiers, score):
         """Creates new UserContributionScoringModel entries.

@@ -359,6 +359,8 @@ def accept_suggestions(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
         None, review_message)
 
+    # When recording of scores is enabled, the author of the suggestion gets an
+    # increase in their score for the suggestion category.
     if feconf.ENABLE_RECORDING_OF_SCORES:
         user_score_identifiers = [
             user_domain.FullyQualifiedUserScoreIdentifier(
@@ -369,6 +371,10 @@ def accept_suggestions(
             user_models.UserContributionScoringModel.get_by_score_identifiers(
                 user_score_identifiers)
         )
+
+        # Create the user scoring domain objects from the user scoring models
+        # and if a user scoring model does not exist, create both the model and
+        # the corresponding domain object.
         user_scorings = []
         for index, user_scoring_model in enumerate(user_scoring_models):
             # If a user scoring model doesn't exist, create one.
@@ -382,9 +388,15 @@ def accept_suggestions(
                 user_scoring = get_user_scoring_from_model(user_scoring_model)
             user_scorings.append(user_scoring)
 
+        # Increment the score of the authors of the suggestions that are being
+        # suggested.
         for index, user_scoring in enumerate(user_scorings):
             user_scoring.increment_score(
                 suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+    
+        # Emails are sent to onboard new reviewers. These new reviewers are
+        # created when the score of the user passes the minimum score required
+        # to review.
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
             for user_scoring in user_scorings:
                 if user_scoring.user_can_review_the_category() and (
@@ -394,6 +406,9 @@ def accept_suggestions(
                         user_scoring.get_score_category()
                     )
                     user_scoring.mark_email_as_sent()
+    
+        # Need to update the corresponding user scoring models after we updated
+        # the domain objects.
         _update_user_scorings(user_scorings)
 
 
@@ -428,6 +443,11 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
     suggestions = get_suggestions_by_ids(suggestion_ids)
 
     for suggestion in suggestions:
+        if suggestion is None:
+            raise Exception(
+                'You cannot reject the suggestion with id %s because it does '
+                'not exist.' % (suggestion_ids[index])
+            )
         if suggestion.is_handled:
             raise Exception(
                 'The suggestion with id %s has already been accepted/'
@@ -735,8 +755,8 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
 
 def create_new_user_scoring(user_id, score_category, score):
     """Create a new UserContributionScoringModel instance and the corresponding
-    UserContributionScoring domain object for the user and the given category
-    with the given score.
+    UserContributionScoring domain object for the user with the given category
+    and the given score.
 
     Args:
         user_id: str. The id of the user.
