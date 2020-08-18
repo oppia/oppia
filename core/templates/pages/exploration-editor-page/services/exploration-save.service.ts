@@ -71,7 +71,7 @@ require('services/stateful/focus-manager.service.ts');
 require('services/external-save.service.ts');
 
 angular.module('oppia').factory('ExplorationSaveService', [
-  '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
+  '$log', '$q', '$timeout', '$uibModal', '$window',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
   'ExplorationCategoryService', 'ExplorationDataService',
   'ExplorationDiffService', 'ExplorationInitStateNameService',
@@ -83,7 +83,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
   'DEFAULT_LANGUAGE_CODE',
   function(
-      $log, $q, $rootScope, $timeout, $uibModal, $window,
+      $log, $q, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
       ExplorationCategoryService, ExplorationDataService,
       ExplorationDiffService, ExplorationInitStateNameService,
