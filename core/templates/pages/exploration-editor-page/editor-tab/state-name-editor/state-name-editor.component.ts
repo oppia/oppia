@@ -65,7 +65,6 @@ angular.module('oppia').component('stateNameEditor', {
         if (!_isNewStateNameValid(normalizedNewName)) {
           return false;
         }
-        console.log('GETS HERE', normalizedNewName);
         if (savedMemento === normalizedNewName) {
           StateNameService.setStateNameEditorVisibility(false);
           return false;

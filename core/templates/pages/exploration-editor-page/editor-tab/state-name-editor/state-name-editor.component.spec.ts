@@ -294,4 +294,3 @@ describe('Sidebar state name controller', function() {
     expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
   });
 });
-
