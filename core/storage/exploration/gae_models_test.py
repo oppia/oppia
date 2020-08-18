@@ -539,7 +539,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
 
-
     def test_get_deletion_policy(self):
         self.assertEqual(
             exp_models.ExpSummaryModel.get_deletion_policy(),

@@ -16,6 +16,8 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -98,6 +100,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
     var modalIsOpen = false;
 
     var diffData = null;
+
+    var _initExplorationPageEventEmitter = new EventEmitter();
 
     var isAdditionalMetadataNeeded = function() {
       return (
@@ -190,7 +194,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           }
           $log.info('Changes to this exploration were saved successfully.');
           ChangeListService.discardAllChanges();
-          $rootScope.$broadcast('initExplorationPage');
+          _initExplorationPageEventEmitter.emit();
           $rootScope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
           });
@@ -242,7 +246,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
           ChangeListService.discardAllChanges();
           AlertsService.addSuccessMessage('Changes discarded.');
-          $rootScope.$broadcast('initExplorationPage');
+          _initExplorationPageEventEmitter.emit();
 
           // The reload is necessary because, otherwise, the
           // exploration-with-draft-changes will be reloaded
@@ -423,6 +427,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
           });
         });
         return whenModalClosed.promise;
+      },
+
+      get onInitExplorationPage() {
+        return _initExplorationPageEventEmitter;
       }
     };
   }

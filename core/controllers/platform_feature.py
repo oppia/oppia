@@ -20,22 +20,25 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import platform_feature_services
+import feconf
 import utils
 
 
 class PlatformFeatureHandler(base.BaseHandler):
-    """The handler for retriving feature flag values."""
+    """The handler for retrieving feature flag values."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def post(self):
-        """Handles POST requests, evaluates and returns all feature flags using
+    def get(self):
+        """Handles POST requests. Evaluates and returns all feature flags using
         the given client information.
         """
         context_dict = {
-            'client_type': self.payload.get('client_type'),
-            'browser_type': self.payload.get('browser_type'),
-            'app_version': self.payload.get('app_version'),
-            'user_locale': self.payload.get('user_locale'),
+            'client_type': self.request.get('client_type', None),
+            'browser_type': self.request.get('browser_type', None),
+            'app_version': self.request.get('app_version', None),
+            'user_locale': self.request.get('user_locale', None),
         }
         context = (
             platform_feature_services.create_evaluation_context_for_client(
