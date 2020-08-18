@@ -2508,14 +2508,15 @@ class State(python_utils.OBJECT):
         """
         return self.written_translations.get_translation_counts()
 
-    def get_content_count(self):
-        """Returns the number of distinct content fields available in the
-        object.
+    def get_translatable_content_count(self):
+        """Returns the number of content fields available for translation in
+        the object.
 
         Returns:
-            int. The number of distinct content fields available in the state.
+            int. The number of content fields available for translation in
+            the state.
         """
-        return len(self.written_translations.translations_mapping)
+        return len(self._get_all_translatable_content())
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
         """Adds or deletes content ids in assets i.e, other parts of state

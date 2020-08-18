@@ -13,8 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the headroom library.
+ * @fileoverview This file imports the dndLists library.
  */
 
-window.Headroom = require('static/headroom-js-0.9.4/headroom.min.js');
-require('static/headroom-js-0.9.4/angular.headroom.min.js');
+require(
+  'static/angular-drag-and-drop-lists-2.1.0/' +
+  'angular-drag-and-drop-lists.min.js');
