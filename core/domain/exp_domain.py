@@ -27,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import functools
+import json
 import re
 import string
 
@@ -4484,6 +4485,63 @@ class Exploration(python_utils.OBJECT):
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
+
+    def serialize(self):
+        """Returns the object serialized as a JSON string.
+
+        Returns:
+            str. JSON-encoded utf-8 string encoding all of the information
+            composing the object.
+        """
+        exploration_dict = self.to_dict()
+        # The only reason we add the version parameter separately is that our
+        # yaml encoding/decoding of this object does not handle the version
+        # parameter.
+        # NOTE: If this changes in the future (i.e the version parameter is
+        # added as part of the yaml representation of this object), all YAML
+        # files must add a version parameter to their files with the correct
+        # version of this object. The line below must then be moved to
+        # to_dict().
+        exploration_dict['version'] = self.version
+
+        if self.created_on:
+            exploration_dict['created_on'] = (
+                utils.convert_naive_datetime_to_string(self.created_on))
+
+        if self.last_updated:
+            exploration_dict['last_updated'] = (
+                utils.convert_naive_datetime_to_string(self.last_updated))
+
+        return json.dumps(exploration_dict).encode('utf-8')
+
+    @classmethod
+    def deserialize(cls, json_string):
+        """Returns an Exploration domain object decoded from a JSON string.
+
+        Args:
+            json_string: str. A JSON-encoded utf-8 string that can be
+                decoded into a dictionary representing an Exploration. Only call
+                on strings that were created using serialize().
+
+        Returns:
+            Exploration. The corresponding Exploration domain object.
+        """
+        exploration_dict = json.loads(json_string.decode('utf-8'))
+        created_on = (
+            utils.convert_string_to_naive_datetime_object(
+                exploration_dict['created_on'])
+            if 'created_on' in exploration_dict else None)
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                exploration_dict['last_updated'])
+            if 'last_updated' in exploration_dict else None)
+        exploration = cls.from_dict(
+            exploration_dict,
+            exploration_version=exploration_dict['version'],
+            exploration_created_on=created_on,
+            exploration_last_updated=last_updated)
+
+        return exploration
 
     def to_player_dict(self):
         """Returns a copy of the exploration suitable for inclusion in the
