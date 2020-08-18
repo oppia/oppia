@@ -1,4 +1,5 @@
-// This additional tsconfig is required by dtslint.
+// This additional tsconfig is required by dtslint. It is used to configure
+// tslint, which is used to compile the tests.
 // See: https://github.com/Microsoft/dtslint#typestsconfigjson
 {
   "compilerOptions": {
