@@ -242,7 +242,6 @@ exports.config = {
       // this thread: https://github.com/angular/protractor/issues/5274
       w3c: false,
       args: [
-        '--headless',
         '--lang=en-EN',
         '--window-size=1285x1000',
         // These arguments let us simulate recording from a microphone.
