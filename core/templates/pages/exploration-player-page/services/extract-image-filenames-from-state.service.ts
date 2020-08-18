@@ -133,15 +133,15 @@ export class ExtractImageFilenamesFromStateService {
 
     /**
      * Extracts the filepath object from the filepath-value attribute of the
-     * oppia-noninteractive-image tags in the strHtml(given string).
-     * @param {string} strHtml - The string from which the object of
+     * oppia-noninteractive-image tags in the htmlString(given string).
+     * @param {string} htmlString - The string from which the object of
      *                           filepath should be extracted.
      */
     _extractFilepathValueFromOppiaNonInteractiveImageTag(
-        strHtml: string): string[] {
+        htmlString: string): string[] {
       let filenames = [];
       let unescapedHtmlString = (
-        this.htmlEscaperService.escapedStrToUnescapedStr(strHtml));
+        this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
       let dummyDocument = (
         new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
 
@@ -161,15 +161,15 @@ export class ExtractImageFilenamesFromStateService {
 
     /**
      * Extracts the SVG filename from the math-content attribute of the
-     * oppia-noninteractive-math tags in the strHtml(given string).
-     * @param {string} strHtml - The string from which the object of
+     * oppia-noninteractive-math tags in the htmlString(given string).
+     * @param {string} htmlString - The string from which the object of
      *                           filepath should be extracted.
      */
     _extractSvgFilenameFromOppiaNonInteractiveMathTag(
-        strHtml: string): string[] {
+        htmlString: string): string[] {
       let filenames = [];
       let unescapedHtmlString = (
-        this.htmlEscaperService.escapedStrToUnescapedStr(strHtml));
+        this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
       let dummyDocument = (
         new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
 
