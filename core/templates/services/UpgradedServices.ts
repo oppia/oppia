@@ -797,7 +797,7 @@ export class UpgradedServices {
     upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
     upgradedServices['JobStatusSummaryObjectFactory'] =
       new JobStatusSummaryObjectFactory();
-    upgradedServices['KeyboardShortcutService'] = 
+    upgradedServices['KeyboardShortcutService'] =
       new KeyboardShortcutService(upgradedServices['WindowRef']);
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
