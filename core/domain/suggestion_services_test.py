@@ -115,6 +115,28 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         suggestion_services.accept_suggestion(
                             suggestion_id, reviewer_id,
                             commit_message, review_message)
+    
+    def mock_accept_suggestions(
+            self, suggestion_ids, reviewer_id, commit_message, review_message):
+        """Sets up the appropriate mocks to successfully call
+        accept_suggestions.
+        """
+        with self.swap(
+            exp_services, 'update_exploration', self.mock_update_exploration):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    suggestion_registry.SuggestionEditStateContent,
+                    'pre_accept_validate',
+                    self.mock_pre_accept_validate_does_nothing):
+                    with self.swap(
+                        suggestion_registry.SuggestionEditStateContent,
+                        'get_change_list_for_accepting_suggestion',
+                        self.mock_get_change_list_does_nothing):
+                        suggestion_services.accept_suggestions(
+                            suggestion_ids, reviewer_id,
+                            commit_message, review_message)
 
     def mock_create_suggestion(self, target_id):
         with self.swap(
@@ -436,22 +458,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_id_3, suggestion_models.STATUS_IN_REVIEW)
         suggestion_ids = [suggestion_id_2, suggestion_id_3]
 
-        with self.swap(
-            exp_services, 'update_exploration', self.mock_update_exploration):
+        with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
             with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                with self.swap(
-                    suggestion_registry.SuggestionEditStateContent,
-                    'pre_accept_validate',
-                    self.mock_pre_accept_validate_does_nothing):
-                    with self.swap(
-                        suggestion_registry.SuggestionEditStateContent,
-                        'get_change_list_for_accepting_suggestion',
-                        self.mock_get_change_list_does_nothing):
-                        suggestion_services.accept_suggestions(
-                            suggestion_ids, self.reviewer_id,
-                            self.COMMIT_MESSAGE, 'review message')
+                feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True):
+                self.mock_accept_suggestions(
+                    suggestion_ids, self.reviewer_id, self.COMMIT_MESSAGE,
+                    'review message')
 
         for suggestion_id in suggestion_ids:
             # Assert that the statuses changed to accepted.
@@ -467,6 +479,21 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             last_message = thread_messages[len(thread_messages) - 1]
             self.assertEqual(
                 last_message.text, 'review message')
+
+        user_scoring = suggestion_services.get_user_scoring(
+            self.author_id, self.score_category
+        )
+        # Assert that the users score was updated to be twice the amount to
+        # increment the score by since two suggestions were accepted by the
+        # same author.
+        self.assertEqual(
+            user_scoring.get_score(),
+            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY * 2)
+        # Assert that their score is not high enough to review the category.
+        self.assertFalse(user_scoring.user_can_review_the_category())
+        # Assert that the onboarding new reviewer email was not sent since
+        # their score was too low.
+        self.assertFalse(user_scoring.email_has_been_sent())
 
     def test_accept_suggestion_raises_exception_if_suggestion_does_not_exist(
             self):

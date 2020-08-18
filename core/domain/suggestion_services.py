@@ -661,15 +661,6 @@ def get_user_scoring(user_id, score_category):
     )
 
 
-def _update_user_scoring(user_scoring):
-    """Updates the given user_scoring.
-
-    Args:
-        user_scoring: UserContributionScoring. The user scoring to be updated.
-    """
-    _update_user_scorings([user_scoring])
-
-
 def _update_user_scorings(user_scorings):
     """Updates the user_scorings.
 
