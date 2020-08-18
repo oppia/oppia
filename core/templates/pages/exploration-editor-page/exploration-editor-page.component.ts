@@ -349,7 +349,8 @@ angular.module('oppia').component('explorationEditorPage', {
             return;
           }
           RouterService.onRefreshStatisticsTab.emit();
-          $scope.$broadcast('refreshVersionHistory', {
+
+          RouterService.onRefreshVersionHistory.emit({
             forceRefresh: true
           });
 

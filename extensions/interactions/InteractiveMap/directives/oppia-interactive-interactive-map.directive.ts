@@ -31,15 +31,18 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
   'InteractionAttributesExtractorService',
-  'InteractiveMapRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'InteractiveMapRulesService', 'PlayerPositionService',
+  'UrlInterpolationService',
   function(
       InteractionAttributesExtractorService,
-      InteractiveMapRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+      InteractiveMapRulesService, PlayerPositionService,
+      UrlInterpolationService,) {
     return {
       restrict: 'E',
       scope: {},
@@ -54,6 +57,7 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
             $attrs, $scope, BrowserCheckerService,
             CurrentInteractionService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var coords = ctrl.coords || [0, 0];
           var zoomLevel = parseInt(ctrl.zoom, 10) || 0;
 
@@ -123,10 +127,14 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
             }
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-              ctrl.setOverlay();
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => {
+                  ctrl.interactionIsActive = false;
+                  ctrl.setOverlay();
+                }
+              )
+            );
 
             $scope.$on('leafletDirectiveMap.interactiveMap.mouseover',
               function() {
@@ -165,6 +173,9 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
             ctrl.mapMarkers = {};
             refreshMap();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
