@@ -35,6 +35,7 @@ describe('Activity tiles infinity grid component', function() {
     location: ''
   };
   var loadingMessageChangeEventEmitter = new EventEmitter();
+  var initialSearchResultsLoadedEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
@@ -57,6 +58,8 @@ describe('Activity tiles infinity grid component', function() {
     searchService = $injector.get('SearchService');
     userService = $injector.get('UserService');
 
+    spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
+      .returnValue(initialSearchResultsLoadedEmitter);
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
     }));
@@ -89,7 +92,7 @@ describe('Activity tiles infinity grid component', function() {
   it('should get more data from backend when reaching end of page and there' +
     ' is more data to be loaded', function() {
     ctrl.$onInit();
-    $rootScope.$broadcast('initialSearchResultsLoaded', [{}]);
+    initialSearchResultsLoadedEmitter.emit([{}]);
 
     var loadMoreDataSpy = spyOn(searchService, 'loadMoreData');
     loadMoreDataSpy.and.callFake(
@@ -110,7 +113,7 @@ describe('Activity tiles infinity grid component', function() {
 
   it('should get more data from backend until reach end of page', function() {
     ctrl.$onInit();
-    $rootScope.$broadcast('initialSearchResultsLoaded', [{}]);
+    initialSearchResultsLoadedEmitter.emit([{}]);
     loadingMessageChangeEventEmitter.emit('Loading...');
 
     var loadMoreDataSpy = spyOn(searchService, 'loadMoreData');
@@ -135,7 +138,7 @@ describe('Activity tiles infinity grid component', function() {
   it('should not get more data from backend when reaching the end of the page',
     function() {
       ctrl.$onInit();
-      $rootScope.$broadcast('initialSearchResultsLoaded', []);
+      initialSearchResultsLoadedEmitter.emit([]);
 
       spyOn(searchService, 'loadMoreData').and.callFake(
         (successCallback, failCallback) => failCallback(false));

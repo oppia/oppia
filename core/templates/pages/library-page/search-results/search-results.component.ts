@@ -21,18 +21,21 @@ require(
   'activity-tiles-infinity-grid.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
+require('services/search.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('searchResults', {
   template: require('./search-results.component.html'),
   controller: [
-    '$scope', '$q', '$timeout', '$window', 'LoaderService',
+    '$scope', '$q', '$timeout', '$window', 'LoaderService', 'SearchService',
     'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
-    function($scope, $q, $timeout, $window, LoaderService,
+    function($scope, $q, $timeout, $window, LoaderService, SearchService,
         SiteAnalyticsService, UrlInterpolationService, UserService) {
       var ctrl = this;
-
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.getStaticImageUrl = function(imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
@@ -44,7 +47,6 @@ angular.module('oppia').component('searchResults', {
         }, 150);
         return false;
       };
-
       ctrl.$onInit = function() {
         ctrl.someResultsExist = true;
 
@@ -57,15 +59,19 @@ angular.module('oppia').component('searchResults', {
 
         // Called when the first batch of search results is retrieved from
         // the server.
-        var searchResultsPromise = $scope.$on(
-          'initialSearchResultsLoaded', function(evt, activityList) {
-            ctrl.someResultsExist = activityList.length > 0;
-          }
+        ctrl.directiveSubscriptions.add(
+          SearchService.onInitialSearchResultsLoaded.subscribe(
+            (activityList) => {
+              ctrl.someResultsExist = activityList.length > 0;
+              userInfoPromise.then(function(userInfo) {
+                ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+                LoaderService.hideLoadingScreen();
+              });
+            })
         );
-
-        $q.all([userInfoPromise, searchResultsPromise]).then(function() {
-          LoaderService.hideLoadingScreen();
-        });
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

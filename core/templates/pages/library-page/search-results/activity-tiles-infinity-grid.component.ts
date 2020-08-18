@@ -20,6 +20,8 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/search.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('activityTilesInfinityGrid', {
   template: require('./activity-tiles-infinity-grid.component.html'),
   controller: [
@@ -29,7 +31,7 @@ angular.module('oppia').component('activityTilesInfinityGrid', {
         WindowDimensionsService) {
       var ctrl = this;
       ctrl.loadingMessage = '';
-      ctrl.subscriptions = [];
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.showMoreActivities = function() {
         if (!ctrl.loadingMessage && !ctrl.endOfPageIsReached) {
           ctrl.searchResultsAreLoading = true;
@@ -46,15 +48,16 @@ angular.module('oppia').component('activityTilesInfinityGrid', {
         }
       };
       ctrl.$onInit = function() {
-        ctrl.subscriptions.push(LoaderService.onLoadingMessageChange
+        ctrl.directiveSubscriptions.add(LoaderService.onLoadingMessageChange
           .subscribe((message: string) => this.loadingMessage = message));
         // Called when the first batch of search results is retrieved from
         // the server.
-        $scope.$on(
-          'initialSearchResultsLoaded', function(evt, activityList) {
-            ctrl.allActivitiesInOrder = activityList;
-            ctrl.endOfPageIsReached = false;
-          }
+        ctrl.directiveSubscriptions.add(
+          SearchService.onInitialSearchResultsLoaded.subscribe(
+            (activityList) => {
+              ctrl.allActivitiesInOrder = activityList;
+              ctrl.endOfPageIsReached = false;
+            })
         );
         ctrl.endOfPageIsReached = false;
         ctrl.allActivitiesInOrder = [];
@@ -62,22 +65,17 @@ angular.module('oppia').component('activityTilesInfinityGrid', {
         ctrl.libraryWindowIsNarrow = (
           WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
-        ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-          subscribe(evt => {
+        ctrl.directiveSubscriptions.add(
+          WindowDimensionsService.getResizeEvent().subscribe(evt => {
             ctrl.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
             $scope.$applyAsync();
-          });
+          })
+        );
       };
 
       ctrl.$onDestroy = function() {
-        if (ctrl.resizeSubscription) {
-          ctrl.resizeSubscription.unsubscribe();
-        }
-
-        for (let subscription of ctrl.subscriptions) {
-          subscription.unsubscribe();
-        }
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

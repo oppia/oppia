@@ -18,6 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { EventEmitter } from '@angular/core';
 
 describe('Search Results component', function() {
   var ctrl = null;
@@ -25,12 +26,14 @@ describe('Search Results component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
+  var searchService = null;
   var siteAnalyticsService = null;
   var userService = null;
 
   var mockWindow = {
     location: ''
   };
+  var initialSearchResultsLoadedEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
@@ -44,8 +47,11 @@ describe('Search Results component', function() {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
+    searchService = $injector.get('SearchService');
     userService = $injector.get('UserService');
 
+    spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
+      .returnValue(initialSearchResultsLoadedEmitter);
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
     }));
@@ -59,6 +65,10 @@ describe('Search Results component', function() {
     $scope.$apply();
   }));
 
+  afterEach(function() {
+    ctrl.$onDestroy();
+  });
+
   it('should initialize controller properties after its initialization and' +
     ' get data from backend', function() {
     expect(ctrl.someResultsExist).toBe(true);
@@ -67,13 +77,15 @@ describe('Search Results component', function() {
 
   it('should show search results when data retrieved from backend is not' +
     ' empty', function() {
-    $rootScope.$broadcast('initialSearchResultsLoaded', new Array(2));
+    initialSearchResultsLoadedEmitter.emit(new Array(2));
+    $scope.$apply();
     expect(ctrl.someResultsExist).toBe(true);
   });
 
   it('should not show search results when data retrieved from back is empty',
     function() {
-      $rootScope.$broadcast('initialSearchResultsLoaded', []);
+      initialSearchResultsLoadedEmitter.emit([]);
+      $scope.$apply();
       expect(ctrl.someResultsExist).toBe(false);
     });
 
