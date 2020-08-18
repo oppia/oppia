@@ -25,7 +25,7 @@ require(
   'exploration-graph.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/state-name-editor/' +
-  'state-name-editor.directive.ts');
+  'state-name-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/state-param-changes-editor/' +
   'state-param-changes-editor.component.ts');

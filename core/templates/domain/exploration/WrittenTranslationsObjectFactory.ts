@@ -104,22 +104,23 @@ export class WrittenTranslations {
     delete this.translationsMapping[contentId];
   }
 
-  addWrittenTranslation(contentId: string, languageCode: string, html: string) {
+  addWrittenTranslation(contentId: string, languageCode: string,
+      dataFormat: string, translation: string) {
     var writtenTranslations = this.translationsMapping[contentId];
     if (writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
     writtenTranslations[languageCode] = this._writtenTranslationObjectFactory
-      .createNew(WRITTEN_TRANSLATION_TYPE_HTML, html);
+      .createNew(dataFormat, translation);
   }
 
-  updateWrittenTranslationHtml(
-      contentId: string, languageCode: string, html: string) {
+  updateWrittenTranslation(
+      contentId: string, languageCode: string, translation: string) {
     var writtenTranslations = this.translationsMapping[contentId];
     if (!writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Unable to find the given language code.');
     }
-    writtenTranslations[languageCode].translation = html;
+    writtenTranslations[languageCode].translation = translation;
     // Marking translation updated.
     writtenTranslations[languageCode].needsUpdate = false;
   }

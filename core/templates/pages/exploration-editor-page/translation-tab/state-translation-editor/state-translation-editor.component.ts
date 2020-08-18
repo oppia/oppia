@@ -19,6 +19,8 @@
 import { WRITTEN_TRANSLATION_TYPE_HTML } from
   'domain/exploration/WrittenTranslationObjectFactory';
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -38,6 +40,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         TranslationTabActiveContentIdService, UrlInterpolationService,
         WrittenTranslationObjectFactory) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var showMarkAudioAsNeedingUpdateModalIfRequired = function(
           contentId, languageCode) {
         var stateName = StateEditorService.getActiveStateName();
@@ -106,7 +109,8 @@ angular.module('oppia').component('stateTranslationEditor', {
           .displayed.getWrittenTranslation(contentId, languageCode));
         var newWrittenTranslation = writtenTranslation;
         if (oldWrittenTranslation === null || (
-          oldWrittenTranslation.getHtml() !== newWrittenTranslation.getHtml() ||
+          (oldWrittenTranslation.translation !==
+           newWrittenTranslation.translation) ||
           (oldWrittenTranslation.needsUpdate !== (
             newWrittenTranslation.needsUpdate)))
         ) {
@@ -137,13 +141,14 @@ angular.module('oppia').component('stateTranslationEditor', {
           StateWrittenTranslationsService.displayed);
         if (displayedWrittenTranslations.hasWrittenTranslation(
           contentId, languageCode)) {
-          displayedWrittenTranslations.updateWrittenTranslationHtml(
+          displayedWrittenTranslations.updateWrittenTranslation(
             contentId, languageCode,
-            $scope.activeWrittenTranslation.getHtml());
+            $scope.activeWrittenTranslation.translation);
         } else {
           displayedWrittenTranslations.addWrittenTranslation(
             contentId, languageCode,
-            $scope.activeWrittenTranslation.getHtml());
+            $scope.dataFormat,
+            $scope.activeWrittenTranslation.translation);
         }
 
         saveTranslation();
@@ -161,19 +166,30 @@ angular.module('oppia').component('stateTranslationEditor', {
         $scope.UNICODE_SCHEMA = {
           type: 'unicode'
         };
-        $scope.$on('activeContentIdChanged', function(unusedEvent, dataFormat) {
-          $scope.dataFormat = dataFormat;
-          initEditor();
-        });
-        $scope.$on('activeLanguageChanged', function() {
-          initEditor();
-        });
+
+        ctrl.directiveSubscriptions.add(
+          TranslationTabActiveContentIdService.onActiveContentIdChanged.
+            subscribe(
+              (dataFormat) => {
+                $scope.dataFormat = dataFormat;
+                initEditor();
+              }
+            )
+        );
+        ctrl.directiveSubscriptions.add(
+          TranslationLanguageService.onActiveLanguageChanged.subscribe(
+            () => initEditor()
+          )
+        );
         initEditor();
         $scope.$on('externalSave', function() {
           if ($scope.translationEditorIsOpen) {
             saveTranslation();
           }
         });
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

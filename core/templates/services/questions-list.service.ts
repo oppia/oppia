@@ -17,6 +17,8 @@
  * questions list in editors.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require('domain/question/question-backend-api.service.ts');
 require('domain/question/QuestionSummaryForOneSkillObjectFactory.ts');
 require('services/context.service.ts');
@@ -25,14 +27,15 @@ require('services/services.constants.ajs.ts');
 angular.module('oppia').factory('QuestionsListService', [
   '$filter', '$rootScope', 'QuestionBackendApiService',
   'QuestionSummaryForOneSkillObjectFactory',
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'NUM_QUESTIONS_PER_PAGE', function(
+  'NUM_QUESTIONS_PER_PAGE', function(
       $filter, $rootScope, QuestionBackendApiService,
       QuestionSummaryForOneSkillObjectFactory,
-      EVENT_QUESTION_SUMMARIES_INITIALIZED, NUM_QUESTIONS_PER_PAGE) {
+      NUM_QUESTIONS_PER_PAGE) {
     var _questionSummaries = [];
     var _questionSummariesForOneSkill = [];
     var _nextCursorForQuestions = '';
     var _currentPage = 0;
+    var _questionSummartiesInitializedEventEmitter = new EventEmitter();
 
     var _setQuestionSummaries = function(newQuestionSummaries) {
       if (_questionSummaries.length > 0) {
@@ -41,13 +44,13 @@ angular.module('oppia').factory('QuestionsListService', [
       }
       _questionSummaries = _questionSummaries.concat(
         angular.copy(newQuestionSummaries));
-      $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
+      _questionSummartiesInitializedEventEmitter.emit();
     };
 
     var _setQuestionSummariesForOneSkill = function(newQuestionSummaries) {
       _questionSummariesForOneSkill = _questionSummariesForOneSkill.concat(
         angular.copy(newQuestionSummaries));
-      $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
+      _questionSummartiesInitializedEventEmitter.emit();
     };
     var _setNextQuestionsCursor = function(nextCursor) {
       _nextCursorForQuestions = nextCursor;
@@ -139,6 +142,10 @@ angular.module('oppia').factory('QuestionsListService', [
 
       getCurrentPageNumber: function() {
         return _currentPage;
+      },
+
+      get onQuestionSummariesInitialized() {
+        return _questionSummartiesInitializedEventEmitter;
       }
     };
   }

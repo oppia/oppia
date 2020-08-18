@@ -391,7 +391,6 @@ class TestBase(unittest.TestCase):
         }
     }
 
-
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
             'outline': (

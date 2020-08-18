@@ -2896,7 +2896,6 @@ class State(python_utils.OBJECT):
 
         return content_id_to_html
 
-
     def to_dict(self):
         """Returns a dict representing this State domain object.
 
@@ -3026,7 +3025,6 @@ class State(python_utils.OBJECT):
                 Solution.convert_html_in_solution(
                     state_dict['interaction']['id'],
                     state_dict['interaction']['solution'], conversion_fn))
-
 
         if state_uses_old_interaction_cust_args_schema:
             # We need to retrieve an older version of interaction_specs to

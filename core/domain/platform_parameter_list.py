@@ -19,13 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import core.domain.platform_parameter_domain as param_domain
-import core.domain.platform_parameter_registry as registry
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_registry as registry
 import utils
 
 Registry = registry.Registry
-FEATURE_STAGES = param_domain.FEATURE_STAGES # pylint: disable=invalid-name
-DATA_TYPES = param_domain.DATA_TYPES # pylint: disable=invalid-name
+FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
+DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
 PARAM_NAMES = utils.create_enum( # pylint: disable=invalid-name
     'dummy_feature', 'dummy_parameter')
