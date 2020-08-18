@@ -337,7 +337,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id, suggestion.score_category
         )
         self.assertTrue(user_scoring.email_has_been_sent())
-        self.assertEqual(user_scoring.get_score(), 1)
+        self.assertEqual(
+            user_scoring.get_score(), feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
 
     def test_accept_suggestion_successfully(self):
         with self.swap(

@@ -1988,7 +1988,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             Exception, 'There is already a UserContributionScoringModel entry '
             'with the given id: category1.user1'):
             user_models.UserContributionScoringModel.create(
-            user_score_identifier, 2)
+            'user1', 'category1', 2)
 
     def test_get_all_users_with_score_above_minimum_for_category(self):
         user_score_identifiers_large_score = [

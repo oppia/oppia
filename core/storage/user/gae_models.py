@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import random
 import string
 
-from core.domain import user_domain
 from constants import constants
 from core.platform import models
 import feconf
@@ -1971,10 +1970,8 @@ class UserContributionScoringModel(base_models.BaseModel):
             UserContributionScoringModel|None. A UserContributionScoringModel
             corresponding to the user score identifier or None if none exist.
         """
-        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
-            user_id, score_category
-        )
-        return cls.get_by_score_identifiers([user_score_identifier])
+        instance_id = cls._get_instance_id(user_id, score_category)
+        return cls.get_by_id(instance_id)
 
     @classmethod
     def get_by_score_identifiers(cls, user_score_identifiers):
@@ -2024,10 +2021,17 @@ class UserContributionScoringModel(base_models.BaseModel):
         Raises:
             Exception. There is already an entry with the given id.
         """
-        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
-            user_id, score_category
-        )
-        return cls.create_multi([user_score_identifier], score)[0]
+        instance_id = cls._get_instance_id(user_id, score_category)
+
+        if cls.get_by_id(instance_id):
+            raise Exception(
+                'There is already a UserContributionScoringModel entry with the'
+                ' given id: %s' % instance_id
+            )
+
+        cls(
+            id=instance_id, user_id=user_id, score_category=score_category,
+            score=score).put()
 
     @classmethod
     def create_multi(cls, user_score_identifiers, score):
