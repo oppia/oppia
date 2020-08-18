@@ -1965,7 +1965,7 @@ class UserContributionScoringModel(base_models.BaseModel):
         Args:
             user_id: str. The id of the user.
             score_category: str. The score category of the suggestion.
-        
+
         Returns:
             UserContributionScoringModel|None. A UserContributionScoringModel
             corresponding to the user score identifier or None if none exist.
@@ -1982,16 +1982,16 @@ class UserContributionScoringModel(base_models.BaseModel):
                 Contains unique (user_id, score_category) pairs that
                 correspond to the id of the user and the suggestion
                 score_category to retrieve the user score model for.
-        
+
         Returns:
             list(UserContributionScoringModel|None). A list of the
             UserContributionScoringModels corresponding to the user score
             identifiers.
         """
         user_ids = [
-                user_score_identifier.user_id for user_score_identifier in
-                user_score_identifiers
-            ]
+            user_score_identifier.user_id for user_score_identifier in
+            user_score_identifiers
+        ]
         score_categories = [
             user_score_identifier.score_category for user_score_identifier in
             user_score_identifiers
@@ -2003,7 +2003,6 @@ class UserContributionScoringModel(base_models.BaseModel):
         ]
 
         return cls.get_multi(instance_ids)
-
 
     @classmethod
     def create(cls, user_id, score_category, score):
@@ -2043,7 +2042,7 @@ class UserContributionScoringModel(base_models.BaseModel):
                 to the id of the users and the suggestion score categories to
                 create the scoring models for.
             score: float. The score of the users.
-    
+
         Returns:
             list(UserContributionScoringModel). The user scoring models that
             were created.
@@ -2052,9 +2051,9 @@ class UserContributionScoringModel(base_models.BaseModel):
             Exception. There is already an entry with the given id.
         """
         user_ids = [
-                user_score_identifier.user_id for user_score_identifier in
-                user_score_identifiers
-            ]
+            user_score_identifier.user_id for user_score_identifier in
+            user_score_identifiers
+        ]
         score_categories = [
             user_score_identifier.score_category for user_score_identifier in
             user_score_identifiers
@@ -2071,7 +2070,7 @@ class UserContributionScoringModel(base_models.BaseModel):
                     'There is already a UserContributionScoringModel entry with'
                     ' the given id: %s' % instance_ids[index]
                 )
-        
+
         new_user_scoring_models = [
             cls(
                 id=instance_id, user_id=user_id, score_category=score_category,

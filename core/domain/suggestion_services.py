@@ -315,10 +315,15 @@ def accept_suggestions(
         Exception. The commit message is empty.
     """
     if not commit_message or not commit_message.strip():
-            raise Exception('Commit message cannot be empty.')
-    
+        raise Exception('Commit message cannot be empty.')
+
     suggestions = get_suggestions_by_ids(suggestion_ids)
-    for suggestion in suggestions:
+    for index, suggestion in enumerate(suggestions):
+        if suggestion is None:
+            raise Exception(
+                'You cannot accept the suggestion with id %s because it does '
+                'not exist.' % (suggestion_ids[index])
+            )
         if suggestion.is_handled:
             raise Exception(
                 'The suggestion with id %s has already been accepted/'
@@ -356,26 +361,28 @@ def accept_suggestions(
 
     if feconf.ENABLE_RECORDING_OF_SCORES:
         user_score_identifiers = [
-        user_domain.FullyQualifiedUserScoreIdentifier(
-            suggestion.author_id, suggestion.score_category)
-        for suggestion in suggestions
+            user_domain.FullyQualifiedUserScoreIdentifier(
+                suggestion.author_id, suggestion.score_category)
+            for suggestion in suggestions
         ]
         user_scoring_models = (
             user_models.UserContributionScoringModel.get_by_score_identifiers(
                 user_score_identifiers)
         )
-        user_scorings = [
-            get_user_scoring_from_model(user_scoring_model) for
-            user_scoring_model in user_scoring_models
-        ]
-        for index, user_scoring in enumerate(user_scorings):
+        user_scorings = []
+        for index, user_scoring_model in enumerate(user_scoring_models):
             # If a user scoring model doesn't exist, create one.
-            if user_scoring is None:
+            if user_scoring_model is None:
                 user_scoring = create_new_user_scoring(
-                    user_scoring.get_user_id(),
-                    user_scoring.get_score_category()
+                    user_score_identifiers[index].user_id,
+                    user_score_identifiers[index].score_category,
+                    0
                 )
-                user_scorings[index] = user_scoring
+            else:
+                user_scoring = get_user_scoring_from_model(user_scoring_model)
+            user_scorings.append(user_scoring)
+
+        for index, user_scoring in enumerate(user_scorings):
             user_scoring.increment_score(
                 suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
@@ -383,8 +390,8 @@ def accept_suggestions(
                 if user_scoring.user_can_review_the_category() and (
                         not user_scoring.email_has_been_sent()):
                     email_manager.send_mail_to_onboard_new_reviewers(
-                    user_scoring.get_user_id(),
-                    user_scoring.get_score_category()
+                        user_scoring.get_user_id(),
+                        user_scoring.get_score_category()
                     )
                     user_scoring.mark_email_as_sent()
         _update_user_scorings(user_scorings)
@@ -669,21 +676,6 @@ def _update_user_scorings(user_scorings):
         user_scoring_models_to_update)
 
 
-def increment_score_for_user(user_id, score_category, increment_by):
-    """Increment the score of the user in the category by the given amount.
-    This method is used for testing purposes.
-    Args:
-        user_id: str. The id of the user.
-        score_category: str. The category of the suggestion.
-        increment_by: float. The amount to increase the score of the user by.
-    """
-    user_scoring = get_user_scoring_from_model(
-        user_models.UserContributionScoringModel.get(user_id, score_category)
-    )
-    user_scoring.increment_score(increment_by)
-    _update_user_scoring(user_scoring)
-
-
 def get_all_scores_of_user(user_id):
     """Gets all scores for a given user.
 
@@ -757,6 +749,7 @@ def create_new_user_scoring(user_id, score_category, score):
     user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
         user_id, score_category)
     return create_new_user_scorings([user_score_identifier], score)[0]
+
 
 def create_new_user_scorings(user_score_identifiers, score):
     """Create new UserContributionScoringModel instances and the corresponding

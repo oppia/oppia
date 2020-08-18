@@ -270,22 +270,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
     def test_accept_suggestion_and_send_email_to_author(self):
-        enable_recording_of_scores_swap = self.swap(
-            feconf, 'ENABLE_RECORDING_OF_SCORES', True)
-        send_suggestion_review_related_emails_swap = self.swap(
-            feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True)
-        # An email is sent to users the first time that they pass the score
-        # required to review a suggestion category. By default, when a
-        # suggestion is accepted and the recording of scores is enabled, the
-        # score of the author of that suggestion is increased by 1. Therefore,
-        # by setting that increment to
-        # the minimum score required to review, we can ensure that the email is
-        # sent.
-        increment_score_of_author_by_swap = self.swap(
-            suggestion_models, 'INCREMENT_SCORE_OF_AUTHOR_BY',
-            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
-        )
-
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'state 1',
@@ -322,10 +306,21 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(user_scoring.email_has_been_sent())
         self.assertEqual(user_scoring.get_score(), 0)
 
-        with enable_recording_of_scores_swap, send_suggestion_review_related_emails_swap, increment_score_of_author_by_swap:
-            suggestion_services.accept_suggestion(
-                suggestion.suggestion_id, self.reviewer_id,
-                self.COMMIT_MESSAGE, 'review message')
+        # An email is sent to users the first time that they pass the score
+        # required to review a suggestion category. By default, when a
+        # suggestion is accepted and the recording of scores is enabled, the
+        # score of the author of that suggestion is increased by 1. Therefore,
+        # by setting that increment to minimum score required to review, we can
+        # ensure that the email is sent.
+        with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+            with self.swap(
+                feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True):
+                with self.swap(
+                    suggestion_models, 'INCREMENT_SCORE_OF_AUTHOR_BY',
+                    feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
+                    suggestion_services.accept_suggestion(
+                        suggestion.suggestion_id, self.reviewer_id,
+                        self.COMMIT_MESSAGE, 'review message')
 
         # Assert that the suggestion is now accepted.
         suggestion = suggestion_services.query_suggestions(
@@ -498,7 +493,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                                    'score_type.score_sub_type, received '
                                    'invalid_score_category'):
             suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
-
 
     def test_accept_suggestion_no_commit_message_failure(self):
         with self.swap(
@@ -948,7 +942,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(
                 suggestion_services.get_translation_suggestions_with_exp_ids(
-                [self.target_id_1])), 1)
+                    [self.target_id_1])), 1)
 
     def test_get_translation_suggestions_with_exp_ids_with_multiple_exps(
             self):
@@ -1012,21 +1006,21 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         user_score_identifiers_large_score = [
             user_domain.FullyQualifiedUserScoreIdentifier(
-            'user1', 'category1'),
+                'user1', 'category1'),
             user_domain.FullyQualifiedUserScoreIdentifier(
-            'user1', 'category2')
+                'user1', 'category2')
         ]
         suggestion_services.create_new_user_scorings(
             user_score_identifiers_large_score, 15)
         user_score_identifiers_small_score = [
             user_domain.FullyQualifiedUserScoreIdentifier(
-            'user1', 'category3'),
+                'user1', 'category3'),
             user_domain.FullyQualifiedUserScoreIdentifier(
-            'user2', 'category1'),
+                'user2', 'category1'),
             user_domain.FullyQualifiedUserScoreIdentifier(
-            'user2', 'category2'),
+                'user2', 'category2'),
             user_domain.FullyQualifiedUserScoreIdentifier(
-            'user2', 'category3')
+                'user2', 'category3')
         ]
         suggestion_services.create_new_user_scorings(
             user_score_identifiers_small_score, 5)

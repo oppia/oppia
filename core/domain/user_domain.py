@@ -299,7 +299,6 @@ class UserContributionScoring(python_utils.OBJECT):
         """
         return self.user_id
 
-
     def get_score(self):
         """Gets the score of the user for the given score category.
 
@@ -311,12 +310,13 @@ class UserContributionScoring(python_utils.OBJECT):
     def increment_score(self, increment_by):
         """Increments the score of the user in the category by the given amount.
 
-        In the first version of the scoring system, the increment_by quantity will
-        be +1, i.e, each user gains a point for a successful contribution and
-        doesn't lose score in any way.
+        In the first version of the scoring system, the increment_by quantity
+        will be +1, i.e, each user gains a point for a successful contribution
+        and doesn't lose score in any way.
 
         Args:
-            increment_by: float. The amount to increase the score of the user by.
+            increment_by: float. The amount to increase the score of the user
+                by.
         """
         self.score += increment_by
 
@@ -406,6 +406,7 @@ class UserContributionRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected can_review_questions to be a boolean value, '
                 'found: %s' % type(self.can_review_questions))
+
 
 class FullyQualifiedUserScoreIdentifier(python_utils.OBJECT):
     """Domain object representing the full identifier of a user's contribution

@@ -51,7 +51,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
-from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_query_services
@@ -14591,7 +14590,7 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
 
         score_category = 'content.Art'
         self.model_instance = user_models.UserContributionScoringModel.create(
-                self.user_id, score_category, 10
+            self.user_id, score_category, 10
         )
         self.job_class = (
             prod_validation_jobs_one_off

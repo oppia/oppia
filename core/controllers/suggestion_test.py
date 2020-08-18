@@ -34,7 +34,6 @@ from core.domain import story_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -505,19 +504,32 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
-        csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token)
-        suggestion_post_accept = self.get_json(
-            '%s?author_id=%s' % (
-                feconf.SUGGESTION_LIST_URL_PREFIX,
-                self.author_id))['suggestions'][0]
+        # By default, when a suggestion is accepted and the recording of scores
+        # is enabled, the score of the author of that suggestion is increased
+        # by 1. Therefore, by setting that increment to the minimum score
+        # required to review, we can ensure that the author of this suggestion
+        # has a high enough score to review suggestions in this category. This
+        # will be used in a test following this one.
+        enable_recording_of_scores_swap = self.swap(
+            feconf, 'ENABLE_RECORDING_OF_SCORES', True)
+        increment_score_of_author_swap = self.swap(
+            suggestion_models, 'INCREMENT_SCORE_OF_AUTHOR_BY',
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+
+        with enable_recording_of_scores_swap, increment_score_of_author_swap:
+            csrf_token = self.get_new_csrf_token()
+            self.put_json('%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token=csrf_token)
+            suggestion_post_accept = self.get_json(
+                '%s?author_id=%s' % (
+                    feconf.SUGGESTION_LIST_URL_PREFIX,
+                    self.author_id))['suggestions'][0]
         self.assertEqual(
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)
@@ -564,12 +576,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=401)
 
         # Testing users with scores above threshold can accept.
+        # The score of this author was increased to the review threshold amount
+        # when the editor accepted a suggestion that was authored by this user.
         self.login(self.AUTHOR_EMAIL)
-        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
-            self.author_id, 'content.Algebra'
-        )
-        suggestion_services.increment_score_for_user(
-            user_score_identifier, 15)
 
         csrf_token = self.get_new_csrf_token()
         self.put_json('%s/exploration/%s/%s' % (
