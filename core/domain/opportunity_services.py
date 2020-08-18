@@ -192,18 +192,43 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     _create_exploration_opportunities(story, topic, exp_ids)
 
 
-def create_exploration_opportunities_for_story_and_topic(story, topic):
-    """Creates new exploration opportunities corresponding to the supplied
-    story and topic.
+def create_exploration_opportunities_for_story(story_id):
+    """Creates exploration opportunities corresponding to the supplied story ID
+    iff the topic linked to the story is published.
 
     Args:
-        story: Story. The story domain object corresponding to the exploration
-            opportunities.
-        topic: Topic. The topic domain object corresponding to the exploration
-            opportunities.
+        story_id: str. The ID of the story domain object.
+
+    Raises:
+        Exception. The topic rights could not be found.
     """
-    exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-    _create_exploration_opportunities(story, topic, exp_ids_in_story)
+    story = story_fetchers.get_story_by_id(story_id)
+    topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
+    topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=False)
+    if topic_rights is None:
+        raise Exception(
+            'Could not find topic rights for topic ID: %s.' % topic.id)
+    if topic_rights.topic_is_published:
+        exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+        _create_exploration_opportunities(story, topic, exp_ids_in_story)
+
+
+def create_exploration_opportunities_for_topic(topic_id):
+    """Creates exploration opportunities corresponding to the supplied topic ID
+    each of the corresponding topic's published stories.
+
+    Args:
+        topic_id: str. The ID of the topic domain object.
+    """
+    topic = topic_fetchers.get_topic_by_id(topic_id)
+    for story_reference in topic.get_all_story_references():
+        if not story_reference.story_is_published:
+            continue
+        story = story_fetchers.get_story_by_id(
+            story_reference.story_id, strict=False)
+        if story is not None:
+            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+            _create_exploration_opportunities(story, topic, exp_ids_in_story)
 
 
 def _create_exploration_opportunities(story, topic, exp_ids):
@@ -360,9 +385,10 @@ def delete_exploration_opportunities_corresponding_to_topic(topic_id):
         exp_opportunity_models)
 
 
-def get_exp_ids_corresponding_to_exploration_opportunity_topic(topic_id):
-    """Returns the exploration IDs corresponding to the supplied topic ID and
-    associated ExplorationOpportunitySummaryModels.
+def get_exploration_opportunity_ids_corresponding_to_topic(topic_id):
+    """Returns the exploration IDs corresponding to the
+    ExplorationOpportunitySummaryModels that are associated with the supplied
+    topic ID.
 
     Args:
         topic_id: str. The ID of the topic.

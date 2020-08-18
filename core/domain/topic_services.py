@@ -666,26 +666,7 @@ def publish_story(topic_id, story_id, committer_id):
         committer_id, topic, 'Published story with id %s' % story_id,
         change_list)
     generate_topic_summary(topic.id)
-    _create_exploration_opportunities_for_story(story, topic)
-
-
-def _create_exploration_opportunities_for_story(story, topic):
-    """Creates exploration opportunities corresponding to the supplied story iff
-    the topic linked to the story is published.
-
-    Args:
-        story: Story. The story domain object.
-        topic: Topic. The topic domain object corresponding to the story.
-
-    Raises:
-        Exception. The topic rights could not be found.
-    """
-    topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=False)
-    if topic_rights is None:
-        raise Exception('Could not find topic rights.')
-    if topic_rights.topic_is_published:
-        opportunity_services.create_exploration_opportunities_for_story_and_topic( # pylint: disable=line-too-long
-            story, topic)
+    opportunity_services.create_exploration_opportunities_for_story(story.id)
 
 
 def unpublish_story(topic_id, story_id, committer_id):
@@ -977,24 +958,7 @@ def publish_topic(topic_id, committer_id):
     })]
     save_topic_rights(
         topic_rights, committer_id, 'Published the topic', commit_cmds)
-    _create_exploration_opportunities_for_topic(topic)
-
-
-def _create_exploration_opportunities_for_topic(topic):
-    """Creates exploration opportunities corresponding to the supplied topic for
-    each of the topic's published stories.
-
-    Args:
-        topic: Topic. The topic domain object.
-    """
-    for story_reference in topic.get_all_story_references():
-        if not story_reference.story_is_published:
-            continue
-        story = story_fetchers.get_story_by_id(
-            story_reference.story_id, strict=False)
-        if story is not None:
-            opportunity_services.create_exploration_opportunities_for_story_and_topic( # pylint: disable=line-too-long
-                story, topic)
+    opportunity_services.create_exploration_opportunities_for_topic(topic.id)
 
 
 def unpublish_topic(topic_id, committer_id):
@@ -1030,7 +994,7 @@ def unpublish_topic(topic_id, committer_id):
     # the corresponding translation suggestions.
     exp_ids = (
         opportunity_services
-        .get_exp_ids_corresponding_to_exploration_opportunity_topic(topic_id)
+        .get_exploration_opportunity_ids_corresponding_to_topic(topic_id)
     )
     opportunity_services.delete_exploration_opportunities(exp_ids)
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
