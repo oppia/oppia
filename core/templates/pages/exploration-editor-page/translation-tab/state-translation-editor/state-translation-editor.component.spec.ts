@@ -30,7 +30,6 @@ import { StateRecordedVoiceoversService } from
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { EventEmitter } from '@angular/core';
 
 describe('State Translation Editor Component', function() {
   var ctrl = null;
