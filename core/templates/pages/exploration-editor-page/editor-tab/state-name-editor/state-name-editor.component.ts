@@ -65,7 +65,7 @@ angular.module('oppia').component('stateNameEditor', {
         if (!_isNewStateNameValid(normalizedNewName)) {
           return false;
         }
-
+        console.log('GETS HERE', normalizedNewName);
         if (savedMemento === normalizedNewName) {
           StateNameService.setStateNameEditorVisibility(false);
           return false;
@@ -74,7 +74,7 @@ angular.module('oppia').component('stateNameEditor', {
             StateEditorService.getActiveStateName(), normalizedNewName);
           StateNameService.setStateNameEditorVisibility(false);
           // Save the contents of other open fields.
-          $rootScope.$broadcast('externalSave');
+          ExternalSaveService.onExternalSave.emit();
           ctrl.initStateNameEditor();
           return true;
         }
