@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import {
   ExplorationStats,
   ExplorationStatsObjectFactory,
-  IExplorationStatsBackendDict
+  ExplorationStatsBackendDict
 } from 'domain/statistics/ExplorationStatsObjectFactory';
 import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
 
@@ -33,7 +33,7 @@ describe('Exploration stats', function() {
   });
 
   it('should derive values from the backend dict', () => {
-    const explorationStatsBackendDict: IExplorationStatsBackendDict = {
+    const explorationStatsBackendDict: ExplorationStatsBackendDict = {
       exp_id: 'eid',
       exp_version: 1,
       num_starts: 1,
@@ -145,6 +145,65 @@ describe('Exploration stats', function() {
       });
       expect(() => explorationStats.getBounceRate('Introduction'))
         .toThrowError('Can not get bounce rate of an unplayed exploration');
+    });
+  });
+
+  describe('Deriving new exploration stats', () => {
+    let original: ExplorationStats;
+    beforeEach(() => {
+      original = explorationStatsObjectFactory.createFromBackendDict({
+        exp_id: 'eid',
+        exp_version: 100,
+        num_starts: 100,
+        num_actual_starts: 100,
+        num_completions: 100,
+        state_stats_mapping: {
+          Introduction: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+          Middle: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+          End: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+        },
+      });
+    });
+
+    it('should create a copy with an added state', () => {
+      let copy = original.createNewWithStateAdded('Epilogue');
+      expect(copy.hasStateStates('Epilogue')).toBeTrue();
+      expect(original.hasStateStates('Epilogue')).toBeFalse();
+    });
+
+    it('should create a copy with a deleted state', () => {
+      let copy = original.createNewWithStateDeleted('End');
+      expect(copy.hasStateStates('End')).toBeFalse();
+      expect(original.hasStateStates('End')).toBeTrue();
+    });
+
+    it('should create a copy with a renamed state', () => {
+      let copy = original.createNewWithStateRenamed('Introduction', 'Prologue');
+      expect(copy.hasStateStates('Introduction')).toBeFalse();
+      expect(original.hasStateStates('Prologue')).toBeFalse();
+      expect(copy.getStateStats('Prologue'))
+        .toEqual(original.getStateStats('Introduction'));
     });
   });
 });

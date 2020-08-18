@@ -23,6 +23,7 @@ require(
 require('components/forms/validators/is-float.filter.ts');
 require(
   'interactions/NumericInput/directives/numeric-input-validation.service.ts');
+require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('schemaBasedFloatEditor', [
@@ -42,12 +43,17 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$timeout', 'FocusManagerService',
-        'NumericInputValidationService',
+        'NumericInputValidationService', 'SchemaFormSubmittedService',
         function($scope, $timeout, FocusManagerService,
-            NumericInputValidationService) {
+            NumericInputValidationService, SchemaFormSubmittedService) {
           var ctrl = this;
           ctrl.validate = function(localValue) {
-            return !NumericInputValidationService.getErrorString(localValue);
+            return (
+              !angular.isUndefined(localValue) &&
+              localValue !== null &&
+              localValue !== '' &&
+              angular.isUndefined(
+                NumericInputValidationService.getErrorString(localValue)));
           };
 
           ctrl.onFocus = function() {
@@ -82,16 +88,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.generateErrors = function() {
-            if (!ctrl.localValue) {
-              // If localValue is not undefined, it gets transformed to 0
-              // in the UI when ideally the input should be empty.
-              ctrl.localValue = undefined;
-              ctrl.errorString = '';
-            } else {
-              ctrl.errorString = (
-                NumericInputValidationService.getErrorString(
-                  ctrl.localValue));
-            }
+            ctrl.errorString = (
+              NumericInputValidationService.getErrorString(ctrl.localValue));
           };
 
           ctrl.onKeypress = function(evt) {
@@ -101,7 +99,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                 ctrl.isUserCurrentlyTyping = false;
                 FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
               } else {
-                $scope.$emit('submittedSchemaBasedFloatForm');
+                SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
               }
             } else {
               ctrl.isUserCurrentlyTyping = true;

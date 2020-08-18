@@ -196,12 +196,14 @@ describe('TrainingDataService', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            rule_specs: [{
-              rule_type: 'Contains',
-              inputs: {
-                x: 'Test'
-              }
-            }],
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Contains: [
+                {
+                  x: 'Test'
+                }
+              ]
+            },
             outcome: {
               dest: 'State',
               feedback: {
@@ -216,6 +218,15 @@ describe('TrainingDataService', function() {
             training_data: [],
             tagged_skill_misconception_id: null
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'State',
             feedback: {

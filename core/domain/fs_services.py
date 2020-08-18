@@ -22,10 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import json
 
 from core.domain import fs_domain
-from core.platform import models
+from core.domain import image_services
 import feconf
-
-gae_image_services = models.Registry.import_gae_image_services()
 
 
 def save_original_and_compressed_versions_of_image(
@@ -61,9 +59,9 @@ def save_original_and_compressed_versions_of_image(
         entity_type, entity_id))
 
     if image_is_compressible:
-        compressed_image_content = gae_image_services.compress_image(
+        compressed_image_content = image_services.compress_image(
             original_image_content, 0.8)
-        micro_image_content = gae_image_services.compress_image(
+        micro_image_content = image_services.compress_image(
             original_image_content, 0.7)
     else:
         compressed_image_content = original_image_content

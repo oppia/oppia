@@ -21,21 +21,26 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  IExplorationSummaryBackendDict,
-  ExplorationSummary,
-  ExplorationSummaryObjectFactory
-} from 'domain/summary/exploration-summary-object.factory';
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryBackendDict,
+  LearnerExplorationSummaryObjectFactory
+} from 'domain/summary/learner-exploration-summary-object.factory';
 
-type IRecommendationsUrlParams = {
-  'stringified_author_recommended_ids'?: string;
+// This is the type used for params that are sent to the backend.
+// This type has optional properties because they may not be present in the URL.
+// If we send these params always, the request URL would have something like
+// '?collection_id=null' and the backend would start looking for a collection
+// with id "null" which is not correct.
+type RecommendationsUrlParams = {
+  'stringified_author_recommended_ids': string;
   'collection_id'?: string;
   'story_id'?: string;
   'current_node_id'?: string;
-  'include_system_recommendations'?: string;
+  'include_system_recommendations': string;
 };
 
-export interface IExplorationSummariesBackendDict {
-  summaries: IExplorationSummaryBackendDict[];
+export interface RecommendedExplorationSummariesBackendDict {
+  summaries: LearnerExplorationSummaryBackendDict[];
 }
 
 @Injectable({
@@ -44,15 +49,15 @@ export interface IExplorationSummariesBackendDict {
 export class ExplorationRecommendationsBackendApiService {
   constructor(
     private http: HttpClient,
-    private explorationSummaryObjectFactory:
-    ExplorationSummaryObjectFactory) {}
+    private learnerExplorationSummaryObjectFactory:
+    LearnerExplorationSummaryObjectFactory) { }
 
   getRecommendedSummaryDicts(
       authorRecommendedExpIds: string[],
       includeSystemRecommendations: string,
       collectionId: string, storyId: string, currentNodeId: string,
-      explorationId: string): Promise<ExplorationSummary[]> {
-    let recommendationsUrlParams: IRecommendationsUrlParams = {
+      explorationId: string): Promise<LearnerExplorationSummary[]> {
+    let recommendationsUrlParams: RecommendationsUrlParams = {
       stringified_author_recommended_ids: JSON.stringify(
         authorRecommendedExpIds),
       include_system_recommendations: includeSystemRecommendations,
@@ -68,16 +73,12 @@ export class ExplorationRecommendationsBackendApiService {
       recommendationsUrlParams.current_node_id = currentNodeId;
     }
 
-    return this.http.get<IExplorationSummariesBackendDict>(
+    return this.http.get<RecommendedExplorationSummariesBackendDict>(
       '/explorehandler/recommendations/' + explorationId, {
         params: recommendationsUrlParams
-      }).toPromise().then(backendDict => {
-      return backendDict.summaries.map((
-          summaryDict: IExplorationSummaryBackendDict) => {
-        return this.explorationSummaryObjectFactory.createFromBackendDict(
-          summaryDict);
-      });
-    });
+      }).toPromise().then(backendDict => backendDict.summaries.map(
+      summaryDict => this.learnerExplorationSummaryObjectFactory
+        .createFromBackendDict(summaryDict)));
   }
 }
 

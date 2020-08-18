@@ -21,10 +21,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
 
 from constants import constants
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import question_domain
 from core.domain import suggestion_jobs_one_off
 from core.domain import suggestion_registry
@@ -100,6 +103,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -144,8 +148,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, add_translation_change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, add_translation_change_dict, 'test description')
         answer_group = {
             'outcome': {
                 'dest': None,
@@ -158,12 +161,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -174,6 +175,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -183,13 +185,15 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
                     'hint_1': {},
                     'solution': {
                         'en': {
-                            'html': html_content,
+                            'data_format': 'html',
+                            'translation': html_content,
                             'needs_update': True
                         }
                     }
@@ -200,7 +204,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': [html_content]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': html_content
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -233,6 +240,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -269,7 +277,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict_with_math['change'],
-                'test description', self.reviewer_id)
+                'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -317,6 +325,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -366,8 +375,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, change_dict, 'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -396,12 +404,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -413,6 +419,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -422,13 +429,15 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
                     'hint_1': {},
                     'solution': {
                         'en': {
-                            'html': html_content,
+                            'data_format': 'html',
+                            'translation': html_content,
                             'needs_update': True
                         }
                     }
@@ -439,7 +448,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': [html_content]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': html_content
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -472,6 +484,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -508,7 +521,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict_without_math['change'],
-                'test description', self.reviewer_id)
+                'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -520,6 +533,297 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.get_output(job_id))
         self.assertEqual(len(actual_output), 0)
+
+
+class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
+    target_id_1 = 'exp1'
+    target_version_at_submission = 1
+    AUTHOR_EMAIL_1 = 'author1@example.com'
+    REVIEWER_EMAIL_1 = 'reviewer1@example.com'
+
+    class MockExploration(python_utils.OBJECT):
+        """Mocks an exploration. To be used only for testing."""
+
+        def __init__(self, exploration_id, states):
+            self.id = exploration_id
+            self.states = states
+            self.category = 'Algebra'
+
+        def get_content_html(self, state_name, content_id):
+            """Used to mock the get_content_html method for explorations."""
+            # state_name and content_id are used here to suppress the unused
+            # arguments warning. The main goal of this method is to just
+            # produce content html for the tests.
+            return '<p>State name: %s, Content id: %s</p>' % (
+                state_name, content_id
+            )
+
+    # All mock explorations created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
+    ]
+
+    def mock_generate_new_skill_thread_id(
+            self, unused_entity_type, unused_entity_id):
+        return 'skill1.thread1'
+
+    def mock_get_exploration_by_id(self, exp_id):
+        for exp in self.explorations:
+            if exp.id == exp_id:
+                return exp
+
+    def setUp(self):
+        super(SuggestionSvgFilenameValidationOneOffJobTests, self).setUp()
+
+        self.signup(self.AUTHOR_EMAIL_1, 'author1')
+        self.author_id_1 = self.get_user_id_from_email(self.AUTHOR_EMAIL_1)
+        self.signup(self.REVIEWER_EMAIL_1, 'reviewer1')
+        self.reviewer_id_1 = self.get_user_id_from_email(self.REVIEWER_EMAIL_1)
+        self.process_and_flush_pending_tasks()
+
+    def test_job_when_suggestions_have_invalid_filenames(self):
+        invalid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        invalid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+
+        change1 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Suggestion html</p>'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': invalid_html_content1
+            }
+        }
+
+        change2 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_2',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Suggestion html2</p>'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': invalid_html_content2
+            }
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+
+            suggestion1 = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, change1, 'test description')
+
+            suggestion2 = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, change2, 'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
+        expected_output = [
+            u'[u\'Overall result\', {u\'number_of_suggestions_with_no_svgs\': '
+            u'2, u\'number_of_math_tags_with_invalid_svg_filename\': 2}]',
+            u'[u\'math tags with no SVGs in suggestion with ID %s\', '
+            u'[u\'%s\']]' % (suggestion1.suggestion_id, invalid_html_content1),
+            u'[u\'math tags with no SVGs in suggestion with ID %s\', '
+            u'[u\'%s\']]' % (suggestion2.suggestion_id, invalid_html_content2),
+        ]
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+    def test_job_when_suggestions_have_valid_filenames(self):
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;file1.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.target_id_1))
+        fs.commit('image/file1.svg', raw_image, mimetype='image/svg+xml')
+
+        change1 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Suggestion html</p>'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': valid_html_content1
+            }
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, change1, 'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
+        self.assertEqual(actual_output, [])
+
+    def test_job_when_suggestions_have_invalid_math_tags(self):
+        invalid_html = (
+            '<oppia-noninteractive-math></oppia-noninteractive-math>')
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.target_id_1))
+        fs.commit('image/file1.svg', raw_image, mimetype='image/svg+xml')
+
+        change1 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Suggestion html</p>'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': invalid_html
+            }
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+
+            suggestion = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, change1, 'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
+        expected_output = [
+            u'[u\'invalid-math-content-attribute-in-math-tag\', [u\'%s\']]' % (
+                suggestion.suggestion_id)]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_job_acts_only_on_suggestion_edit_state_content(self):
+
+        change1 = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1']
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3,
+        }
+
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+                suggestion_models.TARGET_TYPE_SKILL,
+                'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
+                self.author_id_1, change1, 'test description')
+
+        change2 = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'state_1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>State name: state_1, Content id: content</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, 1, self.author_id_1,
+                    change2, 'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
+        self.assertEqual(actual_output, [])
 
 
 class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
@@ -574,6 +878,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -625,8 +930,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, add_translation_change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, add_translation_change_dict, 'test description')
         answer_group = {
             'outcome': {
                 'dest': None,
@@ -639,12 +943,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -656,6 +958,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -665,6 +968,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -677,7 +981,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': ['option 1']
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': 'option 1'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -710,6 +1017,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -745,8 +1053,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, suggestion_dict['change'], 'test description',
-                self.reviewer_id)
+                self.author_id, suggestion_dict['change'], 'test description')
         job_id = (
             suggestion_jobs_one_off.
             SuggestionMathMigrationOneOffJob.create_new())
@@ -814,6 +1121,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -876,8 +1184,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, change_dict, 'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -926,6 +1233,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -975,8 +1283,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, change_dict, 'test description')
 
         job_id = (
             suggestion_jobs_one_off.
@@ -988,7 +1295,6 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathMigrationOneOffJob.get_output(job_id))
         self.assertEqual(len(actual_output), 0)
-
 
     def test_migration_skips_suggestions_failing_validation(self):
         html_content = (
@@ -1006,12 +1312,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1022,6 +1326,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -1031,6 +1336,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -1043,7 +1349,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': ['option 1']
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': 'option 1'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -1076,6 +1385,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -1111,8 +1421,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, suggestion_dict['change'], 'test description',
-                self.reviewer_id)
+                self.author_id, suggestion_dict['change'], 'test description')
 
         def _mock_get_suggestion_by_id(unused_suggestion_id):
             """Mocks get_suggestion_by_id()."""
@@ -1154,12 +1463,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1170,6 +1477,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -1179,6 +1487,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -1191,7 +1500,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': ['option 1']
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': 'option 1'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -1224,6 +1536,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -1259,8 +1572,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
                 suggestion_models.TARGET_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, suggestion_dict['change'], 'test description',
-                self.reviewer_id)
+                self.author_id, suggestion_dict['change'], 'test description')
 
         def _mock_convert_html_in_suggestion_change(
                 unused_self, unused_conversion_fn):

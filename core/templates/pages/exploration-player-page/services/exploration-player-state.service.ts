@@ -17,6 +17,8 @@
  *  like engine service.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
@@ -44,31 +46,29 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationPlayerStateService', [
-  '$q', '$rootScope', 'ContextService',
-  'EditableExplorationBackendApiService',
+  '$q', 'ContextService', 'EditableExplorationBackendApiService',
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
   'ExplorationFeaturesService', 'NumberAttemptsService',
-  'PlayerCorrectnessFeedbackEnabledService',
-  'PlayerTranscriptService', 'PlaythroughService',
-  'PretestQuestionBackendApiService',
+  'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
+  'PlaythroughService', 'PretestQuestionBackendApiService',
   'QuestionBackendApiService', 'QuestionPlayerEngineService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService', 'UrlService',
   'EXPLORATION_MODE',
   function(
-      $q, $rootScope, ContextService,
-      EditableExplorationBackendApiService,
+      $q, ContextService, EditableExplorationBackendApiService,
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
       ExplorationFeaturesService, NumberAttemptsService,
-      PlayerCorrectnessFeedbackEnabledService,
-      PlayerTranscriptService, PlaythroughService,
-      PretestQuestionBackendApiService,
+      PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
+      PlaythroughService, PretestQuestionBackendApiService,
       QuestionBackendApiService, QuestionPlayerEngineService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService, UrlService,
       EXPLORATION_MODE) {
     StatsReportingService = (
       OppiaAngularRootComponent.statsReportingService);
+    var _totalQuestionsReceivedEventEmitter = new EventEmitter();
+    var _oppiaFeedbackAvailableEventEmitter = new EventEmitter();
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -86,6 +86,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     }
 
     var storyId = UrlService.getStoryIdInPlayer();
+
+    var _playerStateChangeEventEmitter = new EventEmitter();
 
     var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
@@ -177,7 +179,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         questionPlayerConfig.questionCount,
         questionPlayerConfig.questionsSortedByDifficulty
       ).then(function(questionData) {
-        $rootScope.$broadcast('totalQuestionsReceived', questionData.length);
+        _totalQuestionsReceivedEventEmitter.emit(questionData.length);
         initializeQuestionPlayerServices(questionData, callback);
       });
     };
@@ -270,5 +272,14 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       recordNewCardAdded: function() {
         return currentEngineService.recordNewCardAdded();
       },
+      get onTotalQuestionsReceived() {
+        return _totalQuestionsReceivedEventEmitter;
+      },
+      get onPlayerStateChange() {
+        return _playerStateChangeEventEmitter;
+      },
+      get onOppiaFeedbackAvailable() {
+        return _oppiaFeedbackAvailableEventEmitter;
+      }
     };
   }]);

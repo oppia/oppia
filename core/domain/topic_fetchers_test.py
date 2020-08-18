@@ -52,20 +52,22 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         })]
         self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
+            abbreviated_name='name', url_fragment='name-one',
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
         self.save_new_story(
-            self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
-        self.save_new_story(
-            self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_3,
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 3',
+            description='Description 3')
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -105,6 +107,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            url_fragment='name-two',
             canonical_name='canonical_name',
             description='description',
             next_subtopic_id=1,
@@ -129,6 +132,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             name='name 2',
             description='description 2',
             abbreviated_name='abbrev',
+            url_fragment='name-three',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
             language_code='en',
@@ -155,6 +159,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.user_id, name='topic name',
+            abbreviated_name='topic-name', url_fragment='topic-name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)

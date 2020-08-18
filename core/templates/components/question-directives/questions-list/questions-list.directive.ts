@@ -49,9 +49,9 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
-require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
@@ -65,6 +65,8 @@ require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -82,7 +84,8 @@ angular.module('oppia').directive('questionsList', [
         getSkillIdToRubricsObject: '&skillIdToRubricsObject',
         getSelectedSkillId: '&selectedSkillId',
         getGroupedSkillSummaries: '=',
-        getSkillsCategorizedByTopics: '='
+        getSkillsCategorizedByTopics: '=',
+        getUntriagedSkillSummaries: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/question-directives/questions-list/' +
@@ -95,10 +98,10 @@ angular.module('oppia').directive('questionsList', [
         'MisconceptionObjectFactory', 'QuestionCreationService',
         'QuestionObjectFactory', 'QuestionsListService',
         'QuestionUndoRedoService', 'SkillBackendApiService',
-        'SkillDifficultyObjectFactory', 'SkillSummaryObjectFactory',
+        'SkillDifficultyObjectFactory', 'ShortSkillSummaryObjectFactory',
         'StateEditorService', 'UndoRedoService',
         'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'MODE_SELECT_DIFFICULTY',
+        'MODE_SELECT_DIFFICULTY',
         'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
@@ -107,12 +110,13 @@ angular.module('oppia').directive('questionsList', [
             MisconceptionObjectFactory, QuestionCreationService,
             QuestionObjectFactory, QuestionsListService,
             QuestionUndoRedoService, SkillBackendApiService,
-            SkillDifficultyObjectFactory, SkillSummaryObjectFactory,
+            SkillDifficultyObjectFactory, ShortSkillSummaryObjectFactory,
             StateEditorService, UndoRedoService,
             UrlService, DEFAULT_SKILL_DIFFICULTY,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, MODE_SELECT_DIFFICULTY,
+            MODE_SELECT_DIFFICULTY,
             MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             if (ctrl.selectedSkillId !== null) {
@@ -246,7 +250,6 @@ angular.module('oppia').directive('questionsList', [
               ctrl.getGroupedSkillSummaries().current.length;
             var allSkillSummaries = sortedSkillSummaries.map(
               function(summary) {
-                summary.isSelected = false;
                 return summary;
               });
             $uibModal.open({
@@ -320,7 +323,7 @@ angular.module('oppia').directive('questionsList', [
                           misconception);
                       });
                     ctrl.associatedSkillSummaries.push(
-                      SkillSummaryObjectFactory.create(
+                      ShortSkillSummaryObjectFactory.create(
                         skillDict.id, skillDict.description));
                   });
                 }
@@ -390,7 +393,6 @@ angular.module('oppia').directive('questionsList', [
             } else {
               var allSkillSummaries = ctrl.getAllSkillSummaries().filter(
                 function(summary) {
-                  summary.isSelected = false;
                   return skillDescription === summary.getDescription();
                 });
               for (var idx in allSkillSummaries) {
@@ -462,6 +464,7 @@ angular.module('oppia').directive('questionsList', [
             var associatedSkillSummaries = ctrl.associatedSkillSummaries;
             var newQuestionIsBeingCreated = ctrl.newQuestionIsBeingCreated;
             var categorizedSkills = ctrl.getSkillsCategorizedByTopics;
+            var untriagedSkillSummaries = ctrl.getUntriagedSkillSummaries;
             QuestionUndoRedoService.clearChanges();
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
@@ -498,6 +501,7 @@ angular.module('oppia').directive('questionsList', [
               backdrop: 'static',
               keyboard: false,
               resolve: {
+                untriagedSkillSummaries: () => untriagedSkillSummaries,
                 associatedSkillSummaries: () => associatedSkillSummaries,
                 canEditQuestion: () => canEditQuestion,
                 categorizedSkills: () => categorizedSkills,
@@ -548,17 +552,21 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
-              _initTab(false);
-            });
+            ctrl.directiveSubscriptions.add(
+              QuestionsListService.onQuestionSummariesInitialized.subscribe(
+                () => _initTab(false)));
             ctrl.skillIds = [];
             ctrl.selectedSkillIds = [];
             ctrl.associatedSkillSummaries = [];
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             ctrl.editorIsOpen = false;
             // The _initTab function is written separately since it is also
-            // called in $scope.$on when some external events are triggered.
+            // called in subscription when some external events are triggered.
             _initTab(true);
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

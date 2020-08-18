@@ -472,6 +472,7 @@ var constants = {
         "LogicProof",
         "NumericInput",
         "SetInput",
+        "NumericExpressionInput",
         "AlgebraicExpressionInput",
         "MathEquationInput",
         "MathExpressionInput",
@@ -565,6 +566,7 @@ var constants = {
             "content": {},
             "default_outcome": {}
           }
-      }
+      },
+      "next_content_id_index": 0
   }
 };

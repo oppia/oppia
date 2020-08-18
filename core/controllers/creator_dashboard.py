@@ -45,9 +45,8 @@ import utils
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
 
-EXPLORATION_ID_KEY = 'explorationId'
-COLLECTION_ID_KEY = 'collectionId'
-QUESTION_ID_KEY = 'questionId'
+EXPLORATION_ID_KEY = 'exploration_id'
+COLLECTION_ID_KEY = 'collection_id'
 
 
 class OldNotificationsDashboardRedirectPage(base.BaseHandler):
@@ -59,13 +58,13 @@ class OldNotificationsDashboardRedirectPage(base.BaseHandler):
         self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL, permanent=True)
 
 
-class OldCommunityDashboardRedirectPage(base.BaseHandler):
-    """Redirects the old community dashboard URL to the new one."""
+class OldContributorDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old contributor dashboard URL to the new one."""
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/community-dashboard', permanent=True)
+        self.redirect('/contributor-dashboard', permanent=True)
 
 
 class NotificationsDashboardPage(base.BaseHandler):
@@ -209,7 +208,7 @@ class CreatorDashboardHandler(base.BaseHandler):
                     'category': collection_summary.category,
                     'objective': collection_summary.objective,
                     'language_code': collection_summary.language_code,
-                    'last_updated': utils.get_time_in_millisecs(
+                    'last_updated_msec': utils.get_time_in_millisecs(
                         collection_summary.collection_model_last_updated),
                     'created_on': utils.get_time_in_millisecs(
                         collection_summary.collection_model_created_on),
@@ -325,6 +324,11 @@ class CreatorDashboardHandler(base.BaseHandler):
             self.values.update({
                 'topic_summary_dicts': topic_summary_dicts
             })
+        else:
+            self.values.update({
+                'topic_summary_dicts': []
+            })
+
         self.render_json(self.values)
 
     @acl_decorators.can_access_creator_dashboard

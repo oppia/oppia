@@ -26,7 +26,7 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -43,16 +43,16 @@ class SentEmailModel(base_models.BaseModel):
     # user with a given intent within a given time period.
 
     # The user ID of the email recipient.
-    recipient_id = ndb.StringProperty(required=True, indexed=True)
+    recipient_id = ndb.StringProperty(required=True)
     # The email address of the recipient.
     recipient_email = ndb.StringProperty(required=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
-    sender_id = ndb.StringProperty(required=True, indexed=True)
+    sender_id = ndb.StringProperty(required=True)
     # The email address used to send the notification.
     sender_email = ndb.StringProperty(required=True)
     # The intent of the email.
-    intent = ndb.StringProperty(required=True, indexed=True, choices=[
+    intent = ndb.StringProperty(required=True, choices=[
         feconf.EMAIL_INTENT_SIGNUP,
         feconf.EMAIL_INTENT_MARKETING,
         feconf.EMAIL_INTENT_DAILY_BATCH,
@@ -78,7 +78,7 @@ class SentEmailModel(base_models.BaseModel):
     # The datetime the email was sent, in UTC.
     sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
     # The hash of the recipient id, email subject and message body.
-    email_hash = ndb.StringProperty(indexed=True)
+    email_hash = ndb.StringProperty()
 
     @staticmethod
     def get_deletion_policy():
@@ -107,32 +107,6 @@ class SentEmailModel(base_models.BaseModel):
             cls.sender_id == user_id,
         )).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SentEmailModel has two fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the recipient_id and
-        sender_id.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(ndb.OR(
-                cls.recipient_id == old_user_id,
-                cls.sender_id == old_user_id)).fetch():
-            if model.recipient_id == old_user_id:
-                model.recipient_id = new_user_id
-            if model.sender_id == old_user_id:
-                model.sender_id = new_user_id
-            migrated_models.append(model)
-        SentEmailModel.put_multi(
-            migrated_models, update_last_updated_time=False)
-
     @classmethod
     def _generate_id(cls, intent):
         """Generates an ID for a new SentEmailModel instance.
@@ -145,7 +119,7 @@ class SentEmailModel(base_models.BaseModel):
             str. The newly-generated ID for the SentEmailModel instance.
 
         Raises:
-            Exception: The id generator for SentEmailModel is producing
+            Exception. The id generator for SentEmailModel is producing
                 too many collisions.
         """
         id_prefix = '%s.' % intent
@@ -216,7 +190,7 @@ class SentEmailModel(base_models.BaseModel):
             value and sent more recently than sent_datetime_lower_bound.
 
         Raises:
-            Exception: sent_datetime_lower_bound is not a valid
+            Exception. The sent_datetime_lower_bound is not a valid
                 datetime.datetime.
         """
 
@@ -292,15 +266,6 @@ class SentEmailModel(base_models.BaseModel):
 
         return False
 
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for recipient_id and sender_id."""
-        user_ids = [self.recipient_id, self.sender_id]
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
-
 
 class BulkEmailModel(base_models.BaseModel):
     """Records the content of an email sent from Oppia to multiple users.
@@ -314,11 +279,11 @@ class BulkEmailModel(base_models.BaseModel):
     recipient_ids = ndb.JsonProperty(default=[], compressed=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
-    sender_id = ndb.StringProperty(required=True, indexed=True)
+    sender_id = ndb.StringProperty(required=True)
     # The email address used to send the notification.
     sender_email = ndb.StringProperty(required=True)
     # The intent of the email.
-    intent = ndb.StringProperty(required=True, indexed=True, choices=[
+    intent = ndb.StringProperty(required=True, choices=[
         feconf.BULK_EMAIL_INTENT_MARKETING,
         feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
         feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION,
@@ -360,16 +325,6 @@ class BulkEmailModel(base_models.BaseModel):
         return cls.query(cls.sender_id == user_id).get(
             keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """BulkEmailModel has one field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.sender_id
-
     @classmethod
     def create(
             cls, instance_id, recipient_ids, sender_id, sender_email,
@@ -406,10 +361,10 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     [user_id].[thread_id]
     """
 
-    user_id = ndb.StringProperty(required=True, indexed=True)
-    thread_id = ndb.StringProperty(required=False, indexed=True)
+    user_id = ndb.StringProperty(required=True)
+    thread_id = ndb.StringProperty(required=False)
     # The reply-to ID that is used in the reply-to email address.
-    reply_to_id = ndb.StringProperty(indexed=True, required=True)
+    reply_to_id = ndb.StringProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -432,13 +387,6 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """GeneralFeedbackEmailReplyToIdModel has ID that contains user id and
-        one other field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):
@@ -486,14 +434,14 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             with the unique reply_to_id generated.
 
         Raises:
-            Exception: Model instance for given user_id and
+            Exception. Model instance for given user_id and
                 thread_id already exists.
         """
 
         instance_id = cls._generate_id(user_id, thread_id)
         if cls.get_by_id(instance_id):
-            raise Exception('Unique reply-to ID for given user and thread'
-                            ' already exists.')
+            raise Exception(
+                'Unique reply-to ID for given user and thread already exists.')
 
         reply_to_id = cls._generate_unique_reply_to_id()
         feedback_email_reply_model_instance = cls(

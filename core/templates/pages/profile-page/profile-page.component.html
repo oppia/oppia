@@ -98,14 +98,14 @@
       <exploration-summary-tile ng-repeat="expl in $ctrl.getExplorationsToDisplay() track by $index"
                                 exploration-id="expl.id"
                                 exploration-title="expl.title"
-                                last-updated-msec="expl.last_updated_msec"
+                                last-updated-msec="expl.lastUpdatedMsec"
                                 objective="expl.objective"
                                 category="expl.category"
                                 ratings="expl.ratings"
-                                thumbnail-icon-url="expl.thumbnail_icon_url"
-                                thumbnail-bg-color="expl.thumbnail_bg_color"
-                                num-views="expl.num_views"
-                                is-community-editable="expl.community_editable"
+                                thumbnail-icon-url="expl.thumbnailIconUrl"
+                                thumbnail-bg-color="expl.thumbnailBgColor"
+                                num-views="expl.numViews"
+                                is-community-owned="expl.communityOwned"
                                 mobile-cutoff-px="610">
       </exploration-summary-tile>
 

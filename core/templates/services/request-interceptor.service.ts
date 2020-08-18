@@ -45,7 +45,7 @@ export class MockCsrfTokenService {
         let actualData = data.substring(5);
         return JSON.parse(actualData);
       },
-    }).then(function(response: any) {
+    }).then(function(response: {token: string}) {
       return response.token;
     });
   }
@@ -64,8 +64,8 @@ export class MockCsrfTokenService {
 export class RequestInterceptor implements HttpInterceptor {
   constructor(private csrf: MockCsrfTokenService) {}
   intercept(
-      request: HttpRequest<any>, next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+      request: HttpRequest<FormData>, next: HttpHandler
+  ): Observable<HttpEvent<FormData>> {
     var csrf = this.csrf;
     try {
       csrf.initializeToken();
@@ -85,12 +85,20 @@ export class RequestInterceptor implements HttpInterceptor {
               if (!(request.body instanceof FormData)) {
                 var body = new FormData();
                 body.append('payload', JSON.stringify(request.body));
+                // This throws "Cannot assign to 'body' because it is
+                // a read-only property". We need to manually suprress this
+                // error because this is a request interceptor and we need to
+                // to modify the contents of the request.
                 // @ts-ignore
                 request.body = body;
               }
               request.body.append('csrf_token', token);
               request.body.append('source', document.URL);
             } else {
+              // This throws "Cannot assign to 'body' because it is
+              // a read-only property". We need to manually suprress this
+              // error because this is a request interceptor and we need to
+              // to modify the contents of the request.
               // @ts-ignore
               request.body = {
                 csrf_token: token,

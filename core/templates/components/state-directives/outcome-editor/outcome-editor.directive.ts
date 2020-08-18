@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Directives for the outcome editor.
  */
@@ -30,6 +31,8 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -58,6 +61,7 @@ angular.module('oppia').directive('outcomeEditor', [
             $scope, StateEditorService, StateInteractionIdService,
             ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
           };
@@ -147,7 +151,6 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
-            $scope.$broadcast('saveOutcomeFeedbackDetails');
             ctrl.feedbackEditorIsOpen = false;
             var contentHasChanged = (
               ctrl.savedOutcome.feedback.getHtml() !==
@@ -172,7 +175,7 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.saveThisDestination = function() {
-            $scope.$broadcast('saveOutcomeDestDetails');
+            StateEditorService.onSaveOutcomeDestDetails.emit();
             ctrl.destinationEditorIsOpen = false;
             ctrl.savedOutcome.dest = angular.copy(ctrl.outcome.dest);
             if (!ctrl.isSelfLoop(ctrl.outcome)) {
@@ -212,10 +215,9 @@ angular.module('oppia').directive('outcomeEditor', [
             $scope.$on('externalSave', function() {
               onExternalSave();
             });
-
-            $scope.$on('onInteractionIdChanged', function() {
-              onExternalSave();
-            });
+            ctrl.directiveSubscriptions.add(
+              () => onExternalSave()
+            );
             ctrl.editOutcomeForm = {};
             ctrl.canAddPrerequisiteSkill = (
               ENABLE_PREREQUISITE_SKILLS &&
@@ -226,6 +228,9 @@ angular.module('oppia').directive('outcomeEditor', [
             // TODO(sll): Investigate whether this line can be removed, due to
             // ctrl.savedOutcome now being set in onExternalSave().
             ctrl.savedOutcome = angular.copy(ctrl.outcome);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

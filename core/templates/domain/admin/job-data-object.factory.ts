@@ -19,17 +19,20 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface IJobDataBackendDict {
+export interface JobDataBackendDict {
   'human_readable_time_finished': string;
   'time_finished_msec': number;
   'job_type': string;
   'status_code': string;
   'error': string;
-  'can_be_canceled'?: boolean;
   'is_cancelable': boolean;
   'id': string;
   'time_started_msec': number;
   'human_readable_time_started': string;
+  // This property is optional because this object factory is used for
+  // both 'recent_job_data' and 'unfinished_job_data' in admin page.
+  // 'recent_job_data' doesn't have this property.
+  'can_be_canceled'?: boolean;
 }
 
 export class Job {
@@ -66,7 +69,7 @@ export class Job {
   providedIn: 'root'
 })
 export class JobDataObjectFactory {
-  createFromBackendDict(backendDict: IJobDataBackendDict): Job {
+  createFromBackendDict(backendDict: JobDataBackendDict): Job {
     return new Job(
       backendDict.human_readable_time_finished, backendDict.time_finished_msec,
       backendDict.job_type, backendDict.status_code, backendDict.error,

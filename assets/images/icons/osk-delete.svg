@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 39.1 (31720) - http://www.bohemiancoding.com/sketch -->
+    <title>7D43BFD7-E509-4B6F-B2CC-826C6D5E292D</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="600" height="956" fill="none"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Math-Input" transform="translate(-250.000000, -1146.000000)"></g>
+        <g id="Asset-Sheet" transform="translate(-50.000000, -50.000000)">
+            <g id="math_keypad_icon_delete" transform="translate(50.000000, 50.000000)">
+                <rect id="bounds" fill-opacity="0" fill="#FF0088" fill-rule="evenodd" x="0" y="0" width="48" height="48"></rect>
+                <path d="M13,24 L13,24 L19,30 L33,30 L33,18 L19,18 L13,24 Z M11.5857864,22.5857864 L11.5857864,22.5857864 L17.5857864,16.5857864 C17.9608592,16.2107137 18.469567,16 19,16 L33,16 C34.1045695,16 35,16.8954305 35,18 L35,30 C35,31.1045695 34.1045695,32 33,32 L19,32 C18.469567,32 17.9608592,31.7892863 17.5857864,31.4142136 L11.5857864,25.4142136 C10.8047379,24.633165 10.8047379,23.366835 11.5857864,22.5857864 L11.5857864,22.5857864 Z" id="outline" fill="#888D93" fill-rule="evenodd"></path>
+                <path d="M23,21 L29,27" id="slash" stroke="#888D93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M23,21 L29,27" id="slash" stroke="#888D93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(26.000000, 24.000000) scale(-1, 1) translate(-26.000000, -24.000000) "></path>
+            </g>
+        </g>
+        <g id="Math-Input" transform="translate(-250.000000, -1146.000000)">
+            <g id="Asset-Sheet" transform="translate(200.000000, 1096.000000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <use id="Mask" fill="#FAFAFA" xlink:href="#path-1"></use>
+                <g id="math_keypad_icon_delete" mask="url(#mask-2)">
+                    <g transform="translate(50.000000, 50.000000)">
+                        <rect id="bounds" stroke="none" fill-opacity="0" fill="#FF0088" fill-rule="evenodd" x="0" y="0" width="48" height="48"></rect>
+                        <path d="M13,24 L13,24 L19,30 L33,30 L33,18 L19,18 L13,24 Z M11.5857864,22.5857864 L11.5857864,22.5857864 L17.5857864,16.5857864 C17.9608592,16.2107137 18.469567,16 19,16 L33,16 C34.1045695,16 35,16.8954305 35,18 L35,30 C35,31.1045695 34.1045695,32 33,32 L19,32 C18.469567,32 17.9608592,31.7892863 17.5857864,31.4142136 L11.5857864,25.4142136 C10.8047379,24.633165 10.8047379,23.366835 11.5857864,22.5857864 L11.5857864,22.5857864 Z" id="outline" stroke="none" fill="#888D93" fill-rule="evenodd"></path>
+                        <path d="M23,21 L29,27" id="slash" stroke="#888D93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+                        <path d="M23,21 L29,27" id="slash" stroke="#888D93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(26.000000, 24.000000) scale(-1, 1) translate(-26.000000, -24.000000) "></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -14,7 +14,8 @@
            ng-model="$ctrl.localValue" ng-blur="$ctrl.onInputBlur()"
            ng-focus="$ctrl.onInputFocus()" focus-on="<[$ctrl.labelForFocusTarget()]>"
            ng-keypress="$ctrl.onKeypress($event)" placeholder="<[$ctrl.getPlaceholder()]>" apply-validation validators="$ctrl.validators()"
-           style="display: inline;">
+           style="display: inline;"
+           aria-label="text input">
   </span>
 
   <!-- Note that we do not yet support ng-blur for the code editor. -->

@@ -50,9 +50,10 @@ export class CollectionValidationService {
   validateTagFormat(tags: string[]) {
     // Check to ensure that all tags follow the format specified in
     // TAG_REGEX.
-    // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
+    // TODO(#7434): Use dot notation after we find a way to get
     // rid of the TS2339 error on AppConstants.
-    var tagRegex = new RegExp(AppConstants.TAG_REGEX);
+    // eslint-disable-next-line dot-notation
+    var tagRegex = new RegExp(AppConstants['TAG_REGEX']);
     return tags.every(function(tag) {
       return tag.match(tagRegex);
     });

@@ -27,7 +27,7 @@ import python_utils
 import utils
 
 from google.appengine.datastore import datastore_query
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (base_models, skill_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill
@@ -62,10 +62,9 @@ class QuestionModel(base_models.VersionedModel):
     question_state_data_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = ndb.StringProperty(required=True)
     # The skill ids linked to this question.
-    linked_skill_ids = ndb.StringProperty(
-        indexed=True, repeated=True)
+    linked_skill_ids = ndb.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -89,11 +88,6 @@ class QuestionModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """QuestionModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def _get_new_id(cls):
         """Generates a unique ID for the question in the form of random hash
@@ -103,7 +97,7 @@ class QuestionModel(base_models.VersionedModel):
             new_id: int. ID of the new QuestionModel instance.
 
         Raises:
-            Exception: The ID generator for QuestionModel is
+            Exception. The ID generator for QuestionModel is
                 producing too many collisions.
         """
 
@@ -164,7 +158,7 @@ class QuestionModel(base_models.VersionedModel):
             QuestionModel. Instance of the new QuestionModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
         instance_id = cls._get_new_id()
         question_model_instance = cls(
@@ -194,9 +188,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     """
 
     # The ID of the question.
-    question_id = ndb.StringProperty(required=True, indexed=True)
+    question_id = ndb.StringProperty(required=True)
     # The ID of the skill to which the question is linked.
-    skill_id = ndb.StringProperty(required=True, indexed=True)
+    skill_id = ndb.StringProperty(required=True)
     # The difficulty of the skill.
     skill_difficulty = ndb.FloatProperty(required=True, indexed=True)
 
@@ -224,11 +218,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """QuestionSkillLinkModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -271,6 +260,22 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             skill_difficulty=skill_difficulty
         )
         return question_skill_link_model_instance
+
+    @classmethod
+    def get_total_question_count_for_skill_ids(cls, skill_ids):
+        """Returns the number of questions assigned to the given skill_ids.
+
+        Args:
+            skill_ids: list(str). Skill IDs for which the question count is
+                requested.
+
+        Returns:
+            int. The number of questions assigned to the given skill_ids.
+        """
+        total_question_count = cls.query().filter(
+            cls.skill_id.IN(skill_ids)).count()
+
+        return total_question_count
 
     @classmethod
     def get_question_skill_links_by_skill_ids(
@@ -586,7 +591,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         cls.put_multi(question_skill_links)
 
-
     @classmethod
     def delete_multi_question_skill_links(cls, question_skill_links):
         """Deletes multiple question skill links from the datastore.
@@ -608,7 +612,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the question being edited.
-    question_id = ndb.StringProperty(indexed=True, required=True)
+    question_id = ndb.StringProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -694,8 +698,3 @@ class QuestionSummaryModel(base_models.BaseModel):
             bool. Whether any models refer to the given user_id.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """QuestionSummaryModel has one field that contains user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

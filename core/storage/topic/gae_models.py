@@ -21,9 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
-import feconf
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
@@ -53,17 +52,17 @@ class TopicModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The name of the topic.
-    name = ndb.StringProperty(required=True, indexed=True)
+    name = ndb.StringProperty(required=True)
     # The canonical name of the topic, created by making `name` lowercase.
-    canonical_name = ndb.StringProperty(required=True, indexed=True)
+    canonical_name = ndb.StringProperty(required=True)
     # The abbreviated name of the topic.
-    abbreviated_name = ndb.StringProperty(indexed=True, default='')
+    abbreviated_name = ndb.StringProperty(default='')
     # The thumbnail filename of the topic.
-    thumbnail_filename = ndb.StringProperty(indexed=True)
+    thumbnail_filename = ndb.StringProperty()
     # The thumbnail background color of the topic.
-    thumbnail_bg_color = ndb.StringProperty(indexed=True)
+    thumbnail_bg_color = ndb.StringProperty()
     # The description of the topic.
-    description = ndb.TextProperty(indexed=False)
+    description = ndb.TextProperty()
     # This consists of the list of objects referencing canonical stories that
     # are part of this topic.
     canonical_story_references = ndb.JsonProperty(repeated=True, indexed=False)
@@ -76,7 +75,7 @@ class TopicModel(base_models.VersionedModel):
         required=True, indexed=True)
     # This consists of the list of uncategorized skill ids that are not part of
     # any subtopic.
-    uncategorized_skill_ids = ndb.StringProperty(repeated=True, indexed=True)
+    uncategorized_skill_ids = ndb.StringProperty(repeated=True)
     # The list of subtopics that are part of the topic.
     subtopics = ndb.JsonProperty(repeated=True, indexed=False)
     # The schema version of the subtopic dict.
@@ -84,7 +83,9 @@ class TopicModel(base_models.VersionedModel):
     # The id for the next subtopic.
     next_subtopic_id = ndb.IntegerProperty(required=True)
     # The ISO 639-1 code for the language this topic is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = ndb.StringProperty(required=True)
+    # The url fragment of the topic.
+    url_fragment = ndb.StringProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -102,11 +103,6 @@ class TopicModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -156,7 +152,24 @@ class TopicModel(base_models.VersionedModel):
         """
         return TopicModel.query().filter(
             cls.canonical_name == topic_name.lower()).filter(
-                cls.deleted == False).get() #pylint: disable=singleton-comparison
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
+
+    @classmethod
+    def get_by_url_fragment(cls, url_fragment):
+        """Gets TopicModel by url_fragment. Returns None if the topic with
+        name url_fragment doesn't exist.
+
+        Args:
+            url_fragment: str. The url fragment of the topic.
+
+        Returns:
+            TopicModel|None. The topic model of the topic or None if not
+            found.
+        """
+        # TODO(#10210): Make fetching by URL fragment faster.
+        return TopicModel.query().filter(
+            cls.url_fragment == url_fragment).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
 
     @staticmethod
     def get_export_policy():
@@ -174,7 +187,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the topic being edited.
-    topic_id = ndb.StringProperty(indexed=True, required=True)
+    topic_id = ndb.StringProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -213,19 +226,22 @@ class TopicSummaryModel(base_models.BaseModel):
 
     A TopicSummaryModel instance stores the following information:
 
-        id, description, language_code, last_updated, created_on, version.
+        id, description, language_code, last_updated, created_on, version,
+        url_fragment.
 
     The key of each instance is the topic id.
     """
 
     # The name of the topic.
-    name = ndb.StringProperty(required=True, indexed=True)
+    name = ndb.StringProperty(required=True)
     # The canonical name of the topic, created by making `name` lowercase.
-    canonical_name = ndb.StringProperty(required=True, indexed=True)
+    canonical_name = ndb.StringProperty(required=True)
     # The ISO 639-1 code for the language this topic is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = ndb.StringProperty(required=True)
     # The description of the topic.
-    description = ndb.TextProperty(indexed=False)
+    description = ndb.TextProperty()
+    # The url fragment of the topic.
+    url_fragment = ndb.StringProperty(required=True)
 
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the
@@ -246,6 +262,10 @@ class TopicSummaryModel(base_models.BaseModel):
     uncategorized_skill_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of subtopics of the topic.
     subtopic_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The thumbnail filename of the topic.
+    thumbnail_filename = ndb.StringProperty()
+    # The thumbnail background color of the topic.
+    thumbnail_bg_color = ndb.StringProperty()
     version = ndb.IntegerProperty(required=True)
 
     @staticmethod
@@ -271,11 +291,6 @@ class TopicSummaryModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicSummaryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
@@ -300,7 +315,7 @@ class SubtopicPageModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The topic id that this subtopic is a part of.
-    topic_id = ndb.StringProperty(required=True, indexed=True)
+    topic_id = ndb.StringProperty(required=True)
     # The json data of the subtopic consisting of subtitled_html,
     # recorded_voiceovers and written_translations fields.
     page_contents = ndb.JsonProperty(required=True)
@@ -308,7 +323,7 @@ class SubtopicPageModel(base_models.VersionedModel):
     page_contents_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
     # The ISO 639-1 code for the language this subtopic page is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = ndb.StringProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -326,11 +341,6 @@ class SubtopicPageModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SubtopicPageModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -377,7 +387,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the subtopic page being edited.
-    subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
+    subtopic_page_id = ndb.StringProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -432,7 +442,7 @@ class TopicRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user_ids of the managers of this topic.
-    manager_ids = ndb.StringProperty(indexed=True, repeated=True)
+    manager_ids = ndb.StringProperty(repeated=True)
 
     # Whether this topic is published.
     topic_is_published = ndb.BooleanProperty(
@@ -457,28 +467,6 @@ class TopicRightsModel(base_models.VersionedModel):
             cls.manager_ids == user_id).get(keys_only=True) is not None
                 or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicRightsModel has one field that contains multiple user IDs."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the manager_ids.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(cls.manager_ids == old_user_id).fetch():
-            model.manager_ids = [
-                new_user_id if manager_id == old_user_id else manager_id
-                for manager_id in model.manager_ids]
-            migrated_models.append(model)
-        cls.put_multi(
-            migrated_models, update_last_updated_time=False)
-
     @classmethod
     def get_by_user(cls, user_id):
         """Retrieves the rights object for all topics assigned to given user
@@ -494,14 +482,6 @@ class TopicRightsModel(base_models.VersionedModel):
             cls.manager_ids == user_id
         )
         return topic_rights_models
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in manager_ids."""
-        user_ids = [user_id for user_id in self.manager_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -566,73 +546,3 @@ class TopicRightsModel(base_models.VersionedModel):
         return {
             'managed_topic_ids': managed_topic_ids
         }
-
-
-class TopicRightsAllUsersModel(base_models.BaseModel):
-    """Temporary storage model for all user ids ever mentioned in the topic
-    rights.
-
-    TODO (#8529): This model should be deleted after the user ID migration is
-    completed.
-
-    The id of each instance is the id of the corresponding topic.
-    """
-
-    # The user_ids of users who are (or were in history) members of manager_ids
-    # in corresponding rights model.
-    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """TopicRightsAllUsersModel are temporary model that will be
-        deleted after user migration.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether TopicRightsAllUsersModel references the given user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.query(
-            cls.all_user_ids == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_export_policy():
-        """This model is only used for migration purposes. All the data
-        contained in this model are already exported through TopicRightsModel.
-        """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicRightsAllUsersModel has multiple fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, unused_old_user_id, unused_new_user_id):
-        """This model is used to verify that the user ID migration of
-        TopicRightsSnapshotContentModel was successful. The content is filled by
-        the AddAllUserIdsVerificationJob and
-        AddAllUserIdsSnapshotsVerificationJob before the
-        GaeIdNotInModelsVerificationJob is run, thus it shouldn't be migrated by
-        this method.
-
-        Args:
-            unused_old_user_id: str. The old user ID.
-            unused_new_user_id: str. The new user ID.
-        """
-        pass
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in all_user_ids."""
-        user_ids = [user_id for user_id in self.all_user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)

@@ -70,18 +70,19 @@ describe('Edit Thumbnail Modal Controller', function() {
     expect($scope.updateBackgroundColor).toHaveBeenCalled();
   });
 
-  it('should init the constiables', function() {
-    expect($scope.uploadedImage).toBe(uploadedImage);
-    expect($scope.invalidImageWarningIsShown).toBe(false);
-    expect($scope.allowedBgColors).toBe(allowedBgColors);
-    expect($scope.aspectRatio).toBe(aspectRatio);
-    expect($scope.getPreviewDescription).toEqual(getPreviewDescription);
-    expect($scope.getPreviewDescriptionBgColor).toEqual(
-      getPreviewDescriptionBgColor);
-    expect($scope.getPreviewFooter).toEqual(
-      getPreviewFooter);
-    expect($scope.getPreviewTitle).toEqual(getPreviewTitle);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.uploadedImage).toBe(uploadedImage);
+      expect($scope.invalidImageWarningIsShown).toBe(false);
+      expect($scope.allowedBgColors).toBe(allowedBgColors);
+      expect($scope.aspectRatio).toBe(aspectRatio);
+      expect($scope.getPreviewDescription).toEqual(getPreviewDescription);
+      expect($scope.getPreviewDescriptionBgColor).toEqual(
+        getPreviewDescriptionBgColor);
+      expect($scope.getPreviewFooter).toEqual(
+        getPreviewFooter);
+      expect($scope.getPreviewTitle).toEqual(getPreviewTitle);
+    });
 
   it('should load a image file in onchange event and save it if it\'s a' +
     ' svg file', function(done) {
@@ -101,9 +102,7 @@ describe('Edit Thumbnail Modal Controller', function() {
 
     // Mocking JQuery element method.
     const element = $(document.createElement('div'));
-    // @ts-ignore
     spyOn(window, '$').withArgs('.oppia-thumbnail-uploader').and.returnValue(
-      // @ts-ignore
       element);
     const fadeInElementSpy = spyOn(element, 'fadeIn').and.callThrough();
 

@@ -44,20 +44,22 @@ describe('Select Skill Modal Controller', function() {
       allowSkillsFromOtherTopics: allowSkillsFromOtherTopics,
       categorizedSkills: categorizedSkills,
       skillsInSameTopicCount: skillsInSameTopicCount,
-      sortedSkillSummaries: sortedSkillSummaries
+      sortedSkillSummaries: sortedSkillSummaries,
+      untriagedSkillSummaries: []
     });
   }));
 
-  it('should check properties set after controller is initialized', function() {
-    expect($scope.skillSummaries).toEqual(sortedSkillSummaries);
-    expect($scope.categorizedSkills).toEqual(categorizedSkills);
-    expect($scope.allowSkillsFromOtherTopics).toEqual(
-      allowSkillsFromOtherTopics);
-    expect($scope.selectedSkillId).toBe(null);
-    expect($scope.countOfSkillsToPrioritize).toBe(skillsInSameTopicCount);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.skillSummaries).toEqual(sortedSkillSummaries);
+      expect($scope.categorizedSkills).toEqual(categorizedSkills);
+      expect($scope.allowSkillsFromOtherTopics).toEqual(
+        allowSkillsFromOtherTopics);
+      expect($scope.selectedSkillId).toBe(null);
+      expect($scope.countOfSkillsToPrioritize).toBe(skillsInSameTopicCount);
+    });
 
-  it('should save skill with its id', function() {
+  it('should save skill with its id when closing modal', function() {
     $scope.selectedSkillId = '2';
     $scope.save();
 

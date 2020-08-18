@@ -27,9 +27,10 @@ from core.domain import rights_manager
 from core.domain import suggestion_services
 from core.platform import models
 
+from google.cloud import ndb
+
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
-transaction_services = models.Registry.import_transaction_services()
 
 
 class UnsentFeedbackEmailHandler(base.BaseHandler):
@@ -43,8 +44,8 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
             # Model may not exist if user has already attended to the feedback.
             return
 
-        transaction_services.run_in_transaction(
-            feedback_services.update_feedback_email_retries, user_id)
+        with ndb.Client().transaction():
+            feedback_services.update_feedback_email_retries(user_id)
 
         messages = {}
         for reference in references:
@@ -67,9 +68,10 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
                 }
 
         email_manager.send_feedback_message_email(user_id, messages)
-        transaction_services.run_in_transaction(
-            feedback_services.pop_feedback_message_references, user_id,
-            len(references))
+
+        with ndb.Client().transaction():
+            feedback_services.pop_feedback_message_references(user_id,
+                len(references))
 
 
 class SuggestionEmailHandler(base.BaseHandler):

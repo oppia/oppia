@@ -132,7 +132,7 @@ describe('Solution object factory', () => {
         id: '0',
         customizationArgs: {
           choices: {
-            value: 'This is a choice'
+            value: [new SubtitledHtml('This is a choice', '')]
           }
         }
       };
@@ -140,7 +140,7 @@ describe('Solution object factory', () => {
         prefix: 'One',
         answer: '<oppia-short-response-0 ' +
           'answer="&amp;quot;This is a correct answer!&amp;quot;" ' +
-          'choices="&amp;quot;This is a choice&amp;quot;">' +
+          'choices="[&amp;quot;This is a choice&amp;quot;]">' +
           '</oppia-short-response-0>'
       };
 

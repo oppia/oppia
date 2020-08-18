@@ -27,10 +27,7 @@
         "downloadFormat": "zip",
         "url": "https://github.com/danielstern/ngAudio/archive/1.7.4.zip",
         "rootDirPrefix": "ngAudio-",
-        "targetDirPrefix": "angular-audio-",
-        "bundle": {
-          "js": ["app/angular.audio.js"]
-        }
+        "targetDirPrefix": "angular-audio-"
       },
       "lamejs": {
         "version": "1.2.0",
@@ -73,10 +70,7 @@
         "downloadFormat": "zip",
         "url": "https://github.com/marceljuenemann/angular-drag-and-drop-lists/archive/2.1.0.zip",
         "rootDirPrefix": "angular-drag-and-drop-lists-",
-        "targetDirPrefix": "angular-drag-and-drop-lists-",
-        "bundle": {
-          "js": ["angular-drag-and-drop-lists.min.js"]
-        }
+        "targetDirPrefix": "angular-drag-and-drop-lists-"
       },
       "angularStorageCookiesRev": {
         "version": "2.18.1",
@@ -235,12 +229,15 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4",
         "rootDirPrefix": "headroom-js-",
         "targetDirPrefix": "headroom-js-",
-        "files": ["angular.headroom.min.js", "headroom.min.js"]
+        "files": ["angular.headroom.min.js", "headroom.min.js"],
+        "bundle": {
+          "js": ["headroom.min.js", "angular.headroom.min.js"]
+        }
       },
       "jquery": {
-        "version": "3.4.1",
+        "version": "3.5.1",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.4.1",
+        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1",
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
         "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"]
@@ -288,19 +285,7 @@
         "rootDirPrefix": "ng-joyride-",
         "targetDir": "ng-joyride-b117e0",
         "bundle": {
-          "css": ["ng-joyride.css"],
-          "js": ["ng-joyride.js"]
-        }
-      },
-      "ngInfiniteScroll": {
-        "version": "1.0.0",
-        "downloadFormat": "files",
-        "url": "https://raw.github.com/BinaryMuse/ngInfiniteScroll/1.0.0/build",
-        "rootDirPrefix": "nginfinitescroll-",
-        "targetDirPrefix": "nginfinitescroll-",
-        "files": ["ng-infinite-scroll.min.js"],
-        "bundle": {
-          "js": ["ng-infinite-scroll.min.js"]
+          "css": ["ng-joyride.css"]
         }
       },
       "select2": {
@@ -310,8 +295,7 @@
         "rootDirPrefix": "select2-",
         "targetDirPrefix": "select2-",
         "bundle": {
-          "css": ["dist/css/select2.css"],
-          "js": ["dist/js/select2.full.js"]
+          "css": ["dist/css/select2.css"]
         }
       },
       "ckeditor": {
@@ -353,16 +337,6 @@
         "rootDirPrefix": "ui-codemirror-",
         "targetDir": "ui-codemirror-5d04fa"
       },
-      "uiSortable": {
-        "version": "0.19.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-sortable/archive/src0.19.0.zip",
-        "rootDirPrefix": "ui-sortable-src",
-        "targetDirPrefix": "ui-sortable-",
-        "bundle": {
-          "js": ["src/sortable.js"]
-        }
-      },
       "uiTree": {
         "version": "",
         "downloadFormat": "zip",
@@ -370,18 +344,7 @@
         "rootDirPrefix": "angular-ui-tree-master",
         "targetDirPrefix": "ui-tree-2.22.6",
         "bundle": {
-          "css": ["dist/angular-ui-tree.min.css"],
-          "js": ["dist/angular-ui-tree.js"]
-        }
-      },
-      "uiValidate": {
-        "version": "1.2.3",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-validate/archive/1.2.3.zip",
-        "rootDirPrefix": "ui-validate-",
-        "targetDirPrefix": "ui-validate-",
-        "bundle": {
-          "js": ["src/validate.js"]
+          "css": ["dist/angular-ui-tree.min.css"]
         }
       }
     },

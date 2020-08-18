@@ -22,11 +22,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ICollectionRightsBackendDict {
-  'collection_id'?: number;
-  'can_edit'?: boolean;
-  'can_unpublish'?: boolean;
-  'is_private'?: boolean;
+export interface CollectionRightsBackendDict {
+  'collection_id': number;
+  'can_edit': boolean;
+  'can_unpublish': boolean;
+  'is_private': boolean;
   'owner_names': string[];
 }
 
@@ -37,7 +37,7 @@ export class CollectionRights {
   _isPrivate: boolean;
   _ownerNames: string[];
 
-  constructor(collectionRightsObject: ICollectionRightsBackendDict) {
+  constructor(collectionRightsObject: CollectionRightsBackendDict) {
     this._collectionId = collectionRightsObject.collection_id;
     this._canEdit = collectionRightsObject.can_edit;
     this._canUnpublish = collectionRightsObject.can_unpublish;
@@ -126,7 +126,7 @@ export class CollectionRightsObjectFactory {
   // contexts. This function takes a JSON object which represents a backend
   // collection python dict.
   create(
-      collectionRightsBackendObject: ICollectionRightsBackendDict):
+      collectionRightsBackendObject: CollectionRightsBackendDict):
       CollectionRights {
     return new CollectionRights(cloneDeep(collectionRightsBackendObject));
   }
@@ -135,7 +135,11 @@ export class CollectionRightsObjectFactory {
   // pass validation tests.
   createEmptyCollectionRights(): CollectionRights {
     return new CollectionRights({
-      owner_names: []
+      owner_names: [],
+      collection_id: null,
+      can_edit: null,
+      can_unpublish: null,
+      is_private: null
     });
   }
 }

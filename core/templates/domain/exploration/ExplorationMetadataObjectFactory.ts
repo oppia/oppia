@@ -20,26 +20,29 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export interface ExplorationMetaDataBackendDict {
+  id: string;
+  objective: string;
+  title: string;
+}
+
 export class ExplorationMetadata {
-  metadataList;
-
-  constructor(metadataList) {
-    this.metadataList = angular.copy(metadataList);
-  }
-
-  getMetadataList() {
-    return this.metadataList;
-  }
+  constructor(
+    public id: string,
+    public objective: string,
+    public title: string) {}
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExplorationMetadataObjectFactory {
-  static createFromBackendDict(explorationMetadataBackendDict: any) {
+  static createFromBackendDict(
+      explorationMetadataBackendDict: ExplorationMetaDataBackendDict) {
     return new ExplorationMetadata(
-      explorationMetadataBackendDict.collection_node_metadata_list
-    );
+      explorationMetadataBackendDict.id,
+      explorationMetadataBackendDict.objective,
+      explorationMetadataBackendDict.title);
   }
 }
 

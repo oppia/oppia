@@ -39,8 +39,10 @@ require('services/context.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('ResponsesService', [
-  '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
+  'AlertsService', 'AnswerGroupsCacheService',
   'LoggerService', 'OutcomeObjectFactory',
   'SolutionValidityService', 'SolutionVerificationService',
   'StateEditorService', 'StateInteractionIdService',
@@ -49,7 +51,7 @@ angular.module('oppia').factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
   function(
-      $rootScope, AlertsService, AnswerGroupsCacheService,
+      AlertsService, AnswerGroupsCacheService,
       LoggerService, OutcomeObjectFactory,
       SolutionValidityService, SolutionVerificationService,
       StateEditorService, StateInteractionIdService,
@@ -69,6 +71,8 @@ angular.module('oppia').factory('ResponsesService', [
     var _defaultOutcome = null;
     var _confirmedUnclassifiedAnswers = null;
     var _answerChoices = null;
+    var _answerGroupsChangedEventEmitter = new EventEmitter();
+    var _initializeAnswerGroupsEventEmitter = new EventEmitter();
 
     var _verifySolution = function() {
       // This checks if the solution is valid once a rule has been changed or
@@ -114,7 +118,7 @@ angular.module('oppia').factory('ResponsesService', [
       if (newAnswerGroups && oldAnswerGroups &&
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
-        $rootScope.$broadcast('answerGroupChanged', newAnswerGroups);
+        _answerGroupsChangedEventEmitter.emit();
         _verifySolution();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
       }
@@ -125,7 +129,7 @@ angular.module('oppia').factory('ResponsesService', [
 
       if (answerGroup) {
         if (updates.hasOwnProperty('rules')) {
-          answerGroup.rules = updates.rules;
+          answerGroup.updateRuleTypesToInputs(updates.rules);
         }
         if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
           answerGroup.taggedSkillMisconceptionId =
@@ -377,7 +381,7 @@ angular.module('oppia').factory('ResponsesService', [
 
           var key, newInputValue;
           _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-            var newRules = angular.copy(answerGroup.rules);
+            var newRules = angular.copy(answerGroup.getRulesAsList());
             newRules.forEach(function(rule) {
               for (key in rule.inputs) {
                 newInputValue = [];
@@ -436,7 +440,7 @@ angular.module('oppia').factory('ResponsesService', [
 
           if (anyChangesHappened) {
             _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-              var newRules = angular.copy(answerGroup.rules);
+              var newRules = angular.copy(answerGroup.getRulesAsList());
               newRules.forEach(function(rule) {
                 if (rule.type === 'HasElementXAtPositionY') {
                   rule.inputs.x = newAnswerChoices[0].val;
@@ -461,6 +465,14 @@ angular.module('oppia').factory('ResponsesService', [
         _saveAnswerGroups(newAnswerGroups);
         _saveDefaultOutcome(defaultOutcome);
         callback(_answerGroupsMemento, _defaultOutcomeMemento);
+      },
+
+      get onAnswerGroupsChanged() {
+        return _answerGroupsChangedEventEmitter;
+      },
+
+      get onInitializeAnswerGroups() {
+        return _initializeAnswerGroupsEventEmitter;
       }
     };
   }

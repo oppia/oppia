@@ -1,20 +1,18 @@
-<md-card class="oppia-editor-card-with-avatar">
+<md-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
   <div class="oppia-editor-card-body">
-    <div class="oppia-editor-card-section">
-      <div class="oppia-misconception-card-header">
+    <div class="oppia-editor-card-section skill-misconception-content">
+      <div class="oppia-misconception-card-header oppia-mobile-collapsible-card-header" ng-click="toggleMisconceptionLists()">
         <strong class="heading-text">Misconceptions</strong>
-        <i ng-click="toggleMisconceptionLists()"
-           class="fa fa-angle-down"
+        <i class="fa fa-caret-down"
            ng-if="!misconceptionsListIsShown"
            aria-hidden="true">
         </i>
-        <i ng-click="toggleMisconceptionLists()"
-           class="fa fa-angle-up"
+        <i class="fa fa-caret-up"
            ng-if="misconceptionsListIsShown"
            aria-hidden="true">
         </i>
       </div>
-      <div ng-if="misconceptionsListIsShown">
+      <div ng-if="misconceptionsListIsShown" class="oppia-mobile-collapsible-card-content">
         <div class="helper-text">
           <span>
             <i>
@@ -55,7 +53,7 @@
           </ul>
         </div>
         <button type="button"
-                class="btn add-skill-misconception-button protractor-test-add-misconception-modal-button"
+                class="btn add-skill-misconception-button skill-editor-add-btn protractor-test-add-misconception-modal-button"
                 ng-click="openAddMisconceptionModal()">
           + ADD MISCONCEPTION
         </button>
@@ -75,7 +73,6 @@
 
   skill-misconceptions-editor .helper-text {
     color: #595959;
-    padding-bottom: 12px;
   }
 
   skill-misconceptions-editor .helper-text span {
@@ -98,6 +95,9 @@
   @media screen and (max-width: 768px) {
     skill-misconceptions-editor .oppia-misconception-card-header i {
       display: block;
+    }
+    skill-misconceptions-editor .skill-misconception-content {
+      padding: 0;
     }
   }
 </style>

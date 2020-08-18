@@ -17,11 +17,17 @@
  */
 
 angular.module('oppia').controller('RteHelperModalController', [
-  '$scope', '$timeout', '$uibModalInstance', 'FocusManagerService',
+  '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
+  'AssetsBackendApiService', 'ContextService', 'FocusManagerService',
+  'ImageLocalStorageService', 'ImageUploadHelperService',
   'attrsCustomizationArgsDict', 'customizationArgSpecs',
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
-      $scope, $timeout, $uibModalInstance, FocusManagerService,
-      attrsCustomizationArgsDict, customizationArgSpecs) {
+      $scope, $timeout, $uibModalInstance, AlertsService,
+      AssetsBackendApiService, ContextService, FocusManagerService,
+      ImageLocalStorageService, ImageUploadHelperService,
+      attrsCustomizationArgsDict, customizationArgSpecs,
+      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     var extractVideoIdFromVideoUrl = function(videoUrl) {
       videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
       return ((videoUrl[2] !== undefined) ?
@@ -42,38 +48,121 @@ angular.module('oppia').controller('RteHelperModalController', [
       $scope.modalIsLoading = false;
     });
 
+    $scope.currentRteIsMathExpressionEditor = false;
     $scope.tmpCustomizationArgs = [];
     for (var i = 0; i < customizationArgSpecs.length; i++) {
       var caName = customizationArgSpecs[i].name;
-      $scope.tmpCustomizationArgs.push({
-        name: caName,
-        value: (
-          attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-            angular.copy(attrsCustomizationArgsDict[caName]) :
-            customizationArgSpecs[i].default_value)
-      });
+      if (caName === 'math_content') {
+        $scope.currentRteIsMathExpressionEditor = true;
+        var mathValueDict = {
+          name: caName,
+          value: (
+            attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+              angular.copy(attrsCustomizationArgsDict[caName]) :
+              customizationArgSpecs[i].default_value)
+        };
+        // If the component being created or edited is math rich text component,
+        // we need to pass this extra attribute svgFile to the math RTE editor.
+        // The math RTE editor will auto-generate the svgFile based on the
+        // rawLatex value and then this file can be saved to the backend when
+        // the user clicks on the save button.
+        mathValueDict.value.svgFile = null;
+        mathValueDict.value.mathExpressionSvgIsBeingProcessed = false;
+        $scope.tmpCustomizationArgs.push(mathValueDict);
+      } else {
+        $scope.tmpCustomizationArgs.push({
+          name: caName,
+          value: (
+            attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+              angular.copy(attrsCustomizationArgsDict[caName]) :
+              customizationArgSpecs[i].default_value)
+        });
+      }
     }
 
     $scope.cancel = function() {
       $uibModalInstance.dismiss('cancel');
     };
 
+    $scope.disableSaveButtonForMathRte = function() {
+      // This method disables the save button when the Math SVG has not yet
+      // been generated but being processed.
+      if (!$scope.currentRteIsMathExpressionEditor) {
+        return false;
+      } else {
+        return (
+          $scope.tmpCustomizationArgs[0].value.
+            mathExpressionSvgIsBeingProcessed);
+      }
+    };
     $scope.save = function() {
       $scope.$broadcast('externalSave');
 
       var customizationArgsDict = {};
-      for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-        var caName = $scope.tmpCustomizationArgs[i].name;
-        if (caName === 'video_id') {
-          var temp = $scope.tmpCustomizationArgs[i].value;
-          customizationArgsDict[caName] = (
-            extractVideoIdFromVideoUrl(temp.toString()));
-        } else {
-          customizationArgsDict[caName] = (
-            $scope.tmpCustomizationArgs[i].value);
+      // For the case of the math rich text components, we need to handle the
+      // saving of the generated SVG file here because the process of saving
+      // the SVG is asynchronous and the saving of SVG to the backend is to
+      // be done only after the user clicks on the save button.
+      // The saving of SVGs to the backend cannot be done in the math RTE editor
+      // because the control is passed to this function as soon as the user
+      // clicks on the save button.
+      if ($scope.currentRteIsMathExpressionEditor) {
+        // The tmpCustomizationArgs is guranteed to have only one element for
+        // the case of math rich text component.
+        var svgFile = $scope.tmpCustomizationArgs[0].value.svgFile;
+        var svgFileName = $scope.tmpCustomizationArgs[0].value.svg_filename;
+        var rawLatex = $scope.tmpCustomizationArgs[0].value.raw_latex;
+        if (rawLatex === '' || svgFileName === '') {
+          AlertsService.addWarning(
+            'The rawLatex or svgFileName for a Math expression should not ' +
+            'be empty.');
+          $uibModalInstance.dismiss('cancel');
+          return;
         }
+        if (
+          ContextService.getImageSaveDestination() ===
+          IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+          ImageLocalStorageService.saveImage(svgFileName, svgFile);
+          var mathContentDict = {
+            raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
+            svg_filename: svgFileName
+          };
+          var caName = $scope.tmpCustomizationArgs[0].name;
+          customizationArgsDict[caName] = mathContentDict;
+          $uibModalInstance.close(customizationArgsDict);
+          return;
+        }
+        var resampledFile = (
+          ImageUploadHelperService.convertImageDataToImageFile(svgFile));
+        AssetsBackendApiService.saveMathExpresionImage(
+          resampledFile, svgFileName, ContextService.getEntityType(),
+          ContextService.getEntityId()).then(function(response) {
+          var mathContentDict = {
+            raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
+            svg_filename: response.filename
+          };
+          var caName = $scope.tmpCustomizationArgs[0].name;
+          customizationArgsDict[caName] = mathContentDict;
+          $uibModalInstance.close(customizationArgsDict);
+        }, function(errorResponse) {
+          AlertsService.addWarning(
+            errorResponse.error || 'Error communicating with server.');
+          $uibModalInstance.dismiss('cancel');
+        });
+      } else {
+        for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+          var caName = $scope.tmpCustomizationArgs[i].name;
+          if (caName === 'video_id') {
+            var temp = $scope.tmpCustomizationArgs[i].value;
+            customizationArgsDict[caName] = (
+              extractVideoIdFromVideoUrl(temp.toString()));
+          } else {
+            customizationArgsDict[caName] = (
+              $scope.tmpCustomizationArgs[i].value);
+          }
+        }
+        $uibModalInstance.close(customizationArgsDict);
       }
-      $uibModalInstance.close(customizationArgsDict);
     };
   }
 ]);

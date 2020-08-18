@@ -22,11 +22,11 @@ import { Injectable } from '@angular/core';
 
 export class Classifier {
   algorithmId: string;
-  classifierData: IClassifierData;
+  classifierData: ClassifierData;
   dataSchemaVersion: number;
 
   constructor(
-      algorithmId: string, classifierData: IClassifierData,
+      algorithmId: string, classifierData: ClassifierData,
       dataSchemaVersion: number) {
     this.algorithmId = algorithmId;
     this.classifierData = classifierData;
@@ -39,7 +39,7 @@ export class Classifier {
 })
 export class ClassifierObjectFactory {
   create(
-      algorithmId: string, classifierData: IClassifierData,
+      algorithmId: string, classifierData: ClassifierData,
       dataSchemaVersion: number): Classifier {
     return new Classifier(algorithmId, classifierData, dataSchemaVersion);
   }

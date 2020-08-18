@@ -137,9 +137,64 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
     def test_get_fails_when_skill_id_not_valid(self):
         self.get_json('%s/%s?cursor=' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, '1,2'),
-                      expected_status_int=404)
+                      expected_status_int=400)
 
     def test_get_fails_when_skill_does_not_exist(self):
         self.get_json('%s/%s?cursor=' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id_3),
                       expected_status_int=404)
+
+
+class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
+
+    def test_get_question_count_succeeds(self):
+        self.login(self.ADMIN_EMAIL)
+        question_id = question_services.get_new_question_id()
+        question_id_1 = question_services.get_new_question_id()
+
+        self.save_new_question(
+            question_id, self.admin_id,
+            self._create_valid_question_data('ABC'),
+            [self.skill_id])
+
+        self.save_new_question(
+            question_id_1, self.admin_id,
+            self._create_valid_question_data('ABC2'),
+            [self.skill_id_2])
+
+        question_services.create_new_question_skill_link(
+            self.admin_id, question_id, self.skill_id, 0.5)
+        question_services.create_new_question_skill_link(
+            self.admin_id, question_id_1, self.skill_id_2, 0.3)
+
+        json_response = self.get_json(
+            '%s/%s,%s' % (
+                feconf.QUESTION_COUNT_URL_PREFIX,
+                self.skill_id, self.skill_id_2
+            ))
+        self.assertEqual(json_response['total_question_count'], 2)
+
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.QUESTION_COUNT_URL_PREFIX,
+                self.skill_id
+            ))
+        self.assertEqual(json_response['total_question_count'], 1)
+
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.QUESTION_COUNT_URL_PREFIX,
+                self.skill_id_2
+            ))
+        self.assertEqual(json_response['total_question_count'], 1)
+
+    def test_get_question_count_when_no_question_is_assigned_to_skill(self):
+        self.login(self.ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.QUESTION_COUNT_URL_PREFIX, self.skill_id))
+        self.assertEqual(json_response['total_question_count'], 0)
+
+    def test_get_question_count_fails_with_invalid_skill_ids(self):
+        self.get_json(
+            '%s/%s' % (feconf.QUESTION_COUNT_URL_PREFIX, 'id1'),
+            expected_status_int=400)

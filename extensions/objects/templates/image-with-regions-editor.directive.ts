@@ -519,9 +519,9 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
                 $('<img/>').attr('src', ctrl.getPreviewUrl(newVal)).on(
                   'load', function() {
                     ctrl.originalImageWidth = (
-                      <HTMLCanvasElement><any> this).width;
+                      <HTMLCanvasElement> this).width;
                     ctrl.originalImageHeight = (
-                      <HTMLCanvasElement><any> this).height;
+                      <HTMLCanvasElement> this).height;
                     $scope.$apply();
                   }
                 );

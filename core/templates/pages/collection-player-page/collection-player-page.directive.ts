@@ -18,7 +18,7 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
@@ -220,7 +220,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
           };
 
           ctrl.getExplorationTitlePosition = function(index) {
-            if (index % 2 === 0 ) {
+            if (index % 2 === 0) {
               return '8px';
             } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
               return '30px';
@@ -308,10 +308,8 @@ angular.module('oppia').directive('collectionPlayerPage', [
             // Load the collection the learner wants to view.
             ReadOnlyCollectionBackendApiService.loadCollection(
               ctrl.collectionId).then(
-              function(collectionBackendObject) {
-                ctrl.collection = CollectionObjectFactory.create(
-                  collectionBackendObject);
-                $rootScope.$broadcast('collectionLoaded');
+              function(collection) {
+                ctrl.collection = collection;
 
                 PageTitleService.setPageTitle(
                   ctrl.collection.getTitle() + ' - Oppia');
@@ -339,10 +337,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                       CollectionPlaythroughObjectFactory.create(
                         nextExplorationId, completedExplorationIds));
                   } else {
-                    ctrl.collectionPlaythrough = (
-                      CollectionPlaythroughObjectFactory
-                        .createFromBackendObject(
-                          collectionBackendObject.playthrough_dict));
+                    ctrl.collectionPlaythrough = collection.getPlaythrough();
                   }
                   ctrl.nextExplorationId =
                     ctrl.collectionPlaythrough.getNextExplorationId();

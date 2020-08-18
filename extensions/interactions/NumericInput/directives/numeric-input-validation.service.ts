@@ -21,9 +21,9 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { INumericInputCustomizationArgs } from
+import { NumericInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,14 +39,14 @@ export class NumericInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: INumericInputCustomizationArgs): IWarning[] {
+      customizationArgs: NumericInputCustomizationArgs): Warning[] {
     return [];
   }
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: INumericInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      customizationArgs: NumericInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
@@ -90,12 +90,12 @@ export class NumericInputValidationService {
       });
     };
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
           lb: null,
           ub: null,
           lbi: false,
@@ -138,14 +138,29 @@ export class NumericInputValidationService {
           default:
         }
         for (var k = 0; k < ranges.length; k++) {
-          if (isEnclosedBy(range, ranges[k])) {
+          // Rules inside an AnswerGroup do not have a set order. We should
+          // check for redundant rules in both directions if rules are in the
+          // same AnswerGroup.
+          const redundantWithinAnswerGroup = (
+            ranges[k].answerGroupIndex === i &&
+            (isEnclosedBy(range, ranges[k]) || isEnclosedBy(ranges[k], range))
+          );
+
+          // AnswerGroups do have a set order. If rules are not in the same
+          // AnswerGroup we only check in one direction.
+          const redundantBetweenAnswerGroups = (
+            ranges[k].answerGroupIndex !== i &&
+            isEnclosedBy(range, ranges[k])
+          );
+
+          if (redundantWithinAnswerGroup || redundantBetweenAnswerGroups) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
                 'Rule ' + (j + 1) + ' from answer group ' +
                 (i + 1) + ' will never be matched because it ' +
-                'is made redundant by rule ' + ranges[k].ruleIndex +
-                ' from answer group ' + ranges[k].answerGroupIndex + '.')
+                'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                ' from answer group ' + (ranges[k].answerGroupIndex + 1) + '.')
             });
           }
         }
@@ -160,35 +175,40 @@ export class NumericInputValidationService {
     return warningsList;
   }
 
-  getErrorString(value: string): string {
-    if (!value) {
-      return '';
+  getErrorString(value: number): string {
+    if (value === undefined || value === null) {
+      return 'Please enter a valid number.';
+    }
+    let stringValue = null;
+    // Convert exponential notation to decimal number.
+    // Logic derived from https://stackoverflow.com/a/16139848.
+    var data = String(value).split(/[eE]/);
+    if (data.length === 1) {
+      stringValue = data[0];
+    } else {
+      var z = '';
+      var sign = value < 0 ? '-' : '';
+      var str = data[0].replace('.', '');
+      var mag = Number(data[1]) + 1;
+
+      if (mag < 0) {
+        z = sign + '0.';
+        while (mag++) {
+          z += '0';
+        }
+        stringValue = z + str.replace(/^\-/, '');
+      } else {
+        mag -= str.length;
+        while (mag--) {
+          z += '0';
+        }
+        stringValue = str + z;
+      }
     }
 
-    value = value.toString().trim();
-    const trailingDot = /\.\d/g;
-    const twoDecimals = /.*\..*\./g;
-    const extraChars = /[^0-9.+-]/g;
-    const trailingMinus = /^-/g;
-    const extraMinus = /-.*-/g;
-
-    if (value.includes('.') && !value.match(trailingDot)) {
-      return 'Trailing decimals are not allowed.';
-    } else if (value.match(twoDecimals)) {
-      return 'At most 1 decimal point should be present.';
-    } else if (value.match(extraChars)) {
-      return 'Only use numbers, minus sign (-), and decimal (.).';
-    } else if (value.includes('-') && !value.match(trailingMinus)) {
-      return 'Minus (-) sign is only allowed in beginning.';
-    } else if (value.includes('-') && value.match(extraMinus)) {
-      return 'At most 1 minus (-) sign should be present.';
-    }
-  }
-
-  parseValue(viewValue: string): number {
-    if (viewValue) {
-      // Remove commas and leading/trailing spaces before parsing.
-      return parseFloat(viewValue.trim().replace(/\,/g, ''));
+    if (stringValue.match(/\d/g).length > 15) {
+      return 'The answer can contain at most 15 digits (0-9) or symbols ' +
+        '(. or -).';
     }
   }
 }

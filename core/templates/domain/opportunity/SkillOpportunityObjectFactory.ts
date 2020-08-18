@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ISkillOpportunityBackendDict {
+export interface SkillOpportunityBackendDict {
   'id': string;
   'skill_description': string;
   'topic_name': string;
@@ -64,7 +64,7 @@ export class SkillOpportunity {
 })
 export class SkillOpportunityObjectFactory {
   createFromBackendDict(
-      backendDict: ISkillOpportunityBackendDict): SkillOpportunity {
+      backendDict: SkillOpportunityBackendDict): SkillOpportunity {
     return new SkillOpportunity(
       backendDict.id, backendDict.skill_description, backendDict.topic_name,
       backendDict.question_count);

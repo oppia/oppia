@@ -34,7 +34,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 from mapreduce import input_readers
 
 (base_models, exp_models, stats_models, job_models) = (
@@ -113,7 +113,10 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         input_reader_swap = self.swap(
             input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
-        assert_raises_context_manager = self.assertRaises(Exception)
+        assert_raises_context_manager = self.assertRaisesRegexp(
+            Exception,
+            r'Invalid status code change for job '
+            r'MockJobManagerOne-\w+-\w+: from new to failed')
 
         job_id = MockJobManagerOne.create_new()
         store_map_reduce_results = jobs.StoreMapReduceResults()
@@ -1069,8 +1072,8 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             realtime_class(
                 id=realtime_model_id, count=1,
                 realtime_layer=active_realtime_layer).put()
-
-        transaction_services.run_in_transaction(_increment_counter)
+        with ndb.Client().transaction():
+            _increment_counter()
 
     # Public query method.
     @classmethod
@@ -1195,7 +1198,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
             # The batch job has not run yet, so no entity for self.EXP_ID will
             # have been created in the batch model yet.
-            with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            with self.assertRaisesRegexp(
+                base_models.BaseModel.EntityNotFoundError,
+                'Entity for class ExplorationAnnotationsModel with id exp_id '
+                'not found'):
                 stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
 
             # Launch the batch computation.
@@ -1266,7 +1272,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
             # The batch job result should still be 0, since the event arrived
             # after the batch job started.
-            with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            with self.assertRaisesRegexp(
+                base_models.BaseModel.EntityNotFoundError,
+                'Entity for class ExplorationAnnotationsModel with id exp_id '
+                'not found'):
                 stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
 
     def test_cannot_start_new_job_while_existing_job_still_running(self):

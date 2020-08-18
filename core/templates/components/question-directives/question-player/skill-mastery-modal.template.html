@@ -3,8 +3,8 @@
 </div>
 
 <div class="modal-body">
-  <skill-mastery-viewer skill-id="skillId"
-                        mastery-change="masteryChange"
+  <skill-mastery-viewer [skill-id]="skillId"
+                        [mastery-change]="masteryChange"
                         ng-if="userIsLoggedIn">
   </skill-mastery-viewer>
   <div ng-if="!userIsLoggedIn">

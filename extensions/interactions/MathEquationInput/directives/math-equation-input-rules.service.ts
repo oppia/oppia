@@ -24,10 +24,10 @@ import nerdamer from 'nerdamer';
 import { AlgebraicExpressionInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts';
-import { IMathEquationAnswer } from 'interactions/answer-defs';
+import { MathEquationAnswer } from 'interactions/answer-defs';
 import {
-  IMathEquationIsEquivalentToRuleInputs,
-  IMathEquationMatchesExactlyWithRuleInputs
+  MathEquationIsEquivalentToRuleInputs,
+  MathEquationMatchesExactlyWithRuleInputs
 } from 'interactions/rule-input-defs';
 
 @Injectable({
@@ -35,9 +35,9 @@ import {
 })
 export class MathEquationInputRulesService {
   MatchesExactlyWith(
-      answer: IMathEquationAnswer,
-      inputs: IMathEquationMatchesExactlyWithRuleInputs): boolean {
-    let aeirs = new AlgebraicExpressionInputRulesService();
+      answer: MathEquationAnswer,
+      inputs: MathEquationMatchesExactlyWithRuleInputs): boolean {
+    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
 
     let positionOfTerms = inputs.y;
 
@@ -48,13 +48,13 @@ export class MathEquationInputRulesService {
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
 
     if (positionOfTerms === 'lhs') {
-      return aeirs.MatchesExactlyWith(lhsAnswer, {x: lhsInput});
+      return algebraicRulesService.MatchesExactlyWith(lhsAnswer, {x: lhsInput});
     } else if (positionOfTerms === 'rhs') {
-      return aeirs.MatchesExactlyWith(rhsAnswer, {x: rhsInput});
+      return algebraicRulesService.MatchesExactlyWith(rhsAnswer, {x: rhsInput});
     } else if (positionOfTerms === 'both') {
       return (
-        aeirs.MatchesExactlyWith(lhsAnswer, {x: lhsInput}) && (
-          aeirs.MatchesExactlyWith(rhsAnswer, {x: rhsInput})));
+        algebraicRulesService.MatchesExactlyWith(lhsAnswer, {x: lhsInput}) && (
+          algebraicRulesService.MatchesExactlyWith(rhsAnswer, {x: rhsInput})));
     } else {
       // Position of terms is irrelevant. So, we bring all terms on one side
       // and perform an exact match.
@@ -64,14 +64,15 @@ export class MathEquationInputRulesService {
       let rhsInputModified = nerdamer(rhsInput).multiply('-1').text();
       let expressionInput = nerdamer(rhsInputModified).add(lhsInput).text();
 
-      return aeirs.MatchesExactlyWith(expressionAnswer, {x: expressionInput});
+      return algebraicRulesService.MatchesExactlyWith(
+        expressionAnswer, {x: expressionInput});
     }
   }
 
   IsEquivalentTo(
-      answer: IMathEquationAnswer,
-      inputs: IMathEquationIsEquivalentToRuleInputs): boolean {
-    let aeirs = new AlgebraicExpressionInputRulesService();
+      answer: MathEquationAnswer,
+      inputs: MathEquationIsEquivalentToRuleInputs): boolean {
+    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
 
     let splitAnswer = answer.split('=');
     let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
@@ -89,9 +90,10 @@ export class MathEquationInputRulesService {
     let expressionInput1 = nerdamer(lhsInput).subtract(rhsInput).text();
     let expressionInput2 = nerdamer(rhsInput).subtract(lhsInput).text();
 
-    if (aeirs.IsEquivalentTo(
-      expressionAnswer, {x: expressionInput1}) || aeirs.IsEquivalentTo(
-      expressionAnswer, {x: expressionInput2})) {
+    if (algebraicRulesService.IsEquivalentTo(
+      expressionAnswer, {x: expressionInput1}) ||
+      algebraicRulesService.IsEquivalentTo(
+        expressionAnswer, {x: expressionInput2})) {
       return true;
     }
 
@@ -109,9 +111,10 @@ export class MathEquationInputRulesService {
       expressionInput1 = nerdamer(lhsInput).divide(rhsInput).text();
       expressionInput2 = nerdamer(rhsInput).divide(lhsInput).text();
 
-      if (aeirs.IsEquivalentTo(
-        expressionAnswer, {x: expressionInput1}) || aeirs.IsEquivalentTo(
-        expressionAnswer, {x: expressionInput2})) {
+      if (algebraicRulesService.IsEquivalentTo(
+        expressionAnswer, {x: expressionInput1}) ||
+        algebraicRulesService.IsEquivalentTo(
+          expressionAnswer, {x: expressionInput2})) {
         return true;
       }
     }

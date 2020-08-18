@@ -41,11 +41,10 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.topic_id = topic_services.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
-        self.save_new_story(
-            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(self.story_id, self.admin_id, self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name', url_fragment='name',
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -67,9 +66,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -178,9 +175,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
 
         self.get_html_response(
             '%s/%s' % (
@@ -201,9 +196,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
         self.get_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id),
@@ -215,9 +208,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
 
         new_story_id = story_services.get_new_story_id()
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
 
         self.get_json(
             '%s/%s' % (
@@ -226,6 +217,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.save_new_topic(
             'topic_id_new', self.admin_id, name='Name 2',
+            abbreviated_name='name-two', url_fragment='name-two',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -262,9 +254,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -288,9 +278,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
         new_story_id = story_services.get_new_story_id()
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -302,6 +290,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # associated with the new topic.
         self.save_new_topic(
             'topic_id_new', self.admin_id, name='Name 2',
+            abbreviated_name='name-new', url_fragment='name-new',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -332,11 +321,38 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         json_response = self.put_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
-            change_cmd, csrf_token=csrf_token, expected_status_int=500)
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             json_response['error'],
             'Expected a commit message but received none.')
+
+        self.logout()
+
+    def test_put_fails_with_long_commit_message(self):
+        self.login(self.ADMIN_EMAIL)
+
+        change_cmd = {
+            'version': 1,
+            'commit_message': 'a' * 1001,
+            'change_dicts': [{
+                'cmd': 'update_story_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            }]
+        }
+
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Commit messages must be at most 1000 characters long.')
 
         self.logout()
 
@@ -353,9 +369,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
     def test_delete_can_not_access_story_handler_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
         new_story_id = story_services.get_new_story_id()
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            'invalid_topic_id')
+        self.save_new_story(new_story_id, self.admin_id, 'invalid_topic_id')
         self.delete_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX,

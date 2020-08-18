@@ -136,11 +136,6 @@ jobs:
           name: Run e2e navigation test
           command: |
             python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
-          # Provide a longer time period for this first test (which omits the
-          # --skip-build flag), since the webpack build process itself can take
-          # up to 10 minutes. If this is not done, then the test may stall due
-          # to lack of test output during this time.
-          no_output_timeout: 20m
       - check_release_chaneglog_update_branch
       - run:
           name: Run e2e admin page test
@@ -185,10 +180,6 @@ jobs:
           name: Run e2e accessibility page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
-      - run:
-          name: Run e2e embedding page test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
 
   e2e_users:
     <<: *job_defaults
@@ -239,15 +230,15 @@ jobs:
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info
       - run:
           name: Run e2e topics and story editor
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --server_log_level=info
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --server_log_level=info
       - run:
           name: Run e2e topic and story editor test
           command: |
@@ -256,6 +247,10 @@ jobs:
           name: Run e2e play voiceovers test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
+      - run:
+          name: Run e2e file upload extensions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
 
 notify:
   webhooks:

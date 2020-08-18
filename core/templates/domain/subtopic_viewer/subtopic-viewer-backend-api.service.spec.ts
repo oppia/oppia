@@ -67,10 +67,10 @@ describe('Subtopic viewer backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      subtopicViewerBackendApiService.fetchSubtopicData('topic', '0').then(
-        successHandler, failHandler);
+      subtopicViewerBackendApiService.fetchSubtopicData(
+        'topic', 'staging', '0').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/subtopic_data_handler/topic/0');
+        '/subtopic_data_handler/staging/topic/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -86,10 +86,10 @@ describe('Subtopic viewer backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      subtopicViewerBackendApiService.fetchSubtopicData('topic', '0').then(
-        successHandler, failHandler);
+      subtopicViewerBackendApiService.fetchSubtopicData(
+        'topic', 'staging', '0').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/subtopic_data_handler/topic/0');
+        '/subtopic_data_handler/staging/topic/0');
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading subtopic.', {
         status: 500, statusText: 'Invalid Request'

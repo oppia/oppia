@@ -17,18 +17,21 @@
  * domain objects.
  */
 
-export interface ISubtitledHtmlBackendDict {
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+export interface SubtitledHtmlBackendDict {
   'content_id': string;
   'html': string;
 }
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 export class SubtitledHtml {
   _html: string;
-  _contentId: string;
-  constructor(html: string, contentId: string) {
+  // A null content_id indicates that the SubtitledHtml has been created
+  // but not saved. Before the SubtitledHtml object is saved into a State,
+  // the content_id should be set to a string.
+  _contentId: string | null;
+  constructor(html: string, contentId: string | null) {
     this._html = html;
     this._contentId = contentId;
   }
@@ -45,11 +48,11 @@ export class SubtitledHtml {
     this._html = newHtml;
   }
 
-  hasNoHtml(): boolean {
-    return !this._html;
+  setContentId(newContentId: string): void {
+    this._contentId = newContentId;
   }
 
-  toBackendDict(): ISubtitledHtmlBackendDict {
+  toBackendDict(): SubtitledHtmlBackendDict {
     return {
       html: this._html,
       content_id: this._contentId
@@ -57,7 +60,7 @@ export class SubtitledHtml {
   }
 
   isEmpty(): boolean {
-    return this.hasNoHtml();
+    return !this._html;
   }
 }
 
@@ -66,7 +69,7 @@ export class SubtitledHtml {
 })
 export class SubtitledHtmlObjectFactory {
   createFromBackendDict(
-      subtitledHtmlBackendDict: ISubtitledHtmlBackendDict): SubtitledHtml {
+      subtitledHtmlBackendDict: SubtitledHtmlBackendDict): SubtitledHtml {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }

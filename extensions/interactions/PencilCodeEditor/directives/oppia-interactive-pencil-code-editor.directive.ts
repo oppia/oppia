@@ -30,12 +30,18 @@ require(
   'interactions/PencilCodeEditor/directives/' +
   'pencil-code-editor-rules.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
-  '$timeout', 'HtmlEscaperService', 'EVENT_NEW_CARD_AVAILABLE',
-  function($timeout, HtmlEscaperService, EVENT_NEW_CARD_AVAILABLE) {
+  '$timeout', 'InteractionAttributesExtractorService',
+  'PlayerPositionService',
+  function($timeout, InteractionAttributesExtractorService,
+      PlayerPositionService) {
     return {
       restrict: 'E',
       scope: {},
@@ -52,6 +58,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             FocusManagerService, PencilCodeEditorRulesService,
             CurrentInteractionService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var iframeDiv, pce;
           ctrl.reset = function() {
             $uibModal.open({
@@ -74,18 +81,28 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             return pce.getCode().replace(/\t/g, '  ');
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-              pce.hideMiddleButton();
-              pce.hideToggleButton();
-              pce.setReadOnly();
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => {
+                  ctrl.interactionIsActive = false;
+                  pce.hideMiddleButton();
+                  pce.hideToggleButton();
+                  pce.setReadOnly();
+                }
+              )
+            );
             iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
             pce = new PencilCodeEmbed(iframeDiv);
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
 
+            const {
+              initialCode
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'PencilCodeEditor',
+              $attrs
+            );
             ctrl.initialCode = ctrl.interactionIsActive ?
-              HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
+              initialCode :
               ctrl.getLastAnswer().code;
 
             pce.beginLoad(ctrl.initialCode);
@@ -186,6 +203,9 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             });
 
             CurrentInteractionService.registerCurrentInteraction(null, null);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

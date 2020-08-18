@@ -19,7 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 
 def fetch_multiple_entities_by_ids_and_models(ids_and_models):

@@ -29,10 +29,9 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
-transaction_services = models.Registry.import_transaction_services()
 
 CURRENT_ACTION_SCHEMA_VERSION = 1
 CURRENT_ISSUE_SCHEMA_VERSION = 1
@@ -99,11 +98,6 @@ class StateCounterModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateCounterModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_or_create(cls, exploration_id, state_name):
         """Gets or creates an entity by exploration_id and state_name.
@@ -131,13 +125,13 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student submitting an answer."""
 
     # Id of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = ndb.StringProperty()
     # Current version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = ndb.StringProperty()
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = ndb.StringProperty()
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
     # Whether the submitted answer received useful feedback.
@@ -151,13 +145,6 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """AnswerSubmittedEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -202,13 +189,13 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     """
 
     # Id of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = ndb.StringProperty()
     # Current version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = ndb.StringProperty()
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = ndb.StringProperty()
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -218,13 +205,6 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationActualStartEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -262,13 +242,13 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student triggering the solution."""
 
     # Id of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = ndb.StringProperty()
     # Current version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = ndb.StringProperty()
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = ndb.StringProperty()
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
@@ -280,11 +260,6 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SolutionHitEventLogEntryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -340,15 +315,15 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     """
 
     # Which specific type of event this is.
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = ndb.StringProperty()
     # Id of exploration currently being played.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = ndb.StringProperty()
     # Current version of exploration.
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = ndb.StringProperty()
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = ndb.StringProperty()
     # Time since start of this state before this event occurred (in sec).
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
     # Current parameter values, map of parameter name to value.
@@ -356,9 +331,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -368,13 +343,6 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StartExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -471,15 +439,15 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     """
 
     # Which specific type of event this is.
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = ndb.StringProperty()
     # Id of exploration currently being played.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = ndb.StringProperty()
     # Current version of exploration.
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = ndb.StringProperty()
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = ndb.StringProperty()
     # Time since start of this state before this event occurred (in sec).
     # Note: Some of these events were migrated from StateHit event instances
     # which did not record timestamp data. For this, we use a placeholder
@@ -490,9 +458,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -502,13 +470,6 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """MaybeLeaveExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -596,15 +557,15 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     """
 
     # Which specific type of event this is.
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = ndb.StringProperty()
     # Id of exploration currently being played.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = ndb.StringProperty()
     # Current version of exploration.
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = ndb.StringProperty()
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = ndb.StringProperty()
     # Time since start of this state before this event occurred (in sec).
     # Note: Some of these events were migrated from StateHit event instances
     # which did not record timestamp data. For this, we use a placeholder
@@ -615,9 +576,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -627,13 +588,6 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CompleteExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -707,9 +661,9 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     """
 
     # Which specific type of event this is.
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = ndb.StringProperty()
     # Id of exploration which has been rated.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = ndb.StringProperty()
     # Value of rating assigned.
     rating = ndb.IntegerProperty(indexed=True)
     # Value of rating previously assigned by the same user. Will be None when a
@@ -724,13 +678,6 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """RateExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
@@ -799,23 +746,23 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     """
 
     # Which specific type of event this is.
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = ndb.StringProperty()
     # Id of exploration currently being played.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = ndb.StringProperty()
     # Current version of exploration.
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = ndb.StringProperty()
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = ndb.StringProperty()
     # Current parameter values, map of parameter name to value.
     params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -825,11 +772,6 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateHitEventLogEntryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -895,13 +837,13 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student completing a state."""
 
     # Id of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = ndb.StringProperty()
     # Current version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = ndb.StringProperty()
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = ndb.StringProperty()
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
@@ -913,13 +855,6 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateCompleteEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -960,15 +895,15 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student leaving for a refresher exploration."""
 
     # ID of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = ndb.StringProperty()
     # ID of the refresher exploration.
-    refresher_exp_id = ndb.StringProperty(indexed=True)
+    refresher_exp_id = ndb.StringProperty()
     # Current version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = ndb.StringProperty()
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = ndb.StringProperty()
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
@@ -980,13 +915,6 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """LeaveForRefresherExplorationEventLogEntryModel doesn't have any field
-        with user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -1032,7 +960,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     """
 
     # ID of exploration.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = ndb.StringProperty()
     # Version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
     # Number of learners starting the exploration (v1 - data collected before
@@ -1069,11 +997,6 @@ class ExplorationStatsModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationStatsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -1224,7 +1147,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     """
 
     # ID of exploration.
-    exp_id = ndb.StringProperty(indexed=True, required=True)
+    exp_id = ndb.StringProperty(required=True)
     # Version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True, required=True)
     # The unresolved issues for this exploration. This will be a list of dicts
@@ -1238,11 +1161,6 @@ class ExplorationIssuesModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationIssuesModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -1310,12 +1228,12 @@ class PlaythroughModel(base_models.BaseModel):
     """
 
     # ID of the exploration.
-    exp_id = ndb.StringProperty(indexed=True, required=True)
+    exp_id = ndb.StringProperty(required=True)
     # Version of the exploration.
     exp_version = ndb.IntegerProperty(indexed=True, required=True)
     # Type of the issue.
     issue_type = ndb.StringProperty(
-        indexed=True, required=True, choices=ALLOWED_ISSUE_TYPES)
+        required=True, choices=ALLOWED_ISSUE_TYPES)
     # The customization args dict for the given issue_type.
     issue_customization_args = ndb.JsonProperty(required=True)
     # The playthrough actions for this playthrough. This will be a list of dicts
@@ -1330,11 +1248,6 @@ class PlaythroughModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """PlaythroughModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the playthrough of the form
@@ -1344,10 +1257,10 @@ class PlaythroughModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new PlaythroughModel instance.
+            str. ID of the new PlaythroughModel instance.
 
         Raises:
-            Exception: The id generator for PlaythroughModel is producing too
+            Exception. The id generator for PlaythroughModel is producing too
                 many collisions.
         """
 
@@ -1424,12 +1337,12 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     # For exploration state the state reference is of the form
     # 'exp_id':'state_name', while for question state reference is of the form
     # 'question_id' as currently the one question holds only one state.
-    state_reference = ndb.StringProperty(required=True, indexed=True)
+    state_reference = ndb.StringProperty(required=True)
     # The type of entity e.g "exploration" or "question".
     entity_type = ndb.StringProperty(
-        required=True, indexed=True, choices=ALLOWED_ENTITY_TYPES)
+        required=True, choices=ALLOWED_ENTITY_TYPES)
     # The id of the interaction for which the answer details were received.
-    interaction_id = ndb.StringProperty(required=True, indexed=True)
+    interaction_id = ndb.StringProperty(required=True)
     # List of LearnerAnswerInfo dicts, which is defined in
     # stats_domain.py, each dict corresponds to a single answer info of
     # learner.
@@ -1451,11 +1364,6 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """LearnerAnswerDetailsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_state_reference_for_exploration(cls, exp_id, state_name):
@@ -1516,7 +1424,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 instance is being created. For exploration state it will be of
                 the form 'exp_id:state_name', and for question it will be of
                 the form 'question_id'.
-            interaction_id: str.  The ID of the interaction for which the
+            interaction_id: str. The ID of the interaction for which the
                 answer details are received.
             learner_answer_info_list: list(LearnerAnswerInfo). The list of
                 LearnerAnswerInfo objects in dict format, which is defined in
@@ -1580,9 +1488,9 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """
 
     # ID of exploration.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = ndb.StringProperty()
     # Version of exploration.
-    version = ndb.StringProperty(indexed=False)
+    version = ndb.TextProperty()
     # Number of students who started the exploration.
     num_starts = ndb.IntegerProperty(indexed=False)
     # Number of students who have completed the exploration.
@@ -1599,11 +1507,6 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationAnnotationsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exploration_id, exploration_version):
@@ -1687,16 +1590,16 @@ class StateAnswersModel(base_models.BaseModel):
 
     # Explicitly store exploration ID, exploration version and state name
     # so we can easily do queries on them.
-    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    exploration_id = ndb.StringProperty(required=True)
     exploration_version = ndb.IntegerProperty(indexed=True, required=True)
-    state_name = ndb.StringProperty(indexed=True, required=True)
+    state_name = ndb.StringProperty(required=True)
     # Which shard this corresponds to in the list of shards. If this is 0 it
     # represents the master shard which includes the shard_count. All other
     # shards look similar to the master shard except they do not populate
     # shard_count.
     shard_id = ndb.IntegerProperty(indexed=True, required=True)
     # Store interaction type to know which calculations should be performed.
-    interaction_id = ndb.StringProperty(indexed=True, required=True)
+    interaction_id = ndb.StringProperty(required=True)
     # Store how many extra shards are associated with this state. This is only
     # present when shard_id is 0. This starts at 0 (the main shard is not
     # counted).
@@ -1705,10 +1608,8 @@ class StateAnswersModel(base_models.BaseModel):
     # submitted_answer_list, minus any overhead of the property itself. This
     # value is found by summing the JSON sizes of all answer dicts stored inside
     # submitted_answer_list.
-    # pylint: disable=invalid-name
     accumulated_answer_json_size_bytes = ndb.IntegerProperty(
         indexed=False, required=False, default=0)
-    # pylint: enable=invalid-name
 
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
@@ -1729,11 +1630,6 @@ class StateAnswersModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateAnswersModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_model(
@@ -1934,10 +1830,10 @@ class StateAnswersModel(base_models.BaseModel):
             new_submitted_answer_dict_list: list(dict). List of new submitted
                 answers each of which is stored as a JSON blob.
         """
-        transaction_services.run_in_transaction(
-            cls._insert_submitted_answers_unsafe, exploration_id,
-            exploration_version, state_name, interaction_id,
-            new_submitted_answer_dict_list)
+        with ndb.Client().transaction():
+            cls._insert_submitted_answers_unsafe(exploration_id,
+                exploration_version, state_name, interaction_id,
+                new_submitted_answer_dict_list)
 
     @classmethod
     def _get_entity_id(
@@ -2032,16 +1928,16 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     {[EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[CALCULATION_ID]}.
     """
 
-    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    exploration_id = ndb.StringProperty(required=True)
     # May be an integral exploration_version or 'all' if this entity represents
     # an aggregation of multiple sets of answers.
-    exploration_version = ndb.StringProperty(indexed=True, required=True)
-    state_name = ndb.StringProperty(indexed=True, required=True)
-    interaction_id = ndb.StringProperty(indexed=True)
-    calculation_id = ndb.StringProperty(indexed=True, required=True)
+    exploration_version = ndb.StringProperty(required=True)
+    state_name = ndb.StringProperty(required=True)
+    interaction_id = ndb.StringProperty()
+    calculation_id = ndb.StringProperty(required=True)
     # Calculation output type (for deserialization). See
     # stats_domain.StateAnswersCalcOutput for an enumeration of valid types.
-    calculation_output_type = ndb.StringProperty(indexed=True)
+    calculation_output_type = ndb.StringProperty()
     # Calculation output dict stored as JSON blob.
     calculation_output = ndb.JsonProperty(indexed=False)
 
@@ -2051,11 +1947,6 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateAnswersCalcOutputModels doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create_or_update(
@@ -2077,7 +1968,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                 stored as a JSON blob.
 
         Raises:
-            Exception: The calculation_output is too large.
+            Exception. The calculation_output is too large.
         """
         instance_id = cls._get_entity_id(
             exploration_id, exploration_version, state_name, calculation_id)

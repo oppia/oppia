@@ -28,9 +28,9 @@ from core.platform import models
 import feconf
 import python_utils
 
+from google.cloud import ndb
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
-transaction_services = models.Registry.import_transaction_services()
 
 ALLOWED_RATINGS = [1, 2, 3, 4, 5]
 
@@ -77,7 +77,9 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         exp_user_data_model.rated_on = datetime.datetime.utcnow()
         exp_user_data_model.put()
         return old_rating
-    old_rating = transaction_services.run_in_transaction(_update_user_rating)
+
+    with ndb.Client().transaction():
+        old_rating = _update_user_rating()
 
     exploration_summary = exp_fetchers.get_exploration_summary_by_id(
         exploration_id)
@@ -141,7 +143,7 @@ def get_overall_ratings_for_exploration(exploration_id):
         exploration_id: str. The id of the exploration.
 
     Returns:
-        a dict whose keys are '1', '2', '3', '4', '5' and whose
+        dict. A dict whose keys are '1', '2', '3', '4', '5' and whose
         values are nonnegative integers representing the frequency counts
         of each rating.
     """

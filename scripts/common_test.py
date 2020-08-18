@@ -44,9 +44,7 @@ _PY_GITHUB_PATH = os.path.join(
     _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
 
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
+import github # isort:skip  pylint: disable=wrong-import-position
 
 
 class MockPsutilProcess(python_utils.OBJECT):
@@ -372,10 +370,8 @@ class CommonTests(test_utils.GenericTestBase):
             return False
         def mock_chdir(unused_dirpath):
             pass
-        # pylint: disable=unused-argument
-        def mock_popen(unused_cmd, stdin, stdout, stderr):
+        def mock_popen(unused_cmd, stdin, stdout, stderr):  # pylint: disable=unused-argument
             return process
-        # pylint: enable=unused-argument
         def mock_communicate(unused_self):
             return ('Output', 'Invalid')
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
@@ -399,10 +395,8 @@ class CommonTests(test_utils.GenericTestBase):
             return False
         def mock_chdir(unused_dirpath):
             pass
-        # pylint: disable=unused-argument
-        def mock_popen(unused_cmd, stdin, stdout, stderr):
+        def mock_popen(unused_cmd, stdin, stdout, stderr):  # pylint: disable=unused-argument
             return process
-        # pylint: enable=unused-argument
         def mock_communicate(unused_self):
             return ('Output', 'You\'ve successfully authenticated!')
         def mock_check_call(unused_cmd_tokens):
@@ -413,6 +407,8 @@ class CommonTests(test_utils.GenericTestBase):
             pass
         def mock_get_remote_alias(unused_url):
             return 'remote'
+        def mock_ask_user_to_confirm(unused_msg):
+            pass
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
         chdir_swap = self.swap(os, 'chdir', mock_chdir)
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
@@ -428,8 +424,10 @@ class CommonTests(test_utils.GenericTestBase):
             mock_verify_current_branch_name)
         get_remote_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         with isdir_swap, chdir_swap, popen_swap, communicate_swap:
-            with check_call_swap, verify_local_repo_swap:
+            with check_call_swap, verify_local_repo_swap, ask_user_swap:
                 with verify_current_branch_name_swap, get_remote_alias_swap:
                     (
                         common
@@ -528,18 +526,14 @@ class CommonTests(test_utils.GenericTestBase):
             common.ask_user_to_confirm('Testing')
 
     def test_get_personal_access_token_with_valid_token(self):
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return 'token'
-        # pylint: enable=unused-argument
         with self.swap(getpass, 'getpass', mock_getpass):
             self.assertEqual(common.get_personal_access_token(), 'token')
 
     def test_get_personal_access_token_with_token_as_none(self):
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return None
-        # pylint: enable=unused-argument
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with getpass_swap, self.assertRaisesRegexp(
             Exception,
@@ -551,12 +545,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_closed_blocking_bugs_milestone_results_in_exception(self):
         mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'state': 'closed'}, completed='')
-        # pylint: enable=unused-argument
         get_milestone_swap = self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone)
         with get_milestone_swap, self.assertRaisesRegexp(
@@ -568,12 +560,10 @@ class CommonTests(test_utils.GenericTestBase):
             requester='', headers='', attributes={}, completed='')
         def mock_open_tab(unused_url):
             pass
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'open_issues': 10, 'state': 'open'}, completed='')
-        # pylint: enable=unused-argument
         get_milestone_swap = self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone)
         open_tab_swap = self.swap(
@@ -588,12 +578,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_zero_blocking_bug_issue_count_results_in_no_exception(self):
         mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'open_issues': 0, 'state': 'open'}, completed='')
-        # pylint: enable=unused-argument
         with self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone):
             common.check_blocking_bug_issue_count(mock_repo)
@@ -621,10 +609,8 @@ class CommonTests(test_utils.GenericTestBase):
             attributes={
                 'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
             completed='')
-        # pylint: disable=unused-argument
-        def mock_get_issues(unused_self, state, labels):
+        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
             return [pull1, pull2]
-        # pylint: enable=unused-argument
         def mock_get_label(unused_self, unused_name):
             return [label]
 
@@ -659,10 +645,8 @@ class CommonTests(test_utils.GenericTestBase):
             attributes={
                 'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
             completed='')
-        # pylint: disable=unused-argument
-        def mock_get_issues(unused_self, state, labels):
+        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
             return [pull1, pull2]
-        # pylint: enable=unused-argument
         def mock_get_label(unused_self, unused_name):
             return [label]
 
@@ -770,10 +754,11 @@ class CommonTests(test_utils.GenericTestBase):
             origin_content = f.readlines()
 
         def mock_compile(unused_arg):
-            raise ValueError
+            raise ValueError('Exception raised from compile()')
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaises(ValueError), compile_swap:
+        with self.assertRaisesRegexp(
+            ValueError, r'Exception raised from compile\(\)'), compile_swap:
             common.inplace_replace_file(
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         self.assertFalse(os.path.isfile(backup_file))
@@ -810,3 +795,75 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             if os.path.exists('readme_test_dir'):
                 shutil.rmtree('readme_test_dir')
+
+    def test_windows_os_throws_exception_when_starting_redis_server(self):
+        def mock_is_windows_os():
+            return True
+        windows_not_supported_exception = self.assertRaisesRegexp(
+            Exception,
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. The redis server '
+            'cannot start.')
+        swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
+        with swap_os_check, windows_not_supported_exception:
+            common.start_redis_server()
+
+    def test_windows_os_throws_exception_when_stopping_redis_server(self):
+        def mock_is_windows_os():
+            return True
+        windows_not_supported_exception = self.assertRaisesRegexp(
+            Exception,
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. There is no redis '
+            'server to shutdown.')
+        swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
+
+        with swap_os_check, windows_not_supported_exception:
+            common.stop_redis_server()
+
+    def test_start_and_stop_server_calls_are_called(self):
+        # Test that starting the server calls subprocess.call().
+        check_function_calls = {
+            'subprocess_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True
+        }
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            check_function_calls['subprocess_call_is_called'] = True
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+            return Ret()
+
+        def mock_wait_for_port_to_be_open(port): # pylint: disable=unused-argument
+            return
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        swap_wait_for_port_to_be_open = self.swap(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open)
+        with swap_call, swap_wait_for_port_to_be_open:
+            common.start_redis_server()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+        # Test that stopping the server calls subprocess.call().
+        check_function_calls = {
+            'subprocess_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True
+        }
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        with swap_call:
+            common.stop_redis_server()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)

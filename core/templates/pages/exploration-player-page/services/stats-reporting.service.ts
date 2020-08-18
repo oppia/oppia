@@ -23,7 +23,7 @@ import { ContextService } from 'services/context.service';
 import { MessengerService } from 'services/messenger.service';
 import { PlaythroughService } from 'services/playthrough.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { IAggregatedStats, StatsReportingBackendApiService } from
+import { AggregatedStats, StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
@@ -66,7 +66,7 @@ export class StatsReportingService {
   // The following dict will contain all stats data accumulated over the
   // interval time and will be reset when the dict is sent to backend for
   // recording.
-  static aggregatedStats: IAggregatedStats = null;
+  static aggregatedStats: AggregatedStats = null;
 
   private refreshAggregatedStats(): void {
     StatsReportingService.aggregatedStats = {
@@ -95,7 +95,7 @@ export class StatsReportingService {
 
   private startStatsTimer(): void {
     if (!StatsReportingService.editorPreviewMode &&
-      !StatsReportingService.questionPlayerMode ) {
+      !StatsReportingService.questionPlayerMode) {
       setInterval(() => this.postStatsToBackend(), 300000);
     }
   }
@@ -363,7 +363,7 @@ export class StatsReportingService {
   // on the stateName.
   recordAnswerSubmitted(
       stateName: string, params: Object, answer: string,
-      answerGroupIndex: number, ruleIndex: number,
+      answerGroupIndex: number,
       classificationCategorization: string, feedbackIsUseful: boolean): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
     StatsReportingService.aggregatedStats.state_stats_mapping[
@@ -380,7 +380,6 @@ export class StatsReportingService {
       StatsReportingService.stateStopwatch.getTimeInSecs(),
       stateName,
       answerGroupIndex,
-      ruleIndex,
       classificationCategorization,
       StatsReportingService.explorationId,
       StatsReportingService.currentStateName,

@@ -29,7 +29,7 @@ describe('Question Editor Modal Controller', function() {
   let AlertsService = null;
   let QuestionObjectFactory = null;
   let QuestionUndoRedoService = null;
-  let SkillSummaryObjectFactory = null;
+  let ShortSkillSummaryObjectFactory = null;
   let StateEditorService = null;
 
   const associatedSkillSummariesDict = [{
@@ -44,6 +44,7 @@ describe('Question Editor Modal Controller', function() {
   }];
   const canEditQuestion = true;
   const categorizedSkills = [];
+  const untriagedSkillSummaries = [];
   const groupedSkillSummaries = {
     current: [],
     others: []
@@ -72,14 +73,15 @@ describe('Question Editor Modal Controller', function() {
       AlertsService = $injector.get('AlertsService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-      SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+      ShortSkillSummaryObjectFactory = $injector.get(
+        'ShortSkillSummaryObjectFactory');
       StateEditorService = $injector.get('StateEditorService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
       associatedSkillSummaries = associatedSkillSummariesDict.map(a => (
-        SkillSummaryObjectFactory.create(a.id, a.description)));
+        ShortSkillSummaryObjectFactory.create(a.id, a.description)));
 
       question = QuestionObjectFactory.createFromBackendDict({
         id: '1',
@@ -100,10 +102,19 @@ describe('Question Editor Modal Controller', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {}
             }],
             confirmed_unclassified_answers: [],
-            customization_args: {},
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: null,
               feedback: {
@@ -155,25 +166,29 @@ describe('Question Editor Modal Controller', function() {
         newQuestionIsBeingCreated: newQuestionIsBeingCreated,
         question: question,
         questionId: questionId,
+        untriagedSkillSummaries: untriagedSkillSummaries,
         questionStateData: questionStateData,
         rubrics: rubrics,
         skillNames: skillNames
       });
     }));
 
-    it('should init the constiables', function() {
-      expect($scope.question).toEqual(question);
-      expect($scope.questionStateData).toBe(questionStateData);
-      expect($scope.associatedSkillSummaries).toEqual(associatedSkillSummaries);
-      expect($scope.questionId).toBe(questionId);
-      expect($scope.misconceptionsBySkill).toEqual(misconceptionsBySkill);
-      expect($scope.canEditQuestion).toBe(canEditQuestion);
-      expect($scope.newQuestionIsBeingCreated).toBe(newQuestionIsBeingCreated);
-      expect($scope.rubrics).toEqual(rubrics);
-      expect($scope.skillNames).toEqual(skillNames);
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.question).toEqual(question);
+        expect($scope.questionStateData).toBe(questionStateData);
+        expect($scope.associatedSkillSummaries).toEqual(
+          associatedSkillSummaries);
+        expect($scope.questionId).toBe(questionId);
+        expect($scope.misconceptionsBySkill).toEqual(misconceptionsBySkill);
+        expect($scope.canEditQuestion).toBe(canEditQuestion);
+        expect($scope.newQuestionIsBeingCreated).toBe(
+          newQuestionIsBeingCreated);
+        expect($scope.rubrics).toEqual(rubrics);
+        expect($scope.skillNames).toEqual(skillNames);
+      });
 
-    it('should get skill editor url', function() {
+    it('should get skill editor url based on the skill id', function() {
       expect($scope.getSkillEditorUrl('1')).toBe('/skill_editor/1');
       expect($scope.getSkillEditorUrl('undefined')).toBe(
         '/skill_editor/undefined');
@@ -265,7 +280,7 @@ describe('Question Editor Modal Controller', function() {
       $scope.$apply();
 
       expect($scope.associatedSkillSummaries).toContain(
-        SkillSummaryObjectFactory.create(
+        ShortSkillSummaryObjectFactory.create(
           skillSummaryDict.id, skillSummaryDict.description));
       expect($scope.associatedSkillSummaries.length).toEqual(4);
       expect($scope.getSkillLinkageModificationsArray().length).toBe(1);
@@ -298,7 +313,7 @@ describe('Question Editor Modal Controller', function() {
       $scope.$apply();
 
       expect($scope.associatedSkillSummaries).toContain(
-        SkillSummaryObjectFactory.create(
+        ShortSkillSummaryObjectFactory.create(
           skillSummaryDict.id, skillSummaryDict.description));
 
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
@@ -322,7 +337,7 @@ describe('Question Editor Modal Controller', function() {
       $scope.$apply();
 
       expect($scope.associatedSkillSummaries).toContain(
-        SkillSummaryObjectFactory.create(
+        ShortSkillSummaryObjectFactory.create(
           skillSummaryDict.id, skillSummaryDict.description));
 
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
@@ -356,7 +371,7 @@ describe('Question Editor Modal Controller', function() {
         $scope.$apply();
 
         expect($scope.associatedSkillSummaries).toContain(
-          SkillSummaryObjectFactory.create(
+          ShortSkillSummaryObjectFactory.create(
             skillSummaryDict.id, skillSummaryDict.description));
 
         spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
@@ -409,14 +424,15 @@ describe('Question Editor Modal Controller', function() {
       AlertsService = $injector.get('AlertsService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-      SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+      ShortSkillSummaryObjectFactory = $injector.get(
+        'ShortSkillSummaryObjectFactory');
       StateEditorService = $injector.get('StateEditorService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
       associatedSkillSummaries = associatedSkillSummariesDict.map(a => (
-        SkillSummaryObjectFactory.create(a.id, a.description)));
+        ShortSkillSummaryObjectFactory.create(a.id, a.description)));
 
       question = QuestionObjectFactory.createFromBackendDict({
         id: '1',
@@ -437,10 +453,19 @@ describe('Question Editor Modal Controller', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {}
             }],
             confirmed_unclassified_answers: [],
-            customization_args: {},
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: null,
               feedback: {
@@ -494,6 +519,7 @@ describe('Question Editor Modal Controller', function() {
         question: question,
         questionId: questionId,
         questionStateData: questionStateData,
+        untriagedSkillSummaries: [],
         rubrics: rubrics,
         skillNames: skillNames
       });

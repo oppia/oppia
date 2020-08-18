@@ -66,6 +66,11 @@ class SubtopicPageDataHandler(base.BaseHandler):
                 subtopic_title = subtopic.title
                 if index != len(topic.subtopics) - 1:
                     next_subtopic_dict = topic.subtopics[index + 1].to_dict()
+                # Checking greater than 1 here, since otherwise the only
+                # subtopic page of the topic would always link to itself at the
+                # bottom of the subtopic page which isn't expected.
+                elif len(topic.subtopics) > 1:
+                    next_subtopic_dict = topic.subtopics[0].to_dict()
                 break
         subtopic_page_contents = (
             subtopic_page_services.get_subtopic_page_contents_by_id(
@@ -74,6 +79,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
 
         self.values.update({
             'topic_id': topic.id,
+            'topic_name': topic.name,
             'page_contents': subtopic_page_contents_dict,
             'subtopic_title': subtopic_title,
             'next_subtopic_dict': next_subtopic_dict

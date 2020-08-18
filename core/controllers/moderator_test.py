@@ -123,8 +123,9 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
         d_text = self.get_json(
             '/moderatorhandler/email_draft')['draft_email_body']
         self.assertEqual(d_text, '')
-        expected_draft_text_body = ('I\'m writing to inform you that '
-                                    'I have unpublished the above exploration.')
+        expected_draft_text_body = (
+            'I\'m writing to inform you that '
+            'I have unpublished the above exploration.')
         with self.can_send_emails_ctx, self.can_send_email_moderator_action_ctx:
             d_text = self.get_json(
                 '/moderatorhandler/email_draft')['draft_email_body']

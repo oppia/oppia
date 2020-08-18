@@ -85,6 +85,9 @@ require(
   'components/question-directives/question-player/' +
   'question-player-concept-card-modal.controller.ts');
 require(
+  'components/question-directives/question-player/services/' +
+  'question-player-state.service.ts');
+require(
   'components/question-directives/question-player/' +
   'skill-mastery-modal.controller.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
@@ -92,12 +95,12 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('components/concept-card/concept-card.directive.ts');
-require('components/skill-mastery/skill-mastery.directive.ts');
+require('components/skill-mastery/skill-mastery.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
@@ -117,6 +120,10 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
+require(
+  'pages/exploration-player-page/services/exploration-player-state.service.ts');
+
+import { Subscription } from 'rxjs';
 
 require('pages/interaction-specs.constants.ajs.ts');
 
@@ -138,8 +145,9 @@ angular.module('oppia').directive('questionPlayer', [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$uibModal', '$window',
-        'AlertsService', 'HtmlEscaperService',
-        'QuestionBackendApiService', 'SkillMasteryBackendApiService',
+        'AlertsService', 'ExplorationPlayerStateService', 'HtmlEscaperService',
+        'PlayerPositionService', 'QuestionBackendApiService',
+        'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
         'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
         'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
@@ -149,14 +157,16 @@ angular.module('oppia').directive('questionPlayer', [
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $uibModal, $window,
-            AlertsService, HtmlEscaperService,
-            QuestionBackendApiService, SkillMasteryBackendApiService,
+            AlertsService, ExplorationPlayerStateService, HtmlEscaperService,
+            PlayerPositionService, QuestionBackendApiService,
+            QuestionPlayerStateService, SkillMasteryBackendApiService,
             UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
             QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
             VIEW_HINT_PENALTY_FOR_MASTERY,
             WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var initResults = function() {
             $scope.resultsLoaded = false;
             ctrl.currentQuestion = 0;
@@ -191,11 +201,12 @@ angular.module('oppia').directive('questionPlayer', [
             if (actionButtonType === 'BOOST_SCORE') {
               iconHtml = `<picture>
               <source type="image/webp" 
-              src="${getStaticImageUrl('/icons/rocket@2x.webp')}">
+              srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
               <source type="image/png" 
-              src="${getStaticImageUrl('/icons/rocket@2x.png')}">
-              <img class="action-button-icon" src="
-              ${getStaticImageUrl('/icons/rocket@2x.png')}"/>
+              srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
+              <img alt=""
+                   class="action-button-icon" 
+                   src="${getStaticImageUrl('/icons/rocket@2x.png')}"/>
               </picture>`;
             } else if (actionButtonType === 'RETRY_SESSION') {
               iconHtml = '<i class="material-icons md-36 ' +
@@ -532,18 +543,25 @@ angular.module('oppia').directive('questionPlayer', [
           };
 
           ctrl.$onInit = function() {
-            $rootScope.$on('currentQuestionChanged', function(event, result) {
-              updateCurrentQuestion(result + 1);
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onCurrentQuestionChange.subscribe(
+                result => updateCurrentQuestion(result + 1)
+              )
+            );
 
-            $rootScope.$on('totalQuestionsReceived', function(event, result) {
-              updateTotalQuestions(result);
-            });
+            ctrl.directiveSubscriptions.add(
+              ExplorationPlayerStateService.onTotalQuestionsReceived.subscribe(
+                result => updateTotalQuestions(result)
+              )
+            );
 
-            $rootScope.$on('questionSessionCompleted', function(event, result) {
-              $location.hash(HASH_PARAM +
-                encodeURIComponent(JSON.stringify(result)));
-            });
+            ctrl.directiveSubscriptions.add(
+              QuestionPlayerStateService.onQuestionSessionCompleted.subscribe(
+                (result) => {
+                  $location.hash(HASH_PARAM +
+                    encodeURIComponent(JSON.stringify(result)));
+                })
+            );
 
             $scope.$on('$locationChangeSuccess', function(event) {
               var hashContent = $location.hash();
@@ -572,6 +590,10 @@ angular.module('oppia').directive('questionPlayer', [
             // called in $scope.$on when some external events are triggered.
             initResults();
             ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

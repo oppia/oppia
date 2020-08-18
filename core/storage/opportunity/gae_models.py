@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 
 from google.appengine.datastore import datastore_query
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -33,19 +33,19 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     The id of each instance is the id of the corresponding exploration.
     """
 
-    topic_id = ndb.StringProperty(required=True, indexed=True)
-    topic_name = ndb.StringProperty(required=True, indexed=True)
-    story_id = ndb.StringProperty(required=True, indexed=True)
-    story_title = ndb.StringProperty(required=True, indexed=True)
-    chapter_title = ndb.StringProperty(required=True, indexed=True)
+    topic_id = ndb.StringProperty(required=True)
+    topic_name = ndb.StringProperty(required=True)
+    story_id = ndb.StringProperty(required=True)
+    story_title = ndb.StringProperty(required=True)
+    chapter_title = ndb.StringProperty(required=True)
     content_count = ndb.IntegerProperty(required=True, indexed=True)
     incomplete_translation_language_codes = ndb.StringProperty(
-        repeated=True, indexed=True)
+        repeated=True)
     translation_counts = ndb.JsonProperty(default={}, indexed=False)
     assigned_voice_artist_in_language_codes = ndb.StringProperty(
-        repeated=True, indexed=True)
+        repeated=True)
     need_voice_artist_in_language_codes = ndb.StringProperty(
-        repeated=True, indexed=True)
+        repeated=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -72,13 +72,6 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationOpportunitySummaryModel doesn't have any field with user
-        ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_all_translation_opportunities(
@@ -185,7 +178,7 @@ class SkillOpportunityModel(base_models.BaseModel):
     """
 
     # The description of the opportunity's skill.
-    skill_description = ndb.StringProperty(required=True, indexed=True)
+    skill_description = ndb.StringProperty(required=True)
     # The number of questions associated with this opportunity's skill.
     question_count = ndb.IntegerProperty(required=True, indexed=True)
 
@@ -213,11 +206,6 @@ class SkillOpportunityModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SkillOpportunityModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):

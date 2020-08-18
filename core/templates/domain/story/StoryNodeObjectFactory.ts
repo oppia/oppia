@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
 
-export interface IStoryNodeBackendDict {
+export interface StoryNodeBackendDict {
   'id': string;
   'title': string;
   'description': string;
@@ -144,7 +144,7 @@ export class StoryNode {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  prepublishValidate(): Array<string> {
+  prepublishValidate(): string[] {
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Chapter ' + this._title + ' should have a thumbnail.');
@@ -280,7 +280,7 @@ export class StoryNode {
 })
 export class StoryNodeObjectFactory {
   createFromBackendDict(
-      storyNodeBackendObject: IStoryNodeBackendDict): StoryNode {
+      storyNodeBackendObject: StoryNodeBackendDict): StoryNode {
     return new StoryNode(
       storyNodeBackendObject.id, storyNodeBackendObject.title,
       storyNodeBackendObject.description,

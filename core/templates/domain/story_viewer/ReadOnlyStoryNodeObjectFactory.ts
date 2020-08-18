@@ -20,12 +20,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ExplorationSummary {
-  title: string;
-  status: string;
-}
+import {
+  LearnerExplorationSummaryBackendDict,
+  LearnerExplorationSummaryObjectFactory,
+  LearnerExplorationSummary
+} from 'domain/summary/learner-exploration-summary-object.factory';
 
-export interface IStoryNodeBackendDict {
+export interface StoryNodeBackendDict {
   'id': string;
   'title': string;
   'description': string;
@@ -35,86 +36,86 @@ export interface IStoryNodeBackendDict {
   'outline': string;
   'outline_is_finalized': boolean;
   'exploration_id': string;
-  'exp_summary_dict': ExplorationSummary;
+  'exp_summary_dict': LearnerExplorationSummaryBackendDict;
   'completed': boolean;
   'thumbnail_bg_color': string;
   'thumbnail_filename': string;
 }
 
 export class ReadOnlyStoryNode {
-  _id: string;
-  _title: string;
-  _description: string;
-  _destinationNodeIds: Array<string>;
-  _prerequisiteSkillIds: Array<string>;
-  _acquiredSkillIds: Array<string>;
-  _outline: string;
-  _outlineIsFinalized: boolean;
-  _explorationId: string;
-  _explorationSummary: ExplorationSummary;
-  _completed: boolean;
-  _thumbnailBgColor: string;
-  _thumbnailFilename: string;
+  id: string;
+  title: string;
+  description: string;
+  destinationNodeIds: string[];
+  prerequisiteSkillIds: string[];
+  acquiredSkillIds: string[];
+  outline: string;
+  outlineIsFinalized: boolean;
+  explorationId: string;
+  explorationSummary: LearnerExplorationSummary;
+  completed: boolean;
+  thumbnailBgColor: string;
+  thumbnailFilename: string;
 
   constructor(id: string, title: string, description: string,
-      destinationNodeIds: Array<string>, prerequisiteSkillIds: Array<string>,
-      acquiredSkillIds: Array<string>, outline: string,
+      destinationNodeIds: string[], prerequisiteSkillIds: string[],
+      acquiredSkillIds: string[], outline: string,
       outlineIsFinalized: boolean, explorationId: string,
-      explorationSummary: ExplorationSummary, completed: boolean,
+      explorationSummary: LearnerExplorationSummary, completed: boolean,
       thumbnailBgColor: string, thumbnailFilename: string) {
-    this._id = id;
-    this._title = title;
-    this._description = description;
-    this._destinationNodeIds = destinationNodeIds;
-    this._prerequisiteSkillIds = prerequisiteSkillIds;
-    this._acquiredSkillIds = acquiredSkillIds;
-    this._outline = outline;
-    this._outlineIsFinalized = outlineIsFinalized;
-    this._explorationId = explorationId;
-    this._explorationSummary = explorationSummary;
-    this._completed = completed;
-    this._thumbnailBgColor = thumbnailBgColor;
-    this._thumbnailFilename = thumbnailFilename;
+    this.id = id;
+    this.title = title;
+    this.description = description;
+    this.destinationNodeIds = destinationNodeIds;
+    this.prerequisiteSkillIds = prerequisiteSkillIds;
+    this.acquiredSkillIds = acquiredSkillIds;
+    this.outline = outline;
+    this.outlineIsFinalized = outlineIsFinalized;
+    this.explorationId = explorationId;
+    this.explorationSummary = explorationSummary;
+    this.completed = completed;
+    this.thumbnailBgColor = thumbnailBgColor;
+    this.thumbnailFilename = thumbnailFilename;
   }
 
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   getTitle(): string {
-    return this._title;
+    return this.title;
   }
 
   getDescription(): string {
-    return this._description;
+    return this.description;
   }
 
   getExplorationId(): string {
-    return this._explorationId;
+    return this.explorationId;
   }
 
   isCompleted(): boolean {
-    return this._completed;
+    return this.completed;
   }
 
-  getExplorationSummaryObject(): ExplorationSummary {
-    return this._explorationSummary;
+  getExplorationSummaryObject(): LearnerExplorationSummary {
+    return this.explorationSummary;
   }
 
   getOutline(): string {
-    return this._outline;
+    return this.outline;
   }
 
   getOutlineStatus(): boolean {
-    return this._outlineIsFinalized;
+    return this.outlineIsFinalized;
   }
 
   getThumbnailFilename(): string {
-    return this._thumbnailFilename;
+    return this.thumbnailFilename;
   }
 
   getThumbnailBgColor(): string {
-    return this._thumbnailBgColor;
+    return this.thumbnailBgColor;
   }
 }
 
@@ -122,8 +123,15 @@ export class ReadOnlyStoryNode {
   providedIn: 'root'
 })
 export class ReadOnlyStoryNodeObjectFactory {
+  constructor(
+    private learnerExplorationSummaryObjectFactory:
+    LearnerExplorationSummaryObjectFactory) {}
+
   createFromBackendDict(
-      storyNodeBackendDict: IStoryNodeBackendDict): ReadOnlyStoryNode {
+      storyNodeBackendDict: StoryNodeBackendDict): ReadOnlyStoryNode {
+    let explorationSummary = this.learnerExplorationSummaryObjectFactory
+      .createFromBackendDict(storyNodeBackendDict.exp_summary_dict);
+
     return new ReadOnlyStoryNode(storyNodeBackendDict.id,
       storyNodeBackendDict.title,
       storyNodeBackendDict.description,
@@ -133,7 +141,7 @@ export class ReadOnlyStoryNodeObjectFactory {
       storyNodeBackendDict.outline,
       storyNodeBackendDict.outline_is_finalized,
       storyNodeBackendDict.exploration_id,
-      storyNodeBackendDict.exp_summary_dict,
+      explorationSummary,
       storyNodeBackendDict.completed,
       storyNodeBackendDict.thumbnail_bg_color,
       storyNodeBackendDict.thumbnail_filename);

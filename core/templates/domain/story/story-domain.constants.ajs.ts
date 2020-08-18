@@ -25,6 +25,10 @@ angular.module('oppia').constant(
   StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE);
 
 angular.module('oppia').constant(
+  'STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE',
+  StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
   'STORY_PUBLISH_URL_TEMPLATE',
   StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE);
 
@@ -67,9 +71,13 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'STORY_PROPERTY_LANGUAGE_CODE',
   StoryDomainConstants.STORY_PROPERTY_LANGUAGE_CODE);
+angular.module('oppia').constant(
+  'STORY_PROPERTY_URL_FRAGMENT',
+  StoryDomainConstants.STORY_PROPERTY_URL_FRAGMENT);
 
 angular.module('oppia').constant(
   'INITIAL_NODE_ID', StoryDomainConstants.INITIAL_NODE_ID);
+angular.module('oppia').constant('NODE', StoryDomainConstants.NODE);
 
 angular.module('oppia').constant(
   'STORY_NODE_PROPERTY_TITLE', StoryDomainConstants.STORY_NODE_PROPERTY_TITLE);

@@ -29,7 +29,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
@@ -232,7 +232,7 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
         directory.
 
         Returns:
-            a list of Python files.
+            list(str). A list of Python files.
         """
         files_in_directory = []
         for directory, _, files in os.walk('.'):

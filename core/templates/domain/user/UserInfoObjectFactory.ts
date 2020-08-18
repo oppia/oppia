@@ -20,7 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface IUserInfoBackendDict {
+interface UserInfoBackendDict {
   'is_moderator': boolean;
   'is_admin': boolean;
   'is_super_admin': boolean;
@@ -101,7 +101,7 @@ export class UserInfo {
 })
 export class UserInfoObjectFactory {
   createFromBackendDict(
-      data: IUserInfoBackendDict): UserInfo {
+      data: UserInfoBackendDict): UserInfo {
     return new UserInfo(
       data.is_moderator, data.is_admin, data.is_super_admin,
       data.is_topic_manager, data.can_create_collections,

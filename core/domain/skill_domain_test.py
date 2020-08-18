@@ -77,15 +77,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.skill.validate()
 
-    def _assert_valid_skill_id(self, expected_error_substring, skill_id):
-        """Checks that the skill passes strict validation."""
+    def test_skill_id_validation_fails_with_invalid_skill_id_type(self):
         with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            skill_domain.Skill.require_valid_skill_id(skill_id)
+            utils.ValidationError, 'Skill id should be a string'):
+            skill_domain.Skill.require_valid_skill_id(10)
 
-    def test_valid_skill_id(self):
-        self._assert_valid_skill_id('Skill id should be a string', 10)
-        self._assert_valid_skill_id('Invalid skill id', 'abc')
+    def test_skill_id_validation_fails_with_invalid_skill_id_length(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid skill id'):
+            skill_domain.Skill.require_valid_skill_id('abc')
 
     def test_valid_misconception_id(self):
         self.skill.next_misconception_id = 'invalid_id'
@@ -474,6 +474,23 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'The misconception with id 5 is out of bounds')
 
+    def test_skill_export_import_returns_original_object(self):
+        """Checks that to_dict and from_dict preserves all the data within a
+        Skill during export and import.
+        """
+        skill_dict = self.skill.to_dict()
+        skill_from_dict = skill_domain.Skill.from_dict(skill_dict)
+        self.assertEqual(skill_from_dict.to_dict(), skill_dict)
+
+    def test_serialize_and_deserialize_returns_unchanged_skill(self):
+        """Checks that serializing and then deserializing a default skill
+        works as intended by leaving the skill unchanged.
+        """
+        self.assertEqual(
+            self.skill.to_dict(),
+            skill_domain.Skill.deserialize(
+                self.skill.serialize()).to_dict())
+
 
 class SkillChangeTests(test_utils.GenericTestBase):
 
@@ -802,3 +819,22 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.augmented_skill_summary.to_dict(),
             augmented_skill_summary_dict)
+
+
+class TopicAssignmentTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TopicAssignmentTests, self).setUp()
+        self.topic_assignments = skill_domain.TopicAssignment(
+            'topic_id1', 'Topic1', 2, 1)
+
+    def test_topic_assignments_gets_created(self):
+        topic_assignments_dict = {
+            'topic_id': 'topic_id1',
+            'topic_name': 'Topic1',
+            'topic_version': 2,
+            'subtopic_id': 1,
+        }
+        self.assertEqual(
+            self.topic_assignments.to_dict(),
+            topic_assignments_dict)

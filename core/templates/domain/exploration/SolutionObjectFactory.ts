@@ -32,15 +32,24 @@ import { NumberWithUnitsObjectFactory } from
 import { SubtitledHtml, SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+import {
+  FractionAnswer,
+  InteractionAnswer,
+  LogicProofAnswer,
+  MathExpressionAnswer,
+  NumberWithUnitsAnswer,
+  PencilCodeEditorAnswer
+} from 'interactions/answer-defs';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
 export interface ExplanationBackendDict {
   'content_id': string;
   'html': string;
 }
 
-export interface ISolutionBackendDict {
+export interface SolutionBackendDict {
   'answer_is_exclusive': boolean;
-  'correct_answer': string;
+  'correct_answer': InteractionAnswer;
   'explanation': ExplanationBackendDict;
 }
 
@@ -48,21 +57,21 @@ export class Solution {
   ehfs: ExplorationHtmlFormatterService;
   shof: SubtitledHtmlObjectFactory;
   answerIsExclusive: boolean;
-  correctAnswer: any;
+  correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;
   constructor(
       ehfs: ExplorationHtmlFormatterService,
       shof: SubtitledHtmlObjectFactory,
-      answerisexclusive: boolean, correctanswer: any,
+      answerIsExclusive: boolean, correctAnswer: InteractionAnswer,
       explanation: SubtitledHtml) {
     this.ehfs = ehfs;
     this.shof = shof;
-    this.answerIsExclusive = answerisexclusive;
-    this.correctAnswer = correctanswer;
+    this.answerIsExclusive = answerIsExclusive;
+    this.correctAnswer = correctAnswer;
     this.explanation = explanation;
   }
 
-  toBackendDict(): ISolutionBackendDict {
+  toBackendDict(): SolutionBackendDict {
     return {
       answer_is_exclusive: this.answerIsExclusive,
       correct_answer: this.correctAnswer,
@@ -77,21 +86,21 @@ export class Solution {
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';
     } else if (interactionId === 'MathExpressionInput') {
-      correctAnswer = this.correctAnswer.latex;
+      correctAnswer = (<MathExpressionAnswer> this.correctAnswer).latex;
     } else if (interactionId === 'CodeRepl' ||
       interactionId === 'PencilCodeEditor') {
-      correctAnswer = this.correctAnswer.code;
+      correctAnswer = (<PencilCodeEditorAnswer> this.correctAnswer).code;
     } else if (interactionId === 'MusicNotesInput') {
       correctAnswer = '[Music Notes]';
     } else if (interactionId === 'LogicProof') {
-      correctAnswer = this.correctAnswer.correct;
+      correctAnswer = (<LogicProofAnswer> this.correctAnswer).correct;
     } else if (interactionId === 'FractionInput') {
       correctAnswer = (new FractionObjectFactory()).fromDict(
-        this.correctAnswer).toString();
+        <FractionAnswer> this.correctAnswer).toString();
     } else if (interactionId === 'NumberWithUnits') {
       correctAnswer = (new NumberWithUnitsObjectFactory(
         new UnitsObjectFactory(), new FractionObjectFactory())).fromDict(
-        this.correctAnswer).toString();
+        <NumberWithUnitsAnswer> this.correctAnswer).toString();
     } else {
       correctAnswer = (
         (new HtmlEscaperService(new LoggerService())).objToEscapedJson(
@@ -104,15 +113,15 @@ export class Solution {
       '". ' + explanation + '.');
   }
 
-  setCorrectAnswer(correctAnswer: any): void {
+  setCorrectAnswer(correctAnswer: InteractionAnswer): void {
     this.correctAnswer = correctAnswer;
   }
 
   setExplanation(explanation: SubtitledHtml): void {
     this.explanation = explanation;
   }
-  // TODO(#7165): Replace any with correct type.
-  getOppiaShortAnswerResponseHtml(interaction: any) {
+
+  getOppiaShortAnswerResponseHtml(interaction: Interaction) {
     return {
       prefix: (this.answerIsExclusive ? 'The only' : 'One'),
       answer: this.ehfs.getShortAnswerHtml(
@@ -131,7 +140,7 @@ export class SolutionObjectFactory {
   constructor(
     private shof: SubtitledHtmlObjectFactory,
     private ehfs: ExplorationHtmlFormatterService) {}
-  createFromBackendDict(solutionBackendDict: ISolutionBackendDict): Solution {
+  createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
     return new Solution(
       this.ehfs,
       this.shof,
@@ -142,8 +151,8 @@ export class SolutionObjectFactory {
   }
 
   createNew(
-      answerIsExclusive: boolean, correctAnswer: any, explanationHtml: string,
-      explanationId: string): Solution {
+      answerIsExclusive: boolean, correctAnswer: InteractionAnswer,
+      explanationHtml: string, explanationId: string): Solution {
     return new Solution(
       this.ehfs,
       this.shof,

@@ -19,13 +19,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ISuggestionBackendDict } from
+import { SuggestionBackendDict } from
   'domain/suggestion/SuggestionObjectFactory';
 
 @Injectable({providedIn: 'root'})
 export class SuggestionsService {
   getThreadIdFromSuggestionBackendDict(
-      suggestionBackendDict: ISuggestionBackendDict): string {
+      suggestionBackendDict: SuggestionBackendDict): string {
     return suggestionBackendDict.suggestion_id;
   }
 }

@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-interface ICollectionPlaythroughBackendDict {
+export interface CollectionPlaythroughBackendDict {
   'next_exploration_id': string;
   'completed_exploration_ids': string[];
 }
@@ -82,7 +82,7 @@ export class CollectionPlaythroughObjectFactory {
   // contexts. This function takes a JSON object which represents a backend
   // collection playthrough python dict.
   createFromBackendObject(
-      collectionPlaythroughBackendObject: ICollectionPlaythroughBackendDict):
+      collectionPlaythroughBackendObject: CollectionPlaythroughBackendDict):
       CollectionPlaythrough {
     return new CollectionPlaythrough(
       collectionPlaythroughBackendObject.next_exploration_id,

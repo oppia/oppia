@@ -21,7 +21,7 @@ from constants import constants
 from core.platform import models
 
 from google.appengine.datastore import datastore_query
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
@@ -51,7 +51,7 @@ class SkillModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The description of the skill.
-    description = ndb.StringProperty(required=True, indexed=True)
+    description = ndb.StringProperty(required=True)
     # The schema version for each of the misconception dicts.
     misconceptions_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
@@ -64,20 +64,20 @@ class SkillModel(base_models.VersionedModel):
     # The rubrics for the skill that explain each difficulty level.
     rubrics = ndb.JsonProperty(repeated=True, indexed=False)
     # The ISO 639-1 code for the language this skill is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = ndb.StringProperty(required=True)
     # The schema version for the skill_contents.
     skill_contents_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
     # A dict representing the skill contents.
     skill_contents = ndb.JsonProperty(indexed=False)
     # The prerequisite skills for the skill.
-    prerequisite_skill_ids = ndb.StringProperty(repeated=True, indexed=False)
+    prerequisite_skill_ids = ndb.TextProperty(repeated=True)
     # The id to be used by the next misconception added.
     next_misconception_id = ndb.IntegerProperty(required=True, indexed=False)
     # The id that the skill is merged into, in case the skill has been
     # marked as duplicate to another one and needs to be merged.
     # This is an optional field.
-    superseding_skill_id = ndb.StringProperty(indexed=True)
+    superseding_skill_id = ndb.StringProperty()
     # A flag indicating whether deduplication is complete for this skill.
     # It will initially be False, and set to true only when there is a value
     # for superseding_skill_id and the merge was completed.
@@ -86,7 +86,7 @@ class SkillModel(base_models.VersionedModel):
     @staticmethod
     def get_deletion_policy():
         """Skill should be kept if it is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -100,16 +100,12 @@ class SkillModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SkillModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_merged_skills(cls):
         """Returns the skill models which have been merged.
 
-        Returns: list(SkillModel). List of skill models which have been merged.
+        Returns:
+            list(SkillModel). List of skill models which have been merged.
         """
 
         return [skill for skill in cls.query() if (
@@ -160,14 +156,14 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the skill being edited.
-    skill_id = ndb.StringProperty(indexed=True, required=True)
+    skill_id = ndb.StringProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
         """Skill commit log is deleted only if the corresponding collection
         is not public.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def _get_instance_id(cls, skill_id, version):
@@ -205,13 +201,13 @@ class SkillSummaryModel(base_models.BaseModel):
     """
 
     # The description of the skill.
-    description = ndb.StringProperty(required=True, indexed=True)
+    description = ndb.StringProperty(required=True)
     # The number of misconceptions associated with the skill.
     misconception_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of worked examples in the skill.
     worked_examples_count = ndb.IntegerProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this skill is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = ndb.StringProperty(required=True)
     # Time when the skill model was last updated (not to be
     # confused with last_updated, which is the time when the
     # skill *summary* model was last updated).
@@ -225,7 +221,7 @@ class SkillSummaryModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Skill summary should be kept if associated skill is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -244,11 +240,6 @@ class SkillSummaryModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SkillSummaryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def fetch_page(cls, page_size, urlsafe_start_cursor, sort_by):

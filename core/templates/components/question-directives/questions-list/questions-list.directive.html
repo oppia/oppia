@@ -1,134 +1,101 @@
-<button class="btn btn-secondary protractor-test-create-question-button"
-        ng-click="$ctrl.createQuestion()"
-        style="float: right;">
-  Create Question
-</button>
-<table class="dashboard-table" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
-  <colgroup>
-    <col style="width: 5%;">
-    <col style="width: 40%;">
-    <col style="width: 35%;">
-    <col style="width: 10%;">
-    <col style="width: 10%;">
-  </colgroup>
-  <tr>
-    <th class="dashboard-table-headings">
-      <p> No. </p>
-    </th>
-    <th class="dashboard-table-headings">
-      <p> Question Content </p>
-    </th>
-    <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
-      <p> Difficulty</p>
-    </th>
-    <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
-      <p> Difficulty corresponding to selected skill </p>
-    </th>
-    <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
-      <p> Edit Question Difficulty </p>
-    </th>
-    <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
-      <p> Edit question difficulty with respect to selected skill </p>
-    </th>
-    <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
-      <p> Unlink questions from skill(s) </p>
-    </th>
-    <th class="dashboard-table-headings" ng-if="!$ctrl.skillDescriptionsAreShown()">
-      <p> Unlink question from skill </p>
-    </th>
-  </tr>
-  <tr ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill()"
-      class="list-item protractor-test-question-list-item"
-      style="height: 4em;"
-      ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDifficulty())"
-      ng-dblclick="$event.stopPropagation()">
-    <td> <[$ctrl.getQuestionIndex($index)]> </td>
-    <td class="question-content"> <[questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()]> </td>
-    <td> <[$ctrl.getDifficultyString(questionSummaryForOneSkill.getSkillDifficulty())]> </td>
-    <td class="edit-icon" ng-click="$event.stopPropagation()">
-      <span ng-click="$ctrl.changeDifficulty(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())"
-            class="list-summary">
-        <i class="material-icons">edit</i>
-      </span>
-    </td>
-    <td class="delete-icon" ng-click="$event.stopPropagation()">
-      <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription())"
-            class="list-summary">
-        <i class="material-icons">link_off</i>
-      </span>
-    </td>
-  </tr>
-</table>
-<h4 ng-if="$ctrl.getQuestionSummariesForOneSkill().length === 0" style="color: gray;">
-  Click on Create Question to create a new question.
-</h4>
-
-<div class="page-navigation-arrows" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
-  <i class="material-icons md-18"
-     ng-if="$ctrl.getCurrentPageNumber() !== 0"
-     ng-click="$ctrl.goToPreviousPage()">&#xE5C4;
-  </i> Page <[$ctrl.getCurrentPageNumber() + 1]>
-  <i class="material-icons md-18" ng-if="!$ctrl.isLastPage()" ng-click="$ctrl.goToNextPage()">&#xE5C8;</i>
+<div class="question-editor-container">
+  <md-card class="question-data-container">
+    <div class="question-list-container">
+      <div class="list-header">
+        <h3>Question List</h3>
+      </div>
+      <div ng-if="$ctrl.getQuestionSummariesForOneSkill().length === 0">
+        <span>
+          There are no questions in this skill.
+        </span>
+      </div>
+      <div  ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill() track by $index" class="question-list-item protractor-test-question-list-item" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
+        <div ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDifficulty())">
+          <div class="question-data">
+            <angular-html-bind class="question-text" html-data="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()"></angular-html-bind>
+            <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription())"
+                  class="link-off-icon">
+              <i class="material-icons">link_off</i>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="page-navigation-arrows" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
+        <i class="material-icons md-18"
+           ng-if="$ctrl.getCurrentPageNumber() !== 0"
+           ng-click="$ctrl.goToPreviousPage()">&#xE5C4;
+        </i> Page <[$ctrl.getCurrentPageNumber() + 1]>
+        <i class="material-icons md-18" ng-if="!$ctrl.isLastPage()" ng-click="$ctrl.goToNextPage()">&#xE5C8;</i>
+      </div>
+    </div>
+  </md-card>
+  <div class="create-question-container">
+    <md-card class="oppia-page-card">
+      <div>
+        <div class="list-header create-question-header">
+          <h3>Create a new question</h3>
+        </div>
+        <button class="btn add-question-btn protractor-test-create-question-button"
+                ng-click="$ctrl.createQuestion()">
+          + ADD QUESTION
+        </button>
+      </div>
+    </md-card>
+  </div>
 </div>
 <style>
   questions-list .oppia-editor-publish-button {
     margin-top: 2%;
   }
-
-  questions-list .dashboard-table {
-    font-size: 15px;
-    text-align: center;
-    width: 100%;
+  questions-list .question-data-container {
+    margin-right: 1%;
+    max-height: 70vh;
+    min-height: 70vh;
+    overflow-y: scroll;
+    width: 28%;
   }
-
-  questions-list i {
+  questions-list .question-editor-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 60px;
+  }
+  questions-list .question-list-container {
+    padding: 0 20px 20px;
+  }
+  questions-list .create-question-container {
+    padding: 10px 12px;
+    width: 40%;
+  }
+  questions-list .list-header {
+    border-bottom: 2px solid #000;
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 0;
+  }
+  questions-list .question-list-item {
+    border-bottom: 1px solid #e3e3e3;
+    padding: 10px 12px;
+  }
+  questions-list .question-data {
     cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
-
+  questions-list  .create-question-header {
+    border-bottom: none;
+  }
+  questions-list .question-text {
+    width: 90%;
+  }
   questions-list .page-navigation-arrows {
     float: right;
   }
-
-  questions-list .list-summary,
-  questions-list .list-summary:active,
-  questions-list .list-summary:visited {
-    color: inherit;
-    display: block;
-    height: 2em;
-    text-decoration: none;
-  }
-
-  questions-list .dashboard-table .dashboard-table-headings {
-    border-bottom: 2px solid #bbb;
-    padding-bottom: 0.7em;
-    text-align: center;
-  }
-
-  questions-list .dashboard-table .question-content {
-    text-align: center;
-  }
-
-  questions-list .dashboard-table .dashboard-table-headings p {
-    display: inline;
-  }
-
-  questions-list .list-item:not(:last-child) {
-    border-bottom: 1px solid #bbb;
-  }
-
-  questions-list .list-item:hover {
-    background-color: #ededed;
-  }
-
-  questions-list .list-summary span {
-    display: inline-block;
-    line-height: normal;
-    vertical-align: middle;
-  }
-
-  @media(max-width: 815px) {
-    questions-list .list-summary .additional-text {
-      display: none;
-    }
+  questions-list .add-question-btn {
+    background-color: #008098;
+    color: #FFFFFF;
+    font-weight: bold;
+    text-align: left;
   }
 </style>

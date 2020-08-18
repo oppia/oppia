@@ -85,22 +85,22 @@ describe('NumericInputValidationService', () => {
         x: 1
       }
     });
-    answerGroups = [agof.createNew(
-      [equalsZeroRule, betweenNegativeOneAndOneRule],
-      goodDefaultOutcome,
-      null,
-      null
-    )];
+    const answerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    answerGroup.updateRuleTypesToInputs(
+      [equalsZeroRule, betweenNegativeOneAndOneRule]);
+    answerGroups = [answerGroup];
   });
 
   it('should be able to perform basic validation', () => {
+    const answerGroup = agof.createNew(goodDefaultOutcome, null, null);
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, {}, [answerGroup], goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
   it('should catch redundant rules', () => {
-    answerGroups[0].rules = [betweenNegativeOneAndOneRule, equalsZeroRule];
+    answerGroups[0].updateRuleTypesToInputs(
+      [betweenNegativeOneAndOneRule, equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -111,7 +111,7 @@ describe('NumericInputValidationService', () => {
   });
 
   it('should catch identical rules as redundant', () => {
-    answerGroups[0].rules = [equalsZeroRule, equalsZeroRule];
+    answerGroups[0].updateRuleTypesToInputs([equalsZeroRule, equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -123,8 +123,8 @@ describe('NumericInputValidationService', () => {
 
   it('should catch redundant rules in separate answer groups', () => {
     answerGroups[1] = cloneDeep(answerGroups[0]);
-    answerGroups[0].rules = [betweenNegativeOneAndOneRule];
-    answerGroups[1].rules = [equalsZeroRule];
+    answerGroups[0].updateRuleTypesToInputs([betweenNegativeOneAndOneRule]);
+    answerGroups[1].updateRuleTypesToInputs([equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -136,7 +136,8 @@ describe('NumericInputValidationService', () => {
 
   it('should catch redundant rules caused by greater/less than range',
     () => {
-      answerGroups[0].rules = [lessThanOneRule, equalsZeroRule];
+      answerGroups[0].updateRuleTypesToInputs(
+        [lessThanOneRule, equalsZeroRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -147,32 +148,22 @@ describe('NumericInputValidationService', () => {
     });
 
   it('should generate errors in the given input', () => {
-    expect(validatorService.getErrorString('3.')).toEqual(
-      'Trailing decimals are not allowed.');
-    expect(validatorService.getErrorString('.3.4')).toEqual(
-      'At most 1 decimal point should be present.');
-    expect(validatorService.getErrorString('36a4')).toEqual(
-      'Only use numbers, minus sign (-), and decimal (.).');
-    expect(validatorService.getErrorString('3-4')).toEqual(
-      'Minus (-) sign is only allowed in beginning.');
-    expect(validatorService.getErrorString('-3-4')).toEqual(
-      'At most 1 minus (-) sign should be present.');
-    expect(validatorService.getErrorString('2.2')).toEqual(undefined);
-    expect(validatorService.getErrorString('-2.2')).toEqual(undefined);
-    expect(validatorService.getErrorString('34.56')).toEqual(undefined);
-  });
-
-  it('should validate floats correctly', () => {
-    let filter = validatorService.parseValue;
-    expect(filter('1.23')).toEqual(1.23);
-    expect(filter('-1.23')).toEqual(-1.23);
-    expect(filter('0')).toEqual(0);
-    expect(filter('-1')).toEqual(-1);
-    expect(filter('-1.0')).toEqual(-1);
-    expect(filter('.35')).toEqual(0.35);
-    expect(filter('.3')).toEqual(0.3);
-    expect(filter('0.')).toEqual(0);
-    expect(filter('1,23,000')).toEqual(123000);
-    expect(filter('     7,00,00,000  ')).toEqual(70000000);
+    expect(validatorService.getErrorString(undefined)).toEqual(
+      'Please enter a valid number.');
+    expect(validatorService.getErrorString(null)).toEqual(
+      'Please enter a valid number.');
+    expect(validatorService.getErrorString(1200000000E+27)).toEqual(
+      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+    expect(validatorService.getErrorString(1200000000E-27)).toEqual(
+      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+    expect(validatorService.getErrorString(999999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(99.9999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(-9.9999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(2.2)).toEqual(undefined);
+    expect(validatorService.getErrorString(-2.2)).toEqual(undefined);
+    expect(validatorService.getErrorString(34.56)).toEqual(undefined);
   });
 });

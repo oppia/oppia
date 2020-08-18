@@ -63,12 +63,10 @@ from . import install_third_party_libs
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
-    os.path.join(
-        common.OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
+    common.GOOGLE_APP_ENGINE_SDK_HOME,
     os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-%s' % common.WEBTEST_VERSION),
     os.path.join(
-        common.OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
-        'lib', 'webob_0_9'),
+        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'),
     os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join(
@@ -89,7 +87,8 @@ TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
 IMPORTANT: Only one of --test_path and --test_target should be specified.
@@ -248,8 +247,8 @@ def main(args=None):
                 os.path.join(
                     common.OPPIA_TOOLS_DIR,
                     'coverage-%s' % common.COVERAGE_VERSION)):
-            raise Exception('Coverage is not installed, please run the start '
-                            'script.')
+            raise Exception(
+                'Coverage is not installed, please run the start script.')
 
         pythonpath_components = [COVERAGE_DIR]
         if os.environ.get('PYTHONPATH'):
@@ -258,8 +257,8 @@ def main(args=None):
         os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
 
     if parsed_args.test_target and parsed_args.test_path:
-        raise Exception('At most one of test_path and test_target '
-                        'should be specified.')
+        raise Exception(
+            'At most one of test_path and test_target should be specified.')
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if parsed_args.test_target and '/' in parsed_args.test_target:

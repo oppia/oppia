@@ -32,6 +32,8 @@ from core.platform import models
 import feconf
 import utils
 
+from google.cloud import ndb
+
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
 
@@ -289,7 +291,7 @@ def _handle_exp_issues_after_state_rename(
             renamed versions. This mapping contains state names only if it is
             actually renamed.
         playthrough_ids_by_state_name: dict. The dict mapping old state names to
-            their new ones
+            their new ones.
 
     Returns:
         ExplorationIssue. The exploration issue domain object.
@@ -431,7 +433,7 @@ def get_exp_issues(exp_id, exp_version):
         exp_version: int. Version of the exploration.
 
     Returns:
-        ExplorationIssues|None: The domain object for exploration issues or
+        ExplorationIssues|None. The domain object for exploration issues or
         None if the exp_id is invalid.
     """
     exp_issues = None
@@ -449,7 +451,7 @@ def get_playthrough_by_id(playthrough_id):
         playthrough_id: str. ID of the playthrough.
 
     Returns:
-        Playthrough|None: The domain object for the playthrough or None if the
+        Playthrough|None. The domain object for the playthrough or None if the
         playthrough_id is invalid.
     """
     playthrough = None
@@ -508,7 +510,7 @@ def get_exploration_stats_by_id(exp_id, exp_version):
         ExplorationStats. The domain object for exploration statistics.
 
     Raises:
-        Exception: Entity for class ExplorationStatsModel with id not found.
+        Exception. Entity for class ExplorationStatsModel with id not found.
     """
     exploration_stats = None
     exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
@@ -681,8 +683,8 @@ def save_stats_model_transactional(exploration_stats):
         exploration_stats: ExplorationStats. The exploration statistics domain
             object.
     """
-    transaction_services.run_in_transaction(
-        _save_stats_model, exploration_stats)
+    with ndb.Client().transaction():
+        _save_stats_model(exploration_stats)
 
 
 def create_exp_issues_model(exp_issues):
@@ -725,8 +727,8 @@ def save_exp_issues_model_transactional(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain
             object.
     """
-    transaction_services.run_in_transaction(
-        _save_exp_issues_model, exp_issues)
+    with ndb.Client().transaction():
+        _save_exp_issues_model(exp_issues)
 
 
 def get_exploration_stats_multi(exp_version_references):
@@ -783,9 +785,11 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         - 'options': dict. The visualization options.
 
         An example of the returned value may be:
-        [{'options': {'y_axis_label': 'Count', 'x_axis_label': 'Answer'},
-        'id': 'BarChart',
-        'data': [{u'frequency': 1, u'answer': 0}]}]
+        [{
+            'options': {'header': 'Pretty Tiles!', 'use_percentages': True},
+            'id': 'SortedTiles',
+            'data': [{'frequency': 1, 'answer': 0}]
+        }]
     """
     if interaction_id is None:
         return []
@@ -1177,7 +1181,7 @@ def save_learner_answer_details(
                  in learner_answer_details.learner_answer_info_list])
             learner_answer_details_model.learner_answer_info_schema_version = (
                 learner_answer_details.learner_answer_info_schema_version)
-            learner_answer_details_model.accumulated_answer_info_json_size_bytes = ( #pylint: disable=line-too-long
+            learner_answer_details_model.accumulated_answer_info_json_size_bytes = ( # pylint: disable=line-too-long
                 learner_answer_details.accumulated_answer_info_json_size_bytes)
             learner_answer_details_model.put()
         else:
@@ -1284,7 +1288,8 @@ def delete_learner_answer_details_for_exploration_state(
         state_name: str. The name of the state.
     """
     state_reference = (
-        stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
+        stats_models.LearnerAnswerDetailsModel.
+        get_state_reference_for_exploration(
             exp_id, state_name))
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(

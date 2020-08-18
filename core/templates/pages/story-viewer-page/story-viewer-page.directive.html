@@ -33,7 +33,12 @@
                   <img class="oppia-lesson-icon-completed"
                        ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>"
                        ng-if="node.isCompleted()">
-                  <div ng-if="!node.isCompleted()" class="oppia-lesson-icon-uncompleted"></div>
+                  <div ng-if="!node.isCompleted() && (node.getId() === $ctrl.storyPlaythroughObject.getNextPendingNodeId())"
+                       class="oppia-lesson-icon-uncompleted">
+                  </div>
+                  <div ng-if="!node.isCompleted() && (node.getId() !== $ctrl.storyPlaythroughObject.getNextPendingNodeId())"
+                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable">
+                  </div>
                 </div>
 
                 <div class="oppia-story-viewer-card">

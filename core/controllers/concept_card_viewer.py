@@ -20,7 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import skill_services
+from core.domain import skill_fetchers
 import feconf
 
 
@@ -37,7 +37,7 @@ class ConceptCardDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         skill_ids = comma_separated_skill_ids.split(',')
-        skills = skill_services.get_multi_skills(skill_ids)
+        skills = skill_fetchers.get_multi_skills(skill_ids)
 
         concept_card_dicts = []
         for skill in skills:

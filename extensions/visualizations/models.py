@@ -76,24 +76,6 @@ class BaseVisualization(python_utils.OBJECT):
                 (self.id, self.addressed_info_is_supported))
 
 
-class BarChart(BaseVisualization):
-    """A visualization representing a bar chart."""
-
-    _OPTIONS_SPECS = [{
-        'name': 'x_axis_label',
-        'description': 'The label for the x-axis.',
-        'schema': {
-            'type': 'unicode',
-        },
-    }, {
-        'name': 'y_axis_label',
-        'description': 'The label for the y-axis',
-        'schema': {
-            'type': 'unicode',
-        },
-    }]
-
-
 class ClickHexbins(BaseVisualization):
     """A visualization which overlays an image with a hexagonal grouping of
     clicks.
@@ -167,4 +149,8 @@ class SortedTiles(BaseVisualization):
         'name': 'header',
         'description': 'Header for the tiles.',
         'schema': {'type': 'unicode'}
+    }, {
+        'name': 'use_percentages',
+        'description': 'Summarize frequency through percentages',
+        'schema': {'type': 'bool'},
     }]

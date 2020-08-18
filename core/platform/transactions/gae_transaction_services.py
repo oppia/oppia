@@ -19,7 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 
 def run_in_transaction(fn, *args, **kwargs):
@@ -30,16 +30,16 @@ def run_in_transaction(fn, *args, **kwargs):
     commit, since TransactionOptions.ALLOWED is used.
 
     Args:
-        fn: A function (or callable) to be called.
-        *args: Variable length argument list passed to the callable.
-        **kwargs: Arbitrary keyword arguments passed to the callable.
+        fn: callable. A function (or callable) to be called.
+        *args: list(*). Variable length argument list passed to the callable.
+        **kwargs: *. Arbitrary keyword arguments passed to the callable.
 
     Returns:
-        Whatever fn() returns.
+        *. Whatever fn() returns.
 
     Raises:
-        *: Whatever fn() raises.
-        datastore_errors.TransactionFailedError: The transaction failed.
+        Exception. Whatever fn() raises.
+        datastore_errors.TransactionFailedError. The transaction failed.
     """
     return ndb.transaction(
         lambda: fn(*args, **kwargs),

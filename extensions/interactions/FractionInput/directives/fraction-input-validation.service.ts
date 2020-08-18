@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IFractionAnswer } from 'interactions/answer-defs';
+import { FractionAnswer } from 'interactions/answer-defs';
 import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 import { baseInteractionValidationService } from
@@ -110,12 +110,12 @@ export class FractionInputValidationService {
     var matchedDenominators = [];
 
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
           lb: null,
           ub: null,
           lbi: false,
@@ -123,15 +123,15 @@ export class FractionInputValidationService {
         };
 
         var matchedDenominator = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
           denominator: null,
         };
 
         switch (rule.type) {
           case 'IsExactlyEqualTo':
             if (shouldBeInSimplestForm) {
-              var fractionDict: IFractionAnswer = rule.inputs.f;
+              var fractionDict: FractionAnswer = rule.inputs.f;
               var fractionInSimplestForm = this.fof.fromDict(
                 fractionDict).convertToSimplestForm();
               if (!angular.equals(fractionDict, fractionInSimplestForm)) {
@@ -257,21 +257,46 @@ export class FractionInputValidationService {
           default:
             break;
         }
+
         for (var k = 0; k < ranges.length; k++) {
-          if (isEnclosedBy(range, ranges[k])) {
-            var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1]
-              .rules[ranges[k].ruleIndex - 1];
-            if (shouldCheckRangeCriteria(earlierRule, rule)) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
-                  (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + ranges[k].ruleIndex +
-                  ' from answer group ' + ranges[k].answerGroupIndex +
-                  '.')
-              });
-            }
+          var earlierRule = answerGroups[ranges[k].answerGroupIndex]
+            .getRulesAsList()[ranges[k].ruleIndex];
+          // Rules inside an AnswerGroup do not have a set order. We should
+          // check for redundant rules in both directions if rules are in the
+          // same AnswerGroup.
+          const redundantWithinAnswerGroup = (
+            ranges[k].answerGroupIndex === i &&
+            (
+              (
+                isEnclosedBy(range, ranges[k]) &&
+                shouldCheckRangeCriteria(earlierRule, rule)
+              ) || (
+                isEnclosedBy(ranges[k], range) &&
+                shouldCheckRangeCriteria(rule, earlierRule)
+              )
+            )
+          );
+
+          // AnswerGroups do have a set order. If rules are not in the same
+          // AnswerGroup we only check in one direction.
+          const redundantBetweenAnswerGroups = (
+            ranges[k].answerGroupIndex !== i &&
+            (
+              isEnclosedBy(range, ranges[k]) &&
+              shouldCheckRangeCriteria(earlierRule, rule)
+            )
+          );
+
+          if (redundantWithinAnswerGroup || redundantBetweenAnswerGroups) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' +
+                (i + 1) + ' will never be matched because it ' +
+                'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
+                '.')
+            });
           }
         }
 
@@ -286,9 +311,9 @@ export class FractionInputValidationService {
                   'Rule ' + (j + 1) + ' from answer group ' +
                   (i + 1) + ' will never be matched because it ' +
                   'is made redundant by rule ' +
-                  matchedDenominators[k].ruleIndex +
+                  (matchedDenominators[k].ruleIndex + 1) +
                   ' from answer group ' +
-                  matchedDenominators[k].answerGroupIndex + '.')
+                  (matchedDenominators[k].answerGroupIndex + 1) + '.')
               });
             }
           }

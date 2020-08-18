@@ -36,7 +36,7 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             skill_models.SkillModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
         self.save_new_skill('skill_id', 'owner_id', description='description')
@@ -45,11 +45,6 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             skill_models.SkillModel.has_reference_to_user_id('x_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            skill_models.SkillModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
 
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Tests the SkillCommitLogEntryModel class."""
@@ -57,7 +52,7 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             skill_models.SkillCommitLogEntryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
         commit = skill_models.SkillCommitLogEntryModel.create(
@@ -80,16 +75,11 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             skill_models.SkillSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             skill_models.SkillSummaryModel.has_reference_to_user_id('any_id'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            skill_models.SkillSummaryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_fetch_page(self):
         skill_models.SkillSummaryModel(

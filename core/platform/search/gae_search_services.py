@@ -59,7 +59,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
             If there is a key named 'language_code', its value will be used as
             the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE
             is used.
-        index: str. The name of the index to insert the document into
+        index: str. The name of the index to insert the document into.
         retries: int. The number of times to retry inserting the documents.
 
     Returns:
@@ -67,9 +67,9 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
         added.
 
     Raises:
-        SearchFailureError: Raised when the indexing fails. If it fails for any
+        SearchFailureError. Raised when the indexing fails. If it fails for any
             document, none will be inserted.
-        ValueError: Raised when invalid values are given.
+        ValueError. Raised when invalid values are given.
     """
     if not isinstance(index, python_utils.BASESTRING):
         raise ValueError(
@@ -80,8 +80,8 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
     gae_docs = [_dict_to_search_document(d) for d in documents]
 
     try:
-        logging.debug('adding the following docs to index %s: %s',
-                      index.name, documents)
+        logging.debug(
+            'adding the following docs to index %s: %s', index.name, documents)
         results = index.put(gae_docs, deadline=5)
     except gae_search.PutError as e:
         logging.exception('PutError raised.')
@@ -91,8 +91,8 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
                     new_retries = retries - 1
                     logging.debug('%d tries left, retrying.' % (new_retries))
                     return add_documents_to_index(
-                        documents=documents,
-                        index=index.name,
+                        documents,
+                        index.name,
                         retries=new_retries)
 
         # At this pint, either we don't have any tries left, or none of the
@@ -113,7 +113,7 @@ def _dict_to_search_document(d):
         Document. The document containing fields.
 
     Raises:
-        ValueError: The given document is not in the dict format.
+        ValueError. The given document is not in the dict format.
     """
     if not isinstance(d, dict):
         raise ValueError('document should be a dictionary, got %s' % type(d))
@@ -146,7 +146,7 @@ def _make_fields(key, value):
         list(*). A list of fields.
 
     Raises:
-        ValueError: The type of field value is not list, str, Number or
+        ValueError. The type of field value is not list, str, Number or
             datetime.
     """
     if isinstance(value, list):
@@ -197,11 +197,11 @@ def delete_documents_from_index(
     Args:
         doc_ids: list(str). A list of document ids of documents to be deleted
             from the index.
-        index: str. The name of the index to delete the document from
+        index: str. The name of the index to delete the document from.
         retries: int. The number of times to retry deleting the documents.
 
     Raises:
-        SearchFailureError: Raised when the deletion fails. If it fails for any
+        SearchFailureError. Raised when the deletion fails. If it fails for any
             document, none will be deleted.
     """
     if not isinstance(index, python_utils.BASESTRING):
@@ -211,13 +211,15 @@ def delete_documents_from_index(
 
     for ind, doc_id in enumerate(doc_ids):
         if not isinstance(doc_id, python_utils.BASESTRING):
-            raise ValueError('all doc_ids must be string, got %s at index %d' %
-                             (type(doc_id), ind))
+            raise ValueError(
+                'all doc_ids must be string, got %s at index %d' % (
+                    type(doc_id), ind))
 
     index = gae_search.Index(index)
     try:
-        logging.debug('Attempting to delete documents from index %s, ids: %s' %
-                      (index.name, ', '.join(doc_ids)))
+        logging.debug(
+            'Attempting to delete documents from index %s, ids: %s' %
+            (index.name, ', '.join(doc_ids)))
         index.delete(doc_ids, deadline=5)
     except gae_search.DeleteError as e:
         logging.exception('Something went wrong during deletion.')
@@ -227,8 +229,8 @@ def delete_documents_from_index(
                     new_retries = retries - 1
                     logging.debug('%d tries left, retrying.' % (new_retries))
                     delete_documents_from_index(
-                        doc_ids=doc_ids,
-                        index=index.name,
+                        doc_ids,
+                        index.name,
                         retries=new_retries)
                     return
 
@@ -255,9 +257,9 @@ def clear_index(index_name):
         index.delete(doc_ids)
 
 
-def search(query_string, index, cursor=None,
-           limit=feconf.SEARCH_RESULTS_PAGE_SIZE, sort='', ids_only=False,
-           retries=DEFAULT_NUM_RETRIES):
+def search(
+        query_string, index, cursor=None, limit=feconf.SEARCH_RESULTS_PAGE_SIZE,
+        sort='', ids_only=False, retries=DEFAULT_NUM_RETRIES):
     """Searches for documents in an index.
 
     Args:
@@ -353,7 +355,7 @@ def _string_to_sort_expressions(input_string):
         list(SortExpression). A list of sorted expressions.
 
     Raises:
-        ValueError: Fields in the sort expression do not start with '+' or '-'
+        ValueError. Fields in the sort expression do not start with '+' or '-'
             to indicate sort direction.
     """
     sort_expressions = []

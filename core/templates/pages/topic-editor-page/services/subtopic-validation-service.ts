@@ -18,9 +18,15 @@
 
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const subtopicValidationConstants = require('constants.ts');
+
 angular.module('oppia').factory('SubtopicValidationService', [
   'TopicEditorStateService', function(
       TopicEditorStateService) {
+    const VALID_URL_FRAGMENT_REGEX = new RegExp(
+      subtopicValidationConstants.VALID_URL_FRAGMENT_REGEX);
     var checkValidSubtopicName = function(title) {
       var subtopicTitles = [];
       var topic = TopicEditorStateService.getTopic();
@@ -31,8 +37,20 @@ angular.module('oppia').factory('SubtopicValidationService', [
       return subtopicTitles.indexOf(title) === -1;
     };
 
+    var doesSubtopicWithUrlFragmentExist = function(urlFragment) {
+      var topic = TopicEditorStateService.getTopic();
+      return topic.getSubtopics().some(
+        subtopic => subtopic.getUrlFragment() === urlFragment);
+    };
+
+    var isUrlFragmentValid = function(urlFragment) {
+      return VALID_URL_FRAGMENT_REGEX.test(urlFragment);
+    };
+
     return {
-      checkValidSubtopicName: checkValidSubtopicName
+      checkValidSubtopicName: checkValidSubtopicName,
+      doesSubtopicWithUrlFragmentExist: doesSubtopicWithUrlFragmentExist,
+      isUrlFragmentValid: isUrlFragmentValid
     };
   }
 ]);

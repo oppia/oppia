@@ -26,7 +26,7 @@ import python_utils
 import utils
 
 from google.appengine.api import users
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 
 def create_login_url(slug):

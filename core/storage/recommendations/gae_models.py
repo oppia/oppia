@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -36,8 +36,7 @@ class ExplorationRecommendationsModel(
     """
 
     # Ids of recommended explorations.
-    recommended_exploration_ids = ndb.StringProperty(
-        repeated=True, indexed=False)
+    recommended_exploration_ids = ndb.TextProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -64,13 +63,6 @@ class ExplorationRecommendationsModel(
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationRecommendationsModel doesn't have any field with user
-        ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
 
 class TopicSimilaritiesModel(base_models.BaseModel):
@@ -99,8 +91,3 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicSimilaritiesModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

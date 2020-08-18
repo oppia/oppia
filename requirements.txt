@@ -15,3 +15,5 @@ simplejson==3.17.0
 six==1.15.0
 soupsieve==1.9.5
 webencodings==0.5.1
+googleapis_common_protos==1.52.0
+google-cloud-ndb==1.5.0

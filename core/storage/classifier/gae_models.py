@@ -24,7 +24,7 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -41,29 +41,28 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     """
 
     # The ID of the algorithm used to create the model.
-    algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES,
-                                      indexed=True)
+    algorithm_id = ndb.StringProperty(
+        required=True, choices=ALGORITHM_CHOICES)
     # The ID of the interaction to which the algorithm belongs.
-    interaction_id = ndb.StringProperty(required=True, indexed=True)
+    interaction_id = ndb.StringProperty(required=True)
     # The exploration_id of the exploration to whose state the model belongs.
-    exp_id = ndb.StringProperty(required=True, indexed=True)
+    exp_id = ndb.StringProperty(required=True)
     # The exploration version at the time this training job was created.
     exp_version = ndb.IntegerProperty(required=True, indexed=True)
     # The name of the state to which the model belongs.
-    state_name = ndb.StringProperty(required=True, indexed=True)
+    state_name = ndb.StringProperty(required=True)
     # The status of the training job. It can be either NEW, COMPLETE or PENDING.
-    status = ndb.StringProperty(required=True,
-                                choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
-                                default=feconf.TRAINING_JOB_STATUS_PENDING,
-                                indexed=True)
+    status = ndb.StringProperty(
+        required=True, choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
+        default=feconf.TRAINING_JOB_STATUS_PENDING)
     # The training data which is to be populated when retrieving the job.
     # The list contains dicts where each dict represents a single training
     # data group.
     training_data = ndb.JsonProperty(default=None)
     # The time when the job's status should next be checked.
     # It is incremented by TTL when a job with status NEW is picked up by VM.
-    next_scheduled_check_time = ndb.DateTimeProperty(required=True,
-                                                     indexed=True)
+    next_scheduled_check_time = ndb.DateTimeProperty(
+        required=True, indexed=True)
     # The schema version for the data that is being classified.
     data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
 
@@ -77,11 +76,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ClassifierTrainingJobModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the training job of the form
@@ -91,10 +85,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new ClassifierTrainingJobModel instance.
+            str. ID of the new ClassifierTrainingJobModel instance.
 
         Raises:
-            Exception: The id generator for ClassifierTrainingJobModel is
+            Exception. The id generator for ClassifierTrainingJobModel is
                 producing too many collisions.
         """
 
@@ -135,10 +129,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             data_schema_version: int. The schema version for the data.
 
         Returns:
-            ID of the new ClassifierModel entry.
+            str. ID of the new ClassifierModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id)
@@ -166,7 +160,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 datastore cursor.
 
         Returns:
-            List of the ClassifierTrainingJobModels with status new or pending.
+            list(ClassifierTrainingJobModel). List of the
+            ClassifierTrainingJobModels with status new or pending.
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
@@ -217,14 +212,14 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     """
 
     # The exploration_id of the exploration to whose state the model belongs.
-    exp_id = ndb.StringProperty(required=True, indexed=True)
+    exp_id = ndb.StringProperty(required=True)
     # The exploration version at the time the corresponding classifier's
     # training job was created.
     exp_version = ndb.IntegerProperty(required=True, indexed=True)
     # The name of the state to which the model belongs.
-    state_name = ndb.StringProperty(required=True, indexed=True)
+    state_name = ndb.StringProperty(required=True)
     # The ID of the training job corresponding to the exploration attributes.
-    job_id = ndb.StringProperty(required=True, indexed=True)
+    job_id = ndb.StringProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -235,13 +230,6 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TrainingJobExplorationMappingModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
@@ -299,10 +287,10 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 combination of <exp_id, exp_version, state_name>.
 
         Returns:
-            ID of the new ClassifierExplorationMappingModel entry.
+            str. ID of the new ClassifierExplorationMappingModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id, exp_version, state_name)

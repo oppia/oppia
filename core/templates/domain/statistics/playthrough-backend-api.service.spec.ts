@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
-import { PlaythroughObjectFactory, IPlaythroughBackendDict } from
+import { PlaythroughObjectFactory, PlaythroughBackendDict } from
   'domain/statistics/PlaythroughObjectFactory';
 
 describe('Playthrough backend api service', () => {
@@ -49,7 +49,7 @@ describe('Playthrough backend api service', () => {
       playthrough_stored: true,
     };
 
-    let playthroughDict: IPlaythroughBackendDict = {
+    let playthroughDict: PlaythroughBackendDict = {
       exp_id: 'expId1',
       exp_version: 1,
       issue_type: 'MultipleIncorrectSubmissions',

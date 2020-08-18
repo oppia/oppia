@@ -71,4 +71,27 @@ describe('State interaction stats backend api service', () => {
 
     flushMicrotasks();
   }));
+
+  it('should use the rejection handler if the backend request failed.',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      sisbas.getStats('expId', 'Intro').then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        '/createhandler/state_interaction_stats/expId/Intro');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+    })
+  );
 });

@@ -27,18 +27,18 @@ import re
 import subprocess
 import time
 
-# Install third party libraries before importing other files.
 from . import install_third_party_libs
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
-# pylint: disable=wrong-import-position
-import python_utils  # isort:skip
+from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-from . import build  # isort:skip
-from . import common  # isort:skip
-# pylint: enable=wrong-import-position
+import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run the script from the oppia root folder:
     python -m scripts.start
 Note that the root folder MUST be named 'oppia'.
@@ -51,6 +51,14 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--enable_console',
     help='optional; if specified, enables console.',
+    action='store_true')
+_PARSER.add_argument(
+    '--disable_host_checking',
+    help=(
+        'optional; if specified, disables host checking so that the dev '
+        'server can be accessed by any device on the same network using the '
+        'host device\'s IP address. DO NOT use this flag if you\'re running '
+        'on an untrusted network.'),
     action='store_true')
 _PARSER.add_argument(
     '--prod_env',
@@ -70,17 +78,26 @@ _PARSER.add_argument(
         'optional; if specified, does not automatically restart when files are '
         'changed.'),
     action='store_true')
+_PARSER.add_argument(
+    '--source_maps',
+    help=(
+        'optional; if specified, build webpack with source maps.'),
+    action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
 
 def cleanup():
-    """Function for waiting for the servers to go down."""
+    """Wait for the servers to go down and set constants back to default
+    values.
+    """
     common.print_each_string_after_two_new_lines([
         'INFORMATION',
         'Cleaning up the servers.'])
     while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
+    build.set_constants_to_default()
+    common.stop_redis_server()
 
 
 def main(args=None):
@@ -102,12 +119,17 @@ def main(args=None):
         '' if parsed_args.save_datastore else '--clear_datastore=true')
     enable_console_arg = (
         '--enable_console=true' if parsed_args.enable_console else '')
+    disable_host_checking_arg = (
+        '--enable_host_checking=false'
+        if parsed_args.disable_host_checking else '')
     no_auto_restart = (
         '--automatic_restart=no' if parsed_args.no_auto_restart else '')
 
     build_args = ['--prod_env'] if parsed_args.prod_env else []
     if parsed_args.maintenance_mode:
         build_args.append('--maintenance_mode')
+    if parsed_args.source_maps:
+        build_args.append('--source_maps')
     build.main(args=build_args)
     app_yaml_filepath = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
 
@@ -120,22 +142,29 @@ def main(args=None):
     if not parsed_args.prod_env:
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
+        webpack_config_file = (
+            build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if parsed_args.source_maps
+            else build.WEBPACK_DEV_CONFIG)
         background_processes.append(subprocess.Popen([
             common.NODE_BIN_PATH,
             os.path.join(
                 common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
-            '--config', 'webpack.dev.config.ts', '--watch']))
+            '--config', webpack_config_file, '--watch']))
+
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)
 
+        common.start_redis_server()
+
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
-        'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 --admin_port '
-        '8000 --host 0.0.0.0 --port %s --skip_sdk_update_check true %s' % (
-            common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
-            enable_console_arg, no_auto_restart,
+        'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 '
+        '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '
+        'true %s --application=%s' % (
+            common.GOOGLE_APP_ENGINE_SDK_HOME, clear_datastore_arg,
+            enable_console_arg, disable_host_checking_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            app_yaml_filepath), shell=True))
+            app_yaml_filepath, 'migration-toy-app'), shell=True))
 
     # Wait for the servers to come up.
     while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):

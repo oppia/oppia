@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: disable=invalid-name
-
 """Loads constants for backend use."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -52,4 +50,4 @@ class Constants(dict):
 
 
 with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f:
-    constants = Constants(parse_json_from_js(f))
+    constants = Constants(parse_json_from_js(f))  # pylint:disable=invalid-name

@@ -25,7 +25,7 @@ from core.platform import models
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -59,7 +59,7 @@ class JobModel(base_models.BaseModel):
         return '%s-%s-%s' % (job_type, current_time_str, random_int)
 
     # The job type.
-    job_type = ndb.StringProperty(indexed=True)
+    job_type = ndb.StringProperty()
     # The time at which the job was queued, in milliseconds since the epoch.
     time_queued_msec = ndb.FloatProperty(indexed=True)
     # The time at which the job was started, in milliseconds since the epoch.
@@ -70,7 +70,6 @@ class JobModel(base_models.BaseModel):
     time_finished_msec = ndb.FloatProperty(indexed=True)
     # The current status code for the job.
     status_code = ndb.StringProperty(
-        indexed=True,
         default=STATUS_CODE_NEW,
         choices=[
             STATUS_CODE_NEW, STATUS_CODE_QUEUED, STATUS_CODE_STARTED,
@@ -101,11 +100,6 @@ class JobModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """JobModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @property
     def is_cancelable(self):
@@ -190,7 +184,6 @@ class ContinuousComputationModel(base_models.BaseModel):
 
     # The current status code for the computation.
     status_code = ndb.StringProperty(
-        indexed=True,
         default=CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE,
         choices=[
             CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE,
@@ -223,8 +216,3 @@ class ContinuousComputationModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ContinuousComputationModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

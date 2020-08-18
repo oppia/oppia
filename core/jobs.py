@@ -31,7 +31,7 @@ import python_utils
 import utils
 
 from google.appengine.api import app_identity
-from google.appengine.ext import ndb
+from google.cloud import ndb
 from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
@@ -119,7 +119,7 @@ class BaseJobManager(python_utils.OBJECT):
             str. The unique id of this job.
 
         Raises:
-            Exception: This method (instead of a subclass method) was directly
+            Exception. This method (instead of a subclass method) was directly
                 used to create a new job.
         """
         if cls._is_abstract():
@@ -138,7 +138,8 @@ class BaseJobManager(python_utils.OBJECT):
             job_models.JobModel(id=job_id, job_type=cls.__name__).put()
             return job_id
 
-        return transaction_services.run_in_transaction(_create_new_job)
+        with ndb.Client().transaction():
+            return _create_new_job()
 
     @classmethod
     def enqueue(
@@ -487,7 +488,7 @@ class BaseJobManager(python_utils.OBJECT):
             new_status_code: str. New status code.
 
         Raises:
-            Exception: The given status code change is invalid.
+            Exception. The given status code change is invalid.
         """
         valid_new_status_codes = VALID_STATUS_CODE_TRANSITIONS[old_status_code]
         if new_status_code not in valid_new_status_codes:
@@ -503,7 +504,7 @@ class BaseJobManager(python_utils.OBJECT):
             job_type: str. Name of a job class.
 
         Raises:
-            Exception: The given job type is incorrect.
+            Exception. The given job type is incorrect.
         """
         if job_type != cls.__name__:
             raise Exception(
@@ -614,7 +615,7 @@ class BaseDeferredJobManager(BaseJobManager):
             additional_job_params: dict(str : *). Additional parameters on job.
 
         Raises:
-            PermanentTaskFailure: No further work can be scheduled.
+            PermanentTaskFailure. No further work can be scheduled.
         """
         logging.info(
             'Job %s started at %s' %
@@ -674,7 +675,6 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
         # "Yields:" section yields 2 objects and the Yields/Returns are
         # generally supposed to only yield 1 object which messes up the
         # indentation checking. This is the only case of this happening.
-        # pylint: disable=4-space-indentation-in-docstring
         """Returns a coroutine which runs the job pipeline and stores results.
 
         Args:
@@ -685,10 +685,10 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
         Yields:
             MapreducePipeline. Ready to start processing. Expects the output of
-                that pipeline to be sent back.
+            that pipeline to be sent back.
             StoreMapReduceResults. Will be constructed with whatever output the
-                caller sends back to the coroutine.
-        """# pylint: enable=4-space-indentation-in-docstring
+            caller sends back to the coroutine.
+        """
 
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
@@ -779,7 +779,7 @@ class BaseMapReduceJobManager(BaseJobManager):
             *. The current value of the parameter.
 
         Raises:
-            Exception: The parameter is not associated to this job type.
+            Exception. The parameter is not associated to this job type.
         """
         return context.get().mapreduce_spec.mapper.params[param_name]
 
@@ -850,7 +850,7 @@ class BaseMapReduceJobManager(BaseJobManager):
             shard_count: int. Number of shards used for the job.
 
         Raises:
-            Exception: Passed a value to a parameter in the mapper which has
+            Exception. Passed a value to a parameter in the mapper which has
                 already been given a value.
         """
         entity_class_types = cls.entity_classes_to_map_over()
@@ -1045,7 +1045,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
                 for this InputReader.
 
         Raises:
-            BadReaderParamsError: Required parameters are missing or invalid.
+            BadReaderParamsError. Required parameters are missing or invalid.
 
         Returns:
             bool. Whether mapper spec and all mapper patterns are valid.
@@ -1209,8 +1209,9 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             exists in the datastore.
 
         Raises:
-            base_models.BaseModel.EntityNotFoundError: strict == True and no
-                undeleted entity with the given id exists in the datastore.
+            base_models.BaseModel.EntityNotFoundError. The value of strinct is
+                True and no undeleted entity with the given id exists in the
+                datastore.
         """
         if not cls._is_valid_realtime_id(entity_id):
             raise ValueError('Invalid realtime id: %s' % entity_id)
@@ -1223,7 +1224,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         """Stores the current realtime layer entity into the database.
 
         Raises:
-            Exception: The current instance has an invalid realtime layer id.
+            Exception. The current instance has an invalid realtime layer id.
 
         Returns:
             realtime_layer. The realtime layer entity.
@@ -1376,8 +1377,8 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
             return cc_model.active_realtime_layer_index
 
-        return transaction_services.run_in_transaction(
-            _get_active_realtime_index_transactional)
+        with ndb.Client().transaction():
+            return _get_active_realtime_index_transactional()
 
     @classmethod
     def get_active_realtime_layer_id(cls, entity_id):
@@ -1428,8 +1429,8 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                 1 - cc_model.active_realtime_layer_index)
             cc_model.put()
 
-        transaction_services.run_in_transaction(
-            _switch_active_realtime_class_transactional)
+        with ndb.Client().transaction():
+            _switch_active_realtime_class_transactional()
 
     @classmethod
     def _clear_inactive_realtime_layer(cls, latest_created_on_datetime):
@@ -1481,8 +1482,8 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
             return cc_model.status_code
 
-        return transaction_services.run_in_transaction(
-            _register_end_of_batch_job_transactional)
+        with ndb.Client().transaction():
+            return _register_end_of_batch_job_transactional()
 
     @classmethod
     def get_status_code(cls):
@@ -1499,7 +1500,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             computation.
 
         Raises:
-            Exception: The computation wasn't idle before trying to start.
+            Exception. The computation wasn't idle before trying to start.
         """
         def _start_computation_transactional():
             """Transactional implementation for marking a continuous
@@ -1522,8 +1523,8 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.last_started_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
-        transaction_services.run_in_transaction(
-            _start_computation_transactional)
+        with ndb.Client().transaction():
+            _start_computation_transactional
 
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
@@ -1558,8 +1559,8 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.last_stopped_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
-        transaction_services.run_in_transaction(
-            _stop_computation_transactional)
+        with ndb.Client().transaction():
+            _stop_computation_transactional()
 
         # The cancellation must be done after the continuous computation
         # status update.
@@ -1614,8 +1615,8 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.last_finished_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
-        transaction_services.run_in_transaction(
-            _update_last_finished_time_transactional)
+        with ndb.Client().transaction():
+            _update_last_finished_time_transactional()
 
         return cls._register_end_of_batch_job_and_return_status()
 

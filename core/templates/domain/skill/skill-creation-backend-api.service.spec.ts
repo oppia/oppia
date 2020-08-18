@@ -21,15 +21,17 @@ import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { SkillCreationBackendApiService, IRubricBackend,
-  ISkillCreationBackend } from
-  'domain/skill/skill-creation-backend-api.service';
+import {
+  RubricBackendDict,
+  SkillCreationBackendApiService,
+  SkillCreationBackendDict
+} from 'domain/skill/skill-creation-backend-api.service';
 
 describe('Skill creation backend api service', () => {
   let httpTestingController: HttpTestingController = null;
   let skillCreationBackendApiService: SkillCreationBackendApiService = null;
-  let rubricDict: IRubricBackend = null;
-  let postData: ISkillCreationBackend = null;
+  let rubricDict: RubricBackendDict = null;
+  let postData: SkillCreationBackendDict = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

@@ -18,7 +18,6 @@
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
@@ -26,50 +25,70 @@ require('domain/utilities/url-interpolation.service.ts');
 // is migrated to Angular.
 const subtopicConstants2 = require('constants.ts');
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/question/question-backend-api.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
-require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
+require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
   controller: [
-    '$scope', 'SubtopicValidationService', 'TopicEditorStateService',
-    'TopicUpdateService',
-    'EntityCreationService',
-    'TopicEditorRoutingService',
-    'UrlInterpolationService', 'EVENT_TOPIC_REINITIALIZED',
-    'EVENT_TOPIC_INITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
+    '$scope', 'EntityCreationService', 'QuestionBackendApiService',
+    'SubtopicValidationService', 'TopicEditorStateService',
+    'TopicEditorRoutingService', 'TopicUpdateService',
+    'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
     'MAX_CHARS_IN_SUBTOPIC_TITLE',
+    'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
-        $scope, SubtopicValidationService, TopicEditorStateService,
-        TopicUpdateService,
-        EntityCreationService,
-        TopicEditorRoutingService,
-        UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
-        EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED,
-        MAX_CHARS_IN_SUBTOPIC_TITLE) {
+        $scope, EntityCreationService, QuestionBackendApiService,
+        SubtopicValidationService, TopicEditorStateService,
+        TopicEditorRoutingService, TopicUpdateService,
+        UrlInterpolationService, WindowDimensionsService, WindowRef,
+        MAX_CHARS_IN_SUBTOPIC_TITLE,
+        MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
-      var _initEditor = function() {
+      ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
+        MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
+      ctrl.initEditor = function() {
+        ctrl.hostname = WindowRef.nativeWindow.location.hostname;
         ctrl.topic = TopicEditorStateService.getTopic();
+        ctrl.classroomUrlFragment = (
+          TopicEditorStateService.getClassroomUrlFragment());
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
-        ctrl.subtopic = ctrl.topic.getSubtopicById(
-          parseInt(ctrl.subtopicId));
+        ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
         ctrl.errorMsg = null;
+        ctrl.subtopicUrlFragmentExists = false;
+        ctrl.subtopicUrlFragmentIsValid = false;
         if (ctrl.topic.getId() && ctrl.subtopic) {
           TopicEditorStateService.loadSubtopicPage(
             ctrl.topic.getId(), ctrl.subtopicId);
-
+          ctrl.skillIds = ctrl.subtopic.getSkillIds();
+          ctrl.questionCount = 0;
+          if (ctrl.skillIds.length) {
+            QuestionBackendApiService.fetchTotalQuestionCountForSkillIds(
+              ctrl.skillIds).then((questionCount) => {
+              ctrl.questionCount = questionCount;
+              $scope.$applyAsync();
+            });
+          }
+          ctrl.skillQuestionCountDict = (
+            TopicEditorStateService.getSkillQuestionCountDict());
           ctrl.editableTitle = ctrl.subtopic.getTitle();
           ctrl.editableThumbnailFilename = (
             ctrl.subtopic.getThumbnailFilename());
           ctrl.editableThumbnailBgColor = (
             ctrl.subtopic.getThumbnailBgColor());
+          ctrl.editableUrlFragment = ctrl.subtopic.getUrlFragment();
+          ctrl.initialSubtopicUrlFragment = ctrl.subtopic.getUrlFragment();
           ctrl.subtopicPage = (
             TopicEditorStateService.getSubtopicPage());
           ctrl.allowedBgColors = (
@@ -80,6 +99,9 @@ angular.module('oppia').component('subtopicEditorTab', {
           }
           ctrl.uncategorizedSkillSummaries = (
             ctrl.topic.getUncategorizedSkillSummaries());
+          ctrl.subtopicUrlFragmentIsValid = (
+            SubtopicValidationService.isUrlFragmentValid(
+              ctrl.editableUrlFragment));
         }
       };
 
@@ -96,6 +118,28 @@ angular.module('oppia').component('subtopicEditorTab', {
         TopicUpdateService.setSubtopicTitle(
           ctrl.topic, ctrl.subtopic.getId(), title);
         ctrl.editableTitle = title;
+      };
+
+      ctrl.updateSubtopicUrlFragment = function(urlFragment) {
+        ctrl.subtopicUrlFragmentIsValid = (
+          SubtopicValidationService.isUrlFragmentValid(urlFragment));
+        if (urlFragment === ctrl.initialSubtopicUrlFragment) {
+          ctrl.subtopicUrlFragmentExists = false;
+          return;
+        }
+
+        ctrl.subtopicUrlFragmentExists = (
+          SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+            urlFragment));
+        if (
+          !ctrl.subtopicUrlFragmentIsValid ||
+          ctrl.subtopicUrlFragmentExists) {
+          return;
+        }
+
+        TopicUpdateService.setSubtopicUrlFragment(
+          ctrl.topic, ctrl.subtopic.getId(), urlFragment);
+        ctrl.editableUrlFragment = urlFragment;
       };
 
       ctrl.updateSubtopicThumbnailFilename = function(
@@ -136,45 +180,6 @@ angular.module('oppia').component('subtopicEditorTab', {
         );
       };
 
-      /**
-       * @param {string|null} oldSubtopicId - The id of the subtopic from
-       *    which the skill is to be moved, or null if the origin is the
-       *    uncategorized section.
-       * @param {SkillSummary} skillSummary - The summary of the skill
-       * that is to be moved.
-      */
-      ctrl.onMoveSkillStart = function(oldSubtopicId, skillSummary) {
-        ctrl.skillSummaryToMove = skillSummary;
-        ctrl.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
-      };
-
-      /**
-       * @param {string|null} newSubtopicId - The subtopic to which the
-       *    skill is to be moved, or null if the destination is the
-       *    uncategorized section.
-      */
-      ctrl.onMoveSkillFinish = function(newSubtopicId) {
-        if (newSubtopicId === ctrl.oldSubtopicId) {
-          return;
-        }
-
-        if (newSubtopicId === null) {
-          TopicUpdateService.removeSkillFromSubtopic(
-            ctrl.topic, ctrl.oldSubtopicId, ctrl.skillSummaryToMove);
-        } else {
-          TopicUpdateService.moveSkillToSubtopic(
-            ctrl.topic, ctrl.oldSubtopicId, newSubtopicId,
-            ctrl.skillSummaryToMove);
-        }
-        _initEditor();
-      };
-
-      ctrl.deleteUncategorizedSkillFromTopic = function(skillSummary) {
-        TopicUpdateService.removeUncategorizedSkill(
-          ctrl.topic, skillSummary);
-        _initEditor();
-      };
-
       ctrl.updateHtmlData = function() {
         if (ctrl.htmlData !==
                 ctrl.subtopicPage.getPageContents().getHtml()) {
@@ -188,12 +193,70 @@ angular.module('oppia').component('subtopicEditorTab', {
         }
       };
 
+      ctrl.cancelHtmlDataChange = function() {
+        ctrl.htmlData = ctrl.htmlDataBeforeUpdate;
+        ctrl.updateHtmlData();
+        ctrl.schemaEditorIsShown = false;
+      };
       ctrl.showSchemaEditor = function() {
         ctrl.schemaEditorIsShown = true;
+        ctrl.htmlDataBeforeUpdate = angular.copy(ctrl.htmlData);
       };
 
-      ctrl.createSkill = function() {
-        EntityCreationService.createSkill();
+      ctrl.onRearrangeMoveSkillFinish = function(toIndex) {
+        ctrl.toIndex = toIndex;
+        if (ctrl.fromIndex === ctrl.toIndex) {
+          return;
+        }
+        TopicUpdateService.rearrangeSkillInSubtopic(
+          ctrl.topic, ctrl.subtopic.getId(), ctrl.fromIndex, ctrl.toIndex);
+      };
+
+      ctrl.onRearrangeMoveSkillStart = function(fromIndex) {
+        ctrl.fromIndex = fromIndex;
+      };
+
+      ctrl.toggleSubtopicPreview = function() {
+        ctrl.subtopicPreviewCardIsShown = !ctrl.subtopicPreviewCardIsShown;
+      };
+
+      ctrl.togglePreviewSkillCard = function() {
+        if (!WindowDimensionsService.isWindowNarrow()) {
+          return;
+        }
+        ctrl.skillsListIsShown = !ctrl.skillsListIsShown;
+      };
+
+      ctrl.toggleSubtopicEditorCard = function() {
+        if (!WindowDimensionsService.isWindowNarrow()) {
+          return;
+        }
+        ctrl.subtopicEditorCardIsShown = !ctrl.subtopicEditorCardIsShown;
+      };
+
+      ctrl.showSkillEditOptions = function(index) {
+        ctrl.selectedSkillEditOptionsIndex = (
+            (ctrl.selectedSkillEditOptionsIndex === index) ? -1 : index);
+      };
+
+      ctrl.removeSkillFromSubtopic = function(skillSummary) {
+        ctrl.selectedSkillEditOptionsIndex = -1;
+        TopicUpdateService.removeSkillFromSubtopic(
+          ctrl.topic, ctrl.subtopicId, skillSummary);
+        ctrl.initEditor();
+      };
+
+      ctrl.removeSkillFromTopic = function(skillSummary) {
+        ctrl.selectedSkillEditOptionsIndex = -1;
+        TopicUpdateService.removeSkillFromSubtopic(
+          ctrl.topic, ctrl.subtopicId, skillSummary);
+        TopicUpdateService.removeUncategorizedSkill(
+          ctrl.topic, skillSummary);
+        ctrl.initEditor();
+      };
+
+      ctrl.navigateToTopicEditor = function() {
+        TopicEditorRoutingService.navigateToMainTab();
       };
 
       ctrl.$onInit = function() {
@@ -204,17 +267,34 @@ angular.module('oppia').component('subtopicEditorTab', {
           }
         };
         ctrl.htmlData = '';
+        ctrl.skillsListIsShown = (
+          !WindowDimensionsService.isWindowNarrow());
+        ctrl.subtopicPreviewCardIsShown = false;
+        ctrl.subtopicEditorCardIsShown = true;
         ctrl.schemaEditorIsShown = false;
-        $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-        $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
-        $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
-          ctrl.subtopicPage = (
-            TopicEditorStateService.getSubtopicPage());
-          var pageContents = ctrl.subtopicPage.getPageContents();
-          ctrl.htmlData = pageContents.getHtml();
-        });
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onSubtopicPageLoaded.subscribe(
+            () => {
+              ctrl.subtopicPage = (
+                TopicEditorStateService.getSubtopicPage());
+              var pageContents = ctrl.subtopicPage.getPageContents();
+              ctrl.htmlData = pageContents.getHtml();
+            }
+          )
+        );
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onTopicInitialized.subscribe(
+            () => ctrl.initEditor()
+          ));
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onTopicReinitialized.subscribe(
+            () => ctrl.initEditor()
+          ));
 
-        _initEditor();
+        ctrl.initEditor();
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

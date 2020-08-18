@@ -17,7 +17,7 @@
  */
 require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
-  'training-panel.directive.ts');
+  'training-panel.component.ts');
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -106,7 +106,7 @@ angular.module('oppia').controller('TrainingModalController', [
       if (index > ResponsesService.getAnswerGroupCount()) {
         var newOutcome = $scope.classification.newOutcome;
         var newAnswerGroup = AnswerGroupObjectFactory.createNew(
-          [], angular.copy(newOutcome), [unhandledAnswer], null);
+          angular.copy(newOutcome), [unhandledAnswer], null);
         _saveNewAnswerGroup(newAnswerGroup);
         TrainingDataService.associateWithAnswerGroup(
           ResponsesService.getAnswerGroupCount() - 1,

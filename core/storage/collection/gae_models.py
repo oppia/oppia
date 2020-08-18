@@ -23,11 +23,10 @@ import datetime
 
 from constants import constants
 import core.storage.base_model.gae_models as base_models
-import core.storage.user.gae_models as user_models
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -56,14 +55,14 @@ class CollectionModel(base_models.VersionedModel):
     # What this collection is called.
     title = ndb.StringProperty(required=True)
     # The category this collection belongs to.
-    category = ndb.StringProperty(required=True, indexed=True)
+    category = ndb.StringProperty(required=True)
     # The objective of this collection.
-    objective = ndb.TextProperty(default='', indexed=False)
+    objective = ndb.TextProperty(default='')
     # The language code of this collection.
     language_code = ndb.StringProperty(
-        default=constants.DEFAULT_LANGUAGE_CODE, indexed=True)
+        default=constants.DEFAULT_LANGUAGE_CODE)
     # Tags associated with this collection.
-    tags = ndb.StringProperty(repeated=True, indexed=True)
+    tags = ndb.StringProperty(repeated=True)
 
     # The version of all property blob schemas.
     schema_version = ndb.IntegerProperty(
@@ -100,11 +99,6 @@ class CollectionModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CollectionModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_collection_count(cls):
@@ -208,13 +202,13 @@ class CollectionRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user_ids of owners of this collection.
-    owner_ids = ndb.StringProperty(indexed=True, repeated=True)
+    owner_ids = ndb.StringProperty(repeated=True)
     # The user_ids of users who are allowed to edit this collection.
-    editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    editor_ids = ndb.StringProperty(repeated=True)
     # The user_ids of users who are allowed to voiceover this collection.
-    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
+    voice_artist_ids = ndb.StringProperty(repeated=True)
     # The user_ids of users who are allowed to view this collection.
-    viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
+    viewer_ids = ndb.StringProperty(repeated=True)
 
     # Whether this collection is owned by the community.
     community_owned = ndb.BooleanProperty(indexed=True, default=False)
@@ -227,14 +221,14 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     # The publication status of this collection.
     status = ndb.StringProperty(
-        default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
+        default=constants.ACTIVITY_STATUS_PRIVATE,
         choices=[
             constants.ACTIVITY_STATUS_PRIVATE,
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
     # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    translator_ids = ndb.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -247,36 +241,6 @@ class CollectionRightsModel(base_models.VersionedModel):
     def get_export_policy():
         """Model contains user data."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
-
-    @staticmethod
-    def convert_to_valid_dict(model_dict):
-        """Replace invalid fields and values in the CollectionRightsModel dict.
-
-        Some old CollectionRightsSnapshotContentModels can contain fields
-        and field values that are no longer supported and would cause
-        an exception when we try to reconstitute a CollectionRightsModel from
-        them. We need to remove or replace these fields and values.
-
-        Args:
-            model_dict: dict. The content of the model. Some fields and field
-                values might no longer exist in the CollectionRightsModel
-                schema.
-
-        Returns:
-            dict. The content of the model. Only valid fields and values are
-            present.
-        """
-        # The status field could historically take the value 'publicized', this
-        # value is now equivalent to 'public'.
-        if model_dict['status'] == 'publicized':
-            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
-        # The voice_artist_ids field was previously named translator_ids. We
-        # need to move the values from translator_ids field to voice_artist_ids
-        # and delete translator_ids.
-        if 'translator_ids' in model_dict and model_dict['translator_ids']:
-            model_dict['voice_artist_ids'] = model_dict['translator_ids']
-            model_dict['translator_ids'] = []
-        return model_dict
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -297,53 +261,6 @@ class CollectionRightsModel(base_models.VersionedModel):
             )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CollectionRightsModel has multiple fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the owner_ids, editor_ids,
-        voice_artist_ids and viewer_ids.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(ndb.OR(
-                cls.owner_ids == old_user_id,
-                cls.editor_ids == old_user_id,
-                cls.voice_artist_ids == old_user_id,
-                cls.viewer_ids == old_user_id)).fetch():
-            model.owner_ids = [
-                new_user_id if owner_id == old_user_id else owner_id
-                for owner_id in model.owner_ids]
-            model.editor_ids = [
-                new_user_id if editor_id == old_user_id else editor_id
-                for editor_id in model.editor_ids]
-            model.voice_artist_ids = [
-                new_user_id if v_artist_id == old_user_id else v_artist_id
-                for v_artist_id in model.voice_artist_ids]
-            model.viewer_ids = [
-                new_user_id if viewer_id == old_user_id else viewer_id
-                for viewer_id in model.viewer_ids]
-            migrated_models.append(model)
-        cls.put_multi(migrated_models, update_last_updated_time=False)
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in owner_ids,
-        editor_ids, voice_artist_ids and viewer_ids.
-        """
-        user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
-                    self.viewer_ids)
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
-
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
@@ -360,6 +277,39 @@ class CollectionRightsModel(base_models.VersionedModel):
         """
         super(CollectionRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
+
+    def _reconstitute(self, snapshot_dict):
+        """Populates the model instance with the snapshot.
+
+        Some old CollectionRightsSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a CollectionRightsModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            snapshot_dict: dict(str, *). The snapshot with the model
+                property values.
+
+        Returns:
+            VersionedModel. The instance of the VersionedModel class populated
+            with the the snapshot.
+        """
+        # The status field could historically take the value 'publicized', this
+        # value is now equivalent to 'public'.
+        if snapshot_dict['status'] == 'publicized':
+            snapshot_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+        # The voice_artist_ids field was previously named translator_ids. We
+        # need to move the values from translator_ids field to voice_artist_ids
+        # and delete translator_ids.
+        if (
+                'translator_ids' in snapshot_dict and
+                snapshot_dict['translator_ids']
+        ):
+            snapshot_dict['voice_artist_ids'] = snapshot_dict['translator_ids']
+            snapshot_dict['translator_ids'] = []
+
+        self.populate(**snapshot_dict)
+        return self
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -434,78 +384,6 @@ class CollectionRightsModel(base_models.VersionedModel):
         }
 
 
-class CollectionRightsAllUsersModel(base_models.BaseModel):
-    """Temporary storage model for all user ids ever mentioned in the collection
-    rights.
-
-    TODO (#8529): This model should be deleted after the user ID migration is
-    completed.
-
-    The id of each instance is the id of the corresponding collection.
-    """
-
-    # The user_ids of users who are (or were in history) members of owner_ids,
-    # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
-    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """CollectionRightsAllUsersModel are temporary model that will be
-        deleted after user migration.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether CollectionRightsAllUsersModel references the given
-        user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.query(
-            cls.all_user_ids == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_export_policy():
-        """This model is only used for migration purposes. All the data
-        contained in this model are already exported through
-        CollectionRightsModel.
-        """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CollectionRightsAllUsersModel has multiple fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, unused_old_user_id, unused_new_user_id):
-        """This model is used to verify that the user ID migration of
-        CollectionRightsSnapshotContentModel was successful. The content is
-        filled by the AddAllUserIdsVerificationJob and
-        AddAllUserIdsSnapshotsVerificationJob before the
-        GaeIdNotInModelsVerificationJob is run, thus it shouldn't be migrated by
-        this method.
-
-        Args:
-            unused_old_user_id: str. The old user ID.
-            unused_new_user_id: str. The new user ID.
-        """
-        pass
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in all_user_ids."""
-        user_ids = [user_id for user_id in self.all_user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
-
-
 class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to collections.
 
@@ -516,7 +394,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the collection being edited.
-    collection_id = ndb.StringProperty(indexed=True, required=True)
+    collection_id = ndb.StringProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -563,8 +441,8 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 fetched.
 
         Raises:
-            ValueError. max_age is neither an instance of datetime.timedelta nor
-                None.
+            ValueError. The max_age is neither an instance of datetime.timedelta
+                nor None.
 
         Returns:
             3-tuple of (results, cursor, more). Where:
@@ -608,13 +486,13 @@ class CollectionSummaryModel(base_models.BaseModel):
     # What this collection is called.
     title = ndb.StringProperty(required=True)
     # The category this collection belongs to.
-    category = ndb.StringProperty(required=True, indexed=True)
+    category = ndb.StringProperty(required=True)
     # The objective of this collection.
-    objective = ndb.TextProperty(required=True, indexed=False)
+    objective = ndb.TextProperty(required=True)
     # The ISO 639-1 code for the language this collection is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = ndb.StringProperty(required=True)
     # Tags associated with this collection.
-    tags = ndb.StringProperty(repeated=True, indexed=True)
+    tags = ndb.StringProperty(repeated=True)
 
     # Aggregate user-assigned ratings of the collection.
     ratings = ndb.JsonProperty(default=None, indexed=False)
@@ -630,7 +508,7 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     # The publication status of this collection.
     status = ndb.StringProperty(
-        default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
+        default=constants.ACTIVITY_STATUS_PRIVATE,
         choices=[
             constants.ACTIVITY_STATUS_PRIVATE,
             constants.ACTIVITY_STATUS_PUBLIC
@@ -641,17 +519,17 @@ class CollectionSummaryModel(base_models.BaseModel):
     community_owned = ndb.BooleanProperty(required=True, indexed=True)
 
     # The user_ids of owners of this collection.
-    owner_ids = ndb.StringProperty(indexed=True, repeated=True)
+    owner_ids = ndb.StringProperty(repeated=True)
     # The user_ids of users who are allowed to edit this collection.
-    editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    editor_ids = ndb.StringProperty(repeated=True)
     # The user_ids of users who are allowed to view this collection.
-    viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
+    viewer_ids = ndb.StringProperty(repeated=True)
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the collection's content).
     # NOTE TO DEVELOPERS: contributor_ids and contributors_summary need to be
     # synchronized, meaning that the keys in contributors_summary need be
     # equal to the contributor_ids list.
-    contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    contributor_ids = ndb.StringProperty(repeated=True)
     # A dict representing the contributors of non-trivial commits to this
     # collection. Each key of this dict is a user_id, and the corresponding
     # value is the number of non-trivial commits that the user has made.
@@ -693,44 +571,6 @@ class CollectionSummaryModel(base_models.BaseModel):
             cls.viewer_ids == user_id,
             cls.contributor_ids == user_id)).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CollectionSummaryModel has multiple fields with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the owner_ids, editor_ids,
-        viewer_ids and contributor_ids.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(ndb.OR(
-                cls.owner_ids == old_user_id, cls.editor_ids == old_user_id,
-                cls.viewer_ids == old_user_id,
-                cls.contributor_ids == old_user_id)).fetch():
-            model.owner_ids = [
-                new_user_id if owner_id == old_user_id else owner_id
-                for owner_id in model.owner_ids]
-            model.editor_ids = [
-                new_user_id if editor_id == old_user_id else editor_id
-                for editor_id in model.editor_ids]
-            model.viewer_ids = [
-                new_user_id if viewer_id == old_user_id else viewer_id
-                for viewer_id in model.viewer_ids]
-            model.contributor_ids = [
-                new_user_id if contributor_id == old_user_id else
-                contributor_id for contributor_id in model.contributor_ids]
-            if old_user_id in model.contributors_summary:
-                model.contributors_summary[new_user_id] = (
-                    model.contributors_summary[old_user_id])
-                del model.contributors_summary[old_user_id]
-            migrated_models.append(model)
-        cls.put_multi(migrated_models, update_last_updated_time=False)
-
     @classmethod
     def get_non_private(cls):
         """Returns an iterable with non-private collection summary models.
@@ -750,7 +590,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         at least viewable by the given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with private collection summary models that
@@ -759,9 +599,10 @@ class CollectionSummaryModel(base_models.BaseModel):
         return CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ndb.OR(CollectionSummaryModel.owner_ids == user_id,
-                   CollectionSummaryModel.editor_ids == user_id,
-                   CollectionSummaryModel.viewer_ids == user_id)
+            ndb.OR(
+                CollectionSummaryModel.owner_ids == user_id,
+                CollectionSummaryModel.editor_ids == user_id,
+                CollectionSummaryModel.viewer_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -772,27 +613,16 @@ class CollectionSummaryModel(base_models.BaseModel):
         editable by the given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with collection summary models that are at
             least viewable by the given user.
         """
         return CollectionSummaryModel.query().filter(
-            ndb.OR(CollectionSummaryModel.owner_ids == user_id,
-                   CollectionSummaryModel.editor_ids == user_id)
+            ndb.OR(
+                CollectionSummaryModel.owner_ids == user_id,
+                CollectionSummaryModel.editor_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in owner_ids,
-        editor_ids, viewer_ids and contributor_ids.
-        """
-        user_ids = (self.owner_ids + self.editor_ids + self.viewer_ids +
-                    self.contributor_ids)
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)

@@ -54,7 +54,14 @@ describe('Graph Data Service', function() {
         param_changes: [],
         interaction: {
           answer_groups: [{
-            rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Contains: [
+                {
+                  x: 'hola'
+                }
+              ]
+            },
             outcome: {
               dest: 'Me Llamo',
               feedback: {
@@ -64,6 +71,15 @@ describe('Graph Data Service', function() {
               labelled_as_correct: true,
             },
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'Hola',
             feedback: {

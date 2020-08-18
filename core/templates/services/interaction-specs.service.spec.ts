@@ -19,7 +19,6 @@
 import { TestBed } from '@angular/core/testing';
 
 import { InteractionSpecsService } from 'services/interaction-specs.service';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 describe('InteractionSpecsService', () => {
   beforeEach(() => {

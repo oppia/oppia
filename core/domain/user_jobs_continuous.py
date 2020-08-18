@@ -29,13 +29,12 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
         models.NAMES.feedback, models.NAMES.user]))
-transaction_services = models.Registry.import_transaction_services()
 
 
 # TODO(bhenning): Implement a working real-time layer for the recent dashboard
@@ -368,11 +367,11 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 triggered and the total play count is incremented. If he/she
                 rates an exploration, an event of type `rate` is triggered and
                 average rating of the realtime model is refreshed.
-            *args: tuple(*). If event_type is 'start', then this is a 1-element
-                tuple containing:
+            *args: list(*). If event_type is 'start', then this is a 1-element
+                list containing:
                     str. The id of the exploration currently being played.
                 If event_type is 'rate_exploration', then this is a 3-element
-                tuple containing:
+                list containing:
                     str. The id of the exploration currently being played.
                     float. The rating given by user to the exploration.
                     float. The old rating of the exploration, before it is
@@ -439,14 +438,14 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         if exp_summary:
             for user_id in exp_summary.owner_ids:
                 if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
-                    transaction_services.run_in_transaction(
-                        _increment_total_plays_count, user_id)
+                    with ndb.Client().transaction():
+                        _increment_total_plays_count(user_id)
 
                 elif event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
                     rating = args[2]
                     old_rating = args[3]
-                    transaction_services.run_in_transaction(
-                        _refresh_average_ratings, user_id, rating, old_rating)
+                    with ndb.Client().transaction():
+                        _refresh_average_ratings(user_id, rating, old_rating)
 
     # Public query method.
     @classmethod
