@@ -179,7 +179,7 @@ export class ReadOnlyCollectionBackendApiService {
     this._collectionCache = {};
   }
 
-  get onCollectionLoad() {
+  get onCollectionLoad(): EventEmitter<unknown> {
     return this._collectionLoadedEventEmitter;
   }
 }

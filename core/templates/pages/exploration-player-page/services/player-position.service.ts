@@ -95,15 +95,15 @@ export class PlayerPositionService {
     return this.learnerJustSubmittedAnAnswer;
   }
 
-  changeCurrentQuestion(index: number) {
+  changeCurrentQuestion(index: number): void {
     this._currentQuestionChangedEventEmitter.emit(index);
   }
 
-  get onActiveCardChanged() {
+  get onActiveCardChanged(): EventEmitter<unknown> {
     return this._activeCardChangedEventEmitter;
   }
 
-  get onCurrentQuestionChange() {
+  get onCurrentQuestionChange(): EventEmitter<unknown> {
     return this._currentQuestionChangedEventEmitter;
   }
 }

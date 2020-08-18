@@ -132,7 +132,7 @@ export class StateEditorService {
     return this.misconceptionsBySkill;
   }
 
-  setInteraction(newInteraction): void {
+  setInteraction(newInteraction: Interaction): void {
     this.interaction = newInteraction;
   }
 
@@ -245,19 +245,19 @@ export class StateEditorService {
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
   }
 
-  get onStateEditorInitialized() {
+  get onStateEditorInitialized(): EventEmitter<unknown> {
     return this._stateEditorInitializedEventEmitter;
   }
 
-  get onStateEditorDirectiveInitialized() {
+  get onStateEditorDirectiveInitialized(): EventEmitter<unknown> {
     return this._stateEditorDirectiveInitializedEventEmitter;
   }
 
-  get onInteractionEditorInitialized() {
+  get onInteractionEditorInitialized(): EventEmitter<unknown> {
     return this._interactionEditorInitializedEventEmitter;
   }
 
-  get onSaveOutcomeDestDetails() {
+  get onSaveOutcomeDestDetails(): EventEmitter<unknown> {
     return this._saveOutcomeDestDetailsEventEmitter;
   }
 }

@@ -55,7 +55,7 @@ export class I18nLanguageCodeService {
     I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
   }
 
-  get onPreferredLanguageCodesLoaded() {
+  get onPreferredLanguageCodesLoaded(): EventEmitter<unknown> {
     return this._preferredLanguageCodesLoadedEventEmitter;
   }
 }

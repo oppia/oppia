@@ -35,7 +35,7 @@ export class StateInteractionIdService extends StatePropertyService<string> {
   }
   private _interactionIdChanged = new EventEmitter();
 
-  get onInteractionIdChanged() {
+  get onInteractionIdChanged(): EventEmitter<unknown> {
     return this._interactionIdChanged;
   }
 }

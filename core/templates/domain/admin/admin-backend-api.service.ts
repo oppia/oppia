@@ -96,6 +96,24 @@ export interface AdminPageData {
   topicSummaries: TopicSummary[];
 }
 
+interface LatexToSvgMapping {
+  [expId: string]: {
+    [latexString: string]: {
+      latexId: string;
+      file: Blob;
+    }
+  }
+}
+
+interface SuggestionLatexToSvgMapping {
+  [suggestionId: string]: {
+    [latexString: string]: {
+      latexId: string;
+      file: Blob;
+    }
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -142,7 +160,7 @@ export class AdminBackendApiService {
   // TODO(#10045): Remove this function once all the math-rich text
   // components in explorations have a valid math SVG stored in the
   // datastore.
-  sendMathSvgsToBackend(latexToSvgMapping): Promise<Object> {
+  sendMathSvgsToBackend(latexToSvgMapping: LatexToSvgMapping): Promise<Object> {
     let body = new FormData();
     for (var expId in latexToSvgMapping) {
       for (var latexString in latexToSvgMapping[expId]) {
@@ -168,7 +186,8 @@ export class AdminBackendApiService {
   // components in suggestions have a valid math SVG stored in the
   // datastore.
   sendSuggestionMathSvgsToBackend(
-      suggestionLatexToSvgMapping): Promise<Object> {
+      suggestionLatexToSvgMapping: SuggestionLatexToSvgMapping):
+      Promise<Object> {
     let body = new FormData();
     for (var suggestionId in suggestionLatexToSvgMapping) {
       for (var latexString in suggestionLatexToSvgMapping[suggestionId]) {

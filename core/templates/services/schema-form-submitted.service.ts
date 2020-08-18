@@ -26,7 +26,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class SchemaFormSubmittedService {
   private _submittedSchemaBasedFormEventEmitter = new EventEmitter();
 
-  get onSubmittedSchemaBasedForm() {
+  get onSubmittedSchemaBasedForm(): EventEmitter<unknown> {
     return this._submittedSchemaBasedFormEventEmitter;
   }
 }

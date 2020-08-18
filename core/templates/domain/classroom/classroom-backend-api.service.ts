@@ -110,7 +110,7 @@ export class ClassroomBackendApiService {
     });
   }
 
-  get onInitializeTranslation() {
+  get onInitializeTranslation(): EventEmitter<unknown> {
     return this._initializeTranslationEventEmitter;
   }
 }
