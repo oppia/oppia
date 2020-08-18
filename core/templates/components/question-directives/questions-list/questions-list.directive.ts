@@ -309,6 +309,11 @@ angular.module('oppia').directive('questionsList', [
             if (ctrl.editorIsOpen) {
               return;
             }
+            if (!ctrl.canEditQuestion()) {
+              AlertsService.addWarning(
+                'User does not have enough rights to delete the question');
+              return;
+            }
             ctrl.difficulty = difficulty;
             ctrl.misconceptionsBySkill = {};
             ctrl.associatedSkillSummaries = [];
@@ -332,11 +337,21 @@ angular.module('oppia').directive('questionsList', [
                 ctrl.questionStateData = ctrl.question.getStateData();
                 ctrl.questionIsBeingUpdated = true;
                 ctrl.newQuestionIsBeingCreated = false;
-                ctrl.openQuestionEditor(difficulty);
+                ctrl.openQuestionEditor();
               }, function(errorResponse) {
                 AlertsService.addWarning(
                   errorResponse.error || 'Failed to fetch question.');
               });
+          };
+
+          ctrl.openQuestionEditor = function() {
+            QuestionUndoRedoService.clearChanges();
+            ctrl.editorIsOpen = true;
+            ImageLocalStorageService.flushStoredImagesData();
+            if (ctrl.newQuestionIsBeingCreated) {
+              ContextService.setImageSaveDestinationToLocalStorage();
+            }
+            $location.hash(ctrl.questionId);
           };
 
           ctrl.deleteQuestionFromSkill = function(
