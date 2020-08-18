@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for CustomizeInteractionModalController.
  */
 
+import { Subscription } from 'rxjs';
+
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -57,6 +59,9 @@ describe('Customize Interaction Modal Controller', function() {
   var stateInteractionIdService = null;
   var stateNextContentIdIndexService = null;
   const showMarkAllAudioAsNeedingUpdateModalIfRequired = () => {};
+  var testSubscriptions: Subscription;
+  const schemaBasedFormsSpy = jasmine.createSpy(
+    'schemaBasedFormsSpy');
 
   var stateName = 'Introduction';
 
@@ -74,6 +79,17 @@ describe('Customize Interaction Modal Controller', function() {
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateNextContentIdIndexService = TestBed.get(
       StateNextContentIdIndexService);
+  });
+
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      stateCustomizationArgsService.onSchemaBasedFormsShown.subscribe(
+        schemaBasedFormsSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
   });
 
   describe('when state editor is in question mode', function() {
@@ -127,7 +143,7 @@ describe('Customize Interaction Modal Controller', function() {
         highlightRegionsOnHover: {value: false}
       });
 
-      expect($scope.$broadcast).toHaveBeenCalledWith('schemaBasedFormsShown');
+      expect(schemaBasedFormsSpy).toHaveBeenCalled();
       expect($scope.form).toEqual({});
       expect($scope.hasCustomizationArgs).toBe(true);
     });
