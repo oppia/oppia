@@ -21,6 +21,10 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import fs_domain
+from core.domain import fs_services
+from core.domain import html_domain
+from core.domain import html_validation_service
 from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import skill_services
@@ -222,7 +226,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.mark_review_completed(
                 suggestion, 'invalid_status', self.reviewer_id)
 
-
     def mock_update_exploration(
             self, unused_user_id, unused_exploration_id, unused_change_list,
             commit_message, is_suggestion):
@@ -334,7 +337,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.check_if_email_has_been_sent_to_user(
                 self.author_id, suggestion.score_category))
 
-
     def test_accept_suggestion_successfully(self):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -431,7 +433,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                             suggestion_services.accept_suggestion(
                                 suggestion, self.reviewer_id,
                                 self.COMMIT_MESSAGE, 'review message')
-
 
     def test_accept_suggestion_handled_suggestion_failure(self):
         with self.swap(
@@ -1405,3 +1406,220 @@ class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
             'Invalid target type for voiceover application: invalid_type'):
             suggestion_services.get_voiceover_application(
                 self.voiceover_application_model.id)
+
+
+class SuggestionLatexSvgUpdationTests(test_utils.GenericTestBase):
+    target_id_1 = 'exp1'
+    target_version_at_submission = 1
+    valid_html_content1 = (
+        '<oppia-noninteractive-math math_content-with-value="{&amp;'
+        'quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;'
+        'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+        '-noninteractive-math>'
+    )
+    valid_html_content2 = (
+        '<oppia-noninteractive-math math_content-with-value="{&amp;'
+        'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+        'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+        '-noninteractive-math>'
+    )
+    change1 = {
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'state_name': 'state_1',
+        'new_value': {
+            'content_id': 'content',
+            'html': '<p>Suggestion html</p>'
+        },
+        'old_value': {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+    }
+    change2 = {
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'state_name': 'state_2',
+        'new_value': {
+            'content_id': 'content',
+            'html': '<p>Suggestion html2</p>'
+        },
+        'old_value': {
+            'content_id': 'content',
+            'html': valid_html_content2
+        }
+    }
+    AUTHOR_EMAIL_1 = 'author1@example.com'
+    REVIEWER_EMAIL_1 = 'reviewer1@example.com'
+
+    class MockExploration(python_utils.OBJECT):
+        """Mocks an exploration. To be used only for testing."""
+
+        def __init__(self, exploration_id, states):
+            self.id = exploration_id
+            self.states = states
+            self.category = 'Algebra'
+
+    # All mock explorations created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
+    ]
+
+    def mock_get_exploration_by_id(self, exp_id):
+        for exp in self.explorations:
+            if exp.id == exp_id:
+                return exp
+
+    def setUp(self):
+        super(SuggestionLatexSvgUpdationTests, self).setUp()
+
+        self.signup(self.AUTHOR_EMAIL_1, 'author1')
+        self.author_id_1 = self.get_user_id_from_email(self.AUTHOR_EMAIL_1)
+        self.signup(self.REVIEWER_EMAIL_1, 'reviewer1')
+        self.reviewer_id_1 = self.get_user_id_from_email(self.REVIEWER_EMAIL_1)
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+
+            self.suggestion1 = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, self.change1, 'test description')
+
+            self.suggestion2 = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, self.change2, 'test description')
+
+    def test_get_latex_strings_to_suggestion_ids_mapping(self):
+        expected_output = {
+            self.suggestion1.suggestion_id: [b'-,-,-,-'],
+            self.suggestion2.suggestion_id: [b'+,+,+,+']
+        }
+        self.assertEqual(
+            suggestion_services.
+            get_latex_strings_to_suggestion_ids_mapping(),
+            expected_output)
+
+    def test_update_suggestions_with_math_svgs(self):
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        svg_file_2 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        latex_string_svg_image_data1 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_1, html_domain.LatexStringSvgImageDimensions(
+                    '1d429', '1d33', '0d241')))
+        latex_string_svg_image_data2 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_2, html_domain.LatexStringSvgImageDimensions(
+                    '1d525', '3d33', '0d241')))
+
+        image_data = {
+            self.suggestion1.suggestion_id: {
+                '-,-,-,-': latex_string_svg_image_data1
+            },
+            self.suggestion2.suggestion_id: {
+                '+,+,+,+': latex_string_svg_image_data2
+            }
+        }
+        suggestion_services.update_suggestions_with_math_svgs(image_data)
+        updated_suggestion_1 = suggestion_services.get_suggestion_by_id(
+            self.suggestion1.suggestion_id)
+        suggestion1_updated_html = ''.join(
+            updated_suggestion_1.get_all_html_content_strings())
+        filenames = (
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(
+                suggestion1_updated_html))
+
+        self.assertEqual(len(filenames), 1)
+        file_system_class = (
+            fs_services.get_entity_file_system_class())
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp1'))
+        filepath = 'image/%s' % filenames[0]
+        self.assertTrue(fs.isfile(filepath))
+
+        updated_suggestion_2 = suggestion_services.get_suggestion_by_id(
+            self.suggestion2.suggestion_id)
+        suggestion2_updated_html = ''.join(
+            updated_suggestion_2.get_all_html_content_strings())
+        filenames = (
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(
+                suggestion2_updated_html))
+        self.assertEqual(len(filenames), 1)
+        file_system_class = (
+            fs_services.get_entity_file_system_class())
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp1'))
+        filepath = 'image/%s' % filenames[0]
+        self.assertTrue(fs.isfile(filepath))
+
+    def test_updation_fails_when_svg_file_is_invalid(self):
+        invalid_svg_file = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><invalid tag stroke="currentColor" fill="c'
+            'urrentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)">'
+            '<path stroke-width="1" d="M52 289Q59 331 106 386T222 442Q257 442'
+            ' 2864Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 3'
+            '8T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 15'
+            '3 504 145284 52 289Z"/></g></svg>'
+        )
+        svg_file_2 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        latex_string_svg_image_data1 = (
+            html_domain.LatexStringSvgImageData(
+                invalid_svg_file, html_domain.LatexStringSvgImageDimensions(
+                    '1d429', '1d33', '0d241')))
+        latex_string_svg_image_data2 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_2, html_domain.LatexStringSvgImageDimensions(
+                    '1d525', '3d33', '0d241')))
+
+        image_data = {
+            self.suggestion1.suggestion_id: {
+                '-,-,-,-': latex_string_svg_image_data1
+            },
+            self.suggestion2.suggestion_id: {
+                '+,+,+,+': latex_string_svg_image_data2
+            }
+        }
+        with self.assertRaisesRegexp(
+            Exception,
+            'Image not recognized SVG image provided for latex -,-,-,-'
+            ' failed validation'):
+            suggestion_services.update_suggestions_with_math_svgs(image_data)

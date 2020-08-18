@@ -8279,7 +8279,6 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
                     'new_value': explorations[index * 2 + 1].id
                 })], 'Changes.')
 
-
         self.model_instance_0 = story_models.StoryModel.get_by_id('0')
         self.model_instance_1 = story_models.StoryModel.get_by_id('1')
         self.model_instance_2 = story_models.StoryModel.get_by_id('2')
@@ -11844,7 +11843,6 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
 
-
         self.model_instance_0 = (
             topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-0-1-1'))
@@ -14852,6 +14850,17 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 'of PendingDeletionRequestModel\', '
                 '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
                 'not marked as deleted"]]') % self.user_id]
+        run_job_and_check_output(self, expected_output)
+
+    def test_incorrect_keys_in_activity_mappings(self):
+        self.model_instance.activity_mappings = {'wrong_key': {'some_id': 'id'}}
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for correct activity_mappings '
+                'check of PendingDeletionRequestModel\', '
+                '[u"Entity id %s: activity_mappings contains keys '
+                '[u\'wrong_key\'] that are not allowed"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
 

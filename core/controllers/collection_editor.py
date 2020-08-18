@@ -90,6 +90,13 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         _require_valid_version(version, collection.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if (commit_message is not None and
+                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+
         change_list = self.payload.get('change_list')
 
         collection_services.update_collection(

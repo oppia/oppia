@@ -27,6 +27,8 @@ require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('voiceoverOpportunities', {
   template: require(
     './../translation-opportunities/' +
@@ -37,6 +39,7 @@ angular.module('oppia').component('voiceoverOpportunities', {
         $rootScope, $scope, ContributionOpportunitiesService,
         TranslationLanguageService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var updateWithNewOpportunities = function(opportunities, more) {
         for (var index in opportunities) {
           var opportunity = opportunities[index];
@@ -66,13 +69,17 @@ angular.module('oppia').component('voiceoverOpportunities', {
         }
       };
       ctrl.$onInit = function() {
-        $scope.$on('activeLanguageChanged', function() {
-          ctrl.opportunities = [];
-          ctrl.opportunitiesAreLoading = true;
-          ContributionOpportunitiesService.getVoiceoverOpportunities(
-            TranslationLanguageService.getActiveLanguageCode(),
-            updateWithNewOpportunities);
-        });
+        ctrl.directiveSubscriptions.add(
+          TranslationLanguageService.onActiveLanguageChanged.subscribe(
+            () => {
+              ctrl.opportunities = [];
+              ctrl.opportunitiesAreLoading = true;
+              ContributionOpportunitiesService.getVoiceoverOpportunities(
+                TranslationLanguageService.getActiveLanguageCode(),
+                updateWithNewOpportunities);
+            }
+          )
+        );
         ctrl.opportunities = [];
         ctrl.opportunitiesAreLoading = true;
         ctrl.moreOpportunitiesAvailable = true;
@@ -80,6 +87,9 @@ angular.module('oppia').component('voiceoverOpportunities', {
         ContributionOpportunitiesService.getVoiceoverOpportunities(
           TranslationLanguageService.getActiveLanguageCode(),
           updateWithNewOpportunities);
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

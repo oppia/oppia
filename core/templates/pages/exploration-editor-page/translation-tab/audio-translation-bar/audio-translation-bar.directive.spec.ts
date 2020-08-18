@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for Audio Translation Bar directive.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
@@ -57,7 +58,7 @@ import $ from 'jquery';
 require('pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
 
-describe('State Graph Visualization directive', function() {
+describe('Audio translation bar directive', function() {
   var ctrl = null;
   var $interval = null;
   var $q = null;
@@ -83,6 +84,10 @@ describe('State Graph Visualization directive', function() {
   var stateName = 'State1';
   var explorationId = 'exp1';
   var isTranslatableSpy = null;
+
+  var mockActiveContentIdChangedEventEmitter = new EventEmitter();
+  var mockActiveLanguageChangedEventEmitter = new EventEmitter();
+  var mockShowTranslationTabBusyModalEventEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(function() {
@@ -148,6 +153,18 @@ describe('State Graph Visualization directive', function() {
     spyOn(explorationStatesService, 'saveRecordedVoiceovers').and
       .callFake(function() {});
 
+    spyOnProperty(translationTabActiveContentIdService,
+      'onActiveContentIdChanged').and.returnValue(
+      mockActiveContentIdChangedEventEmitter);
+
+    spyOnProperty(translationLanguageService,
+      'onActiveLanguageChanged').and.returnValue(
+      mockActiveLanguageChangedEventEmitter);
+
+    spyOnProperty(stateEditorService,
+      'onShowTranslationTabBusyModal').and.returnValue(
+      mockShowTranslationTabBusyModalEventEmitter);
+
     stateRecordedVoiceoversService.init(stateName,
       recordedVoiceoversObjectFactory.createFromBackendDict({
         voiceovers_mapping: {
@@ -203,6 +220,8 @@ describe('State Graph Visualization directive', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: false
     });
+    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+      $q.resolve());
     $scope.checkAndStartRecording();
 
     expect($scope.unsupportedBrowser).toBe(true);
@@ -217,6 +236,20 @@ describe('State Graph Visualization directive', function() {
       $q.resolve());
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
+    var waveSurferObjSpy = {
+      load: () => {},
+      on: () => {},
+      pause: () => {},
+      play: () => {},
+    };
+    // This throws "Argument of type '{ load: () => void; ... }'
+    // is not assignable to parameter of type 'WaveSurfer'."
+    // This is because the actual 'WaveSurfer.create` function returns a
+    // object with around 50 more properties than `waveSurferObjSpy`.
+    // We are suppressing this error because we have defined the properties
+    // we need for this test in 'waveSurferObjSpy' object.
+    // @ts-expect-error
+    spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
 
     $scope.checkAndStartRecording();
     $scope.$apply();
@@ -249,7 +282,7 @@ describe('State Graph Visualization directive', function() {
     $scope.checkAndStartRecording();
     $scope.$apply();
 
-    $rootScope.$broadcast('activeContentIdChanged');
+    mockActiveContentIdChangedEventEmitter.emit();
 
     expect(voiceoverRecordingService.stopRecord).toHaveBeenCalled();
     expect(voiceoverRecordingService.closeRecorder).toHaveBeenCalled();
@@ -272,10 +305,16 @@ describe('State Graph Visualization directive', function() {
     $scope.checkAndStartRecording();
     $scope.$apply();
 
-    $rootScope.$broadcast('activeLanguageChanged');
+    mockActiveLanguageChangedEventEmitter.emit();
 
     expect(voiceoverRecordingService.stopRecord).toHaveBeenCalled();
     expect(voiceoverRecordingService.closeRecorder).toHaveBeenCalled();
+  });
+
+  it('should open translation busy modal on event', () => {
+    spyOn($uibModal, 'open').and.callThrough();
+    mockShowTranslationTabBusyModalEventEmitter.emit();
+    expect($uibModal.open).toHaveBeenCalled();
   });
 
   it('should stop record when externalSave flag is broadcasted', function() {
@@ -398,6 +437,20 @@ describe('State Graph Visualization directive', function() {
     });
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
+    var waveSurferObjSpy = {
+      load: () => {},
+      on: () => {},
+      pause: () => {},
+      play: () => {},
+    };
+    // This throws "Argument of type '{ load: () => void; ... }'
+    // is not assignable to parameter of type 'WaveSurfer'."
+    // This is because the actual 'WaveSurfer.create` function returns a
+    // object with around 50 more properties than `waveSurferObjSpy`.
+    // We are suppressing this error because we have defined the properties
+    // we need for this test in 'waveSurferObjSpy' object.
+    // @ts-expect-error
+    spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
 
     document.body.dispatchEvent(keyEvent);
 

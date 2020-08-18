@@ -24,6 +24,7 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { EventEmitter } from '@angular/core';
 
 describe('Voiceover opportunities component', function() {
   var ctrl = null;
@@ -31,6 +32,9 @@ describe('Voiceover opportunities component', function() {
   var $scope = null;
   var contributionOpportunitiesService = null;
   var explorationOpportunitySummaryObjectFactory = null;
+  var translationLanguageService = null;
+
+  var activeLanguageChangedEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ContributionOpportunitiesBackendApiService',
@@ -53,7 +57,10 @@ describe('Voiceover opportunities component', function() {
     $rootScope = $injector.get('$rootScope');
     contributionOpportunitiesService = $injector.get(
       'ContributionOpportunitiesService');
+    translationLanguageService = $injector.get('TranslationLanguageService');
 
+    spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
+      .returnValue(activeLanguageChangedEmitter);
     spyOn(contributionOpportunitiesService, 'getVoiceoverOpportunities').and
       .callFake((languageCode, callback) => callback([
         explorationOpportunitySummaryObjectFactory.createFromBackendDict({
@@ -98,6 +105,10 @@ describe('Voiceover opportunities component', function() {
     ctrl.$onInit();
   }));
 
+  afterEach(function() {
+    ctrl.$onDestroy();
+  });
+
   it('sshould initialize controller properties after its initialization',
     function() {
       expect(ctrl.opportunities.length).toBe(2);
@@ -112,7 +123,7 @@ describe('Voiceover opportunities component', function() {
       expect(ctrl.opportunitiesAreLoading).toBe(false);
       expect(ctrl.opportunities.length).toBe(3);
 
-      $rootScope.$broadcast('activeLanguageChanged');
+      activeLanguageChangedEmitter.emit();
 
       expect(ctrl.opportunitiesAreLoading).toBe(false);
       expect(ctrl.opportunities.length).toBe(2);
@@ -124,7 +135,7 @@ describe('Voiceover opportunities component', function() {
     expect(ctrl.opportunitiesAreLoading).toBe(false);
     expect(ctrl.opportunities.length).toBe(3);
 
-    $rootScope.$broadcast('activeLanguageChanged');
+    activeLanguageChangedEmitter.emit();
 
     expect(ctrl.opportunitiesAreLoading).toBe(false);
     expect(ctrl.opportunities.length).toBe(2);

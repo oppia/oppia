@@ -28,24 +28,24 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').controller(
   'RearrangeSkillsInSubtopicsModalController', [
     '$controller', '$scope', '$uibModalInstance', 'SubtopicValidationService',
     'TopicEditorStateService',
     'TopicUpdateService', 'UrlInterpolationService',
-    'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
     function(
         $controller, $scope, $uibModalInstance, SubtopicValidationService,
-        TopicEditorStateService, TopicUpdateService, UrlInterpolationService,
-        EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+        TopicEditorStateService, TopicUpdateService, UrlInterpolationService) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance
       });
       var ctrl = this;
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
-      var _initEditor = function() {
+      ctrl.directiveSubscriptions = new Subscription();
+      ctrl.initEditor = function() {
         ctrl.topic = TopicEditorStateService.getTopic();
         ctrl.subtopics = ctrl.topic.getSubtopics();
         ctrl.uncategorizedSkillSummaries = (
@@ -90,7 +90,7 @@ angular.module('oppia').controller(
             ctrl.topic, ctrl.oldSubtopicId, newSubtopicId,
             ctrl.skillSummaryToMove);
         }
-        _initEditor();
+        ctrl.initEditor();
       };
 
 
@@ -115,11 +115,20 @@ angular.module('oppia').controller(
 
       ctrl.init = function() {
         ctrl.editableName = '';
-        $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-        $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
-        _initEditor();
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onTopicInitialized.subscribe(
+            () => ctrl.initEditor()
+          ));
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onTopicReinitialized.subscribe(
+            () => ctrl.initEditor()
+          ));
+        ctrl.initEditor();
       };
       ctrl.init();
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
+      };
     }
   ]
 );

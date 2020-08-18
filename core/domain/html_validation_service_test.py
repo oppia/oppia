@@ -1194,7 +1194,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
                 '&amp;quot;Savjet 1&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
-            'invalid literal for int() with base 10: \'Hello\'': [(
+            'Could not convert unicode to int: Hello': [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
                 'end-with-value="0" start-with-value="&amp;quot;Hello&amp;'
                 'quot;" video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
@@ -1863,7 +1863,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1',
                 html_string_with_filename_having_filename), [])
 
-
     def test_validate_svg_filenames_when_filenames_are_invalid(self):
         """Test the validate_svg_filenames_in_math_rich_text when
         filenames are present but invalid.
@@ -1895,7 +1894,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;qu'
                 'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;img2.'
                 'svg&amp;quot;}"></oppia-noninteractive-math>')])
-
 
     def test_validate_svg_filenames_when_filenames_are_not_present(self):
         """Test the validate_svg_filenames_in_math_rich_text when
