@@ -97,7 +97,7 @@ describe('Topic editor functionality', function() {
 
     await topicEditorPage.get(topicId);
     await topicEditorPage.moveToQuestionsTab();
-    await topicEditorPage.createQuestionForSkillWithIndex(0);
+    await topicEditorPage.createQuestionForSkillWithName('Skill 1');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Question 1'));
     await explorationEditorMainTab.setInteraction(
