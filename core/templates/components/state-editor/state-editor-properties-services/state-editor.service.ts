@@ -37,6 +37,7 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { State } from 'domain/state/StateObjectFactory';
 
 interface AnswerChoice {
   val: string | number;
@@ -49,13 +50,14 @@ interface AnswerChoice {
 export class StateEditorService {
   constructor(private solutionValidityService: SolutionValidityService) {}
 
-  private _stateEditorInitializedEventEmitter = new EventEmitter();
-  private _stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
-  private _interactionEditorInitializedEventEmitter = new EventEmitter();
-  private _showTranslationTabBusyModalEventEmitter = new EventEmitter();
-  private _refreshStateTranslationEventEmitter = new EventEmitter();
-  private _updateAnswerChoicesEventEmitter = new EventEmitter();
-  private _saveOutcomeDestDetailsEventEmitter = new EventEmitter();
+  private _stateEditorInitializedEventEmitter = new EventEmitter<State>();
+  private _stateEditorDirectiveInitializedEventEmitter =
+    new EventEmitter<void>();
+  private _interactionEditorInitializedEventEmitter = new EventEmitter<void>();
+  private _showTranslationTabBusyModalEventEmitter = new EventEmitter<void>();
+  private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
+  private _updateAnswerChoicesEventEmitter = new EventEmitter<AnswerChoice[]>();
+  private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -248,31 +250,31 @@ export class StateEditorService {
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
   }
 
-  get onStateEditorInitialized(): EventEmitter<unknown> {
+  get onStateEditorInitialized(): EventEmitter<State> {
     return this._stateEditorInitializedEventEmitter;
   }
 
-  get onStateEditorDirectiveInitialized(): EventEmitter<unknown> {
+  get onStateEditorDirectiveInitialized(): EventEmitter<void> {
     return this._stateEditorDirectiveInitializedEventEmitter;
   }
 
-  get onInteractionEditorInitialized(): EventEmitter<unknown> {
+  get onInteractionEditorInitialized(): EventEmitter<void> {
     return this._interactionEditorInitializedEventEmitter;
   }
 
-  get onShowTranslationTabBusyModal(): EventEmitter<unknown> {
+  get onShowTranslationTabBusyModal(): EventEmitter<void> {
     return this._showTranslationTabBusyModalEventEmitter;
   }
 
-  get onRefreshStateTranslation(): EventEmitter<unknown> {
+  get onRefreshStateTranslation(): EventEmitter<void> {
     return this._refreshStateTranslationEventEmitter;
   }
 
-  get onUpdateAnswerChoices(): EventEmitter<unknown> {
+  get onUpdateAnswerChoices(): EventEmitter<AnswerChoice[]> {
     return this._updateAnswerChoicesEventEmitter;
   }
 
-  get onSaveOutcomeDestDetails(): EventEmitter<unknown> {
+  get onSaveOutcomeDestDetails(): EventEmitter<void> {
     return this._saveOutcomeDestDetailsEventEmitter;
   }
 }
