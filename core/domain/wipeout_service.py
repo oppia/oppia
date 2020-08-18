@@ -241,7 +241,7 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
 
 
 def _delete_models(user_id, module_name):
-    """Delete the models for one user from one module.
+    """Delete all the models from the given module, for a given user.
 
     Args:
         user_id: str. The id of the user to be deleted.
@@ -361,9 +361,9 @@ def _pseudonymize_feedback_models(pending_deletion_request):
     # We want to preserve the same pseudonymous user ID on all the models
     # related to one feedback thread. So we collect all the users' feedback
     # thread models, feedback thread message models, and suggestion models; then
-    # we for each collection (for example thread with few messages and related
-    # suggestion) of these models we pick pseudonymous user ID and replace
-    # the user ID with that pseudonymous user ID in all the models.
+    # for each collection (e.g. a suggestion thread with a few messages) of
+    # these models we generate a pseudonymous user ID and replace the user ID
+    # with that pseudonymous user ID in all the models.
     feedback_thread_model_class = feedback_models.GeneralFeedbackThreadModel
     feedback_thread_models = feedback_thread_model_class.query(ndb.OR(
         feedback_thread_model_class.original_author_id == user_id,
