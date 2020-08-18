@@ -58,14 +58,12 @@ angular.module('oppia').directive('collectionEditorNavbar', [
         'CollectionValidationService',
         'CollectionRightsBackendApiService',
         'EditableCollectionBackendApiService', 'UrlService',
-        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService, RouterService,
             UndoRedoService, CollectionEditorStateService,
             CollectionValidationService,
             CollectionRightsBackendApiService,
-            EditableCollectionBackendApiService, UrlService,
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+            EditableCollectionBackendApiService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _validateCollection = function() {
@@ -215,8 +213,11 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 () => _validateCollection()
               )
             );
-            $scope.$on(
-              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
+            ctrl.directiveSubscriptions.add(
+              UndoRedoService.onUndoRedoChangeApplied().subscribe(
+                () => _validateCollection()
+              )
+            );
             ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
             ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.collectionRights = (

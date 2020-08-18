@@ -260,7 +260,6 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             user_voiceover_applications[0].status,
             suggestion_models.STATUS_IN_REVIEW)
 
-
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.owner_id))

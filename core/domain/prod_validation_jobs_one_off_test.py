@@ -8288,7 +8288,6 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
                     'new_value': explorations[index * 2 + 1].id
                 })], 'Changes.')
 
-
         self.model_instance_0 = story_models.StoryModel.get_by_id('0')
         self.model_instance_1 = story_models.StoryModel.get_by_id('1')
         self.model_instance_2 = story_models.StoryModel.get_by_id('2')
@@ -11852,7 +11851,6 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                     'new_subtopic_id': 1,
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
-
 
         self.model_instance_0 = (
             topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
