@@ -192,18 +192,21 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     _create_exploration_opportunities(story, topic, exp_ids)
 
 
-def create_exploration_opportunities_for_story(story_id):
+def create_exploration_opportunities_for_story(story_id, topic_id):
     """Creates exploration opportunities corresponding to the supplied story ID
     iff the topic linked to the story is published.
 
     Args:
         story_id: str. The ID of the story domain object.
+        topic_id: str. The ID of the topic domain object corresponding to the
+            supplied story.
 
     Raises:
+        Exception. A topic with the given ID doesn't exist.
         Exception. The topic rights could not be found.
     """
     story = story_fetchers.get_story_by_id(story_id)
-    topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
+    topic = topic_fetchers.get_topic_by_id(topic_id)
     topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=False)
     if topic_rights is None:
         raise Exception(

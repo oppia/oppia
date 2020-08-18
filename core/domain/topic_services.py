@@ -666,7 +666,8 @@ def publish_story(topic_id, story_id, committer_id):
         committer_id, topic, 'Published story with id %s' % story_id,
         change_list)
     generate_topic_summary(topic.id)
-    opportunity_services.create_exploration_opportunities_for_story(story.id)
+    opportunity_services.create_exploration_opportunities_for_story(
+        story_id, topic_id)
 
 
 def unpublish_story(topic_id, story_id, committer_id):
