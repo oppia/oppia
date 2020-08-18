@@ -65,7 +65,7 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
       };
       $scope.onClickStateInMap = function(newStateName) {
         if (ctrl.isTranslationTabBusy) {
-          $rootScope.$broadcast('showTranslationTabBusyModal');
+          StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
         }
         StateEditorService.setActiveStateName(newStateName);

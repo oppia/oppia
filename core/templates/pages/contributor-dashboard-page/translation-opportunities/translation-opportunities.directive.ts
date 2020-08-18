@@ -16,6 +16,8 @@
  * @fileoverview Directive for the translation opportunities.
  */
 
+import { Subscription } from 'rxjs';
+
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
@@ -57,6 +59,7 @@ angular.module('oppia').directive(
             ContributionOpportunitiesService, TranslateTextService,
             TranslationLanguageService, UserService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var userIsLoggedIn = false;
           var getOpportunitySummary = function(expId) {
             for (var index in ctrl.opportunities) {
@@ -129,14 +132,18 @@ angular.module('oppia').directive(
             });
           };
           ctrl.$onInit = function() {
-            $scope.$on('activeLanguageChanged', function() {
-              ctrl.opportunities = [];
-              ctrl.opportunitiesAreLoading = true;
-              ctrl.moreOpportunitiesAvailable = true;
-              ContributionOpportunitiesService.getTranslationOpportunities(
-                TranslationLanguageService.getActiveLanguageCode(),
-                updateWithNewOpportunities);
-            });
+            ctrl.directiveSubscriptions.add(
+              TranslationLanguageService.onActiveLanguageChanged.subscribe(
+                () => {
+                  ctrl.opportunities = [];
+                  ctrl.opportunitiesAreLoading = true;
+                  ctrl.moreOpportunitiesAvailable = true;
+                  ContributionOpportunitiesService.getTranslationOpportunities(
+                    TranslationLanguageService.getActiveLanguageCode(),
+                    updateWithNewOpportunities);
+                }
+              )
+            );
             ctrl.opportunities = [];
             ctrl.opportunitiesAreLoading = true;
             ctrl.moreOpportunitiesAvailable = true;
@@ -148,6 +155,9 @@ angular.module('oppia').directive(
             ContributionOpportunitiesService.getTranslationOpportunities(
               TranslationLanguageService.getActiveLanguageCode(),
               updateWithNewOpportunities);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
