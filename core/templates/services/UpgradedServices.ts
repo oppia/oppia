@@ -293,6 +293,7 @@ import { ItemSelectionInputRulesService } from
 import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
+import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -796,6 +797,7 @@ export class UpgradedServices {
     upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
     upgradedServices['JobStatusSummaryObjectFactory'] =
       new JobStatusSummaryObjectFactory();
+    upgradedServices['KeyboardShortcutService'] = new KeyboardShortcutService(upgradedServices['WindowRef']);
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
