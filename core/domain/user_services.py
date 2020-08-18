@@ -1145,8 +1145,7 @@ def update_multiple_users_data(modifiable_user_data_list):
         ):
         user_id = modifiable_user_data.user_id
         if user_id is None:
-            raise Exception(
-                'Missing user ID.')
+            raise Exception('Missing user ID.')
         if not user_settings or not user_auth_details:
             raise Exception('User not found.')
         user_settings.populate_from_user_data(modifiable_user_data)

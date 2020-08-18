@@ -67,10 +67,14 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
     GENERIC_DISPLAY_ALIAS = 'display_alias'
     GENERIC_DISPLAY_ALIAS_2 = 'display_alias2'
     EXPLORATION_IDS = ['exp_1']
+    EXPLORATION_IDS_2 = ['exp_2']
     COLLECTION_IDS = ['23', '42', '4']
+    COLLECTION_IDS_2 = ['32', '44', '6']
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
+    SKILL_ID_3 = 'skill_id_3'
     DEGREE_OF_MASTERY = 0.5
+    DEGREE_OF_MASTERY_2 = 0.6
     EXP_VERSION = 1
     STATE_NAME = 'state_name'
     STORY_ID_1 = 'story_id_1'
@@ -95,10 +99,10 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         # Setup for UserSkillModel.
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
-                self.USER_ID_1, self.SKILL_ID_1),
+                self.USER_ID_1, self.SKILL_ID_3),
             user_id=self.USER_ID_1,
-            skill_id=self.SKILL_ID_1,
-            degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+            skill_id=self.SKILL_ID_3,
+            degree_of_mastery=self.DEGREE_OF_MASTERY_2).put()
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
                 self.PROFILE_ID_1, self.SKILL_ID_1),
@@ -109,8 +113,8 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         # Setup for CompletedActivitiesModel.
         user_models.CompletedActivitiesModel(
             id=self.USER_ID_1,
-            exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            exploration_ids=self.EXPLORATION_IDS_2,
+            collection_ids=self.COLLECTION_IDS_2).put()
         user_models.CompletedActivitiesModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
@@ -273,15 +277,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
     ]
     EXPLORATION_IDS = ['exp_1']
+    EXPLORATION_IDS_2 = ['exp_2']
     CREATOR_IDS = ['4', '8', '16']
     CREATOR_USERNAMES = ['username4', 'username8', 'username16']
     COLLECTION_IDS = ['23', '42', '4']
+    COLLECTION_IDS_2 = ['32', '44', '6']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
     MESSAGE_IDS_READ_BY_USER = [0, 1]
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
+    SKILL_ID_3 = 'skill_id_3'
     DEGREE_OF_MASTERY = 0.5
+    DEGREE_OF_MASTERY_2 = 0.6
     EXP_VERSION = 1
     STATE_NAME = 'state_name'
     STORY_ID_1 = 'story_id_1'
@@ -353,6 +361,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             user_id=self.USER_ID_1,
             skill_id=self.SKILL_ID_2,
             degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+        user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                self.PROFILE_ID_1, self.SKILL_ID_3),
+            user_id=self.PROFILE_ID_1,
+            skill_id=self.SKILL_ID_3,
+            degree_of_mastery=self.DEGREE_OF_MASTERY_2).put()
 
         # Setup for UserSubscriptionsModel.
         for creator_id in self.CREATOR_IDS:
@@ -398,6 +412,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS).put()
+        user_models.CompletedActivitiesModel(
+            id=self.PROFILE_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_2,
+            collection_ids=self.COLLECTION_IDS_2).put()
 
         # Setup for IncompleteACtivitiesModel.
         user_models.IncompleteActivitiesModel(
@@ -707,9 +725,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             role=self.PROFILE_1_ROLE
         ).put()
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
-        user_models.UserSubscriptionsModel(id=self.PROFILE_ID_1).put()
 
-    def test_export_nonexistent_user_raises_error(self):
+    def test_export_nonexistent_full_user_raises_error(self):
         """Setup for nonexistent user test of export_data functionality."""
         with self.assertRaisesRegexp(
             user_models.UserSettingsModel.EntityNotFoundError,
