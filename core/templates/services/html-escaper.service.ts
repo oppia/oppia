@@ -31,7 +31,7 @@ export class HtmlEscaperService {
     return this.unescapedStrToEscapedStr(JSON.stringify(obj));
   }
 
-escapedJsonToObj(json: string): Object {
+  escapedJsonToObj(json: string): Object {
     if (!json) {
       this.loggerService.error('Empty string was passed to JSON decoder.');
       return '';
@@ -39,7 +39,7 @@ escapedJsonToObj(json: string): Object {
     return JSON.parse(this.escapedStrToUnescapedStr(json));
   }
 
-unescapedStrToEscapedStr(str: string): string {
+  unescapedStrToEscapedStr(str: string): string {
     return String(str)
       .replace(/&/g, '&amp;')
       .replace(/"/g, '&quot;')
@@ -47,7 +47,7 @@ unescapedStrToEscapedStr(str: string): string {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   }
-escapedStrToUnescapedStr(value: string): string {
+  escapedStrToUnescapedStr(value: string): string {
     return String(value)
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, '\'')
