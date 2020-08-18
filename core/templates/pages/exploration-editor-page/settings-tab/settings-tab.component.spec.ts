@@ -181,8 +181,7 @@ describe('Settings Tab Component', function() {
       $scope.$apply();
     }));
 
-
-    it('should evaluate controller properties after its initialization',
+    it('should initialize controller properties after its initialization',
       function() {
         expect(ctrl.isRolesFormOpen).toBe(false);
         expect(ctrl.canDelete).toBe(true);
@@ -209,7 +208,7 @@ describe('Settings Tab Component', function() {
       expect(ctrl.hasPageLoaded).toBe(true);
     });
 
-    it('should get explore page url', function() {
+    it('should get explore page url based on the exploration id', function() {
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
           protocol: 'https:',
@@ -493,7 +492,7 @@ describe('Settings Tab Component', function() {
       expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(false);
     });
 
-    it('should check if exploration is locked for editing', function() {
+    it('should check whenever exploration is locked for editing', function() {
       var changeListSpy = spyOn(
         changeListService, 'isExplorationLockedForEditing');
 
@@ -608,7 +607,6 @@ describe('Settings Tab Component', function() {
       ctrl.$onInit();
       $scope.$apply();
     }));
-
 
     it('should not toggle the preview cards', function() {
       expect(ctrl.basicSettingIsShown).toEqual(true);
