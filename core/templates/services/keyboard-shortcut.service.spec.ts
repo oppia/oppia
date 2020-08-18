@@ -27,7 +27,6 @@ describe('Keyboard Shortcuts', () => {
   var backButton = document.createElement('button');
   var searchBar = document.createElement('input');
   var categoryBar = document.createElement('select');
-  var pageLoaded = ''
 
   const windowRef = new WindowRef();
   const keyboardShortcutService = new KeyboardShortcutService(windowRef);
