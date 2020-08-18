@@ -14592,11 +14592,9 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         score_category = 'content.Art'
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_id, score_category, 10)
-        self.model_instance = (
-            user_models.UserContributionScoringModel.get_by_id(
-                id='%s.%s' % (score_category, self.user_id)))
+        self.model_instance = user_models.UserContributionScoringModel.create(
+                self.user_id, score_category, 10
+        )
         self.job_class = (
             prod_validation_jobs_one_off
             .UserContributionScoringModelAuditOneOffJob)

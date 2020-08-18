@@ -34,6 +34,7 @@ from core.domain import story_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -564,8 +565,11 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         # Testing users with scores above threshold can accept.
         self.login(self.AUTHOR_EMAIL)
+        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
+            self.author_id, 'content.Algebra'
+        )
         suggestion_services.increment_score_for_user(
-            self.author_id, 'content.Algebra', 15)
+            user_score_identifier, 15)
 
         csrf_token = self.get_new_csrf_token()
         self.put_json('%s/exploration/%s/%s' % (

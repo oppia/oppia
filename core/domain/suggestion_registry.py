@@ -58,17 +58,10 @@ class BaseSuggestion(python_utils.OBJECT):
             was last updated.
     """
 
-    def __init__(self):
+    def __init__(self, status, final_reviewer_id):
         """Initializes a Suggestion object."""
-        # These fields are initialized to suppress the 'attributes defined
-        # outside __init__' warning that's raised because of the setters below.
-        # The subclasses define the __init__ function where the attributes are
-        # initialized, however these setters apply to all of the subclasses so
-        # it makes sense to include them in the base class.
-        self.status = None
-        self.final_reviewer_id = None
-        raise NotImplementedError(
-            'Subclasses of BaseSuggestion should implement __init__.')
+        self.status = status
+        self.final_reviewer_id = final_reviewer_id
 
     def to_dict(self):
         """Returns a dict representation of a suggestion object.
@@ -299,22 +292,22 @@ class SuggestionEditStateContent(BaseSuggestion):
     SUGGESTION_TYPE_EDIT_STATE_CONTENT.
     """
 
-    def __init__( # pylint: disable=super-init-not-called
+    def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change, score_category, last_updated=None):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
+        super(SuggestionEditStateContent, self).__init__(
+            status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
         self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
-        self.status = status
         self.author_id = author_id
-        self.final_reviewer_id = final_reviewer_id
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
@@ -462,22 +455,22 @@ class SuggestionTranslateContent(BaseSuggestion):
     SUGGESTION_TYPE_TRANSLATE_CONTENT.
     """
 
-    def __init__( # pylint: disable=super-init-not-called
+    def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change, score_category, last_updated=None):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
+        super(SuggestionTranslateContent, self).__init__(
+            status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
         self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
-        self.status = status
         self.author_id = author_id
-        self.final_reviewer_id = final_reviewer_id
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
@@ -585,21 +578,20 @@ class SuggestionAddQuestion(BaseSuggestion):
             was last updated.
     """
 
-    def __init__( # pylint: disable=super-init-not-called
+    def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change, score_category, last_updated=None):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
+        super(SuggestionAddQuestion, self).__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = suggestion_models.SUGGESTION_TYPE_ADD_QUESTION
         self.target_type = suggestion_models.TARGET_TYPE_SKILL
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
-        self.status = status
         self.author_id = author_id
-        self.final_reviewer_id = final_reviewer_id
         self.change = question_domain.QuestionSuggestionChange(change)
         # Update question_state_data_schema_version here instead of surfacing
         # the version in the frontend.

@@ -317,11 +317,11 @@ class CronJobTests(test_utils.GenericTestBase):
         with threshold_time_before_accept_swap, self.testapp_swap, (
             auto_accept_suggestions_swap):
             self.assertEqual(
-                len(suggestion_services.get_all_stale_suggestions()), 1)
+                len(suggestion_services.get_all_stale_suggestion_ids()), 1)
             self.get_html_response('/cron/suggestions/accept_stale_suggestions')
 
             self.assertEqual(
-                len(suggestion_services.get_all_stale_suggestions()), 0)
+                len(suggestion_services.get_all_stale_suggestion_ids()), 0)
 
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
         self.assertEqual(

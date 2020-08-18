@@ -282,6 +282,67 @@ class UserContributionScoring(python_utils.OBJECT):
         self.score = score
         self.has_email_been_sent = has_email_been_sent
 
+    def get_score_category(self):
+        """Gets the score category which corresponds to the category of a
+        suggestion where the user has points.
+
+        Returns:
+            str. The score category.
+        """
+        return self.score_category
+
+    def get_user_id(self):
+        """Gets the user id who's scoring information is being represented.
+
+        Returns:
+            str. The user_id.
+        """
+        return self.user_id
+
+
+    def get_score(self):
+        """Gets the score of the user for the given score category.
+
+        Returns:
+            float. The score of the user in the given category.
+        """
+        return self.score
+
+    def increment_score(self, increment_by):
+        """Increments the score of the user in the category by the given amount.
+
+        In the first version of the scoring system, the increment_by quantity will
+        be +1, i.e, each user gains a point for a successful contribution and
+        doesn't lose score in any way.
+
+        Args:
+            increment_by: float. The amount to increase the score of the user by.
+        """
+        self.score += increment_by
+
+    def user_can_review_the_category(self):
+        """Checks if user can review suggestions in category score_category.
+        If the user has score above the minimum required score, then the user
+        is allowed to review.
+
+        Returns:
+            bool. Whether the user can review suggestions under category
+            score_category.
+        """
+        return self.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+
+    def email_has_been_sent(self):
+        """Checks whether the email has been sent.
+
+        Returns:
+            bool. Whether the email has been sent.
+        """
+        return self.has_email_been_sent
+
+    def mark_email_as_sent(self):
+        """Marks the email as sent."""
+        self.has_email_been_sent = True
+
 
 class UserContributionRights(python_utils.OBJECT):
     """Domain object for the UserContributionRightsModel."""

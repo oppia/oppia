@@ -243,16 +243,16 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_suggestions_with_exp_ids(cls, exp_ids):
-        """Gets all translation suggestions corresponding to explorations with
-        the given exploration ids.
+        """Gets the ids of translation suggestions corresponding to
+        explorations with the given exploration ids.
 
         Args:
             exp_ids: list(str). List of exploration ids to query for.
 
         Returns:
-            list(SuggestionModel). A list of translation suggestions that
+            list(str). A list of translation suggestion ids that
             correspond to the given exploration ids. Note: it is not
-            guaranteed that the suggestions returned are ordered by the
+            guaranteed that the suggestion ids returned are ordered by the
             exploration ids in exp_ids.
         """
         query = (
@@ -267,21 +267,23 @@ class GeneralSuggestionModel(base_models.BaseModel):
             results, cursor, more = query.fetch_page(
                 feconf.DEFAULT_QUERY_LIMIT, start_cursor=cursor)
             suggestion_models.extend(results)
-        return suggestion_models
+        return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
-    def get_all_stale_suggestions(cls):
-        """Gets all suggestions which were last updated before the threshold
-        time.
+    def get_all_stale_suggestion_ids(cls):
+        """Gets the ids of the suggestions which were last updated before the
+        threshold time.
 
         Returns:
-            list(SuggestionModel). A list of suggestions that are stale.
+            list(str). A list of the ids of the suggestions that are stale.
         """
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
-        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
-            cls.last_updated < threshold_time).fetch()
+        suggestion_models = cls.get_all().filter(
+            cls.status == STATUS_IN_REVIEW).filter(
+                cls.last_updated < threshold_time).fetch()
+        return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
     def get_in_review_suggestions_in_score_categories(

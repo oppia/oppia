@@ -373,19 +373,19 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         # exploration ids found. There should be two fetch_page calls.
         self.assertEqual(len(suggestion_model_results), 2)
 
-    def test_get_all_stale_suggestions(self):
+    def test_get_all_stale_suggestion_ids(self):
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
-                .get_all_stale_suggestions()), 1)
+                .get_all_stale_suggestion_ids()), 1)
 
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS',
             7 * 24 * 60 * 60 * 1000):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
-                .get_all_stale_suggestions()), 0)
+                .get_all_stale_suggestion_ids()), 0)
 
     def test_get_in_review_suggestions_in_score_categories(self):
         suggestion_models.GeneralSuggestionModel.create(

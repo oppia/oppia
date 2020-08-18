@@ -34,6 +34,7 @@ from core.domain import story_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_services
+from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -93,7 +94,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, status)
 
-    def accept_suggestion_setup_with_mocks(
+    def mock_accept_suggestion(
             self, suggestion_id, reviewer_id, commit_message, review_message):
         """Sets up the appropriate mocks to successfully call
         accept_suggestion.
@@ -220,7 +221,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.target_id, self.target_version_at_submission,
                 self.author_id, add_translation_change_dict, 'test description')
 
-    def test_get_all_stale_suggestions(self):
+    def test_get_all_stale_suggestion_ids(self):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -230,13 +231,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):
             self.assertEqual(
-                len(suggestion_services.get_all_stale_suggestions()), 1)
+                len(suggestion_services.get_all_stale_suggestion_ids()), 1)
 
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS',
             7 * 24 * 60 * 60 * 1000):
             self.assertEqual(
-                len(suggestion_services.get_all_stale_suggestions()), 0)
+                len(suggestion_services.get_all_stale_suggestion_ids()), 0)
 
     def mock_update_exploration(
             self, unused_user_id, unused_exploration_id, unused_change_list,
@@ -268,43 +269,22 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
-    def test_email_is_not_sent_to_unregistered_user(self):
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description')
-
-        suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), (
-                'target_id', self.target_id)])[0]
-
-        self.assertFalse(
-            suggestion_services.check_if_email_has_been_sent_to_user(
-                'unregistered_user_id', suggestion.score_category))
-
-    def test_cannot_mark_email_has_been_sent_to_user_with_no_user_scoring_model(
-            self):
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description')
-
-        suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), (
-                'target_id', self.target_id)])[0]
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected user scoring model to exist for user'):
-            suggestion_services.mark_email_has_been_sent_to_user(
-                'unregistered_user_id', suggestion.score_category)
-
     def test_accept_suggestion_and_send_email_to_author(self):
         enable_recording_of_scores_swap = self.swap(
             feconf, 'ENABLE_RECORDING_OF_SCORES', True)
         send_suggestion_review_related_emails_swap = self.swap(
             feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True)
+        # An email is sent to users the first time that they pass the score
+        # required to review a suggestion category. By default, when a
+        # suggestion is accepted and the recording of scores is enabled, the
+        # score of the author of that suggestion is increased by 1. Therefore,
+        # by setting that increment to
+        # the minimum score required to review, we can ensure that the email is
+        # sent.
+        increment_score_of_author_by_swap = self.swap(
+            suggestion_models, 'INCREMENT_SCORE_OF_AUTHOR_BY',
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+        )
 
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
@@ -333,15 +313,16 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'target_id', self.target_id)])[0]
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
-        self.assertFalse(
-            suggestion_services.check_if_email_has_been_sent_to_user(
-                self.author_id, suggestion.score_category))
+        # Needed to create a user scoring domain object to verify that the
+        # score and email_has_been_sent_to_user fields have changed after the
+        # suggestion has been accepted.
+        user_scoring = suggestion_services.create_new_user_scoring(
+            self.author_id, suggestion.score_category, 0
+        )
+        self.assertFalse(user_scoring.email_has_been_sent())
+        self.assertEqual(user_scoring.get_score(), 0)
 
-        suggestion_services.increment_score_for_user(
-            self.author_id, suggestion.score_category, 10)
-
-        with enable_recording_of_scores_swap, (
-            send_suggestion_review_related_emails_swap):
+        with enable_recording_of_scores_swap, send_suggestion_review_related_emails_swap, increment_score_of_author_by_swap:
             suggestion_services.accept_suggestion(
                 suggestion.suggestion_id, self.reviewer_id,
                 self.COMMIT_MESSAGE, 'review message')
@@ -352,9 +333,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'target_id', self.target_id)])[0]
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_ACCEPTED)
-        self.assertTrue(
-            suggestion_services.check_if_email_has_been_sent_to_user(
-                self.author_id, suggestion.score_category))
+        user_scoring = suggestion_services.get_user_scoring(
+            self.author_id, suggestion.score_category
+        )
+        self.assertTrue(user_scoring.email_has_been_sent())
+        self.assertEqual(user_scoring.get_score(), 1)
 
     def test_accept_suggestion_successfully(self):
         with self.swap(
@@ -371,7 +354,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
-        self.accept_suggestion_setup_with_mocks(
+        self.mock_accept_suggestion(
             self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
             'review message')
 
@@ -423,7 +406,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
-            self.accept_suggestion_setup_with_mocks(
+            self.mock_accept_suggestion(
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
                 'review message')
 
@@ -445,7 +428,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
         # Accept the suggestion.
-        self.accept_suggestion_setup_with_mocks(
+        self.mock_accept_suggestion(
             self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
         # Assert that the suggestion has been accepted.
         self.assert_suggestion_status(
@@ -585,7 +568,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
         # Accept the suggestion.
-        self.accept_suggestion_setup_with_mocks(
+        self.mock_accept_suggestion(
             self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
         # Assert that the suggestion has been accepted.
         self.assert_suggestion_status(
@@ -741,7 +724,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
         # Accept the suggestion.
-        self.accept_suggestion_setup_with_mocks(
+        self.mock_accept_suggestion(
             self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
             'review message')
         # Verfiy that the suggestion has been accepted.
@@ -962,7 +945,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Assert that there is one translation suggestion with the given
         # exploration id found.
         self.assertEqual(
-            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+            len(
+                suggestion_services.get_translation_suggestions_with_exp_ids(
                 [self.target_id_1])), 1)
 
     def test_get_translation_suggestions_with_exp_ids_with_multiple_exps(
@@ -1031,7 +1015,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             user_domain.FullyQualifiedUserScoreIdentifier(
             'user1', 'category2')
         ]
-        suggestion_services.create_new_user_contribution_scoring_models(
+        suggestion_services.create_new_user_scorings(
             user_score_identifiers_large_score, 15)
         user_score_identifiers_small_score = [
             user_domain.FullyQualifiedUserScoreIdentifier(
@@ -1043,7 +1027,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             user_domain.FullyQualifiedUserScoreIdentifier(
             'user2', 'category3')
         ]
-        suggestion_services.create_new_user_contribution_scoring_models(
+        suggestion_services.create_new_user_scorings(
             user_score_identifiers_small_score, 5)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -1060,6 +1044,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change, 'category3', 'exploration.exp1.thread_3')
+        # This suggestion does not count as a suggestion that can be reviewed
+        # by a user because it has already been rejected.
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
@@ -1072,7 +1058,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_5')
         self.assertEqual(len(
             suggestion_services
-            .get_all_suggestions_that_can_be_reviewed_by_user('user1')), 4)
+            .get_all_suggestions_that_can_be_reviewed_by_user('user1')), 3)
         self.assertEqual(len(
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user('user2')), 0)
@@ -1394,85 +1380,37 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
 class UserContributionScoringUnitTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(UserContributionScoringUnitTests, self).setUp()
-        user_score_identifiers = [
-            user_domain.FullyQualifiedUserScoreIdentifier(
-            'user1', 'category1'),
-            user_domain.FullyQualifiedUserScoreIdentifier(
-            'user1', 'category2'),
-            user_domain.FullyQualifiedUserScoreIdentifier(
-            'user2', 'category1'),
-        ]
-        suggestion_services.create_new_user_contribution_scoring_models(
-            user_score_identifiers, 0)
-
-        self.signup('user_a@example.com', 'userA')
-        self.signup('user_b@example.com', 'userB')
-        self.signup('user_c@example.com', 'userC')
-        self.user_a_id = self.get_user_id_from_email('user_a@example.com')
-        self.user_b_id = self.get_user_id_from_email('user_b@example.com')
-        self.user_c_id = self.get_user_id_from_email('user_c@example.com')
-
-    def test_update_score_for_user(self):
-        suggestion_services.increment_score_for_user('user1', 'category1', 1)
-        suggestion_services.increment_score_for_user('user2', 'category1', 5)
-        suggestion_services.increment_score_for_user('user1', 'category2', 15.2)
-        suggestion_services.increment_score_for_user('user2', 'category2', 2)
-        suggestion_services.increment_score_for_user('user1', 'category1', -1)
-
-        scores1 = suggestion_services.get_all_scores_of_user('user1')
-        self.assertEqual(scores1['category1'], 0)
-        self.assertEqual(scores1['category2'], 15.2)
-
-        scores2 = suggestion_services.get_all_scores_of_user('user2')
-        self.assertEqual(scores2['category1'], 5)
-        self.assertEqual(scores2['category2'], 2)
-
-        scores3 = suggestion_services.get_all_scores_of_user('invalid_user')
-        self.assertDictEqual(scores3, {})
-
     def test_get_all_user_ids_who_are_allowed_to_review(self):
-        suggestion_services.increment_score_for_user('user1', 'category1', 1)
-        suggestion_services.increment_score_for_user('user2', 'category1', 5)
-        suggestion_services.increment_score_for_user('user1', 'category2', 15.2)
-        suggestion_services.increment_score_for_user('user2', 'category2', 2)
-        with self.swap(feconf, 'MINIMUM_SCORE_REQUIRED_TO_REVIEW', 10):
-            user_ids = (
-                suggestion_services.get_all_user_ids_who_are_allowed_to_review(
-                    'category1'))
-            self.assertEqual(user_ids, [])
-            user_ids = (
-                suggestion_services.get_all_user_ids_who_are_allowed_to_review(
-                    'category2'))
-            self.assertEqual(user_ids, ['user1'])
+        user_scoring_user3_cat1 = suggestion_services.create_new_user_scoring(
+            'user3', 'category1', 0
+        )
+        user_scoring_user3_cat2 = suggestion_services.create_new_user_scoring(
+            'user3', 'category2', feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+        )
+        user_scoring_user4_cat1 = suggestion_services.create_new_user_scoring(
+            'use4', 'category1', 0
+        )
+        user_scoring_user4_cat2 = suggestion_services.create_new_user_scoring(
+            'user4', 'category2', 0
+        )
 
-            self.assertTrue(
-                suggestion_services.check_user_can_review_in_category(
-                    'user1', 'category2'))
-            self.assertFalse(
-                suggestion_services.check_user_can_review_in_category(
-                    'user2', 'category1'))
-            self.assertFalse(
-                suggestion_services.check_user_can_review_in_category(
-                    'user_1', 'category_new'))
-            self.assertFalse(
-                suggestion_services.check_user_can_review_in_category(
-                    'invalid_user', 'category1'))
+        user_ids = (
+            suggestion_services.get_all_user_ids_who_are_allowed_to_review(
+                'category1'))
+        self.assertEqual(user_ids, [])
+        user_ids = (
+            suggestion_services.get_all_user_ids_who_are_allowed_to_review(
+                'category2'))
+        self.assertEqual(user_ids, ['user3'])
 
-    def test_check_if_email_has_been_sent_to_user(self):
-        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
-            self.user_a_id, 'category_a')
-        suggestion_services.create_new_user_contribution_scoring_model(
-            user_score_identifier, 15)
-        self.assertFalse(
-            suggestion_services.check_if_email_has_been_sent_to_user(
-                self.user_a_id, 'category_a'))
-        suggestion_services.mark_email_has_been_sent_to_user(
-            self.user_a_id, 'category_a')
         self.assertTrue(
-            suggestion_services.check_if_email_has_been_sent_to_user(
-                self.user_a_id, 'category_a'))
+            user_scoring_user3_cat2.user_can_review_the_category())
+        self.assertFalse(
+            user_scoring_user3_cat1.user_can_review_the_category())
+        self.assertFalse(
+            user_scoring_user4_cat1.user_can_review_the_category())
+        self.assertFalse(
+            user_scoring_user4_cat2.user_can_review_the_category())
 
 
 class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):

@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import random
 import string
 
+from core.domain import user_domain
 from constants import constants
 from core.platform import models
 import feconf
@@ -1959,42 +1960,41 @@ class UserContributionScoringModel(base_models.BaseModel):
         return '.'.join([score_category, user_id])
 
     @classmethod
-    def get_score_of_user_for_category(cls, user_id, score_category):
-        """Gets the score of the user for the given score category.
+    def get(cls, user_id, score_category):
+        """Gets the user's scoring model corresponding to the score category.
 
         Args:
-            user_id: str. The ID of the user.
-            score_category: str. The category of suggestion to score the user
-                on.
-
+            user_id: str. The id of the user.
+            score_category: str. The score category of the suggestion.
+        
         Returns:
-            float|None. The score of the user in the given category.
+            UserContributionScoringModel|None. A UserContributionScoringModel
+            corresponding to the user score identifier or None if none exist.
         """
-        instance_id = cls._get_instance_id(user_id, score_category)
-        model = cls.get_by_id(instance_id)
-
-        return model.score if model else None
+        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
+            user_id, score_category
+        )
+        return cls.get_by_score_identifiers([user_score_identifier])
 
     @classmethod
-    def get_scores_of_users_for_categories(cls, user_score_identifiers):
-        """Gets the score for each user for the corresponding score category.
+    def get_by_score_identifiers(cls, user_score_identifiers):
+        """Gets the user score models corresponding to the identifiers.
 
         Args:
             user_score_identifiers: list(FullyQualifiedUserScoreIdentifier).
                 Contains unique (user_id, score_category) pairs that
                 correspond to the id of the user and the suggestion
-                score_category to retrieve the score for.
+                score_category to retrieve the user score model for.
         
         Returns:
-            list(float). The scores of the user scoring models.
-
-        Raises:
-            Exception. A UserContributionScoringModel entry does not exist.
+            list(UserContributionScoringModel|None). A list of the
+            UserContributionScoringModels corresponding to the user score
+            identifiers.
         """
         user_ids = [
-            user_score_identifier.user_id for user_score_identifier in
-            user_score_identifiers
-        ]
+                user_score_identifier.user_id for user_score_identifier in
+                user_score_identifiers
+            ]
         score_categories = [
             user_score_identifier.score_category for user_score_identifier in
             user_score_identifiers
@@ -2005,124 +2005,29 @@ class UserContributionScoringModel(base_models.BaseModel):
                 user_ids, score_categories)
         ]
 
-        user_scoring_models = cls.get_multi(instance_ids)
-        scores = []
-        for user_scoring_model in user_scoring_models:
-            if not user_scoring_model:
-                raise Exception(
-                    'Cannot get the score for user with user_id: %s and '
-                    'category: %s because the UserContributionScoringModel '
-                    'entry does not exist.' % (
-                        user_scoring_model.user_id,
-                        user_scoring_model.score_category
-                    )
-                )
-            scores.append(user_scoring_model.score)
-
-        return scores
-
-    @classmethod
-    def mark_email_has_been_sent_to_users(cls, user_score_identifiers):
-    """Marks that the users have received an email.
-
-    Args:
-        user_score_identifiers: list(FullyQualifiedUserScoreIdentifier).
-            Contains unique (user_id, score_category) pairs that
-            correspond to the id of the user and the suggestion
-            score_category to mark the email as sent for.
-    """
-    user_ids = [
-            user_score_identifier.user_id for user_score_identifier in
-            user_score_identifiers
-        ]
-    score_categories = [
-        user_score_identifier.score_category for user_score_identifier in
-        user_score_identifiers
-    ]
-    instance_ids = [
-        cls._get_instance_id(user_id, score_category)
-        for user_id, score_category in python_utils.ZIP(
-            user_ids, score_categories)
-    ]
-    user_scoring_models = cls.multi(instance_ids)
-
-    for user_scoring_model in user_scoring_models:
-        if user_scoring_moedl is None:
-            raise Exception(
-                'A UserContributionScoringModel entry with the given id: %s'
-                ' does not exist.' % instance_id
-            )
-        user_scoring_model.has_email_been_sent = True
-
-    cls.put_multi(user_scoring_models)
-
-    def check_if_email_has_been_sent_to_users(cls, user_score_identifiers):
-    """Checks if the users have received an email.
-
-    Args:
-        user_score_identifiers: list(FullyQualifiedUserScoreIdentifier).
-            Contains unique (user_id, score_category) pairs to check if an
-            email has been sent to each user_id regarding their score_category.
-
-    Returns:
-        list(bool). Whether the emails have already been sent to the users.
-    """
-    user_ids = [
-            user_score_identifier.user_id for user_score_identifier in
-            user_score_identifiers
-        ]
-    score_categories = [
-        user_score_identifier.score_category for user_score_identifier in
-        user_score_identifiers
-    ]
-    instance_ids = [
-        cls._get_instance_id(user_id, score_category)
-        for user_id, score_category in python_utils.ZIP(
-            user_ids, score_categories)
-    ]
-
-    user_scoring_models = cls.get_multi(instance_ids)
-    whether_emails_have_been_sent = []
-    for user_scoring_model in user_scoring_models:
-        if user_scoring_model:
-            raise Exception(
-                'Cannot check if email has been sent because the '
-                'UserContributionScoringModel entry with id: %s does not '
-                'exist.' % instance_id
-            )
-        whether_emails_have_been_sent.append(
-            user_scoring_model.has_email_been_sent)
-
-    return whether_emails_have_been_sent
+        return cls.get_multi(instance_ids)
 
 
     @classmethod
-    def create(cls, user_score_identifier, score):
+    def create(cls, user_id, score_category, score):
         """Creates a new UserContributionScoringModel entry.
 
         Args:
-            user_score_identifier: FullyQualifiedUserScoreIdentifier. Contains
-                the unique (user_id, score_category) pair that corresponds to
-                the id of the user and the suggestion score_category to create
-                the scoring model for.
+            user_id: str. The id of the user.
+            score_category: str. The score category of the suggestion.
             score: float. The score of the user.
+
+        Returns:
+            UserContributionScoringModel. The user scoring model that was
+            created.
 
         Raises:
             Exception. There is already an entry with the given id.
         """
-        user_id = user_score_identifier.user_id
-        score_category = user_score_identifier.score_category
-
-        instance_id = cls._get_instance_id(user_id, score_category)
-        if cls.get_by_id(instance_id):
-            raise Exception(
-                'There is already a UserContributionScoringModel entry with the'
-                ' given id: %s' % instance_id
-            )
-
-        cls(
-            id=instance_id, user_id=user_id, score_category=score_category,
-            score=score).put()
+        user_score_identifier = user_domain.FullyQualifiedUserScoreIdentifier(
+            user_id, score_category
+        )
+        return cls.create_multi([user_score_identifier], score)[0]
 
     @classmethod
     def create_multi(cls, user_score_identifiers, score):
@@ -2134,14 +2039,18 @@ class UserContributionScoringModel(base_models.BaseModel):
                 to the id of the users and the suggestion score categories to
                 create the scoring models for.
             score: float. The score of the users.
+    
+        Returns:
+            list(UserContributionScoringModel). The user scoring models that
+            were created.
 
         Raises:
             Exception. There is already an entry with the given id.
         """
         user_ids = [
-            user_score_identifier.user_id for user_score_identifier in
-            user_score_identifiers
-        ]
+                user_score_identifier.user_id for user_score_identifier in
+                user_score_identifiers
+            ]
         score_categories = [
             user_score_identifier.score_category for user_score_identifier in
             user_score_identifiers
@@ -2151,13 +2060,12 @@ class UserContributionScoringModel(base_models.BaseModel):
             for user_id, score_category in python_utils.ZIP(
                 user_ids, score_categories)
         ]
-
         user_scoring_models = cls.get_multi(instance_ids)
-        for user_scoring_model in user_scoring_models:
+        for index, user_scoring_model in enumerate(user_scoring_models):
             if user_scoring_model:
                 raise Exception(
                     'There is already a UserContributionScoringModel entry with'
-                    ' the given id: %s' % instance_id
+                    ' the given id: %s' % instance_ids[index]
                 )
         
         new_user_scoring_models = [
@@ -2169,61 +2077,7 @@ class UserContributionScoringModel(base_models.BaseModel):
                 instance_ids, user_ids, score_categories)
         ]
         cls.put_multi(new_user_scoring_models)
-
-    @classmethod
-    def increment_score_for_user(cls, user_score_identifier, increment_by):
-        """Increment the score of the user in the category by the given amount.
-
-        Args:
-            user_score_identifier: FullyQualifiedUserScoreIdentifier. A
-                (user_id, score_category) pair that corresponds
-                to the id of the user and the suggestion score category to
-                increment the score for.
-            increment_by: float. The amount to increase the score of the user
-                by. May be negative, in which case the score is reduced.
-        """
-        cls.increment_score_for_users([user_score_identifier], increment_by)
-
-    @classmethod
-    def increment_score_for_users(
-            cls, user_score_identifiers, increment_by):
-        """Increments the score of each (user_id, score_category) pair by the
-        given amount.
-
-        Args:
-            user_score_identifiers: list(FullyQualifiedUserScoreIdentifier). A
-                list of unique (user_id, score_category) pairs that correspond
-                to the id of the users and the suggestion score categories to
-                increment the scores for.
-            increment_by: float. The amount to increase the score of the users
-                by. May be negative, in which case the score is reduced.
-        """
-        user_ids = [
-            user_score_identifier.user_id for user_score_identifier in
-            user_score_identifiers
-        ]
-        score_categories = [
-            user_score_identifier.score_category for user_score_identifier in
-            user_score_identifiers
-        ]
-        instance_ids = [
-            cls._get_instance_id(user_id, score_category)
-            for user_id, score_category in python_utils.ZIP(
-                user_ids, score_categories)
-        ]
-        user_scoring_models = cls.get_multi(instance_ids)
-        user_score_identifiers_missing_models = []
-        for index, user_scoring_model in enumerate(user_scoring_models):
-            if user_scoring_model:
-                user_scoring_model.score += increment_by
-            else:
-                user_score_identifiers_missing_models.append(
-                    user_score_identifiers[index])
-        
-        cls.create_multi(user_score_identifiers_missing_models, increment_by)
-        user_scoring_models =  cls.get_multi(instance_ids)
-
-        cls.put_multi(user_scoring_models)
+        return new_user_scoring_models
 
 
 class UserContributionRightsModel(base_models.BaseModel):
