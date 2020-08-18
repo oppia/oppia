@@ -92,7 +92,6 @@ class CodeOwnerLintChecksManager(python_utils.OBJECT):
                 for x in self._walk_with_gitignore(dir_path, exclude_dirs):
                     yield x
 
-
     def _is_path_ignored(self, path_to_check):
         """Checks whether the given path is ignored by git.
 
@@ -110,7 +109,6 @@ class CodeOwnerLintChecksManager(python_utils.OBJECT):
 
         return subprocess.call(command) == 0
 
-
     def _is_path_contains_frontend_specs(self, path_to_check):
         """Checks whether if a path contains all spec files.
 
@@ -121,7 +119,6 @@ class CodeOwnerLintChecksManager(python_utils.OBJECT):
             bool. Whether the given path contains all spec files.
         """
         return '*.spec.ts' in path_to_check or '*Spec.ts' in path_to_check
-
 
     def _check_for_important_patterns_at_bottom_of_codeowners(
             self, important_patterns):
@@ -182,7 +179,6 @@ class CodeOwnerLintChecksManager(python_utils.OBJECT):
             failed = True
 
         return failed, error_messages
-
 
     def check_codeowner_file(self):
         """Checks the CODEOWNERS file for any uncovered dirs/files and also
@@ -306,9 +302,9 @@ class CodeOwnerLintChecksManager(python_utils.OBJECT):
         error_messages.extend(error_message)
         failed = failed or codeowner_pattern_check_failed
 
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
+            name, failed, error_messages, full_error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

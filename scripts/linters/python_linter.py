@@ -123,8 +123,9 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     error_messages.append(error_message)
                     failed = True
 
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def check_that_all_jobs_are_listed_in_the_job_registry_file(self):
         """This function is used to check that all the one-off and audit jobs
@@ -230,8 +231,9 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     ',\n'.join(sorted(non_registered_validation_jobs))))
             error_messages.append(error_message)
 
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -319,7 +321,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         files_to_lint = self.all_filepaths
         errors_found = False
         error_messages = []
-        full_messages = []
+        full_error_messages = []
         name = 'Pylint'
 
         _batch_size = 50
@@ -345,7 +347,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pylinter.msg_status != 0:
                 for message in pylint_report.read():
-                    full_messages.append(message)
+                    full_error_messages.append(message)
                 pylint_error_messages = (
                     self._get_trimmed_error_output(pylint_report.read()))
                 error_messages.append(pylint_error_messages)
@@ -361,14 +363,14 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pycodestyle_report.get_count() != 0:
                 error_message = stdout.getvalue()
-                full_messages.append(error_message)
+                full_error_messages.append(error_message)
                 error_messages.append(error_message)
                 errors_found = True
 
             current_batch_start_index = current_batch_end_index
 
         return concurrent_task_utils.TaskResult(
-            name, errors_found, error_messages, full_messages)
+            name, errors_found, error_messages, full_error_messages)
 
     def lint_py_files_for_python3_compatibility(self):
         """Prints a list of Python 3 compatibility errors in the given list of
@@ -381,7 +383,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         files_to_lint = self.all_filepaths
         any_errors = False
         error_messages = []
-        full_messages = []
+        full_error_messages = []
         name = 'Pylint for Python 3 compatibility'
 
         files_to_lint_for_python3_compatibility = [
@@ -418,15 +420,15 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 pylint_error_messages = (
                     self._get_trimmed_error_output(pylint_report.read()))
                 error_messages.append(pylint_error_messages)
-                full_messages.append('Messages for Python 3 support:')
+                full_error_messages.append('Messages for Python 3 support:')
                 for message in pylint_report.read():
-                    full_messages.append(message)
+                    full_error_messages.append(message)
                 any_errors = True
 
             current_batch_start_index = current_batch_end_index
 
         return concurrent_task_utils.TaskResult(
-            name, any_errors, error_messages, full_messages)
+            name, any_errors, error_messages, full_error_messages)
 
     def check_import_order(self):
         """This function is used to check that each file
@@ -456,8 +458,9 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 error_message = stdout.getvalue()
                 error_messages.append(error_message)
 
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

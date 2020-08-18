@@ -256,8 +256,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         file_path))
                 error_messages.append(error_message)
 
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def _check_ts_ignore(self):
         """Checks if ts ignore is used.
@@ -329,9 +330,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     or (
                         previous_line_has_comment_with_ts_error and
                         previous_line_has_comment))
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def _check_ts_expect_error(self):
         """Checks if ts expect error is used in non spec file.
@@ -386,9 +387,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     or (
                         previous_line_has_comment_with_ts_error and
                         previous_line_has_comment))
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
@@ -419,9 +420,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
                 'build.py. Otherwise, rename them to .ts\n')
             error_messages.append(err_msg)
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def _check_js_and_ts_component_name_and_count(self):
         """This function ensures that all JS/TS files have exactly
@@ -459,9 +460,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         failed = True
                         error_messages.append(error_message)
                         break
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def _check_directive_scope(self):
         """This function checks that all directives have an explicit
@@ -577,9 +578,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                                     ))
                                             error_messages.append(
                                                 error_message)
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -661,9 +662,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 'sorted order.'
                                 % (property_value, filepath))
                             error_messages.append(error_message)
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
@@ -706,9 +707,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         'exactly match.' % (
                             filepath, stringfied_dependencies,
                             function_parameters))
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
@@ -874,9 +875,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         '%s --> Duplicate constant declaration found.'
                         % filepath)
                     error_messages.append(error_message)
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def _check_comments(self):
         """This function ensures that comments follow correct style. Below are
@@ -965,9 +966,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             'the end of the comment.' % (
                                 filepath, line_num + 1))
                         error_messages.append(error_message)
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -1094,7 +1095,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         files_to_lint = self.all_filepaths
         num_files_with_errors = 0
         error_messages = []
-        full_messages = []
+        full_error_messages = []
         failed = False
         name = 'ESLint'
 
@@ -1120,12 +1121,12 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             failed = True
             for result in result_list:
-                full_messages.append(result)
+                full_error_messages.append(result)
                 error_messages.append(
                     self._get_trimmed_error_output(result))
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_messages)
+            name, failed, error_messages, full_error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

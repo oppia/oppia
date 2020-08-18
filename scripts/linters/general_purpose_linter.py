@@ -705,8 +705,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     self._check_for_mandatory_pattern_in_file(
                         pattern_list, filepath, failed))
                 error_messages.extend(mandatory_error_messages)
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
@@ -763,9 +764,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                             REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
                         error_messages.append(error_message)
                         total_error_count += 1
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def check_newline_at_eof(self):
         """This function is used to detect newline at the end of file."""
@@ -785,9 +786,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     'end of file.' % filepath)
                 error_messages.append(error_message)
                 failed = True
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

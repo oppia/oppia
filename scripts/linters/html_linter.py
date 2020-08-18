@@ -270,9 +270,9 @@ class HTMLLintChecksManager(python_utils.OBJECT):
             if parser.failed:
                 error_messages.extend(parser.error_messages)
                 failed = True
-
+        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, full_error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -358,7 +358,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         name = 'HTMLLint'
         error_summary = []
         error_messages = []
-        full_messages = []
+        full_error_messages = []
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
         html_files_to_lint = self.html_filepaths
         for filepath in html_files_to_lint:
@@ -376,12 +376,12 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
             if error_count:
                 failed = True
                 error_summary.append(error_count)
-                full_messages.append(linter_stdout)
+                full_error_messages.append(linter_stdout)
                 error_messages.append(
                     self._get_trimmed_error_output(linter_stdout))
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_messages)
+            name, failed, error_messages, full_error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
