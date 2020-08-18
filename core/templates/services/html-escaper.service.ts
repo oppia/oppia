@@ -31,7 +31,6 @@ export class HtmlEscaperService {
     return this.unescapedStrToEscapedStr(JSON.stringify(obj));
   }
 
-
 escapedJsonToObj(json: string): Object {
     if (!json) {
       this.loggerService.error('Empty string was passed to JSON decoder.');
@@ -48,7 +47,6 @@ unescapedStrToEscapedStr(str: string): string {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   }
-
 escapedStrToUnescapedStr(value: string): string {
     return String(value)
       .replace(/&quot;/g, '"')
