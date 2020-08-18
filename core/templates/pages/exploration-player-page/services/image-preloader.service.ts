@@ -259,17 +259,13 @@ angular.module('oppia').factory('ImagePreloaderService', [
     *                           math SVGs should be extracted.
     */
     var getDimensionsOfMathSvg = function(filename) {
-      var filenameComponents = filename.split('_');
-      var indexOfHeightString = filenameComponents.indexOf('height') + 1;
-      var indexOfWidthString = filenameComponents.indexOf('width') + 1;
-      var indexOfVerticalPaddingString = (
-        filenameComponents.indexOf('vertical') + 1);
+      var dimensionsRegex = RegExp(
+        '[^/]+_height_([0-9d]+)_width_([0-9d]+)_vertical_([0-9d]+)\.svg', 'g');
+      var imageDimensions = dimensionsRegex.exec(filename);
       var dimensions = {
-        height: filenameComponents[indexOfHeightString].replace('d', '.'),
-        width: filenameComponents[indexOfWidthString].replace('d', '.'),
-        verticalPadding: (
-          filenameComponents[indexOfVerticalPaddingString].replace(
-            'd', '.').replace('.svg', ''))
+        height: imageDimensions[1].replace('d', '.'),
+        width: imageDimensions[2].replace('d', '.'),
+        verticalPadding: imageDimensions[3].replace('d', '.')
       };
       return dimensions;
     };

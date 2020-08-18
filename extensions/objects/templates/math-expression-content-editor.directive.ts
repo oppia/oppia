@@ -66,6 +66,8 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
                 outputElement[0].getElementsByTagName('svg')[0].outerHTML);
             }
             ctrl.numberOfElementsInQueue--;
+            // We need to ensure that all the typepsetting requests in the
+            // MathJax queue is finished before we save the final SVG.
             if (ctrl.numberOfElementsInQueue === 0) {
               ctrl.value.mathExpressionSvgIsBeingProcessed = false;
               $scope.$apply();
