@@ -21,8 +21,8 @@ require('services/services.constants.ajs.ts');
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('SearchService', [
-  '$http', '$log', '$rootScope', '$translate', 'SEARCH_DATA_URL',
-  function($http, $log, $rootScope, $translate, SEARCH_DATA_URL) {
+  '$http', '$log', '$translate', 'SEARCH_DATA_URL',
+  function($http, $log, $translate, SEARCH_DATA_URL) {
     var _lastQuery = null;
     var _lastSelectedCategories = {};
     var _lastSelectedLanguageCodes = {};
@@ -30,6 +30,7 @@ angular.module('oppia').factory('SearchService', [
     var _isCurrentlyFetchingResults = false;
     var numSearchesInProgress = 0;
     var _searchBarLoadedEventEmitter = new EventEmitter();
+    var _initialSearchResultsLoadedEventEmitter = new EventEmitter();
     // Appends a suffix to the query describing allowed category and language
     // codes to filter on.
     var _getSuffixForQuery =
@@ -124,8 +125,7 @@ angular.module('oppia').factory('SearchService', [
           _searchCursor = data.search_cursor;
           numSearchesInProgress--;
 
-          $rootScope.$broadcast(
-            'initialSearchResultsLoaded', data.activity_list);
+          _initialSearchResultsLoadedEventEmitter.emit(data.activity_list);
           _isCurrentlyFetchingResults = false;
           var checkMismatch = function(searchQuery) {
             var isMismatch = true;
@@ -221,6 +221,9 @@ angular.module('oppia').factory('SearchService', [
 
       get onSearchBarLoaded() {
         return _searchBarLoadedEventEmitter;
+      },
+      get onInitialSearchResultsLoaded() {
+        return _initialSearchResultsLoadedEventEmitter;
       }
     };
   }
