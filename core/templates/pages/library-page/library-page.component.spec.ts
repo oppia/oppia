@@ -270,7 +270,7 @@ describe('Library controller', function() {
     });
 
     it('should log an error when exploration summary tile element width' +
-      ' is different of 208 pixels', function() {
+      ' is different from 208 pixels', function() {
       var divMock = $(document.createElement('div'));
       divMock.width(100);
 
@@ -380,7 +380,7 @@ describe('Library controller', function() {
   });
 
   describe('when window location pathname is invalid and user is not' +
-    ' logged in the platform', function() {
+    ' logged in on the platform', function() {
     beforeEach(angular.mock.module('oppia', function($provide) {
       mockWindow = {
         location: {

@@ -206,7 +206,7 @@ describe('Contributions and review component', function() {
         ctrl.switchToContributionsTab('translate_content');
         $scope.$apply();
 
-        spyOn(contributionAndReviewService, 'resolveSuggestiontoExploration');
+        spyOn(contributionAndReviewService, 'resolveSuggestionToExploration');
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.resolve({
             action: 'add',
@@ -218,7 +218,7 @@ describe('Contributions and review component', function() {
         $scope.$apply();
 
         expect($uibModal.open).toHaveBeenCalled();
-        expect(contributionAndReviewService.resolveSuggestiontoExploration)
+        expect(contributionAndReviewService.resolveSuggestionToExploration)
           .toHaveBeenCalled();
       });
 
@@ -227,7 +227,7 @@ describe('Contributions and review component', function() {
         ctrl.switchToContributionsTab('translate_content');
         $scope.$apply();
 
-        spyOn(contributionAndReviewService, 'resolveSuggestiontoExploration');
+        spyOn(contributionAndReviewService, 'resolveSuggestionToExploration');
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.reject()
         });
@@ -235,7 +235,7 @@ describe('Contributions and review component', function() {
         $scope.$apply();
 
         expect($uibModal.open).toHaveBeenCalled();
-        expect(contributionAndReviewService.resolveSuggestiontoExploration)
+        expect(contributionAndReviewService.resolveSuggestionToExploration)
           .not.toHaveBeenCalled();
       });
   });

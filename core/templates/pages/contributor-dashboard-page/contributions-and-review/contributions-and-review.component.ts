@@ -217,7 +217,7 @@ angular.module('oppia').component('contributionsAndReview', {
           },
           controller: 'TranslationSuggestionReviewModalController'
         }).result.then(function(result) {
-          ContributionAndReviewService.resolveSuggestiontoExploration(
+          ContributionAndReviewService.resolveSuggestionToExploration(
             targetId, suggestionId, result.action, result.reviewMessage,
             result.commitMessage, resolveSuggestionSuccess);
         }, function() {
