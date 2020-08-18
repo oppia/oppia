@@ -1993,7 +1993,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-form-error-text {
-  color: red;
+  color: #ff0000;
   font-size: smaller;
 }
 

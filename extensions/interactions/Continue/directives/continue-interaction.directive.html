@@ -1,10 +1,12 @@
-<md-button ng-if="$ctrl.isInEditorMode" class="oppia-learner-confirm-button">
-  <[$ctrl.buttonText]>
-  <i class="fas fa-arrow-right oppia-arrow-right-icon"></i>
-</md-button>
+<div class="oppia-interactive-continue">
+  <md-button ng-if="$ctrl.isInEditorMode" class="oppia-learner-confirm-button">
+    <[$ctrl.buttonText]>
+    <i class="fas fa-arrow-right oppia-arrow-right-icon"></i>
+  </md-button>
+</div>
 
 <style>
-  continue-interaction .oppia-arrow-right-icon {
+  .oppia-interactive-continue .oppia-arrow-right-icon {
     font-size: 19px;
     padding-top: 1.5px;
   }
