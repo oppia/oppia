@@ -217,10 +217,6 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.fromIndex = fromIndex;
       };
 
-      ctrl.createSkill = function() {
-        EntityCreationService.createSkill();
-      };
-
       ctrl.toggleSubtopicPreview = function() {
         ctrl.subtopicPreviewCardIsShown = !ctrl.subtopicPreviewCardIsShown;
       };

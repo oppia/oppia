@@ -17,9 +17,10 @@
  *  like engine service.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { EventEmitter } from '@angular/core';
 
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
@@ -67,6 +68,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     StatsReportingService = (
       OppiaAngularRootComponent.statsReportingService);
     var _totalQuestionsReceivedEventEmitter = new EventEmitter();
+    var _oppiaFeedbackAvailableEventEmitter = new EventEmitter();
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -84,6 +86,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     }
 
     var storyId = UrlService.getStoryIdInPlayer();
+
+    var _playerStateChangeEventEmitter = new EventEmitter();
 
     var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
@@ -249,6 +253,12 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       },
       get onTotalQuestionsReceived() {
         return _totalQuestionsReceivedEventEmitter;
+      },
+      get onPlayerStateChange() {
+        return _playerStateChangeEventEmitter;
+      },
+      get onOppiaFeedbackAvailable() {
+        return _oppiaFeedbackAvailableEventEmitter;
       }
     };
   }]);
