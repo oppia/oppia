@@ -35,16 +35,22 @@ var ruleTester = new RuleTester();
 ruleTester.run('break-after-parens', rule, {
 
   valid: [
-
-    // Give me some code that won't trigger a warning.
+    'var a = (true);',
+    `if (true ||
+      false) {
+        var a = 1 + 2;
+      }`,
+    `it('should' +
+    'happen')`
   ],
 
   invalid: [
     {
-      code: '',
+      code: `var a = (true ||
+        true);`,
       errors: [{
-        message: 'Fill me in.',
-        type: 'Me too'
+        message: 'Expected newline after \'(\'.',
+        type: 'Program'
       }]
     }
   ]

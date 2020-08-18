@@ -31,8 +31,8 @@ module.exports = {
       category: 'Stylistic Issues',
       recommended: false
     },
-    fixable: 'whitespace',
-    schema: ['always'],
+    fixable: null,
+    schema: [],
     messages: {
       expectedAfter: 'Expected newline after \'(\'.'
     }
@@ -98,10 +98,7 @@ module.exports = {
                 context.report({
                   node,
                   loc: paren.loc,
-                  messageId: 'expectedAfter',
-                  fix(fixer) {
-                    return fixer.insertTextAfter(paren, '\n');
-                  }
+                  messageId: 'expectedAfter'
                 });
               }
             }
