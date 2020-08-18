@@ -16,8 +16,6 @@
  * @fileoverview Controller for the Tutor Card.
  */
 
-import { Subscription } from 'rxjs';
-
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/audio-bar.directive.ts');
@@ -51,6 +49,8 @@ require('services/contextual/window-dimensions.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').animation(
   '.conversation-skin-responses-animate-slide', function() {
@@ -95,7 +95,6 @@ angular.module('oppia').directive('tutorCard', [
         'WindowDimensionsService', 'AUDIO_HIGHLIGHT_CSS_CLASS',
         'COMPONENT_NAME_CONTENT', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'DEFAULT_PROFILE_IMAGE_PATH',
-        'EVENT_NEW_CARD_AVAILABLE',
         'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
         'OPPIA_AVATAR_LINK_URL', 'PAGE_CONTEXT', 'TWO_CARD_THRESHOLD_PX',
         function(
@@ -109,15 +108,11 @@ angular.module('oppia').directive('tutorCard', [
             WindowDimensionsService, AUDIO_HIGHLIGHT_CSS_CLASS,
             COMPONENT_NAME_CONTENT, CONTENT_FOCUS_LABEL_PREFIX,
             CONTINUE_BUTTON_FOCUS_LABEL, DEFAULT_PROFILE_IMAGE_PATH,
-            EVENT_NEW_CARD_AVAILABLE,
             INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS,
             OPPIA_AVATAR_LINK_URL, PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-
-          ctrl.directiveSubscriptions = new Subscription();
-
           var updateDisplayedCard = function() {
             $scope.arePreviousResponsesShown = false;
             $scope.lastAnswer = null;
@@ -125,9 +120,11 @@ angular.module('oppia').directive('tutorCard', [
               !$scope.getDisplayedCard().getInteraction());
             $scope.interactionIsActive =
               !$scope.getDisplayedCard().isCompleted();
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
-              $scope.interactionIsActive = false;
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                (data) => $scope.interactionIsActive = false
+              )
+            );
             CurrentInteractionService.registerPresubmitHook(function() {
               $scope.waitingForOppiaFeedback = true;
             });
