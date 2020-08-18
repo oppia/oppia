@@ -29,20 +29,20 @@ angular.module('oppia').component('ratioExpressionEditor', {
       const ctrl = this;
       ctrl.warningText = '';
 
-      ctrl.isValidRatio = function(value) {
+      ctrl.isValidRatio = function() {
         var RATIO_REGEX = /^\s*(\d+\s*(:\s*\d+)+)\s*$/;
         var INVALID_CHARS_REGEX = /[^\d^:]$/;
-        if (value.length === 0) {
+        if (ctrl.currentValue.length === 0) {
           ctrl.warningText =
               ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_FORMAT;
-        } else if (INVALID_CHARS_REGEX.test(value)) {
+        } else if (INVALID_CHARS_REGEX.test(ctrl.currentValue)) {
           ctrl.warningText =
               ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_CHARS;
-        } else if (!RATIO_REGEX.test(value)) {
+        } else if (!RATIO_REGEX.test(ctrl.currentValue)) {
           ctrl.warningText =
               ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_FORMAT;
         } else {
-          ctrl.value = value.toString().replace(/\s/g, '');
+          ctrl.value = ctrl.currentValue.toString().replace(/\s/g, '');
           ctrl.warningText = '';
         }
         return true;

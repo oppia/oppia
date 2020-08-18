@@ -79,8 +79,8 @@ export class RatioExpressionInputValidationService {
           let seenInput = <string> seenRule.inputs.x;
           let seenRuleType = <string> seenRule.type;
 
-          if (seenRuleType === 'IsEquivalent' && (
-            ratioRulesService.IsEquivalent(
+          if (seenRuleType === 'Equals' && (
+            ratioRulesService.Equals(
               seenInput, {x: currentInput}))) {
             // This rule will make all of the following matching
             // inputs obsolete.
@@ -89,10 +89,10 @@ export class RatioExpressionInputValidationService {
               message: (
                 'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
                 ' will never be matched because it is preceded ' +
-                'by an \'IsEquivalent\' rule with a matching input.')
+                'by a \'Equals\' rule with a matching input.')
             });
-          } else if (currentRuleType === 'Equals' && (
-            ratioRulesService.Equals(
+          } else if (currentRuleType === 'IsEquivalent' && (
+            ratioRulesService.IsEquivalent(
               seenInput, {x: currentInput}))) {
             // This rule will make the following inputs with
             // IsEquivalent rule obsolete.
@@ -101,7 +101,7 @@ export class RatioExpressionInputValidationService {
               message: (
                 'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
                 ' will never be matched because it is preceded ' +
-                'by a \'Equals\' rule with a matching input.')
+                'by a \'IsEquivalent\' rule with a matching input.')
             });
           } else if (currentRuleType === 'HasNumberOfTermsEqualTo' && (
             ratioRulesService.HasNumberOfTermsEqualTo(
