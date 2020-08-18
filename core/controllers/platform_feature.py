@@ -24,7 +24,7 @@ import feconf
 import utils
 
 
-class PlatformFeatureHandler(base.BaseHandler):
+class PlatformFeaturesEvaluationHandler(base.BaseHandler):
     """The handler for retrieving feature flag values."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

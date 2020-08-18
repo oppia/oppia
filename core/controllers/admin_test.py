@@ -815,7 +815,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             feature.name)
         self.logout()
 
-    def test_update_feature_flag_rules_with_invalid_rules_returns_400(self):
+    def test_update_flag_rules_with_invalid_rules_returns_400(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -853,6 +853,172 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 response['error'],
                 'Feature in dev stage cannot be enabled in test or production '
                 'environment.')
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            feature.name)
+        self.logout()
+
+    def test_update_flag_rules_with_unknown_feature_name_returns_400(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET', set([]))
+        with feature_list_ctx, feature_set_ctx:
+            response = self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': 'test_feature_1',
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update feature',
+                },
+                csrf_token=csrf_token,
+                expected_status_int=400
+            )
+            self.assertEqual(
+                response['error'],
+                'Unknown feature flag: test_feature_1.')
+
+        self.logout()
+
+    def test_update_flag_rules_with_feature_name_of_non_string_type_returns_400(
+            self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_feature_flag_rules',
+                'feature_name': 123,
+                'new_rules': [],
+                'commit_message': 'test update feature',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'feature_name should be string, got \'123\'.')
+
+        self.logout()
+
+    def test_update_flag_rules_with_message_of_non_string_type_returns_400(
+            self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_feature_flag_rules',
+                'feature_name': 'feature_name',
+                'new_rules': [],
+                'commit_message': 123,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'commit_message should be string, got \'123\'.')
+
+        self.logout()
+
+    def test_update_flag_rules_with_rules_of_non_list_type_returns_400(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_feature_flag_rules',
+                'feature_name': 'feature_name',
+                'new_rules': {},
+                'commit_message': 'test update feature',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'new_rules should be a list of dicts, got \'{}\'.')
+
+        self.logout()
+
+    def test_update_flag_rules_with_rules_of_non_list_of_dict_type_returns_400(
+            self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_feature_flag_rules',
+                'feature_name': 'feature_name',
+                'new_rules': [1, 2],
+                'commit_message': 'test update feature',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'new_rules should be a list of dicts, got \'[1, 2]\'.')
+
+        self.logout()
+
+    def test_update_flag_rules_with_unexpected_exception_returns_500(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        feature = platform_parameter_registry.Registry.create_feature_flag(
+            'test_feature_1', 'feature for test.', 'dev')
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            set([feature.name]))
+        # Replace the stored instance with None in order to trigger unexpected
+        # exception during update.
+        platform_parameter_registry.Registry.parameter_registry[
+            feature.name] = None
+        with feature_list_ctx, feature_set_ctx:
+            response = self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': feature.name,
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update feature',
+                },
+                csrf_token=csrf_token,
+                expected_status_int=500
+            )
+            self.assertEqual(
+                response['error'],
+                '\'NoneType\' object has no attribute \'to_dict\'')
 
         platform_parameter_registry.Registry.parameter_registry.pop(
             feature.name)

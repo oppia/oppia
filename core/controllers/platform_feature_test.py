@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for platform feature handler."""
+"""Tests for platform feature evaluation handler."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -27,11 +27,11 @@ from core.tests import test_utils
 memcache_services = models.Registry.import_memcache_services()
 
 
-class PlatformFeatureHandlerTest(test_utils.GenericTestBase):
-    """Tests for the PlatformFeatureHandler."""
+class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
+    """Tests for the PlatformFeaturesEvaluationHandler."""
 
     def setUp(self):
-        super(PlatformFeatureHandlerTest, self).setUp()
+        super(PlatformFeaturesEvaluationHandlerTest, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -72,7 +72,7 @@ class PlatformFeatureHandlerTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
 
     def tearDown(self):
-        super(PlatformFeatureHandlerTest, self).tearDown()
+        super(PlatformFeaturesEvaluationHandlerTest, self).tearDown()
 
         feature_services.ALL_FEATURES_LIST = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = self.original_feature_name_set
