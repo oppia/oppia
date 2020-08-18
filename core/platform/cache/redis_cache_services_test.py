@@ -135,4 +135,5 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             lines = redis_conf.readlines()
             elements = lines[0].split()
             self.assertEqual(len(elements), 2)
-            self.assertEqual(elements[1], feconf.REDISPORT)
+            self.assertEqual(
+                elements[1], python_utils.convert_to_bytes(feconf.REDISPORT))

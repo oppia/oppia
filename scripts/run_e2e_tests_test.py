@@ -921,7 +921,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
-                (int(feconf.REDISPORT),),
+                (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
@@ -1040,7 +1040,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
-                (int(feconf.REDISPORT),),
+                (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
@@ -1213,7 +1213,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
-                (int(feconf.REDISPORT),),
+                (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
@@ -1337,7 +1337,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
-                (int(feconf.REDISPORT),),
+                (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(

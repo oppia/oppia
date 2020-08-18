@@ -409,7 +409,7 @@ MAILGUN_DOMAIN_NAME = None
 # server. Keep this in sync with redis.conf in the root folder. Specifically,
 # REDISPORT should always be the same as the port in redis.conf.
 REDISHOST = 'localhost'
-REDISPORT = '6379'
+REDISPORT = 6379
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.

@@ -40,7 +40,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
     # A dictionary representation of an exploration that contains unicode
     # characters.
-    exploration_dict = {
+    exploration_dict_with_unicode_characters = {
         'tags': [],
         'title': '',
         'objective': '',
@@ -146,7 +146,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
     # The correct json encoded version of the above exploration containing
     # unicode characters that is set to the memory cache.
-    json_encoded_string = (
+    json_encoded_string_representing_an_exploration = (
         '{"param_changes": [], "category": "", "auto_tts_enabled": true, '
         '"tags": [], "states_schema_version": 39, "title": "", "param_specs":'
         ' {}, "id": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes"'
@@ -623,7 +623,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         default_exploration = exp_domain.Exploration.from_dict(
-            self.exploration_dict)
+            self.exploration_dict_with_unicode_characters)
 
         def mock_memory_cache_services_set_multi(id_value_mapping):
             # The json encoded string is the string that is set to the cache
@@ -636,7 +636,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(key, 'exploration:0:%s' % exploration_id)
                 self.assertEqual(
                     value,
-                    self.json_encoded_string)
+                    self.json_encoded_string_representing_an_exploration)
         with self.swap(
             memory_cache_services, 'set_multi',
             mock_memory_cache_services_set_multi):
@@ -692,7 +692,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         default_exploration = exp_domain.Exploration.from_dict(
-            self.exploration_dict)
+            self.exploration_dict_with_unicode_characters)
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,

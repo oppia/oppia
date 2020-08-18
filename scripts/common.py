@@ -56,7 +56,7 @@ YARN_VERSION = '1.22.4'
 PILLOW_VERSION = '6.2.2'
 
 # We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
-# there is a 'make test' bug in redis 6.0.6 where the solution has not been
+# there is a `make test` bug in redis 6.0.6 where the solution has not been
 # released. This is explained in this issue:
 # https://github.com/redis/redis/issues/7540.
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
@@ -67,11 +67,12 @@ PILLOW_VERSION = '6.2.2'
 #    redis-<new version>/ and change into that directory:
 #    cd redis-<new version>/
 # 4. From the top level of the redis-<new version> directory,
-#    run 'make test'.
+#    run `make test`.
 # 5. All of the tests should pass with an [ok] status with no error codes. The
-#    final output should be 'All tests pass.'
+#    final output should be that 'All tests pass'.
 # 6. Be sure to leave a note in the PR description to confirm that you have read
-#    this message, and that all of the make test tests pass.
+#    this message, and that all of the `make test` tests pass before you commit
+#    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.0.5'
 
@@ -656,7 +657,7 @@ def start_redis_server():
         REDIS_SERVER_PATH, REDIS_CONF_PATH,
         '--daemonize', 'yes'
     ])
-    wait_for_port_to_be_open(int(feconf.REDISPORT))
+    wait_for_port_to_be_open(feconf.REDISPORT)
 
 
 def stop_redis_server():
