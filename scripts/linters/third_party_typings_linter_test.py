@@ -44,7 +44,6 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
         self.files_in_typings_dir = [
             'guppy-defs-0.1.d.ts',
             'skulpt-defs-0.2.d.ts',
-            'math-expressions-defs-0.3.d.ts',
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
