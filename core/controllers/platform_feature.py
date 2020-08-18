@@ -31,7 +31,7 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        """Handles POST requests. Evaluates and returns all feature flags using
+        """Handles GET requests. Evaluates and returns all feature flags using
         the given client information.
         """
         context_dict = {
