@@ -408,5 +408,4 @@ skip_files:
 - third_party/static/MathJax-2.7.5/test/
 - third_party/static/MathJax-2.7.5/unpacked/
 - third_party/static/messageformat-2.0.5/
-- third_party/static/nginfinitescroll-1.0.0/
 - third_party/static/popperJs-1.15.0/
