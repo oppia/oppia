@@ -98,7 +98,7 @@ describe('RatioExpressionInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew([equals], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -109,7 +109,8 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should catch redundancy of rules with matching inputs', () => {
     // The third rule will never get matched.
-    answerGroups[0].rules = [isEquivalent, equals, hasNumberOfTermsEqualTo];
+    answerGroups[0].updateRuleTypesToInputs(
+      [isEquivalent, equals, hasNumberOfTermsEqualTo]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -140,7 +141,7 @@ describe('RatioExpressionInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].rules = [isEquivalent1, isEquivalent2];
+    answerGroups[0].updateRuleTypesToInputs([isEquivalent1, isEquivalent2]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
