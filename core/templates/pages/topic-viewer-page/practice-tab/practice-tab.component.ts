@@ -33,6 +33,7 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class PracticeTabComponent implements OnInit {
   @Input() topicName: string;
+  @Input() openInTopicEditor: boolean = false;
   @Input() subtopicsList: Subtopic[];
   selectedSubtopics: Subtopic[] = [];
   availableSubtopics: Subtopic[] = [];
@@ -55,6 +56,9 @@ export class PracticeTabComponent implements OnInit {
   }
 
   isStartButtonDisabled(): boolean {
+    if (this.openInTopicEditor) {
+      return true;
+    }
     for (var idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
         return false;
