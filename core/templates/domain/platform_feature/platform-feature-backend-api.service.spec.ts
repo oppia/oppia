@@ -51,33 +51,7 @@ describe('PlatformFeatureBackendApiService', () => {
     httpTestingController.verify();
   });
 
-  describe('.getCsrfTokenAsync', () => {
-    it('should correctly fetch csrf token', fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      platformFeatureBackendApiService.getCsrfTokenAsync()
-        .then(successHandler, failHandler);
-
-      httpTestingController
-        .expectOne('/csrfhandler')
-        .flush({ token: 'mock_csrf_token' });
-
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith('mock_csrf_token');
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
-  });
-
   describe('.fetchFeatureFlags', () => {
-    let spy: jasmine.Spy;
-
-    beforeEach(() => {
-      spy = spyOn(platformFeatureBackendApiService, 'getCsrfTokenAsync')
-        .and.resolveTo('mock_csrf_token');
-    });
-
     it('should correctly fetch feature flags',
       fakeAsync(() => {
         const successHandler = jasmine.createSpy('success');
@@ -85,6 +59,7 @@ describe('PlatformFeatureBackendApiService', () => {
 
         const context = clientContextObjectFactory.create(
           'Web', 'Chrome', 'en');
+        const contextDict = context.toBackendDict();
         const responseDict = {
           feature_a: true,
           feature_b: false,
@@ -94,17 +69,17 @@ describe('PlatformFeatureBackendApiService', () => {
           .then(successHandler, failHandler);
 
         flushMicrotasks();
-        httpTestingController
-          .expectOne(
-            PlatformFeatureDomainConstants.PLATFORM_FEATURE_HANDLER_URL)
-          .flush(responseDict);
+
+        const urlWithParams =
+          PlatformFeatureDomainConstants.PLATFORM_FEATURE_HANDLER_URL + '?' +
+          Object.entries(contextDict).map(([k, v]) => `${k}=${v}`).join('&');
+        httpTestingController.expectOne(urlWithParams).flush(responseDict);
 
         flushMicrotasks();
         expect(successHandler).toHaveBeenCalledWith(
           featureStatusSummaryObjectFactory.createFromBackendDict(responseDict)
         );
         expect(failHandler).not.toHaveBeenCalled();
-        expect(spy).toHaveBeenCalled();
       })
     );
   });

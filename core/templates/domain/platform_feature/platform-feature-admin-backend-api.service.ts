@@ -41,7 +41,7 @@ export class PlatformFeatureAdminBackendApiService {
       {
         action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_RULES_ACTION,
         feature_name: name,
-        message: message,
+        commit_message: message,
         new_rules: newRules.map(rule => rule.toBackendDict())
       }
     ).toPromise();
