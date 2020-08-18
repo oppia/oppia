@@ -60,8 +60,8 @@ angular.module('oppia').directive(
 
             ctrl.$onInit = function() {
               ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
-              ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-                subscribe(evt => {
+              ctrl.resizeSubscription = WindowDimensionsService.
+                getResizeEvent().subscribe(evt => {
                   ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
 
                   // TODO(#8521): Remove the use of $rootScope.$apply()

@@ -45,7 +45,8 @@ angular.module('oppia').directive(
               );
               i18nLanguageCodeService.setI18nLanguageCode(
                 $translate.proposedLanguage() || $translate.use());
-              // The next line allows the transcluded content to start executing.
+              // The next line allows the transcluded content to start
+              // executing.
               $scope.initialized = true;
             };
           }]
