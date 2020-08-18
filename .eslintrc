@@ -140,7 +140,6 @@
         "allowEmptyCatch": true
       }
     ],
-    "no-extra-semi": "off",
     "no-multi-spaces": [
       "error"
     ],
@@ -172,7 +171,6 @@
     "no-undef": [
       "off"
     ],
-    "no-use-before-define": "off",
     "no-unused-vars": [
       "off"
     ],
