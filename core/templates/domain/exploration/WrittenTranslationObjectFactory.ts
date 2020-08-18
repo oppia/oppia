@@ -23,8 +23,9 @@ import { Injectable } from '@angular/core';
 export const WRITTEN_TRANSLATION_TYPE_HTML = 'html';
 export const WRITTEN_TRANSLATION_TYPE_UNICODE = 'unicode';
 
-type WrittenTranslationDataFormat = typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
-  typeof WRITTEN_TRANSLATION_TYPE_HTML;
+export type WrittenTranslationDataFormat = (
+  typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
+  typeof WRITTEN_TRANSLATION_TYPE_HTML);
 
 export interface TranslationBackendDict {
   'data_format': WrittenTranslationDataFormat;

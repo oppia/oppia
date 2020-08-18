@@ -24,7 +24,7 @@ import {
   TranslationBackendDict,
   WrittenTranslation,
   WrittenTranslationObjectFactory,
-  WRITTEN_TRANSLATION_TYPE_HTML
+  WrittenTranslationDataFormat
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 export interface WrittenTranslationsBackendDict {
@@ -105,7 +105,7 @@ export class WrittenTranslations {
   }
 
   addWrittenTranslation(contentId: string, languageCode: string,
-      dataFormat: string, translation: string) {
+      dataFormat: WrittenTranslationDataFormat, translation: string) {
     var writtenTranslations = this.translationsMapping[contentId];
     if (writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');
