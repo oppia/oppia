@@ -163,12 +163,17 @@ angular.module('oppia').component('stateTranslationEditor', {
         $scope.HTML_SCHEMA = {
           type: 'html'
         };
-        $scope.$on('activeContentIdChanged', function() {
-          initEditor();
-        });
-        $scope.$on('activeLanguageChanged', function() {
-          initEditor();
-        });
+        ctrl.directiveSubscriptions.add(
+          TranslationTabActiveContentIdService.onActiveContentIdChanged.
+            subscribe(
+              () => initEditor()
+            )
+        );
+        ctrl.directiveSubscriptions.add(
+          TranslationLanguageService.onActiveLanguageChanged.subscribe(
+            () => initEditor()
+          )
+        );
         initEditor();
         ctrl.directiveSubscriptions.add(
           ExternalSaveService.onExternalSave.subscribe(()=> {

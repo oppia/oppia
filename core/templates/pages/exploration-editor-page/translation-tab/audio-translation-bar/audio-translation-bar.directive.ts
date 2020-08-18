@@ -61,6 +61,7 @@ require('services/user.service.ts');
 require('services/external-save.service.ts');
 
 import WaveSurfer from 'wavesurfer.js';
+
 import { Subscription } from 'rxjs';
 
 require(
@@ -552,16 +553,24 @@ angular.module('oppia').directive('audioTranslationBar', [
               })
             );
 
-            $scope.$on('activeContentIdChanged', function() {
-              $scope.initAudioBar();
-            });
-            $scope.$on('activeLanguageChanged', function() {
-              $scope.initAudioBar();
-            });
+            ctrl.directiveSubscriptions.add(
+              TranslationTabActiveContentIdService.onActiveContentIdChanged.
+                subscribe(
+                  () => $scope.initAudioBar()
+                )
+            );
 
-            $scope.$on('showTranslationTabBusyModal', function() {
-              $scope.openTranslationTabBusyModal();
-            });
+            ctrl.directiveSubscriptions.add(
+              TranslationLanguageService.onActiveLanguageChanged.subscribe(
+                () => $scope.initAudioBar()
+              )
+            );
+
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onShowTranslationTabBusyModal.subscribe(
+                () => $scope.openTranslationTabBusyModal()
+              )
+            );
             $scope.track = {
               progress: function(progressPercentage) {
                 if (angular.isDefined(progressPercentage)) {
