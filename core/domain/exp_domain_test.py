@@ -1180,7 +1180,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             })
 
     def test_get_content_count(self):
-        # Adds 2 to content count to exploration (content, default_outcome).
+        # Adds 1 to content count to exploration (content, default_outcome).
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(exploration.get_content_count(), 1)
 

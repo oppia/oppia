@@ -29,6 +29,7 @@ from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.platform import models
 import feconf
+import utils
 
 (opportunity_models,) = models.Registry.import_models(
     [models.NAMES.opportunity])
@@ -219,7 +220,7 @@ def update_opportunity_with_updated_exploration(exp_id):
     exploration_opportunity_summary.content_count = content_count
     exploration_opportunity_summary.translation_counts = translation_counts
     exploration_opportunity_summary.incomplete_translation_language_codes = (
-        _compute_list_difference(
+        utils.compute_list_difference(
             exploration_opportunity_summary
             .incomplete_translation_language_codes,
             complete_translation_language_list
@@ -246,19 +247,6 @@ def update_opportunity_with_updated_exploration(exp_id):
 
     _save_multi_exploration_opportunity_summary(
         [exploration_opportunity_summary])
-
-
-def _compute_list_difference(list_a, list_b):
-    """Returns the set difference of two lists.
-
-    Args:
-        list_a: list. The first list.
-        list_b: list. The second list.
-
-    Returns:
-        list. List of the set difference of list_a - list_b.
-    """
-    return list(set(list_a) - set(list_b))
 
 
 def update_exploration_opportunities_with_story_changes(story, exp_ids):
