@@ -139,13 +139,14 @@ angular.module('oppia').component('storyViewerPage', {
             ctrl.storyIsLoaded = true;
             ctrl.storyPlaythroughObject = storyDataDict;
             ctrl.storyId = ctrl.storyPlaythroughObject.getStoryId();
+            var topicName = ctrl.storyPlaythroughObject.topicName;
             PageTitleService.setPageTitle(
-              storyDataDict.title + ' - Oppia');
+              `Learn ${topicName} | ${storyDataDict.title} | Oppia`);
             ctrl.storyTitle = storyDataDict.title;
             ctrl.storyDescription = storyDataDict.description;
 
             $rootScope.$broadcast('storyData', {
-              topicName: ctrl.storyPlaythroughObject.topicName,
+              topicName: topicName,
               storyTitle: ctrl.storyTitle
             });
 

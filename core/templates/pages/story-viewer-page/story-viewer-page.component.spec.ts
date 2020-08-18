@@ -26,6 +26,7 @@ import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import { PageTitleService } from 'services/page-title.service';
 
 describe('Story Viewer Page component', function() {
   var ctrl = null;
@@ -34,6 +35,7 @@ describe('Story Viewer Page component', function() {
   var alertsService = null;
   var assetsBackendApiService = null;
   var readOnlyStoryNodeObjectFactory = null;
+  var pageTitleService = null;
   var storyNodeObjectFactory = null;
   var storyObjectFactory = null;
   var storyPlaythroughObjectFactory = null;
@@ -49,6 +51,7 @@ describe('Story Viewer Page component', function() {
       imports: [HttpClientTestingModule]
     });
 
+    pageTitleService = TestBed.get(PageTitleService);
     readOnlyStoryNodeObjectFactory = TestBed.get(
       ReadOnlyStoryNodeObjectFactory);
     storyNodeObjectFactory = TestBed.get(StoryNodeObjectFactory);
@@ -75,7 +78,8 @@ describe('Story Viewer Page component', function() {
 
     ctrl = $componentController('storyViewerPage', {
       $rootScope: $rootScope,
-      AlertsService: alertsService
+      AlertsService: alertsService,
+      PageTitleService: pageTitleService
     });
 
     // This approach was choosen because spyOn() doesn't work on properties
@@ -169,7 +173,7 @@ describe('Story Viewer Page component', function() {
       }],
       story_title: 'Story Title 1',
       story_description: 'Story Description 1',
-      topic_name: 'topic_1',
+      topic_name: 'Topic 1',
     });
   }));
 
@@ -220,6 +224,19 @@ describe('Story Viewer Page component', function() {
     expect(ctrl.getStaticImageUrl(imagePath)).toBe(
       '/assets/images/path/to/image.png');
   });
+
+  it('should change page title when story data is fetched from backend',
+    function() {
+      spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+        $q.resolve(storyPlaythrough));
+      spyOn(pageTitleService, 'setPageTitle');
+
+      ctrl.$onInit();
+      $rootScope.$apply();
+
+      expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
+        'Learn Topic 1 | Story Title 1 | Oppia');
+    });
 
   it('should show story\'s chapters when story has chapters', function() {
     spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
