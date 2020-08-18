@@ -111,14 +111,16 @@ class TaskThread(threading.Thread):
             self.output = self.func()
             if self.verbose:
                 for stdout in self.output:
+                    # The following section will print the output of the lint
+                    # checks.
                     if stdout.name:
-                        log('Starting %s check' % stdout.name, show_time=True)
+                        log(
+                            'Printing %s check\'s status' % stdout.name,
+                            show_time=True)
                         log('----------------------------------------')
                         log(stdout.get_task_report)
-                        log(
-                            'FINISHED %s: %.1f secs' % (
-                                stdout.name, time.time() - self.start_time),
-                            show_time=True)
+                    # The following section will print the output of backend
+                    # tests.
                     else:
                         log('LOG %s:' % self.name, show_time=True)
                         log(stdout.all_messages)
