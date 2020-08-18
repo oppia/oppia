@@ -367,6 +367,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             last_message.text, 'review message')
 
+    def test_accept_suggestion_raises_exception_if_suggestion_does_not_exist(
+            self):
+        expected_exception_regexp = (
+            'You cannot accept the suggestion with id %s because it does not '
+            'exist.' % (self.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+            self.mock_accept_suggestion(
+                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
+                'review message')
+
     def test_accept_suggestion_with_invalid_math_fails(self):
         """Test that the method for accepting suggestions raises error when
         a suggestion with invalid math-tags is tried to be accepted.
@@ -548,6 +559,16 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(last_message.text, 'reject review message')
+
+    def test_reject_suggestion_raises_exception_if_suggestion_does_not_exist(
+            self):
+        expected_exception_regexp = (
+            'You cannot reject the suggestion with id %s because it does not '
+            'exist.' % (self.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+            suggestion_services.reject_suggestion(
+                self.suggestion_id, self.reviewer_id, 'review message')
 
     def test_reject_suggestion_raises_exception_if_suggestion_already_accepted(
             self):

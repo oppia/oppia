@@ -393,7 +393,7 @@ def accept_suggestions(
         for index, user_scoring in enumerate(user_scorings):
             user_scoring.increment_score(
                 suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
-    
+
         # Emails are sent to onboard new reviewers. These new reviewers are
         # created when the score of the user passes the minimum score required
         # to review.
@@ -406,7 +406,7 @@ def accept_suggestions(
                         user_scoring.get_score_category()
                     )
                     user_scoring.mark_email_as_sent()
-    
+
         # Need to update the corresponding user scoring models after we updated
         # the domain objects.
         _update_user_scorings(user_scorings)
@@ -442,7 +442,7 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
     """
     suggestions = get_suggestions_by_ids(suggestion_ids)
 
-    for suggestion in suggestions:
+    for index, suggestion in enumerate(suggestions):
         if suggestion is None:
             raise Exception(
                 'You cannot reject the suggestion with id %s because it does '
