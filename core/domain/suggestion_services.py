@@ -655,7 +655,10 @@ def get_user_scoring(user_id, score_category):
     user_scoring_model = user_models.UserContributionScoringModel.get(
         user_id, score_category)
 
-    return get_user_scoring_from_model(user_scoring_model)
+    return (
+        get_user_scoring_from_model(user_scoring_model) if user_scoring_model
+        else None
+    )
 
 
 def _update_user_scoring(user_scoring):
