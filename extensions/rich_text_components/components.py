@@ -151,7 +151,9 @@ class Math(BaseRteComponent):
             '0-9d]+.(svg)$')
         filename = value_dict['math_content-with-value']['svg_filename']
         if not re.match(filename_pattern_regex, filename):
-            raise Exception('Invalid filename')
+            raise Exception(
+                'Invalid svg_filename attribute in math component: %s' % (
+                    filename))
 
 
 class Skillreview(BaseRteComponent):

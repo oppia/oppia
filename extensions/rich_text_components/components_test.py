@@ -174,7 +174,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                     u'raw_latex': 'x^2',
                     u'svg_filename': 'img.svg'
                 }
-            }, 'Invalid filename'),
+            }, 'Invalid svg_filename attribute in math component: img.svg'),
             ({
                 'math_content-with-value': {
                     u'raw_latex': 'x^3',
@@ -182,7 +182,10 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                         u'mathImg_20207s61338_imzlvnf23a_height_4d123_width_23d'
                         '122_vertical_2d123.svg')
                 }
-            }, 'Invalid filename'),
+            }, (
+                'Invalid svg_filename attribute in math component: mathImg_202'
+                '07s61338_imzlvnf23a_height_4d123_width_23d122_vertical_2d123'
+                '.svg')),
             ({
                 'math_content-with-value': {
                     u'raw_latex': 'x^3',
@@ -190,7 +193,10 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                         u'mathImg_20207361338_imzlvnf23a_invalid_4d123_width_2'
                         '3d122_vertical_2d123.svg')
                 }
-            }, 'Invalid filename')]
+            }, (
+                'Invalid svg_filename attribute in math component: mathImg_202'
+                '07361338_imzlvnf23a_invalid_4d123_width_23d122_vertical_2d123'
+                '.svg'))]
 
         self.check_validation(
             components.Math, valid_items, invalid_items_with_error_messages)
