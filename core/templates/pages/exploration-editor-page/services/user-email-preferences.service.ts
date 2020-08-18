@@ -122,6 +122,3 @@ export class UserEmailPreferencesService {
 
 angular.module('oppia').factory('UserEmailPreferencesService',
   downgradeInjectable(UserEmailPreferencesService));
-
-
-
