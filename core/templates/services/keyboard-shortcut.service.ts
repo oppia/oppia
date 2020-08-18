@@ -21,12 +21,14 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
-const windowRef = new WindowRef();
 
 @Injectable({
   providedIn: 'root'
 })
 export class KeyboardShortcutService {
+  constructor(
+    private windowRef: WindowRef) {
+  }
   bindExplorationPlayerShortcuts() {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
@@ -73,7 +75,7 @@ export class KeyboardShortcutService {
   }
 
   setHref(href) {
-    windowRef.nativeWindow.location.href = href;
+    this.windowRef.nativeWindow.location.href = href;
   }
 
   bindNavigationShortcuts() {
