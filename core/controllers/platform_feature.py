@@ -59,6 +59,8 @@ class PlatformFeatureHandler(base.BaseHandler):
 class DummyHandler(base.BaseHandler):
     """Dummy handler for testing feature gating flow."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @acl_decorators.open_access
     def get(self):
         # This handler is gated by the dummy_feature flag, i.e. it's only

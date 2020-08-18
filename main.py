@@ -828,7 +828,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/platform_features_evaluation_handler',
         platform_feature.PlatformFeatureHandler),
     get_redirect_route(
-        r'/platformfeaturedummyhandler', platform_feature.DummyHandler),
+        r'/platform_feature_dummy_handler', platform_feature.DummyHandler),
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),

@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { PlatformFeatureDummyBackendApiService } from
   './platform-feature-dummy-backend-api.service';
 
-fdescribe('PlatformFeatureDummyBackendApiService', () => {
+describe('PlatformFeatureDummyBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let apiService: PlatformFeatureDummyBackendApiService;
 

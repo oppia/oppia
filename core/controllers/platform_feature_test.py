@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as param_domain
+from core.domain import platform_parameter_list as param_list
 from core.domain import platform_parameter_registry as registry
 from core.platform import models
 from core.tests import test_utils
@@ -107,3 +108,43 @@ class PlatformFeatureHandlerTest(test_utils.GenericTestBase):
             'Invalid client type \'Invalid\', must be one of [u\'Web\', '
             'u\'Android\'].'
         )
+
+
+class DummyHandlerTest(test_utils.GenericTestBase):
+    """Tests for the DummyHandler."""
+
+    def setUp(self):
+        super(DummyHandlerTest, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self._enable_dummy_feature()
+
+    def _enable_dummy_feature(self):
+        """Enables the dummy_feature for the dev environment."""
+        feature_services.update_feature_flag_rules(
+            param_list.PARAM_NAMES.dummy_feature, self.user_id,
+            'update rule for testing purpose',
+            [{
+                'value_when_matched': True,
+                'filters': [{
+                    'type': 'server_mode',
+                    'conditions': [['=', param_domain.SERVER_MODES.dev]]
+                }]
+            }]
+        )
+
+    def test_get_with_dummy_feature_enabled_returns_ok(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            result = self.get_json(
+                '/platform_feature_dummy_handler',
+            )
+            self.assertEqual(result, {'msg': 'ok'})
+
+    def test_get_with_dummy_feature_disabled_raises_404(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            self.get_json(
+                '/platform_feature_dummy_handler',
+                expected_status_int=404
+            )
