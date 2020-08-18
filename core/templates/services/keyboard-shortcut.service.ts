@@ -72,37 +72,34 @@ export class KeyboardShortcutService {
     });
   }
 
-  setHref(href) {
-    this.windowRef.nativeWindow.location.href = href;
-  }
 
   bindNavigationShortcuts() {
     Mousetrap.bind('ctrl+0', () => {
-      this.setHref('/get-started');
+      this.windowRef.nativeWindow.location.href = '/get-started';
     });
 
     Mousetrap.bind('ctrl+1', () => {
-      this.setHref('/community-library');
+      this.windowRef.nativeWindow.location.href = '/community-library';
     });
 
     Mousetrap.bind('ctrl+2', () => {
-      this.setHref('/learner-dashboard');
+      this.windowRef.nativeWindow.location.href = '/learner-dashboard';
     });
 
     Mousetrap.bind('ctrl+3', () => {
-      this.setHref('/creator-dashboard');
+      this.windowRef.nativeWindow.location.href = '/creator-dashboard';
     });
 
     Mousetrap.bind('ctrl+4', () => {
-      this.setHref('/about');
+      this.windowRef.nativeWindow.location.href = '/about';
     });
 
     Mousetrap.bind('ctrl+5', () => {
-      this.setHref('/notifications');
+      this.windowRef.nativeWindow.location.href = '/notifications';
     });
 
     Mousetrap.bind('ctrl+6', () => {
-      this.setHref('/preferences');
+      this.windowRef.nativeWindow.location.href = '/preferences';
     });
   }
 }

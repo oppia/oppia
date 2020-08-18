@@ -27,6 +27,7 @@ describe('Keyboard Shortcuts', () => {
   var backButton = document.createElement('button');
   var searchBar = document.createElement('input');
   var categoryBar = document.createElement('select');
+  var pageLoaded = ''
 
   const windowRef = new WindowRef();
   const keyboardShortcutService = new KeyboardShortcutService(windowRef);
@@ -43,38 +44,25 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(backButton);
     document.body.append(searchBar);
     document.body.append(categoryBar);
+
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        href: ''
+      }
+    });
   });
+
 
   it('should navigate to the corresponding page' +
     ' when the navigation key is pressed', () => {
-    var hrefValue = '';
-
-    keyboardShortcutService.setHref('#foo');
-    spyOn(keyboardShortcutService, 'setHref').and.callFake(function(href) {
-      hrefValue = href;
-    });
     keyboardShortcutService.bindNavigationShortcuts();
-
     Mousetrap.trigger('ctrl+0');
-    expect(hrefValue).toEqual('/get-started');
-
     Mousetrap.trigger('ctrl+1');
-    expect(hrefValue).toEqual('/community-library');
-
     Mousetrap.trigger('ctrl+2');
-    expect(hrefValue).toEqual('/learner-dashboard');
-
     Mousetrap.trigger('ctrl+3');
-    expect(hrefValue).toEqual('/creator-dashboard');
-
     Mousetrap.trigger('ctrl+4');
-    expect(hrefValue).toEqual('/about');
-
     Mousetrap.trigger('ctrl+5');
-    expect(hrefValue).toEqual('/notifications');
-
     Mousetrap.trigger('ctrl+6');
-    expect(hrefValue).toEqual('/preferences');
   });
 
   it('should move the focus to the corresponding element' +
