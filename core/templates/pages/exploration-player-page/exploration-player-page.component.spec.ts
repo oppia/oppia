@@ -50,7 +50,7 @@ describe('Exploration player page', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'KeyboardShortcutService', 
+      'KeyboardShortcutService',
       TestBed.get(KeyboardShortcutService));
   }));
 
