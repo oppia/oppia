@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for CreateNewStoryModalController.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { NewlyCreatedStoryObjectFactory } from
   'domain/topic/NewlyCreatedStoryObjectFactory';
 
@@ -28,7 +33,16 @@ describe('Create New Story Modal Controller', function() {
   var StoryEditorStateService = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [EditableStoryBackendApiService]
+    });
+  });
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('EditableStoryBackendApiService',
+      TestBed.get(EditableStoryBackendApiService));
     $provide.value(
       'NewlyCreatedStoryObjectFactory', new NewlyCreatedStoryObjectFactory());
   }));

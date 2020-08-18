@@ -16,160 +16,159 @@
  * @fileoverview Service to send changes to a story to the backend.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('domain/story/story-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { StoryDomainConstants } from 'domain/story/story-domain.constants';
+import cloneDeep from 'lodash/cloneDeep';
 
-angular.module('oppia').factory('EditableStoryBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  'EDITABLE_STORY_DATA_URL_TEMPLATE', 'STORY_PUBLISH_URL_TEMPLATE',
-  'STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE',
-  'VALIDATE_EXPLORATIONS_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService,
-      EDITABLE_STORY_DATA_URL_TEMPLATE, STORY_PUBLISH_URL_TEMPLATE,
-      STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE,
-      VALIDATE_EXPLORATIONS_URL_TEMPLATE) {
-    var _fetchStory = function(storyId, successCallback, errorCallback) {
-      var storyDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_STORY_DATA_URL_TEMPLATE, {
-          story_id: storyId
-        });
 
-      $http.get(storyDataUrl).then(function(response) {
-        var story = angular.copy(response.data.story);
-        var topicName = angular.copy(response.data.topic_name);
-        var storyIsPublished = response.data.story_is_published;
-        var skillSummaries = angular.copy(response.data.skill_summaries);
-        var topicUrlFragment = response.data.topic_url_fragment;
-        var classroomUrlFragment = response.data.classroom_url_fragment;
+@Injectable({
+  providedIn: 'root'
+})
+
+
+export class EditableStoryBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolation: UrlInterpolationService) {}
+  private storyDataDict = null;
+  private _fetchStory(
+      storyId: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
+    var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
+      StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
+        story_id: storyId
+      });
+    this.http.get(
+      editableStoryDataUrl, { observe: 'response'}).toPromise().then(
+      (response) => {
+        this.storyDataDict = cloneDeep(response.body);
         if (successCallback) {
-          successCallback({
-            story: story,
-            topicName: topicName,
-            storyIsPublished: storyIsPublished,
-            skillSummaries: skillSummaries,
-            topicUrlFragment: topicUrlFragment,
-            classroomUrlFragment: classroomUrlFragment
-          });
+          successCallback(this.storyDataDict);
         }
-      }, function(errorResponse) {
+      }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse.error
+          );
         }
       });
-    };
-
-    var _updateStory = function(
-        storyId, storyVersion, commitMessage, changeList,
-        successCallback, errorCallback) {
-      var editableStoryDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_STORY_DATA_URL_TEMPLATE, {
+  }
+    private _updateStory = function(
+        storyId: string, storyVersion: string,
+        commitMessage: string,
+        changeList: string[],
+        successCallback: (value?: Object | PromiseLike<Object>) =>void,
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
+      var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
+        StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
         });
-
       var putData = {
         version: storyVersion,
         commit_message: commitMessage,
         change_dicts: changeList
       };
-      $http.put(editableStoryDataUrl, putData).then(function(response) {
-        // The returned data is an updated story dict.
-        var story = angular.copy(response.data.story);
-
-        if (successCallback) {
-          successCallback(story);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      this.http.put(
+        editableStoryDataUrl, putData).toPromise().then(
+        (response) => {
+          var story = cloneDeep(response.story);
+          if (successCallback) {
+            successCallback(story);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.error);
+          }
+        });
     };
-
-    var _changeStoryPublicationStatus = function(
-        storyId, newStoryStatusIsPublic, successCallback, errorCallback) {
-      var storyPublishUrl = UrlInterpolationService.interpolateUrl(
-        STORY_PUBLISH_URL_TEMPLATE, {
+    private _changeStoryPublicationStatus = function(
+        storyId: string,
+        newStoryStatusIsPublic: boolean,
+        successCallback: (value?: Object | PromiseLike<Object>) =>void,
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
+      var storyPublishUrl = this.urlInterpolation.interpolateUrl(
+        StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
           story_id: storyId
         });
-
       var putData = {
         new_story_status_is_public: newStoryStatusIsPublic
       };
-      $http.put(storyPublishUrl, putData).then(function(response) {
-        if (successCallback) {
-          successCallback();
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      this.http.put(
+        storyPublishUrl, putData).toPromise().then(
+        (response) => {
+          if (successCallback) {
+            successCallback(response.status);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.error);
+          }
+        });
     };
 
-    var _validateExplorations = function(
-        storyId, expIds, successCallback, errorCallback) {
-      var validateExplorationsUrl = UrlInterpolationService.interpolateUrl(
-        VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
+
+    private _validateExplorations = function(
+        storyId: string,
+        expIds: string[],
+        successCallback: (value?: Object | PromiseLike<Object>) =>void,
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
+      var validateExplorationsUrl = this.urlInterpolation.interpolateUrl(
+        StoryDomainConstants.VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
           story_id: storyId
         });
 
-      $http.get(validateExplorationsUrl, {
-        params: {
-          comma_separated_exp_ids: expIds.join(',')
-        }
-      }).then(function(response) {
-        if (successCallback) {
-          successCallback(response.data.validation_error_messages);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      this.http.get(
+        validateExplorationsUrl, {
+          params: {
+            comma_separated_exp_ids: expIds.join(',')
+          }
+        })
+        .toPromise().then(
+          (response) => {
+            if (successCallback) {
+              successCallback(response.status);
+            }
+          }, function(errorResponse) {
+            if (errorCallback) {
+              errorCallback(errorResponse.error);
+            }
+          });
     };
 
-    var _deleteStory = function(
-        storyId, successCallback, errorCallback) {
-      var storyDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_STORY_DATA_URL_TEMPLATE, {
+
+    private _deleteStory = function(
+        storyId: string,
+        successCallback: (value?: Object | PromiseLike<Object>) =>void,
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
+      var storyDataUrl = this.urlInterpolation.interpolateUrl(
+        StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
         });
-      $http['delete'](storyDataUrl).then(function(response) {
-        if (successCallback) {
-          successCallback(response.status);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
 
-    var _doesStoryWithUrlFragmentExist = function(
-        storyUrlFragment, successCallback, errorCallback) {
-      var storyUrlFragmentUrl = UrlInterpolationService.interpolateUrl(
-        STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
-          story_url_fragment: storyUrlFragment
+      this.http.request('delete',
+        storyDataUrl).toPromise().then(
+        (response) => {
+          if (successCallback) {
+            successCallback(response.status);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.error);
+          }
         });
-      $http.get(storyUrlFragmentUrl).then(function(response) {
-        if (successCallback) {
-          successCallback(response.data.story_url_fragment_exists);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
     };
-
-    return {
-      fetchStory: function(storyId) {
-        return $q(function(resolve, reject) {
-          _fetchStory(storyId, resolve, reject);
-        });
-      },
-
-      /**
+    /*
+    Return { */
+    fetchStory(storyId: string): Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._fetchStory(storyId, resolve, reject);
+      });
+    }
+    /**
        * Updates a story in the backend with the provided story ID.
        * The changes only apply to the story of the given version and the
        * request to update the story will fail if the provided story
@@ -179,39 +178,36 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
        * the success callback, if one is provided to the returned promise
        * object. Errors are passed to the error callback, if one is provided.
        */
-      updateStory: function(
-          storyId, storyVersion, commitMessage, changeList) {
-        return $q(function(resolve, reject) {
-          _updateStory(
-            storyId, storyVersion, commitMessage, changeList,
-            resolve, reject);
-        });
-      },
-
-      validateExplorations: function(storyId, expIds) {
-        return $q(function(resolve, reject) {
-          _validateExplorations(storyId, expIds, resolve, reject);
-        });
-      },
-
-      changeStoryPublicationStatus: function(storyId, newStoryStatusIsPublic) {
-        return $q(function(resolve, reject) {
-          _changeStoryPublicationStatus(
-            storyId, newStoryStatusIsPublic, resolve, reject);
-        });
-      },
-
-      deleteStory: function(storyId) {
-        return $q(function(resolve, reject) {
-          _deleteStory(storyId, resolve, reject);
-        });
-      },
-
-      doesStoryWithUrlFragmentExistAsync: async function(storyUrlFragment) {
-        return $q(function(resolve, reject) {
-          _doesStoryWithUrlFragmentExist(storyUrlFragment, resolve, reject);
-        });
-      }
-    };
-  }
-]);
+    updateStory(storyId: string, storyVersion: string,
+        commitMessage: string,
+        changeList: string[]):
+      Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._updateStory(
+          storyId, storyVersion, commitMessage, changeList,
+          resolve, reject);
+      });
+    }
+    changeStoryPublicationStatus(storyId: string,
+        newStoryStatusIsPublic: boolean):
+    Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._changeStoryPublicationStatus(
+          storyId, newStoryStatusIsPublic, resolve, reject);
+      });
+    }
+    validateExplorations(storyId: string, expIds: string[]): Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._validateExplorations(
+          storyId, expIds, resolve, reject);
+      });
+    }
+    deleteStory(storyId: string): Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._deleteStory(storyId, resolve, reject);
+      });
+    }
+}
+angular.module('oppia').factory(
+  'EditableStoryBackendApiService', downgradeInjectable(
+    EditableStoryBackendApiService));
