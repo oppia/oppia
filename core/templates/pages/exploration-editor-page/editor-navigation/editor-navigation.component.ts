@@ -26,7 +26,8 @@ require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-require('pages/exploration-editor-page/services/' +
+require(
+  'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time.service.ts');
 require('services/context.service.ts');
 require('services/exploration-improvements.service.ts');

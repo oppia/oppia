@@ -37,7 +37,8 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
       controller: [
         '$attrs', 'ContextService', '$element',
         'AutoplayedVideosService', 'PAGE_CONTEXT', '$window',
-        function($attrs, ContextService, $element,
+        function(
+            $attrs, ContextService, $element,
             AutoplayedVideosService, PAGE_CONTEXT, $window) {
           var ctrl = this;
           ctrl.$onInit = function() {

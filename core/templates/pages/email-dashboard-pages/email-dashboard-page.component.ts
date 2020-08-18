@@ -25,7 +25,8 @@ angular.module('oppia').component('emailDashboardPage', {
   controller: [
     '$rootScope', 'EmailDashboardDataService', 'LoaderService',
     'UserService',
-    function($rootScope, EmailDashboardDataService, LoaderService,
+    function(
+        $rootScope, EmailDashboardDataService, LoaderService,
         UserService) {
       var ctrl = this;
       ctrl.resetForm = function() {

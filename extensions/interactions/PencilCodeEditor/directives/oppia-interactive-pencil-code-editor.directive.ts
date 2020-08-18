@@ -40,7 +40,8 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
   '$timeout', 'InteractionAttributesExtractorService',
   'PlayerPositionService',
-  function($timeout, InteractionAttributesExtractorService,
+  function(
+      $timeout, InteractionAttributesExtractorService,
       PlayerPositionService) {
     return {
       restrict: 'E',
@@ -54,7 +55,8 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
         '$scope', '$attrs', '$element', '$uibModal',
         'FocusManagerService', 'PencilCodeEditorRulesService',
         'CurrentInteractionService',
-        function($scope, $attrs, $element, $uibModal,
+        function(
+            $scope, $attrs, $element, $uibModal,
             FocusManagerService, PencilCodeEditorRulesService,
             CurrentInteractionService) {
           var ctrl = this;

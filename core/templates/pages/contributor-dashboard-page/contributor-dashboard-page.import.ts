@@ -23,5 +23,6 @@ require(
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('pages/contributor-dashboard-page/' +
+require(
+  'pages/contributor-dashboard-page/' +
   'contributor-dashboard-page.component.ts');

@@ -88,7 +88,8 @@ describe('GuppyConfigurationService', () => {
       $provide.value(
         'GuppyConfigurationService', guppyConfigurationService);
       $provide.value('MathInteractionsService', new MathInteractionsService());
-      $provide.value('GuppyInitializationService',
+      $provide.value(
+        'GuppyInitializationService',
         new GuppyInitializationService());
     }));
     beforeEach(angular.mock.inject(function($componentController) {

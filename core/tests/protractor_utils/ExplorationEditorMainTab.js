@@ -649,7 +649,7 @@ var ExplorationEditorMainTab = function() {
 
     expect(
       await interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId])
-      .isDisplayed()).toBe(true);
+        .isDisplayed()).toBe(true);
     await interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
 
     var targetTile = interactionTile(interactionId);

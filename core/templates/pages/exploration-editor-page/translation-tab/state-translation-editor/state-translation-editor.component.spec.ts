@@ -133,7 +133,8 @@ describe('State Translation Editor Component', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StateRecordedVoiceoversService', TestBed.get(
       StateRecordedVoiceoversService));
-    $provide.value('StateWrittenTranslationsService',
+    $provide.value(
+      'StateWrittenTranslationsService',
       stateWrittenTranslationsService);
   }));
 
@@ -156,10 +157,12 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
 
-      spyOnProperty(translationLanguageService,
+      spyOnProperty(
+        translationLanguageService,
         'onActiveLanguageChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
-      spyOnProperty(translationTabActiveContentIdService,
+      spyOnProperty(
+        translationTabActiveContentIdService,
         'onActiveContentIdChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
 

@@ -161,7 +161,8 @@ var logicProofTeacher2 = (function() {
    *         antecendents or variables) that it will not be possible to deduce
    *         from what the student is required to write.
    */
-  var buildLineTemplate = function(nameString, readerViewString,
+  var buildLineTemplate = function(
+      nameString, readerViewString,
       antecedentsString, resultsString, variablesString, errorStrings,
       language, vocabulary) {
     var possibleReaderViews = logicProofShared.parseLineString(

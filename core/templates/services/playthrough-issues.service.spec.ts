@@ -151,7 +151,8 @@ describe('Playthrough Issues Service', function() {
       var stateName = issue.issueCustomizationArgs.state_names.value[0];
 
       expect(PlaythroughIssuesService.renderIssueStatement(issue))
-        .toBe('Several learners ended up in a cyclic loop revisiting card "' +
+        .toBe(
+          'Several learners ended up in a cyclic loop revisiting card "' +
         stateName + '" many times.');
     });
 
@@ -163,9 +164,10 @@ describe('Playthrough Issues Service', function() {
     var stateName = issue.issueCustomizationArgs.state_name.value;
 
     expect(PlaythroughIssuesService.renderIssueSuggestions(issue))
-      .toEqual(['Check the wording of the card "' + stateName +
+      .toEqual(
+        ['Check the wording of the card "' + stateName +
       '" to ensure it is not confusing.',
-      'Consider addressing the answers submitted in the sample' +
+        'Consider addressing the answers submitted in the sample' +
       ' playthroughs explicitly using answer groups.']);
   });
 
@@ -177,7 +179,8 @@ describe('Playthrough Issues Service', function() {
     var stateName = issue.issueCustomizationArgs.state_name.value;
 
     expect(PlaythroughIssuesService.renderIssueSuggestions(issue))
-      .toEqual(['Review the cards up to and including "' + stateName +
+      .toEqual(
+        ['Review the cards up to and including "' + stateName +
       '" for errors, ' + 'ambiguities, or insufficient motivation.']);
   });
 
@@ -191,7 +194,8 @@ describe('Playthrough Issues Service', function() {
       var lastStateName = statesName[statesName.length - 1];
 
       expect(PlaythroughIssuesService.renderIssueSuggestions(issue))
-        .toEqual(['Check that the concept presented in "' + statesName[0] +
+        .toEqual(
+          ['Check that the concept presented in "' + statesName[0] +
         '" has ' + 'been reinforced sufficiently by the time the learner' +
         ' gets to "' + lastStateName + '".']);
     });

@@ -116,7 +116,8 @@ angular.module('oppia').directive('contributionsAndReview', [
               var requiredData = {
                 id: suggestion.suggestion_id,
                 heading: $filter('formatRtePreview')(change.translation_html),
-                subheading: (details.topic_name + ' / ' + details.story_title +
+                subheading: (
+                  details.topic_name + ' / ' + details.story_title +
                   ' / ' + details.chapter_title),
                 labelText: SUGGESTION_LABELS[suggestion.status].text,
                 labelColor: SUGGESTION_LABELS[suggestion.status].color,

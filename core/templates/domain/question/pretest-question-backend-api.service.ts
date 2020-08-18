@@ -42,7 +42,8 @@ export class PretestQuestionBackendApiService {
     private http: HttpClient
   ) {}
 
-  _fetchPretestQuestions(explorationId: string, storyId: string,
+  _fetchPretestQuestions(
+      explorationId: string, storyId: string,
       successCallback: (value: QuestionBackendDict[]) => void,
       errorCallback: (reason: string) => void): void {
     if (!storyId || !storyId.match(/^[a-zA-Z0-9]+$/i)) {
@@ -71,7 +72,8 @@ export class PretestQuestionBackendApiService {
     });
   }
 
-  fetchPretestQuestions(explorationId: string,
+  fetchPretestQuestions(
+      explorationId: string,
       storyId: string): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchPretestQuestions(explorationId, storyId, resolve, reject);

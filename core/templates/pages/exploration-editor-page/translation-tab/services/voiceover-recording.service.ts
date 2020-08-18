@@ -147,7 +147,8 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
           microphoneStream = stream;
           _processMicAudio(stream);
         }, function() {
-          $log.warn('Microphone was not started because of' +
+          $log.warn(
+            'Microphone was not started because of' +
           'user denied permission.');
           isRecording = false;
         });

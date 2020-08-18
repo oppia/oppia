@@ -158,5 +158,6 @@ export class TopicLandingPageComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('topicLandingPage',
+angular.module('oppia').directive(
+  'topicLandingPage',
   downgradeComponent({component: TopicLandingPageComponent}));

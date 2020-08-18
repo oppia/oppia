@@ -77,9 +77,11 @@ describe('Multiple Incorrect Issue Component', function() {
         'Several learners submitted answers to card "State1" several times,' +
         ' then gave up and quit.');
       expect($scope.suggestions).toEqual([
-        ('Check the wording of the card "State1" to ensure it is ' +
+        (
+          'Check the wording of the card "State1" to ensure it is ' +
           'not confusing.'),
-        ('Consider addressing the answers submitted in the sample ' +
+        (
+          'Consider addressing the answers submitted in the sample ' +
           'playthroughs explicitly using answer groups.'),
       ]);
       expect($scope.playthroughIds).toEqual(['1', '2', '3']);

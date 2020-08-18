@@ -570,7 +570,8 @@ angular.module('oppia').factory('TopicUpdateService', [
           });
       },
 
-      setSubtopicPageContentsAudio: function(subtopicPage, subtopicId,
+      setSubtopicPageContentsAudio: function(
+          subtopicPage, subtopicId,
           newRecordedVoiceovers) {
         var oldRecordedVoiceovers = angular.copy(
           subtopicPage.getPageContents().getRecordedVoiceovers());

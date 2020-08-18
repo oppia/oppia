@@ -77,5 +77,6 @@ export class ExplorationRecommendationsService {
     });
   }
 }
-angular.module('oppia').factory('ExplorationRecommendationsService',
+angular.module('oppia').factory(
+  'ExplorationRecommendationsService',
   downgradeInjectable(ExplorationRecommendationsService));

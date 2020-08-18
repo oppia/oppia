@@ -85,7 +85,8 @@ describe('Search service', function() {
     function() {
       var urlComponent = '?q=test&category=("Architecture"%20OR%20' +
                          '"Mathematics")&language_code=("en"%20OR%20"ar")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
+        urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         ar: true,
@@ -101,7 +102,8 @@ describe('Search service', function() {
     function() {
       var urlComponent = '?q=test&category=("Mathematics")&' +
                          'language_code=("en"%20OR%20"ar")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
+        urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         ar: true,
@@ -117,7 +119,8 @@ describe('Search service', function() {
     function() {
       var urlComponent =
         '?q=test&category=("Mathematics")&language_code=("en")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
+        urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         en: true
@@ -131,7 +134,8 @@ describe('Search service', function() {
   it('should find no categories and one language if given in url search',
     function() {
       var urlComponent = '?q=test&language_code=("en")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
+        urlComponent,
         results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         en: true
@@ -143,7 +147,8 @@ describe('Search service', function() {
   it('should find as many keywords as provided in search query',
     function() {
       var urlComponent = '?q=protractor%20test&language_code=("en")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
+        urlComponent,
         results)).toBe('protractor test');
       expect(results.languageCodes.selections).toEqual({
         en: true
@@ -156,8 +161,10 @@ describe('Search service', function() {
     function() {
       var urlComponent = '?q=protractor%20test%26category=("Mathematics")' +
                          '%26language_code=("en"%20OR%20"ar")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
-        results)).toBe('protractor test&category=("Mathematics")' +
+      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
+        urlComponent,
+        results)).toBe(
+        'protractor test&category=("Mathematics")' +
                        '&language_code=("en" OR "ar")');
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({});
@@ -258,7 +265,8 @@ describe('Search service', function() {
       $(mockInput).val(searchQuery));
     jquerySpy.withArgs(mockInput).and.callThrough();
 
-    $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
+    $httpBackend.expect(
+      'GET', '/searchhandler/data?q=example&category=' +
       '("exploration")&language_code=("en" OR "hi")')
       .respond(200, {
         search_cursor: 'notempty',
@@ -294,7 +302,8 @@ describe('Search service', function() {
       $(mockInput).val('mismatch'));
     jquerySpy.withArgs(mockInput).and.callThrough();
 
-    $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
+    $httpBackend.expect(
+      'GET', '/searchhandler/data?q=example&category=' +
       '("exploration")&language_code=("en" OR "hi")')
       .respond({
         search_cursor: 'notempty',
@@ -324,7 +333,8 @@ describe('Search service', function() {
       hi: true
     };
 
-    $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
+    $httpBackend.expect(
+      'GET', '/searchhandler/data?q=example&category=' +
       '("exploration")&language_code=("en" OR "hi")')
       .respond(500, 'Error on getting query url');
     expect(SearchService.executeSearchQuery(
@@ -353,7 +363,8 @@ describe('Search service', function() {
     };
 
     // Set _last variables.
-    $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
+    $httpBackend.expect(
+      'GET', '/searchhandler/data?q=example&category=' +
       '("exploration")&language_code=("en" OR "hi")')
       .respond(200, {
         search_cursor: 'notempty',
@@ -366,7 +377,8 @@ describe('Search service', function() {
     var successHandler = jasmine.createSpy('sucess');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
+    $httpBackend.expect(
+      'GET', '/searchhandler/data?q=example&category=' +
       '("exploration")&language_code=("en" OR "hi")&cursor=notempty')
       .respond(200, response);
     SearchService.loadMoreData(successHandler, failHandler);
@@ -389,7 +401,8 @@ describe('Search service', function() {
       };
 
       // Set _last variables.
-      $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
+      $httpBackend.expect(
+        'GET', '/searchhandler/data?q=example&category=' +
         '("exploration")&language_code=("en" OR "hi")')
         .respond(200, {
           search_cursor: 'notempty',
@@ -422,7 +435,8 @@ describe('Search service', function() {
       };
 
       // Set _last variables.
-      $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
+      $httpBackend.expect(
+        'GET', '/searchhandler/data?q=example&category=' +
         '("exploration")&language_code=("en" OR "hi")')
         .respond(200, {
           search_cursor: 'notempty',
@@ -432,7 +446,8 @@ describe('Search service', function() {
         searchQuery, categories, languageCodes, successHandler);
       $httpBackend.flush();
 
-      $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
+      $httpBackend.expect(
+        'GET', '/searchhandler/data?q=example&category=' +
         '("exploration")&language_code=("en" OR "hi")&cursor=notempty')
         .respond(200, {
           search_cursor: null

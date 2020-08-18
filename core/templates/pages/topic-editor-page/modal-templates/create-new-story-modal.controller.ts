@@ -32,7 +32,8 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
   'ImageLocalStorageService', 'NewlyCreatedStoryObjectFactory',
   'StoryEditorStateService', 'MAX_CHARS_IN_STORY_TITLE',
   'MAX_CHARS_IN_STORY_URL_FRAGMENT',
-  function($controller, $rootScope, $scope, $uibModalInstance,
+  function(
+      $controller, $rootScope, $scope, $uibModalInstance,
       ImageLocalStorageService, NewlyCreatedStoryObjectFactory,
       StoryEditorStateService, MAX_CHARS_IN_STORY_TITLE,
       MAX_CHARS_IN_STORY_URL_FRAGMENT) {

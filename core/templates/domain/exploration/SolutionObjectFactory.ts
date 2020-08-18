@@ -87,7 +87,8 @@ export class Solution {
       correctAnswer = '[Graph]';
     } else if (interactionId === 'MathExpressionInput') {
       correctAnswer = (<MathExpressionAnswer> this.correctAnswer).latex;
-    } else if (interactionId === 'CodeRepl' ||
+    } else if (
+      interactionId === 'CodeRepl' ||
       interactionId === 'PencilCodeEditor') {
       correctAnswer = (<PencilCodeEditorAnswer> this.correctAnswer).code;
     } else if (interactionId === 'MusicNotesInput') {

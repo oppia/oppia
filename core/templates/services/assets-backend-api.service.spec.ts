@@ -531,7 +531,8 @@ describe('Assets Backend API Service', function() {
       expect(
         AssetsBackendApiService.getAudioDownloadUrl(
           ENTITY_TYPE.EXPLORATION, 'expid12345', 'a.mp3')
-      ).toEqual(gcsPrefix +
+      ).toEqual(
+        gcsPrefix +
         '/exploration/expid12345/assets/audio/a.mp3');
     });
 
@@ -546,7 +547,8 @@ describe('Assets Backend API Service', function() {
       expect(
         AssetsBackendApiService.getThumbnailUrlForPreview(
           ENTITY_TYPE.EXPLORATION, 'expid12345', 'thumbnail.png')
-      ).toEqual(gcsPrefix +
+      ).toEqual(
+        gcsPrefix +
         '/exploration/expid12345/assets/thumbnail/thumbnail.png');
     });
   });

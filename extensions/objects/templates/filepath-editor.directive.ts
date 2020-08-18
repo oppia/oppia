@@ -36,7 +36,8 @@ angular.module('oppia').directive('filepathEditor', [
   'CsrfTokenService', 'ImageLocalStorageService', 'ImagePreloaderService',
   'ImageUploadHelperService', 'UrlInterpolationService',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
-  function($sce, AlertsService, AssetsBackendApiService, ContextService,
+  function(
+      $sce, AlertsService, AssetsBackendApiService, ContextService,
       CsrfTokenService, ImageLocalStorageService, ImagePreloaderService,
       ImageUploadHelperService, UrlInterpolationService,
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
@@ -818,7 +819,8 @@ angular.module('oppia').directive('filepathEditor', [
           }
         };
 
-        ctrl.postImageToServer = function(dimensions, resampledFile,
+        ctrl.postImageToServer = function(
+            dimensions, resampledFile,
             imageType = 'png') {
           let form = new FormData();
           form.append('image', resampledFile);

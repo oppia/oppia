@@ -32,7 +32,8 @@ export class WindowDimensionsService {
   }
 
   getWidth(): number {
-    return (this.windowRef.nativeWindow.innerWidth ||
+    return (
+      this.windowRef.nativeWindow.innerWidth ||
         this.windowRef.nativeWindow.document.documentElement.clientWidth ||
         this.windowRef.nativeWindow.document.body.clientWidth);
   }

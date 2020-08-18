@@ -58,9 +58,11 @@ describe('LocalStorageService', () => {
     });
 
     it('should correctly save the draft', () => {
-      localStorageService.saveExplorationDraft(explorationIdOne,
+      localStorageService.saveExplorationDraft(
+        explorationIdOne,
         changeList, draftChangeListIdOne);
-      localStorageService.saveExplorationDraft(explorationIdTwo,
+      localStorageService.saveExplorationDraft(
+        explorationIdTwo,
         changeList, draftChangeListIdTwo);
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOne);
@@ -69,7 +71,8 @@ describe('LocalStorageService', () => {
     });
 
     it('should correctly change and save a draft', () => {
-      localStorageService.saveExplorationDraft(explorationIdOne,
+      localStorageService.saveExplorationDraft(
+        explorationIdOne,
         changeList, draftChangeListIdOne);
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOne);
@@ -80,14 +83,16 @@ describe('LocalStorageService', () => {
           draftChanges: changeList,
           draftChangeListId: draftChangeListIdOneChanged
         });
-      localStorageService.saveExplorationDraft(explorationIdOne,
+      localStorageService.saveExplorationDraft(
+        explorationIdOne,
         changeList, draftChangeListIdOneChanged);
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOneChanged);
     });
 
     it('should correctly remove the draft', () => {
-      localStorageService.saveExplorationDraft(explorationIdTwo,
+      localStorageService.saveExplorationDraft(
+        explorationIdTwo,
         changeList, draftChangeListIdTwo);
       localStorageService.removeExplorationDraft(explorationIdTwo);
       expect(localStorageService.getExplorationDraft(

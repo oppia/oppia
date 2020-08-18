@@ -18,7 +18,8 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/' +
+require(
+  'pages/exploration-editor-page/services/' +
   'exploration-property.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');

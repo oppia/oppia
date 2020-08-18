@@ -273,7 +273,8 @@ describe('DragAndDropSortInputValidationService', () => {
     answerGroups[0].updateRuleTypesToInputs(
       [equalsListWithValuesRule, equalsListWithAllowedValuesRule]);
 
-    var warnings = validatorService.getAllWarnings(currentState,
+    var warnings = validatorService.getAllWarnings(
+      currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
@@ -288,7 +289,8 @@ describe('DragAndDropSortInputValidationService', () => {
     answerGroups[1].updateRuleTypesToInputs(
       [equalsListWithAllowedValuesRule]);
 
-    var warnings = validatorService.getAllWarnings(currentState,
+    var warnings = validatorService.getAllWarnings(
+      currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,

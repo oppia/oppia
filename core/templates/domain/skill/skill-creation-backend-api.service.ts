@@ -97,15 +97,18 @@ export class SkillCreationBackendApiService {
       });
   }
 
-  createSkill(description: string, rubrics: RubricBackendDict,
+  createSkill(
+      description: string, rubrics: RubricBackendDict,
       explanation: string, linkedTopicIds: string[], imagesData: ImageData[]
   ): Promise<SkillCreationBackendResponse> {
     return new Promise((resolve, reject) => {
-      this._createSkill(resolve, reject,
+      this._createSkill(
+        resolve, reject,
         description, rubrics, explanation, linkedTopicIds, imagesData);
     });
   }
 }
 
-angular.module('oppia').factory('SkillCreationBackendApiService',
+angular.module('oppia').factory(
+  'SkillCreationBackendApiService',
   downgradeInjectable(SkillCreationBackendApiService));

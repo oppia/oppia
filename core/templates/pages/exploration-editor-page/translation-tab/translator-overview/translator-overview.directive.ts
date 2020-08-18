@@ -17,7 +17,8 @@
  * translation language.
  */
 
-require('components/state-editor/state-editor-properties-services/' +
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -108,7 +109,8 @@ angular.module('oppia').directive('translatorOverview', [
             $scope.numberOfAudioNotAvailable = TranslationStatusService
               .getExplorationContentNotAvailableCount();
             var progressPercent = (
-              100 - ($scope.numberOfAudioNotAvailable /
+              100 - (
+                $scope.numberOfAudioNotAvailable /
                 $scope.numberOfRequiredAudio) * 100);
             return {width: progressPercent + '%', height: '100%'};
           };

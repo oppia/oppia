@@ -88,5 +88,6 @@ angular.module('oppia').constant(
   'STATS_REPORTING_URLS',
   ExplorationPlayerConstants.STATS_REPORTING_URLS);
 
-angular.module('oppia').constant('FEEDBACK_POPOVER_PATH',
+angular.module('oppia').constant(
+  'FEEDBACK_POPOVER_PATH',
   ExplorationPlayerConstants.FEEDBACK_POPOVER_PATH);

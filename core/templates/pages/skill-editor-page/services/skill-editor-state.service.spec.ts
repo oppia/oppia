@@ -320,7 +320,8 @@ describe('Skill editor state service', function() {
 
   it('should be able to save the collection and pending changes',
     function() {
-      spyOn(fakeSkillBackendApiService,
+      spyOn(
+        fakeSkillBackendApiService,
         'updateSkill').and.callThrough();
 
       SkillEditorStateService.loadSkill('skill_id_1');

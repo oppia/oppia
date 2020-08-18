@@ -32,7 +32,8 @@ import {
   providedIn: 'root'
 })
 export class GraphInputRulesService {
-  constructor(private gus: GraphUtilsService,
+  constructor(
+private gus: GraphUtilsService,
     private utilsService: UtilsService) {}
   /**
    * @param {object} graph - A graph object.

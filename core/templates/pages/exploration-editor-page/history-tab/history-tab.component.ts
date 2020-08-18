@@ -177,7 +177,8 @@ angular.module('oppia').component('historyTab', {
         ctrl.compareVersionMetadata.laterVersion =
           ctrl.explorationVersionMetadata[laterComparedVersion];
 
-        CompareVersionsService.getDiffGraphData(earlierComparedVersion,
+        CompareVersionsService.getDiffGraphData(
+          earlierComparedVersion,
           laterComparedVersion).then(
           function(response) {
             $log.info('Retrieved version comparison data');

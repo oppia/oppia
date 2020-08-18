@@ -62,7 +62,8 @@ angular.module('oppia').directive('workedExampleEditor', [
             var contentHasChanged = ((
               $scope.workedExampleQuestionMemento !==
               $scope.container.workedExampleQuestionHtml) ||
-              ($scope.workedExampleExplanationMemento !==
+              (
+                $scope.workedExampleExplanationMemento !==
               $scope.container.workedExampleExplanationHtml)
             );
             $scope.workedExampleQuestionMemento = null;

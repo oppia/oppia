@@ -121,8 +121,9 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
               guppyInstance.render(true);
 
               // Get content of the text input field as an array of characters.
-              var textContent = (<HTMLInputElement>document
-                .querySelector('#fakeInputForMathExpression')).value
+              var textContent = (
+<HTMLInputElement>document
+  .querySelector('#fakeInputForMathExpression')).value
                 .toLowerCase().split('');
 
               // Replay key combination for each character on the document.

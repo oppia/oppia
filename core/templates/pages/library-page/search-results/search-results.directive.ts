@@ -36,7 +36,8 @@ angular.module('oppia').directive('searchResults', [
       controller: [
         '$scope', '$q', '$timeout', '$window', 'LoaderService',
         'SiteAnalyticsService', 'UserService',
-        function($scope, $q, $timeout, $window, LoaderService,
+        function(
+            $scope, $q, $timeout, $window, LoaderService,
             SiteAnalyticsService, UserService) {
           var ctrl = this;
 

@@ -357,7 +357,8 @@ angular.module('oppia').directive('stateGraphVisualization', [
                 currentNodeIsTerminal ? 'terminal-node' :
                 nodeId === $scope.currentStateId() ? 'current-node' :
                 nodeId === initStateId ? 'init-node' :
-                !(nodeData[nodeId].reachable &&
+                !(
+nodeData[nodeId].reachable &&
                   nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
                 'normal-node');
 

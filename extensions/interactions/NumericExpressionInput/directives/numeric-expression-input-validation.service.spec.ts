@@ -99,7 +99,8 @@ describe('NumericExpressionInputValidationService', () => {
     answerGroups[0].updateRuleTypesToInputs(
       [isEquivalentTo, matchesExactlyWith]);
 
-    warnings = validatorService.getAllWarnings(currentState,
+    warnings = validatorService.getAllWarnings(
+      currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
@@ -124,7 +125,8 @@ describe('NumericExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].updateRuleTypesToInputs([isEquivalentTo1, isEquivalentTo2]);
 
-    warnings = validatorService.getAllWarnings(currentState,
+    warnings = validatorService.getAllWarnings(
+      currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
@@ -150,7 +152,8 @@ describe('NumericExpressionInputValidationService', () => {
     answerGroups[0].updateRuleTypesToInputs(
       [matchesExactlyWith1, matchesExactlyWith2]);
 
-    warnings = validatorService.getAllWarnings(currentState,
+    warnings = validatorService.getAllWarnings(
+      currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
@@ -176,7 +179,8 @@ describe('NumericExpressionInputValidationService', () => {
     answerGroups[0].updateRuleTypesToInputs(
       [isEquivalentTo, matchesExactlyWith]);
 
-    warnings = validatorService.getAllWarnings(currentState,
+    warnings = validatorService.getAllWarnings(
+      currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });

@@ -316,7 +316,8 @@ angular.module('oppia').directive('libraryPage', [
                               ctrl.activitiesOwned.collections[
                                 activitySummaryDict.id] = false;
                             } else {
-                              $log.error('INVALID ACTIVITY TYPE: Activity' +
+                              $log.error(
+                                'INVALID ACTIVITY TYPE: Activity' +
                               '(id: ' + activitySummaryDict.id +
                               ', name: ' + activitySummaryDict.title +
                               ', type: ' + activitySummaryDict.activity_type +

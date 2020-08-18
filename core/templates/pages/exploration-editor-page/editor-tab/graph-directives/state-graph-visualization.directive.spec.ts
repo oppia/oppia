@@ -47,7 +47,8 @@ import { StateWrittenTranslationsService } from
 import * as d3 from 'd3';
 import { of } from 'rxjs';
 
-require('pages/exploration-editor-page/editor-tab/graph-directives/' +
+require(
+  'pages/exploration-editor-page/editor-tab/graph-directives/' +
   'state-graph-visualization.directive.ts');
 
 describe('State Graph Visualization directive', function() {
@@ -108,12 +109,15 @@ describe('State Graph Visualization directive', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
-    $provide.value('StateInteractionIdService',
+    $provide.value(
+      'StateInteractionIdService',
       TestBed.get(StateInteractionIdService));
-    $provide.value('StateRecordedVoiceoversService',
+    $provide.value(
+      'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value('StateWrittenTranslationsService',
+    $provide.value(
+      'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
     $provide.value('WindowDimensionsService', {
       getResizeEvent: function() {

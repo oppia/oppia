@@ -31,7 +31,7 @@ module.exports = {
       category: 'Stylistic Issues',
       recommended: false
     },
-    fixable: "whitespace",
+    fixable: 'whitespace',
     schema: ['always'],
     messages: {
       expectedAfter: 'Expected newline after \'(\'.'

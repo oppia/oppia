@@ -225,7 +225,8 @@ export class Exploration {
   providedIn: 'root'
 })
 export class ExplorationObjectFactory {
-  constructor(private logger: LoggerService,
+  constructor(
+private logger: LoggerService,
               private paramChangesObjectFactory: ParamChangesObjectFactory,
               private paramSpecsObjectFactory: ParamSpecsObjectFactory,
               private statesObjectFactory: StatesObjectFactory,

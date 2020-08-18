@@ -77,7 +77,8 @@ describe('Exploration Html Formatter Service', () => {
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +
       'choices="[&amp;quot;sampleChoice' +
       '&amp;quot;]"></oppia-response-sample-id>';
-    expect(ehfs.getAnswerHtml(answer, interactionId,
+    expect(ehfs.getAnswerHtml(
+      answer, interactionId,
       interactionCustomizationArgs)
     ).toBe(expectedHtmlTag);
   });
@@ -94,7 +95,8 @@ describe('Exploration Html Formatter Service', () => {
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +
       'choices="[&amp;quot;sampleChoice' +
       '&amp;quot;]"></oppia-short-response-sample-id>';
-    expect(ehfs.getShortAnswerHtml(answer, interactionId,
+    expect(ehfs.getShortAnswerHtml(
+      answer, interactionId,
       interactionCustomizationArgs)
     ).toBe(expectedHtmlTag);
   });

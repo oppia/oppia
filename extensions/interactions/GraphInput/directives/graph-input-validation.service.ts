@@ -99,7 +99,8 @@ export class GraphInputValidationService {
         try {
           if (rule.type === 'HasGraphProperty') {
             continue;
-          } else if (rule.type === 'IsIsomorphicTo' &&
+          } else if (
+            rule.type === 'IsIsomorphicTo' &&
               gInputs.vertices.length > ISOMORPHISM_VERTICES_LIMIT) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,

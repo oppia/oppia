@@ -40,7 +40,8 @@ export class SiteAnalyticsService {
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
     if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
-      this.windowRef.nativeWindow.ga('send', 'event',
+      this.windowRef.nativeWindow.ga(
+        'send', 'event',
         eventCategory, eventAction, eventLabel);
     }
   }
@@ -51,7 +52,8 @@ export class SiteAnalyticsService {
   __sendSocialEventToGoogleAnalytics(
       network: string, action: string, targetUrl: string): void {
     if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
-      this.windowRef.nativeWindow.ga('send', 'social',
+      this.windowRef.nativeWindow.ga(
+        'send', 'social',
         network, action, targetUrl);
     }
   }
@@ -198,7 +200,8 @@ export class SiteAnalyticsService {
   }
   registerNewCard(cardNum: number): void {
     if (cardNum <= 10 || cardNum % 10 === 0) {
-      this._sendEventToGoogleAnalytics('PlayerNewCard', 'click',
+      this._sendEventToGoogleAnalytics(
+        'PlayerNewCard', 'click',
         cardNum.toString());
     }
   }

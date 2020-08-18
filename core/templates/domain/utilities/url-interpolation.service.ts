@@ -38,7 +38,8 @@ export interface InterpolationValuesType {
   providedIn: 'root'
 })
 export class UrlInterpolationService {
-  constructor(private alertsService: AlertsService,
+  constructor(
+private alertsService: AlertsService,
               private urlService: UrlService,
               private utilsService: UtilsService) {}
 
@@ -163,7 +164,8 @@ export class UrlInterpolationService {
     while (match) {
       let currentVarName = match[1];
       if (!escapedInterpolationValues.hasOwnProperty(currentVarName)) {
-        this.alertsService.fatalWarning('Expected variable \'' +
+        this.alertsService.fatalWarning(
+          'Expected variable \'' +
             currentVarName + '\' when interpolating URL.');
         return null;
       }
@@ -220,7 +222,8 @@ export class UrlInterpolationService {
       this.alertsService.fatalWarning(
         'Empty interactionId passed in getInteractionThumbnailImageUrl.');
     }
-    return this.getExtensionResourceUrl('/interactions/' + interactionId +
+    return this.getExtensionResourceUrl(
+      '/interactions/' + interactionId +
         '/static/' + interactionId + '.png');
   }
 

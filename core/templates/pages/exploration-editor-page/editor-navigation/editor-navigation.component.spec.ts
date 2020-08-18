@@ -96,7 +96,8 @@ describe('Editor Navigation Component', function() {
 
       isImprovementsTabEnabledAsyncSpy.and.returnValue(false);
 
-      spyOnProperty(stateTutorialFirstTimeService,
+      spyOnProperty(
+        stateTutorialFirstTimeService,
         'onOpenPostTutorialHelpPopover').and.returnValue(
         mockOpenPostTutorialHelpPopover);
       $scope = $rootScope.$new();
@@ -285,7 +286,8 @@ describe('Editor Navigation Component', function() {
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
 
-      spyOnProperty(stateTutorialFirstTimeService,
+      spyOnProperty(
+        stateTutorialFirstTimeService,
         'onOpenPostTutorialHelpPopover').and.returnValue(
         mockOpenPostTutorialHelpPopover);
 

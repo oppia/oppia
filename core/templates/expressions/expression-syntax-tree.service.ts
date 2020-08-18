@@ -68,7 +68,8 @@ export class ExprWrongArgTypeError extends ExpressionError {
       public arg: number|string,
       public actualType: string, public expectedType: string) {
     super(
-      (arg !== null ?
+      (
+arg !== null ?
         (arg + ' has type ' + actualType + ' which') : ('Type ' + actualType)) +
       ' does not match expected type ' + expectedType);
   }

@@ -69,7 +69,8 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
             if (ctrl.NumberWithUnitsForm === undefined) {
               return true;
             }
-            return (!ctrl.NumberWithUnitsForm.$invalid &&
+            return (
+              !ctrl.NumberWithUnitsForm.$invalid &&
               ctrl.answer !== '');
           };
 

@@ -300,8 +300,9 @@ angular.module('oppia').directive('stateTranslation', [
                 activeContentId = (
                   $scope.stateDefaultOutcome.feedback.getContentId());
               } else {
-                activeContentId = ($scope.stateAnswerGroups[newIndex]
-                  .outcome.feedback.getContentId());
+                activeContentId = (
+                  $scope.stateAnswerGroups[newIndex]
+                    .outcome.feedback.getContentId());
               }
               TranslationTabActiveContentIdService.setActiveContentId(
                 activeContentId);

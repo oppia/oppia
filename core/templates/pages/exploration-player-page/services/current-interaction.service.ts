@@ -103,7 +103,8 @@ export class CurrentInteractionService {
     if (CurrentInteractionService.submitAnswerFn === null) {
       let index = this.playerPositionService.getDisplayedCardIndex();
       let displayedCard = this.playerTranscriptService.getCard(index);
-      let additionalInfo = ('\nUndefined submit answer debug logs:' +
+      let additionalInfo = (
+        '\nUndefined submit answer debug logs:' +
         '\nInteraction ID: ' + displayedCard.getInteractionId() +
         '\nExploration ID: ' + this.contextService.getExplorationId() +
         '\nState Name: ' + displayedCard.getStateName() +
@@ -137,5 +138,6 @@ export class CurrentInteractionService {
     return !CurrentInteractionService.validityCheckFn();
   }
 }
-angular.module('oppia').factory('CurrentInteractionService',
+angular.module('oppia').factory(
+  'CurrentInteractionService',
   downgradeInjectable(CurrentInteractionService));

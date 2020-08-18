@@ -88,7 +88,8 @@ describe('Topic editor tab directive', function() {
       getEntityId: () => 'dkfn32sxssasd'
     };
     var MockImageUploadHelperService = {
-      getTrustedResourceUrlForThumbnailFilename: (filename,
+      getTrustedResourceUrlForThumbnailFilename: (
+          filename,
           entityType,
           entityId) => (entityType + '/' + entityId + '/' + filename)
     };
@@ -146,7 +147,8 @@ describe('Topic editor tab directive', function() {
     topic.setUrlFragment('topic-url-fragment');
     TopicEditorStateService.setTopic(topic);
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOnProperty(TopicEditorStateService,
+    spyOnProperty(
+      TopicEditorStateService,
       'onStorySummariesInitialized').and.returnValue(
       mockStorySummariesInitializedEventEmitter);
     ctrl.$onInit();

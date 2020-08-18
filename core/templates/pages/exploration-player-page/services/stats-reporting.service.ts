@@ -425,5 +425,6 @@ export class StatsReportingService {
       StatsReportingService.stateStopwatch.getTimeInSecs());
   }
 }
-angular.module('oppia').factory('StatsReportingService',
+angular.module('oppia').factory(
+  'StatsReportingService',
   downgradeInjectable(StatsReportingService));

@@ -230,7 +230,8 @@ describe('Question backend Api service', () => {
         ['1'], 'abc', true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
+      expect(failHandler).toHaveBeenCalledWith(
+        'Question count has to be a ' +
         'positive integer');
     })
   );
@@ -243,7 +244,8 @@ describe('Question backend Api service', () => {
         ['1'], -1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
+      expect(failHandler).toHaveBeenCalledWith(
+        'Question count has to be a ' +
         'positive integer');
     })
   );
@@ -256,7 +258,8 @@ describe('Question backend Api service', () => {
         ['1'], 1.5, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
+      expect(failHandler).toHaveBeenCalledWith(
+        'Question count has to be a ' +
         'positive integer');
     })
   );
@@ -269,7 +272,8 @@ describe('Question backend Api service', () => {
         'x', 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      expect(failHandler).toHaveBeenCalledWith(
+        'Skill ids should be a list of' +
       ' strings');
     })
   );
@@ -282,7 +286,8 @@ describe('Question backend Api service', () => {
         [1, 2], 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      expect(failHandler).toHaveBeenCalledWith(
+        'Skill ids should be a list of' +
       ' strings');
     })
   );
@@ -295,7 +300,8 @@ describe('Question backend Api service', () => {
         null, 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      expect(failHandler).toHaveBeenCalledWith(
+        'Skill ids should be a list of' +
       ' strings');
     })
   );
@@ -308,7 +314,8 @@ describe('Question backend Api service', () => {
         ['1'], null, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
+      expect(failHandler).toHaveBeenCalledWith(
+        'Question count has to be a ' +
         'positive integer');
     })
   );
@@ -388,7 +395,8 @@ describe('Question backend Api service', () => {
         'x', 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      expect(failHandler).toHaveBeenCalledWith(
+        'Skill ids should be a list of' +
       ' strings');
     })
   );
@@ -401,7 +409,8 @@ describe('Question backend Api service', () => {
         [1, 2], 2, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      expect(failHandler).toHaveBeenCalledWith(
+        'Skill ids should be a list of' +
       ' strings');
     })
   );
@@ -414,7 +423,8 @@ describe('Question backend Api service', () => {
         null, 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      expect(failHandler).toHaveBeenCalledWith(
+        'Skill ids should be a list of' +
       ' strings');
     })
   );

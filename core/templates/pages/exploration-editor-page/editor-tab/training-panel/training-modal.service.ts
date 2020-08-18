@@ -43,7 +43,8 @@ require(
   'state-property.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
-require('pages/exploration-editor-page/editor-tab/training-panel/' +
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-modal.controller');
 
 angular.module('oppia').factory('TrainingModalService', [

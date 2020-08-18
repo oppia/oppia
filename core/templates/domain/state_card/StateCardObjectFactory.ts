@@ -221,7 +221,8 @@ export class StateCard {
   providedIn: 'root'
 })
 export class StateCardObjectFactory {
-  constructor(private audioTranslationLanguageService:
+  constructor(
+private audioTranslationLanguageService:
                   AudioTranslationLanguageService) {}
 
   /**

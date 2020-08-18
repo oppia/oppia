@@ -228,7 +228,8 @@ describe('Collection rights backend API service', function() {
         // Cache a collection.
         let sampleCollectionRights =
           collectionRightsObjectFactory.create(sampleDataResults);
-        collectionRightsBackendApiService.cacheCollectionRights('0',
+        collectionRightsBackendApiService.cacheCollectionRights(
+          '0',
           sampleCollectionRights);
 
         // It should now be cached.

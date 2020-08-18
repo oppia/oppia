@@ -146,10 +146,12 @@ describe('Story editor page', function() {
       storyInitializedEventEmitter.emit();
       storyReinitializedEventEmitter.emit();
     });
-    spyOnProperty(StoryEditorStateService,
+    spyOnProperty(
+      StoryEditorStateService,
       'onStoryInitialized').and.returnValue(
       storyInitializedEventEmitter);
-    spyOnProperty(StoryEditorStateService,
+    spyOnProperty(
+      StoryEditorStateService,
       'onStoryReinitialized').and.returnValue(
       storyReinitializedEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
@@ -222,10 +224,12 @@ describe('Story editor page', function() {
       storyInitializedEventEmitter.emit();
       storyReinitializedEventEmitter.emit();
     });
-    spyOnProperty(StoryEditorStateService,
+    spyOnProperty(
+      StoryEditorStateService,
       'onStoryInitialized').and.returnValue(
       storyInitializedEventEmitter);
-    spyOnProperty(StoryEditorStateService,
+    spyOnProperty(
+      StoryEditorStateService,
       'onStoryReinitialized').and.returnValue(
       storyReinitializedEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');

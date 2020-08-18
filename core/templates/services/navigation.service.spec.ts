@@ -111,7 +111,8 @@ describe('Navigation Service', () => {
     };
 
     expect(function() {
-      NavigationService.onMenuKeypress(mockEvent, 'New menu',
+      NavigationService.onMenuKeypress(
+        mockEvent, 'New menu',
         eventsTobeHandled);
     }).toThrowError('Invalid action type.');
   });

@@ -63,10 +63,12 @@ describe('Topic editor page', function() {
       topicInitializedEventEmitter.emit();
       topicReinitializedEventEmitter.emit();
     });
-    spyOnProperty(TopicEditorStateService,
+    spyOnProperty(
+      TopicEditorStateService,
       'onTopicInitialized').and.returnValue(
       topicInitializedEventEmitter);
-    spyOnProperty(TopicEditorStateService,
+    spyOnProperty(
+      TopicEditorStateService,
       'onTopicReinitialized').and.returnValue(
       topicReinitializedEventEmitter);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');

@@ -131,7 +131,8 @@ export class SchemaDefaultValueService {
       });
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_BOOL) {
       return false;
-    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_UNICODE ||
+    } else if (
+      schema.type === SchemaConstants.SCHEMA_TYPE_UNICODE ||
         schema.type === SchemaConstants.SCHEMA_TYPE_HTML) {
       return '';
     } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
@@ -149,7 +150,8 @@ export class SchemaDefaultValueService {
           schema.properties[i].schema);
       }
       return result;
-    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_INT ||
+    } else if (
+      schema.type === SchemaConstants.SCHEMA_TYPE_INT ||
         schema.type === SchemaConstants.SCHEMA_TYPE_FLOAT) {
       return 0;
     } else {

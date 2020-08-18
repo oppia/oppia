@@ -33,7 +33,8 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
       controller: [
         '$scope', 'LoaderService', 'SearchService',
         'WindowDimensionsService',
-        function($scope, LoaderService, SearchService,
+        function(
+            $scope, LoaderService, SearchService,
             WindowDimensionsService) {
           var ctrl = this;
           ctrl.loadingMessage = '';
@@ -54,8 +55,9 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
             }
           };
           ctrl.$onInit = function() {
-            ctrl.subscriptions.push(LoaderService.onLoadingMessageChange
-              .subscribe((message: string) => this.loadingMessage = message));
+            ctrl.subscriptions.push(
+              LoaderService.onLoadingMessageChange
+                .subscribe((message: string) => this.loadingMessage = message));
             // Called when the first batch of search results is retrieved from
             // the server.
             $scope.$on(

@@ -24,7 +24,8 @@ import { UtilsService } from 'services/utils.service';
 
 @Pipe({name: 'wrapTextWithEllipsis'})
 export class WrapTextWithEllipsisPipe implements PipeTransform {
-  constructor(private utilsService: UtilsService,
+  constructor(
+private utilsService: UtilsService,
               private normalizeWhitespacePipe: NormalizeWhitespacePipe) {}
   transform(input: string, characterCount: number): string {
     if (this.utilsService.isString(input)) {

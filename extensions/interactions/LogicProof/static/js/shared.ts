@@ -181,14 +181,16 @@ var logicProofShared = (function() {
     } else if (expression.top_kind_name === 'bounded_quantifier') {
       output = symbol + processedArguments[0] + '.' + processedArguments[1];
       return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
-    } else if (expression.top_kind_name === 'prefix_relation' ||
+    } else if (
+      expression.top_kind_name === 'prefix_relation' ||
         expression.top_kind_name === 'prefix_function') {
       return symbol + '(' + processedArguments.join(',') + ')';
     } else if (expression.top_kind_name === 'ranged_function') {
       return (
         symbol + '{' + processedArguments[0] + ' | ' + processedArguments[1] +
         '}');
-    } else if (expression.top_kind_name === 'atom' ||
+    } else if (
+      expression.top_kind_name === 'atom' ||
       expression.top_kind_name === 'constant' ||
       expression.top_kind_name === 'variable') {
       return symbol;

@@ -78,9 +78,11 @@ describe('NumericExpressionInputInteractive', function() {
     guppyInitializationService = new GuppyInitializationService();
     deviceInfoService = new DeviceInfoService(new WindowRef());
 
-    $provide.value('CurrentInteractionService',
+    $provide.value(
+      'CurrentInteractionService',
       mockCurrentInteractionService);
-    $provide.value('NumericExpressionInputRulesService',
+    $provide.value(
+      'NumericExpressionInputRulesService',
       mockNumericExpressionInputRulesService);
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);

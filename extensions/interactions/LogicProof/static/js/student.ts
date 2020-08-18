@@ -581,7 +581,8 @@ var logicProofStudent = (function() {
         matchings[template.top_operator_name] = expression;
         return matchings;
       }
-    } else if (expression.top_operator_name !== template.top_operator_name ||
+    } else if (
+      expression.top_operator_name !== template.top_operator_name ||
           expression.top_kind_name !== template.top_kind_name ||
           expression.arguments.length !== template.arguments.length ||
           expression.dummies.length !== template.dummies.length) {
@@ -855,7 +856,8 @@ var logicProofStudent = (function() {
    *           message: a string describing the problem
    *         }
    */
-  var requireIdentifiableLine = function(lineString, lineTemplates, language,
+  var requireIdentifiableLine = function(
+      lineString, lineTemplates, language,
       vocabulary, generalMessages) {
     try {
       var protoLines = logicProofShared.parseLineString(
@@ -908,7 +910,8 @@ var logicProofStudent = (function() {
     for (var i = 0; i < lineStrings.length; i++) {
       if (lineStrings[i].split(' ').join('').length !== 0) {
         try {
-          requireIdentifiableLine(lineStrings[i],
+          requireIdentifiableLine(
+            lineStrings[i],
             questionInstance.line_templates, questionInstance.language,
             questionInstance.vocabulary, questionInstance.general_messages);
         } catch (err) {

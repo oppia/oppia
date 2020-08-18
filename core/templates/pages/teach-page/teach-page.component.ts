@@ -75,5 +75,6 @@ export class TeachPageComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('teachPage',
+angular.module('oppia').directive(
+  'teachPage',
   downgradeComponent({component: TeachPageComponent}));

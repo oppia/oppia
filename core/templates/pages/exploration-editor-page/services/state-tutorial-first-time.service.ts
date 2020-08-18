@@ -49,7 +49,8 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
           EditorFirstTimeEventsService.initRegisterEvents(expId);
           $http.post(STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId).then(
             null, function() {
-              console.error('Warning: could not record editor tutorial ' +
+              console.error(
+                'Warning: could not record editor tutorial ' +
               'start event.');
             });
         }

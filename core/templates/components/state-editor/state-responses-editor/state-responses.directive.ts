@@ -201,7 +201,8 @@ angular.module('oppia').directive('stateResponses', [
                       if (rule.type === 'Equals' ||
                           rule.type === 'ContainsAtLeastOneOf') {
                         handledAnswersArray[choiceIndex] = true;
-                      } else if (rule.type ===
+                      } else if (
+                        rule.type ===
                         'DoesNotContainAtLeastOneOf') {
                         for (var i = 0; i < handledAnswersArray.length; i++) {
                           if (i !== choiceIndex) {
@@ -567,7 +568,8 @@ angular.module('oppia').directive('stateResponses', [
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 (newInteractionId) => {
                   $rootScope.$broadcast('externalSave');
-                  ResponsesService.onInteractionIdChanged(newInteractionId,
+                  ResponsesService.onInteractionIdChanged(
+                    newInteractionId,
                     function(newAnswerGroups, newDefaultOutcome) {
                       $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
                       $scope.onSaveInteractionAnswerGroups(newAnswerGroups);

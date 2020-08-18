@@ -37,7 +37,8 @@ import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
   providedIn: 'root'
 })
 export class ExtensionTagAssemblerService {
-  constructor(private htmlEscaperService: HtmlEscaperService,
+  constructor(
+private htmlEscaperService: HtmlEscaperService,
               private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
   _convertCustomizationArgsToBackendDict(
       customizationArgs: InteractionCustomizationArgs
@@ -55,8 +56,9 @@ export class ExtensionTagAssemblerService {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         result = value.toBackendDict();
       } else if (value instanceof Array) {
-        result = value.map(element =>
-          traverseSchemaAndConvertSubtitledToDicts(element));
+        result = value.map(
+          element =>
+            traverseSchemaAndConvertSubtitledToDicts(element));
       } else if (value instanceof Object) {
         result = {};
         Object.keys(value).forEach(key => {
