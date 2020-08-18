@@ -46,37 +46,20 @@ export class PlatformFeatureBackendApiService {
    * @param {ClientContext} context - The client side context for feature flag
    * evlauation.
    *
-   * @returns {Promise>FeatureStatusSummary} - A promise that resolves to
+   * @returns {Promise<FeatureStatusSummary>} - A promise that resolves to
    * the feature status summary.
    */
   async fetchFeatureFlags(context: ClientContext):
       Promise<FeatureStatusSummary> {
-    // Manual construct of FormData is needed here since this service is used
-    // before the installation of RequestInterceptor.
-    const body = new FormData();
-    body.append('payload', JSON.stringify(context.toBackendDict()));
-    body.append('csrf_token', await this.getCsrfTokenAsync());
-    body.append('source', document.URL);
-
-    const backendDict = await this.http.post<FeatureStatusSummaryBackendDict>(
-      PlatformFeatureDomainConstants.PLATFORM_FEATURE_HANDLER_URL, body
+    const backendDict = await this.http.get<FeatureStatusSummaryBackendDict>(
+      PlatformFeatureDomainConstants.PLATFORM_FEATURE_HANDLER_URL,
+      {
+        params: {...context.toBackendDict()}
+      }
     ).toPromise();
 
     return this.featureStatusSummaryObjectFactory.createFromBackendDict(
       backendDict);
-  }
-
-  /**
-   * Request for csrf token. CsrfTokenService is not used in this service
-   * because this service is used prior to the initialization of
-   * CsrfTokenService.
-   *
-   * @returns {Promise<string>} - A promise that resolves to the csrf token.
-   */
-  async getCsrfTokenAsync(): Promise<string> {
-    const { token } = await this.http.get<{token: string}>(
-      '/csrfhandler').toPromise();
-    return token;
   }
 }
 

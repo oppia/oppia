@@ -253,7 +253,7 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'update_feature_flag_rules':
                 feature_name = self.payload.get('feature_name')
                 new_rule_dicts = self.payload.get('new_rules')
-                commit_message = self.payload.get('message')
+                commit_message = self.payload.get('commit_message')
                 try:
                     platform_feature_services.update_feature_flag_rules(
                         feature_name, self.user_id, commit_message,

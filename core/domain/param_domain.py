@@ -44,7 +44,6 @@ class ParamSpec(python_utils.OBJECT):
         """
         self.obj_type = obj_type
 
-
     def to_dict(self):
         """Returns a dict representation of this ParamSpec.
 
@@ -55,7 +54,6 @@ class ParamSpec(python_utils.OBJECT):
         return {
             'obj_type': self.obj_type,
         }
-
 
     @classmethod
     def from_dict(cls, param_spec_dict):
@@ -71,7 +69,6 @@ class ParamSpec(python_utils.OBJECT):
             object type.
         """
         return cls(param_spec_dict['obj_type'])
-
 
     def validate(self):
         """Validate the existence of the object class."""

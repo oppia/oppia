@@ -709,7 +709,69 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_update_feature_flag_rules(self):
+    def test_get_handler_includes_all_feature_flags(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        feature = platform_parameter_registry.Registry.create_feature_flag(
+            'test_feature_1', 'feature for test.', 'dev')
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            set([feature.name]))
+        with feature_list_ctx, feature_set_ctx:
+            response_dict = self.get_json('/adminhandler')
+            self.assertEqual(
+                response_dict['feature_flags'], [feature.to_dict()])
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            feature.name)
+        self.logout()
+
+    def test_post_with_flag_changes_updates_feature_flags(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        feature = platform_parameter_registry.Registry.create_feature_flag(
+            'test_feature_1', 'feature for test.', 'dev')
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            set([feature.name]))
+        with feature_list_ctx, feature_set_ctx:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': feature.name,
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update feature',
+                }, csrf_token=csrf_token)
+
+            rule_dicts = [
+                rule.to_dict() for rule
+                in platform_parameter_registry.Registry.get_platform_parameter(
+                    feature.name).rules
+            ]
+            self.assertEqual(rule_dicts, new_rule_dicts)
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            feature.name)
+        self.logout()
+
+    def test_post_flag_changes_correctly_updates_flags_returned_by_getter(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -742,7 +804,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     'action': 'update_feature_flag_rules',
                     'feature_name': feature.name,
                     'new_rules': new_rule_dicts,
-                    'message': 'test update feature',
+                    'commit_message': 'test update feature',
                 }, csrf_token=csrf_token)
 
             response_dict = self.get_json('/adminhandler')
@@ -782,7 +844,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     'action': 'update_feature_flag_rules',
                     'feature_name': feature.name,
                     'new_rules': new_rule_dicts,
-                    'message': 'test update feature',
+                    'commit_message': 'test update feature',
                 },
                 csrf_token=csrf_token,
                 expected_status_int=400

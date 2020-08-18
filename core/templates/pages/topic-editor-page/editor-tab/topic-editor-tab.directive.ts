@@ -49,6 +49,9 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('services/page-title.service.ts');
 require('domain/question/question-backend-api.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -68,19 +71,19 @@ angular.module('oppia').directive('topicEditorTab', [
         'CsrfTokenService', 'EntityCreationService', 'ImageUploadHelperService',
         'PageTitleService', 'SkillCreationService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
         'WindowDimensionsService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
-        'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
-        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        'MAX_CHARS_IN_TOPIC_NAME',
         function(
             $rootScope, $scope, $uibModal, AlertsService, ContextService,
             CsrfTokenService, EntityCreationService, ImageUploadHelperService,
             PageTitleService, SkillCreationService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
+            TopicsAndSkillsDashboardBackendApiService,
             TopicUpdateService, UndoRedoService, UrlInterpolationService,
             WindowDimensionsService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
-            MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            MAX_CHARS_IN_TOPIC_NAME) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -383,6 +386,7 @@ angular.module('oppia').directive('topicEditorTab', [
               TopicUpdateService.moveSkillToSubtopic(
                 $scope.topic, oldSubtopicId, newSubtopicId,
                 skillSummary);
+              ctrl.initEditor();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -435,14 +439,23 @@ angular.module('oppia').directive('topicEditorTab', [
                 () => ctrl.initEditor()
               ));
             $scope.mainTopicCardIsShown = true;
-            $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
-            $scope.$on(
-              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-              $scope.refreshTopic);
+
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onStorySummariesInitialized.subscribe(
+                () => _initStorySummaries()
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              TopicsAndSkillsDashboardBackendApiService.
+                onTopicsAndSkillsDashboardReinitialized.subscribe(
+                  () => {
+                    $scope.refreshTopic();
+                  }
+                )
+            );
             ctrl.initEditor();
             _initStorySummaries();
           };
-
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();
           };

@@ -825,7 +825,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
 
     get_redirect_route(
-        r'/platformfeaturehandler', platform_feature.PlatformFeatureHandler),
+        r'/platform_features_evaluation_handler',
+        platform_feature.PlatformFeatureHandler),
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
