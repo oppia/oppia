@@ -301,7 +301,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
         # Needed to create a user scoring domain object to verify that the
-        # score and email_has_been_sent_to_user fields have changed after the
+        # score and has_email_been_sent fields have changed after the
         # suggestion has been accepted.
         user_scoring = suggestion_services.create_new_user_scoring(
             self.author_id, suggestion.score_category, 0
@@ -337,6 +337,53 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(user_scoring.email_has_been_sent())
         self.assertEqual(
             user_scoring.get_score(), feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+
+    def test_accept_suggestion_does_not_send_email_if_users_score_is_too_low(
+            self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_thread_id):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change, 'test description')
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
+        # Needed to create a user scoring domain object to verify the score and
+        # that the has_email_been_sent_to_user field does not change after the
+        # suggestion is accepted.
+        user_scoring = suggestion_services.create_new_user_scoring(
+            self.author_id, self.score_category, 0
+        )
+        self.assertFalse(user_scoring.email_has_been_sent())
+        self.assertEqual(user_scoring.get_score(), 0)
+
+        with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+            with self.swap(
+                feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True):
+                self.mock_accept_suggestion(
+                    self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
+                    'review message')
+
+        # Assert that the suggestion is now accepted.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
+
+        user_scoring = suggestion_services.get_user_scoring(
+            self.author_id, self.score_category
+        )
+        # Assert that the users score was updated correctly.
+        self.assertEqual(
+            user_scoring.get_score(),
+            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+        # Assert that their score is not high enough to review the category.
+        self.assertFalse(user_scoring.user_can_review_the_category())
+        # Assert that the onboarding new reviewer email was not sent.
+        self.assertFalse(user_scoring.email_has_been_sent())
 
     def test_accept_suggestion_creates_user_scoring_model_if_it_does_not_exist(
             self):
