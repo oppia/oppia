@@ -27,9 +27,12 @@ import { ExplorationDataService } from
   'pages/exploration-editor-page/services/exploration-data.service.ts';
 import { AlertsService } from 'services/alerts.service.ts';
 
-// require('domain/utilities/url-interpolation.service.ts')
-// require('pages/exploration-editor-page/services/exploration-data.service.ts')
-// require('services/alerts.service.ts')
+// Needs to be fixed for this issue;
+// File 'exploration-data.service.ts' is not a module.
+// Further tweaks on the file is needed to after this file is refactored.
+require('domain/utilities/url-interpolation.service.ts')
+require('pages/exploration-editor-page/services/exploration-data.service.ts')
+require('services/alerts.service.ts')
 
 @Injectable({
   providedIn: 'root'
