@@ -253,27 +253,27 @@ describe('Translation tab component', function() {
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   });
 
-  it('should finish tutorial when it has already started',
-    function() {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve({
-          canVoiceover: true
-        }));
+  it('should finish tutorial on clicking the end tutorial button when' +
+    ' it has already started', function() {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue($q.resolve({
+        canVoiceover: true
+      }));
 
-      ctrl.$onInit();
-      $scope.$apply();
+    ctrl.$onInit();
+    $scope.$apply();
 
-      spyOn(editabilityService, 'onEndTutorial');
-      spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
-      openTranslationTutorialEmitter.emit();
+    spyOn(editabilityService, 'onEndTutorial');
+    spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
+    openTranslationTutorialEmitter.emit();
 
-      $scope.onFinishTutorial();
+    $scope.onFinishTutorial();
 
-      expect(editabilityService.onEndTutorial).toHaveBeenCalled();
-      expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
-        .toHaveBeenCalled();
-      expect($scope.translationTutorial).toBe(false);
-    });
+    expect(editabilityService.onEndTutorial).toHaveBeenCalled();
+    expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
+      .toHaveBeenCalled();
+    expect($scope.translationTutorial).toBe(false);
+  });
 
   it('should skip tutorial when it has already started',
     function() {

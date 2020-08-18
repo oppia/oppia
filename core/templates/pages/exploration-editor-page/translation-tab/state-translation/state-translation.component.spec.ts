@@ -618,8 +618,8 @@ describe('State translation component', function() {
       expect($scope.getHtmlSummary(subtitledObject)).toBe('This is the html');
     });
 
-    it('should get content message warning that creating translation' +
-      ' is allowed only when it is on translation mode', function() {
+    it('should get empty content message when text translations haven\'t' +
+      ' been added yet', function() {
       expect($scope.getEmptyContentMessage()).toBe(
         'The translation for this section has not been created yet.' +
         ' Switch to translation mode to add a text translation.');
@@ -826,7 +826,7 @@ describe('State translation component', function() {
     });
   });
 
-  describe('when state is linear', function() {
+  describe('when state\'s property is_linear is true', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
@@ -861,16 +861,16 @@ describe('State translation component', function() {
     });
 
 
-    it('should evaluate feedback tab as disable', function() {
+    it('should evaluate feedback tab as disabled', function() {
       expect($scope.isDisabled('feedback')).toBe(true);
     });
 
-    it('should evaluate hint tab as disable', function() {
+    it('should evaluate hint tab as disabled', function() {
       expect($scope.isDisabled('hint')).toBe(true);
     });
 
 
-    it('should evaluate solution tab as disable', function() {
+    it('should evaluate solution tab as disabled', function() {
       expect($scope.isDisabled('solution')).toBe(true);
     });
   });
