@@ -2376,6 +2376,14 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException. The given page cannot be found.
         """
+        if topic_url_fragment != topic_url_fragment.lower():
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s' % (
+                    classroom_url_fragment,
+                    topic_url_fragment.lower()),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
         topic = topic_fetchers.get_topic_by_url_fragment(
             topic_url_fragment)
 
@@ -2444,6 +2452,15 @@ def can_access_story_viewer_page(handler):
         Raises:
             PageNotFoundException. The given page cannot be found.
         """
+        if story_url_fragment != story_url_fragment.lower():
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s/story/%s' % (
+                    classroom_url_fragment,
+                    topic_url_fragment,
+                    story_url_fragment.lower()),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
 
         if story is None:
@@ -2531,6 +2548,15 @@ def can_access_subtopic_viewer_page(handler):
         Raises:
             PageNotFoundException. The given page cannot be found.
         """
+        if subtopic_url_fragment != subtopic_url_fragment.lower():
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s/revision/%s' % (
+                    classroom_url_fragment,
+                    topic_url_fragment,
+                    subtopic_url_fragment.lower()),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
         topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
         subtopic_id = None
 

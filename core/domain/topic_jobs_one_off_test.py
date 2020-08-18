@@ -395,6 +395,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
             id=self.TOPIC_ID,
             name='Topic name',
             abbreviated_name='Topic',
+            url_fragment='topic-frag',
             thumbnail_bg_color='#C6DCDA',
             thumbnail_filename='topic.svg',
             canonical_name='topic name',
@@ -495,7 +496,6 @@ class SubTopicPageMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
-
 
     def setUp(self):
         super(SubTopicPageMathRteAuditOneOffJobTests, self).setUp()

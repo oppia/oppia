@@ -1271,7 +1271,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
 
-
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'

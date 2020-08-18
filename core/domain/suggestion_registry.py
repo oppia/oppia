@@ -434,7 +434,6 @@ class SuggestionEditStateContent(BaseSuggestion):
             html_string_list.append(self.change.old_value['html'])
         return html_string_list
 
-
     def convert_html_in_suggestion_change(self, conversion_fn):
         """Checks for HTML fields in a suggestion change and converts it
         according to the conversion function.
@@ -714,7 +713,6 @@ class SuggestionAddQuestion(BaseSuggestion):
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
         pass
-
 
     def pre_update_validate(self, change):
         """Performs the pre update validation. This functions need to be called
