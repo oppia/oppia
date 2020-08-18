@@ -354,6 +354,7 @@ describe('State translation component', function() {
     }
   };
   var refreshStateTranslationEmitter = new EventEmitter();
+  var showTranslationTabBusyModalEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
@@ -451,7 +452,6 @@ describe('State translation component', function() {
 
     it('should init state translation when refreshing page', function() {
       spyOn(translationTabActiveContentIdService, 'setActiveContentId');
-      // $rootScope.$broadcast('refreshStateTranslation');
       refreshStateTranslationEmitter.emit();
 
       expect($scope.isActive('content')).toBe(true);
@@ -681,12 +681,12 @@ describe('State translation component', function() {
         .returnValue(false);
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
+      spyOnProperty(stateEditorService, 'onShowTranslationTabBusyModal').and
+        .returnValue(showTranslationTabBusyModalEmitter);
       explorationStatesService.init(explorationState1);
       stateRecordedVoiceoversService.init('Introduction',
         recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
-
-      spyOn($rootScope, '$broadcast');
 
       $scope = $rootScope.$new();
       ctrl = $componentController('stateTranslation', {
@@ -702,66 +702,66 @@ describe('State translation component', function() {
 
     it('should open translation tab busy modal when clicking on content' +
       ' tab', function() {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContentId');
       $scope.onTabClick('content');
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'showTranslationTabBusyModal');
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
       expect(translationTabActiveContentIdService.setActiveContentId).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when clicking on feedback' +
       ' tab', function() {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContentId');
       $scope.onTabClick('feedback');
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'showTranslationTabBusyModal');
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
       expect(translationTabActiveContentIdService.setActiveContentId).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when clicking on hint' +
       ' tab', function() {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContentId');
       $scope.onTabClick('hint');
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'showTranslationTabBusyModal');
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
       expect(translationTabActiveContentIdService.setActiveContentId).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when clicking on solution' +
       ' tab', function() {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContentId');
       $scope.onTabClick('solution');
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'showTranslationTabBusyModal');
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
       expect(translationTabActiveContentIdService.setActiveContentId).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when trying to change' +
       ' active hint index ', function() {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContentId');
       $scope.changeActiveHintIndex(1);
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'showTranslationTabBusyModal');
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
       expect(translationTabActiveContentIdService.setActiveContentId).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when trying to change' +
       ' active answer group index ', function() {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContentId');
       $scope.changeActiveAnswerGroupIndex(1);
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'showTranslationTabBusyModal');
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
       expect(translationTabActiveContentIdService.setActiveContentId).not
         .toHaveBeenCalled();
     });

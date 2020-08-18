@@ -145,7 +145,7 @@ angular.module('oppia').component('stateTranslation', {
 
       $scope.onTabClick = function(tabId) {
         if (ctrl.isTranslationTabBusy) {
-          $rootScope.$broadcast('showTranslationTabBusyModal');
+          StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
         }
         var activeContentId = null;
@@ -270,7 +270,7 @@ angular.module('oppia').component('stateTranslation', {
 
       $scope.changeActiveHintIndex = function(newIndex) {
         if (ctrl.isTranslationTabBusy) {
-          $rootScope.$broadcast('showTranslationTabBusyModal');
+          StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
         }
         if ($scope.activeHintIndex === newIndex) {
@@ -285,7 +285,7 @@ angular.module('oppia').component('stateTranslation', {
 
       $scope.changeActiveAnswerGroupIndex = function(newIndex) {
         if (ctrl.isTranslationTabBusy) {
-          $rootScope.$broadcast('showTranslationTabBusyModal');
+          StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
         }
         if ($scope.activeAnswerGroupIndex !== newIndex) {

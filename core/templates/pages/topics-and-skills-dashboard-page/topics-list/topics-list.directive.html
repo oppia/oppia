@@ -23,21 +23,23 @@
       <td>
         <[$ctrl.getSerialNumberForTopic($index)]>.
       </td>
-      <td class="topic-primary-information-container">
-        <div class="list-summary list-summary-name protractor-test-topics-list-item">
-          <div>
-            <a class="topic-name protractor-test-topic-name"
-               ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
-              <[topic.name]>
-            </a>
+      <td>
+        <div class="topic-primary-information-container">
+          <div class="list-summary list-summary-name protractor-test-topics-list-item">
+            <div>
+              <a class="topic-name protractor-test-topic-name"
+                 ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
+                <[topic.name]>
+              </a>
+            </div>
+            <div>
+              <span class="topic-classroom protractor-test-topic-classroom">
+                <span ng-if="topic.classroom"><[topic.classroom]></span>
+                <span uib-tooltip="Assign this topic to a classroom from the admin page" tooltip-placement="bottom" ng-if="!topic.classroom">No classroom assigned.</span>
+              </span>
+            </div>
+            <div><span class="topic-description protractor-test-topic-description"><[topic.description]></span></div>
           </div>
-          <div>
-            <span class="topic-classroom protractor-test-topic-classroom">
-              <span ng-if="topic.classroom"><[topic.classroom]></span>
-              <span uib-tooltip="Assign this topic to a classroom from the admin page" tooltip-placement="bottom" ng-if="!topic.classroom">No classroom assigned.</span>
-            </span>
-          </div>
-          <div><span class="topic-description protractor-test-topic-description"><[topic.description]></span></div>
         </div>
       </td>
       <td>
@@ -208,6 +210,7 @@
     width: 100%;
   }
   topics-list .topic-primary-information-container {
+    height: 100%;
     overflow: auto;
   }
   topics-list .topic-edit-options-edit {
@@ -257,7 +260,6 @@
   topics-list .list-summary:visited {
     color: inherit;
     display: block;
-    height: 2em;
     text-decoration: none;
   }
 
