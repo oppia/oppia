@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the translation overview and changing
+ * @fileoverview Component for the translation overview and changing
  * translation language.
  */
 
+require('components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -37,14 +39,15 @@ angular.module('oppia').component('translatorOverview', {
   controller: [
     '$rootScope', '$scope', '$window',
     'ExplorationLanguageCodeService', 'LanguageUtilService',
-    'TranslationLanguageService', 'TranslationStatusService',
-    'TranslationTabActiveModeService', 'DEFAULT_AUDIO_LANGUAGE',
-    'SUPPORTED_AUDIO_LANGUAGES', function(
+    'StateEditorService', 'TranslationLanguageService',
+    'TranslationStatusService', 'TranslationTabActiveModeService',
+    'DEFAULT_AUDIO_LANGUAGE', 'SUPPORTED_AUDIO_LANGUAGES',
+    function(
         $rootScope, $scope, $window,
         ExplorationLanguageCodeService, LanguageUtilService,
-        TranslationLanguageService, TranslationStatusService,
-        TranslationTabActiveModeService, DEFAULT_AUDIO_LANGUAGE,
-        SUPPORTED_AUDIO_LANGUAGES) {
+        StateEditorService, TranslationLanguageService,
+        TranslationStatusService, TranslationTabActiveModeService,
+        DEFAULT_AUDIO_LANGUAGE, SUPPORTED_AUDIO_LANGUAGES) {
       var ctrl = this;
       var LAST_SELECTED_TRANSLATION_LANGUAGE = (
         'last_selected_translation_lang');
@@ -108,7 +111,7 @@ angular.module('oppia').component('translatorOverview', {
         if (ctrl.isTranslationTabBusy) {
           $scope.languageCode = $window.localStorage.getItem(
             LAST_SELECTED_TRANSLATION_LANGUAGE);
-          $rootScope.$broadcast('showTranslationTabBusyModal');
+          StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
         }
         TranslationLanguageService.setActiveLanguageCode(

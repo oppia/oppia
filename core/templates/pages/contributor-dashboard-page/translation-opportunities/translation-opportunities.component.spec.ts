@@ -24,6 +24,7 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { EventEmitter } from '@angular/core';
 
 describe('Translation opportunities component', function() {
   var ctrl = null;
@@ -37,6 +38,7 @@ describe('Translation opportunities component', function() {
   var userService = null;
 
   var opportunitiesArray = [];
+  var activeLanguageChangedEmitter = new EventEmitter();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
@@ -61,6 +63,8 @@ describe('Translation opportunities component', function() {
     translationLanguageService = $injector.get('TranslationLanguageService');
     userService = $injector.get('UserService');
 
+    spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
+      .returnValue(activeLanguageChangedEmitter);
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en');
 
@@ -93,6 +97,10 @@ describe('Translation opportunities component', function() {
       $uibModal: $uibModal,
     });
   }));
+
+  afterEach(function() {
+    ctrl.$onDestroy();
+  });
 
   it('should load translation opportunities when component is initialized',
     function() {
@@ -149,7 +157,7 @@ describe('Translation opportunities component', function() {
         .callFake((activeLanguage, callback) => {
           callback(opportunitiesArray, false);
         });
-      $rootScope.$broadcast('activeLanguageChanged');
+      activeLanguageChangedEmitter.emit();
 
       expect(ctrl.opportunities.length).toBe(2);
       expect(ctrl.moreOpportunitiesAvailable).toBe(false);

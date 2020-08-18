@@ -25,6 +25,7 @@ import { StateWrittenTranslationsService } from
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { EventEmitter } from '@angular/core';
 
 var MockWindow = function() {
   var language = 'en';
@@ -42,6 +43,7 @@ describe('Translator Overview component', function() {
   var $scope = null;
   var explorationLanguageCodeService = null;
   var languageUtilService = null;
+  var stateEditorService = null;
   var translationLanguageService = null;
   var translationStatusService = null;
   var translationTabActiveModeService = null;
@@ -70,6 +72,7 @@ describe('Translator Overview component', function() {
     $rootScope = $injector.get('$rootScope');
     explorationLanguageCodeService = $injector.get(
       'ExplorationLanguageCodeService');
+    stateEditorService = $injector.get('StateEditorService');
     translationLanguageService = $injector.get('TranslationLanguageService');
     translationStatusService = $injector.get('TranslationStatusService');
     translationTabActiveModeService = $injector.get(
@@ -137,12 +140,14 @@ describe('Translator Overview component', function() {
   it('should not change translation language when translation tab is busy',
     function() {
       ctrl.isTranslationTabBusy = true;
-      spyOn($rootScope, '$broadcast');
+      var showTranslationTabBusyModalEmitter = new EventEmitter();
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOnProperty(stateEditorService, 'onShowTranslationTabBusyModal').and
+        .returnValue(showTranslationTabBusyModalEmitter);
       $scope.changeTranslationLanguage();
 
       expect($scope.languageCode).toBe('en');
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'showTranslationTabBusyModal');
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
 
       // Reset value for isTranslationTabBusy.
       ctrl.isTranslationTabBusy = false;

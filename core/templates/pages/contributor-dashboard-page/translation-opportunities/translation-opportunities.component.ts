@@ -37,6 +37,8 @@ require(
   'contribution-opportunities.service.ts');
 require('pages/contributor-dashboard-page/services/translate-text.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('translationOpportunities', {
   template: require('./translation-opportunities.component.html'),
   controller: [
@@ -48,6 +50,7 @@ angular.module('oppia').component('translationOpportunities', {
         ContributionOpportunitiesService, TranslationLanguageService,
         UrlInterpolationService, UserService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var userIsLoggedIn = false;
       var getOpportunitySummary = function(expId) {
         for (var index in ctrl.opportunities) {
@@ -117,14 +120,18 @@ angular.module('oppia').component('translationOpportunities', {
         });
       };
       ctrl.$onInit = function() {
-        $scope.$on('activeLanguageChanged', function() {
-          ctrl.opportunities = [];
-          ctrl.opportunitiesAreLoading = true;
-          ctrl.moreOpportunitiesAvailable = true;
-          ContributionOpportunitiesService.getTranslationOpportunities(
-            TranslationLanguageService.getActiveLanguageCode(),
-            updateWithNewOpportunities);
-        });
+        ctrl.directiveSubscriptions.add(
+          TranslationLanguageService.onActiveLanguageChanged.subscribe(
+            () => {
+              ctrl.opportunities = [];
+              ctrl.opportunitiesAreLoading = true;
+              ctrl.moreOpportunitiesAvailable = true;
+              ContributionOpportunitiesService.getTranslationOpportunities(
+                TranslationLanguageService.getActiveLanguageCode(),
+                updateWithNewOpportunities);
+            }
+          )
+        );
         ctrl.opportunities = [];
         ctrl.opportunitiesAreLoading = true;
         ctrl.moreOpportunitiesAvailable = true;
@@ -136,6 +143,9 @@ angular.module('oppia').component('translationOpportunities', {
         ContributionOpportunitiesService.getTranslationOpportunities(
           TranslationLanguageService.getActiveLanguageCode(),
           updateWithNewOpportunities);
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
