@@ -28,12 +28,12 @@ import { AlertsService } from 'services/alerts.service.ts';
 import { UserEmailPreferencesBackendApiService } from
   'domain/user/user-email-preferences-backend-api.service';
 
-// Needs to be fixed for this issue; 
+// Needs to be fixed for this issue;
 // File 'exploration-data.service.ts' is not a module.
 // Further tweaks on the file is needed to after this file is refactored.
-require('domain/utilities/url-interpolation.service.ts')
-require('pages/exploration-editor-page/services/exploration-data.service.ts')
-require('services/alerts.service.ts')
+require('domain/utilities/url-interpolation.service.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require('services/alerts.service.ts');
 
 
 
