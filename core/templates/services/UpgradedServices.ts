@@ -1417,7 +1417,6 @@ export class UpgradedServices {
       new PlatformFeatureDummyBackendApiService(
         upgradedServices['HttpClient']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
-      upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
     upgradedServices['PlaythroughBackendApiService'] =
       new PlaythroughBackendApiService(

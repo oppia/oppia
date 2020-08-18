@@ -204,12 +204,12 @@ export class AdminFeaturesTabComponent implements OnInit {
     if (this.adminTaskManager.isTaskRunning()) {
       return;
     }
-    const updateMessage = this.windowRef.nativeWindow.prompt(
-      'This action is irreversible. If you insist to proceed, please enter' +
-      ' message for the update:',
+    const commitMessage = this.windowRef.nativeWindow.prompt(
+      'This action is irreversible. If you insist to proceed, please enter ' +
+      'the commit message for the update',
       `Update feature '${feature.name}'.`
     );
-    if (!updateMessage) {
+    if (commitMessage === null) {
       return;
     }
 
@@ -217,7 +217,7 @@ export class AdminFeaturesTabComponent implements OnInit {
       this.adminTaskManager.startTask();
 
       await this.apiService.updateFeatureFlag(
-        feature.name, updateMessage, feature.rules);
+        feature.name, commitMessage, feature.rules);
 
       this.setStatusMessage('Saved successfully.');
     } catch (e) {

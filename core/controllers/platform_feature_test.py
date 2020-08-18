@@ -47,14 +47,14 @@ class PlatformFeatureHandlerTest(test_utils.GenericTestBase):
         memcache_services.delete_multi(self.memcache_keys)
 
         registry.Registry.parameter_registry.clear()
-        self.param_1 = registry.Registry.create_platform_parameter(
+        self.dev_feature = registry.Registry.create_platform_parameter(
             'parameter_a', 'parameter for test', 'bool',
             is_feature=True, feature_stage=param_domain.FEATURE_STAGES.dev)
-        self.param_2 = registry.Registry.create_platform_parameter(
+        self.prod_feature = registry.Registry.create_platform_parameter(
             'parameter_b', 'parameter for test', 'bool',
             is_feature=True, feature_stage=param_domain.FEATURE_STAGES.prod)
         registry.Registry.update_platform_parameter(
-            self.param_2.name, self.user_id, 'edit rules',
+            self.prod_feature.name, self.user_id, 'edit rules',
             [
                 {
                     'filters': [
@@ -78,34 +78,30 @@ class PlatformFeatureHandlerTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURES_NAMES_SET = self.original_feature_name_set
         registry.Registry.parameter_registry = self.original_registry
 
-    def test_post_handler_returns_correct_feature_flag_values(self):
-        csrf_token = self.get_new_csrf_token()
+    def test_get_dev_mode_android_client_returns_correct_flag_values(self):
         with self.swap(constants, 'DEV_MODE', True):
-            result = self.post_json(
-                '/platformfeaturehandler',
-                {
+            result = self.get_json(
+                '/platform_features_evaluation_handler',
+                params={
                     'client_type': 'Android',
-                    'browser_type': None,
                     'app_version': '1.0.0',
                     'user_locale': 'en',
-                },
-                csrf_token=csrf_token)
+                }
+            )
             self.assertEqual(
                 result,
-                {'parameter_a': False, 'parameter_b': True})
+                {self.dev_feature.name: False, self.prod_feature.name: True})
 
-    def test_post_handler_with_invalid_context_raises_400(self):
-        csrf_token = self.get_new_csrf_token()
-        resp_dict = self.post_json(
-            '/platformfeaturehandler',
-            {
+    def test_get_with_invalid_client_type_context_raises_400(self):
+        resp_dict = self.get_json(
+            '/platform_features_evaluation_handler',
+            params={
                 'client_type': 'Invalid',
-                'browser_type': None,
                 'app_version': '1.0.0',
                 'user_locale': 'en',
             },
-            csrf_token=csrf_token,
-            expected_status_int=400)
+            expected_status_int=400
+        )
         self.assertEqual(
             resp_dict['error'],
             'Invalid client type \'Invalid\', must be one of [u\'Web\', '
