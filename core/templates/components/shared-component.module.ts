@@ -52,7 +52,8 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-
+import { TopicInfoTabDirective } from
+  'pages/topic-viewer-page/info-tab/topic-info-tab.directive';
 
 @NgModule({
   imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
@@ -72,7 +73,8 @@ import { ProfileLinkTextComponent } from
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    TranslatePipe
+    TranslatePipe,
+    TopicInfoTabDirective
   ],
 
   entryComponents: [
@@ -98,7 +100,8 @@ import { ProfileLinkTextComponent } from
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    TranslatePipe
+    TranslatePipe,
+    TopicInfoTabDirective
   ],
 })
 

@@ -35,14 +35,13 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
       },
       scope: {},
       bindToController: {
-        getTopicName: '&topicName',
-        getTopicDescription: '&topicDescription',
-        getStoryCount: '&storyCount',
-        getSubtopicCount: '&subtopicCount',
-        getChapterCount: '&chapterCount'
+        topicName: '<',
+        topicDescription: '<',
+        storyCount: '<',
+        subtopicCount: '<',
+        chapterCount: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-viewer-page/info-tab/topic-info-tab.directive.html'),
+      template: require('./topic-info-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', 'WindowDimensionsService',
@@ -78,3 +77,20 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'topic-info-tab'
+})
+export class TopicInfoTabDirective extends UpgradeComponent {
+  @Input() topicName;
+  @Input() topicDescription;
+  @Input() storyCount;
+  @Input() subtopicCount;
+  @Input() chapterCount;
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('topicInfoTab', elementRef, injector);
+  }
+}
