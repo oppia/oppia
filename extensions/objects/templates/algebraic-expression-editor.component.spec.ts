@@ -106,6 +106,8 @@ describe('AlgebraicExpressionEditor', function() {
     expect(ctrl.warningText).toBe('Please enter an answer before submitting.');
 
     ctrl.currentValue = 'x/2';
+    spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
+      ['x']);
     expect(ctrl.isCurrentAnswerValid()).toBeTrue();
     expect(ctrl.warningText).toBe('');
   });

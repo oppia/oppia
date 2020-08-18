@@ -96,7 +96,7 @@ export interface AdminPageData {
   topicSummaries: TopicSummary[];
 }
 
-interface LatexToSvgMapping {
+export interface LatexToSvgMapping {
   [expId: string]: {
     [latexString: string]: {
       latexId: string;
@@ -105,7 +105,7 @@ interface LatexToSvgMapping {
   }
 }
 
-interface SuggestionLatexToSvgMapping {
+export interface SuggestionLatexToSvgMapping {
   [suggestionId: string]: {
     [latexString: string]: {
       latexId: string;

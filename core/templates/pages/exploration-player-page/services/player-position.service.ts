@@ -28,8 +28,11 @@ import { PlayerTranscriptService } from
 export class PlayerPositionService {
   constructor(private playerTranscriptService: PlayerTranscriptService) {}
 
-  private _activeCardChangedEventEmitter = new EventEmitter();
+  private _activeCardChangedEventEmitter = new EventEmitter<void>();
   private _currentQuestionChangedEventEmitter = new EventEmitter<number>();
+  private _newCardAvailableEventEmitter = new EventEmitter();
+  private _helpCardAvailableEventEmitter = new EventEmitter();
+  private _newCardOpenedEventEmitter = new EventEmitter();
 
   displayedCardIndex = null;
   onChangeCallback = null;
@@ -95,15 +98,27 @@ export class PlayerPositionService {
     return this.learnerJustSubmittedAnAnswer;
   }
 
+  get onNewCardAvailable(): EventEmitter<unknown> {
+    return this._newCardAvailableEventEmitter;
+  }
+
+  get onHelpCardAvailable(): EventEmitter<unknown> {
+    return this._helpCardAvailableEventEmitter;
+  }
+
+  get onNewCardOpened(): EventEmitter<unknown> {
+    return this._newCardOpenedEventEmitter;
+  }
+
   changeCurrentQuestion(index: number): void {
     this._currentQuestionChangedEventEmitter.emit(index);
   }
 
-  get onActiveCardChanged(): EventEmitter<unknown> {
+  get onActiveCardChanged(): EventEmitter<void> {
     return this._activeCardChangedEventEmitter;
   }
 
-  get onCurrentQuestionChange(): EventEmitter<unknown> {
+  get onCurrentQuestionChange(): EventEmitter<number> {
     return this._currentQuestionChangedEventEmitter;
   }
 }

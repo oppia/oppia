@@ -22,6 +22,7 @@ require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require('third-party-imports/select2.import.ts');
 
 angular.module('oppia').directive('ruleTypeSelector', [function() {
   return {
