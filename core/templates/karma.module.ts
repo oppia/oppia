@@ -13,16 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the user's notifications dashboard.
+ * @fileoverview Module used by karma for frontend tests.
  */
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require(
-  'pages/notifications-dashboard-page/notifications-dashboard-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+import 'third-party-imports/ng-audio.import';
+import 'third-party-imports/ng-joy-ride.import';
+import 'third-party-imports/ui-tree.import';
 
-require(
-  'pages/notifications-dashboard-page/' +
-  'notifications-dashboard-page.component.ts');
+declare var angular: ng.IAngularStatic;
+
+angular.module('oppia', [
+  require('angular-cookies'), 'ngAnimate', 'ngAudio', 'ngJoyRide',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
+]);

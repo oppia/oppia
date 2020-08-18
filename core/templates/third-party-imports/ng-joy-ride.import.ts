@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the user's notifications dashboard.
+ * @fileoverview This file imports the ngJoyRide library.
  */
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require(
-  'pages/notifications-dashboard-page/notifications-dashboard-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
-
-require(
-  'pages/notifications-dashboard-page/' +
-  'notifications-dashboard-page.component.ts');
+require('static/ng-joyride-b117e0/ng-joyride.js');

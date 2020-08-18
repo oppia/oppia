@@ -16,8 +16,6 @@
  * @fileoverview Directive scripts to be used in the learner view.
  */
 
-// Jquery needs to be loaded before anything else to make angular js work.
-require('third-party-imports/jquery.import');
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/exploration-player-page/exploration-player-page.module.ts');

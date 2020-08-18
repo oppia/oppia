@@ -25,5 +25,4 @@ interface Window {
     ga: Function;
     $: JQueryStatic;
     jQuery: JQueryStatic;
-    Headroom: Headroom;
 }
