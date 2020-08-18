@@ -34,9 +34,9 @@
                      maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>"
                      ng-change="$ctrl.resetErrorMsg()">
               <span class="oppia-input-box-subtitle">
-                <i>
+                <em>
                   Subtopic title should be at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
-                </i>
+                </em>
               </span>
             </form>
             <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
@@ -58,14 +58,14 @@
                      ng-model="$ctrl.editableUrlFragment"
                      maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]>">
               <span class="oppia-input-box-subtitle">
-                <i>
+                <em>
                   The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
-                </i>
+                </em>
               </span>
             </form>
-            <span class="form-text error-msg" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicUrlFragmentExists">
+            <div class="oppia-input-box-subtitle text-danger" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicUrlFragmentExists">
               <em>The subtopic url fragment is not unique.</em>
-            </span>
+            </div>
           </div>
           <div class="subtopic-html">
             <div  ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">
@@ -75,9 +75,9 @@
               </p>
             </div>
             <span class="oppia-input-box-subtitle">
-              <i>
+              <em>
                 Gives learner an overview of how to perform a skill. Go to the preview tab to preview.
-              </i>
+              </em>
             </span>
             <div class="text-right" ng-if="$ctrl.schemaEditorIsShown">
               <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
@@ -143,13 +143,11 @@
           </i>
         </div>
         <div ng-if="$ctrl.skillsListIsShown" class="oppia-mobile-collapsible-card-content">
-          <div>
-            <button class="btn add-skill-btn" ng-click="$ctrl.createSkill()">
-              + ADD SKILL
-            </button>
+          <div ng-if="!$ctrl.subtopic.getSkillSummaries().length">
+            <span>There are no skills assigned to this subtopic.</span>
           </div>
-          <div>
-            <div class="list-header" ng-if="$ctrl.subtopic.getSkillSummaries().length">
+          <div ng-if="$ctrl.subtopic.getSkillSummaries().length">
+            <div class="list-header">
               <span>Name</span>
               <span class="number-skills-header"># of Questions</span>
             </div>
@@ -161,6 +159,7 @@
                  class="skill-list-item">
               <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
                  ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+                <span class="material-icons draggable-icon-indicator">drag_indicator</span>
                 <[skillSummary.getDescription()]>
               </a>
               <div class="skill-options-box">
@@ -397,8 +396,11 @@
     .subtopic-content .subtopic-header-text {
       display: none;
     }
-    .subtopic-content {
+    .subtopic-content .subtopic-content {
       margin-top: 25px;
+    }
+    .subtopic-content .draggable-icon-indicator {
+      display: none;
     }
     .subtopic-content .subtopic-left-box,
     .subtopic-content .subtopic-right-box {

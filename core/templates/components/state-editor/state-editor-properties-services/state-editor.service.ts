@@ -51,6 +51,10 @@ export class StateEditorService {
 
   private _stateEditorInitializedEventEmitter = new EventEmitter();
   private _stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
+  private _interactionEditorInitializedEventEmitter = new EventEmitter();
+  private _refreshStateTranslationEventEmitter = new EventEmitter();
+  private _updateAnswerChoicesEventEmitter = new EventEmitter();
+  private _saveOutcomeDestDetailsEventEmitter = new EventEmitter();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -249,6 +253,22 @@ export class StateEditorService {
 
   get onStateEditorDirectiveInitialized() {
     return this._stateEditorDirectiveInitializedEventEmitter;
+  }
+
+  get onInteractionEditorInitialized() {
+    return this._interactionEditorInitializedEventEmitter;
+  }
+
+  get onRefreshStateTranslation() {
+    return this._refreshStateTranslationEventEmitter;
+  }
+
+  get onUpdateAnswerChoices() {
+    return this._updateAnswerChoicesEventEmitter;
+  }
+
+  get onSaveOutcomeDestDetails() {
+    return this._saveOutcomeDestDetailsEventEmitter;
   }
 }
 

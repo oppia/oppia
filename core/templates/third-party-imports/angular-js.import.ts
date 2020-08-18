@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for editor domain.
+ * @fileoverview This file imports the angular js library.
  */
 
-export class EditorDomainConstants {
-  public static EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED =
-    'undoRedoServiceChangeApplied';
-}
+module.exports = require('static/angularjs-1.7.9/angular.js');

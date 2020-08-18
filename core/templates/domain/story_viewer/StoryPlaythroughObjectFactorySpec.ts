@@ -106,6 +106,7 @@ describe('Story playthrough object factory', () => {
       thumbnail_filename: 'filename',
     };
     var storyPlaythroughBackendObject = {
+      story_id: 'qwerty',
       story_nodes: [
         firstSampleReadOnlyStoryNodeBackendDict,
         secondSampleReadOnlyStoryNodeBackendDict],
@@ -128,5 +129,6 @@ describe('Story playthrough object factory', () => {
     expect(_samplePlaythroughObject.hasFinishedStory()).toEqual(false);
     expect(_samplePlaythroughObject.getNextPendingNodeId()).toEqual('node_2');
     expect(_samplePlaythroughObject.hasStartedStory()).toEqual(true);
+    expect(_samplePlaythroughObject.getStoryId()).toEqual('qwerty');
   });
 });

@@ -17,6 +17,8 @@
  * @fileoverview Unit tests for the topic editor tab directive.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -55,9 +57,20 @@ describe('Topic editor tab directive', function() {
   var UndoRedoService = null;
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
+  var mockStorySummariesInitializedEventEmitter = new EventEmitter();
+
+  var mockTasdReinitializedEventEmitter = null;
+  var topicInitializedEventEmitter = null;
+  var topicReinitializedEventEmitter = null;
   var MockWindowDimensionsService = {
     isWindowNarrow: () => false
   };
+  var MockTopicsAndSkillsDashboardBackendApiService = {
+    get onTopicsAndSkillsDashboardReinitialized() {
+      return mockTasdReinitializedEventEmitter;
+    }
+  };
+
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -88,6 +101,21 @@ describe('Topic editor tab directive', function() {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
+    mockTasdReinitializedEventEmitter = new EventEmitter();
+
+    topicInitializedEventEmitter = new EventEmitter();
+    topicReinitializedEventEmitter = new EventEmitter();
+
+    spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
+      function() {
+        return topicInitializedEventEmitter;
+      });
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicReinitialized').and.callFake(
+      function() {
+        return topicReinitializedEventEmitter;
+      });
+
     ctrl = $injector.instantiate(directive.controller, {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
@@ -100,7 +128,9 @@ describe('Topic editor tab directive', function() {
       WindowDimensionsService: MockWindowDimensionsService,
       StoryCreationService: StoryCreationService,
       TopicEditorStateService: TopicEditorStateService,
-      EntityCreationService: EntityCreationService
+      EntityCreationService: EntityCreationService,
+      TopicsAndSkillsDashboardBackendApiService:
+        MockTopicsAndSkillsDashboardBackendApiService
     });
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
     topic = TopicObjectFactory.createInterstitialTopic();
@@ -112,9 +142,19 @@ describe('Topic editor tab directive', function() {
     story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
     story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
+    topic.setName('New Name');
+    topic.setUrlFragment('topic-url-fragment');
+    TopicEditorStateService.setTopic(topic);
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOnProperty(TopicEditorStateService,
+      'onStorySummariesInitialized').and.returnValue(
+      mockStorySummariesInitializedEventEmitter);
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should initialize the variables', function() {
     expect($scope.topic).toEqual(topic);
@@ -194,7 +234,8 @@ describe('Topic editor tab directive', function() {
       'topics and skills dashboard is reinitialized',
   function() {
     var refreshTopicSpy = spyOn(TopicEditorStateService, 'loadTopic');
-    $rootScope.$broadcast('topicsAndSkillsDashboardReinitialized');
+    MockTopicsAndSkillsDashboardBackendApiService.
+      onTopicsAndSkillsDashboardReinitialized.emit();
     expect(refreshTopicSpy).toHaveBeenCalled();
   });
 
@@ -212,16 +253,60 @@ describe('Topic editor tab directive', function() {
 
   it('should call the TopicUpdateService if name is updated', function() {
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
-    $scope.updateTopicName('New Name');
+    spyOn(TopicEditorStateService, 'updateExistenceOfTopicName').and.callFake(
+      (newName, successCallback) => successCallback());
+    $scope.updateTopicName('Different Name');
     expect(topicNameSpy).toHaveBeenCalled();
   });
 
+  it('should not call updateExistenceOfTopicName if name is empty',
+    function() {
+      var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
+      spyOn(TopicEditorStateService, 'updateExistenceOfTopicName');
+      $scope.updateTopicName('');
+      expect(topicNameSpy).toHaveBeenCalled();
+      expect(
+        TopicEditorStateService.updateExistenceOfTopicName
+      ).not.toHaveBeenCalled();
+    });
+
   it('should not call the TopicUpdateService if name is same', function() {
-    $scope.updateTopicName('New Name');
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
     $scope.updateTopicName('New Name');
     expect(topicNameSpy).not.toHaveBeenCalled();
   });
+
+  it('should not call the TopicUpdateService if url fragment is same',
+    function() {
+      var topicUrlFragmentSpy = spyOn(
+        TopicUpdateService, 'setTopicUrlFragment');
+      $scope.updateTopicUrlFragment('topic-url-fragment');
+      expect(topicUrlFragmentSpy).not.toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if url fragment is updated',
+    function() {
+      var topicUrlFragmentSpy = spyOn(
+        TopicUpdateService, 'setTopicUrlFragment');
+      spyOn(
+        TopicEditorStateService,
+        'updateExistenceOfTopicUrlFragment').and.callFake(
+        (newUrlFragment, successCallback) => successCallback());
+      $scope.updateTopicUrlFragment('topic');
+      expect(topicUrlFragmentSpy).toHaveBeenCalled();
+    });
+
+  it('should not update topic url fragment existence for empty url fragment',
+    function() {
+      var topicUrlFragmentSpy = spyOn(
+        TopicUpdateService, 'setTopicUrlFragment');
+      spyOn(TopicEditorStateService, 'updateExistenceOfTopicUrlFragment');
+      $scope.updateTopicUrlFragment('');
+      expect(topicUrlFragmentSpy).toHaveBeenCalled();
+      expect(
+        TopicEditorStateService.updateExistenceOfTopicUrlFragment
+      ).not.toHaveBeenCalled();
+    });
 
   it('should call the TopicUpdateService if thumbnail is updated', function() {
     var topicThumbnailSpy = (
@@ -428,5 +513,19 @@ describe('Topic editor tab directive', function() {
       spyOn(TopicUpdateService, 'rearrangeSubtopic'));
     $scope.onRearrangeSubtopicEnd(0);
     expect(moveSubtopicSpy).not.toHaveBeenCalled();
+  });
+
+  it('should react to event when story summaries are initialized', () => {
+    spyOn(TopicEditorStateService, 'getCanonicalStorySummaries');
+    mockStorySummariesInitializedEventEmitter.emit();
+    expect(
+      TopicEditorStateService.getCanonicalStorySummaries).toHaveBeenCalled();
+  });
+
+  it('should call initEditor on initialization of topic', function() {
+    spyOn(ctrl, 'initEditor').and.callThrough();
+    topicInitializedEventEmitter.emit();
+    topicReinitializedEventEmitter.emit();
+    expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
   });
 });

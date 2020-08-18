@@ -52,18 +52,18 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
         self.story_1 = story_domain.Story.create_default_story(
             self.story_id_1, 'story_title', 'description', self.topic_id_1,
-            'story-one')
+            'story-frag-one')
         self.story_1.description = 'story_description'
         self.story_1.node_titles = []
 
         self.story_2 = story_domain.Story.create_default_story(
             self.story_id_2, 'story_title', 'description', self.topic_id_2,
-            'story-two')
+            'story-frag-two')
         self.story_2.description = 'story_description'
         self.story_2.node_titles = []
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'public_topic_name', 'abbrev', 'description')
+            self.topic_id, 'public_topic_name', 'public', 'description')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2], 'image.svg',
@@ -85,10 +85,12 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story_2)
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'private_topic_name', 'abbrev', 'description')
+            self.topic_id_1, 'private_topic_name',
+            'private_topic_name', 'description')
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.url_fragment = 'private'
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -111,27 +113,21 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
 
     def test_any_user_can_access_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'))
-
+            self.get_html_response('/learn/staging/%s' % 'public')
 
     def test_accessibility_of_unpublished_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '%s/%s' % (
-                    feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'),
+                '/learn/staging/%s' % 'private',
                 expected_status_int=404)
             self.login(self.ADMIN_EMAIL)
-            self.get_html_response(
-                '%s/%s' % (
-                    feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'))
+            self.get_html_response('/learn/staging/%s' % 'private')
             self.logout()
-
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'),
+                '/learn/staging/%s' % 'public',
                 expected_status_int=404)
 
 
@@ -141,7 +137,7 @@ class TopicPageDataHandlerTests(
     def test_get_with_no_user_logged_in(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
             expected_dict = {
                 'topic_name': 'public_topic_name',
                 'topic_id': self.topic_id,
@@ -153,7 +149,8 @@ class TopicPageDataHandlerTests(
                     'thumbnail_filename': None,
                     'thumbnail_bg_color': None,
                     'story_is_published': True,
-                    'completed_node_titles': []
+                    'completed_node_titles': [],
+                    'url_fragment': 'story-frag-one'
                 }],
                 'additional_story_dicts': [{
                     'id': self.story_2.id,
@@ -163,7 +160,8 @@ class TopicPageDataHandlerTests(
                     'thumbnail_filename': None,
                     'thumbnail_bg_color': None,
                     'story_is_published': True,
-                    'completed_node_titles': []
+                    'completed_node_titles': [],
+                    'url_fragment': 'story-frag-two'
                 }],
                 'uncategorized_skill_ids': [self.skill_id_1],
                 'subtopics': [{
@@ -194,7 +192,7 @@ class TopicPageDataHandlerTests(
                     feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
                 json_response = self.get_json(
-                    '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
+                    '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
                 messages = self._get_sent_email_messages(
                     feconf.ADMIN_EMAIL_ADDRESS)
                 expected_email_html_body = (
@@ -216,7 +214,8 @@ class TopicPageDataHandlerTests(
                         'thumbnail_filename': None,
                         'thumbnail_bg_color': None,
                         'story_is_published': True,
-                        'completed_node_titles': []
+                        'completed_node_titles': [],
+                        'url_fragment': 'story-frag-one'
                     }],
                     'additional_story_dicts': [{
                         'id': self.story_2.id,
@@ -226,7 +225,8 @@ class TopicPageDataHandlerTests(
                         'thumbnail_filename': None,
                         'thumbnail_bg_color': None,
                         'story_is_published': True,
-                        'completed_node_titles': []
+                        'completed_node_titles': [],
+                        'url_fragment': 'story-frag-two'
                     }],
                     'uncategorized_skill_ids': [self.skill_id_1],
                     'subtopics': [{
@@ -253,17 +253,19 @@ class TopicPageDataHandlerTests(
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'),
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'),
                 expected_status_int=404)
 
     def test_get_with_no_skills_ids(self):
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic_with_no_skills', 'abbrev', 'description')
+            self.topic_id, 'topic_with_no_skills',
+            'topic-with-no-skills', 'description')
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic_with_no_skills'))
+                '%s/staging/%s' % (
+                    feconf.TOPIC_DATA_HANDLER, 'topic-with-no-skills'))
             expected_dict = {
                 'topic_name': 'topic_with_no_skills',
                 'topic_id': self.topic_id,
@@ -282,7 +284,7 @@ class TopicPageDataHandlerTests(
         self.topic_id = 'new_topic'
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'abbrev', 'description')
+            self.topic_id, 'new_topic', 'new-topic', 'description')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
@@ -300,7 +302,7 @@ class TopicPageDataHandlerTests(
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'new_topic'))
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
             expected_dict = {
                 'topic_name': 'new_topic',
                 'topic_id': self.topic_id,
@@ -314,6 +316,178 @@ class TopicPageDataHandlerTests(
                 'skill_descriptions': {
                     self.skill_id_1: 'Skill Description 1'
                 },
+                'train_tab_should_be_displayed': True
+            }
+            self.assertDictContainsSubset(expected_dict, json_response)
+        self.logout()
+
+    def test_get_with_twenty_or_more_questions(self):
+        number_of_questions = 50
+        self.topic_id = 'new_topic'
+        self.skill_id_1 = skill_services.get_new_skill_id()
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'new_topic', 'new-topic', 'description')
+        self.topic.uncategorized_skill_ids.append(self.skill_id_1)
+        self.topic.thumbnail_filename = 'Image.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic_services.save_new_topic(self.admin_id, self.topic)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        self.save_new_skill(
+            self.skill_id_1, self.admin_id, description='Skill Description 1')
+        for index in python_utils.RANGE(number_of_questions):
+            question_id = question_services.get_new_question_id()
+            self.save_new_question(
+                question_id, self.admin_id,
+                self._create_valid_question_data(index), [self.skill_id_1])
+            question_services.create_new_question_skill_link(
+                self.admin_id, question_id, self.skill_id_1, 0.5)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            json_response = self.get_json(
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+            expected_dict = {
+                'topic_name': 'new_topic',
+                'topic_id': self.topic_id,
+                'canonical_story_dicts': [],
+                'additional_story_dicts': [],
+                'uncategorized_skill_ids': [self.skill_id_1],
+                'subtopics': [],
+                'degrees_of_mastery': {
+                    self.skill_id_1: None
+                },
+                'skill_descriptions': {
+                    self.skill_id_1: 'Skill Description 1'
+                },
+                'train_tab_should_be_displayed': True
+            }
+            self.assertDictContainsSubset(expected_dict, json_response)
+        self.logout()
+
+    def test_get_with_twenty_or_more_questions_with_multiple_skills(self):
+        number_of_skills = 3
+        number_of_questions = [1, 2, 2]
+        self.topic_id = 'new_topic'
+        skill_ids = (
+            [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
+                number_of_skills)])
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'new_topic', 'new-topic', 'description')
+        for index in python_utils.RANGE(number_of_skills):
+            self.topic.uncategorized_skill_ids.append(skill_ids[index])
+        self.topic.thumbnail_filename = 'Image.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic_services.save_new_topic(self.admin_id, self.topic)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        for i in python_utils.RANGE(number_of_skills):
+            self.save_new_skill(
+                skill_ids[i], self.admin_id,
+                description='Skill Description')
+        for i in python_utils.RANGE(number_of_skills):
+            for j in python_utils.RANGE(number_of_questions[i]):
+                question_id = question_services.get_new_question_id()
+                self.save_new_question(
+                    question_id, self.admin_id,
+                    self._create_valid_question_data(j), [skill_ids[i]])
+                question_services.create_new_question_skill_link(
+                    self.admin_id, question_id, skill_ids[i], 0.5)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            json_response = self.get_json(
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+            expected_dict = {
+                'topic_name': 'new_topic',
+                'topic_id': self.topic_id,
+                'canonical_story_dicts': [],
+                'additional_story_dicts': [],
+                'train_tab_should_be_displayed': True
+            }
+            self.assertDictContainsSubset(expected_dict, json_response)
+        self.logout()
+
+    def test_get_with_lesser_questions_with_fifty_or_more_skills(self):
+        number_of_skills = 60
+        number_of_questions = [0] * 60
+        number_of_questions[46] = 2
+        self.topic_id = 'new_topic'
+        skill_ids = (
+            [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
+                number_of_skills)])
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'new_topic', 'new-topic', 'description')
+        for index in python_utils.RANGE(number_of_skills):
+            self.topic.uncategorized_skill_ids.append(skill_ids[index])
+        self.topic.thumbnail_filename = 'Image.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic_services.save_new_topic(self.admin_id, self.topic)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        for i in python_utils.RANGE(number_of_skills):
+            self.save_new_skill(
+                skill_ids[i], self.admin_id,
+                description='Skill Description')
+        for i in python_utils.RANGE(number_of_skills):
+            for j in python_utils.RANGE(number_of_questions[i]):
+                question_id = question_services.get_new_question_id()
+                self.save_new_question(
+                    question_id, self.admin_id,
+                    self._create_valid_question_data(j), [skill_ids[i]])
+                question_services.create_new_question_skill_link(
+                    self.admin_id, question_id, skill_ids[i], 0.5)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            json_response = self.get_json(
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+            expected_dict = {
+                'topic_name': 'new_topic',
+                'topic_id': self.topic_id,
+                'canonical_story_dicts': [],
+                'additional_story_dicts': [],
+                'train_tab_should_be_displayed': False
+            }
+            self.assertDictContainsSubset(expected_dict, json_response)
+        self.logout()
+
+    def test_get_with_more_questions_with_fifty_or_more_skills(self):
+        number_of_skills = 60
+        number_of_questions = [0] * 60
+        number_of_questions[46] = 2
+        number_of_questions[20] = 3
+        number_of_questions[29] = 10
+        self.topic_id = 'new_topic'
+        skill_ids = (
+            [skill_services.get_new_skill_id() for _ in python_utils.RANGE(
+                number_of_skills)])
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'new_topic', 'new-topic', 'description')
+        for index in python_utils.RANGE(number_of_skills):
+            self.topic.uncategorized_skill_ids.append(skill_ids[index])
+        self.topic.thumbnail_filename = 'Image.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic_services.save_new_topic(self.admin_id, self.topic)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        for i in python_utils.RANGE(number_of_skills):
+            self.save_new_skill(
+                skill_ids[i], self.admin_id,
+                description='Skill Description')
+        for i in python_utils.RANGE(number_of_skills):
+            for j in python_utils.RANGE(number_of_questions[i]):
+                question_id = question_services.get_new_question_id()
+                self.save_new_question(
+                    question_id, self.admin_id,
+                    self._create_valid_question_data(j), [skill_ids[i]])
+                question_services.create_new_question_skill_link(
+                    self.admin_id, question_id, skill_ids[i], 0.5)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            json_response = self.get_json(
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+            expected_dict = {
+                'topic_name': 'new_topic',
+                'topic_id': self.topic_id,
+                'canonical_story_dicts': [],
+                'additional_story_dicts': [],
                 'train_tab_should_be_displayed': True
             }
             self.assertDictContainsSubset(expected_dict, json_response)

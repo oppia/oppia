@@ -36,6 +36,8 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
   controller: [
@@ -44,8 +46,7 @@ angular.module('oppia').component('subtopicEditorTab', {
     'TopicEditorRoutingService', 'TopicUpdateService',
     'UndoRedoService',
     'UrlInterpolationService', 'WindowDimensionsService',
-    'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
-    'EVENT_TOPIC_REINITIALIZED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
+    'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
         $scope, EntityCreationService, QuestionBackendApiService,
@@ -53,15 +54,15 @@ angular.module('oppia').component('subtopicEditorTab', {
         TopicEditorRoutingService, TopicUpdateService,
         UndoRedoService,
         UrlInterpolationService, WindowDimensionsService,
-        EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
-        EVENT_TOPIC_REINITIALIZED, MAX_CHARS_IN_SUBTOPIC_TITLE,
+        MAX_CHARS_IN_SUBTOPIC_TITLE,
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
       ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
-      var _initEditor = function() {
+      ctrl.initEditor = function() {
         ctrl.topic = TopicEditorStateService.getTopic();
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
@@ -88,6 +89,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.editableThumbnailBgColor = (
             ctrl.subtopic.getThumbnailBgColor());
           ctrl.editableUrlFragment = ctrl.subtopic.getUrlFragment();
+          ctrl.initialSubtopicUrlFragment = ctrl.subtopic.getUrlFragment();
           ctrl.subtopicPage = (
             TopicEditorStateService.getSubtopicPage());
           ctrl.allowedBgColors = (
@@ -122,7 +124,7 @@ angular.module('oppia').component('subtopicEditorTab', {
       ctrl.updateSubtopicUrlFragment = function(urlFragment) {
         ctrl.subtopicUrlFragmentIsValid = (
           SubtopicValidationService.isUrlFragmentValid(urlFragment));
-        if (urlFragment === ctrl.subtopic.getUrlFragment()) {
+        if (urlFragment === ctrl.initialSubtopicUrlFragment) {
           ctrl.subtopicUrlFragmentExists = false;
           return;
         }
@@ -215,10 +217,6 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.fromIndex = fromIndex;
       };
 
-      ctrl.createSkill = function() {
-        EntityCreationService.createSkill();
-      };
-
       ctrl.toggleSubtopicPreview = function() {
         ctrl.subtopicPreviewCardIsShown = !ctrl.subtopicPreviewCardIsShown;
       };
@@ -246,7 +244,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.selectedSkillEditOptionsIndex = -1;
         TopicUpdateService.removeSkillFromSubtopic(
           ctrl.topic, ctrl.subtopicId, skillSummary);
-        _initEditor();
+        ctrl.initEditor();
       };
 
       ctrl.removeSkillFromTopic = function(skillSummary) {
@@ -255,7 +253,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.topic, ctrl.subtopicId, skillSummary);
         TopicUpdateService.removeUncategorizedSkill(
           ctrl.topic, skillSummary);
-        _initEditor();
+        ctrl.initEditor();
       };
 
       ctrl.navigateToTopicEditor = function() {
@@ -275,16 +273,29 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.subtopicPreviewCardIsShown = false;
         ctrl.subtopicEditorCardIsShown = true;
         ctrl.schemaEditorIsShown = false;
-        $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-        $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
-        $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
-          ctrl.subtopicPage = (
-            TopicEditorStateService.getSubtopicPage());
-          var pageContents = ctrl.subtopicPage.getPageContents();
-          ctrl.htmlData = pageContents.getHtml();
-        });
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onSubtopicPageLoaded.subscribe(
+            () => {
+              ctrl.subtopicPage = (
+                TopicEditorStateService.getSubtopicPage());
+              var pageContents = ctrl.subtopicPage.getPageContents();
+              ctrl.htmlData = pageContents.getHtml();
+            }
+          )
+        );
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onTopicInitialized.subscribe(
+            () => ctrl.initEditor()
+          ));
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onTopicReinitialized.subscribe(
+            () => ctrl.initEditor()
+          ));
 
-        _initEditor();
+        ctrl.initEditor();
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

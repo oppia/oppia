@@ -21,7 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 
+from constants import constants
 from core.controllers import base
+from core.domain import classroom_services
 from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
@@ -38,11 +40,29 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
-import python_utils
 
 current_user_services = models.Registry.import_current_user_services()
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+
+
+def _redirect_based_on_return_type(
+        handler, redirection_url, expected_return_type):
+    """Redirects to the provided URL if the handler type is not JSON.
+
+    Args:
+        handler: function. The function to be decorated.
+        redirection_url: str. The URL to redirect to.
+        expected_return_type: str. The type of the response to be returned
+            in case of errors eg. html, json.
+
+    Raises:
+        PageNotFoundException. The page is not found.
+    """
+    if expected_return_type == feconf.HANDLER_TYPE_JSON:
+        raise handler.PageNotFoundException
+    else:
+        handler.redirect(redirection_url)
 
 
 def open_access(handler):
@@ -70,6 +90,42 @@ def open_access(handler):
     test_can_access.__wrapped__ = True
 
     return test_can_access
+
+
+def does_classroom_exist(handler):
+    """Decorator to check whether classroom exists.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    def test_does_classroom_exist(self, classroom_url_fragment, **kwargs):
+        """Checks if classroom url fragment provided is valid. If so, return
+        handler or else redirect to the correct classroom.
+
+        Args:
+            classroom_url_fragment: str. The classroom url fragment.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            handler. function. The newly decorated function.
+        """
+        classroom = classroom_services.get_classroom_by_url_fragment(
+            classroom_url_fragment)
+
+        if not classroom:
+            _redirect_based_on_return_type(
+                self, '/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT,
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
+        return handler(self, classroom_url_fragment, **kwargs)
+    test_does_classroom_exist.__wrapped__ = True
+
+    return test_does_classroom_exist
 
 
 def can_play_exploration(handler):
@@ -2305,11 +2361,13 @@ def can_access_topic_viewer_page(handler):
         if the user can access the given topic viewer page.
     """
 
-    def test_can_access(self, topic_name, **kwargs):
+    def test_can_access(
+            self, classroom_url_fragment, topic_url_fragment, **kwargs):
         """Checks if the user can access topic viewer page.
 
         Args:
-            topic_name: str. The name of the topic.
+            topic_url_fragment: str. The url fragment of the topic.
+            classroom_url_fragment: str. The classroom url fragment.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2318,11 +2376,34 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException. The given page cannot be found.
         """
-        topic_name = python_utils.url_unquote_plus(topic_name)
-        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic_url_fragment != topic_url_fragment.lower():
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s' % (
+                    classroom_url_fragment,
+                    topic_url_fragment.lower()),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
+        topic = topic_fetchers.get_topic_by_url_fragment(
+            topic_url_fragment)
 
         if topic is None:
-            raise self.PageNotFoundException
+            _redirect_based_on_return_type(
+                self, '/learn/%s' % classroom_url_fragment,
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
+        verified_classroom_url_fragment = (
+            classroom_services.get_classroom_url_fragment_for_topic_id(
+                topic.id))
+        if classroom_url_fragment != verified_classroom_url_fragment:
+            url_substring = topic_url_fragment
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s' % (
+                    verified_classroom_url_fragment,
+                    url_substring),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
 
         topic_id = topic.id
         topic_rights = topic_services.get_topic_rights(
@@ -2333,7 +2414,7 @@ def can_access_topic_viewer_page(handler):
                 topic_rights.topic_is_published or
                 role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
                 user_actions_info.actions):
-            return handler(self, topic_name, **kwargs)
+            return handler(self, topic.name, **kwargs)
         else:
             raise self.PageNotFoundException
     test_can_access.__wrapped__ = True
@@ -2352,11 +2433,16 @@ def can_access_story_viewer_page(handler):
         if the user can access the given story viewer page.
     """
 
-    def test_can_access(self, story_id, *args, **kwargs):
+    def test_can_access(
+            self, classroom_url_fragment, topic_url_fragment,
+            story_url_fragment, *args, **kwargs):
         """Checks if the user can access story viewer page.
 
         Args:
-            story_id: str. The unique id of the story.
+            classroom_url_fragment: str. The classroom url fragment.
+            topic_url_fragment: str. The url fragment of the topic
+                associated to the story.
+            story_url_fragment: str. The story url fragment.
             *args: list(*). A list of arguments from the calling function.
             **kwargs: *. Keyword arguments.
 
@@ -2366,17 +2452,54 @@ def can_access_story_viewer_page(handler):
         Raises:
             PageNotFoundException. The given page cannot be found.
         """
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        if story_url_fragment != story_url_fragment.lower():
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s/story/%s' % (
+                    classroom_url_fragment,
+                    topic_url_fragment,
+                    story_url_fragment.lower()),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
+        story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
 
         if story is None:
-            raise self.PageNotFoundException
+            _redirect_based_on_return_type(
+                self,
+                '/learn/%s/%s/story' %
+                (classroom_url_fragment, topic_url_fragment),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
 
         story_is_published = False
         topic_is_published = False
         topic_id = story.corresponding_topic_id
+        story_id = story.id
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         if topic_id:
             topic = topic_fetchers.get_topic_by_id(topic_id)
+            if topic.url_fragment != topic_url_fragment:
+                _redirect_based_on_return_type(
+                    self,
+                    '/learn/%s/%s/story/%s' % (
+                        classroom_url_fragment,
+                        topic.url_fragment,
+                        story_url_fragment),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return
+
+            verified_classroom_url_fragment = (
+                classroom_services.get_classroom_url_fragment_for_topic_id(
+                    topic.id))
+            if classroom_url_fragment != verified_classroom_url_fragment:
+                url_substring = '%s/story/%s' % (
+                    topic_url_fragment, story_url_fragment)
+                _redirect_based_on_return_type(
+                    self, '/learn/%s/%s' % (
+                        verified_classroom_url_fragment,
+                        url_substring),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return
             topic_rights = topic_services.get_topic_rights(topic_id)
             topic_is_published = topic_rights.topic_is_published
             all_story_references = topic.get_all_story_references()
@@ -2404,15 +2527,19 @@ def can_access_subtopic_viewer_page(handler):
 
     Returns:
         function. The newly decorated function that now checks
-        if the user can access the give subtopic viewer page.
+        if the user can access the given subtopic viewer page.
     """
 
-    def test_can_access(self, topic_name, subtopic_id, **kwargs):
+    def test_can_access(
+            self, classroom_url_fragment, topic_url_fragment,
+            subtopic_url_fragment, **kwargs):
         """Checks if the user can access subtopic viewer page.
 
         Args:
-            topic_name: str. The name of the topic.
-            subtopic_id: str. The id of the Subtopic.
+            classroom_url_fragment: str. The classroom url fragment.
+            topic_url_fragment: str. The url fragment of the topic
+                associated to the subtopic.
+            subtopic_url_fragment: str. The url fragment of the Subtopic.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2421,9 +2548,23 @@ def can_access_subtopic_viewer_page(handler):
         Raises:
             PageNotFoundException. The given page cannot be found.
         """
-        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if subtopic_url_fragment != subtopic_url_fragment.lower():
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s/revision/%s' % (
+                    classroom_url_fragment,
+                    topic_url_fragment,
+                    subtopic_url_fragment.lower()),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
+        topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
+        subtopic_id = None
+
         if topic is None:
-            raise self.PageNotFoundException
+            _redirect_based_on_return_type(
+                self, '/learn/%s' % classroom_url_fragment,
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         topic_rights = topic_services.get_topic_rights(topic.id)
@@ -2432,20 +2573,46 @@ def can_access_subtopic_viewer_page(handler):
                 (topic_rights is None or not topic_rights.topic_is_published)
                 and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR not in
                 user_actions_info.actions):
-            raise self.PageNotFoundException
+            _redirect_based_on_return_type(
+                self, '/learn/%s' % classroom_url_fragment,
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
 
-        subtopic_is_present = any(
-            subtopic.id == int(subtopic_id) for subtopic in topic.subtopics)
+        for subtopic in topic.subtopics:
+            if subtopic.url_fragment == subtopic_url_fragment:
+                subtopic_id = subtopic.id
 
-        if not subtopic_is_present:
-            raise self.PageNotFoundException
+        if not subtopic_id:
+            _redirect_based_on_return_type(
+                self,
+                '/learn/%s/%s/revision' %
+                (classroom_url_fragment, topic_url_fragment),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
+        verified_classroom_url_fragment = (
+            classroom_services.get_classroom_url_fragment_for_topic_id(
+                topic.id))
+        if classroom_url_fragment != verified_classroom_url_fragment:
+            url_substring = '%s/revision/%s' % (
+                topic_url_fragment, subtopic_url_fragment)
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s' % (
+                    verified_classroom_url_fragment,
+                    url_substring),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
 
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-            topic.id, int(subtopic_id), strict=False)
+            topic.id, subtopic_id, strict=False)
         if subtopic_page is None:
-            raise self.PageNotFoundException
+            _redirect_based_on_return_type(
+                self,
+                '/learn/%s/%s/revision' % (
+                    classroom_url_fragment, topic_url_fragment),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
         else:
-            return handler(self, topic_name, subtopic_id, **kwargs)
+            return handler(self, topic.name, subtopic_id, **kwargs)
     test_can_access.__wrapped__ = True
 
     return test_can_access
