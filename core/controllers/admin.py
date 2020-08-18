@@ -269,17 +269,16 @@ class AdminHandler(base.BaseHandler):
                     raise self.InvalidInputException(
                         'new_rules should be a list of dicts, got \'%s\'.' % (
                             new_rule_dicts))
+                FeatureFlagNotFoundException = (
+                    platform_feature_services.FeatureFlagNotFoundException)
                 try:
                     platform_feature_services.update_feature_flag_rules(
                         feature_name, self.user_id, commit_message,
                         new_rule_dicts)
                 except utils.ValidationError as e:
                     raise self.InvalidInputException(e)
-                except Exception as e:
-                    if 'Unknown feature flag' in python_utils.UNICODE(e):
-                        raise self.InvalidInputException(e)
-                    else:
-                        raise e
+                except FeatureFlagNotFoundException as e:
+                    raise self.InvalidInputException(e)
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))

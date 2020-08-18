@@ -18,13 +18,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as param_domain
 from core.domain import platform_parameter_registry as registry
-from core.platform import models
 from core.tests import test_utils
-
-memcache_services = models.Registry.import_memcache_services()
 
 
 class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
@@ -41,10 +39,9 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         self.original_feature_name_set = feature_services.ALL_FEATURES_NAMES_SET
 
         param_names = ['parameter_a', 'parameter_b']
-        self.memcache_keys = [
-            param_domain.PlatformParameter.get_memcache_key(name)
-            for name in param_names]
-        memcache_services.delete_multi(self.memcache_keys)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            param_names)
 
         registry.Registry.parameter_registry.clear()
         self.dev_feature = registry.Registry.create_platform_parameter(

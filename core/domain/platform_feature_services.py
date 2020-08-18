@@ -48,6 +48,11 @@ ALL_FEATURES_LIST = (
 ALL_FEATURES_NAMES_SET = set(ALL_FEATURES_LIST)
 
 
+class FeatureFlagNotFoundException(Exception):
+    """Error class for feature flag not found error."""
+    pass
+
+
 def create_evaluation_context_for_client(client_context_dict):
     """Returns context instance for evaluation, using the information
     provided by clients.
@@ -120,11 +125,12 @@ def update_feature_flag_rules(
             of PlatformParameterRule object.
 
     Raises:
-        Exception. The feature_name is not registered in
+        FeatureFlagNotFoundException. The feature_name is not registered in
             core/platform_feature_list.py.
     """
     if feature_name not in ALL_FEATURES_NAMES_SET:
-        raise Exception('Unknown feature flag: %s.' % feature_name)
+        raise FeatureFlagNotFoundException(
+            'Unknown feature flag: %s.' % feature_name)
 
     registry.Registry.update_platform_parameter(
         feature_name, committer_id, commit_message, new_rule_dicts)
@@ -178,12 +184,12 @@ def _evaluate_feature_flag_values_for_context(feature_names_set, context):
         results of corresponding flags.
 
     Raises:
-        Exception. Some names in 'feature_names_set' are not registered in
-            core/platform_feature_list.py.
+        FeatureFlagNotFoundException. Some names in 'feature_names_set' are not
+            registered in core/platform_feature_list.py.
     """
     unknown_feature_names = list(feature_names_set - ALL_FEATURES_NAMES_SET)
     if len(unknown_feature_names) > 0:
-        raise Exception(
+        raise FeatureFlagNotFoundException(
             'Unknown feature flag(s): %s.' % unknown_feature_names)
 
     result_dict = {}
