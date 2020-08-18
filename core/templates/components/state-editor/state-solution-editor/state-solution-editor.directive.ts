@@ -61,6 +61,7 @@ require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 
 require('components/state-editor/state-editor.constants.ajs.ts');
+require('services/contextual/window-dimensions.service');
 
 angular.module('oppia').directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -81,6 +82,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
         'ExplorationHtmlFormatterService', 'StateInteractionIdService',
         'StateHintsService', 'UrlInterpolationService',
         'StateCustomizationArgsService', 'EditabilityService',
+        'WindowDimensionsService',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
         function(
@@ -90,6 +92,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
             ExplorationHtmlFormatterService, StateInteractionIdService,
             StateHintsService, UrlInterpolationService,
             StateCustomizationArgsService, EditabilityService,
+            WindowDimensionsService,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION) {
           var ctrl = this;
@@ -196,8 +199,15 @@ angular.module('oppia').directive('stateSolutionEditor', [
               AlertsService.clearWarnings();
             });
           };
+
+          $scope.toggleSolutionCard = function() {
+            $scope.solutionCardIsShown = !$scope.solutionCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
+            $scope.solutionCardIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.correctAnswer = null;
             $scope.correctAnswerEditorHtml = '';
             $scope.inlineSolutionEditorIsActive = false;

@@ -17,6 +17,8 @@
  * translation language.
  */
 
+require('components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -42,11 +44,13 @@ angular.module('oppia').directive('translatorOverview', [
       controller: [
         '$rootScope', '$scope', '$window',
         'ExplorationLanguageCodeService', 'LanguageUtilService',
+        'StateEditorService',
         'TranslationLanguageService', 'TranslationStatusService',
         'TranslationTabActiveModeService', 'DEFAULT_AUDIO_LANGUAGE',
         'SUPPORTED_AUDIO_LANGUAGES', function(
             $rootScope, $scope, $window,
             ExplorationLanguageCodeService, LanguageUtilService,
+            StateEditorService,
             TranslationLanguageService, TranslationStatusService,
             TranslationTabActiveModeService, DEFAULT_AUDIO_LANGUAGE,
             SUPPORTED_AUDIO_LANGUAGES) {
@@ -113,7 +117,7 @@ angular.module('oppia').directive('translatorOverview', [
             if ($scope.isTranslationTabBusy) {
               $scope.languageCode = $window.localStorage.getItem(
                 LAST_SELECTED_TRANSLATION_LANGUAGE);
-              $rootScope.$broadcast('showTranslationTabBusyModal');
+              StateEditorService.onShowTranslationTabBusyModal.emit();
               return;
             }
             TranslationLanguageService.setActiveLanguageCode(

@@ -90,176 +90,6 @@ def run_job_for_deleted_exp(
         self.assertEqual(job_class.get_output(job_id), [])
 
 
-class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(MathExpressionValidationOneOffJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
-
-    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
-        """Checks output is produced only for desired interactions."""
-
-        answer_groups_1 = [{
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': True,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'x+y'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }, {
-                'inputs': {
-                    'x': 'x=y'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        states_dict = state_domain.State.from_dict({
-            'content': {
-                'content_id': 'content_1',
-                'html': 'Question 1'
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_1': {},
-                    'feedback_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'content_2': {}
-                }
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'content_1': {},
-                    'feedback_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'content_2': {}
-                }
-            },
-            'interaction': {
-                'answer_groups': answer_groups_1,
-                'confirmed_unclassified_answers': [],
-                'customization_args': {},
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': 'Correct Answer'
-                    },
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'labelled_as_correct': True,
-                    'missing_prerequisite_skill_id': None
-                },
-                'hints': [{
-                    'hint_content': {
-                        'content_id': 'hint_1',
-                        'html': 'Hint 1'
-                    }
-                }],
-                'solution': {
-                    'correct_answer': {
-                        'ascii': 'x+y',
-                        'latex': 'x+y'
-                    },
-                    'answer_is_exclusive': False,
-                    'explanation': {
-                        'html': 'Solution explanation',
-                        'content_id': 'content_2'
-                    }
-                },
-                'id': 'MathExpressionInput'
-            },
-            'next_content_id_index': 3,
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'classifier_model_id': None
-        }).to_dict()
-
-        self.save_new_exp_with_custom_states_schema_version(
-            self.VALID_EXP_ID, 'user_id', states_dict, 34)
-
-        job_id = (
-            exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new())
-        exp_jobs_one_off.MathExpressionValidationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
-                job_id))
-        expected_output = [
-            u'[u\'Invalid\', [u\'The exploration with ID: exp_id0 had some '
-            u'issues during migration. This is most likely due to the '
-            u'exploration having invalid solution(s).\']]']
-
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        state1 = exploration.states['State1']
-
-        state1.update_interaction_id('MathExpressionInput')
-
-        answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'y=mx+c\']'}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state1.update_interaction_answer_groups(answer_group_list)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.MathExpressionValidationOneOffJob)
-
-
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
@@ -958,7 +788,6 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1555,34 +1384,31 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': invalid_html_content2,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': invalid_html_content1,
                     'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [invalid_html_content1]
+                    ]
+                }, {
+                    'x': [
+                        [invalid_html_content2]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [invalid_html_content1]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1847,34 +1673,31 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content,
                     'y': valid_html_content
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2040,34 +1863,31 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content,
                     'y': valid_html_content
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2188,59 +2008,50 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content1]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content1,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content1]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content2,
                     'y': valid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content2]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        [valid_html_content1]
+                    ]
+                }, {
+                    'x': [
+                        [valid_html_content1]
+                    ]
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content2]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
         item_selection_answer_group = {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
-                    'x': [valid_html_content3]
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'ContainsAtLeastOneOf': [{
                     'x': [valid_html_content1]
-                }
-            }, {
-                'rule_type': 'IsProperSubsetOf',
-                'inputs': {
-                    'x': [valid_html_content3]
-                }
-            }, {
-                'rule_type': 'DoesNotContainAtLeastOneOf',
-                'inputs': {
+                }],
+                'DoesNotContainAtLeastOneOf': [{
                     'x': [valid_html_content1]
-                }
-            }],
+                }],
+                'Equals': [{
+                    'x': [valid_html_content3]
+                }],
+                'IsProperSubsetOf': [{
+                    'x': [valid_html_content3]
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -2421,7 +2232,6 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             sorted(expected_latex_strings))
         self.assertEqual(
             exp_models.ExplorationMathRichTextInfoModel.get_all().count(), 1)
-
 
     def test_one_off_job_fails_with_invalid_exploration(self):
         """Test the audit job fails when there is an invalid exploration."""

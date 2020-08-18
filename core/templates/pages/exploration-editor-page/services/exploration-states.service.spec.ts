@@ -157,7 +157,14 @@ describe('ExplorationStatesService', function() {
         param_changes: [],
         interaction: {
           answer_groups: [{
-            rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Contains: [
+                {
+                  x: 'hola'
+                }
+              ]
+            },
             outcome: {
               dest: 'Me Llamo',
               feedback: {

@@ -6,7 +6,7 @@
     </md-card>
     <div class="skill-list-box">
       <md-radio-group ng-model="selectedSkill" ng-change="setSelectedSkillId()">
-        <md-card ng-repeat="(topicName, subtopics) in categorizedSkills" class="list-view-item">
+        <md-card ng-repeat="(topicName, subtopics) in categorizedSkills" class="list-view-item" ng-if="checkIfTopicIsEmpty(topicName)">
           <md-card layout="row" class="list-view-item">
             <h2><label style="padding-left:10px"><[topicName]></label></h2>
           </md-card>
@@ -19,7 +19,7 @@
             </md-card>
           </div>
         </md-card>
-        <md-card ng-if="untriagedSkillSummaries" class="list-view-item">
+        <md-card ng-if="untriagedSkillSummaries.length" class="list-view-item">
           <md-card layout="row" class="list-view-item">
             <h2><label style="padding-left:10px">Untriaged Skills</label></h2>
           </md-card>

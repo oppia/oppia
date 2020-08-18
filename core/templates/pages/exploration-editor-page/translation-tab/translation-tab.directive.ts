@@ -52,6 +52,7 @@ require(
   'state-recorded-voiceovers.service.ts');
 require('services/context.service.ts');
 require('services/editability.service.ts');
+require('pages/admin-page/services/admin-router.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -67,27 +68,29 @@ angular.module('oppia').directive('translationTab', [
 
       controller: ['$scope', '$templateCache', '$uibModal',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
-        'LoaderService', 'SiteAnalyticsService', 'StateEditorService',
-        'StateRecordedVoiceoversService', 'StateTutorialFirstTimeService',
-        'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
+        'LoaderService', 'RouterService', 'SiteAnalyticsService',
+        'StateEditorService', 'StateRecordedVoiceoversService',
+        'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
+        'TranslationTabActiveModeService',
         'UserExplorationPermissionsService',
         function($scope, $templateCache, $uibModal,
             ContextService, EditabilityService, ExplorationStatesService,
-            LoaderService, SiteAnalyticsService, StateEditorService,
-            StateRecordedVoiceoversService, StateTutorialFirstTimeService,
-            StateWrittenTranslationsService, TranslationTabActiveModeService,
+            LoaderService, RouterService, SiteAnalyticsService,
+            StateEditorService, StateRecordedVoiceoversService,
+            StateTutorialFirstTimeService, StateWrittenTranslationsService,
+            TranslationTabActiveModeService,
             UserExplorationPermissionsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
             '#tutorialTranslationLanguage';
           var _ID_TUTORIAL_TRANSLATION_STATE = '#tutorialTranslationState';
-          var _ID_TUTORIAL_TRANSLATION_OVERVIEW =
-            '#tutorialTranslationOverview';
+          var _ID_TUTORIAL_TRANSLATION_OVERVIEW = (
+            '#tutorialTranslationOverview');
           // Replace the ng-joyride template with one that uses
           // <[...]> interpolators instead of/ {{...}} interpolators.
-          var ngJoyrideTemplate =
-            $templateCache.get('ng-joyride-title-tplv1.html');
+          var ngJoyrideTemplate = (
+            $templateCache.get('ng-joyride-title-tplv1.html'));
           ngJoyrideTemplate = ngJoyrideTemplate.replace(
             /\{\{/g, '<[').replace(/\}\}/g, ']>');
 
@@ -155,9 +158,13 @@ angular.module('oppia').directive('translationTab', [
             LoaderService.showLoadingScreen('Loading');
             $scope.isTranslationTabBusy = false;
             $scope.showTranslationTabSubDirectives = false;
-            $scope.$on('refreshTranslationTab', function() {
-              initTranslationTab();
-            });
+            ctrl.directiveSubscriptions.add(
+              RouterService.onRefreshTranslationTab.subscribe(
+                () => {
+                  initTranslationTab();
+                }
+              )
+            );
             // Toggles the translation tab tutorial on/off.
             $scope.translationTutorial = false;
             $scope.TRANSLATION_TUTORIAL_OPTIONS = [{

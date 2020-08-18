@@ -226,7 +226,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.mark_review_completed(
                 suggestion, 'invalid_status', self.reviewer_id)
 
-
     def mock_update_exploration(
             self, unused_user_id, unused_exploration_id, unused_change_list,
             commit_message, is_suggestion):
@@ -338,7 +337,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.check_if_email_has_been_sent_to_user(
                 self.author_id, suggestion.score_category))
 
-
     def test_accept_suggestion_successfully(self):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -435,7 +433,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                             suggestion_services.accept_suggestion(
                                 suggestion, self.reviewer_id,
                                 self.COMMIT_MESSAGE, 'review message')
-
 
     def test_accept_suggestion_handled_suggestion_failure(self):
         with self.swap(

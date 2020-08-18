@@ -43,7 +43,7 @@ def cleanup():
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
     common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
 
-    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
+    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
     processes_to_kill = [
         '.*%s.*' % re.escape(google_app_engine_path),
     ]
@@ -92,11 +92,9 @@ def start_google_app_engine_server():
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' %
         (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
+            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
             GOOGLE_APP_ENGINE_PORT, app_yaml_filepath
-        ),
-        shell=True)
-
+        ), shell=True)
     SUBPROCESSES.append(p)
 
 
@@ -107,7 +105,10 @@ def main():
     atexit.register(cleanup)
 
     python_utils.PRINT('Building files in production mode.')
-    build.main(args=['--prod_env'])
+    # We are using --source_maps here, so that we have at least one CI check
+    # that builds using source maps in prod env. This is to ensure that
+    # there are no issues while deploying oppia.
+    build.main(args=['--prod_env', '--source_maps'])
     build.modify_constants(prod_env=True)
     start_google_app_engine_server()
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)

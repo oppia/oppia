@@ -2975,7 +2975,6 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id,
@@ -3021,7 +3020,6 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.voiceover_reviewer_id,
@@ -3064,7 +3062,6 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
-
 
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(

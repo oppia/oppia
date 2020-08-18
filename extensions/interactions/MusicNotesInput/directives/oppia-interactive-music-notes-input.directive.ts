@@ -33,6 +33,9 @@ require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require(
   'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 interface MusicNote {
   baseNoteMidiNumber: number;
@@ -55,6 +58,7 @@ interface InteractiveMusicNotesInputCustomScope extends ng.IScope {
   _removeNotesFromNoteSequenceWithId?: ((noteId: string) => void);
   _sortNoteSequence?: (() => void);
   clearSequence?: (() => void);
+  directiveSubscriptions?: Subscription;
   generateNoteId?: (() => string);
   getLastAnswer?: (() => string);
   init?: (() => void);
@@ -66,22 +70,23 @@ interface InteractiveMusicNotesInputCustomScope extends ng.IScope {
   playCurrentSequence?: (() => void);
   playSequenceToGuess?: (() => void);
   reinitStaff?: (() => void);
-  sequenceToGuess?: Array<Object>;
+  sequenceToGuess?: Object[];
   staffBottom?: number;
   staffTop?: number;
   submitAnswer?: (() => void);
   topPositionForCenterOfTopStaffLine?: number;
 }
 
+
 angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
   '$timeout', 'AlertsService', 'CurrentInteractionService',
   'InteractionAttributesExtractorService', 'MusicNotesInputRulesService',
-  'MusicPhrasePlayerService', 'EVENT_NEW_CARD_AVAILABLE',
+  'MusicPhrasePlayerService', 'PlayerPositionService',
   'NOTE_NAMES_TO_MIDI_VALUES',
   function(
       $timeout, AlertsService, CurrentInteractionService,
       InteractionAttributesExtractorService, MusicNotesInputRulesService,
-      MusicPhrasePlayerService, EVENT_NEW_CARD_AVAILABLE,
+      MusicPhrasePlayerService, PlayerPositionService,
       NOTE_NAMES_TO_MIDI_VALUES) {
     return {
       restrict: 'E',
@@ -115,11 +120,13 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           initialSequence :
           scope.getLastAnswer();
 
-        scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-          scope.interactionIsActive = false;
-          scope.initialSequence = scope.getLastAnswer();
-          scope.reinitStaff();
-        });
+        scope.directiveSubscriptions.add(
+          PlayerPositionService.onNewCardAvailable.subscribe(() => {
+            scope.interactionIsActive = false;
+            scope.initialSequence = scope.getLastAnswer();
+            scope.reinitStaff();
+          })
+        );
 
         /**
          * A note Object has a baseNoteMidiNumber and an offset property. For
@@ -194,13 +201,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
             scope.init();
           }, 20);
         };
-
-        // When page is in the smaller one card format, reinitialize staff after
-        // the user navigates to the Interaction Panel. Otherwise the dimensions
-        // for the staff will be incorrectly calculated.
-        scope.$on('showInteraction', function() {
-          scope.reinitStaff();
-        });
 
         // Creates draggable notes and droppable staff.
         scope.init = function() {
@@ -892,6 +892,10 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // and then initializes the view after staff has loaded.
         $(document).ready(function() {
           scope.reinitStaff();
+        });
+
+        scope.$on('$destroy', function() {
+          scope.directiveSubscriptions.unsubscribe();
         });
       }
     };

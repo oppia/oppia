@@ -41,8 +41,6 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 import { AppConstants } from 'app.constants';
-import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -68,7 +66,6 @@ import { StoryEditorPageConstants } from
   providers: [
     AppConstants,
     InteractionsExtensionsConstants,
-    EditorDomainConstants,
     ObjectsDomainConstants,
     ServicesConstants,
     SkillDomainConstants,

@@ -85,8 +85,7 @@ class TopicModel(base_models.VersionedModel):
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The url fragment of the topic.
-    # TODO(#10140): Topic url_fragment should be a required field.
-    url_fragment = ndb.StringProperty(indexed=True)
+    url_fragment = ndb.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -242,8 +241,7 @@ class TopicSummaryModel(base_models.BaseModel):
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
     # The url fragment of the topic.
-    # TODO(#10140): TopicSummary url_fragment should be a required field.
-    url_fragment = ndb.StringProperty(indexed=True)
+    url_fragment = ndb.StringProperty(required=True, indexed=True)
 
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the
