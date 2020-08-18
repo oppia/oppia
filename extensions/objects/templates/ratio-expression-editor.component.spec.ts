@@ -55,4 +55,10 @@ describe('RatioExpression', function() {
       .toBe('Please write a ratio that consists of digits separated by colons' +
       '(e.g. 1:2 or 1:2:3).');
   });
+
+  it('should return ctrl.value', function() {
+    RationExpressionCtrl.value = '1:2:3';
+    RationExpressionCtrl.$onInit();
+    expect(RationExpressionCtrl.isValidRatio()).toBe(true);
+  });
 });
