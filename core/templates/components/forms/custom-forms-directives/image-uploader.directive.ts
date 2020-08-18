@@ -56,27 +56,22 @@ angular.module('oppia').directive('imageUploader', [
           var imageTypeMapping = {
             jpeg: {
               format: 'image/jpeg',
-              fileType: /jp(e?)g$/,
               fileExtension: /\.jp(e?)g$/,
             },
             jpg: {
               format: 'image/jpg',
-              fileType: /jp(e?)g$/,
               fileExtension: /\.jp(e?)g$/,
             },
             gif: {
               format: 'image/gif',
-              fileType: /gif$/,
               fileExtension: /\.gif$/,
             },
             png: {
               format: 'image/png',
-              fileType: /png$/,
               fileExtension: /\.png$/,
             },
             svg: {
               format: 'image/svg\\+xml',
-              fileType: /svg\+xml$/,
               fileExtension: /\.svg$/,
             }
           };
@@ -90,7 +85,6 @@ angular.module('oppia').directive('imageUploader', [
             if (file.type.match(imageTypeMapping[imageType].format)) {
               imageHasInvalidFormat = false;
               if (
-                file.type.match(imageTypeMapping[imageType].fileType) &&
                 !file.name.match(imageTypeMapping[imageType].fileExtension)) {
                 return (
                   'This image format does not match the filename extension.');
