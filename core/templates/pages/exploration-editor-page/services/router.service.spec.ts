@@ -36,6 +36,7 @@ describe('Router Service', () => {
   var refreshSettingsTabSpy = null;
   var refreshTranslationTabSpy = null;
   var externalSaveSpy = null;
+  var refreshVersionHistorySpy = null;
 
   beforeEach(angular.mock.module('oppia', $provide => {
     var ugs = new UpgradedServices();
@@ -170,6 +171,7 @@ describe('Router Service', () => {
     refreshSettingsTabSpy = jasmine.createSpy('refreshSettingsTab');
     refreshTranslationTabSpy = jasmine.createSpy('refreshTranslationTab');
     externalSaveSpy = jasmine.createSpy('externalSpy');
+    refreshVersionHistorySpy = jasmine.createSpy('refreshVersionHistory');
     testSubscriptions = new Subscription();
     testSubscriptions.add(
       RouterService.onRefreshStatisticsTab.subscribe(refreshStatisticsTabSpy));
@@ -180,6 +182,9 @@ describe('Router Service', () => {
         refreshTranslationTabSpy));
     testSubscriptions.add(
       ExternalSaveService.onExternalSave.subscribe(externalSaveSpy));
+    testSubscriptions.add(
+      RouterService.onRefreshVersionHistory.subscribe(
+        refreshVersionHistorySpy));
   });
 
   afterEach(() => {
@@ -466,8 +471,6 @@ describe('Router Service', () => {
     }));
 
   it('should navigate to settings tab ', () => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
-
     RouterService.navigateToSettingsTab();
     $rootScope.$apply();
 
@@ -480,15 +483,11 @@ describe('Router Service', () => {
   });
 
   it('should navigate to history tab ', () => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
-
     RouterService.navigateToHistoryTab();
     $rootScope.$apply();
 
     expect(externalSaveSpy).toHaveBeenCalled();
-    expect(broadcastSpy).toHaveBeenCalledWith('refreshVersionHistory', {
-      forceRefresh: false
-    });
+    expect(refreshVersionHistorySpy).toHaveBeenCalled();
     expect(RouterService.getActiveTabName()).toBe('history');
 
     expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
@@ -534,7 +533,6 @@ describe('Router Service', () => {
   });
 
   it('should save pending changes', () => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     RouterService.savePendingChanges();
     expect(externalSaveSpy).toHaveBeenCalled();
   });
