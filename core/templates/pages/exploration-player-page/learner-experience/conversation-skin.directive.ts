@@ -18,6 +18,7 @@
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { Subscription } from 'rxjs';
 
 require(
   'components/question-directives/question-player/services/' +
@@ -370,7 +371,6 @@ angular.module('oppia').directive('conversationSkin', [
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
-        'EVENT_NEW_CARD_AVAILABLE',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'FEEDBACK_POPOVER_PATH',
         'INTERACTION_SPECS', 'REVIEW_TESTS_URL_TEMPLATE',
         'STORY_VIEWER_URL_TEMPLATE',
@@ -402,13 +402,13 @@ angular.module('oppia').directive('conversationSkin', [
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
-            EVENT_NEW_CARD_AVAILABLE,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, FEEDBACK_POPOVER_PATH,
             INTERACTION_SPECS, REVIEW_TESTS_URL_TEMPLATE,
             STORY_VIEWER_URL_TEMPLATE,
             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
           // The minimum width, in pixels, needed to be able to show two cards
@@ -811,8 +811,8 @@ angular.module('oppia').directive('conversationSkin', [
               initialCard, focusLabel) {
             _addNewCard(initialCard);
             $scope.nextCard = initialCard;
-            $rootScope.$broadcast(
-              'playerStateChange', $scope.nextCard.getStateName());
+            ExplorationPlayerStateService.onPlayerStateChange.emit(
+              $scope.nextCard.getStateName());
             FocusManagerService.setFocusIfOnDesktop(focusLabel);
             LoaderService.hideLoadingScreen();
             $scope.hasFullyLoaded = true;
@@ -870,7 +870,7 @@ angular.module('oppia').directive('conversationSkin', [
               FatigueDetectionService.recordSubmissionTimestamp();
               if (FatigueDetectionService.isSubmittingTooFast()) {
                 FatigueDetectionService.displayTakeBreakMessage();
-                $scope.$broadcast('oppiaFeedbackAvailable');
+                ExplorationPlayerStateService.onOppiaFeedbackAvailable.emit();
                 return;
               }
             }
@@ -896,7 +896,7 @@ angular.module('oppia').directive('conversationSkin', [
                 PlayerTranscriptService.addNewResponse(
                   LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion());
                 $scope.answerIsBeingProcessed = false;
-                $scope.$broadcast('helpCardAvailable', {
+                PlayerPositionService.onHelpCardAvailable.emit({
                   helpCardHtml: (
                     LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion()),
                   hasContinueButton: false
@@ -939,8 +939,8 @@ angular.module('oppia').directive('conversationSkin', [
                   }
                 }
                 if (!ExplorationPlayerStateService.isInQuestionMode()) {
-                  $rootScope.$broadcast(
-                    'playerStateChange', nextCard.getStateName());
+                  ExplorationPlayerStateService.onPlayerStateChange.emit(
+                    nextCard.getStateName());
                 } else {
                   QuestionPlayerStateService.answerSubmitted(
                     QuestionPlayerEngineService.getCurrentQuestion(),
@@ -956,7 +956,7 @@ angular.module('oppia').directive('conversationSkin', [
                   1.0));
 
                 $timeout(function() {
-                  $scope.$broadcast('oppiaFeedbackAvailable');
+                  ExplorationPlayerStateService.onOppiaFeedbackAvailable.emit();
                   var pairs = (
                     PlayerTranscriptService.getLastCard().
                       getInputResponsePairs());
@@ -979,7 +979,7 @@ angular.module('oppia').directive('conversationSkin', [
                     }
 
                     if (helpCardAvailable) {
-                      $scope.$broadcast('helpCardAvailable', {
+                      PlayerPositionService.onHelpCardAvailable.emit({
                         helpCardHtml: feedbackHtml,
                         hasContinueButton: false
                       });
@@ -991,7 +991,7 @@ angular.module('oppia').directive('conversationSkin', [
                       ).then(function(conceptCardObject) {
                         $scope.conceptCard = conceptCardObject;
                         if (helpCardAvailable) {
-                          $scope.$broadcast('helpCardAvailable', {
+                          PlayerPositionService.onHelpCardAvailable.emit({
                             helpCardHtml: feedbackHtml,
                             hasContinueButton: true
                           });
@@ -1052,7 +1052,7 @@ angular.module('oppia').directive('conversationSkin', [
                         PlayerTranscriptService.addNewResponse(feedbackHtml);
                         if (
                           !$scope.displayedCard.isInteractionInline()) {
-                          $scope.$broadcast('helpCardAvailable', {
+                          PlayerPositionService.onHelpCardAvailable.emit({
                             helpCardHtml: feedbackHtml,
                             hasContinueButton: true
                           });
@@ -1082,12 +1082,12 @@ angular.module('oppia').directive('conversationSkin', [
                       }
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
                       if (!$scope.displayedCard.isInteractionInline()) {
-                        $scope.$broadcast('helpCardAvailable', {
+                        PlayerPositionService.onHelpCardAvailable.emit({
                           helpCardHtml: feedbackHtml,
                           hasContinueButton: true
                         });
                       }
-                      $rootScope.$broadcast(EVENT_NEW_CARD_AVAILABLE);
+                      PlayerPositionService.onNewCardAvailable.emit();
                       _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
                       FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                       scrollToBottom();
@@ -1147,8 +1147,7 @@ angular.module('oppia').directive('conversationSkin', [
               return;
             }
             if ($scope.questionSessionCompleted) {
-              $rootScope.$broadcast(
-                'questionSessionCompleted',
+              QuestionPlayerStateService.onQuestionSessionCompleted.emit(
                 QuestionPlayerStateService.getQuestionPlayerStateData());
               return;
             }
@@ -1302,57 +1301,69 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.lastRequestedHeight = 0;
             $scope.lastRequestedScroll = false;
             if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
-              $rootScope.$on('hintConsumed', function(evt) {
-                QuestionPlayerStateService.hintUsed(
-                  QuestionPlayerEngineService.getCurrentQuestion());
-              });
+              ctrl.directiveSubscriptions.add(
+                HintsAndSolutionManagerService.onHintConsumed.subscribe(
+                  () => {
+                    QuestionPlayerStateService.hintUsed(
+                      QuestionPlayerEngineService.getCurrentQuestion());
+                  }
+                )
+              );
 
-              $rootScope.$on('solutionViewed', function(evt, timestamp) {
-                QuestionPlayerStateService.solutionViewed(
-                  QuestionPlayerEngineService.getCurrentQuestion());
-              });
+              ctrl.directiveSubscriptions.add(
+                HintsAndSolutionManagerService.onSolutionViewedEventEmitter
+                  .subscribe(() => {
+                    QuestionPlayerStateService.solutionViewed(
+                      QuestionPlayerEngineService.getCurrentQuestion());
+                  })
+              );
             }
-            $rootScope.$on('playerStateChange', function(evt, newStateName) {
-              if (!newStateName) {
-                return;
-              }
-              // To restart the preloader for the new state if required.
-              if (!_editorPreviewMode) {
-                ImagePreloaderService.onStateChange(newStateName);
-              }
-              // Ensure the transition to a terminal state properly logs the end
-              // of the exploration.
-              if (
-                !_editorPreviewMode && $scope.nextCard.isTerminal()) {
-                StatsReportingService.recordExplorationCompleted(
-                  newStateName, LearnerParamsService.getAllParams());
+            ctrl.directiveSubscriptions.add(
+              ExplorationPlayerStateService.onPlayerStateChange.subscribe(
+                (newStateName) => {
+                  if (!newStateName) {
+                    return;
+                  }
+                  // To restart the preloader for the new state if required.
+                  if (!_editorPreviewMode) {
+                    ImagePreloaderService.onStateChange(newStateName);
+                  }
+                  // Ensure the transition to a terminal state properly logs
+                  // the end of the exploration.
+                  if (
+                    !_editorPreviewMode && $scope.nextCard.isTerminal()) {
+                    StatsReportingService.recordExplorationCompleted(
+                      newStateName, LearnerParamsService.getAllParams());
 
-                // If the user is a guest, has completed this exploration within
-                // the context of a collection, and the collection is
-                // whitelisted, record their temporary progress.
-                var collectionAllowsGuestProgress = (
-                  WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
-                    $scope.collectionId) !== -1);
-                if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
-                  GuestCollectionProgressService.
-                    recordExplorationCompletedInCollection(
-                      $scope.collectionId, $scope.explorationId);
+                    // If the user is a guest, has completed this exploration
+                    // within the context of a collection, and the collection is
+                    // whitelisted, record their temporary progress.
+                    var collectionAllowsGuestProgress = (
+                      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.
+                        indexOf($scope.collectionId) !== -1);
+                    if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
+                      GuestCollectionProgressService.
+                        recordExplorationCompletedInCollection(
+                          $scope.collectionId, $scope.explorationId);
+                    }
+
+                    // For single state explorations, when the exploration
+                    // reachesthe terminal state and explorationActuallyStarted
+                    // is false, record exploration actual start event.
+                    if (!explorationActuallyStarted) {
+                      StatsReportingService.recordExplorationActuallyStarted(
+                        newStateName);
+                      explorationActuallyStarted = true;
+                    }
+                  }
                 }
-
-                // For single state explorations, when the exploration reaches
-                // the terminal state and explorationActuallyStarted is false,
-                // record exploration actual start event.
-                if (!explorationActuallyStarted) {
-                  StatsReportingService.recordExplorationActuallyStarted(
-                    newStateName);
-                  explorationActuallyStarted = true;
-                }
-              }
-            });
-            $scope.$on('ratingUpdated', function() {
-              $scope.userRating = LearnerViewRatingService.getUserRating();
-            });
-
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              LearnerViewRatingService.onRatingUpdated.subscribe(() => {
+                $scope.userRating = LearnerViewRatingService.getUserRating();
+              })
+            );
             $window.addEventListener('beforeunload', function(e) {
               if ($scope.redirectToRefresherExplorationConfirmed) {
                 return;
@@ -1405,6 +1416,10 @@ angular.module('oppia').directive('conversationSkin', [
                 }
               );
             }
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
