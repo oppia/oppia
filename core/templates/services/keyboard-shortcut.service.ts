@@ -26,9 +26,7 @@ import { WindowRef } from 'services/contextual/window-ref.service.ts';
   providedIn: 'root'
 })
 export class KeyboardShortcutService {
-  constructor(
-    private windowRef: WindowRef) {
-  }
+  constructor(private windowRef: WindowRef) {}
   bindExplorationPlayerShortcuts() {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();

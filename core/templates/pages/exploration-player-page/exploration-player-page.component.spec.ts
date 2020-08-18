@@ -22,8 +22,9 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { TestBed } from '@angular/core/testing';
+
+import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 
 require('pages/exploration-player-page/exploration-player-page.component.ts');
 
@@ -48,7 +49,8 @@ describe('Exploration player page', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('KeyboardShortcutService',
+    $provide.value(
+      'KeyboardShortcutService', 
       TestBed.get(KeyboardShortcutService));
   }));
 
