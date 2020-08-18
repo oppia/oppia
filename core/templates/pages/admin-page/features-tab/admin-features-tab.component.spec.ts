@@ -281,21 +281,7 @@ describe('Admin page feature tab', function() {
       expect(setStatusSpy).not.toHaveBeenCalled();
     }));
 
-    it('should not proceed if the user does\'t confirm', fakeAsync(() => {
-      mockConfirmResult(false);
-
-      const featureFlag = component.featureFlags[0];
-
-      component.addNewRuleToTop(featureFlag);
-      component.updateFeatureRulesAsync(featureFlag);
-
-      flushMicrotasks();
-
-      expect(updateApiSpy).not.toHaveBeenCalled();
-      expect(setStatusSpy).not.toHaveBeenCalled();
-    }));
-
-    it('should not proceed if the user does\'t cancels the prompt', fakeAsync(
+    it('should not proceed if the user cancels the prompt', fakeAsync(
       () => {
         mockPromptResult(null);
 
