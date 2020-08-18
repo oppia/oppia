@@ -116,32 +116,31 @@ describe('RatioExpressionInputValidationService', () => {
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
+      message: 'Rule 2 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'Equals\' rule with a matching' +
       ' input.'
     }, {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'Equals\' rule with a matching' +
+      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
+      ' input.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 3 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
       ' input.'
     }
     ]);
-    let isEquivalent1 = rof.createFromBackendDict({
+    let isEquivalentSimplified = rof.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
         x: '1:2:3'
       }
     });
 
-    let isEquivalent2 = rof.createFromBackendDict({
-      rule_type: 'IsEquivalent',
-      inputs: {
-        x: '2:4:6'
-      }
-    });
-
     // The second rule will never get matched.
-    answerGroups[0].updateRuleTypesToInputs([isEquivalent1, isEquivalent2]);
+    answerGroups[0].updateRuleTypesToInputs(
+      [isEquivalentSimplified, isEquivalent]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -152,5 +151,25 @@ describe('RatioExpressionInputValidationService', () => {
       ' input.'
     }
     ]);
+
+    let hasNumberOfTermsEqualTo2 = rof.createFromBackendDict({
+      rule_type: 'HasNumberOfTermsEqualTo',
+      inputs: {
+        x: '1:2:4'
+      }
+    });
+
+    // The second rule will never get matched.
+    answerGroups[0].updateRuleTypesToInputs(
+      [hasNumberOfTermsEqualTo, hasNumberOfTermsEqualTo2]);
+
+    warnings = validatorService.getAllWarnings(currentState,
+      customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
+      ' input.'
+    }]);
   });
 });
