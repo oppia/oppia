@@ -29,6 +29,7 @@ import { StateRecordedVoiceoversService } from
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { EventEmitter } from '@angular/core';
 
 describe('State Translation Editor Component', function() {
   var $q = null;
@@ -43,6 +44,9 @@ describe('State Translation Editor Component', function() {
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
   var writtenTranslationObjectFactory = null;
+
+  var mockActiveContentIdChangedEventEmitter = new EventEmitter();
+  var mockActiveLanguageChangedEventEmitter = new EventEmitter();
 
   var stateName = 'State1';
   var state = {
@@ -113,6 +117,7 @@ describe('State Translation Editor Component', function() {
     },
   };
   var stateObj = null;
+  var ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -151,6 +156,13 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
 
+      spyOnProperty(translationLanguageService,
+        'onActiveLanguageChanged').and.returnValue(
+        mockActiveLanguageChangedEventEmitter);
+      spyOnProperty(translationTabActiveContentIdService,
+        'onActiveContentIdChanged').and.returnValue(
+        mockActiveLanguageChangedEventEmitter);
+
       stateWrittenTranslationsService.init(stateName, {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
@@ -164,7 +176,7 @@ describe('State Translation Editor Component', function() {
       });
 
       $scope = $rootScope.$new();
-      var ctrl = $componentController('stateTranslationEditor', {
+      ctrl = $componentController('stateTranslationEditor', {
         $scope: $scope,
         StateEditorService: stateEditorService,
         StateWrittenTranslationsService: stateWrittenTranslationsService,
@@ -172,6 +184,10 @@ describe('State Translation Editor Component', function() {
       });
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should evaluate $scope properties after controller initialization',
       function() {
@@ -311,7 +327,7 @@ describe('State Translation Editor Component', function() {
 
     it('should init editor when changing active content id language',
       function() {
-        $rootScope.$broadcast('activeContentIdChanged');
+        mockActiveContentIdChangedEventEmitter.emit();
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
           writtenTranslationObjectFactory.createFromBackendDict({
@@ -322,7 +338,7 @@ describe('State Translation Editor Component', function() {
       });
 
     it('should init editor when changing active language', function() {
-      $rootScope.$broadcast('activeLanguageChanged');
+      mockActiveLanguageChangedEventEmitter.emit();
       expect($scope.translationEditorIsOpen).toBe(false);
       expect($scope.activeWrittenTranslation).toEqual(
         writtenTranslationObjectFactory.createFromBackendDict({
@@ -365,7 +381,7 @@ describe('State Translation Editor Component', function() {
       });
 
       $scope = $rootScope.$new();
-      var ctrl = $componentController('stateTranslationEditor', {
+      ctrl = $componentController('stateTranslationEditor', {
         $scope: $scope,
         StateEditorService: stateEditorService,
         StateWrittenTranslationsService: stateWrittenTranslationsService,
@@ -373,6 +389,11 @@ describe('State Translation Editor Component', function() {
       });
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
 
     it('should evaluate $scope properties after controller initialization',
       function() {

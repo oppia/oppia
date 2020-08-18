@@ -13,8 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the headroom library.
+ * @fileoverview Production environment config file for Webpack with
+ * proper source maps.
  */
 
-window.Headroom = require('static/headroom-js-0.9.4/headroom.min.js');
-require('static/headroom-js-0.9.4/angular.headroom.min.js');
+const { merge } = require('webpack-merge');
+const prod = require('./webpack.prod.config.ts');
+
+module.exports = merge(prod, {
+  devtool: 'source-map'
+});

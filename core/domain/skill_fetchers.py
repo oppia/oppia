@@ -21,13 +21,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import caching_services
 from core.domain import skill_domain
 from core.platform import models
 import feconf
 import python_utils
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
-memcache_services = models.Registry.import_memcache_services()
 
 
 def get_multi_skills(skill_ids, strict=True):
@@ -66,38 +66,26 @@ def get_skill_by_id(skill_id, strict=True, version=None):
         Skill or None. The domain object representing a skill with the
         given id, or None if it does not exist.
     """
-    skill_memcache_key = get_skill_memcache_key(
-        skill_id, version=version)
-    memcached_skill = memcache_services.get_multi(
-        [skill_memcache_key]).get(skill_memcache_key)
+    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    cached_skill = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_SKILL,
+        sub_namespace,
+        [skill_id]).get(skill_id)
 
-    if memcached_skill is not None:
-        return memcached_skill
+    if cached_skill is not None:
+        return cached_skill
     else:
         skill_model = skill_models.SkillModel.get(
             skill_id, strict=strict, version=version)
         if skill_model:
             skill = get_skill_from_model(skill_model)
-            memcache_services.set_multi({skill_memcache_key: skill})
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_SKILL,
+                sub_namespace,
+                {skill_id: skill})
             return skill
         else:
             return None
-
-
-def get_skill_memcache_key(skill_id, version=None):
-    """Returns a memcache key for the skill.
-
-    Args:
-        skill_id: str. ID of the skill.
-        version: int or None. Schema version of the skill.
-
-    Returns:
-        str. The memcache key of the skill.
-    """
-    if version:
-        return 'skill-version:%s:%s' % (skill_id, version)
-    else:
-        return 'skill:%s' % skill_id
 
 
 def get_skill_from_model(skill_model):

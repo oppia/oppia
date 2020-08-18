@@ -27,6 +27,7 @@ import logging
 
 from constants import constants
 from core.domain import android_validation_constants
+from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import rights_manager
@@ -40,7 +41,6 @@ import utils
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
-memcache_services = models.Registry.import_memcache_services()
 
 
 def get_new_story_id():
@@ -445,7 +445,8 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.url_fragment = story.url_fragment
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
-    memcache_services.delete(story_fetchers.get_story_memcache_key(story.id))
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story.id])
     story.version += 1
 
 
@@ -540,8 +541,8 @@ def delete_story(committer_id, story_id, force_deletion=False):
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.
-    story_memcache_key = story_fetchers.get_story_memcache_key(story_id)
-    memcache_services.delete(story_memcache_key)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story_id])
 
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).

@@ -924,7 +924,7 @@ class InteractionInstance(python_utils.OBJECT):
                 feconf.DEFAULT_OUTCOME_CONTENT_ID), False, {}, None, None)
 
         return cls(
-            cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
+            cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], None)
 
     def get_all_html_content_strings(self):
         """Get all html content strings in the interaction.
@@ -2508,14 +2508,15 @@ class State(python_utils.OBJECT):
         """
         return self.written_translations.get_translation_counts()
 
-    def get_content_count(self):
-        """Returns the number of distinct content fields available in the
-        object.
+    def get_translatable_content_count(self):
+        """Returns the number of content fields available for translation in
+        the object.
 
         Returns:
-            int. The number of distinct content fields available in the state.
+            int. The number of content fields available for translation in
+            the state.
         """
-        return len(self.written_translations.translations_mapping)
+        return len(self._get_all_translatable_content())
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
         """Adds or deletes content ids in assets i.e, other parts of state
@@ -2896,7 +2897,6 @@ class State(python_utils.OBJECT):
 
         return content_id_to_html
 
-
     def to_dict(self):
         """Returns a dict representing this State domain object.
 
@@ -3026,7 +3026,6 @@ class State(python_utils.OBJECT):
                 Solution.convert_html_in_solution(
                     state_dict['interaction']['id'],
                     state_dict['interaction']['solution'], conversion_fn))
-
 
         if state_uses_old_interaction_cust_args_schema:
             # We need to retrieve an older version of interaction_specs to

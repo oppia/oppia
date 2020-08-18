@@ -19,7 +19,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ContextService } from 'services/context.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 
@@ -27,10 +26,13 @@ import { PlayerTranscriptService } from
   providedIn: 'root'
 })
 export class PlayerPositionService {
-  constructor(private contextService: ContextService,
-              private playerTranscriptService: PlayerTranscriptService) {}
+  constructor(private playerTranscriptService: PlayerTranscriptService) {}
 
   private _activeCardChangedEventEmitter = new EventEmitter();
+  private _currentQuestionChangedEventEmitter = new EventEmitter<number>();
+  private _newCardAvailableEventEmitter = new EventEmitter();
+  private _helpCardAvailableEventEmitter = new EventEmitter();
+  private _newCardOpenedEventEmitter = new EventEmitter();
 
   displayedCardIndex = null;
   onChangeCallback = null;
@@ -96,8 +98,28 @@ export class PlayerPositionService {
     return this.learnerJustSubmittedAnAnswer;
   }
 
+  get onNewCardAvailable() {
+    return this._newCardAvailableEventEmitter;
+  }
+
+  get onHelpCardAvailable() {
+    return this._helpCardAvailableEventEmitter;
+  }
+
+  get onNewCardOpened() {
+    return this._newCardOpenedEventEmitter;
+  }
+
+  changeCurrentQuestion(index: number) {
+    this._currentQuestionChangedEventEmitter.emit(index);
+  }
+
   get onActiveCardChanged() {
     return this._activeCardChangedEventEmitter;
+  }
+
+  get onCurrentQuestionChange() {
+    return this._currentQuestionChangedEventEmitter;
   }
 }
 
