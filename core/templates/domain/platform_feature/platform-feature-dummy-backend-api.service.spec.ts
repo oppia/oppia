@@ -20,6 +20,8 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { PlatformFeatureDomainConstants } from
+  './platform-feature-domain.constants';
 import { PlatformFeatureDummyBackendApiService } from
   './platform-feature-dummy-backend-api.service';
 
@@ -49,7 +51,7 @@ describe('PlatformFeatureDummyBackendApiService', () => {
         .then(successHandler, failHandler);
 
       httpTestingController
-        .expectOne('/platformfeaturedummyhandler')
+        .expectOne(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
         .flush({ msg: 'ok' });
 
       flushMicrotasks();
@@ -66,7 +68,7 @@ describe('PlatformFeatureDummyBackendApiService', () => {
         .then(successHandler, failHandler);
 
       httpTestingController
-        .expectOne('/platformfeaturedummyhandler')
+        .expectOne(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
         .flush('Mock 404 Error', {
           status: 404,
           statusText: 'Not Found'
@@ -86,7 +88,7 @@ describe('PlatformFeatureDummyBackendApiService', () => {
         .then(successHandler, failHandler);
 
       httpTestingController
-        .expectOne('/platformfeaturedummyhandler')
+        .expectOne(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
         .flush('Mock 500 Error', {
           status: 500,
           statusText: 'Some internal server error.'
