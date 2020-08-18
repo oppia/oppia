@@ -38,6 +38,7 @@ import zipfile
 
 from constants import constants
 from core.domain import activity_services
+from core.domain import caching_services
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import draft_upgrade_services
@@ -62,7 +63,6 @@ import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
@@ -581,8 +581,10 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
-    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-    memcache_services.delete(exp_memcache_key)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION,
+        None,
+        [exploration.id])
 
     exploration.version += 1
 
@@ -756,12 +758,9 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
         feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
 
-    # This must come after the explorations are retrieved. Otherwise the
-    # memcache keys will be reinstated.
-    exploration_memcache_keys = [
-        exp_fetchers.get_exploration_memcache_key(exploration_id)
-        for exploration_id in exploration_ids]
-    memcache_services.delete_multi(exploration_memcache_keys)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+        exploration_ids)
 
     # Delete the explorations from search.
     search_services.delete_explorations_from_search_index(exploration_ids)
@@ -1187,8 +1186,9 @@ def revert_exploration(
         exploration_model, committer_id,
         'Reverted exploration to version %s' % revert_to_version,
         revert_to_version)
-    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-    memcache_services.delete(exp_memcache_key)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+        [exploration.id])
 
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.

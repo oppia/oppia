@@ -28,6 +28,7 @@ import subprocess
 import sys
 import time
 
+import feconf
 import python_utils
 import release_constants
 
@@ -54,6 +55,27 @@ YARN_VERSION = '1.22.4'
 # Versions of libraries used in backend.
 PILLOW_VERSION = '6.2.2'
 
+# We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
+# there is a `make test` bug in redis 6.0.6 where the solution has not been
+# released. This is explained in this issue:
+# https://github.com/redis/redis/issues/7540.
+# IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
+# 1. Download the new version of the redis cli.
+# 2. Extract the cli in the folder that it was downloaded, most likely
+#    Downloads/.
+# 3. Change directories into the folder you extracted, titled
+#    redis-<new version>/ and change into that directory:
+#    cd redis-<new version>/
+# 4. From the top level of the redis-<new version> directory,
+#    run `make test`.
+# 5. All of the tests should pass with an [ok] status with no error codes. The
+#    final output should be 'All tests pass'.
+# 6. Be sure to leave a note in the PR description to confirm that you have read
+#    this message, and that all of the `make test` tests pass before you commit
+#    the upgrade to develop.
+# 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
+REDIS_CLI_VERSION = '6.0.5'
+
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
@@ -77,6 +99,12 @@ YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+REDIS_SERVER_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
+    'src', 'redis-server')
+REDIS_CLI_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
+    'src', 'redis-cli')
 
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
@@ -87,6 +115,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 FECONF_PATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+REDIS_CONF_PATH = os.path.join('.', 'redis.conf')
 
 
 def is_windows_os():
@@ -608,6 +637,40 @@ def wait_for_port_to_be_open(port_number):
             'Failed to start server on port %s, exiting ...' %
             port_number)
         sys.exit(1)
+
+
+def start_redis_server():
+    """Start the redis server with the daemonize argument to prevent
+    the redis-server from exiting on its own.
+    """
+    if is_windows_os():
+        raise Exception(
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. The redis server '
+            'cannot start.')
+
+    # Redis-cli is only required in a development environment.
+    python_utils.PRINT('Starting Redis development server.')
+    # Start the redis local development server. Redis doesn't run on
+    # Windows machines.
+    subprocess.call([
+        REDIS_SERVER_PATH, REDIS_CONF_PATH,
+        '--daemonize', 'yes'
+    ])
+    wait_for_port_to_be_open(feconf.REDISPORT)
+
+
+def stop_redis_server():
+    """Stops the redis server by shutting it down."""
+    if is_windows_os():
+        raise Exception(
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. There is no redis '
+            'server to shutdown.')
+
+    python_utils.PRINT('Cleaning up the redis_servers.')
+    # Shutdown the redis server before exiting.
+    subprocess.call([REDIS_CLI_PATH, 'shutdown'])
 
 
 class CD(python_utils.OBJECT):

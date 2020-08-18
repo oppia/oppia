@@ -215,6 +215,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
+        r'/memorycacheadminhandler', admin.MemoryCacheAdminHandler),
+    get_redirect_route(
         r'/explorationslatexsvghandler', admin.ExplorationsLatexSvgHandler),
     get_redirect_route(
         r'/suggestionslatexsvghandler', admin.SuggestionsLatexSvgHandler),

@@ -188,6 +188,7 @@ def cleanup():
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
     build.set_constants_to_default()
+    common.stop_redis_server()
 
 
 def is_oppia_server_already_running():
@@ -547,6 +548,7 @@ def main(args=None):
         sys.exit(1)
     setup_and_install_dependencies(parsed_args.skip_install)
 
+    common.start_redis_server()
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env

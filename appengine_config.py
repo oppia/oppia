@@ -54,6 +54,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.43.0'),
     os.path.join(ROOT_PATH, 'third_party', 'packaging-20.4'),
     os.path.join(ROOT_PATH, 'third_party', 'pylatexenc-2.6'),
+    os.path.join(ROOT_PATH, 'third_party', 'redis-3.5.3'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.17.0'),
     os.path.join(ROOT_PATH, 'third_party', 'six-1.15.0'),
     os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.5'),

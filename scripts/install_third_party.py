@@ -21,6 +21,7 @@ import argparse
 import contextlib
 import json
 import os
+import subprocess
 import sys
 import tarfile
 import zipfile
@@ -338,10 +339,79 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
+def install_redis_cli():
+    """This installs the redis-cli to the local oppia third_party directory so
+    that development servers and backend tests can make use of a local redis
+    cache. Redis-cli installed here (redis-cli-6.0.6) is different from the
+    redis package installed in manifest.json (redis-3.5.3). The redis-3.5.3
+    package detailed in manifest.json is the Python library that allows users to
+    communicate with any Redis cache using Python. The redis-cli-6.0.6 package
+    installed in this function contains C++ scripts for the redis-cli and
+    redis-server programs detailed below.
+
+    The redis-cli program is the command line interface that serves up an
+    interpreter that allows users to connect to a redis database cache and
+    query the cache using the Redis CLI API. It also contains functionality to
+    shutdown the redis server. We need to install redis-cli separately from the
+    default installation of backend libraries since it is a system program and
+    we need to build the program files after the library is untarred.
+
+    The redis-server starts a Redis database on the local machine that can be
+    queried using either the Python redis library or the redis-cli interpreter.
+    """
+    try:
+        subprocess.call(
+            [common.REDIS_SERVER_PATH, '--version'],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        python_utils.PRINT('Redis-cli is already installed.')
+    except OSError:
+        # The redis-cli is not installed, run the script to install it.
+        # NOTE: We do the installation here since we need to use make.
+        python_utils.PRINT('Installing redis-cli...')
+
+        download_and_untar_files(
+            ('https://download.redis.io/releases/redis-%s.tar.gz') %
+            common.REDIS_CLI_VERSION,
+            TARGET_DOWNLOAD_DIRS['oppiaTools'],
+            'redis-%s' % common.REDIS_CLI_VERSION,
+            'redis-cli-%s' % common.REDIS_CLI_VERSION)
+
+        # Temporarily change the working directory to redis-cli-6.0.6 so we can
+        # build the source code.
+        with common.CD(
+            os.path.join(
+                TARGET_DOWNLOAD_DIRS['oppiaTools'],
+                'redis-cli-%s' % common.REDIS_CLI_VERSION)):
+            # Build the scripts necessary to start the redis server.
+            # The make command only builds the C++ files in the src/ folder
+            # without modifying anything outside of the oppia root directory.
+            # It will build the redis-cli and redis-server files so that we can
+            # run the server from inside the oppia folder by executing the
+            # script src/redis-cli and src/redis-server.
+            subprocess.call(['make'])
+
+        # Make the scripts executable.
+        subprocess.call([
+            'chmod', '+x', common.REDIS_SERVER_PATH])
+        subprocess.call([
+            'chmod', '+x', common.REDIS_CLI_PATH])
+
+        python_utils.PRINT('Redis-cli installed successfully.')
+
+
 def main(args=None):
     """Installs all the third party libraries."""
+    if common.is_windows_os():
+        # The redis cli is not compatible with Windows machines.
+        raise Exception(
+            'The redis command line interface will not be installed because '
+            'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
     download_manifest_files(MANIFEST_FILE_PATH)
+
+    install_redis_cli()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

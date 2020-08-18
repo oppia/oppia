@@ -405,6 +405,12 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
+# Replace this with the correct Redis Host and Port when switching to prod
+# server. Keep this in sync with redis.conf in the root folder. Specifically,
+# REDISPORT should always be the same as the port in redis.conf.
+REDISHOST = 'localhost'
+REDISPORT = 6379
+
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'

@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import json
 import re
 
 from constants import constants
@@ -557,6 +558,108 @@ class Topic(python_utils.OBJECT):
             'story_reference_schema_version': (
                 self.story_reference_schema_version)
         }
+
+    def serialize(self):
+        """Returns the object serialized as a JSON string.
+
+        Returns:
+            str. JSON-encoded string encoding all of the information composing
+            the object.
+        """
+        topic_dict = self.to_dict()
+        # The only reason we add the version parameter separately is that our
+        # yaml encoding/decoding of this object does not handle the version
+        # parameter.
+        # NOTE: If this changes in the future (i.e the version parameter is
+        # added as part of the yaml representation of this object), all YAML
+        # files must add a version parameter to their files with the correct
+        # version of this object. The line below must then be moved to
+        # to_dict().
+        topic_dict['version'] = self.version
+
+        if self.created_on:
+            topic_dict['created_on'] = utils.convert_naive_datetime_to_string(
+                self.created_on)
+
+        if self.last_updated:
+            topic_dict['last_updated'] = utils.convert_naive_datetime_to_string(
+                self.last_updated)
+
+        return json.dumps(topic_dict).encode('utf-8')
+
+    @classmethod
+    def from_dict(
+            cls, topic_dict, topic_version=0, topic_created_on=None,
+            topic_last_updated=None):
+        """Returns a Topic domain object from a dictionary.
+
+        Args:
+            topic_dict: dict. The dictionary representation of topic
+                object.
+            topic_version: int. The version of the topic.
+            topic_created_on: datetime.datetime. Date and time when the
+                topic is created.
+            topic_last_updated: datetime.datetime. Date and time when the
+                topic was last updated.
+
+        Returns:
+            Topic. The corresponding Topic domain object.
+        """
+        topic = cls(
+            topic_dict['id'], topic_dict['name'],
+            topic_dict['abbreviated_name'],
+            topic_dict['url_fragment'],
+            topic_dict['thumbnail_filename'],
+            topic_dict['thumbnail_bg_color'], topic_dict['description'],
+            [
+                StoryReference.from_dict(reference_dict)
+                for reference_dict in topic_dict['canonical_story_references']
+            ],
+            [
+                StoryReference.from_dict(reference_dict)
+                for reference_dict in topic_dict['additional_story_references']
+            ],
+            topic_dict['uncategorized_skill_ids'],
+            [
+                Subtopic.from_dict(subtopic_dict)
+                for subtopic_dict in topic_dict['subtopics']
+            ],
+            topic_dict['subtopic_schema_version'],
+            topic_dict['next_subtopic_id'],
+            topic_dict['language_code'], topic_version,
+            topic_dict['story_reference_schema_version'], topic_created_on,
+            topic_last_updated)
+
+        return topic
+
+    @classmethod
+    def deserialize(cls, json_string):
+        """Returns a Topic domain object decoded from a JSON string.
+
+        Args:
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Topic. Only call
+                on strings that were created using serialize().
+
+        Returns:
+            Topic. The corresponding Topic domain object.
+        """
+        topic_dict = json.loads(json_string.decode('utf-8'))
+
+        created_on = (
+            utils.convert_string_to_naive_datetime_object(
+                topic_dict['created_on'])
+            if 'created_on' in topic_dict else None)
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                topic_dict['last_updated'])
+            if 'last_updated' in topic_dict else None)
+        topic = cls.from_dict(
+            topic_dict,
+            topic_version=topic_dict['version'],
+            topic_created_on=created_on,
+            topic_last_updated=last_updated)
+        return topic
 
     @classmethod
     def require_valid_topic_id(cls, topic_id):

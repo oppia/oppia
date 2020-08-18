@@ -795,3 +795,75 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             if os.path.exists('readme_test_dir'):
                 shutil.rmtree('readme_test_dir')
+
+    def test_windows_os_throws_exception_when_starting_redis_server(self):
+        def mock_is_windows_os():
+            return True
+        windows_not_supported_exception = self.assertRaisesRegexp(
+            Exception,
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. The redis server '
+            'cannot start.')
+        swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
+        with swap_os_check, windows_not_supported_exception:
+            common.start_redis_server()
+
+    def test_windows_os_throws_exception_when_stopping_redis_server(self):
+        def mock_is_windows_os():
+            return True
+        windows_not_supported_exception = self.assertRaisesRegexp(
+            Exception,
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. There is no redis '
+            'server to shutdown.')
+        swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
+
+        with swap_os_check, windows_not_supported_exception:
+            common.stop_redis_server()
+
+    def test_start_and_stop_server_calls_are_called(self):
+        # Test that starting the server calls subprocess.call().
+        check_function_calls = {
+            'subprocess_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True
+        }
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            check_function_calls['subprocess_call_is_called'] = True
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+            return Ret()
+
+        def mock_wait_for_port_to_be_open(port): # pylint: disable=unused-argument
+            return
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        swap_wait_for_port_to_be_open = self.swap(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open)
+        with swap_call, swap_wait_for_port_to_be_open:
+            common.start_redis_server()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+        # Test that stopping the server calls subprocess.call().
+        check_function_calls = {
+            'subprocess_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True
+        }
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        with swap_call:
+            common.stop_redis_server()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
