@@ -50,6 +50,9 @@ require(
 require('services/context.service.ts');
 require('services/exploration-features.service.ts');
 
+require(
+  'pages/exploration-player-page/services/exploration-player-state.service.ts');
+
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('previewTab', {
@@ -59,6 +62,7 @@ angular.module('oppia').component('previewTab', {
     'EditableExplorationBackendApiService',
     'ExplorationDataService', 'ExplorationEngineService',
     'ExplorationFeaturesService', 'ExplorationInitStateNameService',
+    'ExplorationPlayerStateService',
     'LearnerParamsService', 'NumberAttemptsService',
     'ParamChangeObjectFactory', 'ParameterMetadataService',
     'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
@@ -68,6 +72,7 @@ angular.module('oppia').component('previewTab', {
         EditableExplorationBackendApiService,
         ExplorationDataService, ExplorationEngineService,
         ExplorationFeaturesService, ExplorationInitStateNameService,
+        ExplorationPlayerStateService,
         LearnerParamsService, NumberAttemptsService,
         ParamChangeObjectFactory, ParameterMetadataService,
         PlayerCorrectnessFeedbackEnabledService, RouterService,
@@ -162,9 +167,11 @@ angular.module('oppia').component('previewTab', {
               StateEditorService.setActiveStateName(stateName);
             })
         );
-        $scope.$on('playerStateChange', function() {
-          ctrl.allParams = LearnerParamsService.getAllParams();
-        });
+        ctrl.directiveSubscriptions.add(
+          ExplorationPlayerStateService.onPlayerStateChange.subscribe(() => {
+            ctrl.allParams = LearnerParamsService.getAllParams();
+          })
+        );
         ctrl.isExplorationPopulated = false;
         ExplorationDataService.getData().then(function() {
           var initStateNameForPreview = StateEditorService

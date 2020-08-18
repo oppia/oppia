@@ -40,9 +40,11 @@ describe('HintsAndSolutionManager service', function() {
   var hasms;
   var hof;
   var sof;
-  var EVENT_NEW_CARD_AVAILABLE;
   var firstHint, secondHint, thirdHint;
   var solution;
+  var pps;
+
+  var mockNewCardAvailableEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -64,10 +66,13 @@ describe('HintsAndSolutionManager service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     $timeout = $injector.get('$timeout');
     $rootScope = $injector.get('$rootScope');
+    pps = $injector.get('PlayerPositionService');
+    spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
+      mockNewCardAvailableEmitter);
     hasms = $injector.get('HintsAndSolutionManagerService');
     hof = $injector.get('HintObjectFactory');
     sof = $injector.get('SolutionObjectFactory');
-    EVENT_NEW_CARD_AVAILABLE = $injector.get('EVENT_NEW_CARD_AVAILABLE');
+
 
     firstHint = hof.createFromBackendDict({
       hint_content: {
@@ -158,7 +163,7 @@ describe('HintsAndSolutionManager service', function() {
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(false);
 
-    $rootScope.$broadcast(EVENT_NEW_CARD_AVAILABLE);
+    mockNewCardAvailableEmitter.emit();
     $timeout.flush();
 
     expect(hasms.isHintViewable(0)).toBe(true);

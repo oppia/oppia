@@ -72,6 +72,8 @@ angular.module('oppia').factory('RouterService', [
     var refreshStatisticsTabEventEmitter = new EventEmitter();
     /** @private */
     var refreshTranslationTabEventEmitter = new EventEmitter();
+    /** @private */
+    var refreshVersionHistoryEventEmitter = new EventEmitter();
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -123,7 +125,7 @@ angular.module('oppia').factory('RouterService', [
           });
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
-        $rootScope.$broadcast('refreshVersionHistory', {
+        refreshVersionHistoryEventEmitter.emit({
           forceRefresh: false
         });
         activeTabName = TABS.HISTORY.name;
@@ -277,6 +279,9 @@ angular.module('oppia').factory('RouterService', [
       },
       get onRefreshTranslationTab() {
         return refreshTranslationTabEventEmitter;
+      },
+      get onRefreshVersionHistory() {
+        return refreshVersionHistoryEventEmitter;
       }
     };
 

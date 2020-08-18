@@ -32,20 +32,24 @@ require(
   'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
 require('services/date-time-format.service.ts');
 require('services/editability.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
   controller: [
     '$http', '$log', '$scope', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
-    'LoaderService', 'UrlInterpolationService', 'VersionTreeService',
-    'WindowRef',
+    'LoaderService', 'RouterService', 'UrlInterpolationService',
+    'VersionTreeService', 'WindowRef',
     function(
         $http, $log, $scope, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
-        LoaderService, UrlInterpolationService, VersionTreeService,
-        WindowRef) {
+        LoaderService, RouterService, UrlInterpolationService,
+        VersionTreeService, WindowRef) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       // Variable explorationSnapshots is a list of all snapshots for the
       // exploration in ascending order.
       var explorationSnapshots = null;
@@ -248,17 +252,20 @@ angular.module('oppia').component('historyTab', {
         }
       };
       ctrl.$onInit = function() {
-        $scope.$on('refreshVersionHistory', function(evt, data) {
-          // Uncheck all checkboxes when page is refreshed.
-          angular.forEach(ctrl.versionCheckboxArray, function(
-              versionCheckbox) {
-            versionCheckbox.selected = false;
-          });
-          if (
-            data.forceRefresh || ctrl.explorationVersionMetadata === null) {
-            ctrl.refreshVersionHistory();
-          }
-        });
+        ctrl.directiveSubscriptions.add(
+          RouterService.onRefreshVersionHistory.subscribe((data) => {
+            // Uncheck all checkboxes when page is refreshed.
+            angular.forEach(ctrl.versionCheckboxArray, function(
+                versionCheckbox) {
+              versionCheckbox.selected = false;
+            });
+            if (
+              data.forceRefresh || ctrl.explorationVersionMetadata === null) {
+              ctrl.refreshVersionHistory();
+            }
+          })
+        );
+
         ctrl.EditabilityService = EditabilityService;
         ctrl.explorationId = ExplorationDataService.explorationId;
         ctrl.explorationAllSnapshotsUrl =
@@ -287,6 +294,9 @@ angular.module('oppia').component('historyTab', {
         ctrl.displayedCurrentPageNumber = currentPage + 1;
         ctrl.versionNumbersToDisplay = [];
         ctrl.VERSIONS_PER_PAGE = 30;
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

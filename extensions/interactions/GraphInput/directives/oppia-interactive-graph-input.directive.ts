@@ -27,13 +27,16 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractiveGraphInput', [
   'GraphInputRulesService', 'InteractionAttributesExtractorService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'PlayerPositionService',
   function(
       GraphInputRulesService, InteractionAttributesExtractorService,
-      EVENT_NEW_CARD_AVAILABLE) {
+      PlayerPositionService) {
     return {
       restrict: 'E',
       scope: {},
@@ -47,6 +50,7 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
         function(
             $scope, $attrs, CurrentInteractionService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.submitGraph = function() {
             // Here, angular.copy is needed to strip $$hashkey from the graph.
             CurrentInteractionService.onSubmit(
@@ -76,17 +80,22 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
             return checkValidGraph(ctrl.graph);
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => {
+                  ctrl.interactionIsActive = false;
 
-              ctrl.canAddVertex = false;
-              ctrl.canDeleteVertex = false;
-              ctrl.canEditVertexLabel = false;
-              ctrl.canMoveVertex = false;
-              ctrl.canAddEdge = false;
-              ctrl.canDeleteEdge = false;
-              ctrl.canEditEdgeWeight = false;
-            });
+                  ctrl.canAddVertex = false;
+                  ctrl.canDeleteVertex = false;
+                  ctrl.canEditVertexLabel = false;
+                  ctrl.canMoveVertex = false;
+                  ctrl.canAddEdge = false;
+                  ctrl.canDeleteEdge = false;
+                  ctrl.canEditEdgeWeight = false;
+                }
+              )
+            );
+
             ctrl.errorMessage = '';
             ctrl.graph = {
               vertices: [],
@@ -132,6 +141,9 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
               canDeleteEdge : false;
             ctrl.canEditEdgeWeight = ctrl.interactionIsActive ?
               canEditEdgeWeight : false;
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
