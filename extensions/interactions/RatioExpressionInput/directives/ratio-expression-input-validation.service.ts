@@ -80,7 +80,7 @@ export class RatioExpressionInputValidationService {
           let seenRuleType = <string> seenRule.type;
 
           if (seenRuleType === 'IsEquivalent' && (
-            ratioRulesService.Equals(
+            ratioRulesService.IsEquivalent(
               seenInput, {x: currentInput}))) {
             // This rule will make all of the following matching
             // inputs obsolete.
@@ -92,7 +92,7 @@ export class RatioExpressionInputValidationService {
                 'by an \'IsEquivalent\' rule with a matching input.')
             });
           } else if (currentRuleType === 'Equals' && (
-            ratioRulesService.IsEquivalent(
+            ratioRulesService.Equals(
               seenInput, {x: currentInput}))) {
             // This rule will make the following inputs with
             // IsEquivalent rule obsolete.

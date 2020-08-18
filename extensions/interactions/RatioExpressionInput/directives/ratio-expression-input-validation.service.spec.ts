@@ -98,7 +98,7 @@ describe('RatioExpressionInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew([equals], goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -108,7 +108,7 @@ describe('RatioExpressionInputValidationService', () => {
   });
 
   it('should catch redundancy of rules with matching inputs', () => {
-    // The second rule will never get matched.
+    // The third rule will never get matched.
     answerGroups[0].rules = [isEquivalent, equals, hasNumberOfTermsEqualTo];
 
     warnings = validatorService.getAllWarnings(currentState,
@@ -125,18 +125,17 @@ describe('RatioExpressionInputValidationService', () => {
       ' input.'
     }
     ]);
-
-
     let isEquivalent1 = rof.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
-        x: '2:4:6'
+        x: '1:2:3'
       }
     });
+
     let isEquivalent2 = rof.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
-        x: '3:6:9'
+        x: '2:4:6'
       }
     });
 
@@ -145,6 +144,34 @@ describe('RatioExpressionInputValidationService', () => {
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
+      ' input.'
+    }
+    ]);
+
+    // The second rule will never get matched.
+    answerGroups[0].rules = [isEquivalent1, equals, equals];
+
+    warnings = validatorService.getAllWarnings(currentState,
+      customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
+      ' input.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule2 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
+      ' input.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 3 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'Equals\' rule with a matching' +
+      ' input.'
+    }]);
   });
 });

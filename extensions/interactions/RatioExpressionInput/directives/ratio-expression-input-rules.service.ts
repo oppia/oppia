@@ -45,7 +45,7 @@ export class RatioExpressionInputRulesService {
     };
     var ratios = answer.split(':').map(Number);
     var value = ratios.reduce(gcd);
-    if (value === null) {
+    if (value === 1) {
       return answer;
     } else {
       return ratios.map(currentValue => currentValue / value).join(':');
