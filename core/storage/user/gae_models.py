@@ -2009,7 +2009,7 @@ class UserContributionScoringModel(base_models.BaseModel):
         """Creates a new UserContributionScoringModel entry.
 
         Args:
-            user_id: str. The id of the user.
+            user_id: str. The ID of the user.
             score_category: str. The score category of the suggestion.
             score: float. The score of the user.
 
@@ -2028,9 +2028,12 @@ class UserContributionScoringModel(base_models.BaseModel):
                 ' given id: %s' % instance_id
             )
 
-        cls(
+        user_scoring_model = cls(
             id=instance_id, user_id=user_id, score_category=score_category,
-            score=score).put()
+            score=score)
+        user_scoring_model.put()
+        return user_scoring_model
+
 
     @classmethod
     def create_multi(cls, user_score_identifiers, score):
