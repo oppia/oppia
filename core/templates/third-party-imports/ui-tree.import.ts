@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the angular js library.
+ * @fileoverview This file imports the ui.tree library.
  */
 
-module.exports = require('static/angularjs-1.7.9/angular.js');
+require('static/ui-tree-2.22.6/dist/angular-ui-tree.min.js');
