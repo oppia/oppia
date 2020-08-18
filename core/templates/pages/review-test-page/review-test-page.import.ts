@@ -25,4 +25,4 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
-require('pages/review-test-page/review-test-page.directive.ts');
+require('pages/review-test-page/review-test-page.component.ts');
