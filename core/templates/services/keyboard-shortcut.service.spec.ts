@@ -18,6 +18,7 @@
 import 'mousetrap';
 
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Keyboard Shortcuts', () => {
   var skipButton = document.createElement('button');
@@ -27,7 +28,8 @@ describe('Keyboard Shortcuts', () => {
   var searchBar = document.createElement('input');
   var categoryBar = document.createElement('select');
 
-  const keyboardShortcutService = new KeyboardShortcutService();
+  const windowRef = new WindowRef();
+  const keyboardShortcutService = new KeyboardShortcutService(windowRef);
 
   beforeAll(() => {
     skipButton.setAttribute('id', 'skipToMainContentId');
