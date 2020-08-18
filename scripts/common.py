@@ -69,7 +69,7 @@ PILLOW_VERSION = '6.2.2'
 # 4. From the top level of the redis-<new version> directory,
 #    run `make test`.
 # 5. All of the tests should pass with an [ok] status with no error codes. The
-#    final output should be that 'All tests pass'.
+#    final output should be 'All tests pass'.
 # 6. Be sure to leave a note in the PR description to confirm that you have read
 #    this message, and that all of the `make test` tests pass before you commit
 #    the upgrade to develop.
