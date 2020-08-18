@@ -28,6 +28,8 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 // ^^^ This block is to be removed.
 
+import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
+import { TestBed } from '@angular/core/testing';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -39,6 +41,17 @@ describe('Library controller', function() {
   describe('Library', function() {
     var scope, ctrl, $httpBackend;
     var $componentController;
+
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [KeyboardShortcutService]
+      });
+    });
+
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('KeyboardShortcutService',
+        TestBed.get(KeyboardShortcutService));
+    }));
 
     beforeEach(function() {
       angular.mock.module('ui.bootstrap');
