@@ -191,6 +191,17 @@ var AdminPage = function() {
     }
   };
 
+  this.saveChangeOfFeature = async function(featureElement) {
+    await action.click(
+      'Save feature button',
+      featureElement
+        .element(by.css('.protractor-test-save-button'))
+    );
+
+    await general.acceptAlert();
+    await waitFor.visibilityOf(statusMessage);
+  };
+
   this.enableFeatureForDev = async function(featureElement) {
     await this.removeAllRulesOfFeature(featureElement);
 
@@ -206,14 +217,7 @@ var AdminPage = function() {
         .element(by.css('.protractor-test-value-selector')),
       'Enabled');
 
-    await action.click(
-      'Save feature button',
-      featureElement
-        .element(by.css('.protractor-test-save-button'))
-    );
-
-    await general.acceptAlert();
-    await waitFor.visibilityOf(statusMessage);
+    await this.saveChangeOfFeature(featureElement);
   };
 
   this.editConfigProperty = async function(

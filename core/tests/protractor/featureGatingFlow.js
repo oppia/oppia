@@ -44,6 +44,16 @@ describe('Feature Gating Flow', function() {
     await users.logout();
   });
 
+  afterAll(async function() {
+    await users.login(ADMIN_USER1_EMAIL, true);
+
+    await adminPage.getFeaturesTab();
+    const dummy = await adminPage.getDummyFeatureElement();
+
+    await adminPage.removeAllRulesOfFeature(dummy);
+    await adminPage.saveChangeOfFeature(dummy);
+  });
+
   it('should not show indicators gated by dummy feature', async() => {
     await users.login(ADMIN_USER1_EMAIL, true);
     await adminPage.getFeaturesTab();
