@@ -113,7 +113,8 @@ export interface LogicProofRuleInputs {
 }
 
 // MathEquation interaction has multiple types of inputs based on
-// rule type.
+// rule type. Parameter y is supposed to represent the side of the equation that
+// needs to be checked.
 export interface MathEquationRuleInputsWithSide {
   x: string;
   y: string;

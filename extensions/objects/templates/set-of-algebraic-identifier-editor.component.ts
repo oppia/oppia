@@ -26,17 +26,27 @@ angular.module('oppia').component('setOfAlgebraicIdentifierEditor', {
   bindings: {
     value: '='
   },
-  template: require('./list-editor.directive.html'),
-  controller: ['GuppyInitializationService',
-    function(GuppyInitializationService) {
+  template: require('./set-of-algebraic-identifier-editor.component.html'),
+  controller: ['VALID_ALGEBRAIC_IDENTIFIERS', 'GuppyInitializationService',
+    function(VALID_ALGEBRAIC_IDENTIFIERS, GuppyInitializationService) {
       const ctrl = this;
 
       ctrl.$onInit = function() {
+        ctrl.PLACEHOLDER_INFO = (
+          'NOTE: This rule will consider each side of the equation ' +
+          'independently and won\'t allow reordering of terms ' +
+          'around the = sign.');
+
+        let choices = (
+          GuppyInitializationService.customOskLetters ?
+          GuppyInitializationService.customOskLetters :
+          VALID_ALGEBRAIC_IDENTIFIERS);
+
         ctrl.SCHEMA = {
           type: 'list',
           items: {
             type: 'unicode',
-            choices: GuppyInitializationService.customOskLetters
+            choices: choices
           },
           validators: [{
             id: 'is_uniquified'
