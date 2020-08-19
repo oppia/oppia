@@ -249,7 +249,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             ['editor_id', 'owner_id', 'viewer_id', 'voice_artist_id'],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('id_0-1').mentioned_user_ids
+            .get_by_id('id_0-1').content_user_ids
         )
 
     def test_export_data_on_highly_involved_user(self):

@@ -1066,7 +1066,7 @@ class MockTopicRightsModel(topic_models.TopicRightsModel):
         ).put()
 
 
-class AddMentionedUserIdsContentJobTests(test_utils.GenericTestBase):
+class AddContentUserIdsContentJobTests(test_utils.GenericTestBase):
 
     COL_1_ID = 'col_1_id'
     EXP_1_ID = 'exp_1_id'
@@ -1080,14 +1080,14 @@ class AddMentionedUserIdsContentJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            activity_jobs_one_off.AddMentionedUserIdsContentJob.create_new())
-        activity_jobs_one_off.AddMentionedUserIdsContentJob.enqueue(job_id)
+            activity_jobs_one_off.AddContentUserIdsContentJob.create_new())
+        activity_jobs_one_off.AddContentUserIdsContentJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            activity_jobs_one_off.AddMentionedUserIdsContentJob.get_output(
+            activity_jobs_one_off.AddContentUserIdsContentJob.get_output(
                 job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
@@ -1096,7 +1096,7 @@ class AddMentionedUserIdsContentJobTests(test_utils.GenericTestBase):
             for key, values in eval_output]
 
     def setUp(self):
-        super(AddMentionedUserIdsContentJobTests, self).setUp()
+        super(AddContentUserIdsContentJobTests, self).setUp()
 
         self.collection_rights_model_swap = self.swap(
             collection_models,
@@ -1107,7 +1107,7 @@ class AddMentionedUserIdsContentJobTests(test_utils.GenericTestBase):
         self.topic_rights_model_swap = self.swap(
             topic_models, 'TopicRightsModel', MockTopicRightsModel)
 
-    def test_add_mentioned_user_ids_to_collection_rights_snapshot(self):
+    def test_add_content_user_ids_to_collection_rights_snapshot(self):
         with self.collection_rights_model_swap:
             collection_model = collection_models.CollectionRightsModel(
                 id=self.COL_1_ID,
@@ -1139,13 +1139,13 @@ class AddMentionedUserIdsContentJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.COL_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.COL_1_ID).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.COL_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.COL_1_ID).content_user_ids)
 
-    def test_add_mentioned_user_ids_to_exploration_rights_snapshot(self):
+    def test_add_content_user_ids_to_exploration_rights_snapshot(self):
         with self.exploration_rights_model_swap:
             exp_model = exp_models.ExplorationRightsModel(
                 id=self.EXP_1_ID,
@@ -1176,13 +1176,13 @@ class AddMentionedUserIdsContentJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_4_ID],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.EXP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.EXP_1_ID).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.EXP_1_ID).content_user_ids)
 
-    def test_add_mentioned_user_ids_to_topic_rights_snapshot(self):
+    def test_add_content_user_ids_to_topic_rights_snapshot(self):
         with self.topic_rights_model_swap:
             topic_model = topic_models.TopicRightsModel(
                 id=self.TOP_1_ID,
@@ -1206,13 +1206,13 @@ class AddMentionedUserIdsContentJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.TOP_1_ID).content_user_ids)
         self.assertItemsEqual(
             [self.USER_2_ID, self.USER_3_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.TOP_1_ID).content_user_ids)
 
-    def test_add_mentioned_user_ids_to_multiple_rights_snapshots(self):
+    def test_add_content_user_ids_to_multiple_rights_snapshots(self):
         with self.collection_rights_model_swap:
             collection_model = collection_models.CollectionRightsModel(
                 id=self.COL_1_ID,
@@ -1304,38 +1304,38 @@ class AddMentionedUserIdsContentJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [self.USER_1_ID],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.COL_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.COL_1_ID).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_4_ID],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.COL_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.COL_1_ID).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_4_ID],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.EXP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.EXP_1_ID).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.EXP_1_ID).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.TOP_1_ID).content_user_ids)
         self.assertItemsEqual(
             [self.USER_2_ID, self.USER_3_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.TOP_1_ID).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_2_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.TOP_2_ID).content_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_4_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_2_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.TOP_2_ID).content_user_ids)
 
 
-class AddMentionedUserIdsMetadataJobTests(test_utils.GenericTestBase):
+class AddCommitCmdsUserIdsMetadataJobTests(test_utils.GenericTestBase):
 
     COL_1_ID = 'col_1_id'
     EXP_1_ID = 'exp_1_id'
@@ -1349,14 +1349,14 @@ class AddMentionedUserIdsMetadataJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            activity_jobs_one_off.AddMentionedUserIdsMetadataJob.create_new())
-        activity_jobs_one_off.AddMentionedUserIdsMetadataJob.enqueue(job_id)
+            activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob.create_new())
+        activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            activity_jobs_one_off.AddMentionedUserIdsMetadataJob.get_output(
+            activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob.get_output(
                 job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
@@ -1365,7 +1365,7 @@ class AddMentionedUserIdsMetadataJobTests(test_utils.GenericTestBase):
             for key, values in eval_output]
 
     def setUp(self):
-        super(AddMentionedUserIdsMetadataJobTests, self).setUp()
+        super(AddCommitCmdsUserIdsMetadataJobTests, self).setUp()
 
         self.collection_rights_model_swap = self.swap(
             collection_models,
@@ -1376,7 +1376,7 @@ class AddMentionedUserIdsMetadataJobTests(test_utils.GenericTestBase):
         self.topic_rights_model_swap = self.swap(
             topic_models, 'TopicRightsModel', MockTopicRightsModel)
 
-    def test_add_mentioned_user_ids_to_collection_rights_snapshot(self):
+    def test_add_commit_cmds_user_ids_to_collection_rights_snapshot(self):
         with self.collection_rights_model_swap:
             collection_model = collection_models.CollectionRightsModel(
                 id=self.COL_1_ID,
@@ -1410,13 +1410,13 @@ class AddMentionedUserIdsMetadataJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.COL_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.COL_1_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [self.USER_3_ID],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.COL_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.COL_1_ID).commit_cmds_user_ids)
 
-    def test_add_mentioned_user_ids_to_exploration_rights_snapshot(self):
+    def test_add_commit_cmds_user_ids_to_exploration_rights_snapshot(self):
         with self.exploration_rights_model_swap:
             exp_model = exp_models.ExplorationRightsModel(
                 id=self.EXP_1_ID,
@@ -1448,13 +1448,13 @@ class AddMentionedUserIdsMetadataJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.EXP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.EXP_1_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [self.USER_3_ID],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds_user_ids)
 
-    def test_add_mentioned_user_ids_to_topic_rights_snapshot(self):
+    def test_add_commit_cmds_user_ids_to_topic_rights_snapshot(self):
         with self.topic_rights_model_swap:
             topic_model = topic_models.TopicRightsModel(
                 id=self.TOP_1_ID,
@@ -1488,17 +1488,17 @@ class AddMentionedUserIdsMetadataJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.TOP_1_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [self.USER_3_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.TOP_1_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-3' % self.TOP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-3' % self.TOP_1_ID).commit_cmds_user_ids)
 
-    def test_add_mentioned_user_ids_to_multiple_rights_snapshots(self):
+    def test_add_commit_cmds_user_ids_to_multiple_rights_snapshots(self):
         with self.collection_rights_model_swap:
             collection_model = collection_models.CollectionRightsModel(
                 id=self.COL_1_ID,
@@ -1595,32 +1595,32 @@ class AddMentionedUserIdsMetadataJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.COL_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.COL_1_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [self.USER_4_ID],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.COL_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.COL_1_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.EXP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.EXP_1_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [self.USER_3_ID],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.TOP_1_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [self.USER_3_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_1_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.TOP_1_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_2_ID).mentioned_user_ids)
+            .get_by_id('%s-1' % self.TOP_2_ID).commit_cmds_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID],
             topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_2_ID).mentioned_user_ids)
+            .get_by_id('%s-2' % self.TOP_2_ID).commit_cmds_user_ids)

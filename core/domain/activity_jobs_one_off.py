@@ -247,16 +247,16 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
 
 
-class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
+class AddContentUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
     """For every snapshot content of a rights model, merge the data from all
     the user id fields in content together and put them in the
-    mentioned_user_ids field of an appropriate RightsSnapshotMetadataModel.
+    content_user_ids field of an appropriate RightsSnapshotMetadataModel.
     """
 
     @staticmethod
     def _add_collection_user_ids(snapshot_content_model):
         """Merge the user ids from the snapshot content and put them in
-        the snapshot metadata mentioned_user_ids field.
+        the snapshot metadata content_user_ids field.
         """
         content_dict = (
             collection_models.CollectionRightsModel.convert_to_valid_dict(
@@ -266,7 +266,7 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
         snapshot_metadata_model = (
             collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
                 snapshot_content_model.id))
-        snapshot_metadata_model.mentioned_user_ids = list(sorted(
+        snapshot_metadata_model.content_user_ids = list(sorted(
             set(reconstituted_rights_model.owner_ids) |
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
@@ -276,7 +276,7 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def _add_exploration_user_ids(snapshot_content_model):
         """Merge the user ids from the snapshot content and put them in
-        the snapshot metadata mentioned_user_ids field.
+        the snapshot metadata content_user_ids field.
         """
         content_dict = (
             exp_models.ExplorationRightsModel.convert_to_valid_dict(
@@ -286,7 +286,7 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
         snapshot_metadata_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
                 snapshot_content_model.id))
-        snapshot_metadata_model.mentioned_user_ids = list(sorted(
+        snapshot_metadata_model.content_user_ids = list(sorted(
             set(reconstituted_rights_model.owner_ids) |
             set(reconstituted_rights_model.editor_ids) |
             set(reconstituted_rights_model.voice_artist_ids) |
@@ -296,14 +296,14 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def _add_topic_user_ids(snapshot_content_model):
         """Merge the user ids from the snapshot content and put them in
-        the snapshot metadata mentioned_user_ids field.
+        the snapshot metadata content_user_ids field.
         """
         reconstituted_rights_model = topic_models.TopicRightsModel(
             **snapshot_content_model.content)
         snapshot_metadata_model = (
             topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
                 snapshot_content_model.id))
-        snapshot_metadata_model.mentioned_user_ids = list(sorted(set(
+        snapshot_metadata_model.content_user_ids = list(sorted(set(
             reconstituted_rights_model.manager_ids)))
         snapshot_metadata_model.put(update_last_updated_time=False)
 
@@ -311,7 +311,7 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
     def enqueue(cls, job_id, additional_job_params=None):
         # We can raise the number of shards for this job, since it goes only
         # over three types of entity class.
-        super(AddMentionedUserIdsContentJob, cls).enqueue(
+        super(AddContentUserIdsContentJob, cls).enqueue(
             job_id, shard_count=64)
 
     @classmethod
@@ -328,17 +328,17 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
         if isinstance(
                 rights_snapshot_model,
                 collection_models.CollectionRightsSnapshotContentModel):
-            AddMentionedUserIdsContentJob._add_collection_user_ids(
+            AddContentUserIdsContentJob._add_collection_user_ids(
                 rights_snapshot_model)
         elif isinstance(
                 rights_snapshot_model,
                 exp_models.ExplorationRightsSnapshotContentModel):
-            AddMentionedUserIdsContentJob._add_exploration_user_ids(
+            AddContentUserIdsContentJob._add_exploration_user_ids(
                 rights_snapshot_model)
         elif isinstance(
                 rights_snapshot_model,
                 topic_models.TopicRightsSnapshotContentModel):
-            AddMentionedUserIdsContentJob._add_topic_user_ids(
+            AddContentUserIdsContentJob._add_topic_user_ids(
                 rights_snapshot_model)
         yield ('SUCCESS-%s' % class_name, rights_snapshot_model.id)
 
@@ -348,45 +348,45 @@ class AddMentionedUserIdsContentJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(ids))
 
 
-class AddMentionedUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
+class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
     """For every snapshot metadata of a rights model, merge the data from all
     the user id fields in commit_cmds together and put them in the
-    mentioned_user_ids field of an appropriate RightsSnapshotMetadataModel.
+    commit_cmds_user_ids field of an appropriate RightsSnapshotMetadataModel.
     """
 
     @staticmethod
     def _add_col_and_exp_user_ids(snapshot_model):
         """Merge the user ids from the commit_cmds and put them in the
-        mentioned_user_ids field.
+        commit_cmds_user_ids field.
         """
-        mentioned_user_ids = set(snapshot_model.mentioned_user_ids)
+        commit_cmds_user_ids = set()
         for commit_cmd in snapshot_model.commit_cmds:
             if commit_cmd['cmd'] == feconf.CMD_CHANGE_ROLE:
-                mentioned_user_ids.add(commit_cmd['assignee_id'])
-                snapshot_model.mentioned_user_ids = list(
-                    sorted(mentioned_user_ids))
-                snapshot_model.put(update_last_updated_time=False)
+                commit_cmds_user_ids.add(commit_cmd['assignee_id'])
+        snapshot_model.commit_cmds_user_ids = list(
+            sorted(commit_cmds_user_ids))
+        snapshot_model.put(update_last_updated_time=False)
 
     @staticmethod
     def _add_topic_user_ids(snapshot_model):
         """Merge the user ids from the commit_cmds and put them in the
-        mentioned_user_ids field.
+        commit_cmds_user_ids field.
         """
-        mentioned_user_ids = set(snapshot_model.mentioned_user_ids)
+        commit_cmds_user_ids = set()
         for commit_cmd in snapshot_model.commit_cmds:
             if commit_cmd['cmd'] == feconf.CMD_CHANGE_ROLE:
-                mentioned_user_ids.add(commit_cmd['assignee_id'])
+                commit_cmds_user_ids.add(commit_cmd['assignee_id'])
             elif commit_cmd['cmd'] == feconf.CMD_REMOVE_MANAGER_ROLE:
-                mentioned_user_ids.add(commit_cmd['removed_user_id'])
-            snapshot_model.mentioned_user_ids = list(
-                sorted(mentioned_user_ids))
-            snapshot_model.put(update_last_updated_time=False)
+                commit_cmds_user_ids.add(commit_cmd['removed_user_id'])
+        snapshot_model.commit_cmds_user_ids = list(
+            sorted(commit_cmds_user_ids))
+        snapshot_model.put(update_last_updated_time=False)
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         # We can raise the number of shards for this job, since it goes only
         # over three types of entity class.
-        super(AddMentionedUserIdsMetadataJob, cls).enqueue(
+        super(AddCommitCmdsUserIdsMetadataJob, cls).enqueue(
             job_id, shard_count=64)
 
     @classmethod
@@ -403,17 +403,17 @@ class AddMentionedUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
         if isinstance(
                 snapshot_model,
                 collection_models.CollectionRightsSnapshotMetadataModel):
-            AddMentionedUserIdsMetadataJob._add_col_and_exp_user_ids(
+            AddCommitCmdsUserIdsMetadataJob._add_col_and_exp_user_ids(
                 snapshot_model)
         elif isinstance(
                 snapshot_model,
                 exp_models.ExplorationRightsSnapshotMetadataModel):
-            AddMentionedUserIdsMetadataJob._add_col_and_exp_user_ids(
+            AddCommitCmdsUserIdsMetadataJob._add_col_and_exp_user_ids(
                 snapshot_model)
         elif isinstance(
                 snapshot_model,
                 topic_models.TopicRightsSnapshotMetadataModel):
-            AddMentionedUserIdsMetadataJob._add_topic_user_ids(snapshot_model)
+            AddCommitCmdsUserIdsMetadataJob._add_topic_user_ids(snapshot_model)
         yield ('SUCCESS-%s' % class_name, snapshot_model.id)
 
     @staticmethod
