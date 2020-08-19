@@ -20,6 +20,8 @@
  * followed by the name of the arg.
  */
 
+import { Subscription } from 'rxjs';
+
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/MathExpressionInput/directives/' +
@@ -31,14 +33,15 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/debouncer.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/html-escaper.service.ts');
+require('services/stateful/focus-manager.service.ts');
 require('third-party-imports/math-expressions.import.ts');
 require('third-party-imports/guppy.import.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
-  '$timeout', 'MathExpressionInputRulesService',
+  '$timeout', 'FocusManagerService', 'MathExpressionInputRulesService',
   'UrlInterpolationService',
   function(
-      $timeout, MathExpressionInputRulesService,
+      $timeout, FocusManagerService, MathExpressionInputRulesService,
       UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -55,6 +58,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             DebouncerService, DeviceInfoService, WindowDimensionsService,
             CurrentInteractionService, GuppyConfigurationService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var guppyDivElt, guppyDivId, guppyInstance: Guppy;
           var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
             '/overrides/guppy/oppia_symbols.json');
@@ -214,17 +218,22 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             guppyInstance.render();
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
-            $scope.$on('focusOn', function(e, name) {
-              if (!labelForFocusTarget) {
-                return;
-              }
+            ctrl.directiveSubscriptions.add(
+              FocusManagerService.onFocus.subscribe(name => {
+                if (!labelForFocusTarget) {
+                  return;
+                }
 
-              if (name === labelForFocusTarget) {
-                guppyInstance.activate();
-              } else if (name === LABEL_FOR_CLEARING_FOCUS) {
-                guppyInstance.deactivate();
-              }
-            });
+                if (name === labelForFocusTarget) {
+                  guppyInstance.activate();
+                } else if (name === LABEL_FOR_CLEARING_FOCUS) {
+                  guppyInstance.deactivate();
+                }
+              })
+            );
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
