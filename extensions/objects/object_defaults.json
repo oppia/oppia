@@ -48,5 +48,5 @@
     },
     "NumericExpression": "",
     "PositionOfTerms": "both",
-    "RatioExpression": "1:1"
+    "RatioExpression": [1, 1]
 }

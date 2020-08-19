@@ -52,7 +52,7 @@ angular.module('oppia').component('ratioExpressionEditor', {
         if (ctrl.value === null) {
           ctrl.value = '';
         }
-        ctrl.currentValue = ctrl.value;
+        ctrl.currentValue = ctrl.value.toString();
       };
     }
   ]

@@ -190,8 +190,7 @@ VALIDATOR_SPECS = {
             'max_value': {
                 'type': SCHEMA_TYPE_INT
             }
-        },
-        'is_valid_ratio': {}
+        }
     },
 }
 
@@ -988,29 +987,3 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             'Invalid URL: Sanitized URL should start with \'http://\' or'
             ' \'https://\'; received www.oppia.org'):
             sanitize_url('www.oppia.org')
-
-    def test_is_valid_ratio_input_validator(self):
-        """Tests for the is_valid_ratio static method with
-        ratio type.
-        """
-        is_valid_ratio_input = schema_utils.get_validator(
-            'is_valid_ratio')
-
-        self.assertFalse(is_valid_ratio_input('1'))
-        self.assertFalse(is_valid_ratio_input('1:'))
-        self.assertFalse(is_valid_ratio_input('1:2::3'))
-        self.assertFalse(is_valid_ratio_input('1:2:3:'))
-        self.assertTrue(is_valid_ratio_input('1:2'))
-        self.assertTrue(is_valid_ratio_input('1:2:3:4'))
-        self.assertFalse(is_valid_ratio_input('12:'))
-        self.assertFalse(is_valid_ratio_input('12:22::32'))
-        self.assertFalse(is_valid_ratio_input('12:22:31:'))
-        self.assertTrue(is_valid_ratio_input('1:20'))
-        self.assertTrue(is_valid_ratio_input('12:2:33:4'))
-
-        self.assertFalse(is_valid_ratio_input('a'))
-        self.assertFalse(is_valid_ratio_input('a:b'))
-        self.assertFalse(is_valid_ratio_input(''))
-        self.assertFalse(is_valid_ratio_input('1:a:2:b'))
-        self.assertFalse(is_valid_ratio_input('1:2:3:b'))
-        self.assertFalse(is_valid_ratio_input(':'))

@@ -116,7 +116,7 @@ export interface PencilCodeEditorAnswer {
   error: string;
 }
 
-export type RatioInputAnswer = string;
+export type RatioInputAnswer = number[];
 
 export type SetInputAnswer = string[];
 

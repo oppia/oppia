@@ -72,11 +72,11 @@ export class RatioExpressionInputValidationService {
     for (let i = 0; i < answerGroups.length; i++) {
       let rules = answerGroups[i].getRulesAsList();
       for (let j = 0; j < rules.length; j++) {
-        let currentInput = <string> rules[j].inputs.x;
+        let currentInput = <number[]> rules[j].inputs.x;
         let currentRuleType = <string> rules[j].type;
 
         for (let seenRule of seenRules) {
-          let seenInput = <string> seenRule.inputs.x;
+          let seenInput = <number[]> seenRule.inputs.x;
           let seenRuleType = <string> seenRule.type;
 
           if (seenRuleType === 'Equals' && (

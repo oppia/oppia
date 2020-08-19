@@ -29,59 +29,59 @@ describe('Ratio expression input rules service', () => {
   });
 
   it('should have a correct Equals rule', () => {
-    inputString = '1:2:3';
+    inputString = [1, 2, 3];
 
-    expect(reirs.Equals('1:2:3',
+    expect(reirs.Equals([1, 2, 3],
       {x: inputString})).toBeTrue();
-    expect(reirs.Equals('3:2:1',
+    expect(reirs.Equals([3, 2, 1],
       {x: inputString})).toBeFalse();
-    expect(reirs.Equals('1:2',
+    expect(reirs.Equals([1, 2],
       {x: inputString})).toBeFalse();
-    expect(reirs.Equals('1:2:3:4',
+    expect(reirs.Equals([1, 2, 3, 4],
       {x: inputString})).toBeFalse();
   });
 
   it('should have a correct HasNumberOfTermsEqualTo rule', () => {
-    inputString = '1:2:3';
+    inputString = [1, 2, 3];
 
-    expect(reirs.HasNumberOfTermsEqualTo('1:2:3',
+    expect(reirs.HasNumberOfTermsEqualTo([1, 2, 3],
       {x: inputString})).toBeTrue();
-    expect(reirs.HasNumberOfTermsEqualTo('3:2:1',
+    expect(reirs.HasNumberOfTermsEqualTo([3, 2, 1],
       {x: inputString})).toBeTrue();
-    expect(reirs.HasNumberOfTermsEqualTo('1:2',
+    expect(reirs.HasNumberOfTermsEqualTo([1, 2],
       {x: inputString})).toBeFalse();
-    expect(reirs.HasNumberOfTermsEqualTo('1:2:3:4',
+    expect(reirs.HasNumberOfTermsEqualTo([1, 2, 3, 4],
       {x: inputString})).toBeFalse();
   });
 
 
   it('should have a correct IsEquivalent rule', () => {
-    inputString = '2:4:6';
+    inputString = [2, 4, 6];
 
-    expect(reirs.IsEquivalent('1:2:3',
+    expect(reirs.IsEquivalent([1, 2, 3],
       {x: inputString})).toBeTrue();
-    expect(reirs.IsEquivalent('2:4:6',
+    expect(reirs.IsEquivalent([2, 4, 6],
       {x: inputString})).toBeFalse();
-    expect(reirs.IsEquivalent('1:2',
+    expect(reirs.IsEquivalent([1, 2],
       {x: inputString})).toBeFalse();
-    expect(reirs.IsEquivalent('1:2:3:4',
+    expect(reirs.IsEquivalent([1, 2, 3, 4],
       {x: inputString})).toBeFalse();
-    expect(reirs.IsEquivalent('2:4:3',
+    expect(reirs.IsEquivalent([2, 4, 3],
       {x: inputString})).toBeFalse();
   });
 
   it('should have a correct IsEquivalent rule', () => {
-    inputString = '2:3:5';
+    inputString = [2, 3, 5];
 
-    expect(reirs.IsEquivalent('2:3:5',
+    expect(reirs.IsEquivalent([2, 3, 5],
       {x: inputString})).toBeTrue();
-    expect(reirs.IsEquivalent('2:4:6',
+    expect(reirs.IsEquivalent([2, 4, 6],
       {x: inputString})).toBeFalse();
-    expect(reirs.IsEquivalent('1:2',
+    expect(reirs.IsEquivalent([1, 2],
       {x: inputString})).toBeFalse();
-    expect(reirs.IsEquivalent('1:2:3:4',
+    expect(reirs.IsEquivalent([1, 2, 3, 4],
       {x: inputString})).toBeFalse();
-    expect(reirs.IsEquivalent('2:4:3',
+    expect(reirs.IsEquivalent([2, 4, 3],
       {x: inputString})).toBeFalse();
   });
 });

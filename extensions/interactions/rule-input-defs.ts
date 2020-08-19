@@ -197,7 +197,7 @@ export interface PencilCodeEditorRuleInputs {
 }
 
 export interface RatioInputRulesInputs {
-  x: string;
+  x: number[];
 }
 
 export interface SetInputRuleInputs {

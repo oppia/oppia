@@ -36,19 +36,18 @@ export class RatioExpressionInputRulesService {
   HasNumberOfTermsEqualTo(
       answer: RatioInputAnswer,
       inputs: RatioInputRulesInputs): boolean {
-    return answer.split(':').length === inputs.x.split(':').length;
+    return answer.length === inputs.x.length;
   }
 
-  static convertToSimplestForm(answer: RatioInputAnswer): string {
+  static convertToSimplestForm(answer: RatioInputAnswer): RatioInputAnswer {
     var gcd = (x: number, y: number) => {
       return y === 0 ? x : gcd(y, x % y);
     };
-    var ratios = answer.split(':').map(Number);
-    var value = ratios.reduce(gcd);
-    if (value === 1) {
+    var gcdResult = answer.reduce(gcd);
+    if (gcdResult === 1) {
       return answer;
     } else {
-      return ratios.map(currentValue => currentValue / value).join(':');
+      return answer.map(currentValue => currentValue / gcdResult);
     }
   }
 

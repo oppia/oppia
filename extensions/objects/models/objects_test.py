@@ -765,7 +765,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def test_ratio_validation(self):
         """Tests objects of type RatioExpression."""
 
-        mappings = [('1:2', '1:2'), ('1:2:3', '1:2:3')]
+        mappings = [[1, 2], [1, 2]), ([1, 2, 3], [1, 2, 3])]
 
         invalid_values_with_error_messages = [
             (None, 'Expected unicode string, received None'),

@@ -1197,18 +1197,20 @@ class PositionOfTerms(BaseObject):
 
 
 class RatioExpression(BaseObject):
-    """Class for ratio expression. Stores a unicode string representing a
+    """Class for ratio expression. Stores a list of non-negative integers representing a
     valid ratio expression.
     """
 
-    description = 'A string for ratio expression.'
-    default_value = '1:1'
+    description = 'A list of integers for ratio expression.'
+    default_value = [1,1]
 
     SCHEMA = {
-        'type': 'unicode',
+        'type': 'list',
+        'items': PositiveInt.SCHEMA
         'validators': [{
-            'id': 'is_valid_ratio'
-        }]
+           'id': 'has_length_at_least',
+           'min_value': 2
+       }]
     }
 
 

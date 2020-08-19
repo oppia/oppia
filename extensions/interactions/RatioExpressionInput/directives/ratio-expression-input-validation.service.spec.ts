@@ -80,21 +80,21 @@ describe('RatioExpressionInputValidationService', () => {
     isEquivalent = rof.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
-        x: '2:4:6'
+        x: [2, 4, 6]
       }
     });
 
     equals = rof.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
-        x: '1:2:3'
+        x: [1, 2, 3]
       }
     });
 
     hasNumberOfTermsEqualTo = rof.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
-        x: '1:2:3'
+        x: [1, 2, 3]
       }
     });
 
@@ -134,7 +134,7 @@ describe('RatioExpressionInputValidationService', () => {
     let isEquivalentSimplified = rof.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
-        x: '1:2:3'
+        x: [1, 2, 3]
       }
     });
 
@@ -155,7 +155,7 @@ describe('RatioExpressionInputValidationService', () => {
     let hasNumberOfTermsEqualTo2 = rof.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
-        x: '1:2:4'
+        x: [1, 2, 4]
       }
     });
 
