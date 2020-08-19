@@ -73,10 +73,6 @@ var AdminPage = function() {
       '.protractor-test-reload-exploration-row'
     ));
 
-    var reloadAllExplorationsButtons = element.all(by.css(
-      '.protractor-test-reload-all-explorations-button'
-    ));
-
     var reloadCollectionButtons = element.all(by.css(
       '.protractor-test-reload-collection-button'));
 

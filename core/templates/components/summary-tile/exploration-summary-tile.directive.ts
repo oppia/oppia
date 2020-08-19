@@ -211,7 +211,7 @@ angular.module('oppia').directive('explorationSummaryTile', [
               WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
 
             ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-              subscribe(evt => {
+              subscribe(() => {
                 $scope.isWindowLarge = (
                   WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
                 $scope.$applyAsync();

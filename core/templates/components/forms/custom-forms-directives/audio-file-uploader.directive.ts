@@ -41,7 +41,7 @@ angular.module('oppia').directive('audioFileUploader', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
         'audio-file-uploader.directive.html'),
-      link: function(scope: AudioFileUploaderScope, elt) {
+      link: function(scope: AudioFileUploaderScope) {
         var ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
 
 

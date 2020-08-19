@@ -23,7 +23,6 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
@@ -39,7 +38,6 @@ describe('ExplorationFeedback', function() {
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
-  var adminPage = null;
   var explorationEditorPage = null;
   var explorationEditorFeedbackTab = null;
   var creatorDashboardPage = null;
@@ -47,7 +45,6 @@ describe('ExplorationFeedback', function() {
   var explorationPlayerPage = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -240,7 +237,6 @@ describe('Suggestions on Explorations', function() {
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
   var EXPLORATION_LANGUAGE = 'English';
-  var adminPage = null;
   var creatorDashboardPage = null;
   var libraryPage = null;
   var explorationEditorPage = null;
@@ -248,7 +244,6 @@ describe('Suggestions on Explorations', function() {
   var explorationPlayerPage = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();

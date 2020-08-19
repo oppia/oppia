@@ -169,7 +169,7 @@ angular.module('oppia').directive('rubricsEditor', [
           if (ContextService.getPageContext() !== 'skill_editor') {
             $scope.$watch(function() {
               return SkillCreationService.getSkillDescriptionStatus();
-            }, function(newValue, oldValue) {
+            }, function(newValue) {
               if (newValue === SKILL_DESCRIPTION_STATUS_VALUES.STATUS_CHANGED) {
                 var explanations = ctrl.getRubrics()[1].getExplanations();
                 var difficulty = ctrl.getRubrics()[1].getDifficulty();

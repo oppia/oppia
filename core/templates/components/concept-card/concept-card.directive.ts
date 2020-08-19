@@ -34,11 +34,9 @@ angular.module('oppia').directive('conceptCard', [
         '/components/concept-card/concept-card.template.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$rootScope',
-        'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
+        '$scope', '$filter', '$rootScope', 'ConceptCardBackendApiService',
         function(
-            $scope, $filter, $rootScope,
-            ConceptCardBackendApiService, ConceptCardObjectFactory) {
+            $scope, $filter, $rootScope, ConceptCardBackendApiService) {
           var ctrl = this;
           ctrl.isLastWorkedExample = function() {
             return ctrl.numberOfWorkedExamplesShown ===

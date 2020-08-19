@@ -82,7 +82,7 @@ export class StatePropertyService<StatePropertyType> {
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-  _isValid(value: StatePropertyType): boolean {
+  _isValid(_value: StatePropertyType): boolean {
     return true;
   }
 

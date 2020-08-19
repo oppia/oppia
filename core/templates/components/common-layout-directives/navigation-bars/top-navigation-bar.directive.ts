@@ -72,8 +72,6 @@ angular.module('oppia').directive('topNavigationBar', [
           var NAV_ELEMENTS_ORDER = [
             'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
-          var truncateNavbarDebounced =
-            DebouncerService.debounce(truncateNavbar, 500);
 
           ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
 
@@ -107,7 +105,7 @@ angular.module('oppia').directive('topNavigationBar', [
             // Focus on the current target before opening its submenu.
             NavigationService.openSubmenu(evt, menuName);
           };
-          ctrl.blurNavigationLinks = function(evt) {
+          ctrl.blurNavigationLinks = function() {
             // This is required because if about submenu is in open state
             // and when you hover on library, both will be highlighted,
             // To avoid that, blur all the a's in nav, so that only one
@@ -303,7 +301,7 @@ angular.module('oppia').directive('topNavigationBar', [
             }
 
             ctrl.directiveSubscriptions.add(
-              WindowDimensionsService.getResizeEvent().subscribe(evt => {
+              WindowDimensionsService.getResizeEvent().subscribe(() => {
                 ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
                 // If window is resized larger, try displaying the hidden
                 // elements.

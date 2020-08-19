@@ -555,7 +555,7 @@ angular.module('oppia').directive('questionPlayer', [
                 encodeURIComponent(JSON.stringify(result)));
             });
 
-            $scope.$on('$locationChangeSuccess', function(event) {
+            $scope.$on('$locationChangeSuccess', function() {
               var hashContent = $location.hash();
               if (!hashContent || hashContent.indexOf(HASH_PARAM) === -1) {
                 return;

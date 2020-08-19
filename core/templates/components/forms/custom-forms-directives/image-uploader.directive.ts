@@ -46,7 +46,7 @@ angular.module('oppia').directive('imageUploader', [
             'image-uploader-is-active');
         };
 
-        var validateUploadedFile = function(file, filename) {
+        var validateUploadedFile = function(file, _filename) {
           if (!file || !file.size || !file.type.match('image.*')) {
             return 'This file is not recognized as an image.';
           }

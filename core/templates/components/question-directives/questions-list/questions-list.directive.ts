@@ -298,7 +298,7 @@ angular.module('oppia').directive('questionsList', [
                           .createFromBackendDict(misconceptionsBackendDict);
                       });
                 });
-              }, function(error) {
+              }, function() {
                 AlertsService.addWarning();
               });
           };
@@ -344,7 +344,6 @@ angular.module('oppia').directive('questionsList', [
               return;
             }
             _reInitializeSelectedSkillIds();
-            var skillId = null;
             // For the case when, it is in the skill editor.
             if (ctrl.getAllSkillSummaries().length === 0) {
               EditableQuestionBackendApiService.editQuestionSkillLinks(
@@ -465,7 +464,6 @@ angular.module('oppia').directive('questionsList', [
             QuestionUndoRedoService.clearChanges();
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
-            var selectedSkillId = ctrl.selectedSkillId;
             ImageLocalStorageService.flushStoredImagesData();
             if (newQuestionIsBeingCreated) {
               ContextService.setImageSaveDestinationToLocalStorage();
@@ -520,7 +518,7 @@ angular.module('oppia').directive('questionsList', [
                 EditableQuestionBackendApiService.editQuestionSkillLinks(
                   questionId, modalObject.skillLinkageModificationsArray,
                   questionDifficulty).then(
-                  data => {
+                  () => {
                     $timeout(function() {
                       QuestionsListService.resetPageNumber();
                       _reInitializeSelectedSkillIds();
@@ -549,7 +547,7 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
+            $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function() {
               _initTab(false);
             });
             ctrl.skillIds = [];
