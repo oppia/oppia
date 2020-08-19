@@ -367,6 +367,9 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'getState').and.returnValue(stateObj);
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
+      spyOn(
+        translationTabActiveContentIdService, 'getActiveDataFormat'
+      ).and.returnValue('html');
 
       stateWrittenTranslationsService.init(stateName, {
         hasWrittenTranslation: () => false,
