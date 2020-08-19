@@ -70,7 +70,6 @@ describe('EndExplorationValidationService', () => {
     };
 
     goodAnswerGroups = [agof.createNew(
-      [],
       oof.createFromBackendDict({
         dest: 'Second State',
         feedback: {
@@ -113,6 +112,11 @@ describe('EndExplorationValidationService', () => {
 
   it('should throw for missing recommendations argument', () => {
     expect(() => {
+      // This throws "Argument of type '{}' is not assignable to
+      // parameter of type 'EndExplorationCustomizationArgs'." We are purposely
+      // assigning the wrong type of customization args in order to test
+      // validations.
+      // @ts-expect-error
       validatorService.getAllWarnings(currentState, {}, [], null);
     }).toThrowError(
       'Expected customization arguments to have property: ' +

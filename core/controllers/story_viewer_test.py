@@ -222,6 +222,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
                 '%s/staging/topic/%s'
                 % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT))
             expected_dict = {
+                'story_id': self.STORY_ID,
                 'story_title': 'Title',
                 'story_description': 'Description',
                 'story_nodes': [self.node_2, self.node_1, self.node_3],
@@ -296,7 +297,6 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                     'invalid_node'
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
-
 
     def test_post_fails_when_story_is_not_published_in_story_mode(self):
         topic_services.unpublish_story(

@@ -246,7 +246,6 @@ class SkillMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
-
     def test_job_when_skills_have_math_rich_text_components(self):
         valid_html_1 = (
             '<oppia-noninteractive-math math_content-with-value="{&amp;q'

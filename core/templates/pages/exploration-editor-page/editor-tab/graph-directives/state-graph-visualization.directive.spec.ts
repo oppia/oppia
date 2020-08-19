@@ -16,7 +16,9 @@
  * @fileoverview Unit tests for State Graph Visualization directive.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+
 import { StateGraphLayoutService } from
   'components/graph-services/graph-layout.service';
 import { AnswerGroupsCacheService } from
@@ -61,7 +63,7 @@ describe('State Graph Visualization directive', function() {
   var routerService = null;
   var stateGraphLayoutService = null;
   var translationStatusService = null;
-
+  var mockCenterGraphEventEmitter = null;
   var nodes = {
     state_1: {
       depth: 2,
@@ -122,6 +124,11 @@ describe('State Graph Visualization directive', function() {
         return of(new Event('resize'));
       }
     });
+    mockCenterGraphEventEmitter = new EventEmitter();
+    $provide.value(
+      'RouterService', {
+        onCenterGraph: mockCenterGraphEventEmitter
+      });
   }));
   beforeEach(angular.mock.inject(function($injector) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');

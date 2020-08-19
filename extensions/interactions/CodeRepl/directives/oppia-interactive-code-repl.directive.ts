@@ -28,13 +28,16 @@ require(
 require(
   'interactions/interaction-attributes-extractor.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
   '$timeout', 'CodeReplRulesService', 'InteractionAttributesExtractorService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'PlayerPositionService',
   function(
       $timeout, CodeReplRulesService, InteractionAttributesExtractorService,
-      EVENT_NEW_CARD_AVAILABLE) {
+      PlayerPositionService) {
     return {
       restrict: 'E',
       scope: {},
@@ -50,6 +53,7 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             $scope, $attrs, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.initCodeEditor = function(editor) {
             editor.setValue(ctrl.code);
             // Options for the ui-codemirror display.
@@ -76,15 +80,6 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
 
             editor.on('change', function() {
               ctrl.code = editor.getValue();
-            });
-
-            // Without this, the editor does not show up correctly on small
-            // screens when the user switches to the supplemental interaction.
-            $scope.$on('showInteraction', function() {
-              $timeout(function() {
-                editor.refresh();
-                initMarkers(editor);
-              }, 200);
             });
 
             ctrl.hasLoaded = true;
@@ -197,9 +192,11 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             $scope.$apply();
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => ctrl.interactionIsActive = false
+              )
+            );
             const {
               language,
               placeholder,
@@ -264,6 +261,9 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
 
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswer, null);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

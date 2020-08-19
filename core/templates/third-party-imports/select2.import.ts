@@ -13,11 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the jQuery, jQuery UI.
+ * @fileoverview This file imports the select2 library.
  */
 
-window.$ = require('static/jquery-3.5.1/jquery.min.js');
-window.jQuery = window.$;
-
-require('static/jqueryui-1.12.1/jquery-ui.min.js');
-require('static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js');
+require('static/select2-4.0.3/dist/js/select2.min.js');

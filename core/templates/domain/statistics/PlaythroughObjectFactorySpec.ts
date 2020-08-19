@@ -242,4 +242,28 @@ describe('Playthrough Object Factory', () => {
       'Backend dict does not match any known issue type: ' +
       JSON.stringify(playthroughDict));
   });
+
+  it('should identify the problematic state', () => {
+    let eqPlaythrough = pof.createNewEarlyQuitPlaythrough(
+      'expId1', 1, {
+        state_name: {value: 'state'},
+        time_spent_in_exp_in_msecs: {value: 30000},
+      }, []);
+    expect(eqPlaythrough.getStateNameWithIssue()).toEqual('state');
+
+    var misPlaythrough = pof.createNewMultipleIncorrectSubmissionsPlaythrough(
+      'expId1', 1, {
+        state_name: {value: 'state'},
+        num_times_answered_incorrectly: {value: 10},
+      }, []);
+    expect(misPlaythrough.getStateNameWithIssue()).toEqual('state');
+
+    var cstPlaythrough = pof.createNewCyclicStateTransitionsPlaythrough(
+      'expId1', 1, {
+        state_names: {
+          value: ['state1', 'state2']
+        }
+      }, []);
+    expect(cstPlaythrough.getStateNameWithIssue()).toEqual('state2');
+  });
 });

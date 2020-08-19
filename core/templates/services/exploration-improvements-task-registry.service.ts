@@ -172,7 +172,7 @@ export class ExplorationImprovementsTaskRegistryService {
       expStats: ExplorationStats,
       openTasks: readonly ExplorationTask[],
       resolvedTaskTypesByStateName: ReadonlyMap<string, ExplorationTaskType[]>,
-      topAnswersByStateName: ReadonlyMap<string, AnswerStats[]>,
+      topAnswersByStateName: ReadonlyMap<string, readonly AnswerStats[]>,
       playthroughIssues: readonly PlaythroughIssue[]): void {
     this.config = config;
     this.validateInitializationArgs(
@@ -271,24 +271,28 @@ export class ExplorationImprovementsTaskRegistryService {
     this.tasksByState.get(stateName).refresh(this.expStats, this.config);
   }
 
-  getHighBounceRateTasks(): HbrTask[] {
+  getOpenHighBounceRateTasks(): HbrTask[] {
     return <HbrTask[]> this.tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
+      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE)
+      .filter(t => t.isOpen());
   }
 
-  getIneffectiveFeedbackLoopTasks(): IflTask[] {
+  getOpenIneffectiveFeedbackLoopTasks(): IflTask[] {
     return <IflTask[]> this.tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
+      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP)
+      .filter(t => t.isOpen());
   }
 
-  getNeedsGuidingResponsesTasks(): NgrTask[] {
+  getOpenNeedsGuidingResponsesTasks(): NgrTask[] {
     return <NgrTask[]> this.tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
+      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES)
+      .filter(t => t.isOpen());
   }
 
-  getSuccessiveIncorrectAnswersTasks(): SiaTask[] {
+  getOpenSuccessiveIncorrectAnswersTasks(): SiaTask[] {
     return <SiaTask[]> this.tasksByType.get(
-      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
+      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS)
+      .filter(t => t.isOpen());
   }
 
   getSupportingStateStats(task: ExplorationTask): SupportingStateStats {
@@ -304,7 +308,7 @@ export class ExplorationImprovementsTaskRegistryService {
       expStats: ExplorationStats,
       openTasks: readonly ExplorationTask[],
       resolvedTaskTypesByStateName: ReadonlyMap<string, ExplorationTaskType[]>,
-      topAnswersByStateName: ReadonlyMap<string, AnswerStats[]>,
+      topAnswersByStateName: ReadonlyMap<string, readonly AnswerStats[]>,
       playthroughIssues: readonly PlaythroughIssue[]): void {
     // Validate that the exploration stats correspond with provided exploration.
     if (expStats.expId !== config.explorationId) {

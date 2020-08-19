@@ -210,7 +210,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 38
+CURRENT_STATE_SCHEMA_VERSION = 39
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -405,6 +405,12 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
+# Replace this with the correct Redis Host and Port when switching to prod
+# server. Keep this in sync with redis.conf in the root folder. Specifically,
+# REDISPORT should always be the same as the port in redis.conf.
+REDISHOST = 'localhost'
+REDISPORT = 6379
+
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'
@@ -477,6 +483,9 @@ ENABLE_RECORDING_OF_SCORES = False
 
 # No. of pretest questions to display.
 NUM_PRETEST_QUESTIONS = 3
+
+# Maximum allowed commit message length for SnapshotMetadata models.
+MAX_COMMIT_MESSAGE_LENGTH = 1000
 
 # Whether to automatically accept suggestions after a threshold time.
 ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False

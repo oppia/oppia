@@ -66,21 +66,21 @@ angular.module('oppia').directive('storyNodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'AlertsService',
+        '$scope', '$uibModal', 'AlertsService',
         'PageTitleService',
         'StoryEditorStateService', 'ExplorationIdValidationService',
         'TopicsAndSkillsDashboardBackendApiService',
         'TopicEditorRoutingService', 'StoryUpdateService', 'UndoRedoService',
-        'WindowDimensionsService', 'EVENT_VIEW_STORY_NODE_EDITOR',
-        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
+        'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_TITLE',
+        'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         function(
-            $scope, $rootScope, $uibModal, AlertsService,
+            $scope, $uibModal, AlertsService,
             PageTitleService,
             StoryEditorStateService, ExplorationIdValidationService,
             TopicsAndSkillsDashboardBackendApiService,
             TopicEditorRoutingService, StoryUpdateService, UndoRedoService,
-            WindowDimensionsService, EVENT_VIEW_STORY_NODE_EDITOR,
-            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
+            WindowDimensionsService, MAX_CHARS_IN_CHAPTER_TITLE,
+            MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
@@ -214,7 +214,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.viewNodeEditor = function(nodeId) {
-            $rootScope.$broadcast(EVENT_VIEW_STORY_NODE_EDITOR, nodeId);
+            StoryEditorStateService.onViewStoryNodeEditor.emit(nodeId);
           };
 
           $scope.finalizeOutline = function() {
@@ -437,8 +437,11 @@ angular.module('oppia').directive('storyNodeEditor', [
               StoryEditorStateService.onStoryReinitialized.subscribe(
                 () => _init()
               ));
-            $scope.$on('recalculateAvailableNodes', _recalculateAvailableNodes);
-
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onRecalculateAvailableNodes.subscribe(
+                () => _recalculateAvailableNodes()
+              )
+            );
             _init();
           };
 

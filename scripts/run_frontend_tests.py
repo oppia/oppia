@@ -67,7 +67,6 @@ def main(args=None):
         'on your filesystem.',
         'Running test in development environment'])
 
-
     if parsed_args.run_minified_tests:
         python_utils.PRINT('Running test in production environment')
 
@@ -104,7 +103,7 @@ def main(args=None):
         python_utils.PRINT(
             'If you run into the error "Trying to get the Angular injector",'
             ' please see https://github.com/oppia/oppia/wiki/'
-            'Frontend-test-best-practices#fixing-frontend-test-errors'
+            'Frontend-unit-tests-guide#how-to-handle-common-errors'
             ' for details on how to fix it.')
 
     if parsed_args.check_coverage:

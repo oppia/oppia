@@ -116,10 +116,12 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 category='Architecture', language_code='en')
 
         interaction_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 'abc'},
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{
+                    'x': 'abc'
+                }]
+            },
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'feedback': {
@@ -1048,7 +1050,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'latest schema version.')):
             exp_fetchers.get_multiple_explorations_by_version('exp_id_1', [1])
 
-
     def test_save_multi_exploration_math_rich_text_info_model(self):
         multiple_explorations_math_rich_text_info = []
 
@@ -1610,13 +1611,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}, {'x': 1}]
+            },
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -1637,10 +1635,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'outcome': {
                 'dest': 'state3',
                 'feedback': {
@@ -1656,29 +1654,26 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value1 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice1.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value3 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice3.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{
+                    'x': [
+                        '<p>This is value1 for ItemSelection</p><oppia-noni'
+                        'nteractive-image filepath-with-value="&amp;quot;s3'
+                        'Choice1.png&amp;quot;" caption-with-value="&amp;qu'
+                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
+                        ';"></oppia-noninteractive-image>'
+                    ]
+                }, {
+                    'x': [
+                        '<p>This is value3 for ItemSelection</p><oppia-noni'
+                        'nteractive-image filepath-with-value="&amp;quot;s3'
+                        'Choice3.png&amp;quot;" caption-with-value="&amp;qu'
+                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
+                        ';"></oppia-noninteractive-image>'
+                    ]
+                }]
+            },
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -2443,10 +2438,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         # List of answer groups to add into an interaction.
         self.interaction_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0},
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'outcome': {
                 'dest': self.init_state_name,
                 'feedback': {
@@ -2777,10 +2772,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         init_state = exploration.init_state
         init_interaction = init_state.interaction
-        rule_specs = init_interaction.answer_groups[0].rule_specs
+        rule_types_to_inputs = init_interaction.answer_groups[
+            0].rule_types_to_inputs
         outcome = init_interaction.answer_groups[0].outcome
-        self.assertEqual(rule_specs[0].rule_type, 'Equals')
-        self.assertEqual(rule_specs[0].inputs, {'x': 0})
+        self.assertEqual(rule_types_to_inputs, {
+            'Equals': [{'x': 0}]
+        })
         self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
@@ -2823,31 +2820,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.interaction_default_outcome),
                 '')
 
-    def test_update_state_missing_keys(self):
-        """Test that missing keys in interaction_answer_groups produce an
-        error.
-        """
-        del self.interaction_answer_groups[0]['rule_specs'][0]['inputs']
-        with self.assertRaisesRegexp(KeyError, 'inputs'):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID,
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_ID, 'NumericInput') +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-                    self.interaction_answer_groups) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome),
-                '')
-
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
-        self.interaction_answer_groups[0]['rule_specs'][0][
-            'inputs']['x'] = 'abc'
+        self.interaction_answer_groups[0]['rule_types_to_inputs'][
+            'Equals'][0]['x'] = 'abc'
         with self.assertRaisesRegexp(
             Exception,
             'abc has the wrong type. It should be a NonnegativeInt.'):
@@ -3690,7 +3666,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
                         'new_value': 'cat1'})], 'update category')
             self.assertEqual(actual_docs, [updated_exp_doc])
             self.assertEqual(add_docs_counter.times_called, 3)
-
 
     def test_get_number_of_ratings(self):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
@@ -5067,7 +5042,8 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -5083,7 +5059,8 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
         }

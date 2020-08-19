@@ -44,6 +44,9 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -61,11 +64,12 @@ describe('Exploration editor page component', function() {
   var cls = null;
   var cs = null;
   var efbas = null;
-  var eibas = null;
   var eis = null;
   var ers = null;
   var es = null;
+  var eps = null;
   var ess = null;
+  var esaves = null;
   var ets = null;
   var ews = null;
   var gds = null;
@@ -75,9 +79,17 @@ describe('Exploration editor page component', function() {
   var ses = null;
   var sts = null;
   var stass = null;
+  var stfts = null;
   var tds = null;
   var ueps = null;
   var mockEnterEditorForTheFirstTime = null;
+
+  var refreshGraphEmitter = new EventEmitter();
+
+  var mockOpenEditorTutorialEmitter = new EventEmitter();
+
+  var mockInitExplorationPageEmitter = new EventEmitter();
+
   var explorationId = 'exp1';
   var explorationData = {
     exploration_is_linked_to_story: true,
@@ -191,6 +203,10 @@ describe('Exploration editor page component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
     $provide.value('ExplorationDataService', mockExplorationDataService);
   }));
 
@@ -203,11 +219,12 @@ describe('Exploration editor page component', function() {
     cls = $injector.get('ChangeListService');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
-    eibas = $injector.get('ExplorationImprovementsBackendApiService');
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
+    eps = $injector.get('ExplorationPropertyService');
     ess = $injector.get('ExplorationStatesService');
+    esaves = $injector.get('ExplorationSaveService');
     ets = $injector.get('ExplorationTitleService');
     ews = $injector.get('ExplorationWarningsService');
     gds = $injector.get('GraphDataService');
@@ -217,6 +234,7 @@ describe('Exploration editor page component', function() {
     ses = $injector.get('StateEditorService');
     sts = $injector.get('StateTutorialFirstTimeService');
     stass = $injector.get('StateTopAnswersStatsService');
+    stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataService');
     ueps = $injector.get('UserExplorationPermissionsService');
 
@@ -234,6 +252,8 @@ describe('Exploration editor page component', function() {
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
@@ -241,10 +261,22 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
+        mockOpenEditorTutorialEmitter);
 
       explorationData.is_version_of_draft_valid = false;
 
       ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    it('should start tutorial on event of opening tutorial', () => {
+      spyOn(ctrl, 'startTutorial');
+      mockOpenEditorTutorialEmitter.emit();
+      expect(ctrl.startTutorial).toHaveBeenCalled();
     });
 
     it('should mark exploration as editable and translatable', () => {
@@ -294,22 +326,36 @@ describe('Exploration editor page component', function() {
   });
 
   describe('when user permission is false and draft changes are true', () => {
+    var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
+
     beforeEach(() => {
       spyOnAllFunctions(sas);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(ews, 'updateWarnings').and.callThrough();
-      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
+      spyOnProperty(eps, 'onExplorationPropertyChanged').and.returnValue(
+        mockExplorationPropertyChangedEventEmitter);
+      spyOn(ews, 'updateWarnings');
+      spyOn(gds, 'recompute');
       spyOn(pts, 'setPageTitle').and.callThrough();
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
+      spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
+      spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
+        mockInitExplorationPageEmitter);
+
 
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
     });
 
     it('should link exploration to story when initing exploration page', () => {
@@ -348,7 +394,7 @@ describe('Exploration editor page component', function() {
 
     it('should react when exploration property changes', () => {
       ets.init('Exploration Title');
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setPageTitle).toHaveBeenCalledWith(
         'Exploration Title - Oppia Editor');
@@ -356,14 +402,14 @@ describe('Exploration editor page component', function() {
 
     it('should react when untitled exploration property changes', () => {
       ets.init('');
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setPageTitle).toHaveBeenCalledWith(
         'Untitled Exploration - Oppia Editor');
     });
 
     it('should react when refreshing graph', () => {
-      $rootScope.$broadcast('refreshGraph');
+      refreshGraphEmitter.emit();
 
       expect(gds.recompute).toHaveBeenCalled();
       expect(ews.updateWarnings).toHaveBeenCalled();
@@ -373,6 +419,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
 
       var successCallback = jasmine.createSpy('success');
+      mockInitExplorationPageEmitter.emit(successCallback);
       $rootScope.$broadcast('initExplorationPage', successCallback);
 
       // Need to flush and $apply twice to fire the callback. In practice, this
@@ -674,6 +721,9 @@ describe('Exploration editor page component', function() {
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures')
         .and.returnValue(Promise.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
@@ -689,15 +739,15 @@ describe('Exploration editor page component', function() {
       explorationData.is_version_of_draft_valid = true;
     });
 
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
-      spyOn(eibas, 'getConfigAsync')
-        .and.returnValue(Promise.resolve({improvementsTabIsEnabled: true}));
+      spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
+        Promise.resolve(true));
 
       ctrl.$onInit();
-      // We need to flush and $apply twice to fire the callback under test. In
-      // practice, this will occur seamlessly.
-      flushMicrotasks();
-      $scope.$apply();
       flushMicrotasks();
       $scope.$apply();
 
@@ -705,14 +755,10 @@ describe('Exploration editor page component', function() {
     }));
 
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
-      spyOn(eibas, 'getConfigAsync')
-        .and.returnValue(Promise.resolve({improvementsTabIsEnabled: false}));
+      spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
+        Promise.resolve(false));
 
       ctrl.$onInit();
-      // We need to flush and $apply twice to fire the callback under test. In
-      // practice, this will occur seamlessly.
-      flushMicrotasks();
-      $scope.$apply();
       flushMicrotasks();
       $scope.$apply();
 
@@ -733,6 +779,8 @@ describe('Exploration editor page component', function() {
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
@@ -746,6 +794,13 @@ describe('Exploration editor page component', function() {
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
+    });
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
     });
 
     it('should callback state-added method for stats', fakeAsync(() => {

@@ -95,7 +95,7 @@ export class StatsReportingService {
 
   private startStatsTimer(): void {
     if (!StatsReportingService.editorPreviewMode &&
-      !StatsReportingService.questionPlayerMode ) {
+      !StatsReportingService.questionPlayerMode) {
       setInterval(() => this.postStatsToBackend(), 300000);
     }
   }
@@ -363,7 +363,7 @@ export class StatsReportingService {
   // on the stateName.
   recordAnswerSubmitted(
       stateName: string, params: Object, answer: string,
-      answerGroupIndex: number, ruleIndex: number,
+      answerGroupIndex: number,
       classificationCategorization: string, feedbackIsUseful: boolean): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
     StatsReportingService.aggregatedStats.state_stats_mapping[
@@ -380,7 +380,6 @@ export class StatsReportingService {
       StatsReportingService.stateStopwatch.getTimeInSecs(),
       stateName,
       answerGroupIndex,
-      ruleIndex,
       classificationCategorization,
       StatsReportingService.explorationId,
       StatsReportingService.currentStateName,

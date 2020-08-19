@@ -41,19 +41,20 @@ const login = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Logging into Oppia...');
     // eslint-disable-next-line dot-notation
-    await page.goto(context.url);
+    await page.goto(context.url, { waitUntil: 'networkidle0' });
     await page.click('#admin');
     await Promise.all([
       page.waitForNavigation(),
       page.click('#submit-login'),
     ]);
 
+    await page.waitFor(5000);
     await page.type('#username', 'username1');
     await page.click('#terms-checkbox');
-    await page.waitFor(5000);
 
     await Promise.all([
       page.waitForNavigation(),
+      await page.waitForSelector('#signup-submit'),
       await page.click('#signup-submit')
     ]);
     // eslint-disable-next-line no-console
@@ -72,7 +73,7 @@ const setRoleAdmin = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Changing role to admin...');
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles');
+    await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
     await page.waitFor(2000);
     await page.type('#update-role-username-input', 'username1');
     await page.select('#update-role-input', 'string:ADMIN');
@@ -95,7 +96,7 @@ const createCollections = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles');
+    await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
     await page.waitFor(2000);
     await page.type('#update-role-username-textbook', 'username1');
     await page.select('#update-role-input', 'string:COLLECTION_EDITOR');
@@ -124,7 +125,7 @@ const createExplorations = async function(context, page) {
     console.log('Creating Exploration...');
     // Load in Exploration
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin');
+    await page.goto('http://127.0.0.1:8181/admin', { waitUntil: 'networkidle0' });
     await page.waitFor(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click(

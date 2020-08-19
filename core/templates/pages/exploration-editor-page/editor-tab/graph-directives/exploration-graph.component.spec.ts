@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for explorationGraph.
  */
 
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+
 describe('Exploration Graph Component', function() {
   var ctrl = null;
   var $q = null;
@@ -28,7 +31,12 @@ describe('Exploration Graph Component', function() {
   var routerService = null;
   var stateEditorService = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');

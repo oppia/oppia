@@ -26,8 +26,8 @@ import { WindowRef } from
   'services/contextual/window-ref.service.ts';
 
 interface CreditNames {
-  letter: String;
-  names: Array<String>;
+  letter: string;
+  names: string[];
 }
 
 @Component({
@@ -37,7 +37,7 @@ interface CreditNames {
 export class AboutPageComponent implements OnInit {
   aboutPageMascotImgUrl: string;
   activeTabName: string;
-  allCredits: Array<CreditNames> = [];
+  allCredits: CreditNames[] = [];
   listOfNames: string;
   listOfNamesToThank = [
     'Alex Kauffmann', 'Allison Barros',
@@ -65,7 +65,7 @@ export class AboutPageComponent implements OnInit {
     private windowRef: WindowRef) {
   }
 
-  getCredits(startLetter: string): Array<string> {
+  getCredits(startLetter: string): string[] {
     const results = AboutPageConstants.CREDITS_CONSTANTS.filter(
       (credit) => credit.startsWith(startLetter)).sort();
     return results;

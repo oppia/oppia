@@ -468,6 +468,30 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_suggestion_to_exploration_handler_with_long_commit_mesage(self):
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        suggestion_to_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id))['suggestions'][0]
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json('%s/exploration/%s/%s' % (
+            feconf.SUGGESTION_ACTION_URL_PREFIX,
+            suggestion_to_accept['target_id'],
+            suggestion_to_accept['suggestion_id']), {
+                'action': u'accept',
+                'commit_message':
+                    u'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                'review_message': u'Accepted'
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Commit messages must be at most 1000 characters long.'
+        )
+
     def test_accept_suggestion(self):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
@@ -1242,7 +1266,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.TOPIC_ID = 'topic'

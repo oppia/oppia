@@ -20,7 +20,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import datetime
 import os
 
@@ -162,12 +161,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -407,12 +404,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -657,37 +652,15 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.get_output(job_id))
-        actual_output1 = ast.literal_eval(sorted(actual_output)[1])
-        expected_output1_value = [
-            u'<oppia-noninteractive-math math_content-with-value="{&amp;quo'
-            't;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;quot;'
-            'svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninte'
-            'ractive-math>']
-        self.assertEqual(
-            actual_output1[0],
-            'math tags with no SVGs in suggestion with ID %s' % (
-                suggestion1.suggestion_id))
-        self.assertEqual(actual_output1[1], expected_output1_value)
-
-        actual_output2 = ast.literal_eval(sorted(actual_output)[2])
-        expected_output2_value = [
-            u'<oppia-noninteractive-math math_content-with-value="{&amp;quo'
-            't;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;quot;'
-            'svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninte'
-            'ractive-math>']
-        self.assertEqual(
-            actual_output2[0],
-            'math tags with no SVGs in suggestion with ID %s' % (
-                suggestion2.suggestion_id))
-        self.assertEqual(actual_output2[1], expected_output2_value)
-
-        overall_result = ast.literal_eval(sorted(actual_output)[0])
-        self.assertEqual(
-            overall_result[1],
-            {
-                'number_of_math_tags_with_invalid_svg_filename': 2,
-                'number_of_suggestions_with_no_svgs': 2
-            })
+        expected_output = [
+            u'[u\'Overall result\', {u\'number_of_suggestions_with_no_svgs\': '
+            u'2, u\'number_of_math_tags_with_invalid_svg_filename\': 2}]',
+            u'[u\'math tags with no SVGs in suggestion with ID %s\', '
+            u'[u\'%s\']]' % (suggestion1.suggestion_id, invalid_html_content1),
+            u'[u\'math tags with no SVGs in suggestion with ID %s\', '
+            u'[u\'%s\']]' % (suggestion2.suggestion_id, invalid_html_content2),
+        ]
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
 
     def test_job_when_suggestions_have_valid_filenames(self):
         valid_html_content1 = (
@@ -970,12 +943,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1325,7 +1296,6 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             SuggestionMathMigrationOneOffJob.get_output(job_id))
         self.assertEqual(len(actual_output), 0)
 
-
     def test_migration_skips_suggestions_failing_validation(self):
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
@@ -1342,12 +1312,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1495,12 +1463,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
