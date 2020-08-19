@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { EditabilityService } from 'services/editability.service';
@@ -61,6 +63,8 @@ describe('History tab component', function() {
   var csrfTokenService = null;
   var dateTimeFormatService = null;
   var windowRef = null;
+
+  var mockRefreshVersionHistoryEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var snapshots = [{
@@ -130,6 +134,9 @@ describe('History tab component', function() {
         version: 2,
       })
     });
+    $provide.value('RouterService', {
+      onRefreshVersionHistory: mockRefreshVersionHistoryEmitter
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -153,6 +160,10 @@ describe('History tab component', function() {
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should evaluate controller properties after its initialization',
     function() {
@@ -184,7 +195,7 @@ describe('History tab component', function() {
     $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
       snapshots: snapshots
     });
-    $rootScope.$broadcast('refreshVersionHistory', data);
+    mockRefreshVersionHistoryEmitter.emit(data);
     $scope.$apply();
 
     expect(ctrl.currentVersion).toBe(2);
@@ -227,7 +238,7 @@ describe('History tab component', function() {
     $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
       snapshots: snapshots
     });
-    $rootScope.$broadcast('refreshVersionHistory', data);
+    mockRefreshVersionHistoryEmitter.emit(data);
     $scope.$apply();
 
     expect(ctrl.currentVersion).toBe(2);
