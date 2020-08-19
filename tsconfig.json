@@ -13,6 +13,8 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {

@@ -22,6 +22,7 @@ import logging
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_domain
@@ -32,13 +33,15 @@ from google.appengine.ext import ndb
 
 current_user_services = models.Registry.import_current_user_services()
 (
-    base_models, feedback_models, improvements_models,
-    question_models, skill_models, story_models,
-    suggestion_models, topic_models, user_models
+    base_models, collection_models, exp_models,
+    feedback_models, improvements_models, question_models,
+    skill_models, story_models, suggestion_models,
+    topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.feedback, models.NAMES.improvements,
-    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration,
+    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
 ])
 transaction_services = models.Registry.import_transaction_services()
 
@@ -121,20 +124,50 @@ def pre_delete_user(user_id):
     """
     subscribed_exploration_summaries = (
         exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
+
     explorations_to_be_deleted_ids = [
         exp_summary.id for exp_summary in subscribed_exploration_summaries
         if exp_summary.is_private() and
         exp_summary.is_solely_owned_by_user(user_id)]
     exp_services.delete_explorations(user_id, explorations_to_be_deleted_ids)
 
+    explorations_to_release_ownership_ids = [
+        exp_summary.id for exp_summary in subscribed_exploration_summaries
+        if not exp_summary.is_private() and
+        exp_summary.is_solely_owned_by_user(user_id)
+    ]
+    for exp_id in explorations_to_release_ownership_ids:
+        rights_manager.release_ownership_of_exploration(
+            user_services.get_system_user(), exp_id)
+
+    explorations_to_remove_user_from_ids = [
+        exp_summary.id for exp_summary in subscribed_exploration_summaries
+        if not exp_summary.is_solely_owned_by_user(user_id)
+    ]
+
     subscribed_collection_summaries = (
         collection_services.get_collection_summaries_subscribed_to(user_id))
     collections_to_be_deleted_ids = [
         col_summary.id for col_summary in subscribed_collection_summaries
         if col_summary.is_private() and
-        col_summary.is_solely_owned_by_user(user_id)]
+        col_summary.is_solely_owned_by_user(user_id)
+    ]
     collection_services.delete_collections(
         user_id, collections_to_be_deleted_ids)
+
+    collections_to_release_ownership_ids = [
+        col_summary.id for col_summary in subscribed_collection_summaries
+        if not col_summary.is_private() and
+        col_summary.is_solely_owned_by_user(user_id)
+    ]
+    for col_id in collections_to_release_ownership_ids:
+        rights_manager.release_ownership_of_collection(
+            user_services.get_system_user(), col_id)
+
+    collections_to_remove_user_from_ids = [
+        col_summary.id for col_summary in subscribed_collection_summaries
+        if not col_summary.is_solely_owned_by_user(user_id)
+    ]
 
     topic_services.deassign_user_from_all_topics(
         user_services.get_system_user(), user_id)
@@ -319,6 +352,7 @@ def _collect_activity_ids_from_snapshots_and_commit(
         commit_log_models
     )
 
+
 def _pseudonymize_activity_models(
         pending_deletion_request,
         activity_category,
@@ -399,41 +433,34 @@ def _pseudonymize_activity_models(
                 pseudonymized_user_id)
 
 
-def _pseudonymize_topic_models(
+def _pseudonymize_collection_models(
         pending_deletion_request):
-    """Pseudonymize the activity models for the user with user_id.
+    """Pseudonymize the collection models for the user with user_id.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to be saved in the datastore.
-        activity_category: models.NAMES. The category of the category that is
-            being pseudonymized.
-        snapshot_model_class: class. The metadata model class that is being
-            pseudonymized.
-        commit_log_model_class: class. The commit log model class that is being
-            pseudonymized.
-        commit_log_model_field_name: str. The name of the field holding the
-            activity id in the corresponding commit log model.
     """
     user_id = pending_deletion_request.user_id
 
-    activity_ids, snapshot_metadata_models, commit_log_models = (
+    collection_ids, snapshot_metadata_models, commit_log_models = (
         _collect_activity_ids_from_snapshots_and_commit(
             user_id,
             models.NAMES.topic,
             [
-                topic_models.TopicSnapshotMetadataModel,
-                topic_models.TopicRightsSnapshotMetadataModel
+                collection_models.CollectionSnapshotMetadataModel,
+                collection_models.CollectionRightsSnapshotMetadataModel
             ],
-            topic_models.TopicCommitLogEntryModel,
-            topic_models.TopicCommitLogEntryModel.topic_id
+            collection_models.CollectionCommitLogEntryModel,
+            collection_models.CollectionCommitLogEntryModel.collection_id
         )
     )
+
     # The activity_mappings field might have only been partially generated, so
     # we fill in the missing part for this activity category.
     if models.NAMES.topic not in pending_deletion_request.activity_mappings:
-        pending_deletion_request.activity_mappings[models.NAMES.topic] = (
-            _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
+        pending_deletion_request.activity_mappings[models.NAMES.collection] = (
+            _generate_activity_to_pseudonymized_ids_mapping(collection_ids))
         save_pending_deletion_request(pending_deletion_request)
 
     def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
@@ -448,36 +475,118 @@ def _pseudonymize_topic_models(
             pseudonymized_user_id: str. New pseudonymized user ID to be used for
                 the models.
         """
-        metadata_models = [
+        snapshot_metadata_models = [
             model for model in activity_related_models
-            if isinstance(model, snapshot_model_class)]
-        for metadata_model in metadata_models:
-            metadata_model.committer_id = pseudonymized_user_id
+            if isinstance(model, topic_models.TopicSnapshotMetadataModel) or
+               isinstance(model, topic_models.TopicRightsSnapshotMetadataModel)
+        ]
+        for snapshot_metadata_model in snapshot_metadata_models:
+            snapshot_metadata_model.committer_id = pseudonymized_user_id
 
         commit_log_models = [
             model for model in activity_related_models
-            if isinstance(model, commit_log_model_class)]
+            if isinstance(model, topic_models.TopicCommitLogEntryModel)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_user_id
-        ndb.put_multi(metadata_models + commit_log_models)
 
-    activity_ids_to_pids = (
-        pending_deletion_request.activity_mappings[activity_category])
-    for activity_id, pseudonymized_user_id in activity_ids_to_pids.items():
-        activity_related_models = [
-            model for model in metadata_models
-            if model.get_unversioned_instance_id() == activity_id
+        ndb.put_multi(snapshot_metadata_models + commit_log_models)
+
+    collection_ids_to_pids = (
+        pending_deletion_request.activity_mappings[models.NAMES.topic])
+    for collection_id, pseudonymized_user_id in collection_ids_to_pids.items():
+        collection_related_models = [
+            model for model in snapshot_metadata_models
+            if model.get_unversioned_instance_id() == collection_id
         ] + [
             model for model in commit_log_models
-            if getattr(model, commit_log_model_field_name) == activity_id
+            if getattr(model, commit_log_models) == collection_id
         ]
         for i in python_utils.RANGE(
                 0,
-                len(activity_related_models),
+                len(collection_related_models),
                 MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                activity_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                collection_related_models[
+                    i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                pseudonymized_user_id)
+
+
+def _pseudonymize_topic_models(
+        pending_deletion_request):
+    """Pseudonymize the activity models for the user with user_id.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to be saved in the datastore.
+    """
+    user_id = pending_deletion_request.user_id
+
+    topic_ids, snapshot_metadata_models, commit_log_models = (
+        _collect_activity_ids_from_snapshots_and_commit(
+            user_id,
+            models.NAMES.topic,
+            [
+                topic_models.TopicSnapshotMetadataModel,
+                topic_models.TopicRightsSnapshotMetadataModel
+            ],
+            topic_models.TopicCommitLogEntryModel,
+            topic_models.TopicCommitLogEntryModel.topic_id
+        )
+    )
+
+    # The activity_mappings field might have only been partially generated, so
+    # we fill in the missing part for this activity category.
+    if models.NAMES.topic not in pending_deletion_request.activity_mappings:
+        pending_deletion_request.activity_mappings[models.NAMES.topic] = (
+            _generate_activity_to_pseudonymized_ids_mapping(topic_ids))
+        save_pending_deletion_request(pending_deletion_request)
+
+    def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
+        """Pseudonymize user ID fields in the models.
+
+        This function is run in a transaction, with the maximum number of
+        activity_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
+
+        Args:
+            activity_related_models: list(BaseModel). Models whose user IDs
+                should be pseudonymized.
+            pseudonymized_user_id: str. New pseudonymized user ID to be used for
+                the models.
+        """
+        snapshot_metadata_models = [
+            model for model in activity_related_models
+            if isinstance(model, topic_models.TopicSnapshotMetadataModel) or
+               isinstance(model, topic_models.TopicRightsSnapshotMetadataModel)
+        ]
+        for snapshot_metadata_model in snapshot_metadata_models:
+            snapshot_metadata_model.committer_id = pseudonymized_user_id
+
+        commit_log_models = [
+            model for model in activity_related_models
+            if isinstance(model, topic_models.TopicCommitLogEntryModel)]
+        for commit_log_model in commit_log_models:
+            commit_log_model.user_id = pseudonymized_user_id
+
+        ndb.put_multi(snapshot_metadata_models + commit_log_models)
+
+    topic_ids_to_pids = (
+        pending_deletion_request.activity_mappings[models.NAMES.topic])
+    for topic_id, pseudonymized_user_id in topic_ids_to_pids.items():
+        topic_related_models = [
+            model for model in snapshot_metadata_models
+            if model.get_unversioned_instance_id() == topic_id
+        ] + [
+            model for model in commit_log_models
+            if getattr(model, commit_log_models) == topic_id
+        ]
+        for i in python_utils.RANGE(
+                0,
+                len(topic_related_models),
+                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+            transaction_services.run_in_transaction(
+                _pseudonymize_models,
+                topic_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_user_id)
 
 
