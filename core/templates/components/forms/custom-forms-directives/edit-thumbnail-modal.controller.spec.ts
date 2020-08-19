@@ -88,8 +88,9 @@ describe('Edit Thumbnail Modal Controller', function() {
     ' svg file', function(done) {
     // This spy is to be sure that an image element will be returned from
     // document.querySelector method.
-    document.querySelector = jasmine.createSpy('HTMLElement').and
-      .returnValue(document.createElement('img'));
+    spyOn(document, 'querySelector').and.callFake(function() {
+      return document.createElement('img');
+    });
 
     // This is just a mocked base 64 in order to test the FileReader event
     // and its result property.
