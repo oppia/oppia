@@ -20,6 +20,9 @@ require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
+require('domain/story_viewer/story-viewer-backend-api.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -31,10 +34,13 @@ angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
         'story-viewer-navbar-breadcrumb.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', 'UrlService', 'TOPIC_VIEWER_STORY_URL_TEMPLATE',
+        '$rootScope', 'StoryViewerBackendApiService', 'UrlService',
+        'TOPIC_VIEWER_STORY_URL_TEMPLATE',
         function(
-            $rootScope, UrlService, TOPIC_VIEWER_STORY_URL_TEMPLATE) {
+            $rootScope, StoryViewerBackendApiService, UrlService,
+            TOPIC_VIEWER_STORY_URL_TEMPLATE) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.getTopicUrl = function() {
             return UrlInterpolationService.interpolateUrl(
               TOPIC_VIEWER_STORY_URL_TEMPLATE, {
@@ -46,10 +52,15 @@ angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
           };
 
           ctrl.$onInit = function() {
-            $rootScope.$on('storyData', function(evt, data) {
-              ctrl.topicName = data.topicName;
-              ctrl.storyTitle = data.storyTitle;
-            });
+            ctrl.directiveSubscriptions.add(
+              StoryViewerBackendApiService.onSendStoryData.subscribe((data) => {
+                ctrl.topicName = data.topicName;
+                ctrl.storyTitle = data.storyTitle;
+              })
+            );
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
