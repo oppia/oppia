@@ -32,7 +32,6 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
-import python_utils
 import utils
 
 (feedback_models, suggestion_models, user_models) = (
@@ -627,7 +626,7 @@ def _update_user_scoring(user_scoring):
             updated.
     """
     user_scoring_model = user_models.UserContributionScoringModel.get(
-            user_scoring.user_id, user_scoring.score_category
+        user_scoring.user_id, user_scoring.score_category
     )
 
     user_scoring_model.user_id = user_scoring.user_id
