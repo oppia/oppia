@@ -1687,19 +1687,20 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                         word in split_line[1] for word in
                         EXCLUDED_PHRASES)
 
-                    excluded_pharse_is_present_at_end = any(
-                        word in split_prev_line[-1] for word in
-                        EXCLUDED_PHRASES)
+                    if len(previous_line) > 1:
+                        excluded_pharse_is_present_at_end = any(
+                            word in split_prev_line[-1] for word in
+                            EXCLUDED_PHRASES)
 
-                    # Comments must end with the proper punctuation.
-                    last_char_is_invalid = previous_line[-1] not in (
-                        ALLOWED_TERMINATING_PUNCTUATIONS)
-                    if (last_char_is_invalid and not
-                            excluded_pharse_is_present_at_end):
-                        python_utils.PRINT(split_prev_line)
-                        self.add_message(
-                            'invalid-punctuation-used',
-                            line=previous_line_num)
+                        # Comments must end with the proper punctuation.
+                        last_char_is_invalid = previous_line[-1] not in (
+                            ALLOWED_TERMINATING_PUNCTUATIONS)
+                        if (last_char_is_invalid and not
+                                excluded_pharse_is_present_at_end):
+                            python_utils.PRINT(split_prev_line)
+                            self.add_message(
+                                'invalid-punctuation-used',
+                                line=previous_line_num)
 
                     # Comments may include a lowercase character at the
                     # beginning only if they start with version info or a data
