@@ -1712,9 +1712,12 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.workedExampleObjectFactory = this.workedExampleObjectFactory;
     OppiaAngularRootComponent.writtenTranslationObjectFactory = this.writtenTranslationObjectFactory;
     OppiaAngularRootComponent.writtenTranslationsObjectFactory = this.writtenTranslationsObjectFactory;
-    // This emit triggers ajs to start its app.
 
+    // Only starts the app after the PlatformFeatureService completes the
+    // initialization, in which all feature flags are loaded, so that
+    // feature flag values are available as the app starts.
     this.platformFeatureService.initialize().then(
+      // This emit triggers ajs to start its app.
       () => this.initialized.emit()
     );
   }

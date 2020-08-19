@@ -45,9 +45,25 @@ export type FeatureSummaryDict = {
   }
 };
 
+/**
+ * Item of the summary of feature flags, which represents the status of one
+ * feature flag, providing the '.isEnabled' interface to check the status
+ * of that feature flag.
+ */
 class FeatureSummaryDictItem {
+  /**
+   * Constructor of the FeatureSummaryDictItem class.
+   *
+   * @param {() => boolean} getterFn - Function that returns the status of
+   *     the feature.
+   */
   constructor(private getterFn: () => boolean) {}
 
+  /**
+   * Checks if the feature is enabled.
+   *
+   * @returns {boolean} - True if the feature is enabled.
+   */
   get isEnabled(): boolean {
     return this.getterFn();
   }
@@ -118,6 +134,13 @@ export class FeatureStatusSummaryObjectFactory {
     return new FeatureStatusSummary(backendDict);
   }
 
+  /**
+   * Creates a default FeatureStatusSummary object that all features are
+   * disabled.
+   *
+   * @returns {FeatureStatusSummary} - The FeatureStatusSummary object instance
+   *     with all feature disabled.
+   */
   createDefault(): FeatureStatusSummary {
     const defaultDict: FeatureStatusSummaryBackendDict = {};
     Object.keys(FeatureNames).forEach(

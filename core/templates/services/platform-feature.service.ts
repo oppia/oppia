@@ -13,7 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview A service for retriving feature flags.
+ * @fileoverview A service for retriving feature flags - boolean parameters
+ * that are used to determine if features should be enabled.
+ *
+ * Once the initialization is done, the value of each feature flag is guaranteed
+ * to be constant within the page.
+ * The values are also cached in SessionStorage, so that even after page
+ * refreshing, the values stay the same, unless:
+ *   - the cache TTL of 12 hours has been reached, or
+ *   - the current account is different than the account in use when the values
+ *     are loaded, i.e. a different session id is present in the cookies.
+ * In such cases, the values will be re-initialized, they may be changed.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -29,7 +39,11 @@ import {
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { UrlService } from './contextual/url.service';
+import { BrowserCheckerService } from
+  'domain/utilities/browser-checker.service';
 
 interface FeatureFlagsCacheItem {
   timestamp: number;
@@ -51,7 +65,10 @@ export class PlatformFeatureService {
   static featureStatusSummary: FeatureStatusSummary = null;
 
   // TODO(#9154): Remove static when migration is complete.
-  static _initializedWithError = false;
+  static _isInitializedWithError = false;
+
+  // TODO(#9154): Remove static when migration is complete.
+  static _isSkipped = false;
 
   // TODO(#9154): Remove static when migration is complete.
   static initializationPromise: Promise<void> = null;
@@ -63,13 +80,16 @@ export class PlatformFeatureService {
       private featureStatusSummaryObjectFactory:
         FeatureStatusSummaryObjectFactory,
       private i18nLanguageCodeService: I18nLanguageCodeService,
-      private windowRef: WindowRef) {
+      private windowRef: WindowRef,
+      private loggerService: LoggerService,
+      private urlService: UrlService,
+      private browserCheckerService: BrowserCheckerService) {
     this.initialize();
   }
 
   /**
-   * Inializes the PlatformFeatureService, it's guaranteed that it's only
-   * inialized once.
+   * Inializes the PlatformFeatureService. This function guarantees that the
+   * service is initialized only once for subsequent calls.
    *
    * @returns {Promise} - A promise that is resolved when the initialization
    * is done.
@@ -84,6 +104,7 @@ export class PlatformFeatureService {
   /**
    * Returns the summary object of feature flags, which can be used to get the
    * value of feature flags.
+   *
    * Example:
    *   platformFeatureService.featureSummary.DummyFeature.isEnabled === true.
    *
@@ -103,32 +124,17 @@ export class PlatformFeatureService {
    *
    * @returns {boolean} - True if there is any error during initialization.
    */
-  get initialzedWithError(): boolean {
-    return PlatformFeatureService._initializedWithError;
+  get isInitialzedWithError(): boolean {
+    return PlatformFeatureService._isInitializedWithError;
   }
 
   /**
-   * Detects the type of browser from it's userAgent.
+   * Checks if the loading is skipped.
    *
-   * @returns {string} - The name of the browser that is being used.
+   * @returns {boolean} - True if the loading is skipped.
    */
-  detectBrowserType(): string {
-    const ua = this.windowRef.nativeWindow.navigator.userAgent;
-
-    if (ua.includes('edg') || ua.includes('Edge')) {
-      return 'Edge';
-    }
-    if (ua.includes('Chrome')) {
-      return 'Chrome';
-    }
-    if (ua.includes('Firefox')) {
-      return 'Firefox';
-    }
-    if (ua.includes('Safari')) {
-      return 'Safari';
-    }
-
-    return 'Unknown';
+  get isSkipped(): boolean {
+    return PlatformFeatureService._isSkipped;
   }
 
   /**
@@ -146,20 +152,31 @@ export class PlatformFeatureService {
       if (item && this.validateSavedResults(item)) {
         PlatformFeatureService.featureStatusSummary = item.featureStatusSummary;
         this.saveResults();
-      } else {
-        this.clearSavedResults();
+        return;
+      }
+      this.clearSavedResults();
+
+      // The user is 'partially logged-in' at the signup page, we need to skip
+      // the loading from server otherwise the request will have the cookies
+      // erased, leading to the 'Registration session expired' error.
+      if (this.urlService.getPathname() === '/signup') {
+        PlatformFeatureService._isSkipped = true;
+        PlatformFeatureService.featureStatusSummary = this
+          .featureStatusSummaryObjectFactory.createDefault();
+        return;
       }
 
-      if (!PlatformFeatureService.featureStatusSummary) {
-        PlatformFeatureService.featureStatusSummary = await this
-          .loadFeatureFlagsFromServer();
-        this.saveResults();
-      }
+      PlatformFeatureService.featureStatusSummary = await this
+        .loadFeatureFlagsFromServer();
+      this.saveResults();
     } catch (err) {
+      this.loggerService.error(
+        'Error during initialization of PlatformFeatureService: ' +
+        `${err.message ? err.message : err}`);
       // If any error, just disable all features.
       PlatformFeatureService.featureStatusSummary = this
         .featureStatusSummaryObjectFactory.createDefault();
-      PlatformFeatureService._initializedWithError = true;
+      PlatformFeatureService._isInitializedWithError = true;
       this.clearSavedResults();
     }
   }
@@ -193,7 +210,7 @@ export class PlatformFeatureService {
   }
 
   /**
-   * Reads and parse feature flag results from the sessionStorage.
+   * Reads and parses feature flag results from the sessionStorage.
    *
    * @returns {FeatureFlagsCacheItem|null} - Saved results along with timestamp
    * and session id. Null if there isn't any saved result.
@@ -215,7 +232,10 @@ export class PlatformFeatureService {
   }
 
   /**
-   * Validates the result saved in sessionStorage.
+   * Validates the result saved in sessionStorage. The result is valid only when
+   * all following conditions hold:
+   *   - it hasn't expired.
+   *   - its session id matches the current session id.
    *
    * @param {FeatureFlagsCacheItem} item - The result item loaded from
    * sessionStorage.
@@ -242,7 +262,7 @@ export class PlatformFeatureService {
    */
   private generateClientContext(): ClientContext {
     const clientType = 'Web';
-    const broswerType = this.detectBrowserType();
+    const broswerType = this.browserCheckerService.detectBrowserType();
     const userLocale = (
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
 

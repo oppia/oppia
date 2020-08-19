@@ -1574,7 +1574,10 @@ export class UpgradedServices {
       upgradedServices['PlatformFeatureBackendApiService'],
       upgradedServices['FeatureStatusSummaryObjectFactory'],
       upgradedServices['I18nLanguageCodeService'],
-      upgradedServices['WindowRef']);
+      upgradedServices['WindowRef'],
+      upgradedServices['LoggerService'],
+      upgradedServices['UrlService'],
+      upgradedServices['BrowserCheckerService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],

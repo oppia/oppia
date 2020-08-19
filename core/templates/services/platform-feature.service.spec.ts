@@ -28,6 +28,7 @@ import { PlatformFeatureBackendApiService } from
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { FeatureNames, FeatureStatusSummaryObjectFactory } from
   'domain/platform_feature/feature-status-summary-object.factory';
+import { UrlService } from 'services/contextual/url.service';
 
 
 describe('PlatformFeatureService', () => {
@@ -36,10 +37,12 @@ describe('PlatformFeatureService', () => {
   let apiService: PlatformFeatureBackendApiService;
   let summaryFactory: FeatureStatusSummaryObjectFactory;
   let platformFeatureService: PlatformFeatureService;
+  let urlService: UrlService;
 
   let mockSessionStore: (obj: object) => void;
   let mockCookie: (cookieStr: string) => void;
   let mockUserAgent: (ua: string) => void;
+  let mockPathName: (pathName: string) => void;
 
   let apiSpy: jasmine.Spy;
 
@@ -50,13 +53,9 @@ describe('PlatformFeatureService', () => {
   // PlatformFeatureService.
   const clearStaticProperties = () => {
     PlatformFeatureService.featureStatusSummary = null;
-    PlatformFeatureService._initializedWithError = false;
+    PlatformFeatureService._isInitializedWithError = false;
     PlatformFeatureService.initializationPromise = null;
   };
-
-  beforeAll(() => {
-    clearStaticProperties();
-  });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -67,6 +66,9 @@ describe('PlatformFeatureService', () => {
     i18n = TestBed.get(I18nLanguageCodeService);
     summaryFactory = TestBed.get(FeatureStatusSummaryObjectFactory);
     apiService = TestBed.get(PlatformFeatureBackendApiService);
+    urlService = TestBed.get(UrlService);
+
+    clearStaticProperties();
 
     const store = {};
     let cookie = '';
@@ -92,7 +94,10 @@ describe('PlatformFeatureService', () => {
       Object.assign(store, obj);
     };
     mockCookie = (cookieStr: string) => cookie = cookieStr;
-    mockUserAgent = ua => userAgent = ua;
+
+    let pathName = '/';
+    spyOn(urlService, 'getPathname').and.callFake(() => pathName);
+    mockPathName = path => pathName = path;
 
     spyOn(i18n, 'getCurrentI18nLanguageCode').and.returnValue('en');
     apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
@@ -100,10 +105,6 @@ describe('PlatformFeatureService', () => {
         [FeatureNames.DummyFeature]: true,
       })
     );
-  });
-
-  afterEach(() => {
-    clearStaticProperties();
   });
 
   describe('.initialize', () => {
@@ -119,7 +120,7 @@ describe('PlatformFeatureService', () => {
       expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-      expect(platformFeatureService.initialzedWithError).toBeFalse();
+      expect(platformFeatureService.isInitialzedWithError).toBeFalse();
     }));
 
     it('should save results in sessionStorage after loading.', fakeAsync(() => {
@@ -145,7 +146,7 @@ describe('PlatformFeatureService', () => {
           [FeatureNames.DummyFeature]: true,
         }
       });
-      expect(platformFeatureService.initialzedWithError).toBeFalse();
+      expect(platformFeatureService.isInitialzedWithError).toBeFalse();
     }));
 
     it(
@@ -184,7 +185,7 @@ describe('PlatformFeatureService', () => {
       })
     );
 
-    it('should load from sessionStorage if there\'s valid results.', fakeAsync(
+    it('should load from sessionStorage if there are valid results.', fakeAsync(
       () => {
         const sessionId = 'session_id';
         mockCookie(`SACSID=${sessionId}`);
@@ -198,13 +199,15 @@ describe('PlatformFeatureService', () => {
           })
         });
 
+        // Ticks 60 secs, as stored results are valid for 12 hrs, ths results
+        // should still be valid.
         tick(60 * 1000);
         platformFeatureService = TestBed.get(PlatformFeatureService);
 
         flushMicrotasks();
 
         expect(apiService.fetchFeatureFlags).not.toHaveBeenCalled();
-        expect(platformFeatureService.initialzedWithError).toBeFalse();
+        expect(platformFeatureService.isInitialzedWithError).toBeFalse();
       })
     );
 
@@ -222,13 +225,15 @@ describe('PlatformFeatureService', () => {
           })
         });
 
-        tick(13 * 3600 * 1000); // 13 hours later.
+        // Ticks 13 hrs, as stored results are valid for 12 hrs, ths results
+        // should have expired.
+        tick(13 * 3600 * 1000);
         platformFeatureService = TestBed.get(PlatformFeatureService);
 
         flushMicrotasks();
 
         expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
-        expect(platformFeatureService.initialzedWithError).toBeFalse();
+        expect(platformFeatureService.isInitialzedWithError).toBeFalse();
       })
     );
 
@@ -257,11 +262,11 @@ describe('PlatformFeatureService', () => {
             'SAVED_FEATURE_FLAGS'))
             .sessionId
         ).toEqual(sessionId);
-        expect(platformFeatureService.initialzedWithError).toBeFalse();
+        expect(platformFeatureService.isInitialzedWithError).toBeFalse();
       })
     );
 
-    it('should request only once if there are more than one calls to ' +
+    it('should request only once if there are more than one call to ' +
       '.initialize.', fakeAsync(() => {
       platformFeatureService = TestBed.get(PlatformFeatureService);
 
@@ -271,7 +276,7 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(apiService.fetchFeatureFlags).toHaveBeenCalledTimes(1);
-      expect(platformFeatureService.initialzedWithError).toBeFalse();
+      expect(platformFeatureService.isInitialzedWithError).toBeFalse();
     }));
 
     it('should disable all features when loading fails.', fakeAsync(() => {
@@ -284,46 +289,19 @@ describe('PlatformFeatureService', () => {
       expect(
         platformFeatureService.featureSummary.DummyFeature.isEnabled
       ).toBeFalse();
-      expect(platformFeatureService.initialzedWithError).toBeTrue();
+      expect(platformFeatureService.isInitialzedWithError).toBeTrue();
     }));
 
-    describe('.detectBrowserType', () => {
-      beforeEach(() => {
-        platformFeatureService = TestBed.get(PlatformFeatureService);
-      });
+    it('should skip on the signup page', fakeAsync(() => {
+      mockPathName('/signup');
 
-      it('should correctly detect Edge browser.', () => {
-        mockUserAgent(
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
-          '(KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246');
+      platformFeatureService = TestBed.get(PlatformFeatureService);
 
-        expect(platformFeatureService.detectBrowserType()).toEqual('Edge');
-      });
+      flushMicrotasks();
 
-      it('should correctly detect Chrome browser.', () => {
-        mockUserAgent(
-          'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, ' +
-          'like Gecko) Chrome/47.0.2526.111 Safari/537.36');
-
-        expect(platformFeatureService.detectBrowserType()).toEqual('Chrome');
-      });
-
-      it('should correctly detect Firefox browser.', () => {
-        mockUserAgent(
-          'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101' +
-          ' Firefox/15.0.1');
-
-        expect(platformFeatureService.detectBrowserType()).toEqual('Firefox');
-      });
-
-      it('should correctly detect Safari browser.', () => {
-        mockUserAgent(
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/' +
-          '601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9');
-
-        expect(platformFeatureService.detectBrowserType()).toEqual('Safari');
-      });
-    });
+      expect(apiService.fetchFeatureFlags).not.toHaveBeenCalled();
+      expect(platformFeatureService.isSkipped).toBeTrue();
+    }));
   });
 
   describe('.featureSummary', () => {
@@ -335,7 +313,7 @@ describe('PlatformFeatureService', () => {
       expect(
         platformFeatureService.featureSummary.DummyFeature.isEnabled
       ).toBeTrue();
-      expect(platformFeatureService.initialzedWithError).toBeFalse();
+      expect(platformFeatureService.isInitialzedWithError).toBeFalse();
     }));
 
     it('should throw error when accessed before initialization.', fakeAsync(

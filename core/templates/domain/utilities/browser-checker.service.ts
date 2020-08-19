@@ -61,6 +61,30 @@ export class BrowserCheckerService {
   isMobileDevice(): boolean {
     return this._isMobileDevice();
   }
+
+  /**
+   * Detects the type of browser from it's userAgent.
+   *
+   * @returns {string} - The name of the browser that is being used.
+   */
+  detectBrowserType(): string {
+    const userAgent = this.windowRef.nativeWindow.navigator.userAgent;
+
+    if (userAgent.includes('edg') || userAgent.includes('Edge')) {
+      return 'Edge';
+    }
+    if (userAgent.includes('Chrome')) {
+      return 'Chrome';
+    }
+    if (userAgent.includes('Firefox')) {
+      return 'Firefox';
+    }
+    if (userAgent.includes('Safari')) {
+      return 'Safari';
+    }
+
+    return 'Unknown';
+  }
 }
 
 angular.module('oppia').factory(

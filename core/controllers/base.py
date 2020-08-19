@@ -248,12 +248,7 @@ class BaseHandler(webapp2.RequestHandler):
                 '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
             return
 
-        # The 'platformfeaturehandler' requests should be exceptions here, if
-        # not, requests for feature flags when the user is partially logged in
-        # will cause their session cookie being deleted, leading to the
-        # 'Registration session expired' error.
-        if (self.partially_logged_in
-                and 'platformfeaturehandler' not in self.request.uri):
+        if self.partially_logged_in:
             self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
