@@ -85,7 +85,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         });
     }
 
-    var storyId = UrlService.getStoryIdInPlayer();
+    var storyUrlFragment = UrlService.getStoryUrlFragmentFromLearnerUrl();
 
     var _playerStateChangeEventEmitter = new EventEmitter();
 
@@ -193,7 +193,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       $q.all([
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
-          explorationId, storyId),
+          explorationId, storyUrlFragment),
         ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
           explorationId),
       ]).then(function(combinedData) {
