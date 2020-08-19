@@ -21,13 +21,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import caching_services
 from core.domain import topic_domain
 from core.platform import models
 import feconf
+import python_utils
 
 (skill_models, topic_models,) = models.Registry.import_models([
     models.NAMES.skill, models.NAMES.topic])
-memcache_services = models.Registry.import_memcache_services()
 
 
 def _migrate_subtopics_to_latest_schema(versioned_subtopics):
@@ -92,22 +93,6 @@ def _migrate_story_references_to_latest_schema(versioned_story_references):
         topic_domain.Topic.update_story_references_from_model(
             versioned_story_references, story_reference_schema_version)
         story_reference_schema_version += 1
-
-
-def get_topic_memcache_key(topic_id, version=None):
-    """Returns a memcache key for the topic.
-
-    Args:
-        topic_id: str. ID of the topic.
-        version: int. The version of the topic.
-
-    Returns:
-        str. The memcache key of the topic.
-    """
-    if version:
-        return 'topic-version:%s:%s' % (topic_id, version)
-    else:
-        return 'topic:%s' % topic_id
 
 
 def get_topic_from_model(topic_model):
@@ -183,18 +168,23 @@ def get_topic_by_id(topic_id, strict=True, version=None):
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
     """
-    topic_memcache_key = get_topic_memcache_key(topic_id, version=version)
-    memcached_topic = memcache_services.get_multi(
-        [topic_memcache_key]).get(topic_memcache_key)
+    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    cached_topic = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_TOPIC,
+        sub_namespace,
+        [topic_id]).get(topic_id)
 
-    if memcached_topic is not None:
-        return memcached_topic
+    if cached_topic is not None:
+        return cached_topic
     else:
         topic_model = topic_models.TopicModel.get(
             topic_id, strict=strict, version=version)
         if topic_model:
             topic = get_topic_from_model(topic_model)
-            memcache_services.set_multi({topic_memcache_key: topic})
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_TOPIC,
+                sub_namespace,
+                {topic_id: topic})
             return topic
         else:
             return None

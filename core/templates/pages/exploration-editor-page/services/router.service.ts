@@ -24,17 +24,18 @@ require(
   'exploration-init-state-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/exploration-improvements.service.ts');
+require('services/external-save.service.ts');
 
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$q', '$rootScope', '$timeout', '$window',
   'ExplorationImprovementsService', 'ExplorationInitStateNameService',
-  'ExplorationStatesService', 'StateEditorService',
+  'ExplorationStatesService', 'ExternalSaveService', 'StateEditorService',
   function(
       $interval, $location, $q, $rootScope, $timeout, $window,
       ExplorationImprovementsService, ExplorationInitStateNameService,
-      ExplorationStatesService, StateEditorService) {
+      ExplorationStatesService, ExternalSaveService, StateEditorService) {
     var TABS = {
       MAIN: {name: 'main', path: '/main'},
       TRANSLATION: {name: 'translation', path: '/translation'},
@@ -72,6 +73,8 @@ angular.module('oppia').factory('RouterService', [
     var refreshStatisticsTabEventEmitter = new EventEmitter();
     /** @private */
     var refreshTranslationTabEventEmitter = new EventEmitter();
+    /** @private */
+    var refreshVersionHistoryEventEmitter = new EventEmitter();
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -88,7 +91,8 @@ angular.module('oppia').factory('RouterService', [
 
       // TODO(oparry): Determine whether this is necessary, since
       // _savePendingChanges() is called by each of the navigateTo... functions.
-      $rootScope.$broadcast('externalSave');
+
+      ExternalSaveService.onExternalSave.emit();
 
       if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
         activeTabName = TABS.TRANSLATION.name;
@@ -123,7 +127,7 @@ angular.module('oppia').factory('RouterService', [
           });
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
-        $rootScope.$broadcast('refreshVersionHistory', {
+        refreshVersionHistoryEventEmitter.emit({
           forceRefresh: false
         });
         activeTabName = TABS.HISTORY.name;
@@ -162,15 +166,7 @@ angular.module('oppia').factory('RouterService', [
     };
 
     var _savePendingChanges = function() {
-      try {
-        $rootScope.$broadcast('externalSave');
-      } catch (e) {
-        // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-        // null" error. To get around this we must use $apply().
-        $rootScope.$apply(function() {
-          $rootScope.$broadcast('externalSave');
-        });
-      }
+      ExternalSaveService.onExternalSave.emit();
     };
 
     var _getCurrentStateFromLocationPath = function() {
@@ -277,6 +273,9 @@ angular.module('oppia').factory('RouterService', [
       },
       get onRefreshTranslationTab() {
         return refreshTranslationTabEventEmitter;
+      },
+      get onRefreshVersionHistory() {
+        return refreshVersionHistoryEventEmitter;
       }
     };
 
