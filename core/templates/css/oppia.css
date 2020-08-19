@@ -2663,8 +2663,8 @@ oppia-parameter {
 
 .improvements-tab-overview-body {
   background-color: #F5F5F5;
-  border-radius: 2px;
   border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 2px;
   box-sizing: border-box;
   display: flex;
   height: 121px;
