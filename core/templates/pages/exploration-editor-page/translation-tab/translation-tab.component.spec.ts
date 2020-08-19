@@ -50,6 +50,7 @@ import { StateWrittenTranslationsService } from
 import { ContextService } from 'services/context.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { ExternalSaveService } from 'services/external-save.service';
 
 import $ from 'jquery';
 
@@ -90,6 +91,7 @@ describe('Translation tab component', function() {
       TestBed.get(ExplorationImprovementsTaskRegistryService));
     $provide.value('ExplorationStatsService',
       TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));

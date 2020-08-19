@@ -68,6 +68,7 @@ import { ContinueValidationService } from
 import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
 import { EventEmitter } from '@angular/core';
+import { ExternalSaveService } from 'services/external-save.service';
 
 describe('State translation component', function() {
   var ctrl = null;
@@ -368,6 +369,7 @@ describe('State translation component', function() {
       TestBed.get(ExplorationImprovementsTaskRegistryService));
     $provide.value('ExplorationStatsService',
       TestBed.get(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('NumberWithUnitsObjectFactory',
       TestBed.get(NumberWithUnitsObjectFactory));
