@@ -2567,7 +2567,7 @@ oppia-parameter {
   bottom: 35px;
   color: rgba(0,0,0,0.54);
   font-size: 20px;
-  font-weight: bold;
+  font-weight: 500;
   height: 28px;
   letter-spacing: 0;
   line-height: 28px;
@@ -2609,7 +2609,7 @@ oppia-parameter {
   color: rgba(0,0,0,0.87);
   flex-grow: 1;
   font-size: 20px;
-  font-weight: bold;
+  font-weight: 500;
   height: 24px;
   letter-spacing: 0.33px;
   line-height: 24px;
@@ -2622,7 +2622,7 @@ oppia-parameter {
   color: #00829B;
   display: inline-flex;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 500;
   height: 18px;
   letter-spacing: 0;
   line-height: 16px;
@@ -2645,7 +2645,7 @@ oppia-parameter {
   color: #00829B;
   display: inline-block;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 500;
   letter-spacing: 0;
   line-height: 16px;
   padding: 1px 0;
@@ -3036,7 +3036,7 @@ oppia-parameter {
   color: #333333;
   font-size: 14px;
   font-style: normal;
-  font-weight: bold;
+  font-weight: 500;
   line-height: 16px;
 }
 
