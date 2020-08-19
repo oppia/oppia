@@ -24,6 +24,7 @@ require('services/contextual/device-info.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/guppy-initialization.service.ts');
 require('services/math-interactions.service.ts');
+require('third-party-imports/guppy.import.ts');
 
 angular.module('oppia').component('mathEquationEditor', {
   bindings: {

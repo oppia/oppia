@@ -20,6 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
+import 'third-party-imports/guppy.import';
 
 const SYMBOLS_TO_REMOVE = [
   'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',

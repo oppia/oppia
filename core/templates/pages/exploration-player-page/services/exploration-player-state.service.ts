@@ -41,6 +41,7 @@ require('services/exploration-features-backend-api.service.ts');
 require('services/exploration-features.service.ts');
 require('services/playthrough.service.ts');
 require('services/contextual/url.service.ts');
+require('third-party-imports/guppy.import.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
@@ -160,7 +161,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         var featuresData = combinedData[1];
         if (doesMathExpressionInputInteractionExist(explorationData.states)) {
           Guppy.init({
-            symbols: ['/third_party/static/guppy-175999/sym/symbols.json',
+            symbols: ['/third_party/static/guppy-7509f3/sym/symbols.json',
               oppiaSymbolsUrl]});
         }
         ExplorationFeaturesService.init(explorationData, featuresData);
@@ -204,7 +205,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           doesMathExpressionInputInteractionExist(
             explorationData.exploration.states)) {
           Guppy.init({
-            symbols: ['/third_party/static/guppy-175999/sym/symbols.json',
+            symbols: ['/third_party/static/guppy-7509f3/sym/symbols.json',
               oppiaSymbolsUrl]});
         }
         ExplorationFeaturesService.init(explorationData, featuresData);

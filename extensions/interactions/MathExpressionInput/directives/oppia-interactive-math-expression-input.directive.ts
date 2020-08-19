@@ -32,6 +32,7 @@ require('services/debouncer.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/html-escaper.service.ts');
 require('third-party-imports/math-expressions.import.ts');
+require('third-party-imports/guppy.import.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
   '$timeout', 'MathExpressionInputRulesService',
@@ -207,7 +208,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
 
             if (angular.equals(Guppy.Symbols.symbols, {})) {
               Guppy.init({
-                symbols: ['/third_party/static/guppy-175999/sym/symbols.json',
+                symbols: ['/third_party/static/guppy-7509f3/sym/symbols.json',
                   oppiaSymbolsUrl]});
             }
             guppyInstance.render();
