@@ -29,18 +29,22 @@ require(
   'state-name.service.ts');
 require('services/editability.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('services/external-save.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('stateNameEditor', {
   template: require('./state-name-editor.component.html'),
   controller: [
-    '$scope', '$filter', '$rootScope', 'EditabilityService',
+    '$filter', '$rootScope', 'EditabilityService',
     'StateEditorService', 'StateNameService', 'FocusManagerService',
-    'ExplorationStatesService', 'RouterService',
+    'ExplorationStatesService', 'ExternalSaveService', 'RouterService',
     function(
-        $scope, $filter, $rootScope, EditabilityService,
+        $filter, $rootScope, EditabilityService,
         StateEditorService, StateNameService, FocusManagerService,
-        ExplorationStatesService, RouterService) {
+        ExplorationStatesService, ExternalSaveService, RouterService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
 
       ctrl.initStateNameEditor = function() {
         StateNameService.init();
@@ -61,7 +65,6 @@ angular.module('oppia').component('stateNameEditor', {
         if (!_isNewStateNameValid(normalizedNewName)) {
           return false;
         }
-
         if (savedMemento === normalizedNewName) {
           StateNameService.setStateNameEditorVisibility(false);
           return false;
@@ -70,7 +73,7 @@ angular.module('oppia').component('stateNameEditor', {
             StateEditorService.getActiveStateName(), normalizedNewName);
           StateNameService.setStateNameEditorVisibility(false);
           // Save the contents of other open fields.
-          $rootScope.$broadcast('externalSave');
+          ExternalSaveService.onExternalSave.emit();
           ctrl.initStateNameEditor();
           return true;
         }
@@ -97,16 +100,23 @@ angular.module('oppia').component('stateNameEditor', {
         }
       };
       ctrl.$onInit = function() {
-        $scope.$on('externalSave', function() {
-          if (StateNameService.isStateNameEditorShown()) {
-            ctrl.saveStateName(ctrl.tmpStateName);
-          }
-        });
+        ctrl.directiveSubscriptions.add(
+          ExternalSaveService.onExternalSave.subscribe(
+            () => {
+              if (StateNameService.isStateNameEditorShown()) {
+                ctrl.saveStateName(ctrl.tmpStateName);
+              }
+            }
+          )
+        );
         StateNameService.init();
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
         ctrl.StateNameService = StateNameService;
         ctrl.stateNameEditorIsShown = false;
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
