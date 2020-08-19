@@ -66,19 +66,17 @@ describe('Contributor dashboard page', function() {
     await users.createUser(USER_EMAILS[0], 'user0');
     await users.createUser(USER_EMAILS[1], 'user1');
     await users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
-    // Create 2 topics and 2 skills. Link 1 skill to 1 topic.
+
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAMES[1], 'community-topic-two', 'Topic description 2', false);
     await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
-    // Allow user1 to review suggestions.
+
+    // Allow user1 to review question suggestions.
     await adminPage.get();
     await adminPage.assignQuestionReviewer('user1');
     await users.logout();
