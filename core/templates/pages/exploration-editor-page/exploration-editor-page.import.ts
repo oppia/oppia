@@ -17,8 +17,6 @@
  *               help tab in the navbar.
  */
 
-// Jquery needs to be loaded before anything else to make angular js work.
-require('third-party-imports/jquery.import');
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/exploration-editor-page/exploration-editor-page.module.ts');
@@ -33,5 +31,5 @@ require(
   'editor-navigation.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
-  'exploration-save-and-publish-buttons.directive.ts');
+  'exploration-save-and-publish-buttons.component.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');

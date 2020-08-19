@@ -24,6 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import $ from 'jquery';
 
 import { EventEmitter } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 require('services/search.service.ts');
 
@@ -35,6 +36,9 @@ describe('Search service', function() {
   var $translate = null;
   var CsrfService = null;
   var results = null;
+  var testSubscriptions: Subscription;
+  const initialSearchResultsLoadedSpy = jasmine.createSpy(
+    'initialSearchResultsLoadedSpy');
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -80,6 +84,16 @@ describe('Search service', function() {
       }
     };
   }));
+
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(SearchService.onInitialSearchResultsLoaded.subscribe(
+      initialSearchResultsLoadedSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
 
   it('should find two categories and two languages if given in url search',
     function() {
@@ -270,8 +284,7 @@ describe('Search service', function() {
     $httpBackend.flush();
 
     expect(SearchService.isSearchInProgress()).toBe(false);
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'initialSearchResultsLoaded', []);
+    expect(initialSearchResultsLoadedSpy).toHaveBeenCalled();
     expect($translate.refresh).toHaveBeenCalled();
     expect(successHandler).toHaveBeenCalled();
   });
@@ -306,8 +319,7 @@ describe('Search service', function() {
     $httpBackend.flush();
 
     expect(SearchService.isSearchInProgress()).toBe(false);
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'initialSearchResultsLoaded', []);
+    expect(initialSearchResultsLoadedSpy).toHaveBeenCalled();
     expect(logErrorSpy).toHaveBeenCalled();
     expect($translate.refresh).toHaveBeenCalled();
     expect(successHandler).toHaveBeenCalled();
