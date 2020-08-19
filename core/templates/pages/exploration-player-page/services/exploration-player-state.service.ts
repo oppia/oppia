@@ -213,7 +213,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           initializeExplorationServices(explorationData, true, callback);
           initializePretestServices(pretestQuestionsData, callback);
         } else if (
-          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
           UrlService.getUrlParams().hasOwnProperty('node_id')) {
           setStoryChapterMode();
           initializeExplorationServices(explorationData, false, callback);
@@ -258,7 +258,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       },
       moveToExploration: function(callback) {
         if (
-          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
           UrlService.getUrlParams().hasOwnProperty('node_id')) {
           setStoryChapterMode();
         } else {

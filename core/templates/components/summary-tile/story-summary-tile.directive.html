@@ -16,15 +16,17 @@
            ng-style="{background: $ctrl.storySummary.getThumbnailBgColor()}">
     </div>
     <div class="chapter-details">
-      <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed, 'unavailable-chapter': !$ctrl.isPreviousChapterCompleted($index)}" class="chapter-title" ng-repeat="title in $ctrl.storySummary.getNodeTitles()">
-        <span ng-if="$index < $ctrl.chaptersDisplayed">
-          <span ng-if="$ctrl.storySummary.isNodeCompleted(title)" class="material-icons completed-icon">
-            done
-          </span>
-          <span ng-class="{'incomplete-chapter': !$ctrl.isChapterCompleted(title)}"
-                translate="I18N_TOPIC_VIEWER_CHAPTER">
+      <div ng-class="{'unavailable-chapter': !$ctrl.isPreviousChapterCompleted($index)}"
+           class="chapter-title"
+           ng-repeat="title in $ctrl.storySummary.getNodeTitles()">
+        <div ng-if="$ctrl.storySummary.isNodeCompleted(title)" class="material-icons completed-icon">
+          done
+        </div>
+        <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed, 'incomplete-chapter': !$ctrl.storySummary.isNodeCompleted(title), 'complete-chapter': $ctrl.storySummary.isNodeCompleted(title)}"
+             ng-if="$index < $ctrl.chaptersDisplayed">
+          <span translate="I18N_TOPIC_VIEWER_CHAPTER">
           </span> <[$index + 1]>: <[title]>
-        </span>
+        </div>
       </div>
       <div ng-click="$ctrl.showAllChapters()"
            ng-if="$ctrl.showButton && ($ctrl.chaptersDisplayed < $ctrl.nodeCount)"
@@ -51,10 +53,8 @@
 
   story-summary-tile .completed-icon {
     color: #00645C;
-  }
-
-  story-summary-tile .incomplete-chapter {
-    margin-left: 28px;
+    float: left;
+    margin-right: 6px;
   }
 
   story-summary-tile .unavailable-chapter {
@@ -80,12 +80,21 @@
     margin-bottom: 0.7vh;
   }
 
+  story-summary-tile .incomplete-chapter {
+    margin-left: 30px;
+  }
+
+  story-summary-tile .complete-chapter {
+    display: inline-block;
+    width: 85%;
+  }
+
   story-summary-tile .chapter-details {
     border: 1px solid #7B7B7B;
     border-radius: 0.25rem;
     display: inline-block;
     margin-left: 0.8vw;
-    padding: 1.5vh 1.75vw 1vh 1.75vw;
+    padding: 1.5vh 1.75vw 1vh 1vw;
     width: 65%;
   }
 
@@ -128,10 +137,10 @@
 
   story-summary-tile a {
     color: #000000;
+    cursor: pointer;
   }
 
   story-summary-tile a:hover {
-    cursor: pointer;
     text-decoration: none;
   }
 

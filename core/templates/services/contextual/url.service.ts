@@ -127,14 +127,11 @@ export class UrlService {
     // The following section is for getting the URL fragment from the
     // exploration player.
     if (pathname.startsWith('/explore')) {
-      let urlFragmentRegex = new RegExp(
-        'story_url_fragment=' + constants.VALID_URL_FRAGMENT_REGEX.substring(1),
-        'g');
-      let queryStringSections = this.getCurrentQueryString().split('&');
-      for (var idx in queryStringSections) {
-        if (queryStringSections[idx].match(urlFragmentRegex)) {
-          return decodeURIComponent(queryStringSections[idx].split('=')[1]);
-        }
+      if (
+        this.getUrlParams().hasOwnProperty('story_url_fragment') &&
+        this.getUrlParams().story_url_fragment.match(
+          constants.VALID_URL_FRAGMENT_REGEX)) {
+        return this.getUrlParams().story_url_fragment;
       }
     }
     // Shouldn't throw an error, since this is called whenever an exploration
