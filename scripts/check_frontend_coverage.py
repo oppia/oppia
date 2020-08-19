@@ -33,7 +33,6 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @marianazangrossi first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'about-page.module.ts',
     'activity-tiles-infinity-grid.directive.ts',
     'admin-config-tab.directive.ts',
     'admin-dev-mode-activities-tab.directive.ts',
@@ -114,7 +113,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'exploration-footer.directive.ts',
     'exploration-player-state.service.ts',
     'exploration-recommendations.service.ts',
-    'exploration-save-and-publish-buttons.directive.ts',
     'exploration-save.service.ts',
     'exploration-states.service.ts',
     'exploration-summary-tile.directive.ts',
@@ -281,7 +279,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'request-interceptor.service.ts',
     'response-header.directive.ts',
     'review-material-editor.directive.ts',
-    'review-test-page.directive.ts',
     'role-graph.directive.ts',
     'rubrics-editor.directive.ts',
     'rule-editor.directive.ts',
@@ -339,7 +336,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-editor.service.ts',
     'state-hints-editor.directive.ts',
     'state-interaction-editor.directive.ts',
-    'state-name-editor.directive.ts',
     'state-property.service.ts',
     'state-responses.directive.ts',
     'state-solution-editor.directive.ts',

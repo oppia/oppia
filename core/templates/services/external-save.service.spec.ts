@@ -13,11 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the jQuery, jQuery UI.
- */
+ * @fileoverview Unit tests for ExternalSaveService
+*/
 
-window.$ = require('static/jquery-3.5.1/jquery.min.js');
-window.jQuery = window.$;
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 
-require('static/jqueryui-1.12.1/jquery-ui.min.js');
-require('static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js');
+import { ExternalSaveService } from
+  'services/external-save.service';
+
+describe('External Save Service', () => {
+  let externalSaveService = null;
+
+  beforeEach(() => {
+    externalSaveService = TestBed.get(ExternalSaveService);
+  });
+
+  it('should fetch externalSave event emitter', () => {
+    let sampleExternalSaveEventEmitter = new EventEmitter();
+    expect(externalSaveService.onExternalSave).toEqual(
+      sampleExternalSaveEventEmitter);
+  });
+});
