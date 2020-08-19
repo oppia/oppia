@@ -295,152 +295,79 @@ def accept_suggestion(
         Exception. The suggestion is not valid.
         Exception. The commit message is empty.
     """
-    accept_suggestions(
-        [suggestion_id], reviewer_id, commit_message, review_message)
-
-
-def accept_suggestions(
-        suggestion_ids, reviewer_id, commit_message, review_message):
-    """Accepts the suggestions with the given suggestion_ids.
-
-    Args:
-        suggestion_ids: list(str). The ids of the suggestions to be accepted.
-        reviewer_id: str. The ID of the reviewer accepting the suggestions.
-        commit_message: str. The commit message.
-        review_message: str. The message provided by the reviewer while
-            accepting the suggestions.
-
-    Raises:
-        Exception. A suggestion is already handled.
-        Exception. A suggestion is not valid.
-        Exception. The commit message is empty.
-    """
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
 
-    suggestions = get_suggestions_by_ids(suggestion_ids)
-    for index, suggestion in enumerate(suggestions):
-        if suggestion is None:
-            raise Exception(
-                'You cannot accept the suggestion with id %s because it does '
-                'not exist.' % (suggestion_ids[index])
-            )
-        if suggestion.is_handled:
-            raise Exception(
-                'The suggestion with id %s has already been accepted/'
-                'rejected.' % (suggestion.suggestion_id)
-            )
-        suggestion.pre_accept_validate()
-        html_string = ''.join(suggestion.get_all_html_content_strings())
-        error_list = (
-            html_validation_service.
-            validate_math_tags_in_html_with_attribute_math_content(
-                html_string))
-        if len(error_list) > 0:
-            raise Exception(
-                'Invalid math tags found in the suggestion with id %s.' % (
-                    suggestion.suggestion_id)
-            )
+    suggestion = get_suggestion_by_id(suggestion_id)
 
-    author_ids = [suggestion.author_id for suggestion in suggestions]
-    author_names = user_services.get_usernames(author_ids)
-    commit_messages = [
-        get_commit_message_for_suggestion(author_name, commit_message)
-        for author_name in author_names
-    ]
+    if suggestion is None:
+        raise Exception(
+            'You cannot accept the suggestion with id %s because it does '
+            'not exist.' % (suggestion_id)
+        )
+    if suggestion.is_handled:
+        raise Exception(
+            'The suggestion with id %s has already been accepted/'
+            'rejected.' % (suggestion_id)
+        )
+    suggestion.pre_accept_validate()
+    html_string = ''.join(suggestion.get_all_html_content_strings())
+    error_list = (
+        html_validation_service.
+        validate_math_tags_in_html_with_attribute_math_content(
+            html_string))
+    if len(error_list) > 0:
+        raise Exception(
+            'Invalid math tags found in the suggestion with id %s.' % (
+                suggestion.suggestion_id)
+        )
 
-    for index, suggestion in enumerate(suggestions):
-        suggestion.set_suggestion_status_to_accepted()
-        suggestion.set_final_reviewer_id(reviewer_id)
-        suggestion.accept(commit_messages[index])
+    suggestion.set_suggestion_status_to_accepted()
+    suggestion.set_final_reviewer_id(reviewer_id)
 
-    _update_suggestions(suggestions)
+    author_name = user_services.get_username(suggestion.author_id)
+    commit_message = get_commit_message_for_suggestion(
+        author_name, commit_message)
+    suggestion.accept(commit_message)
 
-    feedback_services.create_messages(
-        suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
+    _update_suggestion(suggestion)
+
+    feedback_services.create_message(
+        suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
         None, review_message)
 
     # When recording of scores is enabled, the author of the suggestion gets an
     # increase in their score for the suggestion category.
     if feconf.ENABLE_RECORDING_OF_SCORES:
-        # The identifiers are needed to retrieve and create multiple user
-        # scoring models.
-        user_score_identifiers = [
-            user_domain.FullyQualifiedUserScoreIdentifier(
-                suggestion.author_id, suggestion.score_category)
-            for suggestion in suggestions
-        ]
-        user_scoring_models = (
-            user_models.UserContributionScoringModel.get_by_score_identifiers(
-                user_score_identifiers)
+        user_id = suggestion.author_id
+        score_category = suggestion.score_category
+
+        # Get user scoring domain object.
+        user_scoring = get_user_scoring(user_id, score_category)
+        if user_scoring is None:
+            # Create the user scoring model and domain object.
+            user_scoring = create_new_user_scoring(user_id, score_category, 0)
+
+        # Increment the score of the author due to their suggestion being
+        # accepted.
+        user_scoring.increment_score(
+            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY
         )
-
-        # Create the user scoring domain objects from the user scoring models.
-        user_scorings = []
-        # Keep track of which user score identifiers do not have user scoring
-        # models so that they can be created.
-        user_score_identifiers_missing_models = []
-        # Keep track of the frequency that each user score identifier occurs so
-        # that domain objects are unique and properly incremented.
-        user_score_identifier_frequencies = {}
-        for user_score_identifier, user_scoring_model in python_utils.ZIP(
-                user_score_identifiers, user_scoring_models):
-            # This is the first time that we've encountered this user score
-            # identifier so we know that it is unique. Therefore, we can add it
-            # to the list of missing ids if the model doesn't exist and if the
-            # model does exist, we can create the corresponding domain object.
-            if user_score_identifier not in user_score_identifier_frequencies:
-                user_score_identifier_frequencies[user_score_identifier] = 1
-                if user_scoring_model is None:
-                    user_score_identifiers_missing_models.append(
-                        user_score_identifiers[index])
-                else:
-                    user_scorings.append(
-                        get_user_scoring_from_model(user_scoring_model)
-                    )
-            # If the user score identifier wasn't unique, we know that it is in
-            # the dict and so we can safely increment the value.
-            else:
-                user_score_identifier_frequencies[user_score_identifier] += 1
-        # Create the new user scoring models and domain objects for the missing
-        # ids and add those new domain objects to the rest of the domain
-        # objects.
-        if user_score_identifiers_missing_models:
-            new_user_scorings = create_new_user_scorings(
-                user_score_identifiers_missing_models, 0
-            )
-            user_scorings.extend(new_user_scorings)
-
-        # Increment the score of the authors of the suggestions that are being
-        # suggested.
-        for index, user_scoring in enumerate(user_scorings):
-            # Create the user score identifier to look up the corresponding
-            # frequency.
-            user_score_identifier = (
-                user_domain.FullyQualifiedUserScoreIdentifier(
-                    user_scoring.user_id, user_scoring.score_category)
-            )
-            frequency = user_score_identifier_frequencies[
-                user_score_identifier]
-            user_scoring.increment_score(
-                suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY * frequency)
 
         # Emails are sent to onboard new reviewers. These new reviewers are
         # created when the score of the user passes the minimum score required
         # to review.
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
-            for user_scoring in user_scorings:
-                if user_scoring.user_can_review_the_category() and (
-                        not user_scoring.email_has_been_sent()):
-                    email_manager.send_mail_to_onboard_new_reviewers(
-                        user_scoring.get_user_id(),
-                        user_scoring.get_score_category()
-                    )
-                    user_scoring.mark_email_as_sent()
+            if user_scoring.user_can_review_the_category() and (
+                    not user_scoring.email_has_been_sent()):
+                email_manager.send_mail_to_onboard_new_reviewers(
+                    user_id, score_category
+                )
+                user_scoring.mark_email_as_sent()
 
-        # Need to update the corresponding user scoring models after we updated
-        # the domain objects.
-        _update_user_scorings(user_scorings)
+        # Need to update the corresponding user scoring model after we updated
+        # the domain object.
+        _update_user_scoring(user_scoring)
 
 
 def reject_suggestion(suggestion_id, reviewer_id, review_message):
@@ -692,33 +619,23 @@ def get_user_scoring(user_id, score_category):
     )
 
 
-def _update_user_scorings(user_scorings):
-    """Updates the user_scorings.
+def _update_user_scoring(user_scoring):
+    """Updates the user_scoring.
 
     Args:
-        user_scorings: list(UserContributionScoring). The user scorings to be
+        user_scoring: UserContributionScoring. The user scoring to be
             updated.
     """
-    user_score_identifiers = [
-        user_domain.FullyQualifiedUserScoreIdentifier(
-            user_scoring.user_id, user_scoring.score_category)
-        for user_scoring in user_scorings
-    ]
-    user_scoring_models_to_update = (
-        user_models.UserContributionScoringModel.get_by_score_identifiers(
-            user_score_identifiers)
+    user_scoring_model = user_models.UserContributionScoringModel.get(
+            user_scoring.user_id, user_scoring.score_category
     )
 
-    for index, user_scoring_model in enumerate(user_scoring_models_to_update):
-        user_scoring = user_scorings[index]
-        user_scoring_model.user_id = user_scoring.user_id
-        user_scoring_model.score_category = user_scoring.score_category
-        user_scoring_model.score = user_scoring.score
-        user_scoring_model.has_email_been_sent = (
-            user_scoring.has_email_been_sent)
+    user_scoring_model.user_id = user_scoring.user_id
+    user_scoring_model.score_category = user_scoring.score_category
+    user_scoring_model.score = user_scoring.score
+    user_scoring_model.has_email_been_sent = user_scoring.has_email_been_sent
 
-    user_models.UserContributionScoringModel.put_multi(
-        user_scoring_models_to_update)
+    user_scoring_model.put()
 
 
 def get_all_scores_of_user(user_id):
