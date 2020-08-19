@@ -197,7 +197,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             ['editor_ids', 'owner_ids', 'viewer_ids', 'voice_artist_ids'],
             collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('id-1').mentioned_user_ids
+            .get_by_id('id-1').content_user_ids
         )
 
     def test_export_data_on_highly_involved_user(self):

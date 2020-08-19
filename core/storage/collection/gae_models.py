@@ -373,17 +373,21 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
-        mentioned_user_ids = (
+
+        snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |
             set(self.editor_ids) |
             set(self.voice_artist_ids) |
             set(self.viewer_ids)
-        )
+        ))
+
+        commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
             if commit_cmd['cmd'] == feconf.CMD_CHANGE_ROLE:
-                mentioned_user_ids.add(commit_cmd['assignee_id'])
-        snapshot_metadata_model.mentioned_user_ids = list(
-            sorted(mentioned_user_ids))
+                commit_cmds_user_ids.add(commit_cmd['assignee_id'])
+        snapshot_metadata_model.commit_cmds_user_ids = list(
+            sorted(commit_cmds_user_ids))
+
         snapshot_metadata_model.put()
 
     @classmethod

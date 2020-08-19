@@ -1078,9 +1078,11 @@ class BaseSnapshotMetadataModel(BaseModel):
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
-    # The user ids that are mentioned in some non-indexed field in this
-    # snapshot.
-    mentioned_user_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # The user ids that are in some field in commit_cmds.
+    commit_cmds_user_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # The user ids that are enclosed inside content field in the relevant
+    # snapshot content model.
+    content_user_ids = ndb.StringProperty(repeated=True, indexed=True)
 
     @staticmethod
     def get_export_policy():
@@ -1099,7 +1101,8 @@ class BaseSnapshotMetadataModel(BaseModel):
         """
         return cls.query(ndb.OR(
             cls.committer_id == user_id,
-            cls.mentioned_user_ids == user_id,
+            cls.commit_cmds_user_ids == user_id,
+            cls.content_user_ids == user_id,
         )).get(keys_only=True) is not None
 
     @classmethod
