@@ -56,7 +56,7 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
         self.render_json(result_dict)
 
 
-class DummyHandler(base.BaseHandler):
+class PlatformFeatureDummyHandler(base.BaseHandler):
     """Dummy handler for testing feature gating flow."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

@@ -107,11 +107,11 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         )
 
 
-class DummyHandlerTest(test_utils.GenericTestBase):
-    """Tests for the DummyHandler."""
+class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
+    """Tests for the PlatformFeatureDummyHandler."""
 
     def setUp(self):
-        super(DummyHandlerTest, self).setUp()
+        super(PlatformFeatureDummyHandlerTest, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
