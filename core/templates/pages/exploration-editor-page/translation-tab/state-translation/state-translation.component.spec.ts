@@ -858,10 +858,9 @@ describe('State translation component', function() {
       ctrl.$onInit();
     }));
 
-    it('should evaluate hint tab as enabled', function() {
+    it('should evaluate content tab as enabled', function() {
       expect($scope.isDisabled('content')).toBe(false);
     });
-
 
     it('should evaluate feedback tab as disabled', function() {
       expect($scope.isDisabled('feedback')).toBe(true);
@@ -907,15 +906,15 @@ describe('State translation component', function() {
       ctrl.$onInit();
     }));
 
-    it('should evaluate feedback tab as disable', function() {
+    it('should evaluate feedback tab as disabled', function() {
       expect($scope.isDisabled('feedback')).toBe(true);
     });
 
-    it('should evaluate hint tab as disable', function() {
+    it('should evaluate hint tab as disabled', function() {
       expect($scope.isDisabled('hint')).toBe(true);
     });
 
-    it('should evaluate solution tab as disable', function() {
+    it('should evaluate solution tab as disabled', function() {
       expect($scope.isDisabled('solution')).toBe(true);
     });
   });
