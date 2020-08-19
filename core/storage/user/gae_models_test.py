@@ -1989,6 +1989,47 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             user_models.UserContributionScoringModel.create(
                 'user1', 'category1', 2)
 
+    def test_create_multi_success(self):
+        user_score_identifiers = [
+            user_domain.FullyQualifiedUserScoreIdentifier(
+                'user0', 'category0'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+                'user1', 'category1')
+        ]
+        user_models.UserContributionScoringModel.create_multi(
+            user_score_identifiers, 1)
+        user_score_models = (
+            user_models.UserContributionScoringModel.get_by_score_identifiers(
+                user_score_identifiers)
+        )
+        self.assertEqual(len(user_score_models), 2)
+        for index, user_score_model in enumerate(user_score_models):
+            index_str = python_utils.UNICODE(index)
+            self.assertEqual(user_score_model.id, 'category%s.user%s' % (
+                index_str, index_str)
+            )
+            self.assertEqual(user_score_model.user_id, 'user%s' % index_str)
+            self.assertEqual(user_score_model.score_category, 'category%s' % (
+                index_str)
+            )
+            self.assertEqual(user_score_model.score, 1)
+
+    def test_create_multi_raises_exception_when_model_already_created(self):
+        user_score_identifiers = [
+            user_domain.FullyQualifiedUserScoreIdentifier(
+                'user1', 'category1'),
+            user_domain.FullyQualifiedUserScoreIdentifier(
+                'user2', 'category2')
+        ]
+        user_models.UserContributionScoringModel.create_multi(
+            user_score_identifiers, 1)
+
+        with self.assertRaisesRegexp(
+            Exception, 'There is already a UserContributionScoringModel entry '
+            'with the given id: category1.user1'):
+            user_models.UserContributionScoringModel.create_multi(
+                user_score_identifiers, 1)
+
     def test_get_all_users_with_score_above_minimum_for_category(self):
         user_score_identifiers_large_score = [
             user_domain.FullyQualifiedUserScoreIdentifier(

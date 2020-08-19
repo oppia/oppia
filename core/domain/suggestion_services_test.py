@@ -1559,15 +1559,14 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             self.user_1_id)
 
         self.assertEqual(len(scores_dict), 3)
-        self.assertEqual(scores_dict, expected_scores_dict)
+        self.assertDictEqual(scores_dict, expected_scores_dict)
 
     def test_get_all_scores_of_the_user_when_no_scores_exist(self):
         scores_dict = suggestion_services.get_all_scores_of_user(
             self.user_1_id)
 
         self.assertEqual(len(scores_dict), 0)
-        self.assertEqual(scores_dict, {})
-
+        self.assertDictEqual(scores_dict, {})
 
 
 class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
