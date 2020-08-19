@@ -46,10 +46,14 @@ require('services/context.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-modal.controller');
+require('services/external-save.service.ts');
 
 angular.module('oppia').factory('TrainingModalService', [
-  '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
-  function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
+  '$uibModal', 'AlertsService', 'ExternalSaveService',
+  'UrlInterpolationService',
+  function(
+      $uibModal, AlertsService, ExternalSaveService,
+      UrlInterpolationService) {
     return {
       /**
       * Opens unresolved answer trainer modal for given answer.
@@ -76,7 +80,7 @@ angular.module('oppia').factory('TrainingModalService', [
           controller: 'TrainingModalController'
         });
         // Save the modified training data externally in state content.
-        $rootScope.$broadcast('externalSave');
+        ExternalSaveService.onExternalSave.emit();
       }
     };
   }

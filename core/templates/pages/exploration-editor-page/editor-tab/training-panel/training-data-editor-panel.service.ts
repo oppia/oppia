@@ -50,10 +50,14 @@ require('services/stateful/focus-manager.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-data-editor-panel-modal.controller.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').factory('TrainingDataEditorPanelService', [
-  '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
-  function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
+  '$uibModal', 'AlertsService', 'ExternalSaveService',
+  'UrlInterpolationService',
+  function(
+      $uibModal, AlertsService, ExternalSaveService,
+      UrlInterpolationService) {
     return {
       /**
       * Opens training data editor for currently selected answer group.
@@ -68,7 +72,7 @@ angular.module('oppia').factory('TrainingDataEditorPanelService', [
           controller: 'TrainingDataEditorPanelServiceModalController'
         });
         // Save the modified training data externally in state content.
-        $rootScope.$broadcast('externalSave');
+        ExternalSaveService.onExternalSave.emit();
       }
     };
   }

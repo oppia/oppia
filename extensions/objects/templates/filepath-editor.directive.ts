@@ -35,12 +35,12 @@ angular.module('oppia').directive('filepathEditor', [
   '$sce', 'AlertsService', 'AssetsBackendApiService', 'ContextService',
   'CsrfTokenService', 'ImageLocalStorageService', 'ImagePreloaderService',
   'ImageUploadHelperService', 'UrlInterpolationService',
-  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  'ALLOWED_IMAGE_FORMATS', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $sce, AlertsService, AssetsBackendApiService, ContextService,
       CsrfTokenService, ImageLocalStorageService, ImagePreloaderService,
       ImageUploadHelperService, UrlInterpolationService,
-      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+      ALLOWED_IMAGE_FORMATS, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     return {
       restrict: 'E',
       scope: {},
@@ -92,6 +92,7 @@ angular.module('oppia').directive('filepathEditor', [
         CROP_CURSORS[MOUSE_LEFT] = 'ew-resize';
         CROP_CURSORS[MOUSE_INSIDE] = 'move';
         ctrl.imageContainerStyle = {};
+        ctrl.allowedImageFormats = ALLOWED_IMAGE_FORMATS;
 
         /** Internal functions (not visible in the view) */
 

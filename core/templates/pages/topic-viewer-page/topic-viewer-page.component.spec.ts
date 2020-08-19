@@ -100,7 +100,7 @@ describe('Topic viewer page', function() {
     expect(ctrl.topicId).toBe('1');
     expect(ctrl.topicName).toBe('Topic Name');
     expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-      topicName + ' - Oppia');
+      `Learn ${topicName} | Topic Description | Oppia`);
     expect(ctrl.topicDescription).toBe('Topic Description');
     expect(ctrl.canonicalStorySummaries.length).toBe(1);
     expect(ctrl.chapterCount).toBe(2);
