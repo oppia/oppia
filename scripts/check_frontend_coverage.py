@@ -33,7 +33,6 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @marianazangrossi first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'about-page.module.ts',
     'activity-tiles-infinity-grid.directive.ts',
     'admin-config-tab.directive.ts',
     'admin-dev-mode-activities-tab.directive.ts',
@@ -353,7 +352,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'story-update.service.ts',
     'story-viewer-backend-api.service.ts',
     'story-viewer-navbar-breadcrumb.directive.ts',
-    'story-viewer-page.directive.ts',
     'StoryContentsObjectFactory.ts',
     'StoryNodeObjectFactory.ts',
     'student.ts',
@@ -387,8 +385,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts',
     'translate-text.service.ts',
     'translation-file-hash-loader.service.ts',
-    'translation-opportunities.directive.ts',
-    'translator-overview.directive.ts',
     'truncate-and-capitalize.filter.ts',
     'truncate-and-capitalize.pipe.ts',
     'truncate-input-based-on-interaction-answer-type.filter.ts',

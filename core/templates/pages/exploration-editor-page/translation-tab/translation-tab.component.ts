@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the translation tab.
+ * @fileoverview Component for the translation tab.
  */
 
 require(
@@ -30,7 +30,7 @@ require(
   'state-translation-status-graph/state-translation-status-graph.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translator-overview/' +
-  'translator-overview.directive.ts');
+  'translator-overview.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
