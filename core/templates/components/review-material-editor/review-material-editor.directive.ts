@@ -45,9 +45,9 @@ angular.module('oppia').directive('reviewMaterialEditor', [
         'review-material-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_SOLUTION_EXPLANATION',
+        'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
         function(
-            SubtitledHtmlObjectFactory, COMPONENT_NAME_SOLUTION_EXPLANATION) {
+            SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION) {
           var ctrl = this;
           var explanationMemento = null;
 
@@ -66,7 +66,7 @@ angular.module('oppia').directive('reviewMaterialEditor', [
           ctrl.saveConceptCardExplanation = function() {
             ctrl.conceptCardExplanationEditorIsShown = false;
             var explanationObject = SubtitledHtmlObjectFactory.createDefault(
-              ctrl.editableExplanation, COMPONENT_NAME_SOLUTION_EXPLANATION);
+              ctrl.editableExplanation, COMPONENT_NAME_EXPLANATION);
             ctrl.onSaveExplanation(explanationObject);
           };
           ctrl.$onInit = function() {

@@ -196,7 +196,7 @@ angular.module('oppia').directive('stateTranslation', [
               }
             }
 
-            TranslationTabActiveContentIdService.setActiveContentId(
+            TranslationTabActiveContentIdService.setActiveContent(
               activeContentId,
               activeDataFormat);
             $scope.activatedTabId = tabId;
@@ -270,10 +270,15 @@ angular.module('oppia').directive('stateTranslation', [
             }
             // This is used to prevent users from adding unwanted audio for
             // default_outcome and hints in Continue and EndExploration
-            // interaction.
-            if (!$scope.stateInteractionId ||
-              INTERACTION_SPECS[$scope.stateInteractionId].is_linear ||
-              INTERACTION_SPECS[$scope.stateInteractionId].is_terminal
+            // interaction. An exception is if the interaction contains
+            // translatable customization arguments -- e.g. Continue
+            // interaction's placeholder.
+            if (
+              tabId !== $scope.TAB_ID_CUSTOMIZATION_ARGS && (
+                !$scope.stateInteractionId ||
+                INTERACTION_SPECS[$scope.stateInteractionId].is_linear ||
+                INTERACTION_SPECS[$scope.stateInteractionId].is_terminal
+              )
             ) {
               return true;
             } else if (tabId === $scope.TAB_ID_FEEDBACK) {
@@ -311,7 +316,7 @@ angular.module('oppia').directive('stateTranslation', [
             $scope.activeHintIndex = newIndex;
             var activeContentId = (
               $scope.stateHints[newIndex].hintContent.getContentId());
-            TranslationTabActiveContentIdService.setActiveContentId(
+            TranslationTabActiveContentIdService.setActiveContent(
               activeContentId, WRITTEN_TRANSLATION_TYPE_HTML);
           };
 
@@ -323,7 +328,6 @@ angular.module('oppia').directive('stateTranslation', [
             if ($scope.activeHintIndex === newIndex) {
               return;
             }
-            $scope.activeCustomizationArgContentIndex = newIndex;
             const activeContent = (
               $scope.interactionCustomizationArgTranslatableContent[
                 newIndex].content
@@ -335,8 +339,9 @@ angular.module('oppia').directive('stateTranslation', [
             } else if (activeContent instanceof SubtitledHtml) {
               activeDataFormat = WRITTEN_TRANSLATION_TYPE_HTML;
             }
-            TranslationTabActiveContentIdService.setActiveContentId(
+            TranslationTabActiveContentIdService.setActiveContent(
               activeContentId, activeDataFormat);
+            $scope.activeCustomizationArgContentIndex = newIndex;
           };
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -354,7 +359,7 @@ angular.module('oppia').directive('stateTranslation', [
                 activeContentId = ($scope.stateAnswerGroups[newIndex]
                   .outcome.feedback.getContentId());
               }
-              TranslationTabActiveContentIdService.setActiveContentId(
+              TranslationTabActiveContentIdService.setActiveContent(
                 activeContentId, WRITTEN_TRANSLATION_TYPE_HTML);
             }
           };
@@ -391,12 +396,14 @@ angular.module('oppia').directive('stateTranslation', [
             }
           };
 
-          $scope.getInteractionCustomizationArgTranslatableContent = function(
+          $scope.getInteractionCustomizationArgTranslatableContents = function(
               customizationArgs: InteractionCustomizationArgs
           ): {name: string, content: SubtitledUnicode|SubtitledHtml}[] {
-            const translatableContent = [];
+            const translatableContents = [];
 
             const camelCaseToSentenceCase = (s) => {
+              // Lowercase the first letter (edge case for UpperCamelCase).
+              s = s.charAt(0).toLowerCase() + s.slice(1);
               // Add a space in front of capital letters.
               s = s.replace(/([A-Z])/g, ' $1');
               // Captialize first letter.
@@ -404,25 +411,25 @@ angular.module('oppia').directive('stateTranslation', [
               return s;
             };
 
-            const traverseValueAndRetrieveSubtitled = (
+            const traverseValueAndRetrieveSubtitledContent = (
                 name: string,
                 value: Object[] | Object,
             ): void => {
               if (value instanceof SubtitledUnicode ||
                   value instanceof SubtitledHtml
               ) {
-                translatableContent.push({
+                translatableContents.push({
                   name, content: value
                 });
               } else if (value instanceof Array) {
                 value.forEach((element, index) =>
-                  traverseValueAndRetrieveSubtitled(
+                  traverseValueAndRetrieveSubtitledContent(
                     `${name} (${index})`,
                     element)
                 );
               } else if (value instanceof Object) {
                 Object.keys(value).forEach(key =>
-                  traverseValueAndRetrieveSubtitled(
+                  traverseValueAndRetrieveSubtitledContent(
                     `${name} > ${camelCaseToSentenceCase(key)}`,
                     value[key]
                   )
@@ -431,11 +438,11 @@ angular.module('oppia').directive('stateTranslation', [
             };
 
             Object.keys(customizationArgs).forEach(caName =>
-              traverseValueAndRetrieveSubtitled(
+              traverseValueAndRetrieveSubtitledContent(
                 camelCaseToSentenceCase(caName),
                 customizationArgs[caName].value));
 
-            return translatableContent;
+            return translatableContents;
           };
 
           $scope.initStateTranslation = function() {
@@ -466,7 +473,7 @@ angular.module('oppia').directive('stateTranslation', [
                 $scope.stateInteractionCustomizationArgs, false)
             );
             $scope.interactionCustomizationArgTranslatableContent = (
-              $scope.getInteractionCustomizationArgTranslatableContent(
+              $scope.getInteractionCustomizationArgTranslatableContents(
                 $scope.stateInteractionCustomizationArgs)
             );
 

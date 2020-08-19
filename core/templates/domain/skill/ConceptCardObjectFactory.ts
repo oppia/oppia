@@ -147,13 +147,12 @@ export class ConceptCardObjectFactory {
   createInterstitialConceptCard(): ConceptCard {
     let recordedVoiceoversDict = {
       voiceovers_mapping: {
-        COMPONENT_NAME_SOLUTION_EXPLANATION: {}
+        COMPONENT_NAME_EXPLANATION: {}
       }
     };
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createDefault(
-        'Loading review material',
-        AppConstants.COMPONENT_NAME_SOLUTION_EXPLANATION), [],
+        'Loading review material', AppConstants.COMPONENT_NAME_EXPLANATION), [],
       this.recordedVoiceoversObjectFactory.createFromBackendDict(
         recordedVoiceoversDict)
     );

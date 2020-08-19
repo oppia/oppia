@@ -696,8 +696,8 @@ describe('Translation status service', function() {
       expect(activeStateContentIdStatusColor).toBe(
         ALL_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', 'html',
-        '<p>Content</p>');
+      swts.displayed.addWrittenTranslation(
+        'content', 'hi', 'html', '<p>Content</p>');
 
       activeStateContentIdStatusColor = (
         tss.getActiveStateContentIdStatusColor('content'));

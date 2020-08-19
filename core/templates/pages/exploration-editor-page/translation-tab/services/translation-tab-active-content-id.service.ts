@@ -29,18 +29,23 @@ angular.module('oppia').factory('TranslationTabActiveContentIdService', [
   'StateRecordedVoiceoversService',
   function(StateRecordedVoiceoversService) {
     var activeContentId = null;
+    var activeDataFormat = null;
     var _activeContentIdChangedEventEmitter = new EventEmitter();
     return {
       getActiveContentId: function() {
         return activeContentId;
       },
-      setActiveContentId: function(contentId, dataFormat) {
+      getActiveDataFormat: function() {
+        return activeDataFormat;
+      },
+      setActiveContent: function(contentId, dataFormat) {
         var allContentIds = (
           StateRecordedVoiceoversService.displayed.getAllContentId());
         if (allContentIds.indexOf(contentId) === -1) {
           throw new Error('Invalid active content id: ' + contentId);
         }
         activeContentId = contentId;
+        activeDataFormat = dataFormat;
         _activeContentIdChangedEventEmitter.emit(dataFormat);
       },
       get onActiveContentIdChanged() {

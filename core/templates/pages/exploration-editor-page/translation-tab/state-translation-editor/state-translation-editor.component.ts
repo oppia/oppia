@@ -159,7 +159,8 @@ angular.module('oppia').component('stateTranslationEditor', {
         initEditor();
       };
       ctrl.$onInit = function() {
-        $scope.dataFormat = WRITTEN_TRANSLATION_TYPE_HTML;
+        $scope.dataFormat = (
+          TranslationTabActiveContentIdService.getActiveDataFormat());
         $scope.HTML_SCHEMA = {
           type: 'html'
         };

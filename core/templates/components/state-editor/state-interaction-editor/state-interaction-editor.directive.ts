@@ -81,7 +81,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         onSaveSolution: '=',
         onSaveStateContent: '=',
         recomputeGraph: '=',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '<'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-interaction-editor/' +
