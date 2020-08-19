@@ -124,27 +124,28 @@ angular.module('oppia').directive('storyViewerPage', [
           ctrl.$onInit = function() {
             ctrl.storyIsLoaded = false;
             LoaderService.showLoadingScreen('Loading');
-            var abbreviatedTopicName = (
+            var topicUrlFragment = (
               UrlService.getTopicUrlFragmentFromLearnerUrl());
             var classroomUrlFragment = (
               UrlService.getClassroomUrlFragmentFromLearnerUrl());
             var storyUrlFragment = (
               UrlService.getStoryUrlFragmentFromLearnerUrl());
             StoryViewerBackendApiService.fetchStoryData(
-              abbreviatedTopicName,
+              topicUrlFragment,
               classroomUrlFragment,
               storyUrlFragment).then(
               function(storyDataDict) {
                 ctrl.storyIsLoaded = true;
                 ctrl.storyPlaythroughObject = storyDataDict;
-                ctrl.storyId = storyDataDict.id;
+                ctrl.storyId = ctrl.storyPlaythroughObject.getStoryId();
+                var topicName = ctrl.storyPlaythroughObject.topicName;
                 PageTitleService.setPageTitle(
-                  storyDataDict.title + ' - Oppia');
+                  `Learn ${topicName} | ${storyDataDict.title} | Oppia`);
                 ctrl.storyTitle = storyDataDict.title;
                 ctrl.storyDescription = storyDataDict.description;
 
                 $rootScope.$broadcast('storyData', {
-                  topicName: ctrl.storyPlaythroughObject.topicName,
+                  topicName: topicName,
                   storyTitle: ctrl.storyTitle
                 });
 

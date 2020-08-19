@@ -59,7 +59,7 @@ export class WinnowingPreprocessingService {
   }
 
   getFingerprintFromHashes(
-      kGramHashes: number[], T: number, K: number): Array<number[]> {
+      kGramHashes: number[], T: number, K: number): number[][] {
     // Generate fingerprint of a document from its k-gram hashes.
     var windowSize = T - K + 1;
     var fingerprintHashesIndex = new Set();

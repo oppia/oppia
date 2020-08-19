@@ -245,9 +245,9 @@ export class UrlService {
   /**
    * This function is used to find the query values as a list.
    * @param {string} fieldName - the name of the field.
-   * @return {Array<string>} the list of query field values.
+   * @return {string[]} the list of query field values.
    */
-  getQueryFieldValuesAsList(fieldName: string): Array<string> {
+  getQueryFieldValuesAsList(fieldName: string): string[] {
     let fieldValues = [];
     if (this.getCurrentQueryString().indexOf('?') > -1) {
       // Each queryItem return one field-value pair in the url.
@@ -272,7 +272,7 @@ export class UrlService {
    * @param {string} url - the url.
    * @param {string} fieldName - the field name.
    * @param {string} fieldValue - the field value.
-   * @return {Array<string>} the list of query field values.
+   * @return {string[]} the list of query field values.
    */
   addField(url: string, fieldName: string, fieldValue: string): string {
     let encodedFieldValue = encodeURIComponent(fieldValue);

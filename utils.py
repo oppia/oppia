@@ -40,6 +40,8 @@ sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
+DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
+
 
 class InvalidInputException(Exception):
     """Error class for invalid input."""
@@ -422,6 +424,34 @@ def get_time_in_millisecs(datetime_obj):
     return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
+def convert_naive_datetime_to_string(datetime_obj):
+    """Returns a human-readable string representing the naive datetime object.
+
+    Args:
+        datetime_obj: datetime. An object of type datetime.datetime. Must be a
+            naive datetime object.
+
+    Returns:
+        str. The string representing the naive datetime object.
+    """
+    return datetime_obj.strftime(DATETIME_FORMAT)
+
+
+def convert_string_to_naive_datetime_object(date_time_string):
+    """Returns the naive datetime object equivalent of the date string.
+
+    Args:
+        date_time_string: str. The string format representing the datetime
+            object in the format: Month/Day/Year,
+            Hour:Minute:Second:MicroSecond.
+
+    Returns:
+        datetime. An object of type naive datetime.datetime corresponding to
+        that string.
+    """
+    return datetime.datetime.strptime(date_time_string, DATETIME_FORMAT)
+
+
 def get_current_time_in_millisecs():
     """Returns time in milliseconds since the Epoch.
 
@@ -780,6 +810,19 @@ def get_hashable_value(value):
             (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
+
+
+def compute_list_difference(list_a, list_b):
+    """Returns the set difference of two lists.
+
+    Args:
+        list_a: list. The first list.
+        list_b: list. The second list.
+
+    Returns:
+        list. List of the set difference of list_a - list_b.
+    """
+    return list(set(list_a) - set(list_b))
 
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):

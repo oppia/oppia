@@ -44,13 +44,15 @@ describe('Skill Mastery Modal Controller', function() {
     });
   }));
 
-  it('should check properties set after controller is initialized', function() {
-    expect($scope.userIsLoggedIn).toEqual(userIsLoggedIn);
-    expect($scope.skillId).toEqual(skillId);
-    expect($scope.masteryChange).toEqual('mastery change');
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.userIsLoggedIn).toEqual(userIsLoggedIn);
+      expect($scope.skillId).toEqual(skillId);
+      expect($scope.masteryChange).toEqual('mastery change');
+    });
 
-  it('should open concept card', function() {
+  it('should open concept card with the skill id when clicking button to' +
+    ' open concept card', function() {
     $scope.openConceptCardModal();
     expect(openConceptCardModal).toHaveBeenCalledWith([skillId]);
   });
