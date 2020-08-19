@@ -16,12 +16,12 @@
  * @fileoverview Constants for platform feature domain.
  */
 
-import { AdminPageConstants } from
-  'pages/admin-page/admin-page.constants';
-
 export class PlatformFeatureDomainConstants {
-  public static PLATFORM_FEATURE_HANDLER_URL =
+  // Url for the backend handler for evaluation of platform features.
+  public static PLATFORM_FEATURES_EVALUATION_HANDLER_URL =
     '/platform_features_evaluation_handler';
-  public static ADMIN_HANDLER_URL = AdminPageConstants.ADMIN_HANDLER_URL;
+
+  // Action name for request to the admin handler that updates the rules
+  // of feature flags.
   public static UPDATE_FEATURE_FLAG_RULES_ACTION = 'update_feature_flag_rules';
 }

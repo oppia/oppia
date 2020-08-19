@@ -20,8 +20,8 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
+import { AdminPageConstants } from
+  'pages/admin-page/admin-page.constants';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformParameterRuleObjectFactory } from
@@ -46,7 +46,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
     httpTestingController.verify();
   });
 
-  it('should make a reqeust to update the feature flag rules',
+  it('should make a request to update the feature flag rules',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -63,7 +63,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       ).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-        PlatformFeatureDomainConstants.ADMIN_HANDLER_URL);
+        AdminPageConstants.ADMIN_HANDLER_URL);
       req.flush({});
       expect(req.request.method).toEqual('POST');
 
@@ -73,4 +73,29 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should reject if the request fails', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    const newRules = [
+      ruleFactory.createFromBackendDict({
+        filters: [],
+        value_when_matched: false
+      })
+    ];
+
+    featureAdminService.updateFeatureFlag(
+      'feature_name', 'update message', newRules
+    ).then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      AdminPageConstants.ADMIN_HANDLER_URL);
+    req.error(new ErrorEvent('Error'));
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

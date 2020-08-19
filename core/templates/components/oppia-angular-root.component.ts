@@ -254,6 +254,7 @@ import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
+import { ExternalSaveService } from 'services/external-save.service.ts';
 import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
@@ -817,6 +818,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
+  static externalSaveService: ExternalSaveService;
   static extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService;
   static featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory;
   static featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory;
@@ -1149,6 +1151,7 @@ private explorationStatsService: ExplorationStatsService,
 private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
+private externalSaveService: ExternalSaveService,
 private extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService,
 private featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory,
 private featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory,
@@ -1482,6 +1485,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationTaskObjectFactory = this.explorationTaskObjectFactory;
     OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
+    OppiaAngularRootComponent.externalSaveService = this.externalSaveService;
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
     OppiaAngularRootComponent.featuredTranslationLanguageObjectFactory = this.featuredTranslationLanguageObjectFactory;
     OppiaAngularRootComponent.featureStatusSummaryObjectFactory = this.featureStatusSummaryObjectFactory;
@@ -1712,9 +1716,12 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.workedExampleObjectFactory = this.workedExampleObjectFactory;
     OppiaAngularRootComponent.writtenTranslationObjectFactory = this.writtenTranslationObjectFactory;
     OppiaAngularRootComponent.writtenTranslationsObjectFactory = this.writtenTranslationsObjectFactory;
-    // This emit triggers ajs to start its app.
 
+    // Only starts the app after the PlatformFeatureService completes the
+    // initialization, in which all feature flags are loaded, so that
+    // feature flag values are available as the app starts.
     this.platformFeatureService.initialize().then(
+      // This emit triggers ajs to start its app.
       () => this.initialized.emit()
     );
   }
