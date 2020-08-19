@@ -2128,7 +2128,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-response-button,
 .oppia-add-fallback-button,
 .oppia-add-hint-button {
-  background-color: rgba(5,140,166,0.9);
+  background-color: rgba(5, 140, 166, 0.9);
   border: 0;
   border-radius: 4px;
   color: white;
@@ -2881,7 +2881,6 @@ oppia-parameter {
 
 .improvements-level .level-header {
   color: rgba(0, 0, 0, 0.87);
-  font-family: Roboto;
   font-size: 20px;
   font-style: normal;
   font-weight: 500;
@@ -2909,7 +2908,7 @@ oppia-parameter {
   width: 40px;
 }
 
-.collapse-arrow a {
+.collapse-arrow .collapse-arrow-button {
   font-size: 24px;
   font-weight: bold;
   text-align: center;
@@ -2918,9 +2917,9 @@ oppia-parameter {
 }
 
 .state-header .state-details {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
 }
 
 .state-details .state-link {
@@ -2928,9 +2927,8 @@ oppia-parameter {
   height: 21px;
 }
 
-.state-link a {
+.state-link .state-link-a {
   color: #004C76 !important;
-  font-family: Roboto;
   font-size: 18px;
   font-style: normal;
   font-weight: bold;
@@ -2945,20 +2943,18 @@ oppia-parameter {
 
 .state-stats .state-retention {
   color: #686868;
-  font-family: Roboto;
+  flex-grow: 1;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
   letter-spacing: 0.28px;
   line-height: 16px;
-  flex-grow: 1;
   text-align: left;
 }
 
 .state-stats .state-num-issues {
   color: #686868;
   flex-grow: 1;
-  font-family: Roboto;
   font-size: 16px;
   font-style: normal;
   font-weight: normal;
@@ -2987,9 +2983,9 @@ oppia-parameter {
 }
 
 .improvement-task-health-bar {
-  width: 10px;
   height: 38px;
   margin: 2px 26px 2px 0;
+  width: 10px;
 }
 
 .improvement-task-health-bar.critical {
@@ -3004,29 +3000,27 @@ oppia-parameter {
 
 .improvement-task-overview .title {
   color: rgba(0, 0, 0, 0.87);
-  font-family: Roboto;
   font-size: 18px;
   font-style: normal;
   font-weight: 500;
+  height: 21px;
   letter-spacing: 0.375px;
   line-height: 21px;
-  height: 21px;
 }
 
 .improvement-task-overview .summary {
   color: rgba(0, 0, 0, 0.541327);
-  font-family: Roboto;
   font-size: 16px;
   font-style: normal;
   font-weight: normal;
+  height: 19px;
   letter-spacing: 0.32px;
   line-height: 19px;
-  height: 19px;
 }
 
 .improvement-task-content {
-  display: flex;
   align-items: flex-start;
+  display: flex;
 }
 
 .improvement-task-details {
@@ -3040,7 +3034,6 @@ oppia-parameter {
 
 .improvement-task-details .header {
   color: #333333;
-  font-family: Roboto;
   font-size: 14px;
   font-style: normal;
   font-weight: bold;
@@ -3056,9 +3049,8 @@ oppia-parameter {
   width: 100%;
 }
 
-.improvement-task-details .navigation a {
+.improvement-task-details .navigation .navigation-action {
   color: #00829B;
-  font-family: Roboto;
   font-size: 16px;
   font-style: normal;
   font-weight: bold;
@@ -3069,8 +3061,8 @@ oppia-parameter {
 }
 
 .navigation .material-icons.east {
-  line-height: 13px;
   height: 13px;
+  line-height: 13px;
 }
 
 .improvement-task-suggestions {
@@ -3083,7 +3075,6 @@ oppia-parameter {
 
 .improvement-task-suggestions .suggestions-header {
   color: #303030;
-  font-family: Roboto;
   font-size: 15px;
   font-style: normal;
   font-weight: 500;
@@ -3095,7 +3086,6 @@ oppia-parameter {
 
 .improvement-task-suggestions .suggestions-content {
   color: rgba(0, 0, 0, 0.541327);
-  font-family: Roboto;
   font-size: 15px;
   font-style: normal;
   letter-spacing: 0.234375px;

@@ -71,7 +71,7 @@
            ng-if="$ctrl.getStateNumCardLevelTasks(stateName) > 0">
         <div class="state-header">
           <div class="collapse-arrow">
-            <a ng-click="$ctrl.toggleStateTasks(stateName)">
+            <a class="collapse-arrow-button" ng-click="$ctrl.toggleStateTasks(stateName)">
               <i class="material-icons">
                 <['keyboard_arrow_' + ($ctrl.isStateTasksVisible(stateName) ? 'down' : 'up')]>
               </i>
@@ -79,7 +79,7 @@
           </div>
           <div class="state-details">
             <div class="state-link">
-              <a ng-click="$ctrl.navigateToStateEditor(stateName)"><[stateName]></a>
+              <a class="state-link-a" ng-click="$ctrl.navigateToStateEditor(stateName)"><[stateName]></a>
             </div>
             <div class="state-stats">
               <div class="state-retention">

@@ -301,43 +301,47 @@ describe('Improvements tab', function() {
         expect($ctrl.getExplorationHealth()).toEqual('warning');
       }));
 
-      it('should report heath as warning if only ifl task exists', fakeAsync(() => {
-        this.iflTasksSpy.and.returnValue([newIflTask()]);
+      it('should report heath as warning if only ifl task exists',
+        fakeAsync(() => {
+          this.iflTasksSpy.and.returnValue([newIflTask()]);
 
-        $ctrl.$onInit();
-        flushMicrotasks();
-        $scope.$apply();
+          $ctrl.$onInit();
+          flushMicrotasks();
+          $scope.$apply();
 
-        expect($ctrl.getExplorationHealth()).toEqual('warning');
-      }));
+          expect($ctrl.getExplorationHealth()).toEqual('warning');
+        }));
 
-      it('should report heath as critical if ngr task exists', fakeAsync(() => {
-        this.ngrTasksSpy.and.returnValue([newNgrTask()]);
+      it('should report heath as critical if ngr task exists',
+        fakeAsync(() => {
+          this.ngrTasksSpy.and.returnValue([newNgrTask()]);
 
-        $ctrl.$onInit();
-        flushMicrotasks();
-        $scope.$apply();
+          $ctrl.$onInit();
+          flushMicrotasks();
+          $scope.$apply();
 
-        expect($ctrl.getExplorationHealth()).toEqual('critical');
-      }));
+          expect($ctrl.getExplorationHealth()).toEqual('critical');
+        }));
 
-      it('should report heath as warning if only sia task exists', fakeAsync(() => {
-        this.siaTasksSpy.and.returnValue([newSiaTask()]);
+      it('should report heath as warning if only sia task exists',
+        fakeAsync(() => {
+          this.siaTasksSpy.and.returnValue([newSiaTask()]);
 
-        $ctrl.$onInit();
-        flushMicrotasks();
-        $scope.$apply();
+          $ctrl.$onInit();
+          flushMicrotasks();
+          $scope.$apply();
 
-        expect($ctrl.getExplorationHealth()).toEqual('warning');
-      }));
+          expect($ctrl.getExplorationHealth()).toEqual('warning');
+        }));
 
-      it('should reporty health as healthy if zero tasks exist', fakeAsync(() => {
-        $ctrl.$onInit();
-        flushMicrotasks();
-        $scope.$apply();
+      it('should reporty health as healthy if zero tasks exist',
+        fakeAsync(() => {
+          $ctrl.$onInit();
+          flushMicrotasks();
+          $scope.$apply();
 
-        expect($ctrl.getExplorationHealth()).toEqual('healthy');
-      }));
+          expect($ctrl.getExplorationHealth()).toEqual('healthy');
+        }));
     });
   });
 });
