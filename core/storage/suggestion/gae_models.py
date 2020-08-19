@@ -242,7 +242,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_translation_suggestions_with_exp_ids(cls, exp_ids):
+    def get_translation_suggestion_ids_with_exp_ids(cls, exp_ids):
         """Gets the ids of translation suggestions corresponding to
         explorations with the given exploration ids.
 

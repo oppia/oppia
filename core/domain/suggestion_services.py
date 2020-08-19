@@ -186,7 +186,7 @@ def query_suggestions(query_fields_and_values):
     ]
 
 
-def get_translation_suggestions_with_exp_ids(exp_ids):
+def get_translation_suggestion_ids_with_exp_ids(exp_ids):
     """Gets the ids of the translation suggestions corresponding to
     explorations with the given exploration ids.
 
@@ -204,7 +204,7 @@ def get_translation_suggestions_with_exp_ids(exp_ids):
 
     return (
         suggestion_models.GeneralSuggestionModel
-        .get_translation_suggestions_with_exp_ids(exp_ids)
+        .get_translation_suggestion_ids_with_exp_ids(exp_ids)
     )
 
 
@@ -422,10 +422,8 @@ def accept_suggestions(
             )
             frequency = user_score_identifier_frequencies[
                 user_score_identifier]
-            # Increment the score 'frequency' amount of times.
-            for freq in range(frequency):
-                user_scoring.increment_score(
-                    suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+            user_scoring.increment_score(
+                suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY * frequency)
 
         # Emails are sent to onboard new reviewers. These new reviewers are
         # created when the score of the user passes the minimum score required
@@ -534,7 +532,7 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids):
         exp_ids: list(str). The exploration IDs corresponding to the target IDs
             of the translation suggestions.
     """
-    suggestion_ids = get_translation_suggestions_with_exp_ids(exp_ids)
+    suggestion_ids = get_translation_suggestion_ids_with_exp_ids(exp_ids)
 
     reject_suggestions(
         suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,

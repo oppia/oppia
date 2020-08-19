@@ -119,7 +119,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         suggestion_services.accept_suggestion(
                             suggestion_id, reviewer_id,
                             commit_message, review_message)
-    
+
     def mock_accept_suggestions(
             self, suggestion_ids, reviewer_id, commit_message, review_message):
         """Sets up the appropriate mocks to successfully call
@@ -383,7 +383,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertFalse(user_scoring.email_has_been_sent())
         self.assertEqual(user_scoring.get_score(), 0)
-    
+
         # An email is sent to users the first time that they pass the score
         # required to review a suggestion category. By default, when a
         # suggestion is accepted and the recording of scores is enabled, the
@@ -421,8 +421,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         # Verify that a user scoring model does not exist.
         self.assertIsNone(suggestion_services.get_user_scoring(
-                self.author_id, self.score_category)
-        )
+            self.author_id, self.score_category))
 
         with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
             self.mock_accept_suggestion(
@@ -431,8 +430,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         # Verify that a user scoring model now exists.
         self.assertIsNotNone(suggestion_services.get_user_scoring(
-                self.author_id, self.score_category)
-        )
+            self.author_id, self.score_category))
 
     def test_accept_suggestion_successfully(self):
         self.mock_create_suggestion(self.target_id)
@@ -521,15 +519,18 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id_3, suggestion_models.STATUS_IN_REVIEW)
         suggestion_ids = [self.suggestion_id_2, self.suggestion_id_3]
 
+        # By dividing the minimum score required to review by 2, we
+        # are ensuring that both suggestions must be accepted in order
+        # for the author to get the email.
+        half_minimum_score_required_to_review = python_utils.divide(
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW, 2
+        )
         with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
             with self.swap(
                 feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True):
-                # By dividing the minimum score required to review by 2, we
-                # are ensuring that both suggestions must be accepted in order
-                # for the author to get the email.
                 with self.swap(
                     suggestion_models, 'INCREMENT_SCORE_OF_AUTHOR_BY',
-                        feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW/2):
+                    half_minimum_score_required_to_review):
                     self.mock_accept_suggestions(
                         suggestion_ids, self.reviewer_id, self.COMMIT_MESSAGE,
                         'review message')
@@ -555,7 +556,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Assert that the users score was updated to be twice the amount to
         # increment the score by.
         self.assertEqual(
-            user_scoring.get_score(), feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+            user_scoring.get_score(), half_minimum_score_required_to_review * 2)
         # Assert that their score is not high enough to review the category.
         self.assertTrue(user_scoring.user_can_review_the_category())
         # Assert that the onboarding new reviewer email was not sent since
@@ -1039,7 +1040,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_services.query_suggestions(queries)
 
-    def test_get_translation_suggestions_with_exp_ids_with_one_exp(self):
+    def test_get_translation_suggestion_ids_with_exp_ids_with_one_exp(self):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
             'state_name': 'state_1',
@@ -1066,10 +1067,11 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # exploration id found.
         self.assertEqual(
             len(
-                suggestion_services.get_translation_suggestions_with_exp_ids(
+                suggestion_services
+                .get_translation_suggestion_ids_with_exp_ids(
                     [self.target_id_1])), 1)
 
-    def test_get_translation_suggestions_with_exp_ids_with_multiple_exps(
+    def test_get_translation_suggestion_ids_with_exp_ids_with_multiple_exps(
             self):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
@@ -1109,24 +1111,29 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Assert that there are two translation suggestions with the given
         # exploration ids found.
         self.assertEqual(
-            len(suggestion_services.get_translation_suggestions_with_exp_ids(
-                [self.target_id_2, self.target_id_3])), 2)
+            len(
+                suggestion_services
+                .get_translation_suggestion_ids_with_exp_ids(
+                    [self.target_id_2, self.target_id_3])), 2)
 
-    def test_get_translation_suggestions_with_exp_ids_with_invalid_exp(
+    def test_get_translation_suggestion_ids_with_exp_ids_with_invalid_exp(
             self):
         # Assert that there are no translation suggestions with an invalid
         # exploration id found.
         self.assertEqual(
-            len(suggestion_services.get_translation_suggestions_with_exp_ids(
-                ['invalid_exp_id'])), 0)
+            len(
+                suggestion_services
+                .get_translation_suggestion_ids_with_exp_ids(
+                    ['invalid_exp_id'])), 0)
 
-    def test_get_translation_suggestions_with_exp_ids_with_empty_exp_list(
+    def test_get_translation_suggestion_ids_with_exp_ids_with_empty_exp_list(
             self):
         # Assert that there are no translation suggestions found when we
         # use an empty exp_ids list.
         self.assertEqual(
-            len(suggestion_services.get_translation_suggestions_with_exp_ids(
-                [])), 0)
+            len(
+                suggestion_services
+                .get_translation_suggestion_ids_with_exp_ids([])), 0)
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         user_score_identifiers_large_score = [
@@ -1541,18 +1548,18 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             user_scoring_user2_cat2.user_can_review_the_category())
 
     def test_get_all_scores_of_the_user_with_multiple_scores(self):
-        user_scoring_user1_cat1 = suggestion_services.create_new_user_scoring(
+        suggestion_services.create_new_user_scoring(
             self.user_1_id, 'category1', 1
         )
-        user_scoring_user1_cat2 = suggestion_services.create_new_user_scoring(
+        suggestion_services.create_new_user_scoring(
             self.user_1_id, 'category2', 2
         )
-        user_scoring_user1_cat2 = suggestion_services.create_new_user_scoring(
+        suggestion_services.create_new_user_scoring(
             self.user_1_id, 'category3', 3
         )
         expected_scores_dict = {}
-        for index in range(1,4):
-            key = 'category%s' % str(index)
+        for index in python_utils.RANGE(1, 4):
+            key = 'category%s' % python_utils.UNICODE(index)
             expected_scores_dict[key] = index
 
         scores_dict = suggestion_services.get_all_scores_of_user(

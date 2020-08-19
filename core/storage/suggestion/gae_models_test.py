@@ -295,7 +295,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(suggestion_models.GeneralSuggestionModel.query_suggestions(
                 queries)), 1)
 
-    def test_get_translation_suggestions_with_exp_ids_with_one_exp(self):
+    def test_get_translation_suggestion_ids_with_exp_ids_with_one_exp(self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -308,10 +308,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         # exploration id found.
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_with_exp_ids(
+            .get_translation_suggestion_ids_with_exp_ids(
                 ['exp1'])), 1)
 
-    def test_get_translation_suggestions_with_exp_ids_with_multiple_exps(
+    def test_get_translation_suggestion_ids_with_exp_ids_with_multiple_exps(
             self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -332,19 +332,19 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         # exploration ids found.
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_with_exp_ids(
+            .get_translation_suggestion_ids_with_exp_ids(
                 ['exp2', 'exp3'])), 2)
 
-    def test_get_translation_suggestions_with_exp_ids_with_invalid_exp(
+    def test_get_translation_suggestion_ids_with_exp_ids_with_invalid_exp(
             self):
         # Assert that there are no translation suggestions with an invalid
         # exploration id found.
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_with_exp_ids(
+            .get_translation_suggestion_ids_with_exp_ids(
                 ['invalid_exp'])), 0)
 
-    def test_get_translation_suggestions_with_exp_ids_past_default_query_limit(
+    def test_get_translation_suggestion_ids_with_exp_ids_past_default_query(
             self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -365,7 +365,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_model_results = (
                 suggestion_models
                 .GeneralSuggestionModel
-                .get_translation_suggestions_with_exp_ids(
+                .get_translation_suggestion_ids_with_exp_ids(
                     ['exp4', 'exp5'])
             )
 

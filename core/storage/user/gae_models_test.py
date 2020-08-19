@@ -2006,12 +2006,10 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         for index, user_score_model in enumerate(user_score_models):
             index_str = python_utils.UNICODE(index)
             self.assertEqual(user_score_model.id, 'category%s.user%s' % (
-                index_str, index_str)
-            )
+                index_str, index_str))
             self.assertEqual(user_score_model.user_id, 'user%s' % index_str)
             self.assertEqual(user_score_model.score_category, 'category%s' % (
-                index_str)
-            )
+                index_str))
             self.assertEqual(user_score_model.score, 1)
 
     def test_create_multi_raises_exception_when_model_already_created(self):
