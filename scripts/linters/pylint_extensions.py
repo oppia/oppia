@@ -818,7 +818,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
             if line != b'':
                 blank_line_counter = 0
 
-
     def check_docstring_structure(self, node):
         """Checks whether the docstring has the correct structure i.e.
         do not have space at the beginning and have a period at the end of
@@ -1605,65 +1604,6 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
             self.add_message('single-space-after-yield', node=node)
 
 
-class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
-    """Checks if there are excessive newlines between method definitions."""
-
-    __implements__ = interfaces.IRawChecker
-
-    name = 'excessive-new-lines'
-    priority = -1
-    msgs = {
-        'C0011': (
-            'Excessive new lines between function definations.',
-            'excessive-new-lines',
-            'Remove extra newlines.'
-        )
-    }
-
-    def process_module(self, node):
-        """Process a module to ensure that method definitions are not seperated
-        by more than two blank lines.
-
-        Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
-        """
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-        blank_line_counter = 0
-
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
-
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
-                continue
-
-            if file_content[line_num] == b'\n':
-                blank_line_counter += 1
-            else:
-                blank_line_counter = 0
-
-            if line_num + 1 < file_length and blank_line_counter > 2:
-                line = file_content[line_num + 1].strip()
-                if line.startswith(b'def') or line.startswith(b'@'):
-                    self.add_message('excessive-new-lines', line=line_num + 1)
-
-
 class DivisionOperatorChecker(checkers.BaseChecker):
     """Checks if division operator is used."""
 
@@ -1932,7 +1872,6 @@ def register(linter):
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
     linter.register_checker(SingleSpaceAfterYieldChecker(linter))
-    linter.register_checker(ExcessiveEmptyLinesChecker(linter))
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))

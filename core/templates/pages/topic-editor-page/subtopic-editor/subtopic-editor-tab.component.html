@@ -60,6 +60,8 @@
               <span class="oppia-input-box-subtitle">
                 <em>
                   The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                  This subtopic can be accessed at the following URL:<br>
+                  <[$ctrl.hostname]>/learn/<[$ctrl.classroomUrlFragment]>/<[$ctrl.topic.getUrlFragment()]>/revision/<[$ctrl.editableUrlFragment]>
                 </em>
               </span>
             </form>
@@ -143,13 +145,11 @@
           </i>
         </div>
         <div ng-if="$ctrl.skillsListIsShown" class="oppia-mobile-collapsible-card-content">
-          <div>
-            <button class="btn add-skill-btn" ng-click="$ctrl.createSkill()">
-              + ADD SKILL
-            </button>
+          <div ng-if="!$ctrl.subtopic.getSkillSummaries().length">
+            <span>There are no skills assigned to this subtopic.</span>
           </div>
-          <div>
-            <div class="list-header" ng-if="$ctrl.subtopic.getSkillSummaries().length">
+          <div ng-if="$ctrl.subtopic.getSkillSummaries().length">
+            <div class="list-header">
               <span>Name</span>
               <span class="number-skills-header"># of Questions</span>
             </div>

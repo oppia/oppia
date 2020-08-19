@@ -157,7 +157,6 @@ class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
             self.get_html_response(
                 '/learn/staging/%s/revision/%s' % ('name', 'sub-url-frag-one'))
 
-
     def test_accessibility_of_subtopic_viewer_page_of_unpublished_topic(
             self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
@@ -170,7 +169,6 @@ class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
                 '/learn/staging/%s/revision/%s'
                 % ('pvttopic', 'sub-url-frag-one'))
             self.logout()
-
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):

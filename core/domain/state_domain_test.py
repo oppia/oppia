@@ -1239,7 +1239,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
 
-
         written_translations_dict = {
             'translations_mapping': {
                 'content': {
@@ -1648,7 +1647,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-
 
         answer_group_dict_with_old_math_schema = {
             'outcome': {
@@ -2231,7 +2229,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }]
             }
         }
-
 
         state_dict_with_new_math_schema = {
             'content': {

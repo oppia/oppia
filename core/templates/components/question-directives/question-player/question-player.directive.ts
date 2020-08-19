@@ -85,6 +85,9 @@ require(
   'components/question-directives/question-player/' +
   'question-player-concept-card-modal.controller.ts');
 require(
+  'components/question-directives/question-player/services/' +
+  'question-player-state.service.ts');
+require(
   'components/question-directives/question-player/' +
   'skill-mastery-modal.controller.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
@@ -143,7 +146,8 @@ angular.module('oppia').directive('questionPlayer', [
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$uibModal', '$window',
         'AlertsService', 'ExplorationPlayerStateService', 'HtmlEscaperService',
-        'QuestionBackendApiService', 'SkillMasteryBackendApiService',
+        'PlayerPositionService', 'QuestionBackendApiService',
+        'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
         'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
         'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
@@ -154,7 +158,8 @@ angular.module('oppia').directive('questionPlayer', [
             $scope, $sce, $rootScope, $location,
             $sanitize, $uibModal, $window,
             AlertsService, ExplorationPlayerStateService, HtmlEscaperService,
-            QuestionBackendApiService, SkillMasteryBackendApiService,
+            PlayerPositionService, QuestionBackendApiService,
+            QuestionPlayerStateService, SkillMasteryBackendApiService,
             UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
             QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
@@ -538,22 +543,25 @@ angular.module('oppia').directive('questionPlayer', [
           };
 
           ctrl.$onInit = function() {
-            $rootScope.$on('currentQuestionChanged', function(event, result) {
-              updateCurrentQuestion(result + 1);
-            });
-
             ctrl.directiveSubscriptions.add(
-              ExplorationPlayerStateService.onTotalQuestionsReceived.subscribe(
-                (result) => {
-                  updateTotalQuestions(result);
-                }
+              PlayerPositionService.onCurrentQuestionChange.subscribe(
+                result => updateCurrentQuestion(result + 1)
               )
             );
 
-            $rootScope.$on('questionSessionCompleted', function(event, result) {
-              $location.hash(HASH_PARAM +
-                encodeURIComponent(JSON.stringify(result)));
-            });
+            ctrl.directiveSubscriptions.add(
+              ExplorationPlayerStateService.onTotalQuestionsReceived.subscribe(
+                result => updateTotalQuestions(result)
+              )
+            );
+
+            ctrl.directiveSubscriptions.add(
+              QuestionPlayerStateService.onQuestionSessionCompleted.subscribe(
+                (result) => {
+                  $location.hash(HASH_PARAM +
+                    encodeURIComponent(JSON.stringify(result)));
+                })
+            );
 
             $scope.$on('$locationChangeSuccess', function(event) {
               var hashContent = $location.hash();

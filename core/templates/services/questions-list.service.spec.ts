@@ -28,6 +28,8 @@ import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 
+import { Subscription } from 'rxjs';
+
 require('services/csrf-token.service.ts');
 
 describe('Questions List Service', function() {
@@ -35,6 +37,10 @@ describe('Questions List Service', function() {
   var $q, $httpBackend;
   var questionBackendApiService = null;
   var httpTestingController = null;
+
+  var testSubscriptions = null;
+  var quesionSummariesInitializedSpy = null;
+
   var sampleResponse = {
     question_summary_dicts: [{
       skill_descriptions: [],
@@ -84,11 +90,19 @@ describe('Questions List Service', function() {
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
     });
-
-    broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
   }));
 
+  beforeEach(() => {
+    quesionSummariesInitializedSpy = jasmine.createSpy(
+      'questionSummariesInitialized');
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(qls.onQuestionSummariesInitialized.subscribe(
+      quesionSummariesInitializedSpy
+    ));
+  });
+
   afterEach(() => {
+    testSubscriptions.unsubscribe();
     httpTestingController.verify();
   });
 
@@ -135,7 +149,7 @@ describe('Questions List Service', function() {
       req.flush(sampleResponse);
       flushMicrotasks();
 
-      expect(broadcastSpy).toHaveBeenCalledTimes(2);
+      expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(2);
     })
   );
 
@@ -171,7 +185,7 @@ describe('Questions List Service', function() {
     expect(req.request.method).toEqual('GET');
     req.flush(sampleResponse);
     flushMicrotasks();
-    expect(broadcastSpy).toHaveBeenCalledTimes(2);
+    expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(2);
   }));
 
   it('should get more than one question summary with history reseted',
@@ -186,7 +200,7 @@ describe('Questions List Service', function() {
 
       expect(qls.getCurrentPageNumber()).toBe(0);
       expect(qls.isLastQuestionBatch()).toBe(true);
-      expect(broadcastSpy).toHaveBeenCalled();
+      expect(quesionSummariesInitializedSpy).toHaveBeenCalled();
 
       qls.getQuestionSummariesAsync(skillIds, true, true);
       req = httpTestingController.expectOne(
@@ -208,7 +222,7 @@ describe('Questions List Service', function() {
 
     expect(qls.getCurrentPageNumber()).toBe(0);
     expect(qls.isLastQuestionBatch()).toBe(true);
-    expect(broadcastSpy).toHaveBeenCalledTimes(1);
+    expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(1);
 
     var cachedQuestionSummaries = qls.getCachedQuestionSummaries();
     expect(cachedQuestionSummaries[0]._questionSummary._questionId).toBe('0');

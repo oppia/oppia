@@ -2491,19 +2491,19 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 u'[u\'failed validation check for content count check '
                 'of ExplorationOpportunitySummaryModel\', '
                 '[u"Entity id 1: Content count: 10 does not match the '
-                'content count of external exploration model: 2"]]'
+                'content count of external exploration model: 1"]]'
             ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
         run_job_and_check_output(
             self, expected_output, sort=True, literal_eval=True)
 
     def test_model_with_invalid_translation_counts(self):
-        self.model_instance_1.translation_counts = {'hi': 2}
+        self.model_instance_1.translation_counts = {'hi': 0}
         self.model_instance_1.put()
         expected_output = [
             (
                 u'[u\'failed validation check for translation count check '
                 'of ExplorationOpportunitySummaryModel\', '
-                '[u"Entity id 1: Translation counts: {u\'hi\': 2} does not '
+                '[u"Entity id 1: Translation counts: {u\'hi\': 0} does not '
                 'match the translation counts of external exploration model: '
                 '{}"]]'
             ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
@@ -8279,7 +8279,6 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
                     'new_value': explorations[index * 2 + 1].id
                 })], 'Changes.')
 
-
         self.model_instance_0 = story_models.StoryModel.get_by_id('0')
         self.model_instance_1 = story_models.StoryModel.get_by_id('1')
         self.model_instance_2 = story_models.StoryModel.get_by_id('2')
@@ -11843,7 +11842,6 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                     'new_subtopic_id': 1,
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
-
 
         self.model_instance_0 = (
             topic_models.SubtopicPageCommitLogEntryModel.get_by_id(

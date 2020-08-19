@@ -415,7 +415,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_getcwd():
             raise ValueError('Exception raised from getcwd()')
 
-
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
         with self.assertRaisesRegexp(

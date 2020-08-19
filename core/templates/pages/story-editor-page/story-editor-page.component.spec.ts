@@ -304,4 +304,16 @@ describe('Story editor page', function() {
     MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
     expect(ctrl.getNavbarText()).toEqual('Story Editor');
   });
+
+  it('should init page on undo redo change applied', () => {
+    let mockUndoRedoChangeEventEmitter = new EventEmitter();
+    spyOn(UndoRedoService, 'onUndoRedoChangeApplied').and.returnValue(
+      mockUndoRedoChangeEventEmitter);
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setPageTitle');
+    ctrl.$onInit();
+    mockUndoRedoChangeEventEmitter.emit();
+    expect(PageTitleService.setPageTitle).toHaveBeenCalled();
+    ctrl.$onDestroy();
+  });
 });
