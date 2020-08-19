@@ -141,6 +141,20 @@ describe('SvgFilenameEditor', function() {
     }
   };
 
+  class mockReaderObject {
+    result = null;
+    onload = null;
+    constructor() {
+      this.onload = function() {
+        return 'Fake onload executed';
+      };
+    }
+    readAsDataURL(file) {
+      this.onload();
+      return 'The file is loaded';
+    }
+  }
+
   class mockImageObject {
     source = null;
     onload = null;
@@ -189,6 +203,12 @@ describe('SvgFilenameEditor', function() {
     // the properties we need in 'mockImageObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
+    // This throws "Argument of type 'mockReaderObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". This is because
+    // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
     svgFilenameCtrl = $componentController('svgFilenameEditor');
     initializeMockDocument(svgFilenameCtrl);
@@ -422,6 +442,36 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.isDrawModePieChart()).toBe(false);
   });
 
+  it('should upload an svg file', function() {
+    var fileContent = (
+      'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
+      'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
+      'PSI1MCIgcj0iNDAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ie' +
+      'WVsbG93IiAvPjwvc3ZnPg==');
+    svgFilenameCtrl.uploadSvgFile();
+    expect(svgFilenameCtrl.isSvgUploadEnabled()).toBe(true);
+    expect(svgFilenameCtrl.isDrawModeSvgUpload()).toBe(true);
+    var file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
+    svgFilenameCtrl.onFileChanged(file, 'circle.svg');
+    svgFilenameCtrl.uploadedSvgDataUrl = fileContent;
+    expect(svgFilenameCtrl.isFileUploaded()).toBe(true);
+    svgFilenameCtrl.uploadSvgFile();
+    expect(svgFilenameCtrl.canvas.getObjects()[0].get('type')).toBe('group');
+    svgFilenameCtrl.canvas.setActiveObject(
+      svgFilenameCtrl.canvas.getObjects()[0]);
+    expect(svgFilenameCtrl.displayFontStyles).toBe(false);
+    svgFilenameCtrl.uploadSvgFile();
+    expect(svgFilenameCtrl.isDrawModeSvgUpload()).toBe(true);
+    var file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
+    svgFilenameCtrl.onFileChanged(file, 'circle.svg');
+    svgFilenameCtrl.uploadedSvgDataUrl = fileContent;
+    expect(svgFilenameCtrl.isFileUploaded()).toBe(true);
+    svgFilenameCtrl.loadType = 'nogroup';
+    svgFilenameCtrl.uploadSvgFile();
+    expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('circle');
+  });
+
+
   it('should trigger object selection and scaling events', function() {
     svgFilenameCtrl.createRect();
     svgFilenameCtrl.createText();
@@ -457,18 +507,18 @@ describe('SvgFilenameEditor', function() {
       d.resolve(responseText);
       return d.promise();
     });
-    svgFilenameCtrl.saveSVGFile();
+    svgFilenameCtrl.saveSvgFile();
 
     // $q Promises need to be forcibly resolved through a JavaScript digest,
     // which is what $apply helps kick-start.
     $scope.$apply();
-    expect(svgFilenameCtrl.data.savedSVGFileName).toBe('imageFile1.svg');
-    expect(svgFilenameCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
+    expect(svgFilenameCtrl.data.savedSvgFileName).toBe('imageFile1.svg');
+    expect(svgFilenameCtrl.data.savedSvgUrl.toString()).toBe(dataUrl);
     expect(svgFilenameCtrl.validate()).toBe(true);
   });
 
   it('should not save svg file when no diagram is created', function() {
-    svgFilenameCtrl.saveSVGFile();
+    svgFilenameCtrl.saveSvgFile();
     expect(alertSpy).toHaveBeenCalledWith('Custom Diagram not created.');
   });
 
@@ -493,7 +543,7 @@ describe('SvgFilenameEditor', function() {
       });
       return d.promise();
     });
-    svgFilenameCtrl.saveSVGFile();
+    svgFilenameCtrl.saveSvgFile();
 
     // $q Promises need to be forcibly resolved through a JavaScript digest,
     // which is what $apply helps kick-start.
@@ -502,8 +552,8 @@ describe('SvgFilenameEditor', function() {
   });
 
   it('should allow user to continue editing the diagram', function() {
-    svgFilenameCtrl.savedSVGDiagram = 'saved';
-    svgFilenameCtrl.savedSVGDiagram = samplesvg;
+    svgFilenameCtrl.savedSvgDiagram = 'saved';
+    svgFilenameCtrl.savedSvgDiagram = samplesvg;
     svgFilenameCtrl.continueDiagramEditing();
     var mocktoSVG = function(arg) {
       return '<path></path>';
@@ -564,7 +614,7 @@ describe('SvgFilenameEditor initialized with value attribute',
       ).respond(samplesvg);
       $httpBackend.flush();
       expect(svgFilenameCtrl.diagramStatus).toBe('saved');
-      expect(svgFilenameCtrl.savedSVGDiagram).toBe(samplesvg);
+      expect(svgFilenameCtrl.savedSvgDiagram).toBe(samplesvg);
     });
   }
 );
@@ -675,18 +725,18 @@ describe('SvgFilenameEditor with image save destination as ' +
   it('should save svg file to local storage created by the svg editor',
     function() {
       svgFilenameCtrl.createRect();
-      svgFilenameCtrl.saveSVGFile();
-      expect(svgFilenameCtrl.data.savedSVGFileName).toBe('350_450.svg');
-      expect(svgFilenameCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
+      svgFilenameCtrl.saveSvgFile();
+      expect(svgFilenameCtrl.data.savedSvgFileName).toBe('350_450.svg');
+      expect(svgFilenameCtrl.data.savedSvgUrl.toString()).toBe(dataUrl);
       expect(svgFilenameCtrl.validate()).toBe(true);
     }
   );
 
   it('should allow user to continue editing the diagram and delete the ' +
     'image from local storage', function() {
-    svgFilenameCtrl.data.savedSVGFileName = 'image.svg';
-    svgFilenameCtrl.savedSVGDiagram = 'saved';
-    svgFilenameCtrl.savedSVGDiagram = samplesvg;
+    svgFilenameCtrl.data.savedSvgFileName = 'image.svg';
+    svgFilenameCtrl.savedSvgDiagram = 'saved';
+    svgFilenameCtrl.savedSvgDiagram = samplesvg;
     svgFilenameCtrl.continueDiagramEditing();
     expect(svgFilenameCtrl.diagramStatus).toBe('editing');
   });
