@@ -19,7 +19,12 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Create new skill modal', function() {
-  beforeEach(angular.mock.module('oppia'));
+  var $scope = null;
+  var $uibModalInstance = null;
+  var skillDifficulties = null;
+  var RubricObjectFactory = null;
+  var COMPONENT_NAME_EXPLANATION = null;
+  var SubtitledHtmlObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -28,12 +33,6 @@ describe('Create new skill modal', function() {
     }
   }));
 
-  var $scope = null;
-  var $uibModalInstance = null;
-  var skillDifficulties = null;
-  var RubricObjectFactory = null;
-  var COMPONENT_NAME_EXPLANATION = null;
-  var SubtitledHtmlObjectFactory = null;
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     $uibModalInstance = jasmine.createSpyObj(
@@ -49,49 +48,48 @@ describe('Create new skill modal', function() {
     });
   }));
 
-  it('should init the variables', function() {
-    var rubrics = [
-      RubricObjectFactory.create(skillDifficulties[0], []),
-      RubricObjectFactory.create(skillDifficulties[1], ['']),
-      RubricObjectFactory.create(skillDifficulties[2], [])];
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      var rubrics = [
+        RubricObjectFactory.create(skillDifficulties[0], []),
+        RubricObjectFactory.create(skillDifficulties[1], ['']),
+        RubricObjectFactory.create(skillDifficulties[2], [])];
 
-    expect($scope.newSkillDescription).toEqual('');
-    expect($scope.errorMsg).toEqual('');
-    expect($scope.conceptCardExplanationEditorIsShown).toEqual(false);
-    expect($scope.bindableDict.displayedConceptCardExplanation).toEqual('');
-    expect($scope.HTML_SCHEMA).toEqual({type: 'html'});
-    expect($scope.MAX_CHARS_IN_SKILL_DESCRIPTION).toEqual(100);
-    expect($scope.newExplanationObject).toEqual(null);
-    expect($scope.rubrics).toEqual(rubrics);
-  });
+      expect($scope.newSkillDescription).toEqual('');
+      expect($scope.errorMsg).toEqual('');
+      expect($scope.conceptCardExplanationEditorIsShown).toEqual(false);
+      expect($scope.bindableDict.displayedConceptCardExplanation).toEqual('');
+      expect($scope.HTML_SCHEMA).toEqual({type: 'html'});
+      expect($scope.MAX_CHARS_IN_SKILL_DESCRIPTION).toEqual(100);
+      expect($scope.newExplanationObject).toEqual(null);
+      expect($scope.rubrics).toEqual(rubrics);
+    });
 
-  it('should open the concept card editor', function() {
+  it('should open the concept card editor when clicking on open concept card' +
+    ' explanation editor', function() {
     expect($scope.conceptCardExplanationEditorIsShown).toEqual(false);
     $scope.openConceptCardExplanationEditor();
     expect($scope.conceptCardExplanationEditorIsShown).toEqual(true);
   });
 
-  it('should reset the error message', function() {
-    expect($scope.errorMsg).toEqual('');
+  it('should update the rubrics explanation and clear error message when' +
+    ' changing skill description', function() {
     $scope.errorMsg = 'Please enter a valid description';
+    $scope.newSkillDescription = 'Addition';
+    expect($scope.rubrics[1].getExplanations()).toEqual(['']);
     expect($scope.errorMsg).toEqual('Please enter a valid description');
-    $scope.resetErrorMsg();
+
+    $scope.updateSkillDescription();
+    expect($scope.rubrics[1].getExplanations()).toEqual(['Addition']);
     expect($scope.errorMsg).toEqual('');
   });
 
-  it('should update the rubrics explanation when skill description updates',
-    function() {
-      $scope.newSkillDescription = 'Addition';
-      $scope.updateSkillDescription();
-      expect($scope.rubrics[1].getExplanations()).toEqual(['Addition']);
-    });
-
-  it('should dismiss modal', function() {
+  it('should dismiss modal when clicking on cancel button', function() {
     $scope.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });
 
-  it('should set the error message if skill description is invalid',
+  it('should add error message text when skill description is invalid',
     function() {
       var errorString = (
         'Please use a non-empty description consisting of ' +
@@ -121,7 +119,7 @@ describe('Create new skill modal', function() {
     expect($scope.isSkillDescriptionValid()).toBe(true);
   });
 
-  it('should close the modal with skill input values ', function() {
+  it('should close the modal with skill input values', function() {
     var rubrics = [
       RubricObjectFactory.create(skillDifficulties[0], []),
       RubricObjectFactory.create(skillDifficulties[1], ['Large addition']),
@@ -132,8 +130,10 @@ describe('Create new skill modal', function() {
     var newExplanationObject = explanationObject.toBackendDict();
 
     $scope.newSkillDescription = 'Large addition';
+    expect($scope.rubrics[1].getExplanations()).toEqual(['']);
     $scope.updateSkillDescription();
     $scope.createNewSkill();
+    expect($scope.rubrics[1].getExplanations()).toEqual(['Large addition']);
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       description: 'Large addition',
       rubrics: rubrics,

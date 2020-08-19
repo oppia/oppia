@@ -48,8 +48,8 @@ export class ConceptCardBackendApiService {
 
   private _fetchConceptCards(
       skillIds: string[],
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: ConceptCard[]) => void,
+      errorCallback: (reason: string) => void): void {
     var conceptCardDataUrl = this.urlInterpolation.interpolateUrl(
       SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(',')

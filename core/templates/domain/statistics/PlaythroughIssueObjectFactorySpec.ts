@@ -71,7 +71,7 @@ describe('Playthrough Issue Object Factory', () => {
     });
 
     expect(playthroughIssueObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughIssueObject.issueCustomizationArgs).toEqual( {
+    expect(playthroughIssueObject.issueCustomizationArgs).toEqual({
       state_name: {
         value: 'state'
       },

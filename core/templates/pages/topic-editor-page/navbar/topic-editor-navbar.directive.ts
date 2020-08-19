@@ -46,12 +46,12 @@ angular.module('oppia').directive('topicEditorNavbar', [
         '$scope', '$rootScope', '$uibModal', '$window', 'AlertsService',
         'UndoRedoService', 'TopicEditorStateService', 'UrlService',
         'TopicRightsBackendApiService', 'TopicEditorRoutingService',
-        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED', 'TOPIC_VIEWER_URL_TEMPLATE',
+        'TOPIC_VIEWER_URL_TEMPLATE',
         function(
             $scope, $rootScope, $uibModal, $window, AlertsService,
             UndoRedoService, TopicEditorStateService, UrlService,
             TopicRightsBackendApiService, TopicEditorRoutingService,
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, TOPIC_VIEWER_URL_TEMPLATE) {
+            TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.isSaveInProgress = function() {
@@ -315,8 +315,11 @@ angular.module('oppia').directive('topicEditorNavbar', [
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             $scope.topicRights = TopicEditorStateService.getTopicRights();
-            $scope.$on(
-              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateTopic);
+            ctrl.directiveSubscriptions.add(
+              UndoRedoService.onUndoRedoChangeApplied().subscribe(
+                () => _validateTopic()
+              )
+            );
           };
 
           ctrl.$onDestroy = function() {

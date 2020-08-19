@@ -182,7 +182,7 @@ describe('Stats reporting backend API Service', () => {
   it('should record answer submission correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordAnswerSubmitted(
       'answer', params, expVersion, sessionId, timeSpent, previousState,
-      1, 2, 'category', expId, currentState, nextExpId, previousState,
+      1, 'category', expId, currentState, nextExpId, previousState,
       nextState);
 
     let req = httpTestingController.expectOne(

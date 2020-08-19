@@ -296,7 +296,6 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         self.allow_revert_swap = self.swap(
             collection_models.CollectionRightsModel, 'ALLOW_REVERT', True)
 
-
     def test_revert_to_valid_version_is_successful(self):
         with self.allow_revert_swap:
             collection_models.CollectionRightsModel.revert(
