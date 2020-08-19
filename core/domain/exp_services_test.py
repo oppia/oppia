@@ -1050,7 +1050,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'latest schema version.')):
             exp_fetchers.get_multiple_explorations_by_version('exp_id_1', [1])
 
-
     def test_save_multi_exploration_math_rich_text_info_model(self):
         multiple_explorations_math_rich_text_info = []
 
@@ -3667,7 +3666,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
                         'new_value': 'cat1'})], 'update category')
             self.assertEqual(actual_docs, [updated_exp_doc])
             self.assertEqual(add_docs_counter.times_called, 3)
-
 
     def test_get_number_of_ratings(self):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)

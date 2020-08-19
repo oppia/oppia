@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for editor domain.
+ * @fileoverview This file imports the dndLists library.
  */
 
-// TODO(#7092): Delete this file once migration is complete and these AngularJS
-// equivalents of the Angular constants are no longer needed.
-import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants';
-
-angular.module('oppia').constant(
-  'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
-  EditorDomainConstants.EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
+require(
+  'static/angular-drag-and-drop-lists-2.1.0/' +
+  'angular-drag-and-drop-lists.min.js');

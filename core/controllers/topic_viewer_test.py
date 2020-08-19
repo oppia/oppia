@@ -115,7 +115,6 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response('/learn/staging/%s' % 'public')
 
-
     def test_accessibility_of_unpublished_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
@@ -124,7 +123,6 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
             self.login(self.ADMIN_EMAIL)
             self.get_html_response('/learn/staging/%s' % 'private')
             self.logout()
-
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):

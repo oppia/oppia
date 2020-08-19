@@ -13,8 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the headroom library.
- */
+ * @fileoverview Unit tests for ExternalSaveService
+*/
 
-window.Headroom = require('static/headroom-js-0.9.4/headroom.min.js');
-require('static/headroom-js-0.9.4/angular.headroom.min.js');
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+
+import { ExternalSaveService } from
+  'services/external-save.service';
+
+describe('External Save Service', () => {
+  let externalSaveService = null;
+
+  beforeEach(() => {
+    externalSaveService = TestBed.get(ExternalSaveService);
+  });
+
+  it('should fetch externalSave event emitter', () => {
+    let sampleExternalSaveEventEmitter = new EventEmitter();
+    expect(externalSaveService.onExternalSave).toEqual(
+      sampleExternalSaveEventEmitter);
+  });
+});

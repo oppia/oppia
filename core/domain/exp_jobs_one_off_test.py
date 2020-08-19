@@ -24,6 +24,7 @@ import datetime
 import logging
 import os
 
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
@@ -44,7 +45,6 @@ import utils
     models.Registry.import_models([
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
-memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 
@@ -88,175 +88,6 @@ def run_job_for_deleted_exp(
 
     else:
         self.assertEqual(job_class.get_output(job_id), [])
-
-
-class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(MathExpressionValidationOneOffJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
-
-    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
-        """Checks output is produced only for desired interactions."""
-
-        answer_groups_1 = [{
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': True,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'IsMathematicallyEquivalentTo': [{
-                    'x': 'x+y'
-                }, {
-                    'x': 'x=y'
-                }]
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        states_dict = state_domain.State.from_dict({
-            'content': {
-                'content_id': 'content_1',
-                'html': 'Question 1'
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_1': {},
-                    'feedback_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'content_2': {}
-                }
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'content_1': {},
-                    'feedback_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'content_2': {}
-                }
-            },
-            'interaction': {
-                'answer_groups': answer_groups_1,
-                'confirmed_unclassified_answers': [],
-                'customization_args': {},
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': 'Correct Answer'
-                    },
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'labelled_as_correct': True,
-                    'missing_prerequisite_skill_id': None
-                },
-                'hints': [{
-                    'hint_content': {
-                        'content_id': 'hint_1',
-                        'html': 'Hint 1'
-                    }
-                }],
-                'solution': {
-                    'correct_answer': {
-                        'ascii': 'x+y',
-                        'latex': 'x+y'
-                    },
-                    'answer_is_exclusive': False,
-                    'explanation': {
-                        'html': 'Solution explanation',
-                        'content_id': 'content_2'
-                    }
-                },
-                'id': 'MathExpressionInput'
-            },
-            'next_content_id_index': 3,
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'classifier_model_id': None
-        }).to_dict()
-
-        self.save_new_exp_with_custom_states_schema_version(
-            self.VALID_EXP_ID, 'user_id', states_dict, 34)
-
-        job_id = (
-            exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new())
-        exp_jobs_one_off.MathExpressionValidationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
-                job_id))
-        expected_output = [
-            u'[u\'Invalid\', [u\'The exploration with ID: exp_id0 had some '
-            u'issues during migration. This is most likely due to the '
-            u'exploration having invalid solution(s).\']]']
-
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        state1 = exploration.states['State1']
-
-        state1.update_interaction_id('MathExpressionInput')
-
-        answer_group_list = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'IsMathematicallyEquivalentTo': [{
-                    'x': u'[\'y=mx+c\']'
-                }]
-            },
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state1.update_interaction_answer_groups(answer_group_list)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.MathExpressionValidationOneOffJob)
 
 
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
@@ -957,7 +788,6 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -966,7 +796,9 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         exploration_model.language_code = 'invalid_language_code'
         exploration_model.commit(
             self.albert_id, 'Changed language_code.', [])
-        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [self.VALID_EXP_ID])
 
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
@@ -1456,7 +1288,9 @@ class ExplorationContentValidationJobForCKEditorTests(
         exploration_model.states_schema_version = 100
         exploration_model.commit(
             self.albert_id, 'Changed states_schema_version.', [])
-        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [self.VALID_EXP_ID])
 
         job_id = (
             exp_jobs_one_off
@@ -2403,7 +2237,6 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
         self.assertEqual(
             exp_models.ExplorationMathRichTextInfoModel.get_all().count(), 1)
 
-
     def test_one_off_job_fails_with_invalid_exploration(self):
         """Test the audit job fails when there is an invalid exploration."""
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -2786,7 +2619,9 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
         exploration_model.states_schema_version = 100
         exploration_model.commit(
             self.albert_id, 'Changed states_schema_version.', [])
-        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            self.VALID_EXP_ID)
 
         job_id = (
             exp_jobs_one_off
