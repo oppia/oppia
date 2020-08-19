@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for paramChangesEditor.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
@@ -53,9 +54,12 @@ describe('Param Changes Editor Component', function() {
   var explorationStatesService = null;
   var paramChangeObjectFactory = null;
   var paramSpecsObjectFactory = null;
+  var externalSaveService = null;
   var stateParamChangesService = null;
 
   var postSaveHookSpy = jasmine.createSpy('postSaveHook', () => {});
+
+  var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -78,6 +82,10 @@ describe('Param Changes Editor Component', function() {
       TestBed.get(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
@@ -92,6 +100,7 @@ describe('Param Changes Editor Component', function() {
     explorationParamSpecsService = $injector.get(
       'ExplorationParamSpecsService');
     explorationStatesService = $injector.get('ExplorationStatesService');
+    externalSaveService = $injector.get('ExternalSaveService');
 
     explorationParamSpecsService.init(
       paramSpecsObjectFactory.createFromBackendDict({
@@ -108,7 +117,8 @@ describe('Param Changes Editor Component', function() {
     ctrl = $componentController('paramChangesEditor', {
       $scope: $scope,
       AlertsService: alertsService,
-      ParamChangeObjectFactory: paramChangeObjectFactory
+      ParamChangeObjectFactory: paramChangeObjectFactory,
+      ExternalSaveService: externalSaveService
     }, {
       paramChangesService: stateParamChangesService,
       postSaveHook: postSaveHookSpy,
@@ -116,6 +126,10 @@ describe('Param Changes Editor Component', function() {
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should initialize $scope properties after controller is initialized',
     function() {
@@ -154,7 +168,7 @@ describe('Param Changes Editor Component', function() {
     $scope.addParamChange();
     $scope.openParamChangesEditor();
 
-    $rootScope.$broadcast('externalSave');
+    mockExternalSaveEventEmitter.emit();
 
     expect(saveParamChangesSpy).toHaveBeenCalled();
     expect(postSaveHookSpy).toHaveBeenCalled();

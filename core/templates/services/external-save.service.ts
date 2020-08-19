@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts required in story viewer.
+ * @fileoverview Service provides emitter for external save
  */
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/story-viewer-page/story-viewer-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+import { Injectable, EventEmitter } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-require('base-components/base-content.directive.ts');
-require('pages/story-viewer-page/story-viewer-page.component.ts');
+@Injectable({
+  providedIn: 'root'
+})
+export class ExternalSaveService {
+  private _externalSaveEventEmitter = new EventEmitter();
+
+  get onExternalSave() {
+    return this._externalSaveEventEmitter;
+  }
+}
+
+angular.module('oppia').factory('ExternalSaveService',
+  downgradeInjectable(ExternalSaveService));

@@ -16,7 +16,9 @@
  * @fileoverview Unit tests for unresolvedAnswersOverview.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+
 import { EditabilityService } from 'services/editability.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
@@ -30,9 +32,12 @@ describe('Unresolved Answers Overview Component', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var improvementsService = null;
+  var externalSaveService = null;
   var stateInteractionIdService = null;
   var stateEditorService = null;
   var stateTopAnswersStatsService = null;
+
+  var mockExternalSaveEventEmitter = null;
 
   var stateName = 'State1';
 
@@ -43,12 +48,20 @@ describe('Unresolved Answers Overview Component', function() {
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     explorationStatesService = $injector.get('ExplorationStatesService');
     improvementsService = $injector.get('ImprovementsService');
+    externalSaveService = $injector.get('ExternalSaveService');
     stateEditorService = $injector.get('StateEditorService');
     stateTopAnswersStatsService = $injector.get('StateTopAnswersStatsService');
 
@@ -147,8 +160,8 @@ describe('Unresolved Answers Overview Component', function() {
     expect($uibModal.open).toHaveBeenCalled();
   });
 
-  it('should broadcast externalSave flag when closing the modal', function() {
-    spyOn($rootScope, '$broadcast');
+  it('should emit externalSave when closing the modal', function() {
+    spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });
@@ -156,12 +169,12 @@ describe('Unresolved Answers Overview Component', function() {
     $scope.openTeachOppiaModal();
     $rootScope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('externalSave');
+    expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
   });
 
   it('should broadcast externalSave flag when dismissing the modal',
     function() {
-      spyOn($rootScope, '$broadcast');
+      spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
@@ -169,7 +182,7 @@ describe('Unresolved Answers Overview Component', function() {
       $scope.openTeachOppiaModal();
       $rootScope.$apply();
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('externalSave');
+      expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
     });
 
   it('should fetch unresolved state stats from backend', function() {
