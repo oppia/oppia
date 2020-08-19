@@ -1786,7 +1786,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
         # Iterate till the start of docstring.
         while True:
             line = linecache.getline(node.root().file, line_number).strip()
-            if line.startswith((b'"""', b'\'\'\'', b'\'', b'"')):
+            if line.startswith((b'\'', b'"')):
                 break
             else:
                 line_number += 1
