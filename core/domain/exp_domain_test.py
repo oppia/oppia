@@ -1080,13 +1080,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     }
                 },
-                'default_outcome': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                }
             }
         })
         exploration.states[
@@ -1214,10 +1207,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             })
 
     def test_get_content_count(self):
-        # Adds 2 to content count to exploration (content, default_outcome).
+        # Adds 1 to content count to exploration (content, default_outcome).
         exploration = exp_domain.Exploration.create_default_exploration('0')
-        self.assertEqual(
-            exploration.get_content_count(), 2)
+        self.assertEqual(exploration.get_content_count(), 1)
 
         # Adds 2 to content count to exploration (content default_outcome).
         exploration.add_states(['New state'])
@@ -1271,7 +1263,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Adds 1 to content count to exploration (solution).
         init_state.update_interaction_solution(solution)
 
-        self.assertEqual(exploration.get_content_count(), 8)
+        self.assertEqual(exploration.get_content_count(), 5)
 
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1698,6 +1690,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'The default outcome for state Introduction is labelled '
             'correct but is a self-loop'):
             exploration.validate(strict=True)
+
+    def test_serialize_and_deserialize_returns_unchanged_exploration(self):
+        """Checks that serializing and then deserializing a default exploration
+        works as intended by leaving the exploration unchanged.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        self.assertEqual(
+            exploration.to_dict(),
+            exp_domain.Exploration.deserialize(
+                exploration.serialize()).to_dict())
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
