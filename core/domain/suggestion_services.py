@@ -19,14 +19,19 @@ suggestions.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import functools
+
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
+from core.domain import fs_services
 from core.domain import html_validation_service
+from core.domain import image_validation_services
 from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 import feconf
+import utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -53,6 +58,9 @@ def create_suggestion(
         author_id: str. The ID of the user who submitted the suggestion.
         change: dict. The details of the suggestion.
         description: str. The description of the changes provided by the author.
+
+    Returns:
+        Suggestion. The newly created suggestion domain object.
     """
     if description is None:
         description = DEFAULT_SUGGESTION_THREAD_SUBJECT
@@ -97,6 +105,7 @@ def create_suggestion(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
         None, change, score_category, thread_id)
+    return get_suggestion_by_id(thread_id)
 
 
 def get_suggestion_from_model(suggestion_model):
@@ -198,11 +207,13 @@ def _update_suggestion(suggestion):
     _update_suggestions([suggestion])
 
 
-def _update_suggestions(suggestions):
+def _update_suggestions(suggestions, update_last_updated_time=True):
     """Updates the given suggestions.
 
     Args:
         suggestions: list(Suggestion). The suggestions to be updated.
+        update_last_updated_time: bool. Whether to update the last_updated
+            field of the suggestions.
     """
     suggestion_ids = []
 
@@ -222,7 +233,8 @@ def _update_suggestions(suggestions):
         suggestion_model.score_category = suggestion.score_category
 
     suggestion_models.GeneralSuggestionModel.put_multi(
-        suggestion_models_to_update)
+        suggestion_models_to_update,
+        update_last_updated_time=update_last_updated_time)
 
 
 def mark_review_completed(suggestion, status, reviewer_id):
@@ -720,3 +732,104 @@ def get_voiceover_application(voiceover_application_id):
         voiceover_application_model.filename,
         voiceover_application_model.content,
         voiceover_application_model.rejection_message)
+
+
+def update_suggestions_with_math_svgs(suggestions_raw_latex_to_image_data_dict):
+    """Saves an SVG for each LaTeX string without an SVG in suggestions
+    and updates the suggestions.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    suggestions have a valid math SVG stored in the datastore.
+
+    Args:
+        suggestions_raw_latex_to_image_data_dict:
+            dict(str, dict(str, LatexStringSvgImageData)). The dictionary
+            having the key as a suggestion ID each value as dict with key as
+            a LaTeX string and its value as LatexStringSvgImageData domain
+            object.
+
+    Raises:
+        Exception. If any of the SVG images provided fail validation.
+    """
+    suggestions_to_update = []
+    suggestion_ids = suggestions_raw_latex_to_image_data_dict.keys()
+    suggestion_models_to_update = (
+        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids))
+
+    for suggestion_model in suggestion_models_to_update:
+        suggestion = get_suggestion_from_model(suggestion_model)
+        suggestion_id = suggestion.suggestion_id
+        exp_id = suggestion.target_id
+        raw_latex_to_image_data_dict = (
+            suggestions_raw_latex_to_image_data_dict[suggestion_id])
+        add_svg_filenames_for_latex_strings_in_html_string = (
+            functools.partial(
+                html_validation_service.
+                add_svg_filenames_for_latex_strings_in_html_string,
+                raw_latex_to_image_data_dict))
+        suggestion.convert_html_in_suggestion_change(
+            add_svg_filenames_for_latex_strings_in_html_string)
+        updated_html_string = ''.join(suggestion.get_all_html_content_strings())
+        filenames_mapping = (
+            html_validation_service.
+            extract_svg_filename_latex_mapping_in_math_rte_components(
+                updated_html_string))
+
+        for filename, raw_latex in filenames_mapping:
+            # Some new filenames may already have the images saved from the math
+            # rich-text editor, for these files we don't need to save the image
+            # again.
+            if raw_latex in raw_latex_to_image_data_dict.keys():
+                image_file = raw_latex_to_image_data_dict[raw_latex].raw_image
+                image_validation_error_message_suffix = (
+                    'SVG image provided for latex %s failed validation' % (
+                        raw_latex))
+                try:
+                    file_format = (
+                        image_validation_services.validate_image_and_filename(
+                            image_file, filename))
+                except utils.ValidationError as e:
+                    e = '%s %s' % (e, image_validation_error_message_suffix)
+                    raise Exception(e)
+                image_is_compressible = (
+                    file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+                fs_services.save_original_and_compressed_versions_of_image(
+                    filename, feconf.ENTITY_TYPE_EXPLORATION, exp_id,
+                    image_file, 'image', image_is_compressible)
+
+        suggestions_to_update.append(suggestion)
+    _update_suggestions(suggestions_to_update, update_last_updated_time=False)
+
+
+def get_latex_strings_to_suggestion_ids_mapping():
+    """Returns a batch of LaTeX strings from suggestion which have LaTeX
+    strings without SVGs.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    suggestions have a valid math SVG stored in the datastore.
+
+    Returns:
+        dict(str, list(str)). The dict having each key as an suggestion iD and
+        value as a list of LaTeX string. Each list has all the LaTeX
+        strings in that particular suggestion.
+    """
+
+    exploration_suggestion_models = (
+        suggestion_models.GeneralSuggestionModel.get_all().filter(
+            suggestion_models.GeneralSuggestionModel.
+            target_type == suggestion_models.TARGET_TYPE_EXPLORATION).filter(
+                suggestion_models.GeneralSuggestionModel.
+                suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)))
+    suggestion_id_to_latex_strings = {}
+    for model in exploration_suggestion_models:
+        suggestion = get_suggestion_from_model(model)
+        html_string = ''.join(suggestion.get_all_html_content_strings())
+        latex_strings_without_svg = (
+            html_validation_service.
+            get_latex_strings_without_svg_from_html(html_string))
+        if len(latex_strings_without_svg) > 0:
+            suggestion_id_to_latex_strings[suggestion.suggestion_id] = (
+                latex_strings_without_svg)
+
+    return suggestion_id_to_latex_strings

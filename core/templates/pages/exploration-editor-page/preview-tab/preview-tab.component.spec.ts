@@ -19,6 +19,10 @@
 import { TestBed } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { EventEmitter } from '@angular/core';
+
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Preview Tab Component', function() {
   var ctrl = null;
@@ -32,12 +36,15 @@ describe('Preview Tab Component', function() {
   var explorationEngineService = null;
   var explorationInitStateNameService = null;
   var explorationFeaturesService = null;
+  var explorationPlayerStateService = null;
   var learnerParamsService = null;
   var numberAttemptsService = null;
   var routerService = null;
   var stateEditorService = null;
   var paramChangeObjectFactory = null;
   var parameterMetadataService = null;
+  var mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
+  var mockPlayerStateChangeEventEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var stateName = 'State1';
@@ -56,7 +63,12 @@ describe('Preview Tab Component', function() {
     paramName: 'paramName2'
   }];
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(function() {
     paramChangeObjectFactory = TestBed.get(ParamChangeObjectFactory);
@@ -81,18 +93,24 @@ describe('Preview Tab Component', function() {
         'EditableExplorationBackendApiService');
       explorationEngineService = $injector.get('ExplorationEngineService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
+      explorationPlayerStateService = $injector.get(
+        'ExplorationPlayerStateService');
       learnerParamsService = $injector.get('LearnerParamsService');
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
       stateEditorService = $injector.get('StateEditorService');
-
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
       spyOn(parameterMetadataService, 'getUnsetParametersInfo').and
         .returnValue(parameters);
       spyOn(editableExplorationBackendApiService, 'fetchApplyDraftExploration')
         .and.returnValue($q.resolve(exploration));
-
+      spyOnProperty(explorationEngineService,
+        'onUpdateActiveStateIfInEditor').and.returnValue(
+        mockUpdateActiveStateIfInEditorEventEmitter);
+      spyOnProperty(explorationPlayerStateService,
+        'onPlayerStateChange').and.returnValue(
+        mockPlayerStateChangeEventEmitter);
       $scope = $rootScope.$new();
       ctrl = $componentController('previewTab', {
         $scope: $scope,
@@ -100,6 +118,10 @@ describe('Preview Tab Component', function() {
       });
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should evaluate ctrl properties after its initialization', function() {
       // Get data from exploration data service.
@@ -112,7 +134,8 @@ describe('Preview Tab Component', function() {
     it('should set active state name when broadcasting' +
       ' updateActiveStateIfInEditor', function() {
       spyOn(stateEditorService, 'setActiveStateName');
-      $rootScope.$broadcast('updateActiveStateIfInEditor', 'State2');
+
+      mockUpdateActiveStateIfInEditorEventEmitter.emit('State2');
 
       expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
         'State2');
@@ -123,7 +146,7 @@ describe('Preview Tab Component', function() {
         spyOn(learnerParamsService, 'getAllParams').and.returnValue({
           foo: []
         });
-        $rootScope.$broadcast('playerStateChange');
+        mockPlayerStateChangeEventEmitter.emit();
 
         expect(ctrl.allParams).toEqual({
           foo: []
@@ -138,8 +161,7 @@ describe('Preview Tab Component', function() {
       spyOn(learnerParamsService, 'getAllParams').and.returnValue({
         foo: []
       });
-
-      $rootScope.$broadcast('playerStateChange');
+      mockPlayerStateChangeEventEmitter.emit();
       expect(ctrl.showParameterSummary()).toBe(true);
     });
 

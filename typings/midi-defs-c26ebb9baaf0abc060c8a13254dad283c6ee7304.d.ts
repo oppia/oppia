@@ -67,7 +67,7 @@ interface MidiWebAudio {
     newCtx: Object, onload: Function, onprogress: Function,
     onerror: Function) => void;
   pitchBend: (channel: number, program: Object, delay: number) => void;
-  setEffects: (list: Array<Object>) => void;
+  setEffects: (list: Object[]) => void;
   stopAllNotes: () => void;
   programChange: (channel: number, program: Object) => void;
   send: (data: Object, delay: number) => void;
@@ -106,7 +106,7 @@ interface MidiNoteToKey {
 interface MIDI {
   audioBuffers: Object;
   AudioTag: MidiAudioTag;
-  channels: Array<Object>;
+  channels: Object[];
   GM: Object;
   keyToNote: MidiKeyToNote;
   noteToKey: MidiNoteToKey;
@@ -138,8 +138,8 @@ interface MIDI {
     onerror: Function) => void;
   setController: (
     channelId: number, type: Object, value: Object, delay: number) => void;
-  setDefaultPlugin: (midi: Obejct) => void;
-  setEffects: (list: Array<Object>) => void;
+  setDefaultPlugin: (midi: Object) => void;
+  setEffects: (list: Object[]) => void;
   setInstrument: (
     channelId: number, program: Object, dealy: number) => NodeJS.Timeout;
   setMono: (

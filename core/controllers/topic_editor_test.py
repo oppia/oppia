@@ -181,7 +181,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'title': 'Story title',
             'description': 'Story Description',
             'filename': 'test_svg.svg',
-            'thumbnailBgColor': '#F8BF74'
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'story-frag-one'
         }
 
         with python_utils.open_file(
@@ -207,7 +208,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'title': 'Story title',
             'description': 'Story Description',
             'filename': 'cafe.flac',
-            'thumbnailBgColor': '#F8BF74'
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'story-frag-two'
         }
 
         with python_utils.open_file(
@@ -463,6 +465,29 @@ class TopicEditorTests(
                 topic_services.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
+
+    def test_editable_topic_handler_put_fails_with_long_commit_message(self):
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+            'topic_and_subtopic_page_change_dicts': [{
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 0
+            }]
+        }
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Commit messages must be at most 1000 characters long.')
 
     def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
         change_cmd = {

@@ -16,8 +16,6 @@
  * @fileoverview Directives required in library.
  */
 
-// Jquery needs to be loaded before anything else to make angular js work.
-require('third-party-imports/jquery.import');
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/library-page/library-page.module.ts');
@@ -26,5 +24,5 @@ require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
 require('pages/library-page/library-page.directive.ts');
-require('pages/library-page/library-footer/library-footer.directive.ts');
+require('pages/library-page/library-footer/library-footer.component.ts');
 require('pages/library-page/search-bar/search-bar.directive.ts');

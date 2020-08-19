@@ -27,10 +27,12 @@ import inspect
 import itertools
 import json
 import os
+import time
 import unittest
 
 from constants import constants
 from core.controllers import base
+from core.domain import caching_domain
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -68,6 +70,7 @@ import webtest
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
 email_services = models.Registry.import_email_services()
+memory_cache_services = models.Registry.import_cache_services()
 
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
@@ -163,6 +166,83 @@ def check_image_png_or_webp(image_string):
             image_string.startswith('data:image/webp')):
         return True
     return False
+
+
+class MemoryCacheServicesStub(python_utils.OBJECT):
+    """The stub class that mocks the API functionality offered by the platform
+    layer, namely the platform.cache cache services API.
+    """
+
+    cache_dict = collections.defaultdict()
+
+    def get_memory_cache_stats(self):
+        """Returns a mock profile of the cache dictionary. This mock does not
+        have the functionality to test for peak memory usage and total memory
+        usage so the values for those attributes will be 0.
+
+        Returns:
+            MemoryCacheStats. MemoryCacheStats object containing the total
+            number of keys in the cache dictionary.
+        """
+        memory_stats = caching_domain.MemoryCacheStats(
+            0,
+            0,
+            len(self.cache_dict))
+
+        return memory_stats
+
+    def flush_cache(self):
+        """Wipes the cache dictionary clean."""
+        self.cache_dict = collections.defaultdict()
+
+    def get_multi(self, keys):
+        """Looks up a list of keys in cache dictionary.
+
+        Args:
+            keys: list(str). A list of keys (strings) to look up.
+
+        Returns:
+            list(str). A list of values in the cache dictionary corresponding to
+            the keys that are passed in.
+        """
+        assert isinstance(keys, list)
+        cache_list = [
+            (self.cache_dict[key] if key in self.cache_dict else None)
+            for key in keys]
+        return cache_list
+
+    def set_multi(self, key_value_mapping):
+        """Sets multiple keys' values at once in the cache dictionary.
+
+        Args:
+            key_value_mapping: dict(str, str). Both the key and value are
+                strings. The value can either be a primitive binary-safe string
+                or the JSON-encoded string version of the object.
+
+        Returns:
+            bool. Whether the set action succeeded.
+        """
+        assert isinstance(key_value_mapping, dict)
+        for key, value in key_value_mapping.items():
+            self.cache_dict[key] = value
+        return True
+
+    def delete_multi(self, keys):
+        """Deletes multiple keys in the cache dictionary.
+
+        Args:
+            keys: list(str). The keys (strings) to delete.
+
+        Returns:
+            int. Number of successfully deleted keys.
+        """
+        number_of_deleted_keys = 0
+        for key in keys:
+            assert isinstance(key, python_utils.BASESTRING)
+            if key in self.cache_dict:
+                del self.cache_dict[key]
+                number_of_deleted_keys += 1
+        return number_of_deleted_keys
 
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
@@ -389,7 +469,6 @@ class TestBase(unittest.TestCase):
             'param_changes': []
         }
     }
-
 
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
@@ -1356,8 +1435,9 @@ tags: []
         )
         exp_summary_model.put()
 
-    def save_new_exp_with_states_schema_v34(self, exp_id, user_id, states_dict):
-        """Saves a new default exploration with a default version 34 states
+    def save_new_exp_with_custom_states_schema_version(
+            self, exp_id, user_id, states_dict, version):
+        """Saves a new default exploration with the given version of states
         dictionary.
 
         This function should only be used for creating explorations in tests
@@ -1373,6 +1453,7 @@ tags: []
             exp_id: str. The exploration ID.
             user_id: str. The user_id of the creator.
             states_dict: dict. The dict representation of all the states.
+            version: int. Custom states schema version.
         """
         exp_model = exp_models.ExplorationModel(
             id=exp_id,
@@ -1383,7 +1464,7 @@ tags: []
             tags=[],
             blurb='',
             author_notes='',
-            states_schema_version=34,
+            states_schema_version=version,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=states_dict,
             param_specs={},
@@ -1606,7 +1687,8 @@ tags: []
             self, story_id, thumbnail_filename, thumbnail_bg_color,
             owner_id, title, description,
             notes, corresponding_topic_id,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='story-frag'):
         """Saves a new story with a default version 1 story contents
         data dictionary.
 
@@ -1633,6 +1715,7 @@ tags: []
                 belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
+            url_fragment: str. The URL fragment for the story.
         """
         story_model = story_models.StoryModel(
             id=story_id,
@@ -1644,7 +1727,8 @@ tags: []
             story_contents_schema_version=1,
             notes=notes,
             corresponding_topic_id=corresponding_topic_id,
-            story_contents=self.VERSION_1_STORY_CONTENTS_DICT
+            story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
+            url_fragment=url_fragment
         )
         commit_message = (
             'New story created with title \'%s\'.' % title)
@@ -2213,6 +2297,11 @@ tags: []
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
+    # We can't instantiate the stub in setUp because the overrided
+    # method run() executes before setUp() and run() requires the memory
+    # cache stub.
+    memory_cache_services_stub = MemoryCacheServicesStub()
+
     def _delete_all_models(self):
         """Deletes all models from the NDB datastore."""
         from google.appengine.ext import ndb
@@ -2220,6 +2309,7 @@ class AppEngineTestBase(TestBase):
 
     def setUp(self):
         empty_environ()
+        self.memory_cache_services_stub.flush_cache()
 
         from google.appengine.datastore import datastore_stub_util
         from google.appengine.ext import testbed
@@ -2237,25 +2327,70 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_app_identity_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
+        self.testbed.init_blobstore_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_files_stub()
-        self.testbed.init_blobstore_stub()
         self.testbed.init_search_stub()
-        self.testbed.init_images_stub()
 
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
 
+        # Set the timezone to be UTC.
+        # Retrieve the current timezone, accounting for daylight savings
+        # as necessary.
+        self.initial_timezone = time.tzname[time.daylight]
+        os.environ['TZ'] = 'UTC'
+        time.tzset()
+
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
         self.signup_superadmin_user()
 
+    def run(self, result=None):
+        """Adds a context switch to all test classes. This context switch occurs
+        to allow all test classes to automatically have access to a mock version
+        of the cache services functionality. All test classes that inherit
+        AppEngineTestBase will use a mocked version of the platform.cache cache
+        services API that can be found in the MemoryCacheServicesStub class.
+
+        Args:
+            result: TestResult|None. Optional result object that, if provided,
+                will collect the results of the test and returned to the caller
+                of run(). If None is provided, a default result object is
+                created and used. More details can be found here:
+                https://docs.python.org/3/library/unittest.html#unittest.
+                TestCase.run.
+        """
+        swap_flush_cache = self.swap(
+            memory_cache_services, 'flush_cache',
+            self.memory_cache_services_stub.flush_cache)
+        swap_get_multi = self.swap(
+            memory_cache_services, 'get_multi',
+            self.memory_cache_services_stub.get_multi)
+        swap_set_multi = self.swap(
+            memory_cache_services, 'set_multi',
+            self.memory_cache_services_stub.set_multi)
+        swap_get_memory_cache_stats = self.swap(
+            memory_cache_services, 'get_memory_cache_stats',
+            self.memory_cache_services_stub.get_memory_cache_stats)
+        swap_delete_multi = self.swap(
+            memory_cache_services, 'delete_multi',
+            self.memory_cache_services_stub.delete_multi)
+        with swap_flush_cache, swap_get_multi, swap_set_multi:
+            with swap_get_memory_cache_stats, swap_delete_multi:
+                super(AppEngineTestBase, self).run(result=result)
+
     def tearDown(self):
         self.logout()
         self._delete_all_models()
+
+        # Set the timezone back to the original timezone.
+        os.environ['TZ'] = self.initial_timezone
+        time.tzset()
+
         self.testbed.deactivate()
 
     def _get_all_queue_names(self):

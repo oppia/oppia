@@ -151,7 +151,6 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
-            $scope.$broadcast('saveOutcomeFeedbackDetails');
             ctrl.feedbackEditorIsOpen = false;
             var contentHasChanged = (
               ctrl.savedOutcome.feedback.getHtml() !==
@@ -176,7 +175,7 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.saveThisDestination = function() {
-            $scope.$broadcast('saveOutcomeDestDetails');
+            StateEditorService.onSaveOutcomeDestDetails.emit();
             ctrl.destinationEditorIsOpen = false;
             ctrl.savedOutcome.dest = angular.copy(ctrl.outcome.dest);
             if (!ctrl.isSelfLoop(ctrl.outcome)) {

@@ -25,6 +25,8 @@ require(
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/exploration-improvements.service.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$q', '$rootScope', '$timeout', '$window',
   'ExplorationImprovementsService', 'ExplorationInitStateNameService',
@@ -64,6 +66,15 @@ angular.module('oppia').factory('RouterService', [
 
     var activeTabName = TABS.MAIN.name;
 
+    /** @private */
+    var refreshSettingsTabEventEmitter = new EventEmitter();
+    /** @private */
+    var refreshStatisticsTabEventEmitter = new EventEmitter();
+    /** @private */
+    var refreshTranslationTabEventEmitter = new EventEmitter();
+    /** @private */
+    var refreshVersionHistoryEventEmitter = new EventEmitter();
+
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
     $rootScope.$watch(() => $location.path(), (newPath, oldPath) => {
@@ -90,7 +101,7 @@ angular.module('oppia').factory('RouterService', [
               StateEditorService.setActiveStateName(
                 ExplorationInitStateNameService.savedMemento);
             }
-            $rootScope.$broadcast('refreshTranslationTab');
+            refreshTranslationTabEventEmitter.emit();
           }
         }, 300);
       } else if (newPath.indexOf(TABS.PREVIEW.path) === 0) {
@@ -98,10 +109,10 @@ angular.module('oppia').factory('RouterService', [
         _doNavigationWithState(newPath, SLUG_PREVIEW);
       } else if (newPath === TABS.SETTINGS.path) {
         activeTabName = TABS.SETTINGS.name;
-        $rootScope.$broadcast('refreshSettingsTab');
+        refreshSettingsTabEventEmitter.emit();
       } else if (newPath === TABS.STATS.path) {
         activeTabName = TABS.STATS.name;
-        $rootScope.$broadcast('refreshStatisticsTab');
+        refreshStatisticsTabEventEmitter.emit();
       } else if (newPath === TABS.IMPROVEMENTS.path) {
         activeTabName = TABS.IMPROVEMENTS.name;
         $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
@@ -114,7 +125,7 @@ angular.module('oppia').factory('RouterService', [
           });
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
-        $rootScope.$broadcast('refreshVersionHistory', {
+        refreshVersionHistoryEventEmitter.emit({
           forceRefresh: false
         });
         activeTabName = TABS.HISTORY.name;
@@ -260,6 +271,18 @@ angular.module('oppia').factory('RouterService', [
         _savePendingChanges();
         $location.path(TABS.FEEDBACK.path);
       },
+      get onRefreshSettingsTab() {
+        return refreshSettingsTabEventEmitter;
+      },
+      get onRefreshStatisticsTab() {
+        return refreshStatisticsTabEventEmitter;
+      },
+      get onRefreshTranslationTab() {
+        return refreshTranslationTabEventEmitter;
+      },
+      get onRefreshVersionHistory() {
+        return refreshVersionHistoryEventEmitter;
+      }
     };
 
     return RouterService;

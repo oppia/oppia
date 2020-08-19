@@ -16,12 +16,17 @@
  * @fileoverview Directive for the translation opportunities.
  */
 
+import { Subscription } from 'rxjs';
+
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
+require(
+  'pages/contributor-dashboard-page/login-required-message/' +
+  'login-required-message.directive.ts');
 require(
   'pages/contributor-dashboard-page/modal-templates/' +
   'translation-modal.controller.ts');
@@ -54,6 +59,7 @@ angular.module('oppia').directive(
             ContributionOpportunitiesService, TranslateTextService,
             TranslationLanguageService, UserService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var userIsLoggedIn = false;
           var getOpportunitySummary = function(expId) {
             for (var index in ctrl.opportunities) {
@@ -102,6 +108,10 @@ angular.module('oppia').directive(
           };
 
           ctrl.onClickButton = function(expId) {
+            if (!userIsLoggedIn) {
+              ContributionOpportunitiesService.showRequiresLoginModal();
+              return;
+            }
             var opportunity = getOpportunitySummary(expId);
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -112,9 +122,6 @@ angular.module('oppia').directive(
               resolve: {
                 opportunity: function() {
                   return opportunity;
-                },
-                userIsLoggedIn: function() {
-                  return userIsLoggedIn;
                 }
               },
               controller: 'TranslationModalController'
@@ -125,14 +132,18 @@ angular.module('oppia').directive(
             });
           };
           ctrl.$onInit = function() {
-            $scope.$on('activeLanguageChanged', function() {
-              ctrl.opportunities = [];
-              ctrl.opportunitiesAreLoading = true;
-              ctrl.moreOpportunitiesAvailable = true;
-              ContributionOpportunitiesService.getTranslationOpportunities(
-                TranslationLanguageService.getActiveLanguageCode(),
-                updateWithNewOpportunities);
-            });
+            ctrl.directiveSubscriptions.add(
+              TranslationLanguageService.onActiveLanguageChanged.subscribe(
+                () => {
+                  ctrl.opportunities = [];
+                  ctrl.opportunitiesAreLoading = true;
+                  ctrl.moreOpportunitiesAvailable = true;
+                  ContributionOpportunitiesService.getTranslationOpportunities(
+                    TranslationLanguageService.getActiveLanguageCode(),
+                    updateWithNewOpportunities);
+                }
+              )
+            );
             ctrl.opportunities = [];
             ctrl.opportunitiesAreLoading = true;
             ctrl.moreOpportunitiesAvailable = true;
@@ -144,6 +155,9 @@ angular.module('oppia').directive(
             ContributionOpportunitiesService.getTranslationOpportunities(
               TranslationLanguageService.getActiveLanguageCode(),
               updateWithNewOpportunities);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

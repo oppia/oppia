@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 import python_utils
+import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -28,7 +29,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
 
     def __init__(
             self, user_id, email, deletion_complete, exploration_ids,
-            collection_ids, story_mappings):
+            collection_ids, activity_mappings):
         """Constructs a PendingDeletionRequest domain object.
 
         Args:
@@ -39,15 +40,15 @@ class PendingDeletionRequest(python_utils.OBJECT):
                 deleted and need to be hard-deleted.
             collection_ids: list(str). Private collections that are marked as
                 deleted and need to be hard-deleted.
-            story_mappings: dict(str, str). Mapping between the story IDs and
-                pseudonymized user IDs.
+            activity_mappings: dict(str, str). Mapping between the activity IDs
+                and pseudonymized user IDs.
         """
         self.user_id = user_id
         self.email = email
         self.deletion_complete = deletion_complete
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
-        self.story_mappings = story_mappings
+        self.activity_mappings = activity_mappings
 
     @classmethod
     def create_default(cls, user_id, email, exploration_ids, collection_ids):
@@ -67,4 +68,15 @@ class PendingDeletionRequest(python_utils.OBJECT):
             PendingDeletionRequest. The default pending deletion request
             domain object.
         """
-        return cls(user_id, email, False, exploration_ids, collection_ids, None)
+        return cls(user_id, email, False, exploration_ids, collection_ids, {})
+
+    def validate(self):
+        """Checks that the domain object is valid.
+
+        Raises:
+            ValidationError. The field activity_mappings contains wrong key.
+        """
+        for key in self.activity_mappings.keys():
+            if key not in [name for name in models.NAMES.__dict__]:
+                raise utils.ValidationError(
+                    'activity_mappings contain wrong key')

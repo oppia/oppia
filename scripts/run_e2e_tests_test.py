@@ -28,6 +28,7 @@ import sys
 import time
 
 from core.tests import test_utils
+import feconf
 import python_utils
 
 from scripts import build
@@ -95,6 +96,13 @@ class MockProcessClass(python_utils.OBJECT):
         self.signals_received.append(signal_number)
         if signal_number == signal.SIGINT and self.clean_shutdown:
             self.poll_return = False
+
+    def wait(self):
+        """Wait for the process completion.
+
+        Mocks the process waiting for completion before it continues execution.
+        """
+        return
 
 
 class RunE2ETestsTests(test_utils.GenericTestBase):
@@ -195,7 +203,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
         google_app_engine_path = '%s/' % (
-            common.GOOGLE_APP_ENGINE_HOME)
+            common.GOOGLE_APP_ENGINE_SDK_HOME)
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [
@@ -248,8 +256,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
-        google_app_engine_path = '%s/' % (
-            common.GOOGLE_APP_ENGINE_HOME)
+        google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [
@@ -270,7 +277,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_windows_os', mock_is_windows_os)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
-        with swap_kill_process, subprocess_swap, swap_is_windows:
+        windows_exception = self.assertRaisesRegexp(
+            Exception, 'The redis command line interface is not installed '
+            'because your machine is on the Windows operating system. There is '
+            'no redis server to shutdown.'
+        )
+        with swap_kill_process, subprocess_swap, swap_is_windows, (
+            windows_exception):
             with swap_set_constants_to_default:
                 run_e2e_tests.cleanup()
 
@@ -555,6 +568,43 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.build_js_files(
                         False, deparallelize_terser=True)
 
+    def test_build_js_files_in_prod_mode_with_source_maps(self):
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', self.mock_run_cmd, called=False)
+
+        build_main_swap = self.swap_with_checks(
+            build, 'main', self.mock_build_main,
+            expected_kwargs=[{'args': [
+                '--prod_env', '--source_maps']}])
+
+        with self.constant_file_path_swap:
+            with self.node_bin_path_swap, self.webpack_bin_path_swap:
+                with build_main_swap, run_cmd_swap:
+                    run_e2e_tests.build_js_files(
+                        False, source_maps=True)
+
+    def test_webpack_compilation_in_dev_mode_with_source_maps(self):
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', self.mock_run_cmd, called=False)
+
+        build_main_swap = self.swap_with_checks(
+            build, 'main', self.mock_build_main,
+            expected_kwargs=[{'args': []}])
+
+        def mock_run_webpack_compilation(source_maps=False):
+            self.assertEqual(source_maps, True)
+
+        run_webpack_compilation_swap = self.swap(
+            run_e2e_tests, 'run_webpack_compilation',
+            mock_run_webpack_compilation)
+
+        with self.constant_file_path_swap:
+            with self.node_bin_path_swap, self.webpack_bin_path_swap:
+                with build_main_swap, run_cmd_swap:
+                    with run_webpack_compilation_swap:
+                        run_e2e_tests.build_js_files(
+                            True, source_maps=True)
+
     def test_tweak_webdriver_manager_on_x64_machine(self):
 
         def mock_is_windows():
@@ -737,7 +787,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
             '--clear_datastore=yes --dev_appserver_log_level=critical '
             '--log_level=critical --skip_sdk_update_check=true %s' % (
-                common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
+                common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
                 run_e2e_tests.GOOGLE_APP_ENGINE_PORT,
                 'app_dev.yaml'))
         popen_swap = self.popen_swap(
@@ -758,7 +808,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
             '--clear_datastore=yes --dev_appserver_log_level=critical '
             '--log_level=critical --skip_sdk_update_check=true %s' % (
-                common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
+                common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
                 run_e2e_tests.GOOGLE_APP_ENGINE_PORT,
                 'app.yaml'))
         popen_swap = self.popen_swap(
@@ -803,7 +853,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
+        def mock_build_js_files(
+                unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
             return
 
         def mock_start_webdriver_manager(unused_arg):
@@ -870,6 +921,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
+                (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
@@ -880,6 +932,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
+                ([
+                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    '--daemonize', 'yes'
+                ],),
                 ([
                     'python', '-m',
                     'scripts.run_portserver',
@@ -984,6 +1040,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
+                (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
@@ -994,6 +1051,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
+                ([
+                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    '--daemonize', 'yes'
+                ],),
                 ([
                     'python', '-m',
                     'scripts.run_portserver',
@@ -1084,7 +1145,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
+        def mock_build_js_files(
+                unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
             return
 
         def mock_start_webdriver_manager(unused_arg):
@@ -1151,6 +1213,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
+                (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
@@ -1161,6 +1224,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
+                ([
+                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    '--daemonize', 'yes'
+                ],),
                 ([
                     'python', '-m',
                     'scripts.run_portserver',
@@ -1202,7 +1269,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
+        def mock_build_js_files(
+                unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
             return
 
         def mock_start_webdriver_manager(unused_arg):
@@ -1269,6 +1337,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
+                (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
@@ -1279,6 +1348,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
+                ([
+                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    '--daemonize', 'yes'
+                ],),
                 ([
                     'python', '-m',
                     'scripts.run_portserver',

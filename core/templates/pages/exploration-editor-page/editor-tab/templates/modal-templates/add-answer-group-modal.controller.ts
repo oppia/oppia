@@ -87,8 +87,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     $scope.addAnswerGroupForm = {};
 
     $scope.saveResponse = function(reopen) {
-      $scope.$broadcast('saveOutcomeFeedbackDetails');
-      $scope.$broadcast('saveOutcomeDestDetails');
+      StateEditorService.onSaveOutcomeDestDetails.emit();
 
       EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
       // Close the modal and save it afterwards.

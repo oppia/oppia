@@ -72,7 +72,7 @@ export class InteractiveMapValidationService {
       this.getCustomizationArgsWarnings(customizationArgs));
 
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         if (rules[j].type === 'Within' ||
             rules[j].type === 'NotWithin') {

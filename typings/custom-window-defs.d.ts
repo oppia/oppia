@@ -26,5 +26,4 @@ interface Window {
     $: JQueryStatic;
     Base64Binary: Base64Binary;
     jQuery: JQueryStatic;
-    Headroom: Headroom;
 }

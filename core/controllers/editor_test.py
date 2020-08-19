@@ -144,7 +144,6 @@ class EditorTests(BaseEditorControllerTests):
         # by validating it.
         exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
 
-
     def test_that_default_exploration_cannot_be_published(self):
         """Test that publishing a default exploration raises an error
         due to failing strict validation.
@@ -1501,9 +1500,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # Check that collaborator can add a new state called 'State 4'.
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
-            add_url,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': exploration.version,
                 'commit_message': 'Added State 4',
@@ -1537,9 +1535,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # Check that collaborator2 can add a new state called 'State 5'.
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
-            add_url,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': exploration.version,
                 'commit_message': 'Added State 5',
@@ -1666,6 +1663,45 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             params={'v': 'invalid_version'}, expected_status_int=404)
         self.logout()
+
+    def test_put_with_long_commit_message_raises_error(self):
+        # Create several users.
+        self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+
+        # Owner creates exploration.
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+
+        csrf_token = self.get_new_csrf_token()
+
+        response_dict = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message':
+                    'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State 4'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 4',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response_dict['error'],
+            'Commit messages must be at most 1000 characters long.')
 
     def test_put_with_invalid_new_member_raises_error(self):
         self.login(self.OWNER_EMAIL)
@@ -2204,7 +2240,6 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         }
-
 
     def test_resolve_issue_handler(self):
         """Test that resolving an issue deletes associated playthroughs."""

@@ -15,10 +15,23 @@ indexes:
   - name: status
   - name: next_scheduled_check_time
 
-- kind: DeleteExpCopiesRealtimeModel
+- kind: CollectionRightsSnapshotMetadataModel
   properties:
-  - name: realtime_layer
-  - name: created_on
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: CollectionSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: ConfigPropertySnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
 
 - kind: ExpCopiesRealtimeModel
   properties:
@@ -92,6 +105,18 @@ indexes:
   properties:
   - name: deleted
   - name: status
+
+- kind: ExplorationRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: ExplorationSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
 
 - kind: FeedbackAnalyticsRealtimeModel
   properties:
@@ -174,6 +199,11 @@ indexes:
 
 - kind: JobModel
   properties:
+  - name: status
+  - name: next_scheduled_check_time
+
+- kind: JobModel
+  properties:
   - name: status_code
   - name: time_queued_msec
     direction: desc
@@ -210,6 +240,12 @@ indexes:
   - name: skill_difficulty
     direction: desc
 
+- kind: QuestionSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
 - kind: RecentUpdatesRealtimeModel
   properties:
   - name: realtime_layer
@@ -230,15 +266,45 @@ indexes:
   - name: deleted
   - name: created_on
 
+- kind: SkillSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
 - kind: StatisticsRealtimeModel
   properties:
   - name: realtime_layer
   - name: created_on
 
+- kind: StorySnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: SubtopicPageSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
 - kind: TaskEntryModel
   properties:
   - name: composite_entity_id
   - name: status
+
+- kind: TopicRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: TopicSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
 
 - kind: UserContributionScoringModel
   properties:
@@ -246,7 +312,7 @@ indexes:
   - name: user_id
   - name: score
 
-- kind: UserImpactRealtimeModel
+- kind: UserContributionScoringModel
   properties:
   - name: realtime_layer
   - name: created_on
