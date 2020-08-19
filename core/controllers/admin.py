@@ -256,25 +256,25 @@ class AdminHandler(base.BaseHandler):
                 commit_message = self.payload.get('commit_message')
                 if not isinstance(feature_name, python_utils.BASESTRING):
                     raise self.InvalidInputException(
-                        'feature_name should be string, got \'%s\'.' % (
+                        'feature_name should be string, received \'%s\'.' % (
                             feature_name))
                 elif not isinstance(commit_message, python_utils.BASESTRING):
                     raise self.InvalidInputException(
-                        'commit_message should be string, got \'%s\'.' % (
+                        'commit_message should be string, received \'%s\'.' % (
                             commit_message))
                 elif (not isinstance(new_rule_dicts, list) or not all(
                         [isinstance(rule_dict, dict)
                          for rule_dict in new_rule_dicts])):
                     raise self.InvalidInputException(
-                        'new_rules should be a list of dicts, got \'%s\'.' % (
-                            new_rule_dicts))
+                        'new_rules should be a list of dicts, received'
+                        ' \'%s\'.' % new_rule_dicts)
                 try:
                     feature_services.update_feature_flag_rules(
                         feature_name, self.user_id, commit_message,
                         new_rule_dicts)
-                except utils.ValidationError as e:
-                    raise self.InvalidInputException(e)
-                except feature_services.FeatureFlagNotFoundException as e:
+                except (
+                        utils.ValidationError,
+                        feature_services.FeatureFlagNotFoundException) as e:
                     raise self.InvalidInputException(e)
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '

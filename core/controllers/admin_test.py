@@ -912,7 +912,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
-            'feature_name should be string, got \'123\'.')
+            'feature_name should be string, received \'123\'.')
 
         self.logout()
 
@@ -933,7 +933,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
-            'commit_message should be string, got \'123\'.')
+            'commit_message should be string, received \'123\'.')
 
         self.logout()
 
@@ -953,7 +953,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
-            'new_rules should be a list of dicts, got \'{}\'.')
+            'new_rules should be a list of dicts, received \'{}\'.')
 
         self.logout()
 
@@ -974,7 +974,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
-            'new_rules should be a list of dicts, got \'[1, 2]\'.')
+            'new_rules should be a list of dicts, received \'[1, 2]\'.')
 
         self.logout()
 
