@@ -30,12 +30,28 @@ import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureDummyBackendApiService } from
   'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlatformParameterObjectFactory, FeatureStage, PlatformParameter } from
   'domain/platform_feature/platform-parameter-object.factory';
 import { PlatformParameterFilterType, ServerMode } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+
+let dummyFeatureStatus = false;
+const mockDummyFeatureStatus = (status: boolean) => dummyFeatureStatus = status;
+
+class MockPlatformFeatureService {
+  get featureSummary() {
+    return {
+      DummyFeature: {
+        get isEnabled() {
+          return dummyFeatureStatus;
+        }
+      }
+    };
+  }
+}
 
 describe('Admin page feature tab', function() {
   let component: AdminFeaturesTabComponent;
@@ -51,13 +67,18 @@ describe('Admin page feature tab', function() {
 
   let mockConfirmResult: (val: boolean) => void;
   let mockPromptResult: (msg: string) => void;
-  let mockDummyFeatureStatus: (status: boolean) => void;
 
   beforeEach(async(() => {
     TestBed
       .configureTestingModule({
         imports: [FormsModule, HttpClientTestingModule],
         declarations: [AdminFeaturesTabComponent],
+        providers: [
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService
+          }
+        ]
       })
       .compileComponents();
 
@@ -104,11 +125,6 @@ describe('Admin page feature tab', function() {
 
     updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
       .and.resolveTo(null);
-
-    let isDummyFeatureEnabled = false;
-    spyOnProperty(component, 'isDummyFeatureEnabled').and.callFake(
-      () => isDummyFeatureEnabled);
-    mockDummyFeatureStatus = status => isDummyFeatureEnabled = status;
 
     component.ngOnInit();
   }));
@@ -378,6 +394,18 @@ describe('Admin page feature tab', function() {
     );
   });
 
+  describe('.isDummyFeatureEnabled', () => {
+    it('should return true when dummy feature is enabled', () => {
+      mockDummyFeatureStatus(true);
+      expect(component.isDummyFeatureEnabled).toBeTrue();
+    });
+
+    it('should return false when dummy feature is disabled', () => {
+      mockDummyFeatureStatus(false);
+      expect(component.isDummyFeatureEnabled).toBeFalse();
+    });
+  });
+
   describe('.reloadDummyHandlerStatusAsync', () => {
     let dummyApiService: PlatformFeatureDummyBackendApiService;
 
@@ -392,6 +420,8 @@ describe('Admin page feature tab', function() {
 
     it('should not request dummy handler if the dummy feature is disabled',
       fakeAsync(() => {
+        mockDummyFeatureStatus(false);
+
         component.reloadDummyHandlerStatusAsync();
 
         flushMicrotasks();
