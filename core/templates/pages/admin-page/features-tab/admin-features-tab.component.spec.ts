@@ -28,6 +28,8 @@ import { AdminTaskManagerService } from
   '../services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { PlatformParameterObjectFactory, FeatureStage, PlatformParameter } from
   'domain/platform_feature/platform-parameter-object.factory';
 import { PlatformParameterFilterType, ServerMode } from
@@ -49,6 +51,7 @@ describe('Admin page feature tab', function() {
 
   let mockConfirmResult: (val: boolean) => void;
   let mockPromptResult: (msg: string) => void;
+  let mockDummyFeatureStatus: (status: boolean) => void;
 
   beforeEach(async(() => {
     TestBed
@@ -101,6 +104,11 @@ describe('Admin page feature tab', function() {
 
     updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
       .and.resolveTo(null);
+
+    let isDummyFeatureEnabled = false;
+    spyOnProperty(component, 'isDummyFeatureEnabled').and.callFake(
+      () => isDummyFeatureEnabled);
+    mockDummyFeatureStatus = status => isDummyFeatureEnabled = status;
 
     component.ngOnInit();
   }));
@@ -367,6 +375,41 @@ describe('Admin page feature tab', function() {
         )
           .toEqual(['dev', 'test', 'prod']);
       }
+    );
+  });
+
+  describe('.reloadDummyHandlerStatusAsync', () => {
+    let dummyApiService: PlatformFeatureDummyBackendApiService;
+
+    let dummyApiSpy: jasmine.Spy;
+
+    beforeEach(() => {
+      dummyApiService = TestBed.get(PlatformFeatureDummyBackendApiService);
+
+      dummyApiSpy = spyOn(dummyApiService, 'isHandlerEnabled')
+        .and.resolveTo(null);
+    });
+
+    it('should not request dummy handler if the dummy feature is disabled',
+      fakeAsync(() => {
+        component.reloadDummyHandlerStatusAsync();
+
+        flushMicrotasks();
+
+        expect(dummyApiSpy).not.toHaveBeenCalled();
+      })
+    );
+
+    it('should request dummy handler if the dummy feature is enabled',
+      fakeAsync(() => {
+        mockDummyFeatureStatus(true);
+
+        component.reloadDummyHandlerStatusAsync();
+
+        flushMicrotasks();
+
+        expect(dummyApiSpy).toHaveBeenCalled();
+      })
     );
   });
 });
