@@ -32,7 +32,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('voiceoverOpportunities', {
   template: require(
     './../translation-opportunities/' +
-    'translation-opportunities.directive.html'),
+    'translation-opportunities.component.html'),
   controller: [
     '$rootScope', '$scope', 'ContributionOpportunitiesService',
     'TranslationLanguageService', function(
