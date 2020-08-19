@@ -44,8 +44,7 @@
 
 
 # Android team
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/domain/android_validation_constants*.py @seanlip
+/core/domain/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
@@ -143,8 +142,7 @@
 
 
 # Dev workflow team.
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/.circleci/ @vinitamurthi @U8NWXD @kevintab95
+/.circleci/ @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -154,8 +152,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/.travis.yml @vinitamurthi @U8NWXD @kevintab95
+/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -455,6 +452,7 @@
 /core/templates/services/interaction-rules-registry.service*.ts @bansalnitish
 /core/templates/services/interaction-specs.service*.ts @bansalnitish
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
+/redis.conf @seanlip
 /release_constants.py @ankita240796 @nithusha21 @DubeySandeep
 
 
@@ -554,6 +552,7 @@
 /core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
+/core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
@@ -606,6 +605,7 @@
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
+/core/templates/karma.module.ts @nishantwrp @vojtechjelinek
 /core/tests/protractor_utils/ @U8NWXD @kevintab95
 /core/tests/protractor_desktop/ @U8NWXD @kevintab95
 /core/tests/protractor/ @U8NWXD @kevintab95
@@ -642,5 +642,4 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/.github/workflows/ @vinitamurthi
+/.github/workflows/ @BenHenning @vinitamurthi
