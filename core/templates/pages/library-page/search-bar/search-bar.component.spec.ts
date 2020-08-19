@@ -18,6 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { EventEmitter } from '@angular/core';
+
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
