@@ -422,8 +422,10 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
 
     def test_increment_score(self):
         self.assertEqual(self.user_contribution_scoring.get_score(), 0)
+
         self.user_contribution_scoring.increment_score(4)
         self.assertEqual(self.user_contribution_scoring.get_score(), 4)
+
         self.user_contribution_scoring.increment_score(-3)
         self.assertEqual(self.user_contribution_scoring.get_score(), 1)
 
@@ -434,12 +436,15 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
 
         self.user_contribution_scoring.increment_score(
             feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+
         self.assertTrue(
             self.user_contribution_scoring.user_can_review_the_category())
 
     def test_mark_email_as_sent(self):
         self.assertFalse(self.user_contribution_scoring.email_has_been_sent())
+
         self.user_contribution_scoring.mark_email_as_sent()
+
         self.assertTrue(self.user_contribution_scoring.email_has_been_sent())
 
 

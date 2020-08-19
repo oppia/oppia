@@ -1996,8 +1996,10 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             user_domain.FullyQualifiedUserScoreIdentifier(
                 'user1', 'category1')
         ]
+
         user_models.UserContributionScoringModel.create_multi(
             user_score_identifiers, 1)
+
         user_score_models = (
             user_models.UserContributionScoringModel.get_by_score_identifiers(
                 user_score_identifiers)
@@ -2019,6 +2021,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             user_domain.FullyQualifiedUserScoreIdentifier(
                 'user2', 'category2')
         ]
+
         user_models.UserContributionScoringModel.create_multi(
             user_score_identifiers, 1)
 
@@ -2089,6 +2092,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         score_models = (
             user_models.UserContributionScoringModel
             .get_all_scores_of_user('user1'))
+
         self.assertEqual(len(score_models), 3)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
             'category1.user1'), score_models)

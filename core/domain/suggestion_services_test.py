@@ -332,7 +332,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'target_id', self.target_id)])[0]
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
-        # Needed to create a user scoring domain object to verify that the
+        # Create a user scoring domain object to verify that the
         # score and has_email_been_sent fields have changed after the
         # suggestion has been accepted.
         user_scoring = suggestion_services.create_new_user_scoring(
@@ -375,7 +375,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.mock_create_suggestion(self.target_id)
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
-        # Needed to create a user scoring domain object to verify the score and
+        # Create a user scoring domain object to verify the score and
         # that the has_email_been_sent_to_user field does not change after the
         # suggestion is accepted.
         user_scoring = suggestion_services.create_new_user_scoring(
@@ -1156,6 +1156,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         ]
         suggestion_services.create_new_user_scorings(
             user_score_identifiers_small_score, 5)
+
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -1183,6 +1184,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_5')
+
         self.assertEqual(len(
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user('user1')), 3)
