@@ -2223,6 +2223,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
     USER_1_EMAIL = 'email@email.com'
+    USER_1_ROLE = feconf.ROLE_ID_LEARNER
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2231,6 +2232,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         user_models.PendingDeletionRequestModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
+            role=self.USER_1_ROLE,
             exploration_ids=[],
             collection_ids=[],
         ).put()

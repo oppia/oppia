@@ -58,11 +58,13 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         super(WipeoutServiceHelpersTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.role = user_services.get_user_settings(self.user_1_id).role
 
     def test_gets_pending_deletion_request(self):
         wipeout_service.save_pending_deletion_requests(
             [wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, ['exp1', 'exp2'], ['col1']
+                self.user_1_id, self.USER_1_EMAIL, self.role, ['exp1', 'exp2'],
+                ['col1']
             )]
         )
 
@@ -79,7 +81,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
     def test_saves_pending_deletion_request_when_new(self):
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, [], []))
+                self.user_1_id, self.USER_1_EMAIL, self.role, [], []))
         wipeout_service.save_pending_deletion_requests(
             [pending_deletion_request])
 
@@ -100,6 +102,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel(
                 id=self.user_1_id,
                 email=self.USER_1_EMAIL,
+                role=self.role,
                 deletion_complete=False,
                 exploration_ids=['exp1', 'exp2'],
                 collection_ids=['col1'],
@@ -110,7 +113,10 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
 
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, ['exp1', 'exp2'], ['col1']))
+                self.user_1_id, self.USER_1_EMAIL, self.role, ['exp1', 'exp2'],
+                ['col1']
+            )
+        )
         pending_deletion_request.deletion_complete = True
         pending_deletion_request.activity_mappings = {
             'story': {'story_id': 'user_id'}
@@ -141,7 +147,8 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
     def test_deletes_pending_deletion_request(self):
         wipeout_service.save_pending_deletion_requests(
             [wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, ['exp1', 'exp2'], ['col1']
+                self.user_1_id, self.USER_1_EMAIL, self.role, ['exp1', 'exp2'],
+                ['col1']
             )]
         )
 

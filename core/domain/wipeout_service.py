@@ -40,6 +40,14 @@ transaction_services = models.Registry.import_transaction_services()
 
 MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 
+PROFILE_SPECIFIC_USER_MODELS = [
+    user_models.UserAuthDetailsModel, user_models.UserSkillMasteryModel,
+    user_models.StoryProgressModel, user_models.CollectionProgressModel,
+    user_models.LearnerPlaylistModel, user_models.ExpUserLastPlaythroughModel,
+    user_models.UserSettingsModel, user_models.CompletedActivitiesModel,
+    user_models.IncompleteActivitiesModel
+]
+
 
 def get_pending_deletion_request(user_id):
     """Return the pending deletion request.
@@ -55,6 +63,7 @@ def get_pending_deletion_request(user_id):
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
+        pending_deletion_request_model.role,
         pending_deletion_request_model.deletion_complete,
         pending_deletion_request_model.exploration_ids,
         pending_deletion_request_model.collection_ids,
@@ -81,6 +90,7 @@ def save_pending_deletion_requests(pending_deletion_requests):
         deletion_request.validate()
         deletion_request_dict = {
             'email': deletion_request.email,
+            'role': deletion_request.role,
             'deletion_complete': deletion_request.deletion_complete,
             'exploration_ids': deletion_request.exploration_ids,
             'collection_ids': deletion_request.collection_ids,
@@ -136,13 +146,13 @@ def pre_delete_user(user_id):
     profile_users_settings_list = user_services.get_users_settings(
         linked_profile_user_ids)
     for profile_user_settings in profile_users_settings_list:
-        email = profile_user_settings.email
         profile_id = profile_user_settings.user_id
         user_services.mark_user_for_deletion(profile_id)
         pending_deletion_requests.append(
             wipeout_domain.PendingDeletionRequest.create_default(
                 profile_id,
-                email,
+                profile_user_settings.email,
+                profile_user_settings.role,
                 [],
                 []
             )
@@ -183,6 +193,7 @@ def pre_delete_user(user_id):
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id,
             user_settings.email,
+            user_settings.role,
             explorations_to_be_deleted_ids,
             collections_to_be_deleted_ids
         )
@@ -192,33 +203,37 @@ def pre_delete_user(user_id):
 
 
 def delete_user(pending_deletion_request):
-    """Delete all the models for user specified in pending_deletion_request.
+    """Delete all the models for user specified in pending_deletion_request
+    on the basis of the user role specified in the request.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to delete or pseudonymize all the models.
     """
-    _delete_user_models(pending_deletion_request.user_id)
-    _hard_delete_explorations_and_collections(pending_deletion_request)
-    _delete_improvements_models(pending_deletion_request.user_id)
-    _delete_activity_models(
-        pending_deletion_request,
-        models.NAMES.question,
-        question_models.QuestionSnapshotMetadataModel,
-        question_models.QuestionCommitLogEntryModel,
-        'question_id')
-    _delete_activity_models(
-        pending_deletion_request,
-        models.NAMES.skill,
-        skill_models.SkillSnapshotMetadataModel,
-        skill_models.SkillCommitLogEntryModel,
-        'skill_id')
-    _delete_activity_models(
-        pending_deletion_request,
-        models.NAMES.story,
-        story_models.StorySnapshotMetadataModel,
-        story_models.StoryCommitLogEntryModel,
-        'story_id')
+    if pending_deletion_request.role == feconf.ROLE_ID_LEARNER:
+        _delete_profile_user_models(pending_deletion_request.user_id)
+    else:
+        _delete_full_user_models(pending_deletion_request.user_id)
+        _hard_delete_explorations_and_collections(pending_deletion_request)
+        _delete_improvements_models(pending_deletion_request.user_id)
+        _delete_activity_models(
+            pending_deletion_request,
+            models.NAMES.question,
+            question_models.QuestionSnapshotMetadataModel,
+            question_models.QuestionCommitLogEntryModel,
+            'question_id')
+        _delete_activity_models(
+            pending_deletion_request,
+            models.NAMES.skill,
+            skill_models.SkillSnapshotMetadataModel,
+            skill_models.SkillCommitLogEntryModel,
+            'skill_id')
+        _delete_activity_models(
+            pending_deletion_request,
+            models.NAMES.story,
+            story_models.StorySnapshotMetadataModel,
+            story_models.StoryCommitLogEntryModel,
+            'story_id')
 
 
 def verify_user_deleted(pending_deletion_request):
@@ -233,10 +248,14 @@ def verify_user_deleted(pending_deletion_request):
         bool. True if all the models were correctly deleted, False otherwise.
     """
     user_id = pending_deletion_request.user_id
-    return all((
-        _verify_basic_models_deleted(user_id),
-        _verify_activity_models_deleted(user_id),
-    ))
+    role = pending_deletion_request.role
+    if role == feconf.ROLE_ID_LEARNER:
+        return _verify_profile_related_models_are_deleted(user_id)
+    else:
+        return all((
+            _verify_basic_models_deleted(user_id),
+            _verify_activity_models_deleted(user_id),
+        ))
 
 
 def _hard_delete_explorations_and_collections(pending_deletion_request):
@@ -382,14 +401,27 @@ def _delete_activity_models(
                 pseudonymized_user_id)
 
 
-def _delete_user_models(user_id):
-    """Delete the user models for the user with user_id.
+def _delete_full_user_models(user_id):
+    """Delete the user models for the full user with the given user_id.
 
     Args:
-        user_id: str. The id of the user to be deleted.
+        user_id: str. The id of the full user to be deleted.
     """
     for model_class in models.Registry.get_storage_model_classes(
-            [models.NAMES.user]):
+            [models.NAMES.improvements, models.NAMES.user]):
+        if (model_class.get_deletion_policy() not in
+                [base_models.DELETION_POLICY.KEEP,
+                 base_models.DELETION_POLICY.NOT_APPLICABLE]):
+            model_class.apply_deletion_policy(user_id)
+
+
+def _delete_profile_user_models(user_id):
+    """Delete the user models for the profile user with the given user_id.
+
+    Args:
+        user_id: str. The id of the profile user to be deleted.
+    """
+    for model_class in PROFILE_SPECIFIC_USER_MODELS:
         if (model_class.get_deletion_policy() not in
                 [base_models.DELETION_POLICY.KEEP,
                  base_models.DELETION_POLICY.NOT_APPLICABLE]):
@@ -409,6 +441,26 @@ def _verify_basic_models_deleted(user_id):
     """
     for model_class in models.Registry.get_storage_model_classes(
             [models.NAMES.improvements, models.NAMES.user]):
+        if (model_class.get_deletion_policy() not in
+                [base_models.DELETION_POLICY.KEEP,
+                 base_models.DELETION_POLICY.NOT_APPLICABLE] and
+                model_class.has_reference_to_user_id(user_id)):
+            return False
+    return True
+
+
+def _verify_profile_related_models_are_deleted(user_id):
+    """Verify that all the models corresponding to the profile user with give
+    user_id were correctly deleted.
+
+    Args:
+        user_id: str. The id of the profile user to be deleted.
+
+    Returns:
+        bool. True if all the user models for given profile user_id were
+        correctly deleted, False otherwise.
+    """
+    for model_class in PROFILE_SPECIFIC_USER_MODELS:
         if (model_class.get_deletion_policy() not in
                 [base_models.DELETION_POLICY.KEEP,
                  base_models.DELETION_POLICY.NOT_APPLICABLE] and

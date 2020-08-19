@@ -2132,6 +2132,9 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     # The email of the user.
     email = ndb.StringProperty(required=True)
+    # Role of the user. Needed to decide which storage models have to be deleted
+    # for it.
+    role = ndb.StringProperty(required=True)
     # Whether the deletion is completed.
     deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
 
