@@ -36,7 +36,8 @@ describe('Translation Tab Busy Modal Controller', function() {
     });
   }));
 
-  it('should init the constiables', function() {
-    expect($scope.busyMessage).toBe(message);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.busyMessage).toBe(message);
+    });
 });

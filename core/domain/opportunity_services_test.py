@@ -313,7 +313,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 4)
+        self.assertEqual(translation_opportunities[0].content_count, 2)
 
         answer_group_dict = {
             'outcome': {
@@ -327,12 +327,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Contains': [{'x': 'Test'}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -400,7 +398,70 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 7)
+        self.assertEqual(translation_opportunities[0].content_count, 5)
+
+    def test_completing_translation_removes_language_from_incomplete_language_codes( # pylint: disable=line-too-long
+            self):
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'content',
+                'new_value': {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content',
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': '<p><strong>Test content</strong></p>',
+                'translation_html': '<p>Translated text</p>'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'End State',
+                'property_name': 'content',
+                'new_value': {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content',
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'state_name': 'End State',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': '<p><strong>Test content</strong></p>',
+                'translation_html': '<p>Translated text</p>'
+            }),
+        ]
+        exp_services.update_exploration(
+            self.owner_id, '0', change_list, 'commit message')
+
+        # get_translation_opportunities should no longer return the opportunity
+        # after translation completion.
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
 
     def test_create_new_skill_creates_new_skill_opportunity(self):
         skill_opportunities, _, _ = (
