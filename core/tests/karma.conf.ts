@@ -15,11 +15,8 @@ module.exports = function(config) {
       // Since jquery, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.5.1/jquery.min.js',
-      // Any of the *.module.ts files could be used here, we use
-      // about-page.module.ts because it is first alphabetically.
-      // The module needs to be loaded directly after jquery because
-      // it imports angular js.
-      'core/templates/pages/about-page/about-page.module.ts',
+      'third_party/static/angularjs-1.7.9/angular.js',
+      'core/templates/karma.module.ts',
       'third_party/static/angularjs-1.7.9/angular-mocks.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
       generatedJs,

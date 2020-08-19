@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import json
 import re
 
 from constants import constants
@@ -908,6 +909,94 @@ class Story(python_utils.OBJECT):
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'url_fragment': self.url_fragment
         }
+
+    @classmethod
+    def deserialize(cls, json_string):
+        """Returns a Story domain object decoded from a JSON string.
+
+        Args:
+            json_string: str. A JSON-encoded utf-8 string that can be
+                decoded into a dictionary representing a Story. Only call
+                on strings that were created using serialize().
+
+        Returns:
+            Story. The corresponding Story domain object.
+        """
+        story_dict = json.loads(json_string.decode('utf-8'))
+        created_on = (
+            utils.convert_string_to_naive_datetime_object(
+                story_dict['created_on'])
+            if 'created_on' in story_dict else None)
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                story_dict['last_updated'])
+            if 'last_updated' in story_dict else None)
+
+        story = cls.from_dict(
+            story_dict,
+            story_version=story_dict['version'],
+            story_created_on=created_on,
+            story_last_updated=last_updated)
+
+        return story
+
+    def serialize(self):
+        """Returns the object serialized as a JSON string.
+
+        Returns:
+            str. JSON-encoded utf-8 string encoding all of the information
+            composing the object.
+        """
+        story_dict = self.to_dict()
+        # The only reason we add the version parameter separately is that our
+        # yaml encoding/decoding of this object does not handle the version
+        # parameter.
+        # NOTE: If this changes in the future (i.e the version parameter is
+        # added as part of the yaml representation of this object), all YAML
+        # files must add a version parameter to their files with the correct
+        # version of this object. The line below must then be moved to
+        # to_dict().
+        story_dict['version'] = self.version
+
+        if self.created_on:
+            story_dict['created_on'] = utils.convert_naive_datetime_to_string(
+                self.created_on)
+
+        if self.last_updated:
+            story_dict['last_updated'] = utils.convert_naive_datetime_to_string(
+                self.last_updated)
+
+        return json.dumps(story_dict).encode('utf-8')
+
+    @classmethod
+    def from_dict(
+            cls, story_dict, story_version=0,
+            story_created_on=None, story_last_updated=None):
+        """Returns a Story domain object from a dictionary.
+
+        Args:
+            story_dict: dict. The dictionary representation of story
+                object.
+            story_version: int. The version of the story.
+            story_created_on: datetime.datetime. Date and time when the
+                story is created.
+            story_last_updated: datetime.datetime. Date and time when the
+                story was last updated.
+
+        Returns:
+            Story. The corresponding Story domain object.
+        """
+        story = cls(
+            story_dict['id'], story_dict['title'],
+            story_dict['thumbnail_filename'], story_dict['thumbnail_bg_color'],
+            story_dict['description'], story_dict['notes'],
+            StoryContents.from_dict(story_dict['story_contents']),
+            story_dict['story_contents_schema_version'],
+            story_dict['language_code'], story_dict['corresponding_topic_id'],
+            story_version, story_dict['url_fragment'],
+            story_created_on, story_last_updated)
+
+        return story
 
     @classmethod
     def create_default_story(
