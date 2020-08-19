@@ -820,8 +820,7 @@ angular.module('oppia').directive('filepathEditor', [
         };
 
         ctrl.postImageToServer = function(
-            dimensions, resampledFile,
-            imageType = 'png') {
+            dimensions, resampledFile, imageType = 'png') {
           let form = new FormData();
           form.append('image', resampledFile);
           form.append('payload', JSON.stringify({

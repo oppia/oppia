@@ -564,8 +564,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           if (a.note.noteStart && b.note.noteStart) {
             return (
               a.note.noteStart.num * b.note.noteStart.den -
-                    a.note.noteStart.den * b.note.noteStart.num) /
-                   (a.note.noteStart.den * b.note.noteStart.den);
+              a.note.noteStart.den * b.note.noteStart.num) /
+              (a.note.noteStart.den * b.note.noteStart.den);
           }
         };
 
@@ -726,8 +726,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
             _getCorrespondingNoteName(note.baseNoteMidiNumber);
 
           var accidental = (
-note.offset === 1 ? '#' :
-            note.offset === 0 ? '' : 'b');
+            note.offset === 1 ? '#' : note.offset === 0 ? '' : 'b');
 
           return {
             readableNoteName:

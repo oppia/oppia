@@ -138,6 +138,5 @@ export class CurrentInteractionService {
     return !CurrentInteractionService.validityCheckFn();
   }
 }
-angular.module('oppia').factory(
-  'CurrentInteractionService',
+angular.module('oppia').factory('CurrentInteractionService',
   downgradeInjectable(CurrentInteractionService));

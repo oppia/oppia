@@ -39,8 +39,8 @@ interface ExplorationLanguageInfo {
 })
 export class AudioTranslationLanguageService {
   constructor(
-private browserCheckerService: BrowserCheckerService,
-              private languageUtilService: LanguageUtilService) {}
+    private browserCheckerService: BrowserCheckerService,
+    private languageUtilService: LanguageUtilService) {}
 
   _currentAudioLanguageCode: string = null;
   _allAudioLanguageCodesInExploration: string[] = null;

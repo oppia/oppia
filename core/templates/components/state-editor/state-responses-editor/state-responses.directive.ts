@@ -201,9 +201,7 @@ angular.module('oppia').directive('stateResponses', [
                       if (rule.type === 'Equals' ||
                           rule.type === 'ContainsAtLeastOneOf') {
                         handledAnswersArray[choiceIndex] = true;
-                      } else if (
-                        rule.type ===
-                        'DoesNotContainAtLeastOneOf') {
+                      } else if (rule.type === 'DoesNotContainAtLeastOneOf') {
                         for (var i = 0; i < handledAnswersArray.length; i++) {
                           if (i !== choiceIndex) {
                             handledAnswersArray[i] = true;

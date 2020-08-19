@@ -89,8 +89,7 @@ describe('GuppyConfigurationService', () => {
         'GuppyConfigurationService', guppyConfigurationService);
       $provide.value('MathInteractionsService', new MathInteractionsService());
       $provide.value(
-        'GuppyInitializationService',
-        new GuppyInitializationService());
+        'GuppyInitializationService', new GuppyInitializationService());
     }));
     beforeEach(angular.mock.inject(function($componentController) {
       ctrl = $componentController('algebraicExpressionEditor');

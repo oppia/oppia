@@ -33,8 +33,7 @@ angular.module('oppia').component('emailDashboardResultPage', {
 
       var getQueryId = function() {
         return (
-          WindowRef.nativeWindow.location.pathname
-            .split('/').slice(-1)[0]);
+          WindowRef.nativeWindow.location.pathname.split('/').slice(-1)[0]);
       };
 
       var validateEmailSubjectAndBody = function() {

@@ -38,59 +38,59 @@ require('pages/admin-page/services/admin-router.service.ts');
 require('services/csrf-token.service.ts');
 require('services/utils.service.ts');
 
-angular.module('oppia').directive(
-  'adminPage', ['UrlInterpolationService',
-    function(UrlInterpolationService) {
-      return {
-        restrict: 'E',
-        scope: {},
-        bindToController: {},
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/admin-page/admin-page.directive.html'),
-        controllerAs: '$ctrl',
-        controller: [
-          '$http', '$location', '$rootScope', '$scope', 'AdminDataService',
-          'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
-          function(
-              $http, $location, $rootScope, $scope, AdminDataService,
-              AdminRouterService, CsrfTokenService, DEV_MODE) {
-            var ctrl = this;
-            ctrl.isActivitiesTabOpen = function() {
-              return AdminRouterService.isActivitiesTabOpen();
-            };
-            ctrl.isJobsTabOpen = function() {
-              return AdminRouterService.isJobsTabOpen();
-            };
-            ctrl.isConfigTabOpen = function() {
-              return AdminRouterService.isConfigTabOpen();
-            };
-            ctrl.isRolesTabOpen = function() {
-              return AdminRouterService.isRolesTabOpen();
-            };
-            ctrl.isMiscTabOpen = function() {
-              return AdminRouterService.isMiscTabOpen();
-            };
-            ctrl.setStatusMessage = function(statusMessage) {
-              ctrl.statusMessage = statusMessage;
-            };
+angular.module('oppia').directive('adminPage', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/admin-page/admin-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$http', '$location', '$rootScope', '$scope', 'AdminDataService',
+        'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
+        function(
+            $http, $location, $rootScope, $scope, AdminDataService,
+            AdminRouterService, CsrfTokenService, DEV_MODE) {
+          var ctrl = this;
+          ctrl.isActivitiesTabOpen = function() {
+            return AdminRouterService.isActivitiesTabOpen();
+          };
+          ctrl.isJobsTabOpen = function() {
+            return AdminRouterService.isJobsTabOpen();
+          };
+          ctrl.isConfigTabOpen = function() {
+            return AdminRouterService.isConfigTabOpen();
+          };
+          ctrl.isRolesTabOpen = function() {
+            return AdminRouterService.isRolesTabOpen();
+          };
+          ctrl.isMiscTabOpen = function() {
+            return AdminRouterService.isMiscTabOpen();
+          };
+          ctrl.setStatusMessage = function(statusMessage) {
+            ctrl.statusMessage = statusMessage;
+          };
 
-            ctrl.$onInit = function() {
-              $scope.$on('$locationChangeSuccess', function() {
-                AdminRouterService.showTab($location.path().replace('/', '#'));
-              });
-              ctrl.userEmail = '';
-              AdminDataService.getDataAsync().then(function(response) {
-                ctrl.userEmail = response.user_email;
-                // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the directive is migrated to angular.
-                $rootScope.$apply();
-              });
-              ctrl.inDevMode = DEV_MODE;
-              ctrl.statusMessage = '';
-              CsrfTokenService.initializeToken();
-            };
-          }
-        ]
-      };
-    }
-  ]);
+          ctrl.$onInit = function() {
+            $scope.$on('$locationChangeSuccess', function() {
+              AdminRouterService.showTab($location.path().replace('/', '#'));
+            });
+            ctrl.userEmail = '';
+            AdminDataService.getDataAsync().then(function(response) {
+              ctrl.userEmail = response.user_email;
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            });
+            ctrl.inDevMode = DEV_MODE;
+            ctrl.statusMessage = '';
+            CsrfTokenService.initializeToken();
+          };
+        }
+      ]
+    };
+  }
+]);

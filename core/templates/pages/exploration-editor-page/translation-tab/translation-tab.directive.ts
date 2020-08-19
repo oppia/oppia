@@ -103,8 +103,7 @@ angular.module('oppia').directive('translationTab', [
               stateName, ExplorationStatesService.getRecordedVoiceoversMemento(
                 stateName));
             StateWrittenTranslationsService.init(
-              stateName,
-              ExplorationStatesService.getWrittenTranslationsMemento(
+              stateName, ExplorationStatesService.getWrittenTranslationsMemento(
                 stateName));
             $scope.showTranslationTabSubDirectives = true;
             TranslationTabActiveModeService.activateVoiceoverMode();
@@ -207,9 +206,9 @@ angular.module('oppia').directive('translationTab', [
               heading: 'Choose a Card to Translate',
               text: (
                 'Then, choose a card from the exploration overview by ' +
-              'clicking on the card. The selected card will have ' +
-              'a bolded border. Cards that have missing translations are ' +
-              'coloured yellow or red, and these are good places to start.'),
+                'clicking on the card. The selected card will have ' +
+                'a bolded border. Cards that have missing translations are ' +
+                'coloured yellow or red, and these are good places to start.'),
               placement: 'left'
             }, {
               type: 'function',
@@ -327,8 +326,7 @@ angular.module('oppia').directive('translationTab', [
                 'for non-native speakers!')
             }];
             $templateCache.put(
-              'ng-joyride-title-tplv1.html',
-              ngJoyrideTemplate);
+              'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
             UserExplorationPermissionsService.getPermissionsAsync()
               .then(function(explorationPermissions) {
                 permissions = explorationPermissions;

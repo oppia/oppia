@@ -79,11 +79,9 @@ describe('MathEquationInputInteractive', function() {
     deviceInfoService = new DeviceInfoService(new WindowRef());
 
     $provide.value(
-      'CurrentInteractionService',
-      mockCurrentInteractionService);
+      'CurrentInteractionService', mockCurrentInteractionService);
     $provide.value(
-      'MathEquationInputRulesService',
-      mockMathEquationInputRulesService);
+      'MathEquationInputRulesService', mockMathEquationInputRulesService);
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);

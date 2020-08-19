@@ -101,8 +101,8 @@ angular.module('oppia').directive('progressNav', [
                   show_generic_submit_button);
             } catch (e) {
               var additionalInfo = (
-                '\nSubmit button debug logs:' +
-                '\ninterationId: ' + $scope.interactionId);
+                '\nSubmit button debug logs:\ninterationId: ' +
+                $scope.interactionId);
               e.message += additionalInfo;
               throw e;
             }

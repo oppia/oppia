@@ -26,11 +26,9 @@ require('directives/angular-html-bind.directive.ts');
 require('services/bottom-navbar-status.service.ts');
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
 require(
-  'pages/topic-editor-page/subtopic-editor/' +
-    'subtopic-preview-tab.component.ts');
+  'pages/topic-editor-page/subtopic-editor/subtopic-preview-tab.component.ts');
 require(
-  'pages/topic-editor-page/subtopic-editor/' +
-    'subtopic-editor-tab.component.ts');
+  'pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts');
 require(
   'pages/topic-editor-page/questions-tab/topic-questions-tab.directive.ts');
 

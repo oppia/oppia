@@ -72,8 +72,7 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
 
           ctrl.isAnswerValid = function() {
             return (
-              ctrl.answer.length > 0 &&
-              !hasBlankOption(ctrl.answer));
+              ctrl.answer.length > 0 && !hasBlankOption(ctrl.answer));
           };
 
           var submitAnswerFn = function() {

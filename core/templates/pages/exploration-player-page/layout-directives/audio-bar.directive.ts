@@ -103,8 +103,7 @@ angular.module('oppia').directive('audioBar', [
               if (!$scope.audioBarIsExpanded) {
                 audioHeader.addClass('audio-bar-nav-hidden');
               }
-            } else if (
-              scrollTop === 0 ||
+            } else if (scrollTop === 0 ||
                        scrollTop + $(window).height() < $(document).height()) {
               audioHeader.removeClass('audio-bar-nav-up');
               audioHeader.removeClass('audio-bar-nav-hidden');

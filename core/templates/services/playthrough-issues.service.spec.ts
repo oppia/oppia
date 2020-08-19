@@ -153,7 +153,7 @@ describe('Playthrough Issues Service', function() {
       expect(PlaythroughIssuesService.renderIssueStatement(issue))
         .toBe(
           'Several learners ended up in a cyclic loop revisiting card "' +
-        stateName + '" many times.');
+          stateName + '" many times.');
     });
 
   it('should render issue suggestion when its type is' +
@@ -166,9 +166,9 @@ describe('Playthrough Issues Service', function() {
     expect(PlaythroughIssuesService.renderIssueSuggestions(issue))
       .toEqual(
         ['Check the wording of the card "' + stateName +
-      '" to ensure it is not confusing.',
+        '" to ensure it is not confusing.',
         'Consider addressing the answers submitted in the sample' +
-      ' playthroughs explicitly using answer groups.']);
+        ' playthroughs explicitly using answer groups.']);
   });
 
   it('should render issue suggestion when its type is EarlyQuit', function() {

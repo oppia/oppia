@@ -39,9 +39,9 @@ export interface InterpolationValuesType {
 })
 export class UrlInterpolationService {
   constructor(
-private alertsService: AlertsService,
-              private urlService: UrlService,
-              private utilsService: UtilsService) {}
+    private alertsService: AlertsService,
+    private urlService: UrlService,
+    private utilsService: UtilsService) {}
 
   validateResourcePath(resourcePath: string): void {
     if (!resourcePath) {
@@ -165,8 +165,8 @@ private alertsService: AlertsService,
       let currentVarName = match[1];
       if (!escapedInterpolationValues.hasOwnProperty(currentVarName)) {
         this.alertsService.fatalWarning(
-          'Expected variable \'' +
-            currentVarName + '\' when interpolating URL.');
+          'Expected variable \'' + currentVarName +
+          '\' when interpolating URL.');
         return null;
       }
       filledUrl = filledUrl.replace(
@@ -223,8 +223,7 @@ private alertsService: AlertsService,
         'Empty interactionId passed in getInteractionThumbnailImageUrl.');
     }
     return this.getExtensionResourceUrl(
-      '/interactions/' + interactionId +
-        '/static/' + interactionId + '.png');
+      '/interactions/' + interactionId + '/static/' + interactionId + '.png');
   }
 
   /**

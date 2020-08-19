@@ -82,8 +82,7 @@ describe('Rule spec services', function() {
       'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());
     $provide.value(
-      'MathEquationInputRulesService',
-      new MathEquationInputRulesService());
+      'MathEquationInputRulesService', new MathEquationInputRulesService());
     $provide.value(
       'MultipleChoiceInputRulesService', new MultipleChoiceInputRulesService());
     $provide.value('NumericInputRulesService', new NumericInputRulesService());

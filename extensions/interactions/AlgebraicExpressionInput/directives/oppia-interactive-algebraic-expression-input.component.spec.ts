@@ -79,8 +79,7 @@ describe('AlgebraicExpressionInputInteractive', function() {
     deviceInfoService = new DeviceInfoService(new WindowRef());
 
     $provide.value(
-      'CurrentInteractionService',
-      mockCurrentInteractionService);
+      'CurrentInteractionService', mockCurrentInteractionService);
     $provide.value(
       'AlgebraicExpressionInputRulesService',
       mockAlgebraicExpressionInputRulesService);

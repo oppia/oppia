@@ -162,9 +162,8 @@ var logicProofTeacher2 = (function() {
    *         from what the student is required to write.
    */
   var buildLineTemplate = function(
-      nameString, readerViewString,
-      antecedentsString, resultsString, variablesString, errorStrings,
-      language, vocabulary) {
+      nameString, readerViewString, antecedentsString, resultsString,
+      variablesString, errorStrings, language, vocabulary) {
     var possibleReaderViews = logicProofShared.parseLineString(
       readerViewString, language.operators, vocabulary, true);
     if (possibleReaderViews.length > 1) {

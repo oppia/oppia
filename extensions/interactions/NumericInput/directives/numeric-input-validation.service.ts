@@ -80,8 +80,7 @@ export class NumericInputValidationService {
 
     var ranges = [];
     var raiseWarningForRuleIsInclusivelyBetween = function(
-        ruleIndex,
-        answerGroupIndex) {
+        ruleIndex, answerGroupIndex) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (

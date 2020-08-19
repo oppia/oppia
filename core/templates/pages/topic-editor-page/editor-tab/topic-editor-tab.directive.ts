@@ -40,8 +40,7 @@ require('pages/topic-editor-page/services/entity-creation.service.ts');
 require(
   'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 require(
-  'pages/topic-editor-page/modal-templates/' +
-    'preview-thumbnail.component.ts');
+  'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 
 require('services/alerts.service.ts');
 require('services/context.service.ts');

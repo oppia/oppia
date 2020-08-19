@@ -36,8 +36,7 @@ angular.module('oppia').component('splashPage', {
       };
       ctrl.getStaticSubjectImageUrl = function(subjectName) {
         return UrlInterpolationService.getStaticImageUrl(
-          '/subjects/' +
-          subjectName + '.svg');
+          '/subjects/' + subjectName + '.svg');
       };
 
       ctrl.onRedirectToLogin = function(destinationUrl) {

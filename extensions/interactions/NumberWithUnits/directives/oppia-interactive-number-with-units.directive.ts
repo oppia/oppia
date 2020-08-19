@@ -70,8 +70,7 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
               return true;
             }
             return (
-              !ctrl.NumberWithUnitsForm.$invalid &&
-              ctrl.answer !== '');
+              !ctrl.NumberWithUnitsForm.$invalid && ctrl.answer !== '');
           };
 
           var submitAnswerFn = function() {

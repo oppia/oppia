@@ -36,8 +36,8 @@ describe('Build line templates', function() {
     };
   };
   var buildThenDisplay = function(
-      nameString, readerViewString,
-      antecedentsString, resultsString, variablesString, errorStrings) {
+      nameString, readerViewString, antecedentsString, resultsString,
+      variablesString, errorStrings) {
     return logicProofTeacher2.displayLineTemplate(
       logicProofTeacher2.buildLineTemplate(
         nameString, readerViewString, antecedentsString, resultsString,

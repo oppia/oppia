@@ -89,9 +89,8 @@ describe('Topic editor tab directive', function() {
     };
     var MockImageUploadHelperService = {
       getTrustedResourceUrlForThumbnailFilename: (
-          filename,
-          entityType,
-          entityId) => (entityType + '/' + entityId + '/' + filename)
+          filename, entityType, entityId) => (
+        entityType + '/' + entityId + '/' + filename)
     };
     SkillCreationService = $injector.get('SkillCreationService');
     TopicUpdateService = $injector.get('TopicUpdateService');

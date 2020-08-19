@@ -29,7 +29,7 @@ require('components/rubrics-editor/rubrics-editor.directive.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
-    'TopicsAndSkillsDashboardFilterObjectFactory.ts');
+  'TopicsAndSkillsDashboardFilterObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -244,8 +244,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
                 }
                 $scope.$applyAsync();
               });
-        } else if (
-          ctrl.skillSummaries.length >
+        } else if (ctrl.skillSummaries.length >
                 ((ctrl.skillPageNumber + 1) * ctrl.itemsPerPage)) {
           ctrl.goToPageNumber(ctrl.pageNumber + 1);
         }
@@ -271,8 +270,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
           String(ctrl.currentCount / ctrl.itemsPerPage));
         if (direction === ctrl.MOVE_TO_PREV_PAGE && ctrl.pageNumber >= 1) {
           ctrl.goToPageNumber(ctrl.pageNumber - 1);
-        } else if (
-          direction === ctrl.MOVE_TO_NEXT_PAGE &&
+        } else if (direction === ctrl.MOVE_TO_NEXT_PAGE &&
                 ctrl.pageNumber < ctrl.lastPage - 1) {
           ctrl.goToPageNumber(ctrl.pageNumber + 1);
         }

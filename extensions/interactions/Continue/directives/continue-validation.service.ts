@@ -71,8 +71,7 @@ export class ContinueValidationService {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
-          'Please specify what Oppia should do after the button' +
-          ' is clicked.')
+          'Please specify what Oppia should do after the button is clicked.')
       });
     }
 
@@ -80,5 +79,5 @@ export class ContinueValidationService {
   }
 }
 
-angular.module('oppia').factory(
-  'ContinueValidationService', downgradeInjectable(ContinueValidationService));
+angular.module('oppia').factory('ContinueValidationService',
+  downgradeInjectable(ContinueValidationService));

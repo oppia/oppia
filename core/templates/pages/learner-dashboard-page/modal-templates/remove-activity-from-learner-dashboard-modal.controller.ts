@@ -48,8 +48,7 @@ angular.module('oppia').controller(
         if (subsectionName ===
           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
           activityType = ACTIVITY_TYPE_EXPLORATION;
-        } else if (
-          subsectionName ===
+        } else if (subsectionName ===
                   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
                     .COLLECTIONS) {
           activityType = ACTIVITY_TYPE_COLLECTION;
@@ -62,8 +61,7 @@ angular.module('oppia').controller(
             LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
           removeActivityUrlPrefix =
             '/learnerplaylistactivityhandler/';
-        } else if (
-          sectionNameI18nId ===
+        } else if (sectionNameI18nId ===
                   LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
           removeActivityUrlPrefix =
             '/learnerincompleteactivityhandler/';

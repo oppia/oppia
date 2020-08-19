@@ -25,7 +25,6 @@
 module.exports = {
   meta: {
     type: 'layout',
-
     docs: {
       description: 'There should be a break after parenthesis',
       category: 'Stylistic Issues',
@@ -67,10 +66,11 @@ module.exports = {
         parens.forEach((paren, i) => {
           const line = lines[paren.loc.start.line - 1].trim();
           const nextParen = parens[i + 1];
-          if (line.startsWith('it') || line.startsWith('describe')) {
+          if (line.startsWith('it') || line.startsWith('describe') ||
+            line.startsWith('angular.module(\'oppia\').')) {
             return true;
           }
-          if (line.startsWith('if') || line.startsWith('else if') ||
+          if (line.startsWith('if') || line.startsWith('} else if') ||
             line.startsWith('while') || line.startsWith('for')) {
             excluded = true;
           }

@@ -22,8 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require(
-  'pages/exploration-editor-page/' +
-  'services/exploration-title.service.ts');
+  'pages/exploration-editor-page/services/exploration-title.service.ts');
 
 describe('Exploration Title Service', function() {
   let ets = null;

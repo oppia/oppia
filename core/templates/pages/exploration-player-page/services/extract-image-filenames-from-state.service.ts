@@ -170,10 +170,9 @@ export class ExtractImageFilenamesFromStateService {
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath.
       if (state.interaction.id === this.INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-        let filename = (
-          (
-<ImageClickInputCustomizationArgs> state.interaction
-  .customizationArgs).imageAndRegions.value.imagePath);
+        let filename = ((
+          <ImageClickInputCustomizationArgs> state.interaction
+            .customizationArgs).imageAndRegions.value.imagePath);
         filenamesInState.push(filename);
       }
       let allHtmlOfState = this._getAllHtmlOfState(state);

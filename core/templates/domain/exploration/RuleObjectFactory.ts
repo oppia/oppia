@@ -60,6 +60,5 @@ export class RuleObjectFactory {
   }
 }
 
-angular.module('oppia').factory(
-  'RuleObjectFactory',
+angular.module('oppia').factory('RuleObjectFactory',
   downgradeInjectable(RuleObjectFactory));

@@ -116,11 +116,9 @@ describe('Audio translation bar directive', function() {
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
     $provide.value(
-      'StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
     $provide.value(
-      'StateRecordedVoiceoversService',
-      stateRecordedVoiceoversService);
+      'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     $provide.value(
       'StateWrittenTranslationsService',
@@ -163,8 +161,7 @@ describe('Audio translation bar directive', function() {
       mockActiveContentIdChangedEventEmitter);
 
     spyOnProperty(
-      translationLanguageService,
-      'onActiveLanguageChanged').and.returnValue(
+      translationLanguageService, 'onActiveLanguageChanged').and.returnValue(
       mockActiveLanguageChangedEventEmitter);
 
     spyOnProperty(
@@ -173,8 +170,7 @@ describe('Audio translation bar directive', function() {
       mockShowTranslationTabBusyModalEventEmitter);
 
     stateRecordedVoiceoversService.init(
-      stateName,
-      recordedVoiceoversObjectFactory.createFromBackendDict({
+      stateName, recordedVoiceoversObjectFactory.createFromBackendDict({
         voiceovers_mapping: {
           content: {
             en: {
@@ -351,8 +347,7 @@ describe('Audio translation bar directive', function() {
 
   it('should toggle audio needs update', function() {
     spyOn(
-      stateRecordedVoiceoversService.displayed,
-      'toggleNeedsUpdateAttribute');
+      stateRecordedVoiceoversService.displayed, 'toggleNeedsUpdateAttribute');
 
     $scope.toggleAudioNeedsUpdate();
     expect(
@@ -733,8 +728,7 @@ describe('Audio translation bar directive', function() {
           canVoiceover: true
         }));
       stateRecordedVoiceoversService.init(
-        stateName,
-        recordedVoiceoversObjectFactory.createFromBackendDict({
+        stateName, recordedVoiceoversObjectFactory.createFromBackendDict({
           voiceovers_mapping: {
             content: {
               en: {

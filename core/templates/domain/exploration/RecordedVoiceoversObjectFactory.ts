@@ -107,8 +107,7 @@ export class RecordedVoiceovers {
     }
     languageCodeToVoiceover[languageCode] =
       this._voiceoverObjectFactory.createNew(
-        filename,
-        fileSizeBytes, durationSecs);
+        filename, fileSizeBytes, durationSecs);
   }
 
   deleteVoiceover(contentId: string, languageCode: string): void {

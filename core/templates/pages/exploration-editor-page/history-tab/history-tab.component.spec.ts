@@ -99,8 +99,7 @@ describe('History tab component', function() {
     $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
     $provide.value(
-      'FractionObjectFactory',
-      TestBed.get(FractionObjectFactory));
+      'FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
     $provide.value(
       'HintObjectFactory', TestBed.get(HintObjectFactory));
@@ -119,8 +118,7 @@ describe('History tab component', function() {
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
     $provide.value('VersionTreeService', TestBed.get(VersionTreeService));
     $provide.value(
-      'VoiceoverObjectFactory',
-      TestBed.get(VoiceoverObjectFactory));
+      'VoiceoverObjectFactory', TestBed.get(VoiceoverObjectFactory));
     $provide.value(
       'WrittenTranslationObjectFactory',
       TestBed.get(WrittenTranslationObjectFactory));

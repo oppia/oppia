@@ -75,8 +75,7 @@ angular.module('oppia').factory('NavigationService', [function() {
         evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
         if (eventsTobeHandled[targetEvents[i]] === navigation.ACTION_OPEN) {
           navigation.openSubmenu(evt, menuName);
-        } else if (
-          eventsTobeHandled[targetEvents[i]] ===
+        } else if (eventsTobeHandled[targetEvents[i]] ===
           navigation.ACTION_CLOSE) {
           navigation.closeSubmenu(evt);
         } else {

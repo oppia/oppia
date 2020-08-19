@@ -149,8 +149,7 @@ export class Interaction {
         result = value.toBackendDict();
       } else if (value instanceof Array) {
         result = value.map(
-          element =>
-            traverseSchemaAndConvertSubtitledToDicts(element));
+          element => traverseSchemaAndConvertSubtitledToDicts(element));
       } else if (value instanceof Object) {
         result = {};
         Object.keys(value).forEach(key => {
@@ -195,8 +194,7 @@ export class Interaction {
         contentIds.push(value.getContentId());
       } else if (value instanceof Array) {
         value.forEach(
-          element =>
-            traverseValueAndRetrieveContentIdsFromSubtitled(element));
+          element => traverseValueAndRetrieveContentIdsFromSubtitled(element));
       } else if (value instanceof Object) {
         Object.keys(value).forEach(key => {
           traverseValueAndRetrieveContentIdsFromSubtitled(value[key]);
@@ -205,9 +203,8 @@ export class Interaction {
     };
 
     Object.keys(customizationArgs).forEach(
-      caName =>
-        traverseValueAndRetrieveContentIdsFromSubtitled(
-          customizationArgs[caName])
+      caName => traverseValueAndRetrieveContentIdsFromSubtitled(
+        customizationArgs[caName])
     );
 
     return contentIds;

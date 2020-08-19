@@ -180,8 +180,8 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
           skillIds, skillDifficulties, questionDict, imagesData) {
         return $q(function(resolve, reject) {
           _createQuestion(
-            skillIds, skillDifficulties,
-            questionDict, imagesData, resolve, reject);
+            skillIds, skillDifficulties, questionDict, imagesData, resolve,
+            reject);
         });
       },
 

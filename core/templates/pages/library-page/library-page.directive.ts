@@ -318,12 +318,12 @@ angular.module('oppia').directive('libraryPage', [
                             } else {
                               $log.error(
                                 'INVALID ACTIVITY TYPE: Activity' +
-                              '(id: ' + activitySummaryDict.id +
-                              ', name: ' + activitySummaryDict.title +
-                              ', type: ' + activitySummaryDict.activity_type +
-                              ') has an invalid activity type, which could ' +
-                              'not be recorded as an exploration or a ' +
-                              'collection.'
+                                '(id: ' + activitySummaryDict.id +
+                                ', name: ' + activitySummaryDict.title +
+                                ', type: ' + activitySummaryDict.activity_type +
+                                ') has an invalid activity type, which could ' +
+                                'not be recorded as an exploration or a ' +
+                                'collection.'
                               );
                             }
                           });

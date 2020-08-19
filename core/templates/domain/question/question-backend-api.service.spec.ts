@@ -231,8 +231,7 @@ describe('Question backend Api service', () => {
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Question count has to be a ' +
-        'positive integer');
+        'Question count has to be a positive integer');
     })
   );
 
@@ -245,8 +244,7 @@ describe('Question backend Api service', () => {
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Question count has to be a ' +
-        'positive integer');
+        'Question count has to be a positive integer');
     })
   );
 
@@ -259,8 +257,7 @@ describe('Question backend Api service', () => {
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Question count has to be a ' +
-        'positive integer');
+        'Question count has to be a positive integer');
     })
   );
 
@@ -273,8 +270,7 @@ describe('Question backend Api service', () => {
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Skill ids should be a list of' +
-      ' strings');
+        'Skill ids should be a list of strings');
     })
   );
 
@@ -287,8 +283,7 @@ describe('Question backend Api service', () => {
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Skill ids should be a list of' +
-      ' strings');
+        'Skill ids should be a list of strings');
     })
   );
 
@@ -301,8 +296,7 @@ describe('Question backend Api service', () => {
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Skill ids should be a list of' +
-      ' strings');
+        'Skill ids should be a list of strings');
     })
   );
 
@@ -315,8 +309,7 @@ describe('Question backend Api service', () => {
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Question count has to be a ' +
-        'positive integer');
+        'Question count has to be a positive integer');
     })
   );
 
@@ -396,8 +389,7 @@ describe('Question backend Api service', () => {
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Skill ids should be a list of' +
-      ' strings');
+        'Skill ids should be a list of strings');
     })
   );
 
@@ -410,8 +402,7 @@ describe('Question backend Api service', () => {
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Skill ids should be a list of' +
-      ' strings');
+        'Skill ids should be a list of strings');
     })
   );
 
@@ -424,8 +415,7 @@ describe('Question backend Api service', () => {
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Skill ids should be a list of' +
-      ' strings');
+        'Skill ids should be a list of strings');
     })
   );
 });

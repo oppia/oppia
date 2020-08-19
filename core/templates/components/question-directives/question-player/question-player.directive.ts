@@ -562,8 +562,7 @@ angular.module('oppia').directive('questionPlayer', [
               QuestionPlayerStateService.onQuestionSessionCompleted.subscribe(
                 (result) => {
                   $location.hash(
-                    HASH_PARAM +
-                    encodeURIComponent(JSON.stringify(result)));
+                    HASH_PARAM + encodeURIComponent(JSON.stringify(result)));
                 })
             );
 

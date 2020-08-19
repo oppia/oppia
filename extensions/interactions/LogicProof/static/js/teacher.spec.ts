@@ -62,8 +62,7 @@ describe('Build questions', function() {
   it('should forbid the use of reserved words', function() {
     expect(function() {
       logicProofTeacher.buildQuestion(
-        'we\u2227you', 'p=q',
-        logicProofData.BASE_VOCABULARY);
+        'we\u2227you', 'p=q', logicProofData.BASE_VOCABULARY);
     }).toThrow(
       {
         message: (

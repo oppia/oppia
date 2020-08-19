@@ -24,14 +24,12 @@ angular.module('oppia').factory('TopicRightsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'TOPIC_RIGHTS_URL_TEMPLATE',
   function(
-      $http, $q, UrlInterpolationService,
-      TOPIC_RIGHTS_URL_TEMPLATE) {
+      $http, $q, UrlInterpolationService, TOPIC_RIGHTS_URL_TEMPLATE) {
     // Maps previously loaded topic rights to their IDs.
     var topicRightsCache = {};
 
     var _fetchTopicRights = function(
-        topicId, successCallback,
-        errorCallback) {
+        topicId, successCallback, errorCallback) {
       var topicRightsUrl = UrlInterpolationService.interpolateUrl(
         TOPIC_RIGHTS_URL_TEMPLATE, {
           topic_id: topicId
@@ -72,8 +70,7 @@ angular.module('oppia').factory('TopicRightsBackendApiService', [
     };
 
     var _sendMail = function(
-        topicId, topicName, successCallback,
-        errorCallback) {
+        topicId, topicName, successCallback, errorCallback) {
       var sendMailUrl = UrlInterpolationService.interpolateUrl(
         '/rightshandler/send_topic_publish_mail/<topic_id>', {
           topic_id: topicId

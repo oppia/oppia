@@ -385,11 +385,9 @@ angular.module('oppia').directive('audioTranslationBar', [
             if (AudioPlayerService.isTrackLoaded()) {
               $scope.audioTimerIsShown = true;
               var currentTime = $filter('formatTimer')(
-                AudioPlayerService
-                  .getCurrentTime());
+                AudioPlayerService.getCurrentTime());
               var duration = $filter('formatTimer')(
-                AudioPlayerService
-                  .getAudioDuration());
+                AudioPlayerService.getAudioDuration());
               return currentTime + ' / ' + duration;
             } else {
               $scope.audioTimerIsShown = false;

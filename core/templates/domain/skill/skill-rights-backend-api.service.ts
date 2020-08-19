@@ -116,6 +116,5 @@ export class SkillRightsBackendApiService {
   }
 }
 
-angular.module('oppia').factory(
-  'SkillRightsBackendApiService',
+angular.module('oppia').factory('SkillRightsBackendApiService',
   downgradeInjectable(SkillRightsBackendApiService));

@@ -79,8 +79,7 @@ describe('NumericExpressionInputInteractive', function() {
     deviceInfoService = new DeviceInfoService(new WindowRef());
 
     $provide.value(
-      'CurrentInteractionService',
-      mockCurrentInteractionService);
+      'CurrentInteractionService', mockCurrentInteractionService);
     $provide.value(
       'NumericExpressionInputRulesService',
       mockNumericExpressionInputRulesService);

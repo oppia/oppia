@@ -227,8 +227,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         if (entity.status === 'private') {
           if (ctrl.currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE) {
             value = (value || ctrl.DEFAULT_EMPTY_TITLE);
-          } else if (
-            ctrl.currentSortType !==
+          } else if (ctrl.currentSortType !==
                     EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED) {
             value = 0;
           }

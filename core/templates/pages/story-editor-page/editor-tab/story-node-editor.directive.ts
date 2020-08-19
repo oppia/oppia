@@ -25,8 +25,7 @@ require(
   'pages/story-editor-page/modal-templates/' +
   'new-chapter-title-modal.controller.ts');
 require(
-  'pages/topic-editor-page/modal-templates/' +
-    'preview-thumbnail.component.ts');
+  'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
 require('domain/exploration/exploration-id-validation.service.ts');

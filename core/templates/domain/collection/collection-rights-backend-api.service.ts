@@ -194,7 +194,5 @@ export class CollectionRightsBackendApiService {
   }
 }
 
-angular.module('oppia')
-  .factory(
-    'CollectionRightsBackendApiService',
+angular.module('oppia').factory('CollectionRightsBackendApiService',
     downgradeInjectable(CollectionRightsBackendApiService));

@@ -37,6 +37,5 @@ export class ProfileLinkImageBackendApiService {
   }
 }
 
-angular.module('oppia').factory(
-  'ProfileLinkImageBackendApiService',
+angular.module('oppia').factory('ProfileLinkImageBackendApiService',
   downgradeInjectable(ProfileLinkImageBackendApiService));

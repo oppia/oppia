@@ -159,16 +159,16 @@ describe('GraphInputValidationService', () => {
     'number of vertices of 10 for isomorphism check.',
   () => {
     (
-<GraphIsomorphicRuleInputs>
+    <GraphIsomorphicRuleInputs>
       answerGroups[0].ruleTypesToInputs.IsIsomorphicTo[0]
     ).g.vertices = new Array(11);
     (
-<GraphIsomorphicRuleInputs>
-      answerGroups[0].ruleTypesToInputs.IsIsomorphicTo[1]
+      <GraphIsomorphicRuleInputs>
+        answerGroups[0].ruleTypesToInputs.IsIsomorphicTo[1]
     ).g.vertices = new Array(11);
     (
-<GraphIsomorphicRuleInputs>
-      answerGroups[1].ruleTypesToInputs.IsIsomorphicTo[0]
+      <GraphIsomorphicRuleInputs>
+        answerGroups[1].ruleTypesToInputs.IsIsomorphicTo[0]
     ).g.vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,

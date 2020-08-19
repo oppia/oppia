@@ -103,12 +103,11 @@ export class SkillCreationBackendApiService {
   ): Promise<SkillCreationBackendResponse> {
     return new Promise((resolve, reject) => {
       this._createSkill(
-        resolve, reject,
-        description, rubrics, explanation, linkedTopicIds, imagesData);
+        resolve, reject, description, rubrics, explanation, linkedTopicIds,
+        imagesData);
     });
   }
 }
 
-angular.module('oppia').factory(
-  'SkillCreationBackendApiService',
+angular.module('oppia').factory('SkillCreationBackendApiService',
   downgradeInjectable(SkillCreationBackendApiService));

@@ -92,8 +92,7 @@ export class StoryPlaythrough {
 })
 export class StoryPlaythroughObjectFactory {
   constructor(
-private readOnlyStoryNodeObjectFactory:
-      ReadOnlyStoryNodeObjectFactory) {}
+    private readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory) {}
 
   createFromBackendDict(
       storyPlaythroughBackendDict:

@@ -44,8 +44,7 @@ class MockTranslateService {
   };
 
   getInterpolatedString(
-      key: string,
-      interpolateParams?: Object) {
+      key: string, interpolateParams?: Object) {
     const str = this.translations[key];
     if (!str) {
       return key;

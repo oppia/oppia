@@ -248,14 +248,13 @@ angular.module('oppia').component('learnerDashboardPage', {
           },
           update: function(e, ui) {
             var insertExpInLearnerPlaylistUrl = (
-              UrlInterpolationService.interpolateUrl(
-                (
-                  '/learnerplaylistactivityhandler/<activityType>/' +
+              UrlInterpolationService.interpolateUrl((
+                '/learnerplaylistactivityhandler/<activityType>/' +
                 '<activityId>'), {
-                  activityType: activityType,
-                  activityId: (
-                    ctrl.explorationPlaylist[ui.item.sortable.index].id)
-                }));
+                activityType: activityType,
+                activityId: (
+                  ctrl.explorationPlaylist[ui.item.sortable.index].id)
+              }));
 
             $http.post(insertExpInLearnerPlaylistUrl, {
               index: ui.item.sortable.dropindex
@@ -376,8 +375,7 @@ angular.module('oppia').component('learnerDashboardPage', {
               if (index !== -1) {
                 ctrl.incompleteExplorationsList.splice(index, 1);
               }
-            } else if (
-              subsectionName ===
+            } else if (subsectionName ===
                       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
               var index = ctrl.incompleteCollectionsList.findIndex(
                 collection => collection.id === activity.id);
@@ -385,8 +383,7 @@ angular.module('oppia').component('learnerDashboardPage', {
                 ctrl.incompleteCollectionsList.splice(index, 1);
               }
             }
-          } else if (
-            sectionNameI18nId ===
+          } else if (sectionNameI18nId ===
                     LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
             if (subsectionName ===
                 LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
@@ -395,8 +392,7 @@ angular.module('oppia').component('learnerDashboardPage', {
               if (index !== -1) {
                 ctrl.explorationPlaylist.splice(index, 1);
               }
-            } else if (
-              subsectionName ===
+            } else if (subsectionName ===
                       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
               var index = ctrl.collectionPlaylist.findIndex(
                 collection => collection.id === activity.id);

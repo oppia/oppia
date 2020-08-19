@@ -49,8 +49,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
     var ASSET_TYPE_THUMBNAIL = 'thumbnail';
 
     var GCS_PREFIX = (
-      'https://storage.googleapis.com/' +
-      GCS_RESOURCE_BUCKET_NAME);
+      'https://storage.googleapis.com/' + GCS_RESOURCE_BUCKET_NAME);
     var AUDIO_DOWNLOAD_URL_TEMPLATE = (
       (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
       '/<entity_type>/<entity_id>/assets/audio/<filename>');
@@ -129,8 +128,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
     };
 
     var _removeFromFilesCurrentlyBeingRequested = function(
-        filename,
-        assetType) {
+        filename, assetType) {
       if (_isAssetCurrentlyBeingRequested(filename, ASSET_TYPE_AUDIO)) {
         for (var index = 0; index <
              _audioFilesCurrentlyBeingRequested.length; index++) {
@@ -276,8 +274,8 @@ angular.module('oppia').factory('AssetsBackendApiService', [
               filename, assetsCache[filename]));
           } else {
             _fetchFile(
-              entityType, entityId, filename, ASSET_TYPE_IMAGE,
-              resolve, reject);
+              entityType, entityId, filename, ASSET_TYPE_IMAGE, resolve,
+              reject);
           }
         });
       },

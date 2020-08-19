@@ -38,11 +38,9 @@ require('pages/exploration-player-page/services/player-position.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
-  '$timeout', 'InteractionAttributesExtractorService',
-  'PlayerPositionService',
+  '$timeout', 'InteractionAttributesExtractorService', 'PlayerPositionService',
   function(
-      $timeout, InteractionAttributesExtractorService,
-      PlayerPositionService) {
+      $timeout, InteractionAttributesExtractorService, PlayerPositionService) {
     return {
       restrict: 'E',
       scope: {},

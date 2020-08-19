@@ -82,11 +82,9 @@ describe('Param Changes Editor Component', function() {
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
     $provide.value(
-      'StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
     $provide.value(
-      'StateSolutionService',
-      TestBed.get(StateSolutionService));
+      'StateSolutionService', TestBed.get(StateSolutionService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');

@@ -226,11 +226,11 @@ export class Exploration {
 })
 export class ExplorationObjectFactory {
   constructor(
-private logger: LoggerService,
-              private paramChangesObjectFactory: ParamChangesObjectFactory,
-              private paramSpecsObjectFactory: ParamSpecsObjectFactory,
-              private statesObjectFactory: StatesObjectFactory,
-              private urlInterpolationService: UrlInterpolationService) {}
+    private logger: LoggerService,
+    private paramChangesObjectFactory: ParamChangesObjectFactory,
+    private paramSpecsObjectFactory: ParamSpecsObjectFactory,
+    private statesObjectFactory: StatesObjectFactory,
+    private urlInterpolationService: UrlInterpolationService) {}
 
   createFromBackendDict(
       explorationBackendDict: ExplorationBackendDict): Exploration {

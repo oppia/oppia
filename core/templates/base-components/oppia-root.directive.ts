@@ -21,35 +21,34 @@
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-angular.module('oppia').directive(
-  'oppiaRoot', ['$translate',
-    function($translate) {
-      return {
-        template: require('./oppia-root.directive.html'),
-        scope: {},
-        transclude: true,
-        controllerAs: '$ctrl',
-        controller: ['$scope',
-          function($scope) {
-            $scope.initialized = false;
+angular.module('oppia').directive('oppiaRoot', [
+  '$translate', function($translate) {
+    return {
+      template: require('./oppia-root.directive.html'),
+      scope: {},
+      transclude: true,
+      controllerAs: '$ctrl',
+      controller: ['$scope',
+        function($scope) {
+          $scope.initialized = false;
 
-            $scope.onInit = function() {
-              const translateService = (
-                OppiaAngularRootComponent.translateService);
-              const i18nLanguageCodeService = (
-                OppiaAngularRootComponent.i18nLanguageCodeService);
-              translateService.use(
-                i18nLanguageCodeService.getCurrentI18nLanguageCode());
-              i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-                (code) => translateService.use(code)
-              );
-              i18nLanguageCodeService.setI18nLanguageCode(
-                $translate.proposedLanguage() || $translate.use());
-              // The next line allows the transcluded content to start
-              // executing.
-              $scope.initialized = true;
-            };
-          }]
-      };
-    }
-  ]);
+          $scope.onInit = function() {
+            const translateService = (
+              OppiaAngularRootComponent.translateService);
+            const i18nLanguageCodeService = (
+              OppiaAngularRootComponent.i18nLanguageCodeService);
+            translateService.use(
+              i18nLanguageCodeService.getCurrentI18nLanguageCode());
+            i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+              (code) => translateService.use(code)
+            );
+            i18nLanguageCodeService.setI18nLanguageCode(
+              $translate.proposedLanguage() || $translate.use());
+            // The next line allows the transcluded content to start
+            // executing.
+            $scope.initialized = true;
+          };
+        }]
+    };
+  }
+]);

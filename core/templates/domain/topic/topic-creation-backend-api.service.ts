@@ -76,6 +76,5 @@ export class TopicCreationBackendApiService {
   }
 }
 
-angular.module('oppia').factory(
-  'TopicCreationBackendApiService',
+angular.module('oppia').factory('TopicCreationBackendApiService',
   downgradeInjectable(TopicCreationBackendApiService));

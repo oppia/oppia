@@ -252,8 +252,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
       // exploration data from what's currently specified in the editor, and
       // also initializes the parameters to empty strings.
       initSettingsFromEditor: function(
-          activeStateNameFromPreviewTab,
-          manualParamChangesToInit) {
+          activeStateNameFromPreviewTab, manualParamChangesToInit) {
         if (_editorPreviewMode) {
           manualParamChanges = manualParamChangesToInit;
           initStateName = activeStateNameFromPreviewTab;

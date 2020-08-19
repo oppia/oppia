@@ -356,11 +356,10 @@ angular.module('oppia').directive('stateGraphVisualization', [
               nodeData[nodeId].nodeClass = (
                 currentNodeIsTerminal ? 'terminal-node' :
                 nodeId === $scope.currentStateId() ? 'current-node' :
-                nodeId === initStateId ? 'init-node' :
-                !(
-nodeData[nodeId].reachable &&
+                nodeId === initStateId ? 'init-node' : !(
+                  nodeData[nodeId].reachable &&
                   nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
-                'normal-node');
+                  'normal-node');
 
               nodeData[nodeId].canDelete = (nodeId !== initStateId);
               $scope.nodeList.push(nodeData[nodeId]);

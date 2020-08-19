@@ -32,7 +32,7 @@ import {
 })
 export class FractionInputRulesService {
   constructor(
-private fractionObjectFactory: FractionObjectFactory,
+    private fractionObjectFactory: FractionObjectFactory,
     private utilsService: UtilsService) {}
 
   toFloat(fractionDict: FractionAnswer) {

@@ -19,63 +19,63 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
-angular.module('oppia').directive(
-  'topicInfoTab', ['UrlInterpolationService',
-    function(UrlInterpolationService) {
-      return {
-        restrict: 'E',
-        link: function(scope, element, attrs, ctrl) {
-        // This is needed in order for the $ctrl scope to be retrievable during
-        // Karma unit testing. The usual function getControllerScope() couldn't
-        // be used here as the functions local to the controller could only be
-        // accessed as scope.$ctrl.<fn_name>, which is not a part of IScope and
-        // hence threw typescript errors.
-          element[0].getLocalControllerScope = function() {
-            return ctrl;
+angular.module('oppia').directive('topicInfoTab', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      link: function(scope, element, attrs, ctrl) {
+      // This is needed in order for the $ctrl scope to be retrievable during
+      // Karma unit testing. The usual function getControllerScope() couldn't
+      // be used here as the functions local to the controller could only be
+      // accessed as scope.$ctrl.<fn_name>, which is not a part of IScope and
+      // hence threw typescript errors.
+        element[0].getLocalControllerScope = function() {
+          return ctrl;
+        };
+      },
+      scope: {},
+      bindToController: {
+        getTopicName: '&topicName',
+        getTopicDescription: '&topicDescription',
+        getStoryCount: '&storyCount',
+        getSubtopicCount: '&subtopicCount',
+        getChapterCount: '&chapterCount'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/topic-viewer-page/info-tab/topic-info-tab.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$rootScope', 'WindowDimensionsService',
+        function(
+            $rootScope, WindowDimensionsService) {
+          var ctrl = this;
+
+          ctrl.checkSmallScreenWidth = function() {
+            if (WindowDimensionsService.getWidth() <= 1024) {
+              return true;
+            }
+            return false;
           };
-        },
-        scope: {},
-        bindToController: {
-          getTopicName: '&topicName',
-          getTopicDescription: '&topicDescription',
-          getStoryCount: '&storyCount',
-          getSubtopicCount: '&subtopicCount',
-          getChapterCount: '&chapterCount'
-        },
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/topic-viewer-page/info-tab/topic-info-tab.directive.html'),
-        controllerAs: '$ctrl',
-        controller: [
-          '$rootScope', 'WindowDimensionsService',
-          function(
-              $rootScope, WindowDimensionsService) {
-            var ctrl = this;
 
-            ctrl.checkSmallScreenWidth = function() {
-              if (WindowDimensionsService.getWidth() <= 1024) {
-                return true;
-              }
-              return false;
-            };
+          ctrl.$onInit = function() {
+            ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
+            ctrl.resizeSubscription = WindowDimensionsService.
+              getResizeEvent().subscribe(evt => {
+                ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
 
-            ctrl.$onInit = function() {
-              ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
-              ctrl.resizeSubscription = WindowDimensionsService.
-                getResizeEvent().subscribe(evt => {
-                  ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular.
+                $rootScope.$applyAsync();
+              });
+          };
 
-                  // TODO(#8521): Remove the use of $rootScope.$apply()
-                  // once the directive is migrated to angular.
-                  $rootScope.$applyAsync();
-                });
-            };
-
-            ctrl.$onDestroy = function() {
-              if (ctrl.resizeSubscription) {
-                ctrl.resizeSubscription.unsubscribe();
-              }
-            };
-          }
-        ]
-      };
-    }]);
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
+          };
+        }
+      ]
+    };
+  }]);

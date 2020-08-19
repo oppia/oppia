@@ -40,6 +40,5 @@ export class AudioBarStatusService {
   }
 }
 
-angular.module('oppia').factory(
-  'AudioBarStatusService',
+angular.module('oppia').factory('AudioBarStatusService',
   downgradeInjectable(AudioBarStatusService));

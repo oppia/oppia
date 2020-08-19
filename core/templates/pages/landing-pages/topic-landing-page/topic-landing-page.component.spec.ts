@@ -130,8 +130,7 @@ describe('Topic Landing Page', () => {
     tick(150);
     fixture.detectChanges();
     expect(pageTitleService.getPageTitle()).toBe(
-      'Fractions | ' +
-      'Add, Subtract, Multiply and Divide | Oppia');
+      'Fractions | Add, Subtract, Multiply and Divide | Oppia');
   }));
 
   it('should return correct lesson quality image src', function() {

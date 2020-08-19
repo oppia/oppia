@@ -244,7 +244,7 @@ export class Skill {
 })
 export class SkillObjectFactory {
   constructor(
-private conceptCardObjectFactory: ConceptCardObjectFactory,
+    private conceptCardObjectFactory: ConceptCardObjectFactory,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private rubricObjectFactory: RubricObjectFactory,
     private validatorService: ValidatorsService) {
@@ -294,6 +294,5 @@ private conceptCardObjectFactory: ConceptCardObjectFactory,
     });
   }
 }
-angular.module('oppia').factory(
-  'SkillObjectFactory',
+angular.module('oppia').factory('SkillObjectFactory',
   downgradeInjectable(SkillObjectFactory));

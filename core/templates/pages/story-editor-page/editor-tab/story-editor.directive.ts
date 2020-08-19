@@ -36,8 +36,7 @@ require('services/contextual/window-dimensions.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require(
-  'pages/topic-editor-page/modal-templates/' +
-    'preview-thumbnail.component.ts');
+  'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 
 import { Subscription } from 'rxjs';
 

@@ -100,8 +100,7 @@ describe('Learner answer details service', function() {
         var failHandler = jasmine.createSpy('fail');
 
         var createFromBackendDictSpy = spyOn(
-          LearnerAnswerInfoObjectFactory,
-          'createFromBackendDict');
+          LearnerAnswerInfoObjectFactory, 'createFromBackendDict');
 
         $httpBackend.expect(
           'GET', '/learneranswerinfohandler/' +
@@ -126,8 +125,7 @@ describe('Learner answer details service', function() {
         var failHandler = jasmine.createSpy('fail');
 
         var createFromBackendDictSpy = spyOn(
-          LearnerAnswerInfoObjectFactory,
-          'createFromBackendDict');
+          LearnerAnswerInfoObjectFactory, 'createFromBackendDict');
 
         $httpBackend.expect(
           'GET', '/learneranswerinfohandler/' +

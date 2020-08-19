@@ -537,8 +537,7 @@ describe('States Object Factory', () => {
     expect((Object.keys(newStates.getStateObjects())).length).toBe(2);
 
     newStates.setState(
-      'new state',
-      sof.createFromBackendDict('new state', newState));
+      'new state', sof.createFromBackendDict('new state', newState));
     expect(newStates.getState('new state')).toEqual(
       sof.createFromBackendDict('new state', newState));
   });
@@ -547,8 +546,7 @@ describe('States Object Factory', () => {
     let newStates = ssof.createFromBackendDict(statesDict);
 
     newStates.setState(
-      'first state',
-      sof.createFromBackendDict('first state', newState));
+      'first state', sof.createFromBackendDict('first state', newState));
     expect(newStates.getFinalStateNames()).toEqual['new state'];
   });
 

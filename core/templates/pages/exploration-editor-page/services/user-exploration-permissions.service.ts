@@ -44,6 +44,5 @@ export class UserExplorationPermissionsService {
   }
 }
 
-angular.module('oppia').factory(
-  'UserExplorationPermissionsService',
+angular.module('oppia').factory('UserExplorationPermissionsService',
   downgradeInjectable(UserExplorationPermissionsService));

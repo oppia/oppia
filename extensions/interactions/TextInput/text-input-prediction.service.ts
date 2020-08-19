@@ -37,9 +37,9 @@ export class TextInputPredictionService {
   private TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD = (
     InteractionsExtensionsConstants.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD);
   constructor(
-private countVectorizerService: CountVectorizerService,
-      private svmPredictionService: SVMPredictionService,
-      private textInputTokenizer: TextInputTokenizer) {
+    private countVectorizerService: CountVectorizerService,
+    private svmPredictionService: SVMPredictionService,
+    private textInputTokenizer: TextInputTokenizer) {
   }
 
   predict(classifierData: TextInputClassifierData, textInput: string): number {

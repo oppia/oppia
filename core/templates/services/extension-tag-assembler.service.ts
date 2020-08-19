@@ -38,8 +38,8 @@ import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 })
 export class ExtensionTagAssemblerService {
   constructor(
-private htmlEscaperService: HtmlEscaperService,
-              private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
+    private htmlEscaperService: HtmlEscaperService,
+    private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
   _convertCustomizationArgsToBackendDict(
       customizationArgs: InteractionCustomizationArgs
   ): InteractionCustomizationArgsBackendDict {
@@ -57,8 +57,7 @@ private htmlEscaperService: HtmlEscaperService,
         result = value.toBackendDict();
       } else if (value instanceof Array) {
         result = value.map(
-          element =>
-            traverseSchemaAndConvertSubtitledToDicts(element));
+          element => traverseSchemaAndConvertSubtitledToDicts(element));
       } else if (value instanceof Object) {
         result = {};
         Object.keys(value).forEach(key => {

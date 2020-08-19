@@ -73,8 +73,7 @@ export class PretestQuestionBackendApiService {
   }
 
   fetchPretestQuestions(
-      explorationId: string,
-      storyId: string): Promise<QuestionBackendDict[]> {
+      explorationId: string, storyId: string): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchPretestQuestions(explorationId, storyId, resolve, reject);
     });

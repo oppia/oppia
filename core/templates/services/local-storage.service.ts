@@ -35,8 +35,8 @@ import {
 })
 export class LocalStorageService {
   constructor(
-private explorationDraftObjectFactory:
-                  ExplorationDraftObjectFactory) {}
+    private explorationDraftObjectFactory:
+    ExplorationDraftObjectFactory) {}
 
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,

@@ -160,8 +160,7 @@ export class ItemSelectionInputValidationService {
               handledAnswers[choiceIndex] = true;
             } else if (rule.type === 'ContainsAtLeastOneOf') {
               handledAnswers[choiceIndex] = true;
-            } else if (
-              rule.type ===
+            } else if (rule.type ===
               'DoesNotContainAtLeastOneOf') {
               for (var i = 0; i < handledAnswers.length; i++) {
                 if (i !== choiceIndex) {

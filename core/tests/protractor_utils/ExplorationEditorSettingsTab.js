@@ -69,8 +69,7 @@ var ExplorationEditorSettingsTab = function() {
    */
   this.deleteExploration = async function() {
     await waitFor.elementToBeClickable(
-      deleteExplorationButton,
-      'Delete Exploration button is not clickable');
+      deleteExplorationButton, 'Delete Exploration button is not clickable');
     await deleteExplorationButton.click();
     await waitFor.elementToBeClickable(
       confirmDeleteExplorationButton,
@@ -106,8 +105,7 @@ var ExplorationEditorSettingsTab = function() {
     expect(await explorationSummaryTile.isPresent()).toBeTruthy();
     await closePreviewSummaryButton.click();
     await waitFor.invisibilityOf(
-      explorationSummaryTile,
-      'Summary Tile takes too long to disappear');
+      explorationSummaryTile, 'Summary Tile takes too long to disappear');
     expect(await explorationSummaryTile.isPresent()).toBeFalsy();
   };
 

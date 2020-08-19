@@ -119,8 +119,7 @@ describe('Settings Tab Component', function() {
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
     $provide.value(
-      'StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     $provide.value('ExplorationDataService', {
       explorationId: explorationId,

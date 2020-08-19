@@ -86,8 +86,7 @@ describe('Search service', function() {
       var urlComponent = '?q=test&category=("Architecture"%20OR%20' +
                          '"Mathematics")&language_code=("en"%20OR%20"ar")';
       expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent,
-        results)).toBe('test');
+        urlComponent, results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         ar: true,
         en: true
@@ -103,8 +102,7 @@ describe('Search service', function() {
       var urlComponent = '?q=test&category=("Mathematics")&' +
                          'language_code=("en"%20OR%20"ar")';
       expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent,
-        results)).toBe('test');
+        urlComponent, results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         ar: true,
         en: true
@@ -120,8 +118,7 @@ describe('Search service', function() {
       var urlComponent =
         '?q=test&category=("Mathematics")&language_code=("en")';
       expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent,
-        results)).toBe('test');
+        urlComponent, results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         en: true
       });
@@ -135,8 +132,7 @@ describe('Search service', function() {
     function() {
       var urlComponent = '?q=test&language_code=("en")';
       expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent,
-        results)).toBe('test');
+        urlComponent, results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         en: true
       });
@@ -148,8 +144,7 @@ describe('Search service', function() {
     function() {
       var urlComponent = '?q=protractor%20test&language_code=("en")';
       expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent,
-        results)).toBe('protractor test');
+        urlComponent, results)).toBe('protractor test');
       expect(results.languageCodes.selections).toEqual({
         en: true
       });
@@ -162,10 +157,9 @@ describe('Search service', function() {
       var urlComponent = '?q=protractor%20test%26category=("Mathematics")' +
                          '%26language_code=("en"%20OR%20"ar")';
       expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent,
-        results)).toBe(
+        urlComponent, results)).toBe(
         'protractor test&category=("Mathematics")' +
-                       '&language_code=("en" OR "ar")');
+        '&language_code=("en" OR "ar")');
       expect(results.languageCodes.selections).toEqual({});
       expect(results.categories.selections).toEqual({});
     }

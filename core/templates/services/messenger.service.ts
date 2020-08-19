@@ -209,6 +209,5 @@ export class MessengerService {
     }
   }
 }
-angular.module('oppia').factory(
-  'MessengerService',
+angular.module('oppia').factory('MessengerService',
   downgradeInjectable(MessengerService));

@@ -156,8 +156,7 @@ angular.module('oppia').factory('RouterService', [
               $rootScope.$broadcast('centerGraph');
             }
           } else {
-            $location.path(
-              pathBase +
+            $location.path(pathBase +
                            ExplorationInitStateNameService.savedMemento);
           }
         }
@@ -190,8 +189,7 @@ angular.module('oppia').factory('RouterService', [
         StateEditorService.setActiveStateName(newStateName);
       }
       $location.path(
-        '/' + pathType + '/' +
-                     StateEditorService.getActiveStateName());
+        '/' + pathType + '/' + StateEditorService.getActiveStateName());
       $window.scrollTo(0, 0);
     };
 

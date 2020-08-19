@@ -343,8 +343,7 @@ describe('Core exploration functionality', function() {
         await forms.toRichText('some content'));
       await explorationEditorMainTab.setInteraction('NumericInput');
       await explorationEditorMainTab.addResponse(
-        'NumericInput',
-        async function(richTextEditor) {
+        'NumericInput', async function(richTextEditor) {
           await richTextEditor.appendBoldText('correct');
         }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
       var responseEditor = await explorationEditorMainTab.getResponseEditor(0);

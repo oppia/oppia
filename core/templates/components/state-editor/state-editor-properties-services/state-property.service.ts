@@ -49,7 +49,7 @@ export class StatePropertyService<StatePropertyType> {
   savedMemento: StatePropertyType;
 
   constructor(
-private alertsService: AlertsService,
+    private alertsService: AlertsService,
     private utilsService: UtilsService) {
     this.setterMethodKey = null;
   }

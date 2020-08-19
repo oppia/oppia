@@ -110,8 +110,7 @@ describe('State Graph Visualization directive', function() {
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
     $provide.value(
-      'StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
     $provide.value(
       'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));

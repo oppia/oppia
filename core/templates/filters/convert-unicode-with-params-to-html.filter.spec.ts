@@ -48,8 +48,7 @@ describe('HTML to text', function() {
           return $filter('convertUnicodeWithParamsToHtml')(s);
         };
         expect(fn).toThrowError(
-          'Invalid unicode-string-with-parameters: ' +
-          false);
+          'Invalid unicode-string-with-parameters: ' + false);
       });
     }));
 

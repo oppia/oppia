@@ -25,11 +25,9 @@ require(
   'suggestion-modal-for-creator-view.controller');
 
 angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
-  '$http', '$log',
-  '$uibModal', 'UrlInterpolationService',
+  '$http', '$log', '$uibModal', 'UrlInterpolationService',
   function(
-      $http, $log,
-      $uibModal, UrlInterpolationService) {
+      $http, $log, $uibModal, UrlInterpolationService) {
     var _showEditStateContentSuggestionModal = function(
         activeThread, suggestionsToReviewList, clearActiveThread,
         canReviewActiveThread) {

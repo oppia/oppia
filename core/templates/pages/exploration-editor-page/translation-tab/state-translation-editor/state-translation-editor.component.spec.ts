@@ -134,8 +134,7 @@ describe('State Translation Editor Component', function() {
     $provide.value('StateRecordedVoiceoversService', TestBed.get(
       StateRecordedVoiceoversService));
     $provide.value(
-      'StateWrittenTranslationsService',
-      stateWrittenTranslationsService);
+      'StateWrittenTranslationsService', stateWrittenTranslationsService);
   }));
 
   describe('when has written translation', function() {
@@ -158,8 +157,7 @@ describe('State Translation Editor Component', function() {
         () => {});
 
       spyOnProperty(
-        translationLanguageService,
-        'onActiveLanguageChanged').and.returnValue(
+        translationLanguageService, 'onActiveLanguageChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
       spyOnProperty(
         translationTabActiveContentIdService,
