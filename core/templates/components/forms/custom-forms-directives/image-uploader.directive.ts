@@ -23,6 +23,7 @@ interface ImageUploaderCustomScope extends ng.IScope {
   errorMessage?: string;
   onFileChanged?: (file: File, fileName?: string) => void;
   fileInputClassName?: string;
+  getAllowedImageFormats?: () => string[];
 }
 
 angular.module('oppia').directive('imageUploader', [
@@ -34,7 +35,8 @@ angular.module('oppia').directive('imageUploader', [
         height: '@',
         onFileChanged: '=',
         errorMessage: '@',
-        width: '@'
+        width: '@',
+        getAllowedImageFormats: '&allowedImageFormats'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
@@ -51,19 +53,47 @@ angular.module('oppia').directive('imageUploader', [
             return 'This file is not recognized as an image.';
           }
 
-          if (!file.type.match('image/jpeg') &&
-            !file.type.match('image/gif') &&
-            !file.type.match('image/jpg') &&
-            !file.type.match('image/png') &&
-            !file.type.match('image/svg\\+xml')) {
-            return 'This image format is not supported.';
+          var imageTypeMapping = {
+            jpeg: {
+              format: 'image/jpeg',
+              fileExtension: /\.jp(e?)g$/,
+            },
+            jpg: {
+              format: 'image/jpg',
+              fileExtension: /\.jp(e?)g$/,
+            },
+            gif: {
+              format: 'image/gif',
+              fileExtension: /\.gif$/,
+            },
+            png: {
+              format: 'image/png',
+              fileExtension: /\.png$/,
+            },
+            svg: {
+              format: 'image/svg\\+xml',
+              fileExtension: /\.svg$/,
+            }
+          };
+          var imageHasInvalidFormat = true;
+          for (var i = 0; i < scope.getAllowedImageFormats().length; i++) {
+            var imageType = scope.getAllowedImageFormats()[i];
+            if (!imageTypeMapping.hasOwnProperty(imageType)) {
+              return (
+                imageType + ' is not in the list of allowed image formats.');
+            }
+            if (file.type.match(imageTypeMapping[imageType].format)) {
+              imageHasInvalidFormat = false;
+              if (
+                !file.name.match(imageTypeMapping[imageType].fileExtension)) {
+                return (
+                  'This image format does not match the filename extension.');
+              }
+            }
           }
 
-          if ((file.type.match(/jp(e?)g$/) && !file.name.match(/\.jp(e?)g$/)) ||
-            (file.type.match(/gif$/) && !file.name.match(/\.gif$/)) ||
-            (file.type.match(/png$/) && !file.name.match(/\.png$/)) ||
-            (file.type.match(/svg\+xml$/) && !file.name.match(/\.svg$/))) {
-            return 'This image format does not match the filename extension.';
+          if (imageHasInvalidFormat) {
+            return 'This image format is not supported.';
           }
 
           const HUNDRED_KB_IN_BYTES = 100 * 1024;
