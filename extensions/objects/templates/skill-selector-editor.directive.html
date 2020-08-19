@@ -17,7 +17,7 @@
         </div>
         <strong> Worked Examples </strong>
         <ul>
-          <li ng-repeat="example in skill.skill_contents.worked_examples" class="example-questions-container">
+          <li ng-repeat="example in skill.skill_contents.worked_examples" class="worked-example-container">
             <b> Question: </b>
             <angular-html-bind html-data="example.question.html">
             </angular-html-bind>
@@ -44,7 +44,7 @@
     padding-bottom: 10px;
     padding-top: 5px;
   }
-  skill-selector-editor .example-questions-container {
+  skill-selector-editor .worked-example-container {
     padding-top: 5px;
   }
   skill-selector-editor .oppia-list-group-item-text {
