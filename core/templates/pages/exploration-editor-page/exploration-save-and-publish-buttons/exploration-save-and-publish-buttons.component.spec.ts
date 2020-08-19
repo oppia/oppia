@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for explorationSaveAndPublishButtons.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -60,6 +61,8 @@ describe('Exploration save and publish buttons component', function() {
   var editabilityService = null;
   var userExplorationPermissionsService = null;
 
+  var mockExternalSaveEventEmitter = null;
+
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
@@ -84,6 +87,10 @@ describe('Exploration save and publish buttons component', function() {
       TestBed.get(ExplorationImprovementsTaskRegistryService));
     $provide.value('ExplorationStatsService',
       TestBed.get(ExplorationStatsService));
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
