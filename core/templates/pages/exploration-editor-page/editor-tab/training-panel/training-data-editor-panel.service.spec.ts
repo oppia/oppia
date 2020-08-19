@@ -16,21 +16,34 @@
  * @fileoverview Unit tests for TrainingDataEditorPanelService.
  */
 
+import { EventEmitter } from '@angular/core';
+
 describe('Training Data Editor Panel Service', function() {
   var TrainingDataEditorPanelService = null;
   var $uibModal = null;
   var AlertsService = null;
+  var ExternalSaveService = null;
   var $rootScope = null;
 
+  var mockExternalSaveEventEmitter = null;
+
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
+  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     TrainingDataEditorPanelService = $injector.get(
       'TrainingDataEditorPanelService');
     $uibModal = $injector.get('$uibModal');
     AlertsService = $injector.get('AlertsService');
+    ExternalSaveService = $injector.get('ExternalSaveService');
     $rootScope = $injector.get('$rootScope');
-
-    spyOn($rootScope, '$broadcast').and.callThrough();
+    spyOn(mockExternalSaveEventEmitter, 'emit');
   }));
 
   it('should call $uibModal when opening training data editor', function() {
@@ -40,6 +53,6 @@ describe('Training Data Editor Panel Service', function() {
     TrainingDataEditorPanelService.openTrainingDataEditor();
     expect(uibModalSpy).toHaveBeenCalled();
     expect(clearWarningsSpy).toHaveBeenCalled();
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('externalSave');
+    expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
   });
 });

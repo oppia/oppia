@@ -68,27 +68,30 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').factory('ExplorationSaveService', [
-  '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
+  '$log', '$q', '$timeout', '$uibModal', '$window',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
   'ExplorationCategoryService', 'ExplorationDataService',
   'ExplorationDiffService', 'ExplorationInitStateNameService',
   'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
   'ExplorationRightsService', 'ExplorationStatesService',
   'ExplorationTagsService', 'ExplorationTitleService',
-  'ExplorationWarningsService', 'FocusManagerService', 'RouterService',
+  'ExplorationWarningsService', 'ExternalSaveService',
+  'FocusManagerService', 'RouterService',
   'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
   'DEFAULT_LANGUAGE_CODE',
   function(
-      $log, $q, $rootScope, $timeout, $uibModal, $window,
+      $log, $q, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
       ExplorationCategoryService, ExplorationDataService,
       ExplorationDiffService, ExplorationInitStateNameService,
       ExplorationLanguageCodeService, ExplorationObjectiveService,
       ExplorationRightsService, ExplorationStatesService,
       ExplorationTagsService, ExplorationTitleService,
-      ExplorationWarningsService, FocusManagerService, RouterService,
+      ExplorationWarningsService, ExternalSaveService,
+      FocusManagerService, RouterService,
       SiteAnalyticsService, StatesObjectFactory, UrlInterpolationService,
       DEFAULT_LANGUAGE_CODE) {
     // Whether or not a save action is currently in progress
@@ -232,7 +235,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           AlertsService.clearWarnings();
-          $rootScope.$broadcast('externalSave');
+          ExternalSaveService.onExternalSave.emit();
 
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

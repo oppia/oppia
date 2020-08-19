@@ -15,12 +15,17 @@
 /**
  * @fileoverview Unit tests for RteHelperModalController.
  */
+
+import { EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
 
 describe('Rte Helper Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var $timeout = null;
+  var externalRteSaveService = null;
+
+  var mockExternalRteSaveEventEmitter = null;
 
   describe('when customization args has a valid youtube video', function() {
     var customizationArgSpecs = [{
@@ -32,12 +37,22 @@ describe('Rte Helper Modal Controller', function() {
     }];
 
     beforeEach(angular.mock.module('oppia'));
+
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      mockExternalRteSaveEventEmitter = new EventEmitter();
+      $provide.value('ExternalRteSaveService', {
+        onExternalRteSave: mockExternalRteSaveEventEmitter
+      });
+    }));
+
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
+
+      externalRteSaveService = $injector.get('ExternalRteSaveService');
 
       $scope = $rootScope.$new();
       $controller(
@@ -64,10 +79,10 @@ describe('Rte Helper Modal Controller', function() {
     });
 
     it('should save modal customization args when closing it', function() {
-      var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
+      spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       expect($scope.disableSaveButtonForMathRte()).toBe(false);
       $scope.save();
-      expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+      expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
       expect($uibModalInstance.close).toHaveBeenCalledWith({
         heading: 'This value is not default.',
         video_id: 'Ntcw0H0hwPU'
@@ -89,6 +104,14 @@ describe('Rte Helper Modal Controller', function() {
     var ImageLocalStorageService = null;
     var ContextService = null;
     beforeEach(angular.mock.module('oppia'));
+
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      mockExternalRteSaveEventEmitter = new EventEmitter();
+      $provide.value('ExternalRteSaveService', {
+        onExternalRteSave: mockExternalRteSaveEventEmitter
+      });
+    }));
+
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');
@@ -97,6 +120,7 @@ describe('Rte Helper Modal Controller', function() {
       AssetsBackendApiService = $injector.get('AssetsBackendApiService');
       ImageUploadHelperService = $injector.get('ImageUploadHelperService');
       ImageLocalStorageService = $injector.get('ImageLocalStorageService');
+      externalRteSaveService = $injector.get('ExternalRteSaveService');
       ContextService = $injector.get('ContextService');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -127,7 +151,7 @@ describe('Rte Helper Modal Controller', function() {
     });
 
     it('should save modal customization args when closing it', function() {
-      var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
+      spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {
@@ -152,7 +176,7 @@ describe('Rte Helper Modal Controller', function() {
         'convertImageDataToImageFile').and.returnValue(imageFile);
       $scope.save();
       $scope.$apply();
-      expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+      expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
       expect($uibModalInstance.close).toHaveBeenCalledWith({
         math_content: {
           raw_latex: 'x^2',
@@ -162,7 +186,7 @@ describe('Rte Helper Modal Controller', function() {
     });
 
     it('should cancel the modal when saving of math SVG fails', function() {
-      var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
+      spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {
@@ -182,13 +206,13 @@ describe('Rte Helper Modal Controller', function() {
         'convertImageDataToImageFile').and.returnValue(imageFile);
       $scope.save();
       $scope.$apply();
-      expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+      expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
     it('should cancel the modal when if the rawLatex or filename field is' +
        'empty for a math expression', function() {
-      var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
+      spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {
@@ -199,13 +223,13 @@ describe('Rte Helper Modal Controller', function() {
       }];
       $scope.save();
       $scope.$apply();
-      expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+      expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
     it('should save modal customization args while in local storage',
       function() {
-        var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
+        spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
         $scope.tmpCustomizationArgs = [{
           name: 'math_content',
           value: {
@@ -225,7 +249,7 @@ describe('Rte Helper Modal Controller', function() {
           'convertImageDataToImageFile').and.returnValue(imageFile);
         $scope.save();
         $scope.$apply();
-        expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+        expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
         expect($uibModalInstance.close).toHaveBeenCalledWith({
           math_content: {
             raw_latex: 'x^2',
@@ -246,12 +270,22 @@ describe('Rte Helper Modal Controller', function() {
       }];
 
       beforeEach(angular.mock.module('oppia'));
+
+      beforeEach(angular.mock.module('oppia', function($provide) {
+        mockExternalRteSaveEventEmitter = new EventEmitter();
+        $provide.value('ExternalRteSaveService', {
+          onExternalRteSave: mockExternalRteSaveEventEmitter
+        });
+      }));
+
       beforeEach(angular.mock.inject(function($injector, $controller) {
         $timeout = $injector.get('$timeout');
         var $rootScope = $injector.get('$rootScope');
 
         $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);
+
+        externalRteSaveService = $injector.get('ExternalRteSaveService');
 
         $scope = $rootScope.$new();
         $controller(
@@ -278,9 +312,9 @@ describe('Rte Helper Modal Controller', function() {
       });
 
       it('should save modal customization args when closing it', function() {
-        var broadcastSpy = spyOn($scope, '$broadcast').and.callThrough();
+        spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
         $scope.save();
-        expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+        expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
         expect($uibModalInstance.close).toHaveBeenCalledWith({
           heading: {},
           video_id: 'https://www.youtube.com'

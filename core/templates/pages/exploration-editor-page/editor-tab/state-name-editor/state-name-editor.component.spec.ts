@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { EditabilityService } from 'services/editability.service';
 import { StateEditorService } from
@@ -38,6 +39,8 @@ describe('Sidebar state name controller', function() {
   var routerService = null;
   var stateEditorService = null;
   var stateNameService = null;
+
+  var mockExternalSaveEventEmitter = null;
 
   var mockExplorationData = {
     explorationId: 0,
@@ -68,6 +71,10 @@ describe('Sidebar state name controller', function() {
     $provide.value('ExplorationStatsService',
       TestBed.get(ExplorationStatsService));
     $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -198,6 +205,10 @@ describe('Sidebar state name controller', function() {
     ctrl.$onInit();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should not save state name when it is longer than 50 characters',
     function() {
       expect(ctrl.saveStateName(
@@ -274,5 +285,12 @@ describe('Sidebar state name controller', function() {
     ctrl.saveStateName('Third State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
     expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+  });
+
+  it('should save state name when ExternalSave event occurs', function() {
+    spyOn(ctrl, 'saveStateName');
+    ctrl.tmpStateName = 'SampleState';
+    mockExternalSaveEventEmitter.emit();
+    expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
   });
 });
