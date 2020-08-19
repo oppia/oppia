@@ -72,8 +72,6 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-reassign-skill-button'));
   var uncategorizedSkills = element.all(
     by.css('.protractor-test-uncategorized-skill-card'));
-  var skillSelectorModal = element(
-    by.css('.protractor-test-skill-select-modal'));
   var uncategorizedSkillItems = element.all(
     by.css('.protractor-test-skill-item'));
   var uncategorizedSkillsContainer = element(
@@ -84,9 +82,6 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-questions-tab-button'));
   var createQuestionButton = element(
     by.css('.protractor-test-create-question-button'));
-  var skillItems = element.all(by.css('.protractor-test-skill-item'));
-  var confirmSkillButton = element(
-    by.css('.protractor-test-confirm-skill-button'));
   var confirmSkillDifficultyButton = element(
     by.css('.protractor-test-confirm-skill-difficulty-button'));
   var saveQuestionButton = element(
