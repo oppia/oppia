@@ -21,17 +21,20 @@ import { Subscription } from 'rxjs';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
-    '$scope', '$uibModal', 'EditabilityService', 'ExplorationStatesService',
+    '$scope', '$uibModal', 'EditabilityService',
+    'ExternalSaveService', 'ExplorationStatesService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService', 'UrlInterpolationService',
     'WrittenTranslationObjectFactory',
     function(
-        $scope, $uibModal, EditabilityService, ExplorationStatesService,
+        $scope, $uibModal, EditabilityService,
+        ExternalSaveService, ExplorationStatesService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
         TranslationTabActiveContentIdService, UrlInterpolationService,
@@ -180,11 +183,12 @@ angular.module('oppia').component('stateTranslationEditor', {
           )
         );
         initEditor();
-        $scope.$on('externalSave', function() {
-          if ($scope.translationEditorIsOpen) {
-            saveTranslation();
-          }
-        });
+        ctrl.directiveSubscriptions.add(
+          ExternalSaveService.onExternalSave.subscribe(()=> {
+            if ($scope.translationEditorIsOpen) {
+              saveTranslation();
+            }
+          }));
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
