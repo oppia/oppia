@@ -24,14 +24,14 @@ import feconf
 import utils
 
 
-class PlatformFeatureHandler(base.BaseHandler):
+class PlatformFeaturesEvaluationHandler(base.BaseHandler):
     """The handler for retrieving feature flag values."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self):
-        """Handles POST requests. Evaluates and returns all feature flags using
+        """Handles GET requests. Evaluates and returns all feature flags using
         the given client information.
         """
         context_dict = {
