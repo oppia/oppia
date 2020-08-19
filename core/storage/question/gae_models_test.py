@@ -114,7 +114,6 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_models.QuestionModel.get(
             question_ids[1]).linked_skill_ids, ['skill_id3'])
 
-
     def test_raise_exception_by_mocking_collision(self):
         state = state_domain.State.create_default_state('ABC')
         question_state_data = state.to_dict()

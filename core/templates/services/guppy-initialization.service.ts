@@ -37,7 +37,7 @@ export class GuppyInitializationService {
   private guppyInstances: GuppyObject[] = [];
   private onScreenKeyboardShown = false;
   static interactionType: string;
-  static customOskLetters: Array<string> = [];
+  private static customOskLetters: string[] = [];
 
   init(guppyDivClassName: string, placeholderText: string, initialValue = ''):
       void {
@@ -95,6 +95,14 @@ export class GuppyInitializationService {
 
   setShowOSK(value: boolean): void {
     this.onScreenKeyboardShown = value;
+  }
+
+  getCustomOskLetters(): string[] {
+    return GuppyInitializationService.customOskLetters;
+  }
+
+  setCustomOskLetters(customOskLetters: string[]): void {
+    GuppyInitializationService.customOskLetters = customOskLetters;
   }
 }
 

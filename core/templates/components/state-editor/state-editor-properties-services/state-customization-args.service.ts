@@ -17,8 +17,9 @@
  * args for theinteraction. This is a dict mapping customization arg names
  * to dicts of the form {value: customization_arg_value}.
  */
+
+import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
@@ -34,9 +35,14 @@ import { InteractionCustomizationArgs } from
 // TODO(sll): Add validation.
 export class StateCustomizationArgsService extends
   StatePropertyService<InteractionCustomizationArgs> {
+  private _schemaBasedFormsShownEventEmitter = new EventEmitter();
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveInteractionCustomizationArgs';
+  }
+
+  get onSchemaBasedFormsShown() {
+    return this._schemaBasedFormsShownEventEmitter;
   }
 }
 

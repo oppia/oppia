@@ -19,6 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
@@ -37,6 +38,7 @@ export class DonatePageComponent implements OnInit {
   windowIsNarrow: boolean = false;
   donateImgUrl: string = '';
   constructor(
+    private pageTitleService: PageTitleService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
@@ -46,6 +48,8 @@ export class DonatePageComponent implements OnInit {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/opp_donate_text.svg');
+    this.pageTitleService.setPageTitle(
+      'Donate | Make a Positive Impact | Oppia');
   }
 
   onDonateThroughAmazon() {

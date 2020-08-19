@@ -93,6 +93,7 @@ angular.module('oppia').directive('stateTranslation', [
             RULE_SUMMARY_WRAP_CHARACTER_COUNT
         ) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.isVoiceoverModeActive = (
             TranslationTabActiveModeService.isVoiceoverModeActive);
           var isTranslatedTextRequired = function() {
@@ -153,7 +154,7 @@ angular.module('oppia').directive('stateTranslation', [
 
           $scope.onTabClick = function(tabId) {
             if ($scope.isTranslationTabBusy) {
-              $rootScope.$broadcast('showTranslationTabBusyModal');
+              StateEditorService.onShowTranslationTabBusyModal.emit();
               return;
             }
             var activeContentId = null;
@@ -294,7 +295,7 @@ angular.module('oppia').directive('stateTranslation', [
 
           $scope.changeActiveHintIndex = function(newIndex) {
             if ($scope.isTranslationTabBusy) {
-              $rootScope.$broadcast('showTranslationTabBusyModal');
+              StateEditorService.onShowTranslationTabBusyModal.emit();
               return;
             }
             if ($scope.activeHintIndex === newIndex) {
@@ -309,7 +310,7 @@ angular.module('oppia').directive('stateTranslation', [
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
             if ($scope.isTranslationTabBusy) {
-              $rootScope.$broadcast('showTranslationTabBusyModal');
+              StateEditorService.onShowTranslationTabBusyModal.emit();
               return;
             }
             if ($scope.activeAnswerGroupIndex !== newIndex) {
@@ -423,10 +424,15 @@ angular.module('oppia').directive('stateTranslation', [
             $scope.stateDefaultOutcome = null;
             $scope.stateHints = [];
             $scope.stateSolution = null;
-            $scope.$on('refreshStateTranslation', function() {
-              $scope.initStateTranslation();
-            });
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onRefreshStateTranslation.subscribe(
+                () => $scope.initStateTranslation())
+            );
             $scope.initStateTranslation();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

@@ -66,6 +66,8 @@ require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -99,7 +101,7 @@ angular.module('oppia').directive('questionsList', [
         'SkillDifficultyObjectFactory', 'ShortSkillSummaryObjectFactory',
         'StateEditorService', 'UndoRedoService',
         'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'MODE_SELECT_DIFFICULTY',
+        'MODE_SELECT_DIFFICULTY',
         'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
@@ -111,9 +113,10 @@ angular.module('oppia').directive('questionsList', [
             SkillDifficultyObjectFactory, ShortSkillSummaryObjectFactory,
             StateEditorService, UndoRedoService,
             UrlService, DEFAULT_SKILL_DIFFICULTY,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, MODE_SELECT_DIFFICULTY,
+            MODE_SELECT_DIFFICULTY,
             MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             if (ctrl.selectedSkillId !== null) {
@@ -229,60 +232,37 @@ angular.module('oppia').directive('questionsList', [
           ctrl.createQuestion = function() {
             ctrl.newQuestionSkillIds = [];
             var currentMode = MODE_SELECT_SKILL;
-            var skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
+            ctrl.skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
             if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
               currentMode = MODE_SELECT_DIFFICULTY;
+            } else {
+              ctrl.newQuestionSkillIds = [ctrl.getSelectedSkillId()];
             }
-            var linkedSkillsWithDifficulty = [];
+            ctrl.linkedSkillsWithDifficulty = [];
             ctrl.newQuestionSkillIds.forEach(function(skillId) {
-              linkedSkillsWithDifficulty.push(
+              ctrl.linkedSkillsWithDifficulty.push(
                 SkillDifficultyObjectFactory.create(
                   skillId, '', DEFAULT_SKILL_DIFFICULTY));
             });
-            var sortedSkillSummaries =
-              ctrl.getGroupedSkillSummaries().current.concat(
-                ctrl.getGroupedSkillSummaries().others);
-            var countOfSkillsToPrioritize =
-              ctrl.getGroupedSkillSummaries().current.length;
-            var allSkillSummaries = sortedSkillSummaries.map(
-              function(summary) {
-                return summary;
-              });
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                'select-skill-and-difficulty-modal.template.html'),
-              backdrop: true,
-              resolve: {
-                allSkillSummaries: () => allSkillSummaries,
-                countOfSkillsToPrioritize: () => countOfSkillsToPrioritize,
-                currentMode: () => currentMode,
-                linkedSkillsWithDifficulty: () => linkedSkillsWithDifficulty,
-                skillIdToRubricsObject: () => skillIdToRubricsObject
-              },
-              controller: 'QuestionsListSelectSkillAndDifficultyModalController'
-            }).result.then(function(linkedSkillsWithDifficulty) {
-              ctrl.newQuestionSkillIds = [];
-              ctrl.newQuestionSkillDifficulties = [];
-              linkedSkillsWithDifficulty.forEach(
-                function(linkedSkillWithDifficulty) {
-                  ctrl.newQuestionSkillIds.push(
-                    linkedSkillWithDifficulty.getId());
-                  ctrl.newQuestionSkillDifficulties.push(
-                    linkedSkillWithDifficulty.getDifficulty());
-                }
-              );
-              ctrl.populateMisconceptions(ctrl.newQuestionSkillIds);
-              if (AlertsService.warnings.length === 0) {
-                ctrl.initializeNewQuestionCreation(
-                  ctrl.newQuestionSkillIds);
-              }
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+            ctrl.showDifficultyChoices = true;
+          };
+
+          ctrl.initiateQuestionCreation = function(linkedSkillsWithDifficulty) {
+            ctrl.showDifficultyChoices = false;
+            ctrl.newQuestionSkillIds = [];
+            ctrl.newQuestionSkillDifficulties = [];
+            linkedSkillsWithDifficulty.forEach((linkedSkillWithDifficulty) => {
+              ctrl.newQuestionSkillIds.push(
+                linkedSkillWithDifficulty.getId());
+              ctrl.newQuestionSkillDifficulties.push(
+                linkedSkillWithDifficulty.getDifficulty());
             });
+            ctrl.populateMisconceptions(ctrl.newQuestionSkillIds);
+            if (AlertsService.warnings.length === 0) {
+              ctrl.initializeNewQuestionCreation(
+                ctrl.newQuestionSkillIds);
+            }
           };
 
           ctrl.populateMisconceptions = function(skillIds) {
@@ -549,17 +529,21 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
-              _initTab(false);
-            });
+            ctrl.directiveSubscriptions.add(
+              QuestionsListService.onQuestionSummariesInitialized.subscribe(
+                () => _initTab(false)));
             ctrl.skillIds = [];
             ctrl.selectedSkillIds = [];
             ctrl.associatedSkillSummaries = [];
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             ctrl.editorIsOpen = false;
             // The _initTab function is written separately since it is also
-            // called in $scope.$on when some external events are triggered.
+            // called in subscription when some external events are triggered.
             _initTab(true);
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
