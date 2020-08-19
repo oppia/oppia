@@ -200,9 +200,11 @@ var AdminPage = function() {
         .element(by.css('.protractor-test-feature-add-rule-button'))
     );
 
-    await featureElement
-      .element(by.css('.protractor-test-value-selector'))
-      .sendKeys('Enabled');
+    await action.sendKeys(
+      'Rule value selector',
+      featureElement
+        .element(by.css('.protractor-test-value-selector')),
+      'Enabled');
 
     await action.click(
       'Save feature button',
