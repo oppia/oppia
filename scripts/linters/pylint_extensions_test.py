@@ -2351,17 +2351,20 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# Something/
+                u"""# This is a multiline
+                # comment/
+
+                # Comment.
                 """)
         node_invalid_punctuation.file = filename
         node_invalid_punctuation.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_invalid_punctuation)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_invalid_punctuation))
 
         message = testutils.Message(
             msg_id='invalid-punctuation-used',
-            line=1)
+            line=2)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2380,8 +2383,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_no_space_at_beginning.file = filename
         node_no_space_at_beginning.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_no_space_at_beginning)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_no_space_at_beginning))
 
         message = testutils.Message(
             msg_id='no-space-at-beginning',
@@ -2399,17 +2402,19 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# something.
+                u"""# coding: utf-8
+
+                    # something.
                 """)
         node_no_capital_letter_at_beginning.file = filename
         node_no_capital_letter_at_beginning.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_no_capital_letter_at_beginning)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_no_capital_letter_at_beginning))
 
         message = testutils.Message(
             msg_id='no-capital-letter-at-beginning',
-            line=1)
+            line=3)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2429,8 +2434,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_comment_with_excluded_phrase.file = filename
         node_comment_with_excluded_phrase.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_comment_with_excluded_phrase)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_comment_with_excluded_phrase))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2449,8 +2454,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_variable_name_in_comment.file = filename
         node_variable_name_in_comment.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_variable_name_in_comment)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_variable_name_in_comment))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2469,8 +2474,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_comment_with_version_info.file = filename
         node_comment_with_version_info.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_comment_with_version_info)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_comment_with_version_info))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2489,8 +2494,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_data_type_in_comment.file = filename
         node_data_type_in_comment.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_data_type_in_comment)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_data_type_in_comment))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2512,8 +2517,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_comment_inside_docstring.file = filename
         node_comment_inside_docstring.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_comment_inside_docstring)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_comment_inside_docstring))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2534,8 +2539,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_with_no_error_message))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()

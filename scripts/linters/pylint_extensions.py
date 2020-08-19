@@ -1633,7 +1633,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
 class SingleLineCommentChecker(checkers.BaseChecker):
     """Checks if comments follow correct style."""
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.ITokenChecker
     name = 'incorrectly_styled_comment'
     priority = -1
     msgs = {
@@ -1654,99 +1654,83 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         )
     }
 
-    def process_module(self, node):
-        """Process a module to ensure that comments follow correct style.
+    def process_tokens(self, tokens):
+        """Custom pylint checker to ensure that comments follow correct style.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            tokens: Token. Object to access all tokens of a module.
         """
-
         allowed_comment_prefixes = ['int', 'str', 'float', 'bool', 'v']
-        in_multi_line_comment = False
+        previous_line_num = 0
+        previous_line = ''
         space_at_beginning_of_comment = True
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        file_length = len(file_content)
 
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
+        for (token_type, _, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.COMMENT:
+                line = line.strip()
 
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
+                if not line.startswith('#'):
+                    continue
 
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multiline comment.
-            if in_multi_line_comment:
-                continue
-
-            next_line = ''
-            previous_line = ''
-            if line_num + 1 < file_length:
-                next_line = file_content[line_num + 1].strip()
-            if line_num > 0:
-                previous_line = file_content[line_num - 1].strip()
-
-            # Ignore lines which are not comments.
-            if not line.startswith(b'#'):
-                continue
-
-            # Check if comment contains any excluded phrase.
-            word_is_present_in_excluded_phrases = any(
-                word in line for word in EXCLUDED_PHRASES)
-
-            # Comments may include a lowercase character at beginning
-            # or may not use a punctuation at end if it contains a
-            # excluded phrase e.g. "# coding: utf-8".
-            if word_is_present_in_excluded_phrases:
-                continue
-
-            if not next_line.startswith(b'#'):
-                # Comments must end with the proper punctuation.
-                last_char_is_invalid = line[-1] not in (
-                    ALLOWED_TERMINATING_PUNCTUATIONS)
-                if last_char_is_invalid:
+                # Comments must start with a space.
+                if re.search(br'^#[^\s].*$', line):
+                    space_at_beginning_of_comment = False
                     self.add_message(
-                        'invalid-punctuation-used', line=line_num + 1)
+                        'no-space-at-beginning', line=line_num)
 
-            # Comments must start with a space.
-            if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
-                space_at_beginning_of_comment = False
-                self.add_message(
-                    'no-space-at-beginning', line=line_num + 1)
+                if line_num - previous_line_num > 1:
+                    split_line = line.split()
+                    split_prev_line = previous_line.split()
 
-            # Comments may include a lowercase character at the beginning
-            # only if they start with version info or a data type or.
-            # a variable name e.g. "# next_line is of string type."
-            # or "# v2 version does not have ExplorationStatsModel."
-            # or "# int. The file size, in bytes.".
-            if len(line) > 1 and space_at_beginning_of_comment:
+                    # Check if comment contains any excluded phrase.
+                    excluded_phrase_is_present_at_beginning = any(
+                        word in split_line[1] for word in
+                        EXCLUDED_PHRASES)
 
-                # Check if variable name is used.
-                underscore_is_present = '_' in line.split()[1]
-                if underscore_is_present:
-                    continue
+                    excluded_pharse_is_present_at_end = any(
+                        word in split_prev_line[-1] for word in
+                        EXCLUDED_PHRASES)
 
-                # Check if allowed prefix is used.
-                allowed_prefix_is_present = any(
-                    line[2:].startswith(word) for word in (
-                        allowed_comment_prefixes))
-                if allowed_prefix_is_present:
-                    continue
+                    # Comments must end with the proper punctuation.
+                    last_char_is_invalid = previous_line[-1] not in (
+                        ALLOWED_TERMINATING_PUNCTUATIONS)
+                    if (last_char_is_invalid and not
+                            excluded_pharse_is_present_at_end):
+                        python_utils.PRINT(split_prev_line)
+                        self.add_message(
+                            'invalid-punctuation-used',
+                            line=previous_line_num)
 
-            # Comments must start with a capital letter.
-            if not previous_line.startswith(b'#') and (
-                    re.search(br'^# [a-z][A-Za-z]*.*$', line)):
-                self.add_message(
-                    'no-capital-letter-at-beginning', line=line_num + 1)
+                    # Comments may include a lowercase character at the
+                    # beginning only if they start with version info or a data
+                    # type or a variable name e.g. "# next_line is of string
+                    # type." or "# v2 version does not have ExplorationStats
+                    # Model." or "# int. The file size, in bytes.".
+                    if len(line) > 1 and space_at_beginning_of_comment:
+
+                        # Check if variable name is used.
+                        underscore_is_present = '_' in line.split()[1]
+                        if underscore_is_present:
+                            previous_line_num = line_num
+                            previous_line = line
+                            continue
+
+                        # Check if allowed prefix is used.
+                        allowed_prefix_is_present = any(
+                            line[2:].startswith(word) for word in (
+                                allowed_comment_prefixes))
+                        if allowed_prefix_is_present:
+                            previous_line_num = line_num
+                            previous_line = line
+                            continue
+
+                    # Comments must start with a capital letter.
+                    if (re.search(br'^# [a-z][A-Za-z]*.*$', line) and not
+                            excluded_phrase_is_present_at_beginning):
+                        self.add_message(
+                            'no-capital-letter-at-beginning', line=line_num)
+                previous_line_num = line_num
+                previous_line = line
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
