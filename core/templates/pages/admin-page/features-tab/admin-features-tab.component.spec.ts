@@ -58,6 +58,9 @@ describe('Admin page feature tab', function() {
       })
       .compileComponents();
 
+    fixture = TestBed.createComponent(AdminFeaturesTabComponent);
+    component = fixture.componentInstance;
+
     paramFactory = TestBed.get(PlatformParameterObjectFactory);
     adminDataService = TestBed.get(AdminDataService);
     featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
@@ -98,11 +101,6 @@ describe('Admin page feature tab', function() {
 
     updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
       .and.resolveTo(null);
-  }));
-
-  beforeEach(async(() => {
-    fixture = TestBed.createComponent(AdminFeaturesTabComponent);
-    component = fixture.componentInstance;
 
     component.ngOnInit();
   }));

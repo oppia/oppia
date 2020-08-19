@@ -52,7 +52,7 @@ export class PlatformFeatureBackendApiService {
   async fetchFeatureFlags(context: ClientContext):
       Promise<FeatureStatusSummary> {
     const backendDict = await this.http.get<FeatureStatusSummaryBackendDict>(
-      PlatformFeatureDomainConstants.PLATFORM_FEATURE_HANDLER_URL,
+      PlatformFeatureDomainConstants.PLATFORM_FEATURES_EVALUATION_HANDLER_URL,
       {
         params: {...context.toBackendDict()}
       }

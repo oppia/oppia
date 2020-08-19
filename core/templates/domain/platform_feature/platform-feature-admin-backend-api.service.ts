@@ -20,6 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { AdminPageConstants } from
+  'pages/admin-page/admin-page.constants';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
 import { PlatformParameterRule } from
@@ -37,7 +39,7 @@ export class PlatformFeatureAdminBackendApiService {
       name: string, message: string, newRules: PlatformParameterRule[]):
       Promise<void> {
     await this.http.post(
-      PlatformFeatureDomainConstants.ADMIN_HANDLER_URL,
+      AdminPageConstants.ADMIN_HANDLER_URL,
       {
         action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_RULES_ACTION,
         feature_name: name,

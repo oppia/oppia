@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the headroom library.
+ * @fileoverview This file imports the ui.tree library.
  */
 
-window.Headroom = require('static/headroom-js-0.9.4/headroom.min.js');
-require('static/headroom-js-0.9.4/angular.headroom.min.js');
+require('static/ui-tree-2.22.6/dist/angular-ui-tree.min.js');

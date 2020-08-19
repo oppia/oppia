@@ -70,8 +70,9 @@ describe('PlatformFeatureBackendApiService', () => {
 
         flushMicrotasks();
 
-        const urlWithParams =
-          PlatformFeatureDomainConstants.PLATFORM_FEATURE_HANDLER_URL + '?' +
+        const url = PlatformFeatureDomainConstants
+          .PLATFORM_FEATURES_EVALUATION_HANDLER_URL;
+        const urlWithParams = url + '?' +
           Object.entries(contextDict).map(([k, v]) => `${k}=${v}`).join('&');
         httpTestingController.expectOne(urlWithParams).flush(responseDict);
 
@@ -82,5 +83,31 @@ describe('PlatformFeatureBackendApiService', () => {
         expect(failHandler).not.toHaveBeenCalled();
       })
     );
+
+    it('shoud reject if the request fails', fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      const context = clientContextObjectFactory.create(
+        'Web', 'Chrome', 'en');
+      const contextDict = context.toBackendDict();
+
+      platformFeatureBackendApiService.fetchFeatureFlags(context)
+        .then(successHandler, failHandler);
+
+      flushMicrotasks();
+
+      const url = PlatformFeatureDomainConstants
+        .PLATFORM_FEATURES_EVALUATION_HANDLER_URL;
+      const urlWithParams = url + '?' +
+        Object.entries(contextDict).map(([k, v]) => `${k}=${v}`).join('&');
+      httpTestingController
+        .expectOne(urlWithParams)
+        .error(new ErrorEvent('Error'));
+
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }));
   });
 });
