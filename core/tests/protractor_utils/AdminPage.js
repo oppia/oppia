@@ -157,9 +157,7 @@ var AdminPage = function() {
   this.getFeaturesTab = async function() {
     await this.get();
     const featuresTab = element(by.css('.protractor-test-admin-features-tab'));
-    await waitFor.elementToBeClickable(
-      featuresTab, 'Features tab is not clickable');
-    await featuresTab.click();
+    await action.click('Admin features tab', featuresTab);
     const featureFlagElements = element.all(
       by.css('.protractor-test-feature-flag'));
     await waitFor.visibilityOf(
@@ -169,34 +167,48 @@ var AdminPage = function() {
   this.getDummyFeatureElement = async function() {
     const featureFlagElements = element.all(
       by.css('.protractor-test-feature-flag'));
-    return featureFlagElements
-      .filter(async elem => {
-        return (await elem.element(by.css('h2.feature-name')).getText()) ===
-          'dummy_feature';
-      })
-      .first();
+
+    const count = await featureFlagElements.count();
+    for (let i = 0; i < count; i++) {
+      const elem = await featureFlagElements.get(i);
+      if ((await elem.element(by.css('h2.feature-name')).getText()) ===
+          'dummy_feature') {
+        return elem;
+      }
+    }
+
+    return null;
   };
 
   this.removeAllRulesOfFeature = async function(featureElement) {
     while (!await featureElement.isElementPresent(
       by.css('.protractor-test-no-rule-indicator'))) {
-      await featureElement
-        .element(by.css('.protractor-test-remove-rule-button'))
-        .click();
+      await action.click(
+        'Remove feature rule button',
+        featureElement
+          .element(by.css('.protractor-test-remove-rule-button'))
+      );
     }
   };
 
   this.enableFeatureForDev = async function(featureElement) {
     await this.removeAllRulesOfFeature(featureElement);
-    await featureElement
-      .element(by.css('.protractor-test-feature-add-rule-button'))
-      .click();
+
+    await action.click(
+      'Add feature rule button',
+      featureElement
+        .element(by.css('.protractor-test-feature-add-rule-button'))
+    );
+
     await featureElement
       .element(by.css('.protractor-test-value-selector'))
       .sendKeys('Enabled');
-    await featureElement
-      .element(by.css('.protractor-test-save-button'))
-      .click();
+
+    await action.click(
+      'Save feature button',
+      featureElement
+        .element(by.css('.protractor-test-save-button'))
+    );
 
     await general.acceptAlert();
     await waitFor.visibilityOf(statusMessage);

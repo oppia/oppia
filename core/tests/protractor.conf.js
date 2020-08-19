@@ -78,7 +78,7 @@ var suites = {
     ],
 
     featureGating: [
-      'protractor/featureGatingFlow.js' // TODO
+      'protractor/featureGatingFlow.js'
     ],
 
     fileUploadFeatures: [
