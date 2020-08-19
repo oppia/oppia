@@ -16,9 +16,6 @@
  * @fileoverview Component for the state translation editor.
  */
 
-import { WRITTEN_TRANSLATION_TYPE_HTML } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-
 import { Subscription } from 'rxjs';
 
 require(
