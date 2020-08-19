@@ -21,7 +21,9 @@
             <span class="outer-dot">
               <span class="inner-dot">&nbsp;</span>
             </span>
-            <p class="exploration-health"><[$ctrl.getExplorationHealth()]></p>
+            <p class="exploration-health protractor-test-improvements-tab-health">
+              <[$ctrl.getExplorationHealth()]>
+            </p>
           </div>
         </div>
         <ul class="improvements-tab-navigation" ng-if="$ctrl.getNumTasks() > 0">
@@ -64,7 +66,8 @@
         card-level improvements
       </div>
       <hr>
-      <div class="state-groups" ng-repeat="(stateName, stateTasks) in $ctrl.stateTasksDictionary"
+      <div class="state-groups protractor-test-improvements-tab-state-group"
+           ng-repeat="(stateName, stateTasks) in $ctrl.stateTasksDictionary"
            ng-if="$ctrl.getStateNumCardLevelTasks(stateName) > 0">
         <div class="state-header">
           <div class="collapse-arrow">

@@ -17,6 +17,8 @@
  * tests.
  */
 var waitFor = require('./waitFor.js');
+var ExplorationEditorImprovementsTab = require(
+  '../protractor_utils/ExplorationEditorImprovementsTab.js');
 var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
 var ExplorationEditorHistoryTab = require(
@@ -36,6 +38,10 @@ var ExplorationEditorPage = function() {
   /*
    * Components
    */
+  this.getImprovementsTab = function() {
+    return (
+      new ExplorationEditorImprovementsTab.ExplorationEditorImprovementsTab());
+  };
   this.getFeedbackTab = function() {
     return new ExplorationEditorFeedbackTab.ExplorationEditorFeedbackTab();
   };
@@ -79,6 +85,8 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-confirm-discard-changes'));
   var discardChangesButton = element(
     by.css('.protractor-test-discard-changes'));
+  var navigateToImprovementsTabButton = element(
+    by.css('.protractor-test-improvements-tab'));
   var navigateToFeedbackTabButton = element(
     by.css('.protractor-test-feedback-tab'));
   var navigateToHistoryTabButton = element(
@@ -230,12 +238,27 @@ var ExplorationEditorPage = function() {
     expect(await saveChangesButton.isPresent()).toBeFalsy();
   };
 
+  this.expectCanPublishChanges = async function() {
+    expect(await publishExplorationButton.isEnabled()).toBeTrue();
+  };
+
+  this.expectCannotPublishChanges = async function() {
+    expect(await publishExplorationButton.isEnabled()).toBeFalsy();
+  };
+
   // ---- NAVIGATION ----
 
   this.navigateToHistoryTab = async function() {
     await waitFor.elementToBeClickable(
       navigateToHistoryTabButton, 'History tab is not clickable');
     await navigateToHistoryTabButton.click();
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToImprovementsTab = async function() {
+    await waitFor.elementToBeClickable(
+      navigateToImprovementsTabButton, 'Improvements tab is not clickable');
+    await navigateToImprovementsTabButton.click();
     await waitFor.pageToFullyLoad();
   };
 
