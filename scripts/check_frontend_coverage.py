@@ -33,7 +33,6 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @marianazangrossi first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'activity-tiles-infinity-grid.directive.ts',
     'admin-config-tab.directive.ts',
     'admin-dev-mode-activities-tab.directive.ts',
     'admin-jobs-tab.directive.ts',
@@ -253,7 +252,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'player-correctness-feedback-enabled.service.ts',
     'player-transcript.service.ts',
     'Polyfills.ts',
-    'practice-tab.component.ts',
     'pretest-question-backend-api.service.ts',
     'profile-link-image.component.ts',
     'profile-link-text.component.ts',
@@ -302,7 +300,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'schema-based-viewer.directive.ts',
     'score-ring.directive.ts',
     'search-bar.directive.ts',
-    'search-results.directive.ts',
     'select2-dropdown.directive.ts',
     'set-of-html-string-editor.directive.ts',
     'set-of-unicode-string-editor.directive.ts',
@@ -397,7 +394,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'utils.service.ts',
     'version-diff-visualization.directive.ts',
     'version-tree.service.ts',
-    'voiceover-opportunities.directive.ts',
     'voiceover-recording.service.ts',
     'warnings-and-alerts.directive.ts',
     'worked-example-editor.directive.ts',
