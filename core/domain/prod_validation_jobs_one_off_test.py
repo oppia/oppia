@@ -2490,19 +2490,19 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 u'[u\'failed validation check for content count check '
                 'of ExplorationOpportunitySummaryModel\', '
                 '[u"Entity id 1: Content count: 10 does not match the '
-                'content count of external exploration model: 2"]]'
+                'content count of external exploration model: 1"]]'
             ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
         run_job_and_check_output(
             self, expected_output, sort=True, literal_eval=True)
 
     def test_model_with_invalid_translation_counts(self):
-        self.model_instance_1.translation_counts = {'hi': 2}
+        self.model_instance_1.translation_counts = {'hi': 0}
         self.model_instance_1.put()
         expected_output = [
             (
                 u'[u\'failed validation check for translation count check '
                 'of ExplorationOpportunitySummaryModel\', '
-                '[u"Entity id 1: Translation counts: {u\'hi\': 2} does not '
+                '[u"Entity id 1: Translation counts: {u\'hi\': 0} does not '
                 'match the translation counts of external exploration model: '
                 '{}"]]'
             ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
