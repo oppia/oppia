@@ -179,12 +179,12 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                 'math_content-with-value': {
                     u'raw_latex': 'x^3',
                     u'svg_filename': (
-                        u'mathImg_20207s61338_imzlvnf23a_height_4d123_width_23d'
+                        u'invalid_2020761338_imzlvnf23a_height_4d123_width_23d'
                         '122_vertical_2d123.svg')
                 }
             }, (
-                'Invalid svg_filename attribute in math component: mathImg_202'
-                '07s61338_imzlvnf23a_height_4d123_width_23d122_vertical_2d123'
+                'Invalid svg_filename attribute in math component: invalid_202'
+                '0761338_imzlvnf23a_height_4d123_width_23d122_vertical_2d123'
                 '.svg')),
             ({
                 'math_content-with-value': {

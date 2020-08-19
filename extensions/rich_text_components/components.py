@@ -147,7 +147,7 @@ class Math(BaseRteComponent):
         """Validates Math component."""
         super(Math, cls).validate(value_dict)
         filename_pattern_regex = (
-            r'mathImg_[0-9]+_\S{10}_height_[0-9d]+_width_[0-9d]+_vertical_['
+            r'mathImg_[A-Za-z0-9+/_-]+_height_[0-9d]+_width_[0-9d]+_vertical_['
             '0-9d]+.(svg)$')
         filename = value_dict['math_content-with-value']['svg_filename']
         if not re.match(filename_pattern_regex, filename):
