@@ -34,8 +34,6 @@ require('services/debouncer.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
-require('third-party-imports/math-expressions.import.ts');
-require('third-party-imports/guppy.import.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
   '$timeout', 'FocusManagerService', 'MathExpressionInputRulesService',

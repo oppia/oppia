@@ -41,7 +41,6 @@ require('services/exploration-features-backend-api.service.ts');
 require('services/exploration-features.service.ts');
 require('services/playthrough.service.ts');
 require('services/contextual/url.service.ts');
-require('third-party-imports/guppy.import.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');

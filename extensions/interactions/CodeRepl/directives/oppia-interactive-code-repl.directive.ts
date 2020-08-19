@@ -29,7 +29,6 @@ require(
   'interactions/interaction-attributes-extractor.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
-require('third-party-imports/skulpt.import');
 
 import { Subscription } from 'rxjs';
 

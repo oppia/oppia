@@ -19,8 +19,6 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import 'third-party-imports/midi-js.import';
-
 export interface Note {
   midiValue: number;
   duration: number;
