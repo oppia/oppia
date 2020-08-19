@@ -421,3 +421,10 @@ class FullyQualifiedUserScoreIdentifier(python_utils.OBJECT):
     def __init__(self, user_id, score_category):
         self.user_id = user_id
         self.score_category = score_category
+
+    def __hash__(self):
+        return hash((self.user_id, self.score_category))
+
+    def __eq__(self, other):
+        return (self.user_id, self.score_category) == (
+            other.user_id, other.score_category)

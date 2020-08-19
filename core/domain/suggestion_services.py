@@ -32,6 +32,7 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (feedback_models, suggestion_models, user_models) = (
@@ -362,6 +363,8 @@ def accept_suggestions(
     # When recording of scores is enabled, the author of the suggestion gets an
     # increase in their score for the suggestion category.
     if feconf.ENABLE_RECORDING_OF_SCORES:
+        # The identifiers are needed to retrieve and create multiple user
+        # scoring models.
         user_score_identifiers = [
             user_domain.FullyQualifiedUserScoreIdentifier(
                 suggestion.author_id, suggestion.score_category)
@@ -372,27 +375,57 @@ def accept_suggestions(
                 user_score_identifiers)
         )
 
-        # Create the user scoring domain objects from the user scoring models
-        # and if a user scoring model does not exist, create both the model and
-        # the corresponding domain object.
+        # Create the user scoring domain objects from the user scoring models.
         user_scorings = []
-        for index, user_scoring_model in enumerate(user_scoring_models):
-            # If a user scoring model doesn't exist, create one.
-            if user_scoring_model is None:
-                user_scoring = create_new_user_scoring(
-                    user_score_identifiers[index].user_id,
-                    user_score_identifiers[index].score_category,
-                    0
-                )
+        # Keep track of which user score identifiers do not have user scoring
+        # models so that they can be created.
+        user_score_identifiers_missing_models = []
+        # Keep track of the frequency that each user score identifier occurs so
+        # that domain objects are unique and properly incremented.
+        user_score_identifier_frequencies = {}
+        for user_score_identifier, user_scoring_model in python_utils.ZIP(
+                user_score_identifiers, user_scoring_models):
+            # This is the first time that we've encountered this user score
+            # identifier so we know that it is unique. Therefore, we can add it
+            # to the list of missing ids if the model doesn't exist and if the
+            # model does exist, we can create the corresponding domain object.
+            if user_score_identifier not in user_score_identifier_frequencies:
+                user_score_identifier_frequencies[user_score_identifier] = 1
+                if user_scoring_model is None:
+                    user_score_identifiers_missing_models.append(
+                        user_score_identifiers[index])
+                else:
+                    user_scorings.append(
+                        get_user_scoring_from_model(user_scoring_model)
+                    )
+            # If the user score identifier wasn't unique, we know that it is in
+            # the dict and so we can safely increment the value.
             else:
-                user_scoring = get_user_scoring_from_model(user_scoring_model)
-            user_scorings.append(user_scoring)
+                user_score_identifier_frequencies[user_score_identifier] += 1
+        # Create the new user scoring models and domain objects for the missing
+        # ids and add those new domain objects to the rest of the domain
+        # objects.
+        if user_score_identifiers_missing_models:
+            new_user_scorings = create_new_user_scorings(
+                user_score_identifiers_missing_models, 0
+            )
+            user_scorings.extend(new_user_scorings)
 
         # Increment the score of the authors of the suggestions that are being
         # suggested.
         for index, user_scoring in enumerate(user_scorings):
-            user_scoring.increment_score(
-                suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+            # Create the user score identifier to look up the corresponding
+            # frequency.
+            user_score_identifier = (
+                user_domain.FullyQualifiedUserScoreIdentifier(
+                    user_scoring.user_id, user_scoring.score_category)
+            )
+            frequency = user_score_identifier_frequencies[
+                user_score_identifier]
+            # Increment the score 'frequency' amount of times.
+            for freq in range(frequency):
+                user_scoring.increment_score(
+                    suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
 
         # Emails are sent to onboard new reviewers. These new reviewers are
         # created when the score of the user passes the minimum score required
@@ -772,7 +805,7 @@ def create_new_user_scorings(user_score_identifiers, score):
 
     Args:
         user_score_identifiers: list(FullyQualifiedUserScoreIdentifier). A list
-            of unique (user_id, score_category) pairs that correspond to the
+            of unqiue (user_id, score_category) pairs that correspond to the
             user scorings to create.
         score: float. The scores of the users for the given categories.
 
