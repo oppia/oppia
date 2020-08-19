@@ -978,6 +978,52 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_update_flag_rules_with_unexpected_exception_returns_500(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        feature = platform_parameter_registry.Registry.create_feature_flag(
+            'test_feature_1', 'feature for test.', 'dev')
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            set([feature.name]))
+        # Replace the stored instance with None in order to trigger unexpected
+        # exception during update.
+        platform_parameter_registry.Registry.parameter_registry[
+            feature.name] = None
+        with feature_list_ctx, feature_set_ctx:
+            response = self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': feature.name,
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update feature',
+                },
+                csrf_token=csrf_token,
+                expected_status_int=500
+            )
+            self.assertEqual(
+                response['error'],
+                '\'NoneType\' object has no attribute \'serialize\'')
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            feature.name)
+        self.logout()
+
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy explorations."""

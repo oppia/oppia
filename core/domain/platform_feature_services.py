@@ -49,7 +49,8 @@ ALL_FEATURES_NAMES_SET = set(ALL_FEATURES_LIST)
 
 
 class FeatureFlagNotFoundException(Exception):
-    """Error class for feature flag not found error."""
+    """Exception thrown when an unknown feature flag is requested."""
+
     pass
 
 
