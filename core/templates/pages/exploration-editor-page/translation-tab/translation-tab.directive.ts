@@ -329,7 +329,7 @@ angular.module('oppia').directive('translationTab', [
             ctrl.directiveSubscriptions.add(
               // eslint-disable-next-line max-len
               StateTutorialFirstTimeService.onEnterTranslationForTheFirstTime.subscribe(
-                () => ctrl.showWelcomeTranslationModal()
+                () => $scope.showWelcomeTranslationModal()
               )
             );
             ctrl.directiveSubscriptions.add(
