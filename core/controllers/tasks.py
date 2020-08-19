@@ -28,6 +28,7 @@ from core.domain import suggestion_services
 from core.platform import models
 
 from google.cloud import ndb
+from google.cloud import datastore
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
@@ -44,8 +45,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
             # Model may not exist if user has already attended to the feedback.
             return
 
-        with ndb.Client().transaction():
-            feedback_services.update_feedback_email_retries(user_id)
+        feedback_services.update_feedback_email_retries(user_id)
 
         messages = {}
         for reference in references:
@@ -69,7 +69,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
 
         email_manager.send_feedback_message_email(user_id, messages)
 
-        with ndb.Client().transaction():
+        with datastore.Client().transaction():
             feedback_services.pop_feedback_message_references(user_id,
                 len(references))
 

@@ -30,6 +30,7 @@ import python_utils
 import utils
 
 from google.cloud import ndb
+from google.cloud import datastore
 
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
@@ -379,6 +380,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         """
         exp_id = args[0]
 
+        @ndb.transactional()
         def _refresh_average_ratings(user_id, rating, old_rating):
             """Refreshes the average ratings in the given realtime layer.
 
@@ -414,6 +416,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.num_ratings = num_ratings
                 model.put()
 
+        @ndb.transactional()
         def _increment_total_plays_count(user_id):
             """Increments the total plays count of the exploration in the
             realtime layer.
@@ -438,14 +441,12 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         if exp_summary:
             for user_id in exp_summary.owner_ids:
                 if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
-                    with ndb.Client().transaction():
-                        _increment_total_plays_count(user_id)
+                    _increment_total_plays_count(user_id)
 
                 elif event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
                     rating = args[2]
                     old_rating = args[3]
-                    with ndb.Client().transaction():
-                        _refresh_average_ratings(user_id, rating, old_rating)
+                    _refresh_average_ratings(user_id, rating, old_rating)
 
     # Public query method.
     @classmethod

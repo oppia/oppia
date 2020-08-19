@@ -35,6 +35,8 @@ import feconf
 import python_utils
 
 from google.cloud import ndb
+from google.cloud import datastore
+
 from mapreduce import input_readers
 
 (base_models, exp_models, stats_models, job_models) = (
@@ -42,7 +44,6 @@ from mapreduce import input_readers
         models.NAMES.base_model, models.NAMES.exploration,
         models.NAMES.statistics, models.NAMES.job]))
 taskqueue_services = models.Registry.import_taskqueue_services()
-transaction_services = models.Registry.import_transaction_services()
 
 JOB_FAILED_MESSAGE = 'failed (as expected)'
 
@@ -1061,6 +1062,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             unused_state_name, unused_session_id, unused_params,
             unused_play_type):
 
+        @ndb.transactional()
         def _increment_counter():
             """Increments the count, if the realtime model corresponding to the
             active real-time model id exists.
@@ -1072,8 +1074,8 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             realtime_class(
                 id=realtime_model_id, count=1,
                 realtime_layer=active_realtime_layer).put()
-        with ndb.Client().transaction():
-            _increment_counter()
+
+        _increment_counter()
 
     # Public query method.
     @classmethod

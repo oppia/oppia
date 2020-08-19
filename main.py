@@ -72,7 +72,6 @@ from webapp2_extras import routes
 
 
 current_user_services = models.Registry.import_current_user_services()
-transaction_services = models.Registry.import_transaction_services()
 
 
 class FrontendErrorHandler(base.BaseHandler):

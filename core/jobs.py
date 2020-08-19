@@ -32,6 +32,8 @@ import utils
 
 from google.appengine.api import app_identity
 from google.cloud import ndb
+from google.cloud import datastore
+
 from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
@@ -43,7 +45,6 @@ from pipeline import pipeline
 (base_models, job_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job])
 taskqueue_services = models.Registry.import_taskqueue_services()
-transaction_services = models.Registry.import_transaction_services()
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
 MAPPER_PARAM_KEY_QUEUED_TIME_MSECS = 'queued_time_msecs'
@@ -127,6 +128,7 @@ class BaseJobManager(python_utils.OBJECT):
                 'Tried to directly create a job using the abstract base '
                 'manager class %s, which is not allowed.' % cls.__name__)
 
+        @ndb.transactional()
         def _create_new_job():
             """Creates a new job by generating a unique id and inserting
             it into the model.
@@ -138,8 +140,7 @@ class BaseJobManager(python_utils.OBJECT):
             job_models.JobModel(id=job_id, job_type=cls.__name__).put()
             return job_id
 
-        with ndb.Client().transaction():
-            return _create_new_job()
+        return _create_new_job()
 
     @classmethod
     def enqueue(
@@ -1360,6 +1361,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         Returns:
             str. The active realtime layer index of this class.
         """
+        @ndb.transactional()
         def _get_active_realtime_index_transactional():
             """Finds the Continous Computation Model corresponding to this
             class type or inserts it in the database if not found and extracts
@@ -1377,8 +1379,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
             return cc_model.active_realtime_layer_index
 
-        with ndb.Client().transaction():
-            return _get_active_realtime_index_transactional()
+        return _get_active_realtime_index_transactional()
 
     @classmethod
     def get_active_realtime_layer_id(cls, entity_id):
@@ -1419,6 +1420,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         """Switches the currently-active realtime layer for this continuous
         computation.
         """
+        @ndb.transactional()
         def _switch_active_realtime_class_transactional():
             """Retrieves currently-active realtime layer index, switches it
             and inserts the new model to the database.
@@ -1429,8 +1431,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                 1 - cc_model.active_realtime_layer_index)
             cc_model.put()
 
-        with ndb.Client().transaction():
-            _switch_active_realtime_class_transactional()
+        _switch_active_realtime_class_transactional()
 
     @classmethod
     def _clear_inactive_realtime_layer(cls, latest_created_on_datetime):
@@ -1469,6 +1470,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         Processing means the following: if the job is currently 'stopping', its
         status is set to 'idle'; otherwise, its status remains as 'running'.
         """
+        @ndb.transactional()
         def _register_end_of_batch_job_transactional():
             """Transactionally change the computation's status when a batch job
             ends.
@@ -1482,8 +1484,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
             return cc_model.status_code
 
-        with ndb.Client().transaction():
-            return _register_end_of_batch_job_transactional()
+        return _register_end_of_batch_job_transactional()
 
     @classmethod
     def get_status_code(cls):
@@ -1502,6 +1503,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         Raises:
             Exception. The computation wasn't idle before trying to start.
         """
+        @ndb.transactional()
         def _start_computation_transactional():
             """Transactional implementation for marking a continuous
             computation as started.
@@ -1523,8 +1525,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.last_started_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
-        with ndb.Client().transaction():
-            _start_computation_transactional
+        _start_computation_transactional
 
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
@@ -1545,6 +1546,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             job_models.JobModel.do_unfinished_jobs_exist(
                 cls._get_batch_job_manager_class().__name__))
 
+        @ndb.transactional()
         def _stop_computation_transactional():
             """Transactional implementation for marking a continuous
             computation as stopping/idle.
@@ -1559,8 +1561,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.last_stopped_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
-        with ndb.Client().transaction():
-            _stop_computation_transactional()
+        _stop_computation_transactional()
 
         # The cancellation must be done after the continuous computation
         # status update.
@@ -1606,6 +1607,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         cls._switch_active_realtime_class()
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
+        @ndb.transactional()
         def _update_last_finished_time_transactional():
             """Updates the time at which a batch job for this computation was
             last completed or failed, in milliseconds since the epoch, setting
@@ -1615,8 +1617,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.last_finished_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
-        with ndb.Client().transaction():
-            _update_last_finished_time_transactional()
+        _update_last_finished_time_transactional()
 
         return cls._register_end_of_batch_job_and_return_status()
 

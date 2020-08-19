@@ -29,6 +29,8 @@ import feconf
 import python_utils
 
 from google.cloud import ndb
+from google.cloud import datastore
+
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
 
@@ -61,6 +63,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     except:
         raise Exception('Invalid exploration id %s' % exploration_id)
 
+    @ndb.transactional()
     def _update_user_rating():
         """Updates the user rating of the exploration. Returns the old rating
         before updation.
@@ -78,8 +81,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         exp_user_data_model.put()
         return old_rating
 
-    with ndb.Client().transaction():
-        old_rating = _update_user_rating()
+    old_rating = _update_user_rating()
 
     exploration_summary = exp_fetchers.get_exploration_summary_by_id(
         exploration_id)

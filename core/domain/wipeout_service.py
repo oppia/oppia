@@ -27,6 +27,8 @@ from core.domain import wipeout_domain
 from core.platform import models
 import python_utils
 
+from google.cloud import datastore
+
 current_user_services = models.Registry.import_current_user_services()
 (
     base_models, improvements_models, question_models,
@@ -296,6 +298,7 @@ def _delete_activity_models(
             _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
         save_pending_deletion_request(pending_deletion_request)
 
+    @ndb.transactional()
     def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
 
@@ -332,11 +335,10 @@ def _delete_activity_models(
                 0,
                 len(activity_related_models),
                 MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            with ndb.Client().transaction():
-                _pseudonymize_models(
-                    activity_related_models[
-                        i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-                    pseudonymized_user_id)
+            _pseudonymize_models(
+                activity_related_models[
+                    i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                pseudonymized_user_id)
 
 
 def _delete_user_models(user_id):

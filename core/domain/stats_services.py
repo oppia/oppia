@@ -33,6 +33,7 @@ import feconf
 import utils
 
 from google.cloud import ndb
+from google.cloud import datastore
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
@@ -644,6 +645,7 @@ def create_stats_model(exploration_stats):
     return instance_id
 
 
+@ndb.transactional()
 def _save_stats_model(exploration_stats):
     """Updates the ExplorationStatsModel datastore instance with the passed
     ExplorationStats domain object.
@@ -683,8 +685,7 @@ def save_stats_model_transactional(exploration_stats):
         exploration_stats: ExplorationStats. The exploration statistics domain
             object.
     """
-    with ndb.Client().transaction():
-        _save_stats_model(exploration_stats)
+    _save_stats_model(exploration_stats)
 
 
 def create_exp_issues_model(exp_issues):
@@ -700,6 +701,7 @@ def create_exp_issues_model(exp_issues):
         exp_issues.exp_id, exp_issues.exp_version, unresolved_issues_dicts)
 
 
+@ndb.transactional()
 def _save_exp_issues_model(exp_issues):
     """Updates the ExplorationIssuesModel datastore instance with the passed
     ExplorationIssues domain object.
@@ -727,8 +729,7 @@ def save_exp_issues_model_transactional(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain
             object.
     """
-    with ndb.Client().transaction():
-        _save_exp_issues_model(exp_issues)
+    _save_exp_issues_model(exp_issues)
 
 
 def get_exploration_stats_multi(exp_version_references):

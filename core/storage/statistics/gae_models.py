@@ -30,6 +30,7 @@ import python_utils
 import utils
 
 from google.cloud import ndb
+from google.cloud import datastore
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -1712,6 +1713,7 @@ class StateAnswersModel(base_models.BaseModel):
             return None
 
     @classmethod
+    @ndb.transactional()
     def _insert_submitted_answers_unsafe(
             cls, exploration_id, exploration_version, state_name,
             interaction_id, new_submitted_answer_dict_list):
@@ -1830,10 +1832,9 @@ class StateAnswersModel(base_models.BaseModel):
             new_submitted_answer_dict_list: list(dict). List of new submitted
                 answers each of which is stored as a JSON blob.
         """
-        with ndb.Client().transaction():
-            cls._insert_submitted_answers_unsafe(exploration_id,
-                exploration_version, state_name, interaction_id,
-                new_submitted_answer_dict_list)
+        cls._insert_submitted_answers_unsafe(exploration_id,
+            exploration_version, state_name, interaction_id,
+            new_submitted_answer_dict_list)
 
     @classmethod
     def _get_entity_id(

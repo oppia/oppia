@@ -34,6 +34,8 @@ import feconf
 import python_utils
 import utils
 
+from google.cloud import datastore
+
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -335,6 +337,7 @@ def _send_email(
             (recipient_id, email_subject, cleaned_plaintext_body))
         return
 
+    @ndb.transactional()
     def _send_email_in_transaction():
         """Sends the email to a single recipient."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
@@ -347,8 +350,7 @@ def _send_email(
             recipient_id, recipient_email, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
-    with ndb.Client().transaction():
-        _send_email_in_transaction()
+    _send_email_in_transaction()
 
 
 def _send_bulk_mail(
@@ -384,6 +386,7 @@ def _send_bulk_mail(
         '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
+    @ndb.transactional()
     def _send_bulk_mail_in_transaction(instance_id):
         """Sends the emails in bulk to the recipients.
 
@@ -400,8 +403,7 @@ def _send_bulk_mail(
             instance_id, recipient_ids, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
-    with ndb.Client().transaction():
-        _send_bulk_mail_in_transaction(instance_id)
+    _send_bulk_mail_in_transaction(instance_id)
 
 
 def send_job_failure_email(job_id):

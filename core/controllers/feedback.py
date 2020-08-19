@@ -25,6 +25,7 @@ from core.platform import models
 import feconf
 
 from google.cloud import ndb
+from google.cloud import datastore
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -183,7 +184,6 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
     @acl_decorators.can_comment_on_feedback_thread
     def post(self, thread_id):
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
-        with ndb.Client().transaction():
-            feedback_services.clear_feedback_message_references(self.user_id,
-                exploration_id, thread_id)
+        feedback_services.clear_feedback_message_references(self.user_id,
+            exploration_id, thread_id)
         self.render_json(self.values)

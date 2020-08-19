@@ -33,6 +33,7 @@ import feconf
 import python_utils
 
 from google.cloud import ndb
+from google.cloud import datastore
 
 (feedback_models, email_models, suggestion_models) = (
     models.Registry.import_models(
@@ -748,6 +749,7 @@ def enqueue_feedback_message_batch_email_task(user_id):
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
 
 
+@ndb.transactional()
 def enqueue_feedback_message_instant_email_task(user_id, reference):
     """Adds a 'send feedback email' (instant) task into the task queue.
 
@@ -764,6 +766,7 @@ def enqueue_feedback_message_instant_email_task(user_id, reference):
         feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS, payload, 0)
 
 
+@ndb.transactional()
 def _enqueue_feedback_thread_status_change_email_task(
         user_id, reference, old_status, new_status):
     """Adds a task for sending email when a feedback thread status is changed.
@@ -807,6 +810,7 @@ def get_feedback_message_references(user_id):
     ]
 
 
+@ndb.transactional()
 def _add_feedback_message_reference(user_id, reference):
     """Adds a new message to the feedback message buffer that is used to
     generate the next notification email to the given user.
@@ -829,6 +833,7 @@ def _add_feedback_message_reference(user_id, reference):
         enqueue_feedback_message_batch_email_task(user_id)
 
 
+@ndb.transactional()
 def update_feedback_email_retries(user_id):
     """If sufficient time has passed, increment the number of retries for the
     corresponding user's UnsentEmailFeedbackModel.
@@ -846,6 +851,7 @@ def update_feedback_email_retries(user_id):
         model.put()
 
 
+@ndb.transactional()
 def pop_feedback_message_references(user_id, num_references_to_pop):
     """Pops feedback message references of the given user which have been
     processed already.
@@ -869,7 +875,7 @@ def pop_feedback_message_references(user_id, num_references_to_pop):
         model.put()
         enqueue_feedback_message_batch_email_task(user_id)
 
-
+@ndb.transactional()
 def clear_feedback_message_references(user_id, exploration_id, thread_id):
     """Removes feedback message references associated with a feedback thread.
 
@@ -963,9 +969,8 @@ def _send_batch_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            with ndb.Client().transaction():
-                _add_feedback_message_reference(recipient_id,
-                    feedback_message_reference)
+            _add_feedback_message_reference(recipient_id,
+                feedback_message_reference)
 
 
 def _send_instant_emails(
@@ -988,9 +993,8 @@ def _send_instant_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            with ndb.Client().transaction():
-                enqueue_feedback_message_instant_email_task(recipient_id,
-                    feedback_message_reference)
+            enqueue_feedback_message_instant_email_task(recipient_id,
+                feedback_message_reference)
 
 
 def _send_feedback_thread_status_change_emails(
@@ -1014,9 +1018,8 @@ def _send_feedback_thread_status_change_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            with ndb.Client().transaction():
-                _enqueue_feedback_thread_status_change_email_task(recipient_id,
-                    feedback_message_reference, old_status, new_status)
+            _enqueue_feedback_thread_status_change_email_task(recipient_id,
+                feedback_message_reference, old_status, new_status)
 
 
 def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):

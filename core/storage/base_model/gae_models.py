@@ -239,6 +239,7 @@ class BaseModel(ndb.Model):
         return super(BaseModel, self).put_async()
 
     @classmethod
+    @ndb.transactional()
     def put_multi(cls, entities, update_last_updated_time=True):
         """Stores the given ndb.Model instances.
 
@@ -249,8 +250,8 @@ class BaseModel(ndb.Model):
         """
         # Internally put_multi calls put so we don't need to call
         # _update_timestamps here.
-        ndb.put_multi(
-            entities, update_last_updated_time=update_last_updated_time)
+        #cls._update_timestamps(update_last_updated_time)
+        ndb.put_multi(entities)
 
     @classmethod
     def put_multi_async(cls, entities, update_last_updated_time=True):
@@ -266,10 +267,11 @@ class BaseModel(ndb.Model):
         """
         # Internally put_multi_async calls put_async so we don't need to call
         # _update_timestamps here.
-        return ndb.put_multi_async(
-            entities, update_last_updated_time=update_last_updated_time)
+        #cls._update_timestamps(update_last_updated_time)
+        return ndb.put_multi_async(entities)
 
     @classmethod
+    @ndb.transactional()
     def delete_multi(cls, entities):
         """Deletes the given ndb.Model instances.
 
@@ -676,13 +678,12 @@ class VersionedModel(BaseModel):
         snapshot_content_instance = (
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
-        with datastore.Client().transaction():
-            BaseModel.put_multi(
-                [
-                    snapshot_metadata_instance,
-                    snapshot_content_instance,
-                    self
-                ])
+        BaseModel.put_multi(
+            [
+                snapshot_metadata_instance,
+                snapshot_content_instance,
+                self,
+            ])
 
     def delete(self, committer_id, commit_message, force_deletion=False):
         """Deletes this model instance.
@@ -767,10 +768,9 @@ class VersionedModel(BaseModel):
                     ndb.Key(model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                     for snapshot_id in model_snapshot_ids])
             versioned_models_keys = [model.key for model in versioned_models]
-            with datastore.Client().transaction():
-                ndb.delete_multi(
-                    all_models_metadata_keys + all_models_content_keys +
-                    versioned_models_keys)
+            ndb.delete_multi(
+                all_models_metadata_keys + all_models_content_keys +
+                versioned_models_keys)
         else:
             for model in versioned_models:
                 model._require_not_marked_deleted()  # pylint: disable=protected-access
@@ -793,10 +793,9 @@ class VersionedModel(BaseModel):
                 snapshot_content_models.append(
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
-            with datastore.Client().transaction():
-                BaseModel.put_multi(
-                    snapshot_metadata_models + snapshot_content_models +
-                    versioned_models)
+            BaseModel.put_multi(
+                snapshot_metadata_models + snapshot_content_models +
+                versioned_models)
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
