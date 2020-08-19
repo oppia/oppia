@@ -31,13 +31,13 @@ const createSubtopicConstants = require('constants.ts');
 angular.module('oppia').controller('CreateNewSubtopicModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'SubtopicPageObjectFactory', 'SubtopicValidationService',
-  'TopicEditorStateService', 'TopicUpdateService',
+  'TopicEditorStateService', 'TopicUpdateService', 'WindowRef',
   'topic', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
   'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
   function(
       $controller, $scope, $uibModalInstance,
       SubtopicPageObjectFactory, SubtopicValidationService,
-      TopicEditorStateService, TopicUpdateService,
+      TopicEditorStateService, TopicUpdateService, WindowRef,
       topic, MAX_CHARS_IN_SUBTOPIC_TITLE,
       MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
@@ -47,6 +47,9 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
     var ctrl = this;
 
     ctrl.init = function() {
+      ctrl.hostname = WindowRef.nativeWindow.location.hostname;
+      ctrl.classroomUrlFragment = (
+        TopicEditorStateService.getClassroomUrlFragment());
       ctrl.topic = topic;
       ctrl.SUBTOPIC_PAGE_SCHEMA = {
         type: 'html',
