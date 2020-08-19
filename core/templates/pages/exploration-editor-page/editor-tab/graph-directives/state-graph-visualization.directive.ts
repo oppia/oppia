@@ -391,10 +391,6 @@ angular.module('oppia').directive('stateGraphVisualization', [
             }
           };
           ctrl.$onInit = function() {
-            $scope.$on('redrawGraph', function() {
-              redrawGraph();
-            });
-
             $scope.$on('centerGraph', function() {
               centerGraph();
             });
