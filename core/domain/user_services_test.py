@@ -71,13 +71,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserServicesUnitTests, self).setUp()
+        schema_version = 1
         self.modifiable_user_data = user_domain.ModifiableUserData(
             'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, 'user_id'
+            None, None, schema_version, 'user_id'
         )
         self.modifiable_new_user_data = user_domain.ModifiableUserData(
             'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None
+            None, None, schema_version
         )
 
     def test_is_user_id_correct(self):
@@ -797,6 +798,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 gae_id, email, [self.modifiable_new_user_data])
 
     def test_create_multiple_new_profiles_for_same_user_works_correctly(self):
+        schema_version = 1
         gae_id = 'gae_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
@@ -818,7 +820,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data.pin = profile_pin
         modifiable_new_user_data_2 = user_domain.ModifiableUserData(
             display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
-            None, None
+            None, None, schema_version
         )
         user_settings_list = user_services.create_new_profiles(
             gae_id, email, [
@@ -928,6 +930,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_users_data_for_multiple_users_works_correctly(self):
         # Preparing for the test.
+        schema_version = 1
         gae_id = 'gae_id'
         email = 'new@example.com'
         display_alias = 'display_alias'
@@ -949,7 +952,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data.pin = profile_pin
         modifiable_new_user_data_2 = user_domain.ModifiableUserData(
             display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
-            None, None
+            None, None, schema_version
         )
         user_settings_list = user_services.create_new_profiles(
             gae_id, email, [
@@ -1755,14 +1758,14 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings = user_services.get_user_settings(self.owner_id)
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
-
+        schema_version = 1
         self.modifiable_user_data = user_domain.ModifiableUserData(
             'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, 'user_id'
+            None, None, schema_version, 'user_id'
         )
         self.modifiable_new_user_data = user_domain.ModifiableUserData(
             'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None
+            None, None, schema_version
         )
 
     def test_validate_non_str_user_id_raises_exception(self):
