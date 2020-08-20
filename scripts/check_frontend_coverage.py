@@ -374,6 +374,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topic-editor-page.component.ts',
     'topic-editor-state.service.ts',
     'topic-editor-stories-list.directive.ts',
+    'topic-info-tab.directive.ts',
     'topic-questions-tab.directive.ts',
     'topic-selector.directive.ts',
     'topic-summary-tile.directive.ts',
