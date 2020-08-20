@@ -74,6 +74,7 @@ angular.module('oppia').component('improvementsTab', {
             const siaTasks = (
               ExplorationImprovementsTaskRegistryService
                 .getOpenSuccessiveIncorrectAnswersTasks());
+
             this.getNumTasks = () => (
               hbrTasks.length + iflTasks.length + ngrTasks.length +
               siaTasks.length);
@@ -81,14 +82,6 @@ angular.module('oppia').component('improvementsTab', {
             this.getNumConceptLevelTasks = () => iflTasks.length;
             this.getNumCardLevelTasks = () => ngrTasks.length + siaTasks.length;
             this.hasCriticalTasks = () => ngrTasks.length > 0;
-            this.getStateNumCardLevelTasks = (stateName: string) => {
-              const stateTasks = (
-                ExplorationImprovementsTaskRegistryService.getStateTasks(
-                  stateName));
-              const ngrTask = stateTasks.ngrTask;
-              const siaTask = stateTasks.siaTask;
-              return (ngrTask.isOpen() ? 1 : 0) + (siaTask.isOpen() ? 1 : 0);
-            };
             this.getExplorationHealth = () => {
               if (this.hasCriticalTasks()) {
                 return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_CRITICAL;
@@ -98,15 +91,23 @@ angular.module('oppia').component('improvementsTab', {
                 return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_HEALTHY;
               }
             };
+            this.getStateNumCardLevelTasks = (stateName: string) => {
+              const stateTasks = (
+                ExplorationImprovementsTaskRegistryService.getStateTasks(
+                  stateName));
+              const ngrTask = stateTasks.ngrTask;
+              const siaTask = stateTasks.siaTask;
+              return (ngrTask.isOpen() ? 1 : 0) + (siaTask.isOpen() ? 1 : 0);
+            };
 
             this.allStateTasks = (
               ExplorationImprovementsTaskRegistryService.getAllStateTasks());
 
             const stateRetentions: Map<string, number> = new Map(
               this.allStateTasks.map(stateTasks => {
-                const numCompletions = (
-                  stateTasks.supportingStats.numCompletions);
-                const totalHitCount = stateTasks.supportingStats.totalHitCount;
+                const stateStats = stateTasks.supportingStats.stateStats;
+                const numCompletions = stateStats.numCompletions;
+                const totalHitCount = stateStats.totalHitCount;
                 const retentionRate = Math.round(
                   totalHitCount ? (100.0 * numCompletions / totalHitCount) : 0);
                 return [stateTasks.stateName, retentionRate];
