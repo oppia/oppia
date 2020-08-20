@@ -177,7 +177,7 @@ angular.module('oppia').factory('ImageUploadHelperService', [
             '_vertical_' + verticalPadding +
             '.' + 'svg'
         );
-        var filenameRegexString = Constants.MATH_SVG_FILENAME_RE;
+        var filenameRegexString = Constants.MATH_SVG_FILENAME_REGEX;
         var filenameRegex = RegExp(filenameRegexString, 'g');
         if (filenameRegex.exec(filename)) {
           return filename;

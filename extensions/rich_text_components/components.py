@@ -146,7 +146,7 @@ class Math(BaseRteComponent):
     def validate(cls, value_dict):
         """Validates Math component."""
         super(Math, cls).validate(value_dict)
-        filename_pattern_regex = constants.constants.MATH_SVG_FILENAME_RE
+        filename_pattern_regex = constants.constants.MATH_SVG_FILENAME_REGEX
         filename = value_dict['math_content-with-value']['svg_filename']
         if not re.match(filename_pattern_regex, filename):
             raise Exception(
