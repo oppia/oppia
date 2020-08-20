@@ -1197,8 +1197,8 @@ class PositionOfTerms(BaseObject):
 
 
 class RatioExpression(BaseObject):
-    """Class for ratio expression. Stores a list of non-negative integers representing a
-    valid ratio expression.
+    """Class for ratio expression. Stores a list of non-negative 
+    integers representing a valid ratio expression.
     """
 
     description = 'A list of integers for ratio expression.'

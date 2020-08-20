@@ -772,10 +772,11 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             (2, 'Expected list, received 2'),
             ({'a': 1}, r'Expected list, received \{u\'a\': 1\}'),
             ('1: 2: 1', r'Expected list, received 1: 2: 1')]
- 
+
         self.check_normalization(
             objects.RatioExpression, mappings,
             invalid_values_with_error_messages)
+
 
 class SchemaValidityTests(test_utils.GenericTestBase):
 
