@@ -146,38 +146,38 @@ describe('Search bar component', function() {
       '/find?q=&language_code=(%22es%22%20OR%20%22hi%22)');
   });
 
-  it('should filter and search content by categories, language and text',
-    function() {
-      var getUrlParamsSpy = spyOn(urlService, 'getUrlParams');
+  it('should filter and search content by categories, language and text when' +
+    'changing language code', function() {
+    var getUrlParamsSpy = spyOn(urlService, 'getUrlParams');
 
-      $httpBackend.expectGET(
-        '/searchhandler/data?q=%22mars%22&' +
-        'category=("astronomy")&language_code=("pt")').respond({});
-      getUrlParamsSpy.and.returnValue({q: 'mars'});
-      mockWindow.location.pathname = '/search/find';
-      mockWindow.location.search = (
-        '?q=%22mars%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
-      preferredLanguageCodesLoadedEmitter.emit([]);
-      $httpBackend.flush();
+    $httpBackend.expectGET(
+      '/searchhandler/data?q=%22mars%22&' +
+      'category=("astronomy")&language_code=("pt")').respond({});
+    getUrlParamsSpy.and.returnValue({q: 'mars'});
+    mockWindow.location.pathname = '/search/find';
+    mockWindow.location.search = (
+      '?q=%22mars%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
+    preferredLanguageCodesLoadedEmitter.emit([]);
+    $httpBackend.flush();
 
-      expect($location.url()).toBe(
-        '/find?q=%22mars%22&category=(%22astronomy%22)&' +
-        'language_code=(%22pt%22)');
+    expect($location.url()).toBe(
+      '/find?q=%22mars%22&category=(%22astronomy%22)&' +
+      'language_code=(%22pt%22)');
 
-      $httpBackend.expectGET(
-        '/searchhandler/data?q=%22sun%22&category=("astronomy")&' +
-        'language_code=("es")').respond({});
-      mockWindow.location.pathname = '';
-      mockWindow.location.search = (
-        '?q=%22sun%22&language_code=(%22es%22)&category=(%22astronomy%22)');
-      getUrlParamsSpy.and.returnValue({q: 'sun'});
-      preferredLanguageCodesLoadedEmitter.emit([]);
-      $scope.$digest();
-      $httpBackend.flush();
+    $httpBackend.expectGET(
+      '/searchhandler/data?q=%22sun%22&category=("astronomy")&' +
+      'language_code=("es")').respond({});
+    mockWindow.location.pathname = '';
+    mockWindow.location.search = (
+      '?q=%22sun%22&language_code=(%22es%22)&category=(%22astronomy%22)');
+    getUrlParamsSpy.and.returnValue({q: 'sun'});
+    preferredLanguageCodesLoadedEmitter.emit([]);
+    $scope.$digest();
+    $httpBackend.flush();
 
-      expect(mockWindow.location.href).toBe(
-        '/search/find?q=%22sun%22&category=("astronomy")&language_code=("es")');
-    });
+    expect(mockWindow.location.href).toBe(
+      '/search/find?q=%22sun%22&category=("astronomy")&language_code=("es")');
+  });
 
   it('should filter and search content by categories, language and text' +
     ' when url location changes', function() {

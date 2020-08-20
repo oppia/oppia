@@ -160,12 +160,17 @@ angular.module('oppia').component('searchBar', {
         ctrl.selectionDetails.categories.selections = {};
         ctrl.selectionDetails.languageCodes.selections = {};
 
-        ctrl.searchQuery = (
+        updateSelectionDetails('categories');
+        updateSelectionDetails('languageCodes');
+
+        var newSearchQuery = (
           SearchService.updateSearchFieldsBasedOnUrlQuery(
             $window.location.search, ctrl.selectionDetails));
 
-        updateSelectionDetails('categories');
-        updateSelectionDetails('languageCodes');
+        if (ctrl.searchQuery !== newSearchQuery) {
+          ctrl.searchQuery = newSearchQuery;
+          onSearchQueryChangeExec();
+        }
       };
 
       var refreshSearchBarLabels = function() {
@@ -227,12 +232,6 @@ angular.module('oppia').component('searchBar', {
         // Non-translatable parts of the html strings, like numbers or user
         // names.
         ctrl.translationData = {};
-        $scope.$watch('$ctrl.searchQuery', function(newQuery, oldQuery) {
-          // Run only if the query has changed.
-          if (newQuery !== oldQuery) {
-            onSearchQueryChangeExec();
-          }
-        });
         // Initialize the selection descriptions and summaries.
         for (var itemsType in ctrl.selectionDetails) {
           updateSelectionDetails(itemsType);
