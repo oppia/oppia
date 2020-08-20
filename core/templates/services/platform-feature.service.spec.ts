@@ -307,7 +307,7 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(
-        platformFeatureService.featureSummary.DummyFeature.isEnabled
+        platformFeatureService.status.DummyFeature.isEnabled
       ).toBeFalse();
       expect(platformFeatureService.isInitialzedWithError).toBeTrue();
     }));
@@ -331,7 +331,7 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(
-        platformFeatureService.featureSummary.DummyFeature.isEnabled
+        platformFeatureService.status.DummyFeature.isEnabled
       ).toBeTrue();
       expect(platformFeatureService.isInitialzedWithError).toBeFalse();
     }));
@@ -340,7 +340,7 @@ describe('PlatformFeatureService', () => {
       () => {
         platformFeatureService = TestBed.get(PlatformFeatureService);
         expect(
-          () => platformFeatureService.featureSummary.DummyFeature.isEnabled
+          () => platformFeatureService.status.DummyFeature.isEnabled
         ).toThrowError(
           'The platform feature service has not been initialized.');
       })

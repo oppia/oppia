@@ -25,29 +25,30 @@
  *     are loaded, i.e. a different session id is present in the cookies.
  *   - there are new features defined in the code base while the cached
  *     summary is out-of-date.
- * In such cases, the values will be re-initialized, they may be changed.
+ * In such cases, the values will be re-initialized and they may be changed.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { isEqual } from 'lodash';
 
 import { ClientContext, ClientContextObjectFactory } from
   'domain/platform_feature/client-context-object.factory';
-import {
-  FeatureStatusSummary,
-  FeatureStatusSummaryObjectFactory,
-  FeatureSummaryDict,
-  FeatureNames
-} from 'domain/platform_feature/feature-status-summary-object.factory';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
+import {
+  FeatureNames,
+  FeatureStatusSummary,
+  FeatureStatusSummaryObjectFactory,
+  FeatureStatusChecker
+} from 'domain/platform_feature/feature-status-summary-object.factory';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { UrlService } from './contextual/url.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
-import { isEqual } from 'lodash';
 
 interface FeatureFlagsCacheItem {
   timestamp: number;
@@ -106,18 +107,18 @@ export class PlatformFeatureService {
   }
 
   /**
-   * Returns the summary object of feature flags, which can be used to get the
-   * value of feature flags.
+   * Returns the status checker object for feature flags, which can be used
+   * to get the value of feature flags.
    *
    * Example:
-   *   platformFeatureService.featureSummary.DummyFeature.isEnabled === true.
+   *   platformFeatureService.status.DummyFeature.isEnabled === true.
    *
-   * @returns {FeatureSummaryDict} - Summary object of feature flags.
+   * @returns {FeatureStatusChecker} - Status checker object for feature flags.
    * @throws {Error} - If this method is called before inialization.
    */
-  get featureSummary(): FeatureSummaryDict {
+  get status(): FeatureStatusChecker {
     if (PlatformFeatureService.featureStatusSummary) {
-      return PlatformFeatureService.featureStatusSummary.toSummaryDict();
+      return PlatformFeatureService.featureStatusSummary.toStatusChecker();
     } else {
       throw new Error('The platform feature service has not been initialized.');
     }

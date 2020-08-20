@@ -16,9 +16,9 @@
  * @fileoverview Service for admin to update feature flag rules.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';

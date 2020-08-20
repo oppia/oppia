@@ -34,25 +34,25 @@ export interface FeatureStatusSummaryBackendDict {
 }
 
 /**
- * Summary of feature flags, which are keyed on their names defined in
+ * Statuc checker of feature flags, which are keyed on their names defined in
  * FeatureNames. This provides interface for developer to access feature flag
  * values with feature name hint:
- *   featureSummaryDict.DummyFeature.isEnabled === true
+ *   featureStatusChecker.DummyFeature.isEnabled === true
  */
-export type FeatureSummaryDict = {
+export type FeatureStatusChecker = {
   [name in keyof typeof FeatureNames]: {
       isEnabled: boolean;
   }
 };
 
 /**
- * Item of the summary of feature flags, which represents the status of one
- * feature flag, providing the '.isEnabled' interface to check the status
+ * Item of the status checker of feature flags, which represents the status of
+ * one feature flag, providing the '.isEnabled' interface to check the status
  * of that feature flag.
  */
-class FeatureSummaryDictItem {
+class FeatureStatusCheckerItem {
   /**
-   * Constructor of the FeatureSummaryDictItem class.
+   * Constructor of the FeatureStatusCheckerDictItem class.
    *
    * @param {() => boolean} getterFn - Function that returns the status of
    *     the feature.
@@ -95,18 +95,18 @@ export class FeatureStatusSummary {
   }
 
   /**
-   * Construct and returns the feature summary.
+   * Construct and returns the feature status checker.
    *
-   * @returns {FeatureSummaryDict} - The feature summary dict.
+   * @returns {FeatureStatusChecker} - The feature status checker.
    */
-  toSummaryDict(): FeatureSummaryDict {
-    const summary = <FeatureSummaryDict>{};
+  toStatusChecker(): FeatureStatusChecker {
+    const checker = <FeatureStatusChecker>{};
     Object.keys(FeatureNames).forEach(name => {
-      summary[name] = new FeatureSummaryDictItem(
+      checker[name] = new FeatureStatusCheckerItem(
         () => this.isFeatureEnabled(FeatureNames[name])
       );
     });
-    return summary;
+    return checker;
   }
 
   /**
@@ -135,7 +135,7 @@ export class FeatureStatusSummaryObjectFactory {
   }
 
   /**
-   * Creates a default FeatureStatusSummary object that all features are
+   * Creates a default FeatureStatusSummary object such that all features are
    * disabled.
    *
    * @returns {FeatureStatusSummary} - The FeatureStatusSummary object instance
