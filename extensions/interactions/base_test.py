@@ -446,7 +446,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 #    * A TS file called
                 #      {InteractionName}-validation.service.specs.ts.
                 #    * A TS file called {InteractionName}-rules.service.specs.ts.
-    
+
                 hyphenated_interaction_id = (
                     utils.camelcase_to_hyphenated(interaction_id))
                 if interaction_id in INTERACTIONS_THAT_USE_COMPONENTS:
@@ -501,7 +501,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         directives_dir,
                         '%s-short-response.directive.html' %
                         hyphenated_interaction_id)
-    
+
                 self.assertTrue(os.path.isfile(interaction_ts_file))
                 self.assertTrue(os.path.isfile(response_ts_file))
                 self.assertTrue(os.path.isfile(
@@ -511,7 +511,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(os.path.isfile(interaction_html))
                 self.assertTrue(os.path.isfile(response_html))
                 self.assertTrue(os.path.isfile(short_response_html))
-    
+
                 # Check that the PNG thumbnail image has the correct dimensions.
                 static_dir = os.path.join(interaction_dir, 'static')
                 self.assertTrue(os.path.isdir(static_dir))
@@ -524,7 +524,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
                     self.assertEqual(
                         int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
-    
+
                 interaction_ts_file_content = utils.get_file_contents(
                     interaction_ts_file)
                 response_ts_file_content = utils.get_file_contents(
@@ -536,7 +536,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     rules_service_ts_file)
                 validation_service_ts_file_content = utils.get_file_contents(
                     validation_service_ts_file)
-    
+
                 self.assertIn(
                     'oppiaInteractive%s' % interaction_id,
                     interaction_ts_file_content)
@@ -553,7 +553,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertIn(
                     '%sValidationService' % interaction_id,
                     validation_service_ts_file_content)
-    
+
                 # Check that the html template includes js script for the
                 # interaction.
                 self.assertTrue(
@@ -577,7 +577,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertIn(
                     '%s-validation.service.ts' % hyphenated_interaction_id,
                     ts_file_content)
-    
+
                 self.assertNotIn(
                     '<script>', interaction_ts_file_content)
                 self.assertNotIn(
@@ -594,14 +594,14 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertNotIn('<script>', validation_service_ts_file_content)
                 self.assertNotIn(
                     '</script>', validation_service_ts_file_content)
-    
+
                 interaction = interaction_registry.Registry.get_interaction_by_id(
                     interaction_id)
-    
+
                 # Check that the specified interaction id is the same as the class
                 # name.
                 self.assertTrue(interaction_id, msg=interaction.__class__.__name__)
-    
+
                 # Check that the configuration file contains the correct
                 # top-level keys, and that these keys have the correct types.
                 for item, item_type in _INTERACTION_CONFIG_SCHEMA:
@@ -609,9 +609,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         getattr(interaction, item), item_type))
                     if item_type == python_utils.BASESTRING:
                         self.assertTrue(getattr(interaction, item))
-    
+
                 self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
-    
+
                 if interaction.is_linear or interaction.is_terminal:
                     self.assertIsNone(interaction.answer_type)
                 else:
@@ -619,15 +619,15 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     # class.
                     obj_services.Registry.get_object_class_by_type(
                         interaction.answer_type)
-    
+
                 self._validate_customization_arg_specs(
                     interaction.customization_arg_specs)
-    
+
                 answer_visualization_specs = (
                     interaction.answer_visualization_specs)
                 self._validate_answer_visualization_specs(
                     answer_visualization_specs)
-    
+
                 answer_visualizations = interaction.answer_visualizations
                 for ind, visualization in enumerate(answer_visualizations):
                     self.assertEqual(
@@ -638,10 +638,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     self.assertEqual(
                         visualization.options,
                         answer_visualization_specs[ind]['options'])
-    
+
                     # Check that the derived visualization is valid.
                     visualization.validate()
-    
+
                 # Check that supplemental interactions have instructions, and
                 # inline ones do not.
                 if interaction.display_mode == base.DISPLAY_MODE_INLINE:
@@ -668,18 +668,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         and interaction.default_outcome_heading)
                 else:
                     self.assertIsNone(interaction.default_outcome_heading)
-    
+
                 # Check that interactions that can have solution cannot be linear.
                 if interaction.can_have_solution:
                     self.assertFalse(interaction.is_linear)
-    
+
                 default_object_values = obj_services.get_default_object_values()
-    
+
                 # Check that the rules for this interaction have object editor
                 # templates and default values.
                 for rule_name in list(interaction.rules_dict.keys()):
                     param_list = interaction.get_rule_param_list(rule_name)
-    
+
                     for (_, param_obj_cls) in param_list:
                         # TODO(sll): Get rid of these special cases.
                         if param_obj_cls.__name__ in [
@@ -687,7 +687,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                                 'ListOfCoordTwoDim', 'ListOfGraph',
                                 'SetOfNormalizedString']:
                             continue
-                        
+
                         # Check that the rule has a default value.
                         self.assertIn(
                             param_obj_cls.__name__, default_object_values)

@@ -70,9 +70,7 @@ describe('Ratio expression input rules service', () => {
       {x: inputString})).toBeFalse();
     expect(reirs.IsEquivalent([2, 4, 3],
       {x: inputString})).toBeFalse();
-  });
 
-  it('should have a correct IsEquivalent rule', () => {
     inputString = [2, 3, 5];
 
     expect(reirs.IsEquivalent([2, 3, 5],

@@ -29,10 +29,6 @@ angular.module('oppia').component('ratioExpressionEditor', {
       ctrl.warningText = '';
 
       ctrl.isValidRatio = function(value) {
-        if (value.length === 0) {
-          ctrl.warningText = 'Please enter a valid ratio (e.g. 1:2 or 1:2:3).';
-          return false;
-        }
         try {
           ctrl.value = RatioObjectFactory.fromRawInputString(value);
           ctrl.warningText = '';

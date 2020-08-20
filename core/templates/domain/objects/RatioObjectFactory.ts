@@ -43,7 +43,11 @@ export class Ratio {
         return y === 0 ? x : gcd(y, x % y);
       };
       var gcdResult = this.numbers.reduce(gcd);
-      return this.numbers.map(currentValue => currentValue / gcdResult);
+      if (gcdResult === 0) {
+        return this.numbers;
+      } else {
+        return this.numbers.map(currentValue => currentValue / gcdResult);
+      }
     }
 }
 
@@ -52,6 +56,10 @@ export class Ratio {
 })
 export class RatioObjectFactory {
   fromRawInputString(rawInput: string): number[] {
+    if (rawInput.length === 0) {
+      throw new Error(
+        ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_RATIO);
+    }
     var INVALID_CHARS_REGEX = /[^\d^:^\.^\/^\s]/g;
     if (INVALID_CHARS_REGEX.test(rawInput)) {
       throw new Error(
