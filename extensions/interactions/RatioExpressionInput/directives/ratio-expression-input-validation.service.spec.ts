@@ -76,7 +76,7 @@ describe('RatioExpressionInputValidationService', () => {
         value: new SubtitledUnicode('', '')
       },
       noOfTerms: {
-        value: 0
+        value: 3
       }
     };
 
@@ -173,6 +173,24 @@ describe('RatioExpressionInputValidationService', () => {
       message: 'Rule 2 from answer group 1 will never be matched because' +
       ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
       ' input.'
+    }]);
+
+    let equalsTwoTerms = rof.createFromBackendDict({
+      rule_type: 'Equals',
+      inputs: {
+        x: [1, 2]
+      }
+    });
+
+    // The second rule will never get matched.
+    answerGroups[0].updateRuleTypesToInputs(
+      [equals, equalsTwoTerms]);
+    warnings = validatorService.getAllWarnings(currentState,
+      customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because' +
+      ' it has less no of terms than required.'
     }]);
   });
 });

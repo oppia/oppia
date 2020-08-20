@@ -355,6 +355,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
         for interaction_id in all_interaction_ids:
+            # Ignoring the RatioExpressionInput for now as there's no creator
+            # for the interaction yet.Once added this needs to be removed.
+            if(interaction_id != 'RatioExpressionInput')
             # Check that the interaction id is valid.
             self.assertTrue(self._is_camel_cased(interaction_id))
             hyphenated_interaction_id = (
@@ -740,7 +743,12 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
-        if list(missing_interaction_ids) != ['MathExpressionInput']:
+        if list(missing_interaction_ids) != [
+                'MathExpressionInput', 'RatioExpressionInput' 
+            ]:
+            # Ignoring the RatioExpressionInput for now as there's no creator
+            # for the interaction yet.Once added this needs to be removed.
+            
             # Ignoring the lack of the MathExpressionInput since it is going
             # to be deprecated and explorations that use it will now be using
             # one of AlgebraicExpressionInput, NumericExpressionInput, or

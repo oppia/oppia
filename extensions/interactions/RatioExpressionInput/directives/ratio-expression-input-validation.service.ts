@@ -25,7 +25,7 @@ import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { RatioExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
-import { RatioObjectFactory } from
+import { RatioObjectFactory, Ratio } from
   'domain/objects/RatioObjectFactory';
 import { RatioExpressionInputRulesService } from
   './ratio-expression-input-rules.service';
@@ -55,7 +55,8 @@ export class RatioExpressionInputValidationService {
     let warningsList = [];
     let ratioRulesService = (
       new RatioExpressionInputRulesService(this.rof));
-
+    var minimumNoOfTerms =
+      customizationArgs.noOfTerms.value;
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 
@@ -81,7 +82,19 @@ export class RatioExpressionInputValidationService {
         for (let seenRule of seenRules) {
           let seenInput = <number[]> seenRule.inputs.x;
           let seenRuleType = <string> seenRule.type;
-
+          if (minimumNoOfTerms > 2) {
+            var ratio: Ratio = this.rof.fromList(currentInput);
+            if (ratio.getNoOfTerms() < minimumNoOfTerms) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' from answer group ' +
+                  (i + 1) +
+                  ' will never be matched because it has ' +
+                  'less no of terms than required.')
+              });
+            }
+          }
           if (seenRuleType === 'Equals' && (
             ratioRulesService.Equals(
               seenInput, {x: currentInput}))) {

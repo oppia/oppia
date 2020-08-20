@@ -1004,7 +1004,7 @@
     "instructions": null,
     "is_trainable": false,
     "narrow_instructions": null,
-    "description": "Allows learners to enter ratios.",
+    "description": "Allow learners to enter ratios.",
     "needs_summary": false,
     "name": "Ratio Expression Input",
     "answer_type": "RatioExpression",
@@ -1025,7 +1025,7 @@
         }
       },
       {
-        "description": "Minmium number of terms required",
+        "description": "Minimum number of terms required",
         "name": "noOfTerms",
         "schema": {
           "type": "int",
