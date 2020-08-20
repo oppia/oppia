@@ -42,7 +42,7 @@ ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 # the punctuation and capital letter checks will be skipped for that
 # comment or docstring.
 EXCLUDED_PHRASES = [
-    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+    'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1673,7 +1673,8 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                     continue
 
                 # Comments must start with a space.
-                if re.search(br'^#[^\s].*$', line):
+                if (re.search(br'^#[^\s].*$', line) and not
+                        line.startswith(b'#!')):
                     space_at_beginning_of_comment = False
                     self.add_message(
                         'no-space-at-beginning', line=line_num)
@@ -1688,16 +1689,19 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                         EXCLUDED_PHRASES)
 
                     if len(previous_line) > 1:
-                        excluded_pharse_is_present_at_end = any(
+                        excluded_phrase_is_present_at_end = any(
                             word in split_prev_line[-1] for word in
+                            EXCLUDED_PHRASES)
+                        excluded_phrase_at_beginning_of_prev_line = any(
+                            word in split_prev_line[1] for word in
                             EXCLUDED_PHRASES)
 
                         # Comments must end with the proper punctuation.
                         last_char_is_invalid = previous_line[-1] not in (
                             ALLOWED_TERMINATING_PUNCTUATIONS)
                         if (last_char_is_invalid and not
-                                excluded_pharse_is_present_at_end):
-                            python_utils.PRINT(split_prev_line)
+                                (excluded_phrase_is_present_at_end or
+                                excluded_phrase_at_beginning_of_prev_line)):
                             self.add_message(
                                 'invalid-punctuation-used',
                                 line=previous_line_num)

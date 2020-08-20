@@ -2430,6 +2430,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""# coding: utf-8
                 # pylint: disable
+                a = 1 + 2  # pylint: disable
                 """)
         node_comment_with_excluded_phrase.file = filename
         node_comment_with_excluded_phrase.path = filename
@@ -2449,7 +2450,9 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# variable_name is used.
+                u"""# coding: utf-8
+                
+                # variable_name is used.
                 """)
         node_variable_name_in_comment.file = filename
         node_variable_name_in_comment.path = filename
@@ -2469,7 +2472,9 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# v2 is used.
+                u"""# coding: utf-8
+                
+                # v2 is used.
                 """)
         node_comment_with_version_info.file = filename
         node_comment_with_version_info.path = filename
@@ -2489,7 +2494,9 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# str. variable is type of str.
+                u"""# coding: utf-8
+                
+                # str. variable is type of str.
                 """)
         node_data_type_in_comment.file = filename
         node_data_type_in_comment.path = filename
@@ -2509,7 +2516,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""
+                u"""# coding: utf-8
                     \"\"\"# str. variable is type of str.\"\"\"
                     \"\"\"# str. variable is type
                     of str.\"\"\"
@@ -2532,9 +2539,11 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""# Multi
-                    # line
-                    # comment.
+                u"""# coding: utf-8
+                
+                # Multi
+                # line
+                # comment.
                 """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
