@@ -137,8 +137,10 @@ describe('Library controller', function() {
       });
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         classroomBackendApiService);
-      spyOn(classroomBackendApiService, 'fetchClassroomPageIsShownStatusAsync')
-        .and.returnValue($q.resolve(true));
+      spyOn(
+        classroomBackendApiService,
+        'fetchClassroomPromosAreEnabledStatusAsync').and.returnValue(
+        $q.resolve(true));
       ctrl.$onInit();
       $scope.$apply();
       $httpBackend.flush(2);
@@ -150,7 +152,7 @@ describe('Library controller', function() {
           .toContain(ctrl.bannerImageFilename);
         expect(ctrl.bannerImageFileUrl).toBe(
           '/assets/images/library/' + ctrl.bannerImageFilename);
-        expect(ctrl.CLASSROOM_PAGE_IS_SHOWN).toBe(true);
+        expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
         expect(logErrorSpy.calls.allArgs()).toContain(
           ['INVALID URL PATH: /invalid']);
         expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
@@ -437,8 +439,10 @@ describe('Library controller', function() {
       });
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         classroomBackendApiService);
-      spyOn(classroomBackendApiService, 'fetchClassroomPageIsShownStatusAsync')
-        .and.returnValue($q.resolve(true));
+      spyOn(
+        classroomBackendApiService,
+        'fetchClassroomPromosAreEnabledStatusAsync').and.returnValue(
+        $q.resolve(true));
       ctrl.$onInit();
       $scope.$apply();
       $httpBackend.flush();
@@ -450,7 +454,7 @@ describe('Library controller', function() {
           .toContain(ctrl.bannerImageFilename);
         expect(ctrl.bannerImageFileUrl).toBe(
           '/assets/images/library/' + ctrl.bannerImageFilename);
-        expect(ctrl.CLASSROOM_PAGE_IS_SHOWN).toBe(true);
+        expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
         expect(logErrorSpy.calls.allArgs()).toContain(
           ['INVALID URL PATH: /invalid']);
         expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
@@ -540,8 +544,10 @@ describe('Library controller', function() {
       });
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         classroomBackendApiService);
-      spyOn(classroomBackendApiService, 'fetchClassroomPageIsShownStatusAsync')
-        .and.returnValue($q.resolve(true));
+      spyOn(
+        classroomBackendApiService,
+        'fetchClassroomPromosAreEnabledStatusAsync').and.returnValue(
+        $q.resolve(true));
       ctrl.$onInit();
       $scope.$apply();
       $httpBackend.flush();
@@ -553,7 +559,7 @@ describe('Library controller', function() {
           .toContain(ctrl.bannerImageFilename);
         expect(ctrl.bannerImageFileUrl).toBe(
           '/assets/images/library/' + ctrl.bannerImageFilename);
-        expect(ctrl.CLASSROOM_PAGE_IS_SHOWN).toBe(true);
+        expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
         expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
           'Find explorations to learn from - Oppia');
         expect(ctrl.activitiesOwned).toBe(undefined);
