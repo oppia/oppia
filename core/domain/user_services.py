@@ -238,7 +238,7 @@ class UserSettings(python_utils.OBJECT):
             modifiable_user_data.
 
         Args:
-            modifiable_user_data: ModifiableUserDataV1. The modifiable user
+            modifiable_user_data: ModifiableUserData. The modifiable user
                 data version_1 object with the data information to be updated.
 
         Raises:
@@ -1060,7 +1060,7 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
             profiles.
         email: str. The email address of the full (parent) user trying to create
             new profiles.
-        modifiable_user_data_list: list(ModifiableUserDataV1). The list of
+        modifiable_user_data_list: list(ModifiableUserData). The list of
             modifiable user data objects used for creation of new profiles.
 
     Returns:
@@ -1125,7 +1125,7 @@ def update_multiple_users_data(modifiable_user_data_list):
     specified in the modifiable_user_data_list.
 
     Args:
-        modifiable_user_data_list: list(ModifiableUserDataV1). The list of
+        modifiable_user_data_list: list(ModifiableUserData). The list of
             modifiable_user_data entries corresponding to the users whose
             data has to be updated.
 

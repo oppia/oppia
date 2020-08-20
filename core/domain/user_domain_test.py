@@ -498,7 +498,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
     def test_initialization_with_none_user_id_is_successful(self):
         """Testing init method user id set None."""
         modifiable_user_data = (
-            user_domain.ModifiableUserDataV1(
+            user_domain.ModifiableUserData(
                 'display_alias', '123', 'preferred_language_codes',
                 'preferred_site_language_code', 'preferred_audio_language_code'
             )
@@ -524,7 +524,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
     def test_initialization_with_valid_user_id_is_successful(self):
         """Testing init method with a valid user id set."""
         modifiable_user_data = (
-            user_domain.ModifiableUserDataV1(
+            user_domain.ModifiableUserData(
                 'display_alias', '123', 'preferred_language_codes',
                 'preferred_site_language_code', 'preferred_audio_language_code',
                 'user_id'

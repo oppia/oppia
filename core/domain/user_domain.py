@@ -347,7 +347,7 @@ class UserContributionRights(python_utils.OBJECT):
                 'found: %s' % type(self.can_review_questions))
 
 
-class ModifiableUserDataV1(python_utils.OBJECT):
+class ModifiableUserData(python_utils.OBJECT):
     """Domain object to represent change in allowed attributes for UserSettings
     and UserAuthDetails domain object.
     """
@@ -356,7 +356,7 @@ class ModifiableUserDataV1(python_utils.OBJECT):
             self, display_alias, pin, preferred_language_codes,
             preferred_site_language_code, preferred_audio_language_code,
             user_id=None):
-        """Constructs a ModifiableUserDataV1 domain object.
+        """Constructs a ModifiableUserData domain object.
 
         Args:
             display_alias: str. Display alias of the user shown on Android.

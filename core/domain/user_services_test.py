@@ -71,11 +71,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserServicesUnitTests, self).setUp()
-        self.modifiable_user_data = user_domain.ModifiableUserDataV1(
+        self.modifiable_user_data = user_domain.ModifiableUserData(
             'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None, 'user_id'
         )
-        self.modifiable_new_user_data = user_domain.ModifiableUserDataV1(
+        self.modifiable_new_user_data = user_domain.ModifiableUserData(
             'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None
         )
@@ -816,7 +816,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.update_multiple_users_data([self.modifiable_user_data])
         self.modifiable_new_user_data.display_alias = display_alias_2
         self.modifiable_new_user_data.pin = profile_pin
-        modifiable_new_user_data_2 = user_domain.ModifiableUserDataV1(
+        modifiable_new_user_data_2 = user_domain.ModifiableUserData(
             display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
             None, None
         )
@@ -947,7 +947,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.update_multiple_users_data([self.modifiable_user_data])
         self.modifiable_new_user_data.display_alias = display_alias_2
         self.modifiable_new_user_data.pin = profile_pin
-        modifiable_new_user_data_2 = user_domain.ModifiableUserDataV1(
+        modifiable_new_user_data_2 = user_domain.ModifiableUserData(
             display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
             None, None
         )
@@ -1756,11 +1756,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
-        self.modifiable_user_data = user_domain.ModifiableUserDataV1(
+        self.modifiable_user_data = user_domain.ModifiableUserData(
             'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None, 'user_id'
         )
-        self.modifiable_new_user_data = user_domain.ModifiableUserDataV1(
+        self.modifiable_new_user_data = user_domain.ModifiableUserData(
             'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None
         )

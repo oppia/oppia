@@ -173,11 +173,11 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
-        self.modifiable_user_data = user_domain.ModifiableUserDataV1(
+        self.modifiable_user_data = user_domain.ModifiableUserData(
             'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None, self.user_1_id
         )
-        self.modifiable_new_user_data = user_domain.ModifiableUserDataV1(
+        self.modifiable_new_user_data = user_domain.ModifiableUserData(
             'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None
         )
@@ -1587,11 +1587,11 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         ).put()
 
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
-        self.modifiable_user_data = user_domain.ModifiableUserDataV1(
+        self.modifiable_user_data = user_domain.ModifiableUserData(
             'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None, self.user_1_id
         )
-        self.modifiable_new_user_data = user_domain.ModifiableUserDataV1(
+        self.modifiable_new_user_data = user_domain.ModifiableUserData(
             'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None
         )
@@ -1867,11 +1867,11 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
-        self.modifiable_user_data = user_domain.ModifiableUserDataV1(
+        self.modifiable_user_data = user_domain.ModifiableUserData(
             'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None, self.user_1_id
         )
-        self.modifiable_new_user_data = user_domain.ModifiableUserDataV1(
+        self.modifiable_new_user_data = user_domain.ModifiableUserData(
             'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
             None, None
         )
