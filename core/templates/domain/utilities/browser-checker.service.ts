@@ -74,6 +74,12 @@ export class BrowserCheckerService {
   detectBrowserType(): string {
     const userAgent = this.windowRef.nativeWindow.navigator.userAgent;
 
+    // Per https://docs.microsoft.com/en-us/microsoft-edge/web-platform/user-agent-string
+    // there are two types of tokens, 'edg' & 'Edge', for the Edge browser in
+    // its user agent.
+    if (userAgent.includes('edg') || userAgent.includes('Edge')) {
+      return 'Edge';
+    }
     if (userAgent.includes('Chrome')) {
       return 'Chrome';
     }
@@ -82,12 +88,6 @@ export class BrowserCheckerService {
     }
     if (userAgent.includes('Safari')) {
       return 'Safari';
-    }
-    // Per https://docs.microsoft.com/en-us/microsoft-edge/web-platform/user-agent-string
-    // there are two types of tokens, 'edg' & 'Edge', for the Edge browser in
-    // its user agent.
-    if (userAgent.includes('edg') || userAgent.includes('Edge')) {
-      return 'Edge';
     }
 
     return 'Unknown';
