@@ -215,29 +215,34 @@ def delete_user(pending_deletion_request):
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to delete or pseudonymize all the models.
     """
-    _delete_models(pending_deletion_request.user_id, models.NAMES.user)
-    _hard_delete_explorations_and_collections(pending_deletion_request)
-    _delete_models(pending_deletion_request.user_id, models.NAMES.improvements)
-    _pseudonymize_feedback_models(pending_deletion_request)
-    _pseudonymize_suggestion_models(pending_deletion_request)
-    _pseudonymize_activity_models(
-        pending_deletion_request,
-        models.NAMES.question,
-        question_models.QuestionSnapshotMetadataModel,
-        question_models.QuestionCommitLogEntryModel,
-        'question_id')
-    _pseudonymize_activity_models(
-        pending_deletion_request,
-        models.NAMES.skill,
-        skill_models.SkillSnapshotMetadataModel,
-        skill_models.SkillCommitLogEntryModel,
-        'skill_id')
-    _pseudonymize_activity_models(
-        pending_deletion_request,
-        models.NAMES.story,
-        story_models.StorySnapshotMetadataModel,
-        story_models.StoryCommitLogEntryModel,
-        'story_id')
+    if pending_deletion_request.role == feconf.ROLE_ID_LEARNER:
+        _delete_profile_user_models(pending_deletion_request.user_id)
+    else:
+        _delete_full_user_models(
+            pending_deletion_request.user_id, models.NAMES.user)
+        _delete_full_user_models(
+            pending_deletion_request.user_id, models.NAMES.improvements)
+        _hard_delete_explorations_and_collections(pending_deletion_request)
+        _pseudonymize_feedback_models(pending_deletion_request)
+        _pseudonymize_suggestion_models(pending_deletion_request)
+        _pseudonymize_activity_models(
+            pending_deletion_request,
+            models.NAMES.question,
+            question_models.QuestionSnapshotMetadataModel,
+            question_models.QuestionCommitLogEntryModel,
+            'question_id')
+        _pseudonymize_activity_models(
+            pending_deletion_request,
+            models.NAMES.skill,
+            skill_models.SkillSnapshotMetadataModel,
+            skill_models.SkillCommitLogEntryModel,
+            'skill_id')
+        _pseudonymize_activity_models(
+            pending_deletion_request,
+            models.NAMES.story,
+            story_models.StorySnapshotMetadataModel,
+            story_models.StoryCommitLogEntryModel,
+            'story_id')  
 
 
 def verify_user_deleted(pending_deletion_request):
@@ -299,7 +304,20 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
     }
 
 
-def _delete_models(user_id, module_name):
+def _delete_profile_user_models(user_id):
+    """Delete the user models for the profile user with the given user_id.
+
+    Args:
+        user_id: str. The id of the profile user to be deleted.
+    """
+    for model_class in PROFILE_SPECIFIC_USER_MODELS:
+        if (model_class.get_deletion_policy() not in
+                [base_models.DELETION_POLICY.KEEP,
+                 base_models.DELETION_POLICY.NOT_APPLICABLE]):
+            model_class.apply_deletion_policy(user_id)
+
+
+def _delete_full_user_models(user_id, module_name):
     """Delete all the models from the given module, for a given user.
 
     Args:
@@ -449,7 +467,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
         pending_deletion_request.activity_mappings[models.NAMES.feedback] = (
             _generate_activity_to_pseudonymized_ids_mapping(feedback_ids)
         )
-        save_pending_deletion_request(pending_deletion_request)
+        save_pending_deletion_requests([pending_deletion_request])
 
     def _pseudonymize_models(feedback_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
@@ -543,7 +561,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         pending_deletion_request.activity_mappings[models.NAMES.suggestion] = (
             _generate_activity_to_pseudonymized_ids_mapping(suggestion_ids)
         )
-        save_pending_deletion_request(pending_deletion_request)
+        save_pending_deletion_requests([pending_deletion_request])
 
     suggestion_ids_to_pids = (
         pending_deletion_request.activity_mappings[models.NAMES.suggestion])
