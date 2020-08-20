@@ -157,16 +157,23 @@ def main(args=None):
         common.start_redis_server()
 
     python_utils.PRINT('Starting GAE development server')
-
     background_processes.append(subprocess.Popen(
         'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 '
         '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '
-        'true %s --require_indexes=no '
-        '--support_datastore_emulator=yes --application=%s' % (
+        'true %s --application=%s' % (
             common.GOOGLE_APP_ENGINE_SDK_HOME, clear_datastore_arg,
             enable_console_arg, disable_host_checking_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             app_yaml_filepath, 'migration-toy-app'), shell=True))
+    # background_processes.append(subprocess.Popen(
+    #     'python %s/dev_appserver.py --clear_datastore=yes %s %s --admin_host 0.0.0.0 '
+    #     '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '
+    #     'true %s --require_indexes=no '
+    #     '--support_datastore_emulator=yes --application=%s' % (
+    #         common.GOOGLE_CLOUD_SDK_BIN,
+    #         enable_console_arg, disable_host_checking_arg, no_auto_restart,
+    #         python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
+    #         app_yaml_filepath, ), shell=True))
 
     # os.path.join(common.CURR_DIR, 'WEB_INF')
 
