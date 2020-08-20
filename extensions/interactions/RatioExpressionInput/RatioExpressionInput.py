@@ -48,7 +48,7 @@ class RatioExpressionInput(base.BaseInteraction):
         }
     }, {
         'name': 'noOfTerms',
-        'description': 'Require the learner\'s answer to have constraint on no of terms.',
+        'description': 'Minimum number of terms required by the learner\'s.',
         'schema': {
             'type': 'int',
             'validators': [{

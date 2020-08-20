@@ -1202,15 +1202,15 @@ class RatioExpression(BaseObject):
     """
 
     description = 'A list of integers for ratio expression.'
-    default_value = [1,1]
+    default_value = [1, 1]
 
     SCHEMA = {
         'type': 'list',
         'items': PositiveInt.SCHEMA,
         'validators': [{
-           'id': 'has_length_at_least',
-           'min_value': 2
-       }]
+            'id': 'has_length_at_least',
+            'min_value': 2
+        }]
     }
 
 

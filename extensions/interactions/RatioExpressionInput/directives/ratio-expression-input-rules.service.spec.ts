@@ -21,7 +21,7 @@ import { RatioExpressionInputRulesService } from
   'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { TestBed } from '@angular/core/testing';
 
-fdescribe('Ratio expression input rules service', () => {
+describe('Ratio expression input rules service', () => {
   let reirs: RatioExpressionInputRulesService = null;
   let inputString;
 
