@@ -34,7 +34,6 @@ from core.domain import story_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_services
-from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -42,8 +41,8 @@ import feconf
 import python_utils
 import utils
 
-(suggestion_models, feedback_models, user_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.user])
+(suggestion_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.suggestion, models.NAMES.feedback])
 
 
 class SuggestionServicesUnitTests(test_utils.GenericTestBase):
@@ -1407,9 +1406,12 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             user_scoring_user2_cat2.check_if_user_can_review_the_category())
 
     def test_get_all_scores_of_the_user_with_multiple_scores(self):
-        suggestion_services.create_new_user_scoring(self.user_1_id, 'category1', 1)
-        suggestion_services.create_new_user_scoring(self.user_1_id, 'category2', 2)
-        suggestion_services.create_new_user_scoring(self.user_1_id, 'category3', 3)
+        suggestion_services.create_new_user_scoring(
+            self.user_1_id, 'category1', 1)
+        suggestion_services.create_new_user_scoring(
+            self.user_1_id, 'category2', 2)
+        suggestion_services.create_new_user_scoring(
+            self.user_1_id, 'category3', 3)
 
         expected_scores_dict = {}
         for index in python_utils.RANGE(1, 4):

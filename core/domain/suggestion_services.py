@@ -693,16 +693,16 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
 
 
 def get_user_scoring(user_id, score_category):
-        """Gets the user scoring model from storage and creates the
-        corresponding user scoring domain object if the model exists.
-        """
-        user_scoring_model = user_models.UserContributionScoringModel.get(
+    """Gets the user scoring model from storage and creates the
+    corresponding user scoring domain object if the model exists.
+    """
+    user_scoring_model = user_models.UserContributionScoringModel.get(
         user_id, score_category)
 
-        return (
-            create_user_scoring_from_model(user_scoring_model) if
-            user_scoring_model else None
-        )
+    return (
+        create_user_scoring_from_model(user_scoring_model) if
+        user_scoring_model else None
+    )
 
 
 def check_can_resubmit_suggestion(suggestion_id, user_id):
