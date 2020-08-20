@@ -636,7 +636,12 @@ describe('Extracting Image file names in the state service', () => {
                 dest: 'State 1',
                 feedback: {
                   content_id: 'feedback_2',
-                  html: "<p>Let's go to State 1</p>"
+                  html: '<p>Let\'s go to State 1</p><oppia-noninteractive-mat' +
+                  'h math_content-with-value="{&amp;quot;raw_latex&amp;quot;:' +
+                  ' &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;q' +
+                  'uot;: &amp;quot;mathImg_20207261338jhi1j6rvob_height_1d34' +
+                  '5_width_3d124_vertical_0d124.svg&amp;quot;}"></oppia-noni' +
+                  'nteractive-math>'
                 },
                 labelled_as_correct: false,
                 param_changes: [],
@@ -689,7 +694,10 @@ describe('Extracting Image file names in the state service', () => {
       'State 4': ['s4Content.png', 's4Choice1.png', 's4Choice2.png',
         's4DefaultOutcomeFeedback.png'],
       'State 5': ['s5ImagePath.png'],
-      'State 6': ['s6Hint1.png', 's6SolutionExplanation.png'],
+      'State 6': [
+        's6Hint1.png', 's6SolutionExplanation.png',
+        'mathImg_20207261338jhi1j6rvob_height_1d34' +
+        '5_width_3d124_vertical_0d124.svg'],
       Introduction: ['sIMultipleChoice1.png', 'sIMultipleChoice2.png',
         'sIOutcomeFeedback.png']
     };
