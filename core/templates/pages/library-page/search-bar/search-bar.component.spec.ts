@@ -32,6 +32,7 @@ var MockWindow = function() {
 
 describe('Search bar component', function() {
   var ctrl = null;
+  var $httpBackend = null;
   var $location = null;
   var $scope = null;
   var $rootScope = null;
@@ -58,6 +59,7 @@ describe('Search bar component', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $httpBackend = $injector.get('$httpBackend');
     $location = $injector.get('$location');
     $rootScope = $injector.get('$rootScope');
     classroomBackendApiService = $injector.get('ClassroomBackendApiService');
@@ -146,45 +148,68 @@ describe('Search bar component', function() {
 
   it('should filter and search content by categories, language and text',
     function() {
-      var calls = 0;
-      spyOn(searchService, 'getCurrentUrlQueryString').and.callFake(function() {
-        calls++;
-        if (calls === 1) {
-          return (
-            '?q=%22sun%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
-        } else if (calls === 2) {
-          return '?q=%22sun%22';
-        }
-      });
+      var getUrlParamsSpy = spyOn(urlService, 'getUrlParams');
+
+      $httpBackend.expectGET(
+        '/searchhandler/data?q=%22mars%22&' +
+        'category=("astronomy")&language_code=("pt")').respond({});
+      getUrlParamsSpy.and.returnValue({q: 'mars'});
+      mockWindow.location.pathname = '/search/find';
       mockWindow.location.search = (
-        '?q=%22sun%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
-      spyOn(urlService, 'getUrlParams').and.returnValue({q: ''});
-      $scope.$digest();
+        '?q=%22mars%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
       preferredLanguageCodesLoadedEmitter.emit([]);
+      $httpBackend.flush();
+
+      expect($location.url()).toBe(
+        '/find?q=%22mars%22&category=(%22astronomy%22)&' +
+        'language_code=(%22pt%22)');
+
+      $httpBackend.expectGET(
+        '/searchhandler/data?q=%22sun%22&category=("astronomy")&' +
+        'language_code=("es")').respond({});
+      mockWindow.location.pathname = '';
+      mockWindow.location.search = (
+        '?q=%22sun%22&language_code=(%22es%22)&category=(%22astronomy%22)');
+      getUrlParamsSpy.and.returnValue({q: 'sun'});
+      preferredLanguageCodesLoadedEmitter.emit([]);
+      $scope.$digest();
+      $httpBackend.flush();
 
       expect(mockWindow.location.href).toBe(
-        '/search/find?q=%22sun%22&category=("astronomy")&language_code=("pt")');
+        '/search/find?q=%22sun%22&category=("astronomy")&language_code=("es")');
     });
 
   it('should filter and search content by categories, language and text' +
     ' when url location changes', function() {
-    var calls = 0;
-    spyOn(searchService, 'getCurrentUrlQueryString').and.callFake(function() {
-      calls++;
-      if (calls === 1) {
-        return (
-          '?q=%22sun%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
-      } else if (calls === 2) {
-        return '?q=%22sun%22';
-      }
-    });
+    var getUrlParamsSpy = spyOn(urlService, 'getUrlParams');
+
+    $httpBackend.expectGET(
+      '/searchhandler/data?q=%22mars%22&' +
+      'category=("astronomy")&language_code=("pt")').respond({});
+    getUrlParamsSpy.and.returnValue({q: 'mars'});
+    mockWindow.location.pathname = '/search/find';
     mockWindow.location.search = (
-      '?q=%22sun%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
-    spyOn(urlService, 'getUrlParams').and.returnValue({q: ''});
+      '?q=%22mars%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
+    preferredLanguageCodesLoadedEmitter.emit([]);
+    $httpBackend.flush();
+
+    expect($location.url()).toBe(
+      '/find?q=%22mars%22&category=(%22astronomy%22)&' +
+        'language_code=(%22pt%22)');
+
+    $httpBackend.expectGET(
+      '/searchhandler/data?q=%22sun%22&category=("astronomy")&' +
+      'language_code=("es")').respond({});
+    mockWindow.location.pathname = '';
+    mockWindow.location.search = (
+      '?q=%22sun%22&language_code=(%22es%22)&category=(%22astronomy%22)');
+    getUrlParamsSpy.and.returnValue({q: 'sun'});
     $rootScope.$broadcast('$locationChangeSuccess');
+    $scope.$digest();
+    $httpBackend.flush();
 
     expect(mockWindow.location.href).toBe(
-      '/search/find?q=%22sun%22&category=("astronomy")&language_code=("pt")');
+      '/search/find?q=%22sun%22&category=("astronomy")&language_code=("es")');
   });
 
   it('should toggle select languages when searching content', function() {

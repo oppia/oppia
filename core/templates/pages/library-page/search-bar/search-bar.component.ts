@@ -157,8 +157,6 @@ angular.module('oppia').component('searchBar', {
       };
 
       var updateSearchFieldsBasedOnUrlQuery = function() {
-        var oldQueryString = SearchService.getCurrentUrlQueryString();
-
         ctrl.selectionDetails.categories.selections = {};
         ctrl.selectionDetails.languageCodes.selections = {};
 
@@ -168,12 +166,6 @@ angular.module('oppia').component('searchBar', {
 
         updateSelectionDetails('categories');
         updateSelectionDetails('languageCodes');
-
-        var newQueryString = SearchService.getCurrentUrlQueryString();
-
-        if (oldQueryString !== newQueryString) {
-          onSearchQueryChangeExec();
-        }
       };
 
       var refreshSearchBarLabels = function() {
@@ -235,8 +227,7 @@ angular.module('oppia').component('searchBar', {
         // Non-translatable parts of the html strings, like numbers or user
         // names.
         ctrl.translationData = {};
-        $scope.$watch('$ctrl.searchQuery', function(
-            newQuery, oldQuery) {
+        $scope.$watch('$ctrl.searchQuery', function(newQuery, oldQuery) {
           // Run only if the query has changed.
           if (newQuery !== oldQuery) {
             onSearchQueryChangeExec();
