@@ -445,7 +445,7 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
 
         self.user_scoring.mark_email_as_sent()
 
-        self.assertTrue(self.user_scoring.email_has_been_sent())
+        self.assertTrue(self.user_scoring.check_if_email_has_been_sent())
 
 
 class UserContributionRightsTests(test_utils.GenericTestBase):
