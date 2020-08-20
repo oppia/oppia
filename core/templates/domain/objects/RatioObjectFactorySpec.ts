@@ -88,6 +88,32 @@ describe('Ratio Object Factory', () => {
     expect(() => {
       ratio.fromRawInputString('1');
     }).toThrowError(errors.INVALID_FORMAT);
+    // Invalid Ratio.
+    expect(() => {
+      ratio.fromRawInputString('1:3');
+    }).toThrowError(errors.INVALID_FORMAT);
+    expect(() => {
+      ratio.fromRawInputString(':1:3');
+    }).toThrowError(errors.INVALID_FORMAT);
+    expect(() => {
+      ratio.fromRawInputString('1:2:3:4:5:');
+    }).toThrowError(errors.INVALID_FORMAT);
+    expect(() => {
+      ratio.fromRawInputString('1:');
+    }).toThrowError(errors.INVALID_FORMAT);
+    expect(() => {
+      ratio.fromRawInputString('1');
+    }).toThrowError(errors.INVALID_FORMAT);
+    // Invalid Colons.
+    expect(() => {
+      ratio.fromRawInputString('1::2::3');
+    }).toThrowError(errors.INVALID_COLONS);
+    expect(() => {
+      ratio.fromRawInputString('1:2::3');
+    }).toThrowError(errors.INVALID_COLONS);
+    expect(() => {
+      ratio.fromRawInputString('1:2:::3');
+    }).toThrowError(errors.INVALID_COLONS);
     // Simplest from.
     expect(() => {
       ratio.fromRawInputString('2:4:6');
