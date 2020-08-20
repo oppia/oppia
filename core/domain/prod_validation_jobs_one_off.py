@@ -2737,9 +2737,11 @@ class GeneralFeedbackThreadUserModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         # Valid id: [user_id].[thread_id]
-        thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_=]{1,}' % (
-            ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
-            base_models.ID_LENGTH)
+        thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_]{1,%s}' % (
+            ('|').join(
+                choice[:feedback_models.THREAD_ID_PREFIX_MAX_LEN]
+                for choice in suggestion_models.TARGET_TYPE_CHOICES),
+            base_models.ID_LENGTH, feedback_models.THREAD_ID_SUFFIX_MAX_LEN)
         regex_string = '^%s\\.%s$' % (USER_ID_REGEX, thread_id_string)
         return regex_string
 
@@ -3795,8 +3797,10 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
     def _get_model_id_regex(cls, item):
         # Valid id: same as thread id:
         # [target_type].[target_id].[GENERATED_STRING].
-        regex_string = '^%s\\.%s\\.[A-Za-z0-9=+/]{1,}$' % (
-            item.target_type, item.target_id)
+        regex_string = '^%s\\.%s\\.[A-Za-z0-9-_]{%s}$' % (
+            item.target_type[:feedback_models.THREAD_ID_PREFIX_MAX_LEN],
+            item.target_id,
+            feedback_models.THREAD_ID_PREFIX_MAX_LEN)
         return regex_string
 
     @classmethod

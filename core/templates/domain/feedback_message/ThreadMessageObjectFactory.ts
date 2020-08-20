@@ -24,10 +24,9 @@ import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
 interface ThreadMessageBackendDict {
+  'id': string;
   'author_username': string;
   'created_on_msecs': number;
-  'entity_type': string;
-  'entity_id': string;
   'message_id': number;
   'text': string;
   'updated_status': string;
@@ -46,13 +45,12 @@ export class ThreadMessage {
   summary: ThreadMessageSummary;
 
   constructor(
-      authorUsername: string, createdOnMsecs: number, entityType: string,
-      entityId: string, messageId: number, text: string, updatedStatus: string,
+      id: string, authorUsername: string, createdOnMsecs: number,
+      messageId: number, text: string, updatedStatus: string,
       updatedSubject: string, summary: ThreadMessageSummary) {
+    this.id = id;
     this.authorUsername = authorUsername;
     this.createdOnMsecs = createdOnMsecs;
-    this.entityType = entityType;
-    this.entityId = entityId;
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
@@ -82,9 +80,9 @@ export class ThreadMessageObjectFactory {
   createFromBackendDict(
       threadMessageBackendDict: ThreadMessageBackendDict): ThreadMessage {
     return new ThreadMessage(
+      threadMessageBackendDict.id,
       threadMessageBackendDict.author_username,
       threadMessageBackendDict.created_on_msecs,
-      threadMessageBackendDict.entity_type, threadMessageBackendDict.entity_id,
       threadMessageBackendDict.message_id, threadMessageBackendDict.text,
       threadMessageBackendDict.updated_status,
       threadMessageBackendDict.updated_subject,

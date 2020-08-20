@@ -665,17 +665,19 @@ def get_threads(entity_type, entity_id):
     return [_get_thread_from_model(m) for m in thread_models]
 
 
-def get_thread(thread_id):
+def get_thread(thread_id, strict=True):
     """Fetches the thread by thread id.
 
     Args:
         thread_id: str. The id of the thread.
+        strict: bool. Whether to fail noisily if no entity with the given id
+                exists in the datastore. Default is True.
 
     Returns:
         FeedbackThread. The resulting FeedbackThread domain object.
     """
     return _get_thread_from_model(
-        feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
+        feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id, strict))
 
 
 def get_closed_threads(entity_type, entity_id, has_suggestion):

@@ -29,20 +29,18 @@ describe('ThreadMessageObjectFactory', () => {
   describe('.createFromBackendDict', () => {
     it('should create a new thread message from a backend dict.', () => {
       let threadMessage = this.factory.createFromBackendDict({
+        id: 'thread_message_id',
+        message_id: 1,
         author_username: 'author',
         created_on_msecs: 1000,
-        entity_type: 'exploration',
-        entity_id: 'exploration.exp1.thread1',
-        message_id: 1,
         text: 'message content',
         updated_status: null,
         updated_subject: null
       });
 
+      expect(threadMessage.id).toEqual('thread_message_id');
       expect(threadMessage.authorUsername).toEqual('author');
       expect(threadMessage.createdOnMsecs).toEqual(1000);
-      expect(threadMessage.entityType).toEqual('exploration');
-      expect(threadMessage.entityId).toEqual('exploration.exp1.thread1');
       expect(threadMessage.messageId).toEqual(1);
       expect(threadMessage.text).toEqual('message content');
       expect(threadMessage.summary.authorUsername).toEqual('author');
@@ -70,11 +68,10 @@ describe('ThreadMessageObjectFactory', () => {
 
     it('should be false when updatedSubject is null', () => {
       let threadMessage = this.factory.createFromBackendDict({
+        id: 'thread_message',
         updated_subject: null,
         author_username: 'author',
         created_on_msecs: 1000,
-        entity_type: 'exploration',
-        entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         text: '',
         updated_status: null
@@ -87,11 +84,10 @@ describe('ThreadMessageObjectFactory', () => {
   describe('.hasStatusUpdate', () => {
     it('should be true when updatedStatus is non-null', () => {
       let threadMessage = this.factory.createFromBackendDict({
+        id: 'thread_message',
         updated_status: 'open',
         author_username: 'author',
         created_on_msecs: 1000,
-        entity_type: 'exploration',
-        entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         text: null,
         updated_subject: null
@@ -102,11 +98,10 @@ describe('ThreadMessageObjectFactory', () => {
 
     it('should be false when updatedStatus is null', () => {
       let threadMessage = this.factory.createFromBackendDict({
+        id: 'thread_message',
         updated_status: null,
         author_username: 'author',
         created_on_msecs: 1000,
-        entity_type: 'exploration',
-        entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         text: '',
         updated_subject: null
@@ -119,11 +114,10 @@ describe('ThreadMessageObjectFactory', () => {
   describe('.hasText', () => {
     it('should be true when text is nonempty string', () => {
       let threadMessage = this.factory.createFromBackendDict({
+        id: 'thread_message',
         text: 'nonempty!',
         author_username: 'author',
         created_on_msecs: 1000,
-        entity_type: 'exploration',
-        entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         updated_status: null,
         updated_subject: null
@@ -134,11 +128,10 @@ describe('ThreadMessageObjectFactory', () => {
 
     it('should be false when text is empty string', () => {
       let threadMessage = this.factory.createFromBackendDict({
+        id: 'thread_message',
         text: '',
         author_username: 'author',
         created_on_msecs: 1000,
-        entity_type: 'exploration',
-        entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         updated_status: null,
         updated_subject: null

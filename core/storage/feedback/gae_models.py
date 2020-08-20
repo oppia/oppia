@@ -305,24 +305,6 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
         return '.'.join([thread_id, python_utils.UNICODE(message_id)])
 
-    @property
-    def entity_id(self):
-        """Returns the entity_id corresponding to this thread instance.
-
-        Returns:
-            str. The entity_id.
-        """
-        return self.id.split('.')[1]
-
-    @property
-    def entity_type(self):
-        """Returns the entity_type corresponding to this thread instance.
-
-        Returns:
-            str. The entity_type.
-        """
-        return self.id.split('.')[0]
-
     @classmethod
     def create(cls, message_identifier):
         """Creates a new GeneralFeedbackMessageModel entry.

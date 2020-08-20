@@ -202,10 +202,6 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         feedback_services.create_message(
             thread_id, None, 'open', 'subject 2', 'text 2')
 
-        model = feedback_models.GeneralFeedbackMessageModel.get(
-            thread_id, 0)
-        self.assertEqual(model.entity_type, 'exploration')
-
         all_messages = (
             feedback_models.GeneralFeedbackMessageModel
             .get_all_messages(2, None))
@@ -213,14 +209,10 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(len(all_messages[0]), 2)
 
         self.assertEqual(all_messages[0][0].thread_id, thread_id)
-        self.assertEqual(all_messages[0][0].entity_id, '0')
-        self.assertEqual(all_messages[0][0].entity_type, 'exploration')
         self.assertEqual(all_messages[0][0].text, 'text 2')
         self.assertEqual(all_messages[0][0].updated_subject, 'subject 2')
 
         self.assertEqual(all_messages[0][1].thread_id, thread_id)
-        self.assertEqual(all_messages[0][1].entity_id, '0')
-        self.assertEqual(all_messages[0][1].entity_type, 'exploration')
         self.assertEqual(all_messages[0][1].text, 'text 1')
         self.assertEqual(all_messages[0][1].updated_subject, 'subject 1')
 
@@ -231,18 +223,11 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         feedback_services.create_message(
             thread_id, None, 'open', 'subject 2', 'text 2')
 
-        model1 = feedback_models.GeneralFeedbackMessageModel.get(
-            thread_id, 0)
-
-        self.assertEqual(model1.entity_type, 'exploration')
-
         message = (
             feedback_models.GeneralFeedbackMessageModel
             .get_most_recent_message(thread_id))
 
         self.assertEqual(message.thread_id, thread_id)
-        self.assertEqual(message.entity_id, '0')
-        self.assertEqual(message.entity_type, 'exploration')
         self.assertEqual(message.text, 'text 2')
         self.assertEqual(message.updated_subject, 'subject 2')
 

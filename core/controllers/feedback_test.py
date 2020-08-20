@@ -704,13 +704,9 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertEqual(results[0]['text'], 'new text')
         self.assertEqual(results[0]['updated_subject'], 'new subject')
-        self.assertEqual(results[0]['entity_type'], 'exploration')
-        self.assertEqual(results[0]['entity_id'], self.exp_id)
 
         self.assertEqual(results[1]['text'], 'some text')
         self.assertEqual(results[1]['updated_subject'], 'a subject')
-        self.assertEqual(results[1]['entity_type'], 'exploration')
-        self.assertEqual(results[1]['entity_id'], self.exp_id)
 
         self.logout()
 
