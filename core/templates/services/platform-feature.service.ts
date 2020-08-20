@@ -23,6 +23,8 @@
  *   - the cache TTL of 12 hours has been reached, or
  *   - the current account is different than the account in use when the values
  *     are loaded, i.e. a different session id is present in the cookies.
+ *   - there are new features defined in the code base while the cached
+ *     summary is out-of-date.
  * In such cases, the values will be re-initialized, they may be changed.
  */
 
@@ -34,7 +36,8 @@ import { ClientContext, ClientContextObjectFactory } from
 import {
   FeatureStatusSummary,
   FeatureStatusSummaryObjectFactory,
-  FeatureSummaryDict
+  FeatureSummaryDict,
+  FeatureNames
 } from 'domain/platform_feature/feature-status-summary-object.factory';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
@@ -44,6 +47,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { UrlService } from './contextual/url.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
+import { isEqual } from 'lodash';
 
 interface FeatureFlagsCacheItem {
   timestamp: number;
@@ -236,6 +240,8 @@ export class PlatformFeatureService {
    * all following conditions hold:
    *   - it hasn't expired.
    *   - its session id matches the current session id.
+   *   - there are new features defined in the code base while the cached
+   *     summary is out-of-date.
    *
    * @param {FeatureFlagsCacheItem} item - The result item loaded from
    * sessionStorage.
@@ -247,9 +253,20 @@ export class PlatformFeatureService {
         PlatformFeatureService.SESSION_STORAGE_CACHE_TTL) {
       return false;
     }
+
     if (this.getSessionIdFromCookie() !== item.sessionId) {
       return false;
     }
+
+    const storedFeatures: string[] = Array.from(
+      item.featureStatusSummary.featureNameToFlag.keys());
+    const requiredFeatures: string[] = Object.keys(FeatureNames)
+      .map(name => FeatureNames[name]);
+
+    if (!isEqual(storedFeatures.sort(), requiredFeatures.sort())) {
+      return false;
+    }
+
     return true;
   }
 
