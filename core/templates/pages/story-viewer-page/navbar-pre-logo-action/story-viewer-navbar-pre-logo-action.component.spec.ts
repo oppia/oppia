@@ -15,20 +15,36 @@
 /**
  * @fileoverview Unit tests for the story viewer pre logo action
  */
+
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+
 import { UrlService } from 'services/contextual/url.service';
+
 
 require('pages/story-viewer-page/navbar-pre-logo-action/' +
   'story-viewer-navbar-pre-logo-action.component.ts');
 
 describe('story viewer pre logo action', function() {
   let ctrl = null;
+  let storyViewerBackendApiService = null;
   let urlService: UrlService = null;
   let rootScope = null;
 
+  var mockSendStoryDataEventEmitter = null;
+
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    mockSendStoryDataEventEmitter = new EventEmitter();
+    $provide.value('StoryViewerBackendApiService', {
+      onSendStoryData: mockSendStoryDataEventEmitter
+    });
+  }));
+
   beforeEach(() => {
     urlService = TestBed.get(UrlService);
+    // StoryViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
       .and.returnValue('abbrev');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
@@ -43,7 +59,7 @@ describe('story viewer pre logo action', function() {
 
   it('should set the topic name and URL correctly', function() {
     ctrl.$onInit();
-    rootScope.$emit('storyData', {
+    mockSendStoryDataEventEmitter.emit({
       topicName: 'Topic Name'
     });
     rootScope.$digest();
