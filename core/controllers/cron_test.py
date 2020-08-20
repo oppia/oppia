@@ -23,13 +23,9 @@ from core import jobs
 from core.controllers import cron
 from core.domain import cron_services
 from core.domain import email_manager
-from core.domain import exp_fetchers
-from core.domain import state_domain
-from core.domain import suggestion_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
-import feconf
 import main_cron
 
 from mapreduce import model as mapreduce_model
@@ -279,54 +275,4 @@ class CronJobTests(test_utils.GenericTestBase):
                 '0 MR jobs cleaned up.',
                 'A previous cleanup job is still running.'
             ]
-        )
-
-    def test_cron_accept_stale_suggestions_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.save_new_valid_exploration(
-            'exp_id', self.admin_id, title='A title', category='Algebra')
-        author_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-
-        new_content = state_domain.SubtitledHtml(
-            'content', '<p>new suggestion content</p>').to_dict()
-        change = {
-            'cmd': 'edit_state_property',
-            'property_name': 'content',
-            'state_name': 'Introduction',
-            'new_value': new_content
-        }
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            'exp_id', 1,
-            author_id, change, 'change title')
-
-        exploration = exp_fetchers.get_exploration_by_id('exp_id')
-        self.assertEqual(
-            exploration.states['Introduction'].content.to_dict(), {
-                'content_id': 'content',
-                'html': ''
-            }
-        )
-
-        threshold_time_before_accept_swap = self.swap(
-            suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0)
-        auto_accept_suggestions_swap = self.swap(
-            feconf, 'ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS', True)
-
-        with threshold_time_before_accept_swap, self.testapp_swap, (
-            auto_accept_suggestions_swap):
-            self.assertEqual(
-                len(suggestion_services.get_all_stale_suggestion_ids()), 1)
-            self.get_html_response('/cron/suggestions/accept_stale_suggestions')
-
-            self.assertEqual(
-                len(suggestion_services.get_all_stale_suggestion_ids()), 0)
-
-        exploration = exp_fetchers.get_exploration_by_id('exp_id')
-        self.assertEqual(
-            exploration.states['Introduction'].content.to_dict(), {
-                'content_id': 'content',
-                'html': '<p>new suggestion content</p>'
-            }
         )
