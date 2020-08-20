@@ -103,7 +103,8 @@ describe('NumberWithUnitsObjectFactory', () => {
           uof.fromRawInputString('m / s^2')).toString()).toBe('-4/3 m s^-2');
       expect(
         new NumberWithUnits('fraction', 0, new Fraction(false, 0, 4, 3),
-          uof.fromRawInputString('$ per hour')).toString()).toBe('$ 4/3 hour^-1');
+          uof.fromRawInputString(
+            '$ per hour')).toString()).toBe('$ 4/3 hour^-1');
       expect(
         new NumberWithUnits('real', 40, new Fraction(false, 0, 0, 1),
           uof.fromRawInputString('Rs per hour')).toString()).toBe(
