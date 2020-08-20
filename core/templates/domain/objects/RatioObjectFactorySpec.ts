@@ -74,9 +74,6 @@ describe('Ratio Object Factory', () => {
     }).toThrowError(errors.INVALID_CHARS);
     // Invalid format.
     expect(() => {
-      ratio.fromRawInputString('1::3');
-    }).toThrowError(errors.INVALID_FORMAT);
-    expect(() => {
       ratio.fromRawInputString(':1:3');
     }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
@@ -90,20 +87,20 @@ describe('Ratio Object Factory', () => {
     }).toThrowError(errors.INVALID_FORMAT);
     // Invalid Ratio.
     expect(() => {
-      ratio.fromRawInputString('1:3');
-    }).toThrowError(errors.INVALID_FORMAT);
+      ratio.fromRawInputString('1:3/2');
+    }).toThrowError(errors.INVALID_RATIO);
     expect(() => {
-      ratio.fromRawInputString(':1:3');
-    }).toThrowError(errors.INVALID_FORMAT);
+      ratio.fromRawInputString('1:1/2:3/2');
+    }).toThrowError(errors.INVALID_RATIO);
     expect(() => {
-      ratio.fromRawInputString('1:2:3:4:5:');
-    }).toThrowError(errors.INVALID_FORMAT);
+      ratio.fromRawInputString('1/2:2:3:4:5');
+    }).toThrowError(errors.INVALID_RATIO);
     expect(() => {
-      ratio.fromRawInputString('1:');
-    }).toThrowError(errors.INVALID_FORMAT);
+      ratio.fromRawInputString('1:2.2');
+    }).toThrowError(errors.INVALID_RATIO);
     expect(() => {
-      ratio.fromRawInputString('1');
-    }).toThrowError(errors.INVALID_FORMAT);
+      ratio.fromRawInputString('1.2:2');
+    }).toThrowError(errors.INVALID_RATIO);
     // Invalid Colons.
     expect(() => {
       ratio.fromRawInputString('1::2::3');
