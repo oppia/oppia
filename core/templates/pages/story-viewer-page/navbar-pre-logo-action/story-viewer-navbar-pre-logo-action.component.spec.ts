@@ -27,7 +27,6 @@ require('pages/story-viewer-page/navbar-pre-logo-action/' +
 
 describe('story viewer pre logo action', function() {
   let ctrl = null;
-  let storyViewerBackendApiService = null;
   let urlService: UrlService = null;
   let rootScope = null;
 
@@ -44,7 +43,6 @@ describe('story viewer pre logo action', function() {
 
   beforeEach(() => {
     urlService = TestBed.get(UrlService);
-    // StoryViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
       .and.returnValue('abbrev');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
