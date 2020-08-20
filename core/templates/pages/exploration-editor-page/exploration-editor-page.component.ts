@@ -476,13 +476,18 @@ angular.module('oppia').component('explorationEditorPage', {
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
-        $scope.$on(
-          'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
+        ctrl.directiveSubscriptions.add(
+          // eslint-disable-next-line max-len
+          StateTutorialFirstTimeService.onEnterEditorForTheFirstTime.subscribe(() => {
+            ctrl.showWelcomeExplorationModal();
+          })
+        );
         ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
             () => {
               ctrl.startTutorial();
-            }));
+            })
+        );
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
 
