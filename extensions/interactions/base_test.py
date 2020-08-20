@@ -740,7 +740,7 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
-        if list(missing_interaction_ids) != ['MathExpressionInput']:
+        if list(missing_interaction_ids) != ['MathExpressionInput', 'RatioExpressionInput']:
             # Ignoring the lack of the MathExpressionInput since it is going
             # to be deprecated and explorations that use it will now be using
             # one of AlgebraicExpressionInput, NumericExpressionInput, or
