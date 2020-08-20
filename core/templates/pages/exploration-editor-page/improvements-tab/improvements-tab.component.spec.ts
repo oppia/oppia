@@ -227,20 +227,18 @@ describe('Improvements tab', function() {
     }));
 
     it('should provide the correct state retention', fakeAsync(() => {
-      const numStarts = 100;
+      const totalHitCount = 100;
       const numCompletions = 60;
-      this.expStatsSpy.and.returnValue(
-        new ExplorationStats('id', 1, 0, 0, 0, new Map([
-          [
-            'Introduction',
-            new StateStats(0, 0, numStarts, 0, 0, numCompletions)
-          ],
-        ])));
+      const stateStats = (
+        new StateStats(0, 0, totalHitCount, 0, 0, numCompletions));
+      this.expStatsSpy.and.returnValue(new ExplorationStats(
+        'id', 1, 0, 0, 0, new Map([['Introduction', stateStats]])));
       this.allStateTasksSpy.and.returnValue([
         {
           stateName: 'Introduction',
           ngrTask: newNgrTask(),
-          siaTask: newSiaTask()
+          siaTask: newSiaTask(),
+          supportingStats: {stateStats},
         }
       ]);
 
