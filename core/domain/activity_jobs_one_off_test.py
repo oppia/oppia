@@ -42,8 +42,8 @@ from google.appengine.ext import ndb
 
 gae_search_services = models.Registry.import_search_services()
 
-(collection_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.collection, models.NAMES.exploration])
+(collection_models, exp_models, topic_models) = models.Registry.import_models(
+    [models.NAMES.collection, models.NAMES.exploration, models.NAMES.topic])
 
 
 class ActivityContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
@@ -919,3 +919,206 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_commit_model_2.last_updated,
             migrated_commit_model_2.last_updated)
+
+
+class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
+
+    COL_1_ID = 'col_1_id'
+    EXP_1_ID = 'exp_1_id'
+    TOP_1_ID = 'top_1_id'
+    USER_1_ID = 'user_1_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off.AuditSnapshotMetadataModelsJob.create_new())
+        activity_jobs_one_off.AuditSnapshotMetadataModelsJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            activity_jobs_one_off.AuditSnapshotMetadataModelsJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return [
+            [key, sorted(values) if isinstance(values, list) else values]
+            for key, values in eval_output]
+
+    def test_audit_collection_rights_snapshot(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='%s-1' % self.COL_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }, {
+                    'cmd': 'some_other_command',
+                    'other_field': 'test',
+                    'different_field': 'test'
+                }
+            ]
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['collection-some_command-length-2', 1],
+                ['collection-cmd-some_command', 1],
+                ['collection-cmd-some_other_command', 1],
+                ['collection-some_command-field-other_field', 1],
+                ['collection-some_other_command-field-other_field', 1],
+                ['collection-some_other_command-field-different_field', 1],
+            ]
+        )
+
+    def test_audit_deleted_collection_rights_snapshot(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='%s-1' % self.COL_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }, {
+                    'cmd': 'some_other_command',
+                    'other_field': 'test',
+                    'different_field': 'test'
+                }
+            ],
+            deleted=True
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(output, [['collection-deleted', 1]])
+
+    def test_audit_collection_rights_snapshot_with_missing_cmd(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='%s-1' % self.COL_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'other_field': 'test',
+                    'different_field': 'test'
+                }
+            ]
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['collection-missing_cmd-length-1', 1],
+                ['collection-missing-cmd', 1],
+                ['collection-missing_cmd-field-other_field', 1],
+                ['collection-missing_cmd-field-different_field', 1],
+            ]
+        )
+
+    def test_audit_exploration_rights_snapshot_with_empty_commit_cmds(self):
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[]
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(output, [['exploration-length-0', 1]])
+
+    def test_audit_topic_rights_snapshot(self):
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id='%s-1' % self.TOP_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }, {
+                    'cmd': 'some_other_command',
+                    'other_field': 'test',
+                    'different_field': 'test'
+                }
+            ]
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['topic-some_command-length-2', 1],
+                ['topic-cmd-some_command', 1],
+                ['topic-cmd-some_other_command', 1],
+                ['topic-some_command-field-other_field', 1],
+                ['topic-some_other_command-field-other_field', 1],
+                ['topic-some_other_command-field-different_field', 1],
+            ]
+        )
+
+    def test_audit_multiple_rights_snapshots(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='%s-1' % self.COL_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }, {
+                    'cmd': 'some_other_command',
+                    'other_field': 'test',
+                    'different_field': 'test'
+                }
+            ]
+        ).put()
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }
+            ]
+        ).put()
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-2' % self.EXP_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }
+            ]
+        ).put()
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id='%s-1' % self.TOP_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[]
+        ).put()
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['collection-some_command-length-2', 1],
+                ['collection-cmd-some_command', 1],
+                ['collection-cmd-some_other_command', 1],
+                ['collection-some_command-field-other_field', 1],
+                ['collection-some_other_command-field-other_field', 1],
+                ['collection-some_other_command-field-different_field', 1],
+                ['exploration-some_command-length-1', 2],
+                ['exploration-cmd-some_command', 2],
+                ['exploration-some_command-field-other_field', 2],
+                ['topic-length-0', 1]
+            ]
+        )
