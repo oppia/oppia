@@ -131,16 +131,16 @@ angular.module('oppia').component('searchBar', {
         }
 
         updateSelectionDetails(itemsType);
-        onSearchQueryChangeExec();
+        ctrl.onSearchQueryChangeExec();
       };
 
       ctrl.deselectAll = function(itemsType) {
         ctrl.selectionDetails[itemsType].selections = {};
         updateSelectionDetails(itemsType);
-        onSearchQueryChangeExec();
+        ctrl.onSearchQueryChangeExec();
       };
 
-      var onSearchQueryChangeExec = function() {
+      ctrl.onSearchQueryChangeExec = function() {
         SearchService.executeSearchQuery(
           ctrl.searchQuery, ctrl.selectionDetails.categories.selections,
           ctrl.selectionDetails.languageCodes.selections);
@@ -160,12 +160,17 @@ angular.module('oppia').component('searchBar', {
         ctrl.selectionDetails.categories.selections = {};
         ctrl.selectionDetails.languageCodes.selections = {};
 
-        ctrl.searchQuery = (
+        updateSelectionDetails('categories');
+        updateSelectionDetails('languageCodes');
+
+        var newQuery = (
           SearchService.updateSearchFieldsBasedOnUrlQuery(
             $window.location.search, ctrl.selectionDetails));
 
-        updateSelectionDetails('categories');
-        updateSelectionDetails('languageCodes');
+        if (ctrl.searchQuery !== newQuery) {
+          ctrl.searchQuery = newQuery;
+          ctrl.onSearchQueryChangeExec();
+        }
       };
 
       var refreshSearchBarLabels = function() {
@@ -227,12 +232,6 @@ angular.module('oppia').component('searchBar', {
         // Non-translatable parts of the html strings, like numbers or user
         // names.
         ctrl.translationData = {};
-        $scope.$watch('$ctrl.searchQuery', function(newQuery, oldQuery) {
-          // Run only if the query has changed.
-          if (newQuery !== oldQuery) {
-            onSearchQueryChangeExec();
-          }
-        });
         // Initialize the selection descriptions and summaries.
         for (var itemsType in ctrl.selectionDetails) {
           updateSelectionDetails(itemsType);
@@ -263,7 +262,7 @@ angular.module('oppia').component('searchBar', {
               }
 
               if ($window.location.pathname === '/search/find') {
-                onSearchQueryChangeExec();
+                ctrl.onSearchQueryChangeExec();
               }
 
               refreshSearchBarLabels();
