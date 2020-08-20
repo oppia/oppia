@@ -2142,7 +2142,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_types_to_inputs': {
-                'Equals': [{'x': 'test'}]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{'x': 'test'}]
+                }
             },
             'training_data': [],
             'tagged_skill_misconception_id': None

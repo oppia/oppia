@@ -122,12 +122,15 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         answer_group_list1 = [{
             'rule_types_to_inputs': {
-                'IsEqualToOrdering': [{
-                    'x': [
-                        ['a'],
-                        ['b']
-                    ]
-                }]
+                'IsEqualToOrdering': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': [
+                            ['a'],
+                            ['b']
+                        ]
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'Introduction',
@@ -157,20 +160,29 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         answer_group_list2 = [{
             'rule_types_to_inputs': {
-                'HasElementXBeforeElementY': [{
-                    'x': '',
-                    'y': ''
-                }],
-                'IsEqualToOrdering': [{
-                    'x': [
-                        ['a']
-                    ]
-                }, {
-                    'x': []
-                }],
-                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
-                    'x': []
-                }]
+                'HasElementXBeforeElementY': {
+                    'content_id': None,
+                        'rule_inputs': [{
+                        'x': '',
+                        'y': ''
+                    }]
+                },
+                'IsEqualToOrdering': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': [
+                            ['a']
+                        ]
+                    }, {
+                        'x': []
+                    }]
+                },
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': []
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'State1',
@@ -187,13 +199,16 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }, {
             'rule_types_to_inputs': {
-                'HasElementXAtPositionY': [{
-                    'x': '',
-                    'y': 1
-                }, {
-                    'x': 'a',
-                    'y': 2
-                }]
+                'HasElementXAtPositionY': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': '',
+                        'y': 1
+                    }, {
+                        'x': 'a',
+                        'y': 2
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'Introduction',
@@ -253,14 +268,14 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             .get_output(job_id))
         expected_output = [(
             u'[u\'exp_id0\', [u"[u\'State name: State2, AnswerGroup: 0, Rule in'
-            'put x in rule with rule type IsEqualToOrderingWithOneItemAtIncorre'
-            'ctPosition and rule input index 0 is empty. \', u\'State name: Sta'
-            'te2, AnswerGroup: 0, Rule input y in rule with rule type HasElemen'
-            'tXBeforeElementY and rule input index 0 is empty. \', u\'State nam'
-            'e: State2, AnswerGroup: 0, Rule input x in rule with rule type Has'
-            'ElementXBeforeElementY and rule input index 0 is empty. \', u\'Sta'
-            'te name: State2, AnswerGroup: 0, Rule input x in rule with rule ty'
-            'pe IsEqualToOrdering and rule input index 1 is empty. \', u\'State'
+            'put x in rule with rule type IsEqualToOrdering and rule input inde'
+            'x 1 is empty. \', u\'State name: State2, AnswerGroup: 0, Rule inpu'
+            't y in rule with rule type HasElementXBeforeElementY and rule inpu'
+            't index 0 is empty. \', u\'State name: State2, AnswerGroup: 0, Rul'
+            'e input x in rule with rule type HasElementXBeforeElementY and rul'
+            'e input index 0 is empty. \', u\'State name: State2, AnswerGroup: '
+            '0, Rule input x in rule with rule type IsEqualToOrderingWithOneIte'
+            'mAtIncorrectPosition and rule input index 0 is empty. \', u\'State'
             ' name: State2, AnswerGroup: 1, Rule input x in rule with rule type'
             ' HasElementXAtPositionY and rule input index 0 is empty. \']"]]'
         )]
@@ -306,11 +321,14 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         answer_group_list = [{
             'rule_types_to_inputs': {
-                'IsEqualToOrdering': [{
-                    'x': []
-                }, {
-                    'x': []
-                }]
+                'IsEqualToOrdering': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': []
+                    }, {
+                        'x': []
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'State1',
@@ -382,9 +400,12 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         answer_group_list1 = [{
             'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': '1'
-                }]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': '1'
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'Introduction',
@@ -439,11 +460,14 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         answer_group_list2 = [{
             'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': '0'
-                }, {
-                    'x': '9007199254740991'
-                }]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': '0'
+                    }, {
+                        'x': '9007199254740991'
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'State1',
@@ -509,11 +533,14 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         answer_group_list = [{
             'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': '0'
-                }, {
-                    'x': '9007199254740991'
-                }]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': '0'
+                    }, {
+                        'x': '9007199254740991'
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'State1',
@@ -585,11 +612,14 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         answer_group_list1 = [{
             'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': ['<p>This is value1 for ItemSelection</p>']
-                }, {
-                    'x': ['<p>This is value2 for ItemSelection</p>']
-                }]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    }, {
+                        'x': ['<p>This is value2 for ItemSelection</p>']
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'Introduction',
@@ -639,11 +669,14 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         answer_group_list2 = [{
             'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': ['<p>This is value1 for ItemSelection</p>']
-                }, {
-                    'x': ['<p>This is value3 for ItemSelection</p>']
-                }]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    }, {
+                        'x': ['<p>This is value3 for ItemSelection</p>']
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'State1',
@@ -710,11 +743,14 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         answer_group_list = [{
             'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': ['<p>This is value1 for ItemSelection</p>']
-                }, {
-                    'x': ['<p>This is value3 for ItemSelection</p>']
-                }]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    }, {
+                        'x': ['<p>This is value3 for ItemSelection</p>']
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'State1',

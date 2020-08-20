@@ -355,7 +355,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'rule_types_to_inputs': {
-                    'Contains': [{'x': 'Test'}]
+                    'Contains': {
+                        'content_id': None,
+                        'rule_inputs': [{'x': 'Test'}]
+                    }
                 },
                 'training_data': [],
                 'tagged_skill_misconception_id': None

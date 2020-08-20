@@ -117,9 +117,12 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
 
         interaction_answer_groups = [{
             'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': 'abc'
-                }]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': 'abc'
+                    }]
+                }
             },
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
@@ -1611,7 +1614,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
         answer_group_list2 = [{
             'rule_types_to_inputs': {
-                'Equals': [{'x': 0}, {'x': 1}]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{'x': 0}, {'x': 1}]
+                }
             },
             'outcome': {
                 'dest': 'state1',
@@ -1634,7 +1640,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'tagged_skill_misconception_id': None
         }, {
             'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{'x': 0}]
+                }
             },
             'outcome': {
                 'dest': 'state3',
@@ -1652,23 +1661,26 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         }]
         answer_group_list3 = [{
             'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': [
-                        '<p>This is value1 for ItemSelection</p><oppia-noni'
-                        'nteractive-image filepath-with-value="&amp;quot;s3'
-                        'Choice1.png&amp;quot;" caption-with-value="&amp;qu'
-                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
-                        ';"></oppia-noninteractive-image>'
-                    ]
-                }, {
-                    'x': [
-                        '<p>This is value3 for ItemSelection</p><oppia-noni'
-                        'nteractive-image filepath-with-value="&amp;quot;s3'
-                        'Choice3.png&amp;quot;" caption-with-value="&amp;qu'
-                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
-                        ';"></oppia-noninteractive-image>'
-                    ]
-                }]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{
+                        'x': [
+                            '<p>This is value1 for ItemSelection</p><oppia-noni'
+                            'nteractive-image filepath-with-value="&amp;quot;s3'
+                            'Choice1.png&amp;quot;" caption-with-value="&amp;qu'
+                            'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
+                            ';"></oppia-noninteractive-image>'
+                        ]
+                    }, {
+                        'x': [
+                            '<p>This is value3 for ItemSelection</p><oppia-noni'
+                            'nteractive-image filepath-with-value="&amp;quot;s3'
+                            'Choice3.png&amp;quot;" caption-with-value="&amp;qu'
+                            'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
+                            ';"></oppia-noninteractive-image>'
+                        ]
+                    }]
+                }
             },
             'outcome': {
                 'dest': 'state1',
@@ -2435,7 +2447,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # List of answer groups to add into an interaction.
         self.interaction_answer_groups = [{
             'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{'x': 0}]
+                }
             },
             'outcome': {
                 'dest': self.init_state_name,
@@ -2770,8 +2785,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         rule_types_to_inputs = init_interaction.answer_groups[
             0].rule_types_to_inputs
         outcome = init_interaction.answer_groups[0].outcome
-        self.assertEqual(rule_types_to_inputs, {
-            'Equals': [{'x': 0}]
+        self.assertEqual(rule_types_to_inputs['Equals'].to_dict(), {
+            'content_id': None,
+            'rule_inputs': [{'x': 0}]
         })
         self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
@@ -2818,7 +2834,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
         self.interaction_answer_groups[0]['rule_types_to_inputs'][
-            'Equals'][0]['x'] = 'abc'
+            'Equals']['rule_inputs'][0]['x'] = 'abc'
         with self.assertRaisesRegexp(
             Exception,
             'abc has the wrong type. It should be a NonnegativeInt.'):

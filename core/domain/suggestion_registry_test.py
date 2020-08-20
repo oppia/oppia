@@ -1737,7 +1737,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
+                'Equals': {
+                    'content_id': None,
+                    'rule_inputs': [{'x': 0}]
+                }
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
