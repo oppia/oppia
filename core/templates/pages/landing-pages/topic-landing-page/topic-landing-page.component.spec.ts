@@ -88,8 +88,8 @@ describe('Topic Landing Page', () => {
     fixture.detectChanges();
   });
 
-
-  it('should get information from topic identified at pathname', () => {
+  it('should get topic title from topic id in pathname when component' +
+    ' is initialized', () => {
     windowRef.nativeWindow.location.pathname = '/math/ratios';
     component.ngOnInit();
     expect(component.topicTitle).toBe('Ratios');

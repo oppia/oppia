@@ -59,7 +59,7 @@ export class MathExpressionInputValidationService {
 
     // Check that each rule has a valid math expression.
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         try {
           MathExpression.fromLatex((<string>rules[j].inputs.x));

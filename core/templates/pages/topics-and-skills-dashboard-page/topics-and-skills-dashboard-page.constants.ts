@@ -31,9 +31,6 @@ export enum ETopicPublishedOptions {
 }
 
 export class TopicsAndSkillsDashboardPageConstants {
-  public static EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED =
-    'topicsAndSkillsDashboardReinitialized';
-
   public static SKILL_DESCRIPTION_STATUS_VALUES = {
     STATUS_UNCHANGED: 'unchanged',
     STATUS_CHANGED: 'changed',
