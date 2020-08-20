@@ -50,7 +50,7 @@ describe('Exploration search backend API service', () => {
       let failHandler = jasmine.createSpy('fail');
       let query = escape(btoa('three'));
 
-      SearchExplorationsService.fetchExplorations('three')
+      SearchExplorationsService.fetchExplorationsAsync('three')
         .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/exploration/metadata_search?q=' + query);
@@ -108,7 +108,7 @@ describe('Exploration search backend API service', () => {
       let failHandler = jasmine.createSpy('fail');
       let query = escape(btoa('oppia'));
 
-      SearchExplorationsService.fetchExplorations('oppia')
+      SearchExplorationsService.fetchExplorationsAsync('oppia')
         .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/exploration/metadata_search?q=' + query);

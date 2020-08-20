@@ -43,7 +43,7 @@ describe('Profile Link Backend Api Service', () => {
   it('should fetch profile photo details', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let username = 'user';
-    profileLinkImageBackendApiService.fetchProfilePictureData(
+    profileLinkImageBackendApiService.fetchProfilePictureDataAsync(
       '/preferenceshandler/profile_picture_by_username/user').then(
       successHandler);
     let req = httpTestingController.expectOne(

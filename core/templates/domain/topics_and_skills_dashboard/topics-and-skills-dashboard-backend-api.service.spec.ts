@@ -65,7 +65,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
       fakeAsync(() => {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
-        topicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+        topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync().then(
           successHandler, failHandler);
         let req = httpTestingController.expectOne(
           TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
@@ -146,7 +146,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
       'backend', fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      topicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+      topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync().then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
         TOPICS_AND_SKILLS_DASHBOARD_DATA_URL);

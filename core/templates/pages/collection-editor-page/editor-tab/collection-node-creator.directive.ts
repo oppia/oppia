@@ -63,7 +63,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
           ctrl.fetchTypeaheadResults = function(searchQuery) {
             if (isValidSearchQuery(searchQuery)) {
               ctrl.searchQueryHasError = false;
-              return SearchExplorationsBackendApiService.fetchExplorations(
+              return SearchExplorationsBackendApiService.fetchExplorationsAsync(
                 searchQuery
               ).then(function(explorationMetadataList) {
                 var options = [];

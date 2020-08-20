@@ -53,7 +53,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
           var ctrl = this;
           var categorizedSkills = null;
           var untriagedSkillSummaries = null;
-          TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+          TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync().then(
             function(response) {
               categorizedSkills = response.categorizedSkillsDict;
               untriagedSkillSummaries = response.untriagedSkillSummaries;

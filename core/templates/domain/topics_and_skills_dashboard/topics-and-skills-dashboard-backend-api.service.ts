@@ -124,7 +124,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
   private _topicsAndSkillsDashboardReinitializedEventEmitter =
     new EventEmitter();
 
-  fetchDashboardData(): Promise<TopicsAndSkillDashboardData> {
+  async fetchDashboardDataAsync(): Promise<TopicsAndSkillDashboardData> {
     return this.http.get<TopicsAndSkillsDashboardDataBackendDict>(
       '/topics_and_skills_dashboard/data').toPromise().then(response => {
       let categorizedSkills = {};

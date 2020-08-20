@@ -67,9 +67,9 @@ angular.module('oppia').factory('CollectionEditorStateService', [
        * specified collection ID. See setCollection() for more information on
        * additional behavior of this function.
        */
-      loadCollection: function(collectionId) {
+      loadCollectionAsync: function(collectionId) {
         _collectionIsLoading = true;
-        EditableCollectionBackendApiService.fetchCollection(
+        EditableCollectionBackendApiService.fetchCollectionAsync(
           collectionId).then(
           function(newCollectionObject) {
             _updateCollection(newCollectionObject);
@@ -82,7 +82,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
               error || 'There was an error when loading the collection.');
             _collectionIsLoading = false;
           });
-        CollectionRightsBackendApiService.fetchCollectionRights(
+        CollectionRightsBackendApiService.fetchCollectionRightsAsync(
           collectionId).then(function(newBackendCollectionRightsObject) {
           _setCollectionRights(newBackendCollectionRightsObject);
           _collectionIsLoading = false;
@@ -107,7 +107,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
 
       /**
        * Returns whether a collection has yet been loaded using either
-       * loadCollection() or setCollection().
+       * loadCollectionAsync() or setCollection().
        */
       hasLoadedCollection: function() {
         return _collectionIsInitialized;
@@ -180,7 +180,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
           return false;
         }
         _collectionIsBeingSaved = true;
-        EditableCollectionBackendApiService.updateCollection(
+        EditableCollectionBackendApiService.updateCollectionAsync(
           _collection.getId(), _collection.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(collectionObject) {

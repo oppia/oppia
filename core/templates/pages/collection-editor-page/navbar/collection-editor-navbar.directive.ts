@@ -83,7 +83,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
           var _publishCollection = function() {
             // TODO(bhenning): This also needs a confirmation of destructive
             // action since it is not reversible.
-            CollectionRightsBackendApiService.setCollectionPublic(
+            CollectionRightsBackendApiService.setCollectionPublicAsync(
               ctrl.collectionId, ctrl.collection.getVersion()).then(
               function() {
                 ctrl.collectionRights.setPublic();
@@ -168,7 +168,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
           // Unpublish the collection. Will only show up if the collection is
           // public and the user has access to the collection.
           ctrl.unpublishCollection = function() {
-            CollectionRightsBackendApiService.setCollectionPrivate(
+            CollectionRightsBackendApiService.setCollectionPrivateAsync(
               ctrl.collectionId, ctrl.collection.getVersion()).then(
               function() {
                 ctrl.collectionRights.setPrivate();

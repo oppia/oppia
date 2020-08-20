@@ -32,7 +32,7 @@ export class ProfileLinkImageBackendApiService {
     private http: HttpClient
   ) {}
 
-  fetchProfilePictureData(profileImageUrl: string): Promise<ProfileDict> {
+  async fetchProfilePictureDataAsync(profileImageUrl: string): Promise<ProfileDict> {
     return this.http.get<ProfileDict>(profileImageUrl).toPromise();
   }
 }

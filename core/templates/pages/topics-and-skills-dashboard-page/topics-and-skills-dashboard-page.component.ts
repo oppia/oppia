@@ -92,7 +92,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
            * @param {Boolean} stayInSameTab - To stay in the same tab or not.
            */
       ctrl._initDashboard = function(stayInSameTab) {
-        TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+        TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync().then(
           function(response) {
             ctrl.totalTopicSummaries = response.topicSummaries;
             ctrl.topicSummaries = ctrl.totalTopicSummaries;

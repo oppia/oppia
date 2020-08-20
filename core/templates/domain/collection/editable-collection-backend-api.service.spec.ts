@@ -94,7 +94,7 @@ describe('Editable collection backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      editableCollectionBackendApiService.fetchCollection('0').then(
+      editableCollectionBackendApiService.fetchCollectionAsync('0').then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
         '/collection_editor_handler/data/0');
@@ -116,7 +116,7 @@ describe('Editable collection backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      editableCollectionBackendApiService.fetchCollection('1').then(
+      editableCollectionBackendApiService.fetchCollectionAsync('1').then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
         '/collection_editor_handler/data/1');
@@ -141,7 +141,7 @@ describe('Editable collection backend API service', () => {
       var collection: Collection = null;
       var collectionDict = sampleDataResults;
       // Loading a collection the first time should fetch it from the backend.
-      editableCollectionBackendApiService.fetchCollection('0').then(
+      editableCollectionBackendApiService.fetchCollectionAsync('0').then(
         (data) => {
           collection = data;
         });
@@ -157,7 +157,7 @@ describe('Editable collection backend API service', () => {
       collection = collectionObjectFactory.create(collectionDict.collection);
 
       // Send a request to update collection.
-      editableCollectionBackendApiService.updateCollection(
+      editableCollectionBackendApiService.updateCollectionAsync(
         collectionDict.collection.id,
         collectionDict.collection.version,
         collectionDict.collection.title, []

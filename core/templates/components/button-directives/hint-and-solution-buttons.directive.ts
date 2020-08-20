@@ -114,7 +114,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             var inQuestionMode = (
               ExplorationPlayerStateService.isInQuestionMode());
             if (!_editorPreviewMode && !inQuestionMode) {
-              StatsReportingService.recordSolutionHit(
+              StatsReportingService.recordSolutionHitAsync(
                 PlayerPositionService.getCurrentStateName());
             }
             var promise = HintAndSolutionModalService.displaySolutionModal();

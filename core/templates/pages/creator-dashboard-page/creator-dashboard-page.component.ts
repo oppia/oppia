@@ -262,7 +262,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         });
 
         var dashboardDataPromise = (
-          CreatorDashboardBackendApiService.fetchDashboardData());
+          CreatorDashboardBackendApiService.fetchDashboardDataAsync());
         dashboardDataPromise.then(
           function(response) {
             // The following condition is required for Karma testing. The

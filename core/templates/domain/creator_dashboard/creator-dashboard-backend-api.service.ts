@@ -195,7 +195,7 @@ export class CreatorDashboardBackendApiService {
     });
   }
 
-  fetchDashboardData(): Promise<CreatorDashboardData> {
+  async fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this._fetchDashboardData();
   }
 }

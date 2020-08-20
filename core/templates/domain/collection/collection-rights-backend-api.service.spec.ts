@@ -68,12 +68,12 @@ describe('Collection rights backend API service', function() {
     httpTestingController.verify();
   });
 
-  describe('when .fetchCollectionRights is called', () => {
+  describe('when .fetchCollectionRightsAsync is called', () => {
     it('should fetch collection rights', fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      collectionRightsBackendApiService.fetchCollectionRights('0')
+      collectionRightsBackendApiService.fetchCollectionRightsAsync('0')
         .then(successHandler, failHandler);
 
       let req = httpTestingController
@@ -95,7 +95,7 @@ describe('Collection rights backend API service', function() {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
 
-        collectionRightsBackendApiService.fetchCollectionRights('1')
+        collectionRightsBackendApiService.fetchCollectionRightsAsync('1')
           .then(successHandler, failHandler);
 
         let req = httpTestingController
@@ -117,7 +117,7 @@ describe('Collection rights backend API service', function() {
       }));
   });
 
-  describe('when .setCollectionPublic is called', () => {
+  describe('when .setCollectionPublicAsync is called', () => {
     it('should successfully set a collection to be public', fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -125,7 +125,7 @@ describe('Collection rights backend API service', function() {
       // TODO(bhenning): Figure out how to test the actual payload sent with the
       // PUT request. The typical expect() syntax with a passed-in object
       // payload does not seem to be working correctly.
-      collectionRightsBackendApiService.setCollectionPublic('0', 1)
+      collectionRightsBackendApiService.setCollectionPublicAsync('0', 1)
         .then(successHandler, failHandler);
 
       let req = httpTestingController
@@ -145,7 +145,7 @@ describe('Collection rights backend API service', function() {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
 
-        collectionRightsBackendApiService.setCollectionPublic('0', 1)
+        collectionRightsBackendApiService.setCollectionPublicAsync('0', 1)
           .then(successHandler, failHandler);
 
         let req = httpTestingController
@@ -166,7 +166,7 @@ describe('Collection rights backend API service', function() {
       }));
   });
 
-  describe('when .setCollectionPrivate is called', () => {
+  describe('when .setCollectionPrivateAsync is called', () => {
     it('should successfully set a collection to be public', fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -174,7 +174,7 @@ describe('Collection rights backend API service', function() {
       // TODO(bhenning): Figure out how to test the actual payload sent with the
       // PUT request. The typical expect() syntax with a passed-in object
       // payload does not seem to be working correctly.
-      collectionRightsBackendApiService.setCollectionPrivate('0', 1)
+      collectionRightsBackendApiService.setCollectionPrivateAsync('0', 1)
         .then(successHandler, failHandler);
 
       let req = httpTestingController
@@ -194,7 +194,7 @@ describe('Collection rights backend API service', function() {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
 
-        collectionRightsBackendApiService.setCollectionPrivate('0', 1)
+        collectionRightsBackendApiService.setCollectionPrivateAsync('0', 1)
           .then(successHandler, failHandler);
 
         let req = httpTestingController
@@ -215,7 +215,7 @@ describe('Collection rights backend API service', function() {
       }));
   });
 
-  describe('when .loadCollectionRights is called', () => {
+  describe('when .loadCollectionRightsAsync is called', () => {
     it('should report a cached collection rights after caching it',
       fakeAsync(() => {
         let successHandler = jasmine.createSpy('success');
@@ -237,7 +237,7 @@ describe('Collection rights backend API service', function() {
 
         // A new collection should not have been fetched from the backend. Also,
         // the returned collection should match the expected collection object.
-        collectionRightsBackendApiService.loadCollectionRights('0')
+        collectionRightsBackendApiService.loadCollectionRightsAsync('0')
           .then(successHandler, failHandler);
 
         flushMicrotasks();
@@ -254,7 +254,7 @@ describe('Collection rights backend API service', function() {
         expect(collectionRightsBackendApiService.isCached('0'))
           .toBe(false);
 
-        collectionRightsBackendApiService.loadCollectionRights('0')
+        collectionRightsBackendApiService.loadCollectionRightsAsync('0')
           .then(successHandler, failHandler);
 
         let req = httpTestingController

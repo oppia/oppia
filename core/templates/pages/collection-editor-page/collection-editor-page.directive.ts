@@ -67,7 +67,7 @@ angular.module('oppia').directive('collectionEditorPage', [
               )
             );
             // Load the collection to be edited.
-            CollectionEditorStateService.loadCollection(
+            CollectionEditorStateService.loadCollectionAsync(
               UrlService.getCollectionIdFromEditorUrl());
           };
           ctrl.$onDestroy = function() {
