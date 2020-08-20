@@ -235,18 +235,6 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.showDataExtractionQueryStatus = false;
         };
         ctrl.$onInit = function() {
-          ctrl.numberOfExplorationsLeftToUpdate;
-          $http.get(
-            EXPLORATIONS_LATEX_SVG_HANDLER, {
-              params: {
-                item_to_fetch: 'number_of_explorations_left_to_update'
-              }
-            }).then(function(response) {
-            ctrl.numberOfExplorationsLeftToUpdate = (
-              response.data.number_of_explorations_left_to_update);
-          });
-
-          ctrl.generateSvgs = true;
           ctrl.topicIdForRegeneratingOpportunities = null;
           ctrl.regenerationMessage = null;
           ctrl.oldUsername = null;
