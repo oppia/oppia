@@ -225,18 +225,18 @@ class BaseModel(ndb.Model):
         self._update_timestamps(update_last_updated_time)
         return super(BaseModel, self).put()
 
-    def put_async(self, update_last_updated_time=True):
-        """Stores the given ndb.Model instance to the datastore asynchronously.
+    # def put_async(self, update_last_updated_time=True):
+    #     """Stores the given ndb.Model instance to the datastore asynchronously.
 
-        Args:
-            update_last_updated_time: bool. Whether to update the
-                last_updated field of the model.
+    #     Args:
+    #         update_last_updated_time: bool. Whether to update the
+    #             last_updated field of the model.
 
-        Returns:
-            Model. The entity that was stored.
-        """
-        self._update_timestamps(update_last_updated_time)
-        return super(BaseModel, self).put_async()
+    #     Returns:
+    #         Model. The entity that was stored.
+    #     """
+    #     self._update_timestamps(update_last_updated_time)
+    #     return super(BaseModel, self).put_async()
 
     @classmethod
     @ndb.transactional()
@@ -248,12 +248,12 @@ class BaseModel(ndb.Model):
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
         """
-        # Internally put_multi calls put so we don't need to call
-        # _update_timestamps here.
-        #cls._update_timestamps(update_last_updated_time)
+        for entity in entities:
+            entity._update_timestamps(update_last_updated_time)
         ndb.put_multi(entities)
 
     @classmethod
+    @ndb.transactional()
     def put_multi_async(cls, entities, update_last_updated_time=True):
         """Stores the given ndb.Model instances asynchronously.
 
@@ -265,9 +265,8 @@ class BaseModel(ndb.Model):
         Returns:
             list(future). A list of futures.
         """
-        # Internally put_multi_async calls put_async so we don't need to call
-        # _update_timestamps here.
-        #cls._update_timestamps(update_last_updated_time)
+        for entity in entities:
+            entity._update_timestamps(update_last_updated_time)
         return ndb.put_multi_async(entities)
 
     @classmethod
@@ -677,7 +676,10 @@ class VersionedModel(BaseModel):
             snapshot_id, committer_id, commit_type, commit_message, commit_cmds)
         snapshot_content_instance = (
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
-
+        import logging
+        # logging.info(type(snapshot_metadata_instance)) ExplorationRightsSnapshotMetadataModel
+        # logging.info(type(snapshot_content_instance)) ExplorationRightsSnapshotContentModel
+        # logging.info(type(self)) ExplorationRightsModel
         BaseModel.put_multi(
             [
                 snapshot_metadata_instance,
