@@ -464,7 +464,7 @@ describe('Exploration improvements task registrar service', () => {
       ).toEqual(0);
     });
 
-    it('should return tasks for each state in a dictionary', () => {
+    it('should return tasks for each state as an array', () => {
       statesBackendDict = {
         Introduction: stateBackendDict,
         Middle: stateBackendDict,
@@ -474,8 +474,36 @@ describe('Exploration improvements task registrar service', () => {
       taskRegistryService.initialize(
         config, makeStates(), makeExpStats(), [], new Map(), new Map(), []);
 
-      expect(Object.keys(taskRegistryService.makeStateTasksObject()))
+      expect(taskRegistryService.getAllStateTasks().map(st => st.stateName))
         .toEqual(jasmine.arrayContaining(['Introduction', 'Middle', 'End']));
+    });
+
+    it('should throw an error when state does not exist', () => {
+      statesBackendDict = {
+        Introduction: stateBackendDict,
+        Middle: stateBackendDict,
+        End: stateBackendDict,
+      };
+
+      taskRegistryService.initialize(
+        config, makeStates(), makeExpStats(), [], new Map(), new Map(), []);
+
+      expect(() => taskRegistryService.getStateTasks('Epilogue'))
+        .toThrowError('Unknown state with name: Epilogue');
+    });
+
+    it('should return tasks for a specific state', () => {
+      statesBackendDict = {
+        Introduction: stateBackendDict,
+        Middle: stateBackendDict,
+        End: stateBackendDict,
+      };
+
+      taskRegistryService.initialize(
+        config, makeStates(), makeExpStats(), [], new Map(), new Map(), []);
+
+      expect(taskRegistryService.getStateTasks('Introduction').stateName)
+        .toEqual('Introduction');
     });
   });
 

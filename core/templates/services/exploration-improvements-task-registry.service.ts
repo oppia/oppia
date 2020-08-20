@@ -103,6 +103,7 @@ export class SupportingStateStats {
  * fits with the "container" model the class aims to fulfill.
  */
 export class StateTasks implements Iterable<ExplorationTask> {
+  public readonly stateName: string;
   public readonly hbrTask: HighBounceRateTask;
   public readonly iflTask: IneffectiveFeedbackLoopTask;
   public readonly ngrTask: NeedsGuidingResponsesTask;
@@ -112,8 +113,10 @@ export class StateTasks implements Iterable<ExplorationTask> {
   public readonly supportingStats: SupportingStateStats;
 
   constructor(
+      stateName: string,
       tasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask>,
       supportingStats: SupportingStateStats) {
+    this.stateName = stateName;
     this.hbrTask = <HbrTask> tasksByType.get(
       ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
     this.iflTask = <IflTask> tasksByType.get(
@@ -223,6 +226,7 @@ export class ExplorationImprovementsTaskRegistryService {
   onStateAdded(newStateName: string): void {
     this.expStats = this.expStats.createNewWithStateAdded(newStateName);
     const newStateTasks = new StateTasks(
+      newStateName,
       new Map(ImprovementsConstants.TASK_TYPES.map(taskType => [
         taskType, this.explorationTaskObjectFactory.createNewObsoleteTask(
           this.config.explorationId, this.config.explorationVersion, taskType,
@@ -254,6 +258,7 @@ export class ExplorationImprovementsTaskRegistryService {
       oldStateName, newStateName);
     const oldStateTasks = this.tasksByState.get(oldStateName);
     const newStateTasks = new StateTasks(
+      newStateName,
       new Map(oldStateTasks.map(oldTask => [
         oldTask.taskType,
         this.explorationTaskObjectFactory.createFromBackendDict({
@@ -310,12 +315,15 @@ export class ExplorationImprovementsTaskRegistryService {
       ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
   }
 
-  makeStateTasksObject(): {[stateName: string]: StateTasks} {
-    const obj = {};
-    for (const [stateName, stateTasks] of this.tasksByState) {
-      obj[stateName] = stateTasks;
+  getStateTasks(stateName: string): StateTasks {
+    if (!this.tasksByState.has(stateName)) {
+      throw new Error('Unknown state with name: ' + stateName);
     }
-    return obj;
+    return this.tasksByState.get(stateName);
+  }
+
+  getAllStateTasks(): StateTasks[] {
+    return Array.from(this.tasksByState.values());
   }
 
   private validateInitializationArgs(
@@ -433,7 +441,8 @@ export class ExplorationImprovementsTaskRegistryService {
     const supportingStats = new SupportingStateStats(
       this.expStats.getStateStats(stateName), answerStats, cstPlaythroughIssues,
       eqPlaythroughIssues, misPlaythroughIssues);
-    const newStateTasks = new StateTasks(tasksByType, supportingStats);
+    const newStateTasks = (
+      new StateTasks(stateName, tasksByType, supportingStats));
 
     for (const task of newStateTasks) {
       if (task.isOpen()) {

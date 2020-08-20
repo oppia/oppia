@@ -67,27 +67,31 @@
       </div>
       <hr>
       <div class="improvements-tab-state-groups protractor-test-improvements-tab-state-group"
-           ng-repeat="(stateName, stateTasks) in $ctrl.stateTasksObject"
-           ng-if="$ctrl.getStateNumCardLevelTasks(stateName) > 0">
+           ng-repeat="stateTasks in $ctrl.allStateTasks track by stateTasks.stateName"
+           ng-if="$ctrl.getStateNumCardLevelTasks(stateTasks.stateName) > 0">
         <div class="improvements-tab-state-header">
           <div class="improvements-tab-collapse-arrow">
-            <a class="improvements-tab-collapse-arrow-button" ng-click="$ctrl.toggleStateTasks(stateName)">
+            <a class="improvements-tab-collapse-arrow-button"
+              ng-click="$ctrl.toggleStateTasks(stateTasks.stateName)">
               <i class="material-icons">
-                <['keyboard_arrow_' + ($ctrl.isStateTasksVisible(stateName) ? 'down' : 'up')]>
+                keyboard_arrow_<[$ctrl.isStateTasksVisible(stateTasks.stateName) ? 'down' : 'up']>
               </i>
             </a>
           </div>
           <div class="improvements-tab-state-details">
             <div class="improvements-tab-state-link">
-              <a class="improvements-tab-state-link-a" ng-click="$ctrl.navigateToStateEditor(stateName)"><[stateName]></a>
+              <a class="improvements-tab-state-link-a"
+                 ng-click="$ctrl.navigateToStateEditor(stateTasks.stateName)">
+                <[stateTasks.stateName]>
+              </a>
             </div>
             <div class="improvements-tab-state-stats">
               <div class="improvements-tab-state-retention">
-                <[$ctrl.getStateRetention(stateName)]>% Current Retention
+                <[$ctrl.getStateRetention(stateTasks.stateName)]>% Current Retention
               </div>
               <div class="improvements-tab-state-num-issues">
-                <strong><[$ctrl.getStateNumCardLevelTasks(stateName)]></strong>
-                <span ng-pluralize count="$ctrl.getStateNumCardLevelTasks(stateName)"
+                <strong><[$ctrl.getStateNumCardLevelTasks(stateTasks.stateName)]></strong>
+                <span ng-pluralize count="$ctrl.getStateNumCardLevelTasks(stateTasks.stateName)"
                       when="{'one': 'issue found', 'other': 'issues found'}">
                 </span>
               </div>
@@ -95,7 +99,8 @@
           </div>
         </div>
         <hr>
-        <div class="improvements-tab-state-body" ng-show="$ctrl.isStateTasksVisible(stateName)">
+        <div class="improvements-tab-state-body"
+             ng-show="$ctrl.isStateTasksVisible(stateTasks.stateName)">
           <needs-guiding-responses-task ng-if="stateTasks.ngrTask.isOpen()"
                                         task="stateTasks.ngrTask"
                                         stats="stateTasks.supportingStats">

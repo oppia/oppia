@@ -81,6 +81,14 @@ angular.module('oppia').component('improvementsTab', {
             this.getNumConceptLevelTasks = () => iflTasks.length;
             this.getNumCardLevelTasks = () => ngrTasks.length + siaTasks.length;
             this.hasCriticalTasks = () => ngrTasks.length > 0;
+            this.getStateNumCardLevelTasks = (stateName: string) => {
+              const stateTasks = (
+                ExplorationImprovementsTaskRegistryService.getStateTasks(
+                  stateName));
+              const ngrTask = stateTasks.ngrTask;
+              const siaTask = stateTasks.siaTask;
+              return (ngrTask.isOpen() ? 1 : 0) + (siaTask.isOpen() ? 1 : 0);
+            };
             this.getExplorationHealth = () => {
               if (this.hasCriticalTasks()) {
                 return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_CRITICAL;
@@ -91,29 +99,27 @@ angular.module('oppia').component('improvementsTab', {
               }
             };
 
-            this.stateTasksObject = (
-              ExplorationImprovementsTaskRegistryService
-                .makeStateTasksObject());
+            this.allStateTasks = (
+              ExplorationImprovementsTaskRegistryService.getAllStateTasks());
 
             const stateRetentions: Map<string, number> = new Map(
-              Object.keys(this.stateTasksObject).map(stateName => {
-                const {numCompletions, totalHitCount} = (
-                  expStats.getStateStats(stateName));
-                const retentionRate = (
-                  totalHitCount ? (numCompletions / totalHitCount) : 0);
-                return [stateName, Math.round(100.0 * retentionRate)];
+              this.allStateTasks.map(stateTasks => {
+                const numCompletions = (
+                  stateTasks.supportingStats.numCompletions);
+                const totalHitCount = stateTasks.supportingStats.totalHitCount;
+                const retentionRate = Math.round(
+                  totalHitCount ? (100.0 * numCompletions / totalHitCount) : 0);
+                return [stateTasks.stateName, retentionRate];
               }));
+
             this.getStateRetention = (stateName: string) => {
               return stateRetentions.get(stateName);
             };
-            this.getStateNumCardLevelTasks = (stateName: string) => {
-              const {ngrTask, siaTask} = this.stateTasksObject[stateName];
-              return (ngrTask.isOpen() ? 1 : 0) + (siaTask.isOpen() ? 1 : 0);
-            };
 
             const stateVisibility: Map<string, boolean> = new Map(
-              Object.keys(this.stateTasksObject).map(
-                stateName => [stateName, true]));
+              this.allStateTasks.map(
+                stateTasks => [stateTasks.stateName, true]));
+
             this.isStateTasksVisible = (stateName: string) => {
               return stateVisibility.get(stateName);
             };
