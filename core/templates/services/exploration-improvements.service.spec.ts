@@ -202,7 +202,7 @@ describe('ExplorationImprovementsService', function() {
     explorationStatesService.init(statesBackendDict);
   });
 
-  it('should enable improvements tab based on backend response',
+  it('should enable improvements tab based on back-end response',
     fakeAsync(async() => {
       spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
@@ -218,7 +218,7 @@ describe('ExplorationImprovementsService', function() {
       ).toBeTrue();
     }));
 
-  it('should disable improvements tab based on backend response',
+  it('should disable improvements tab based on back-end response',
     fakeAsync(async() => {
       spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
@@ -282,7 +282,7 @@ describe('ExplorationImprovementsService', function() {
       ).toBeFalse();
     }));
 
-  it('should propagate errors from the backend', fakeAsync(async() => {
+  it('should propagate errors from the back-end', fakeAsync(async() => {
     const error = new Error('Whoops!');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
       .and.throwError(error);
@@ -350,7 +350,7 @@ describe('ExplorationImprovementsService', function() {
       this.pibasFetchIssuesSpy.and.returnValue(Promise.resolve(
         [eqPlaythrough]));
 
-      // The newly open HBR tasks should be flushed to the backend.
+      // The newly open HBR tasks should be flushed to the back-end.
       this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
         expect(tasks.length).toEqual(1);
         expect(tasks[0].taskType).toEqual('high_bounce_rate');
@@ -389,7 +389,7 @@ describe('ExplorationImprovementsService', function() {
         ]));
       this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
 
-      // Mock a pre-existing open HBR task provided by the backend.
+      // Mock a preexisting open HBR task provided by the back-end.
       const hbrTask = highBounceRateTaskObjectFactory.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: expId,

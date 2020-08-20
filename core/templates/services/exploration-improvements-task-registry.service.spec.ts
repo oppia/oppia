@@ -621,7 +621,7 @@ describe('Exploration improvements task registrar service', () => {
       ).toEqual(0);
     });
 
-    it('should have an obsolete and retargeted task for states that are ' +
+    it('should have an obsolete and re-targeted task for states that are ' +
       'renamed', () => {
       statesBackendDict = {
         Introduction: stateBackendDict,

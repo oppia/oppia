@@ -90,7 +90,7 @@ describe('Improvements tab', function() {
     this.stateTasksSpy.and.returnValue({});
   });
 
-  it('should provide the time machine image url', () => {
+  it('should provide the time machine image URL', () => {
     $ctrl.$onInit();
 
     expect($ctrl.timeMachineImageUrl).toMatch('/icons/time_machine.svg');
@@ -290,7 +290,7 @@ describe('Improvements tab', function() {
     }));
 
     describe('Exploration-health', () => {
-      it('should report health as warning if hbr task exists', fakeAsync(() => {
+      it('should report health as warning if HBR task exists', fakeAsync(() => {
         this.hbrTasksSpy.and.returnValue([newHbrTask()]);
 
         $ctrl.$onInit();
@@ -300,7 +300,7 @@ describe('Improvements tab', function() {
         expect($ctrl.getExplorationHealth()).toEqual('warning');
       }));
 
-      it('should report heath as warning if only ifl task exists',
+      it('should report heath as warning if only IFL task exists',
         fakeAsync(() => {
           this.iflTasksSpy.and.returnValue([newIflTask()]);
 
@@ -311,7 +311,7 @@ describe('Improvements tab', function() {
           expect($ctrl.getExplorationHealth()).toEqual('warning');
         }));
 
-      it('should report heath as critical if ngr task exists',
+      it('should report heath as critical if NGR task exists',
         fakeAsync(() => {
           this.ngrTasksSpy.and.returnValue([newNgrTask()]);
 
@@ -322,7 +322,7 @@ describe('Improvements tab', function() {
           expect($ctrl.getExplorationHealth()).toEqual('critical');
         }));
 
-      it('should report heath as warning if only sia task exists',
+      it('should report heath as warning if only SIA task exists',
         fakeAsync(() => {
           this.siaTasksSpy.and.returnValue([newSiaTask()]);
 
@@ -333,7 +333,7 @@ describe('Improvements tab', function() {
           expect($ctrl.getExplorationHealth()).toEqual('warning');
         }));
 
-      it('should reporty health as healthy if zero tasks exist',
+      it('should report health as healthy if zero tasks exist',
         fakeAsync(() => {
           $ctrl.$onInit();
           flushMicrotasks();
