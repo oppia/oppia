@@ -216,33 +216,9 @@ def delete_user(pending_deletion_request):
             request object for which to delete or pseudonymize all the models.
     """
     if pending_deletion_request.role == feconf.ROLE_ID_LEARNER:
-        _delete_profile_user_models(pending_deletion_request.user_id)
+        _delete_profile_user(pending_deletion_request)
     else:
-        _delete_full_user_models(
-            pending_deletion_request.user_id, models.NAMES.user)
-        _delete_full_user_models(
-            pending_deletion_request.user_id, models.NAMES.improvements)
-        _hard_delete_explorations_and_collections(pending_deletion_request)
-        _pseudonymize_feedback_models(pending_deletion_request)
-        _pseudonymize_suggestion_models(pending_deletion_request)
-        _pseudonymize_activity_models(
-            pending_deletion_request,
-            models.NAMES.question,
-            question_models.QuestionSnapshotMetadataModel,
-            question_models.QuestionCommitLogEntryModel,
-            'question_id')
-        _pseudonymize_activity_models(
-            pending_deletion_request,
-            models.NAMES.skill,
-            skill_models.SkillSnapshotMetadataModel,
-            skill_models.SkillCommitLogEntryModel,
-            'skill_id')
-        _pseudonymize_activity_models(
-            pending_deletion_request,
-            models.NAMES.story,
-            story_models.StorySnapshotMetadataModel,
-            story_models.StoryCommitLogEntryModel,
-            'story_id')  
+        _delete_full_user(pending_deletion_request)
 
 
 def verify_user_deleted(pending_deletion_request):
@@ -259,7 +235,10 @@ def verify_user_deleted(pending_deletion_request):
     user_id = pending_deletion_request.user_id
     role = pending_deletion_request.role
     if role == feconf.ROLE_ID_LEARNER:
-        return _verify_profile_related_models_are_deleted(user_id)
+        return all((
+            _verify_profile_related_models_are_deleted(user_id),
+            _verify_activity_models_deleted(user_id),
+        ))
     else:
         return all((
             _verify_basic_models_deleted(user_id),
@@ -304,12 +283,15 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
     }
 
 
-def _delete_profile_user_models(user_id):
-    """Delete the user models for the profile user with the given user_id.
+def _delete_profile_user(pending_deletion_request):
+    """Delete all the models for profile user specified in
+    pending_deletion_request.
 
     Args:
-        user_id: str. The id of the profile user to be deleted.
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object for which to delete or pseudonymize all the models.
     """
+    user_id = pending_deletion_request.user_id
     for model_class in PROFILE_SPECIFIC_USER_MODELS:
         if (model_class.get_deletion_policy() not in
                 [base_models.DELETION_POLICY.KEEP,
@@ -317,18 +299,43 @@ def _delete_profile_user_models(user_id):
             model_class.apply_deletion_policy(user_id)
 
 
-def _delete_full_user_models(user_id, module_name):
-    """Delete all the models from the given module, for a given user.
+def _delete_full_user(pending_deletion_request):
+    """Delete all the models for full user specified in
+    pending_deletion_request.
 
     Args:
-        user_id: str. The id of the user to be deleted.
-        module_name: models.NAMES. The name of the module containing the models
-            that are being deleted.
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object for which to delete or pseudonymize all the models.
     """
-    for model_class in models.Registry.get_storage_model_classes([module_name]):
+    user_id = pending_deletion_request.user_id
+
+    for model_class in models.Registry.get_storage_model_classes(
+            [models.NAMES.user, models.NAMES.improvements]):
         deletion_policy = model_class.get_deletion_policy()
         if deletion_policy == base_models.DELETION_POLICY.DELETE:
             model_class.apply_deletion_policy(user_id)
+
+    _hard_delete_explorations_and_collections(pending_deletion_request)
+    _pseudonymize_feedback_models(pending_deletion_request)
+    _pseudonymize_suggestion_models(pending_deletion_request)
+    _pseudonymize_activity_models(
+        pending_deletion_request,
+        models.NAMES.question,
+        question_models.QuestionSnapshotMetadataModel,
+        question_models.QuestionCommitLogEntryModel,
+        'question_id')
+    _pseudonymize_activity_models(
+        pending_deletion_request,
+        models.NAMES.skill,
+        skill_models.SkillSnapshotMetadataModel,
+        skill_models.SkillCommitLogEntryModel,
+        'skill_id')
+    _pseudonymize_activity_models(
+        pending_deletion_request,
+        models.NAMES.story,
+        story_models.StorySnapshotMetadataModel,
+        story_models.StoryCommitLogEntryModel,
+        'story_id')
 
 
 def _pseudonymize_activity_models(

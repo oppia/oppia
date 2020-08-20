@@ -2361,3 +2361,28 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_2_id))
         self.assertTrue(wipeout_service.verify_user_deleted(
             wipeout_service.get_pending_deletion_request(self.user_2_id)))
+
+    def test_verify_user_delete_when_profile_user_not_deleted_is_false(self):
+        wipeout_service.pre_delete_user(self.profile_user_id)
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.profile_user_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(
+            wipeout_service.get_pending_deletion_request(self.profile_user_id)))
+
+        user_models.CompletedActivitiesModel(
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+        ).put()
+        user_models.IncompleteActivitiesModel(
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+        ).put()
+        user_models.LearnerPlaylistModel(
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+        ).put()
+
+        self.assertFalse(wipeout_service.verify_user_deleted(
+            wipeout_service.get_pending_deletion_request(self.profile_user_id)))
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.profile_user_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(
+            wipeout_service.get_pending_deletion_request(self.profile_user_id)))
