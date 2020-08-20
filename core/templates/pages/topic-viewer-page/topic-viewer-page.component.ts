@@ -112,7 +112,8 @@ export class TopicViewerPageComponent implements OnInit {
         }
       },
       errorResponse => {
-        if (AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+        let errorCodes = AppConstants.FATAL_ERROR_CODES;
+        if (errorCodes.indexOf(errorResponse.status) !== -1) {
           this.alertsService.addWarning('Failed to get dashboard data');
         }
       }
@@ -129,7 +130,7 @@ export class TopicViewerPageComponent implements OnInit {
 
   setActiveTab(newActiveTabName) {
     this.activeTab = newActiveTabName;
-  };
+  }
 }
 
 angular.module('oppia').directive(

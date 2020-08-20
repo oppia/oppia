@@ -47,8 +47,6 @@ import { InteractionsExtensionsConstants } from
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
-// import { TopicInfoTabDirective } from
-//   'pages/topic-viewer-page/info-tab/topic-info-tab.directive';
 import { PracticeTabComponent } from
   'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import { StoriesListComponent } from

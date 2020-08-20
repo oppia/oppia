@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
-   '@angular/common/http/testing';
+  '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ReadOnlyTopicObjectFactory } from
@@ -80,7 +80,7 @@ describe('Topic viewer page', () => {
     topicViewerPageComponent = TestBed.get(TopicViewerPageComponent);
     readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
   });
-  
+
   afterEach(() => {
     httpTestingController.verify();
   });
@@ -169,25 +169,25 @@ describe('Topic viewer page', () => {
     spyOn(urlService, 'getPathname').and.returnValue(
       `/learn/math/${topicUrlFragment}/practice`);
     let topicDataDict = {
-        topic_id: '1',
-        topic_name: 'Topic Name',
-        topic_description: 'Topic Description',
-        canonical_story_dicts: [{
-          id: '2',
-          title: 'Story Title',
-          node_titles: ['Node title 1', 'Node title 2'],
-          thumbnail_filename: '',
-          thumbnail_bg_color: '',
-          description: 'Story Description',
-          story_is_published: true
-        }],
-        additional_story_dicts: [],
-        uncategorized_skill_ids: [],
-        subtopics: [],
-        degrees_of_mastery: {},
-        skill_descriptions: {},
-        train_tab_should_be_displayed: false
-      };
+      topic_id: '1',
+      topic_name: 'Topic Name',
+      topic_description: 'Topic Description',
+      canonical_story_dicts: [{
+        id: '2',
+        title: 'Story Title',
+        node_titles: ['Node title 1', 'Node title 2'],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        description: 'Story Description',
+        story_is_published: true
+      }],
+      additional_story_dicts: [],
+      uncategorized_skill_ids: [],
+      subtopics: [],
+      degrees_of_mastery: {},
+      skill_descriptions: {},
+      train_tab_should_be_displayed: false
+    };
     spyOn(pageTitleService, 'setPageTitle').and.callThrough();
 
     topicViewerPageComponent.ngOnInit();
@@ -215,7 +215,8 @@ describe('Topic viewer page', () => {
       topicViewerPageComponent.ngOnInit();
       let req = httpTestingController.expectOne(
         `/topic_data_handler/math/${topicUrlFragment}`);
-      req.flush({error: {status: 404, statusText: 'Not Found'}}, {status: 404, statusText: 'Not Found'});
+      let errorObject = { status: 404, statusText: 'Not Found' };
+      req.flush({ error: errorObject }, errorObject);
       flushMicrotasks();
 
       expect(alertsService.addWarning).toHaveBeenCalledWith(

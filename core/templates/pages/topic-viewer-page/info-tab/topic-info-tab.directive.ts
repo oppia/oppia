@@ -19,8 +19,8 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
-angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
-  function(UrlInterpolationService) {
+angular.module('oppia').directive('topicInfoTab', [
+  function() {
     return {
       restrict: 'E',
       link: function(scope, element, attrs, ctrl) {
