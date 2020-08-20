@@ -74,6 +74,9 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
           };
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
           };
 
           ctrl.$onInit = function() {

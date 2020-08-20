@@ -16,24 +16,24 @@
  * @fileoverview Unit tests for the feature tab in admin page.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, async, TestBed, flushMicrotasks } from
   '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 
-import { AdminDataService } from '../services/admin-data.service';
-import { AdminFeaturesTabComponent } from './admin-features-tab.component';
 import { AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { AdminFeaturesTabComponent } from
+  'pages/admin-page/features-tab/admin-features-tab.component';
+import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
-  '../services/admin-task-manager.service';
+  'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformParameterObjectFactory, FeatureStage, PlatformParameter } from
-  'domain/platform_feature/platform-parameter-object.factory';
 import { PlatformParameterFilterType, ServerMode } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
+import { PlatformParameterObjectFactory, FeatureStage, PlatformParameter } from
+  'domain/platform_feature/platform-parameter-object.factory';
 import { WindowRef } from 'services/contextual/window-ref.service';
-
 
 describe('Admin page feature tab', function() {
   let component: AdminFeaturesTabComponent;
@@ -204,7 +204,6 @@ describe('Admin page feature tab', function() {
     });
   });
 
-
   describe('.onFilterTypeSelectionChanged', () => {
     it('should clear existing conditions', () => {
       const filter = component.featureFlags[0].rules[0].filters[0];
@@ -227,7 +226,7 @@ describe('Admin page feature tab', function() {
       expect(featureFlag.rules.length).toBe(1);
     });
 
-    it('should not proceed if the user does\'t confirm', () => {
+    it('should not proceed if the user doesn\'t confirm', () => {
       mockConfirmResult(false);
       const featureFlag = component.featureFlags[0];
 
@@ -245,7 +244,7 @@ describe('Admin page feature tab', function() {
 
     beforeEach(() => {
       setStatusSpy = jasmine.createSpy();
-      component.setStatusMessage = setStatusSpy;
+      setStatusSpy = spyOn(component.setStatusMessage, 'emit');
 
       adminTaskManagerService.finishTask();
       mockConfirmResult(true);
@@ -263,6 +262,18 @@ describe('Admin page feature tab', function() {
       expect(updateApiSpy).toHaveBeenCalledWith(
         featureFlag.name, 'mock msg', featureFlag.rules);
       expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
+    }));
+
+    it('should update feature backup after update succeeds', fakeAsync(() => {
+      const featureFlag = component.featureFlags[0];
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(component.featureFlagNameToBackupMap.get(featureFlag.name))
+        .toEqual(featureFlag);
     }));
 
     it('should not proceed if there is another task running', fakeAsync(() => {
