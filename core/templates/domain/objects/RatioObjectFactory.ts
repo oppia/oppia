@@ -51,7 +51,7 @@ export class Ratio {
   providedIn: 'root'
 })
 export class RatioObjectFactory {
-  fromRawInputString(rawInput: string): Ratio {
+  fromRawInputString(rawInput: string): number[] {
     var INVALID_CHARS_REGEX = /[^\d^:]$/g;
     if (INVALID_CHARS_REGEX.test(rawInput)) {
       throw new Error(
@@ -65,7 +65,20 @@ export class RatioObjectFactory {
     var numbersList = [];
     rawInput = rawInput.trim();
     numbersList = rawInput.split(':').map(Number);
-    return new Ratio(numbersList);
+    var ratio = new Ratio(numbersList);
+    if (!this.arrayEquals(ratio.convertToSimplestForm(), ratio.numbers)) {
+      throw new Error(
+        ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_FORM);
+    }
+    return ratio.numbers;
+  }
+
+  // Checks the equality of arrays value by value.
+  arrayEquals(a: number[], b: number[]) {
+    return Array.isArray(a) &&
+      Array.isArray(b) &&
+      a.length === b.length &&
+      a.every((val, index) => val === b[index]);
   }
 
   fromList(ratioList: RatioInputAnswer) {

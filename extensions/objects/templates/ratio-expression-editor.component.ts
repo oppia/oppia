@@ -30,7 +30,7 @@ angular.module('oppia').component('ratioExpressionEditor', {
 
       ctrl.isValidRatio = function(value) {
         if (value.length === 0) {
-          ctrl.warningText = 'Please enter a non-empty fraction value.';
+          ctrl.warningText = 'Please enter a valid ratio (e.g. 1:2 or 1:2:3).';
           return false;
         }
         try {
@@ -45,7 +45,7 @@ angular.module('oppia').component('ratioExpressionEditor', {
 
       ctrl.$onInit = function() {
         if (ctrl.value === null) {
-          ctrl.value = '';
+          ctrl.value = [1, 1];
         }
         ctrl.localValue = {
           label: RatioObjectFactory.fromList(ctrl.value).toString()

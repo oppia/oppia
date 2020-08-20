@@ -74,6 +74,8 @@ export class ObjectsDomainConstants {
       'Please enter a valid ratio (e.g. 1:2 or 1:2:3).',
     INVALID_RATIO:
       'For this question, each element in your ratio should be a whole' +
-      'numbers (not a fraction or a decimal).'
+      'numbers (not a fraction or a decimal).',
+    INVALID_FORM:
+      'It seems like the input can be reduced further.'
   };
 }

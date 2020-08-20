@@ -16,49 +16,47 @@
  * @fileoverview Unit tests for the ratio expression component.
  */
 
+import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
+
+
 describe('RatioExpression', function() {
   var RationExpressionCtrl = null;
-
+  var ratioObjectFactory = null;
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    ratioObjectFactory = new RatioObjectFactory();
+    $provide.value('RatioObjectFactory', ratioObjectFactory);
+  }));
   beforeEach(angular.mock.inject(function($componentController) {
     RationExpressionCtrl = $componentController('ratioExpressionEditor');
-    RationExpressionCtrl.$onInit();
   }));
 
-  it('should initialize ctrl.value with an empty string', function() {
+  it('should initialize ctrl.value with an default value', function() {
     RationExpressionCtrl.value = null;
     RationExpressionCtrl.$onInit();
     expect(RationExpressionCtrl.value).not.toBeNull();
   });
 
   it('should initialize ctrl.warningText with invalid ratio', function() {
-    RationExpressionCtrl.value = '1:2:';
-    RationExpressionCtrl.$onInit();
-    RationExpressionCtrl.isValidRatio();
+    RationExpressionCtrl.isValidRatio('1:2:');
     expect(RationExpressionCtrl.warningText)
       .toBe('Please enter a valid ratio (e.g. 1:2 or 1:2:3).');
   });
 
   it('should initialize ctrl.warningText with invalid ratio', function() {
-    RationExpressionCtrl.value = '';
-    RationExpressionCtrl.$onInit();
-    RationExpressionCtrl.isValidRatio();
+    RationExpressionCtrl.isValidRatio('');
     expect(RationExpressionCtrl.warningText)
       .toBe('Please enter a valid ratio (e.g. 1:2 or 1:2:3).');
   });
 
   it('should initialize ctrl.warningText with invalid character', function() {
-    RationExpressionCtrl.value = 'abc';
-    RationExpressionCtrl.$onInit();
-    RationExpressionCtrl.isValidRatio();
+    RationExpressionCtrl.isValidRatio('abc');
     expect(RationExpressionCtrl.warningText)
       .toBe('Please write a ratio that consists of digits separated by colons' +
       '(e.g. 1:2 or 1:2:3).');
   });
 
   it('should return ctrl.value', function() {
-    RationExpressionCtrl.value = '1:2:3';
-    RationExpressionCtrl.$onInit();
-    expect(RationExpressionCtrl.isValidRatio()).toBe(true);
+    expect(RationExpressionCtrl.isValidRatio('1:2:3')).toBe(true);
   });
 });

@@ -32,7 +32,7 @@ export class RatioExpressionInputRulesService {
   constructor(private ratioObjectFactory: RatioObjectFactory) {}
   Equals(answer: RatioInputAnswer, inputs: RatioInputRulesInputs):
   boolean {
-    return answer === inputs.x;
+    return this.ratioObjectFactory.arrayEquals(answer, inputs.x);
   }
 
   HasNumberOfTermsEqualTo(
@@ -45,7 +45,8 @@ export class RatioExpressionInputRulesService {
       answer: RatioInputAnswer,
       inputs: RatioInputRulesInputs): boolean {
     // eslint-disable-next-line max-len
-    return answer === this.ratioObjectFactory.fromList(inputs.x).convertToSimplestForm();
+    var simplifiedInput = this.ratioObjectFactory.fromList(inputs.x).convertToSimplestForm();
+    return this.ratioObjectFactory.arrayEquals(answer, simplifiedInput);
   }
 }
 
