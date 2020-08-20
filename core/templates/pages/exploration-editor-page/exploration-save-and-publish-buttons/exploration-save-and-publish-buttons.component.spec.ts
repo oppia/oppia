@@ -44,11 +44,12 @@ import { StateCustomizationArgsService } from
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Exploration save and publish buttons component', function() {
   var ctrl = null;

@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { TestBed } from '@angular/core/testing';
-
 /**
  * @fileoverview Unit tests for testInteractionPanel.
  */
+
+import { TestBed } from '@angular/core/testing';
+
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Test Interaction Panel directive', function() {
   var $scope = null;

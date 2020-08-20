@@ -267,7 +267,6 @@ angular.module('oppia').component('explorationEditorTab', {
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           StateEditorRefreshService.onRefreshStateEditor.subscribe(() => {
-            console.log('GETS HERE');
             ctrl.initStateEditor();
           })
         );

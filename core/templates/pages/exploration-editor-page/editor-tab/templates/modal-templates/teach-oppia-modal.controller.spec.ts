@@ -29,6 +29,8 @@ import { AngularNameService } from
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { StateSolutionService } from
@@ -37,7 +39,6 @@ import { StateSolutionService } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Teach Oppia Modal Controller', function() {
   var $httpBackend = null;

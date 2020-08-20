@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TestBed } from '@angular/core/testing';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
-
 /**
  * @fileoverview Unit tests for ExplorationGraphModalController.
  */
+
+import { TestBed } from '@angular/core/testing';
+
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Exploration Graph Modal Controller', function() {
   var $scope = null;

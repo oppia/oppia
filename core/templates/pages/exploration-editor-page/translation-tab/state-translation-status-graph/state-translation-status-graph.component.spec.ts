@@ -27,11 +27,12 @@ import { StateRecordedVoiceoversService } from
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
 
 import { Subscription } from 'rxjs';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('State Translation Status Graph Component', function() {
   var $rootScope = null;

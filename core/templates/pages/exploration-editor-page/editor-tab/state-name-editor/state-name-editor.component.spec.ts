@@ -24,11 +24,12 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateNameService } from
   'components/state-editor/state-editor-properties-services/state-name.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('State Name Editor component', function() {
   var ctrl = null;

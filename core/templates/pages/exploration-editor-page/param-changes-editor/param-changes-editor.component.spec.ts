@@ -25,6 +25,8 @@ import { AngularNameService } from
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -43,7 +45,6 @@ import { ParamSpecsObjectFactory } from
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Param Changes Editor Component', function() {
   var ctrl = null;

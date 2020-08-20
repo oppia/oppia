@@ -29,6 +29,8 @@ import { StateSolutionService } from
   'components/state-editor/state-editor-properties-services/state-solution.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -42,7 +44,6 @@ import { UserExplorationPermissionsService } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 import { Subscription } from 'rxjs';
 

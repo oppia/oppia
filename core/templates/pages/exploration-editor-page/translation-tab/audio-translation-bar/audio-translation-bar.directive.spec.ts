@@ -49,12 +49,13 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
 
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 require('pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');

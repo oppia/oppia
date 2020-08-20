@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import { TestBed } from '@angular/core/testing';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 /**
  * @fileoverview Unit tests for ExplorationMetadataModalController.

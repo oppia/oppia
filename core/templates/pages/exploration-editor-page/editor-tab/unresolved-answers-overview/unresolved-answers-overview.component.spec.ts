@@ -23,7 +23,8 @@ import { EditabilityService } from 'services/editability.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Unresolved Answers Overview Component', function() {
   var $q = null;

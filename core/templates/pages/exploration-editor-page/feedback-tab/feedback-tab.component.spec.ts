@@ -22,8 +22,9 @@ import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { AlertsService } from 'services/alerts.service';
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;

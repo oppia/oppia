@@ -25,6 +25,8 @@ import { AngularNameService } from
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -36,7 +38,6 @@ import { StateCustomizationArgsService } from
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Training Panel Component', function() {
   var ctrl = null;
