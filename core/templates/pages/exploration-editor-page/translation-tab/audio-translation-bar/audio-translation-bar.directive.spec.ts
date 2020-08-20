@@ -558,7 +558,7 @@ describe('Audio translation bar directive', function() {
         result: $q.resolve()
       });
 
-      $rootScope.$broadcast('showTranslationTabBusyModal');
+      mockShowTranslationTabBusyModalEventEmitter.emit();
       $scope.$apply();
 
       expect($q.resolve).toHaveBeenCalled();
@@ -571,7 +571,7 @@ describe('Audio translation bar directive', function() {
         result: $q.reject()
       });
 
-      $rootScope.$broadcast('showTranslationTabBusyModal');
+      mockShowTranslationTabBusyModalEventEmitter.emit();
       $scope.$apply();
 
       expect($q.reject).toHaveBeenCalled();

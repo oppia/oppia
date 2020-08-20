@@ -222,7 +222,7 @@ describe('Settings Tab Component', function() {
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
         'broadcasted', function() {
-      $rootScope.$broadcast('refreshSettingsTab');
+      routerService.onRefreshSettingsTab.emit();
       $scope.$apply();
 
       expect(ctrl.stateNames).toEqual(['Introduction']);

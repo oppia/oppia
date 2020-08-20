@@ -135,7 +135,6 @@ describe('State Translation Status Graph Component', function() {
 
     it('should set new active state name and refresh state when clicking' +
       ' on state in map', function() {
-      var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(stateEditorService, 'setActiveStateName');
       $scope.onClickStateInMap('State2');
 

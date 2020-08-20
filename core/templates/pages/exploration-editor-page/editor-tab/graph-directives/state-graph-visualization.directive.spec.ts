@@ -206,93 +206,6 @@ describe('State Graph Visualization directive', function() {
     ctrl.$onDestroy();
   });
 
-  describe('when graph is redrawed after redrawGraph flag is broadcasted',
-    function() {
-      beforeEach(function() {
-        $rootScope.$broadcast('redrawGraph');
-        $flushPendingTasks();
-      });
-
-      it('should evaluate $scope properties', function() {
-        expect($scope.graphLoaded).toBe(true);
-        expect($scope.GRAPH_WIDTH).toBe(630);
-        expect($scope.GRAPH_HEIGHT).toBe(280);
-        expect($scope.VIEWPORT_WIDTH).toBe(10000);
-        expect($scope.VIEWPORT_HEIGHT).toBe(10000);
-        expect($scope.VIEWPORT_X).toBe(-1260);
-        expect($scope.VIEWPORT_Y).toBe(-1000);
-
-        expect($scope.getGraphHeightInPixels()).toBe(300);
-
-        expect($scope.augmentedLinks[0].style).toBe(
-          'background-color: red; ');
-        expect($scope.nodeList.length).toBe(2);
-      });
-
-      it('should get highlight transform css value based on provided values',
-        function() {
-          expect($scope.getHighlightTransform(20, 10)).toBe('rotate(-10,10,5)');
-          expect($scope.getHighlightTextTransform(20, 10)).toBe(
-            'rotate(-10,20,6)');
-        });
-
-      it('should check if can navigate to node whenever node id is equal to' +
-        ' current state id', function() {
-        expect($scope.canNavigateToNode('state_1')).toBe(false);
-        expect($scope.canNavigateToNode('state_3')).toBe(true);
-      });
-
-      it('should call deleteFunction when deleting a non initial node',
-        function() {
-          $scope.onNodeDeletionClick('state_3');
-          expect($scope.onDeleteFunction).toHaveBeenCalled();
-        });
-
-      it('should call deleteFunction when deleting a initial node', function() {
-        $scope.onNodeDeletionClick('state_1');
-        expect($scope.onDeleteFunction).not.toHaveBeenCalled();
-      });
-
-      it('should get node complete title with its secondary label and' +
-        ' warnings', function() {
-        expect($scope.getNodeTitle(nodes.state_1)).toBe(
-          'This is a label for node 1 Second label for node 1 ' +
-          '(Warning: this state is unreachable.)');
-        expect($scope.getNodeTitle(nodes.state_3)).toBe(
-          'This is a label for node 3 This is a secondary label for ' +
-          'state_3 (Warning: there is no path from this state to the ' +
-          'END state.)');
-      });
-
-      it('should get truncated label with truncate filter', function() {
-        expect($scope.getTruncatedLabel('This is a label for node 3')).toBe(
-          'This is a la...');
-      });
-
-      it('should get node error message from node label when' +
-        ' showTranslationWarnings is true', function() {
-        var nodeErrorMessage = 'Node 1 error message';
-        spyOn(translationStatusService, 'getAllStatesNeedUpdatewarning').and
-          .returnValue({
-            'This is a label for node 1': [nodeErrorMessage]
-          });
-        expect($scope.getNodeErrorMessage('This is a label for node 1')).toBe(
-          nodeErrorMessage);
-      });
-
-      it('should get node error message from node label when' +
-        ' showTranslationWarnings is false', function() {
-        $scope.showTranslationWarnings = false;
-        var nodeErrorMessage = 'Node 1 error message from exploration warnings';
-        spyOn(explorationWarningsService, 'getAllStateRelatedWarnings').and
-          .returnValue({
-            'This is a label for node 1': [nodeErrorMessage]
-          });
-        expect($scope.getNodeErrorMessage('This is a label for node 1')).toBe(
-          nodeErrorMessage);
-      });
-    });
-
   it('should redraw graph when resizing page', function() {
     expect($scope.graphLoaded).toBe(false);
 
@@ -314,10 +227,7 @@ describe('State Graph Visualization directive', function() {
       top: 10,
       right: 20
     });
-
-    $rootScope.$broadcast('redrawGraph');
     $flushPendingTasks();
-
     // Spies for d3 library.
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({
@@ -350,7 +260,6 @@ describe('State Graph Visualization directive', function() {
       top: 10,
       right: 30
     });
-    $rootScope.$broadcast('redrawGraph');
     $flushPendingTasks();
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({

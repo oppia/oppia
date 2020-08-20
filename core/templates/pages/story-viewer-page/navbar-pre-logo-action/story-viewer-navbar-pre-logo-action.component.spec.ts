@@ -65,5 +65,6 @@ describe('story viewer pre logo action', function() {
     rootScope.$digest();
     expect(ctrl.topicName).toEqual('Topic Name');
     expect(ctrl.getTopicUrl()).toEqual('/learn/math/abbrev/story');
+    ctrl.$onDestroy();
   });
 });
