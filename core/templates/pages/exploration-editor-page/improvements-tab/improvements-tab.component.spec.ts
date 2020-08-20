@@ -286,13 +286,15 @@ describe('Improvements tab', function() {
       this.allStateTasksSpy.and.returnValue([
         {
           stateName: 'Introduction',
-          ngrTask: newNgrTask(true),
-          siaTask: newSiaTask(false)
+          ngrTask: newNgrTask(),
+          siaTask: newSiaTask(),
+          supportingStats: {stateStats: new StateStats(0, 0, 0, 0, 0, 0)},
         },
         {
           stateName: 'End',
-          ngrTask: newNgrTask(true),
-          siaTask: newSiaTask(true)
+          ngrTask: newNgrTask(),
+          siaTask: newSiaTask(),
+          supportingStats: {stateStats: new StateStats(0, 0, 0, 0, 0, 0)},
         },
       ]);
 
