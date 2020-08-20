@@ -52,12 +52,23 @@ export class Ratio {
 })
 export class RatioObjectFactory {
   fromRawInputString(rawInput: string): number[] {
-    var INVALID_CHARS_REGEX = /[^\d^:]$/g;
+    var INVALID_CHARS_REGEX = /[^\d^:^\.^\/^\s]/g;
     if (INVALID_CHARS_REGEX.test(rawInput)) {
       throw new Error(
         ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_CHARS);
     }
-    var RATIO_REGEX = /^(\d+(:\d+)+)$/;
+    var INVALID_COLON_REGEX = /(:{2})/g;
+    if (INVALID_COLON_REGEX.test(rawInput)) {
+      throw new Error(
+        ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_COLONS);
+    }
+    // eslint-disable-next-line max-len
+    var INVALID_RATIO_REGEX = /\d+[\.\/]{1,}\d*/g;
+    if (INVALID_RATIO_REGEX.test(rawInput)) {
+      throw new Error(
+        ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_RATIO);
+    }
+    var RATIO_REGEX = /^(\s)*(\d+((\s)*:(\s)*\d+)+)(\s)*$/;
     if (!RATIO_REGEX.test(rawInput)) {
       throw new Error(
         ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_FORMAT);

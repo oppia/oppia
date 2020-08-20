@@ -56,6 +56,32 @@ describe('RatioExpression', function() {
       '(e.g. 1:2 or 1:2:3).');
   });
 
+  it('should initialize ctrl.warningText with invalid form', function() {
+    RationExpressionCtrl.isValidRatio('2:4:6');
+    expect(RationExpressionCtrl.warningText)
+      .toBe('It seems like the input can be reduced further.');
+  });
+
+  it('should initialize ctrl.warningText with invalid colons', function() {
+    RationExpressionCtrl.isValidRatio('1:2::3');
+    expect(RationExpressionCtrl.warningText)
+      .toBe('It seems like the input can be reduced further.');
+  });
+
+  it('should initialize ctrl.warningText with invalid ratio', function() {
+    RationExpressionCtrl.isValidRatio('1:2/3');
+    expect(RationExpressionCtrl.warningText)
+      .toBe('For this question, each element in your ratio should be a whole' +
+      'numbers (not a fraction or a decimal).');
+  });
+
+  it('should initialize ctrl.warningText with invalid ratio', function() {
+    RationExpressionCtrl.isValidRatio('1:2.3');
+    expect(RationExpressionCtrl.warningText)
+      .toBe('For this question, each element in your ratio should be a whole' +
+      'numbers (not a fraction or a decimal).');
+  });
+
   it('should return ctrl.value', function() {
     expect(RationExpressionCtrl.isValidRatio('1:2:3')).toBe(true);
   });

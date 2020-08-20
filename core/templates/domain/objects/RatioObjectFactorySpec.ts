@@ -34,7 +34,7 @@ describe('Ratio Object Factory', () => {
     const ratioObject = [1, 2, 3];
     const createdRatio = ratio.fromList(ratioObject);
 
-    expect(createdRatio).toEqual(ratioObject);
+    expect(createdRatio.numbers).toEqual(ratioObject);
   });
 
   it('should convert itself to a string in ratio format', () => {
@@ -97,11 +97,11 @@ describe('Ratio Object Factory', () => {
     }).toThrowError(errors.INVALID_FORM);
   });
 
-  it('shoud covert to simplest form', () => {
-    expect(new Ratio([1, 2, 3]).convertToSimplestForm()).toBe([1, 2, 3]);
-    expect(new Ratio([2, 4, 6]).convertToSimplestForm()).toBe([1, 2, 3]);
-    expect(new Ratio([3, 6, 9]).convertToSimplestForm()).toBe([1, 2, 3]);
-    expect(new Ratio([2, 3, 5]).convertToSimplestForm()).toBe([2, 3, 5]);
-    expect(new Ratio([2, 4, 5]).convertToSimplestForm()).toBe([2, 4, 5]);
+  it('should covert to simplest form', () => {
+    expect(new Ratio([1, 2, 3]).convertToSimplestForm()).toEqual([1, 2, 3]);
+    expect(new Ratio([2, 4, 6]).convertToSimplestForm()).toEqual([1, 2, 3]);
+    expect(new Ratio([3, 6, 9]).convertToSimplestForm()).toEqual([1, 2, 3]);
+    expect(new Ratio([2, 3, 5]).convertToSimplestForm()).toEqual([2, 3, 5]);
+    expect(new Ratio([2, 4, 5]).convertToSimplestForm()).toEqual([2, 4, 5]);
   });
 });
