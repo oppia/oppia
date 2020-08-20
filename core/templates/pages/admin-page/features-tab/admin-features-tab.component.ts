@@ -235,7 +235,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     featureFlag.rules = cloneDeep(backup.rules);
   }
 
-  onFilterTypeSelectionChanged(filter: PlatformParameterFilter): void {
+  clearFilterConditions(filter: PlatformParameterFilter): void {
     filter.conditions.splice(0);
   }
 

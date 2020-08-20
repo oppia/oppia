@@ -5428,5 +5428,14 @@ export = {
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 
+  "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
+    "Chrome", "Edge", "Safari", "Firefox", "Others"],
+  "PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES": ["Android", "Web"],
+  // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
+  // of corresponding flavors, which is used in app_version_flavor filter for
+  // order comparison, with ordering: 'test' < 'alpha' < 'beta' < 'release'.
+  "PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS": [
+    "test", "alpha", "beta", "release"],
+
   "DEV_MODE": true
 };

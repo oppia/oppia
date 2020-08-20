@@ -79,7 +79,7 @@
                         <div class="col-2"><b>Type:</b></div>
                         <div class="col-10">
                           <select [(ngModel)]="filter.type"
-                                  (change)="onFilterTypeSelectionChanged(filter)">
+                                  (change)="clearFilterConditions(filter)">
                             <option *ngFor="let filterType of availableFilterTypes"
                                     [value]="filterType.toString()">
                               {{filterTypeToContext[filterType].displayName}}

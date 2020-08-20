@@ -26,16 +26,17 @@ export class AdminFeaturesTabConstants {
     ServerMode.Dev, ServerMode.Test, ServerMode.Prod
   ].map(val => val.toString());
 
-  public static ALLOWED_CLIENT_TYPES = ['Android', 'Web'];
+  public static ALLOWED_CLIENT_TYPES: string[] =
+    constants.PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES;
 
-  public static ALLOWED_BROWSER_TYPES = [
-    'Chrome', 'Edge', 'Safari', 'Firefox', 'Others'];
+  public static ALLOWED_BROWSER_TYPES: string[] =
+    constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES;
 
   public static APP_VERSION_REGEXP = /^\d+(?:\.\d+)*$/;
 
   public static ALLOWED_SITE_LANGUAGE_IDS = constants.SUPPORTED_SITE_LANGUAGES
     .map((lang: {id: string}) => lang.id);
 
-  public static ALLOWED_APP_VERSION_FLAVORS = [
-    'test', 'alpha', 'beta', 'release'];
+  public static ALLOWED_APP_VERSION_FLAVORS: string[] =
+    constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS;
 }
