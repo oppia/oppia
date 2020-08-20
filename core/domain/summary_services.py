@@ -372,7 +372,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
         }, ]
     """
     exp_version_references = [
-        exp_domain.ExpVersionReference(exp_summary.id, exp_summary.version)
+        exp_domain.ExpVersionReference(exp_summary.id, int(exp_summary.version))
         for exp_summary in exploration_summaries]
     exp_stats_list = stats_services.get_exploration_stats_multi(
         exp_version_references)

@@ -116,7 +116,7 @@ def main(args=None):
             % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
 
     clear_datastore_arg = (
-        '' if parsed_args.save_datastore else '--clear_datastore=true')
+        '' if parsed_args.save_datastore else '--clear_datastore=yes')
     enable_console_arg = (
         '--enable_console=true' if parsed_args.enable_console else '')
     disable_host_checking_arg = (
@@ -157,21 +157,18 @@ def main(args=None):
         common.start_redis_server()
 
     python_utils.PRINT('Starting GAE development server')
-    # background_processes.append(subprocess.Popen(
-    #     '%s beta emulators datastore start %s' % (
-    #         common.GCLOUD_PATH, '--no-store-on-disk'), shell=True
-    # ))
-    # subprocess.Popen('$(%s beta emulators datastore env-init)' % (
-    #     common.GCLOUD_PATH
-    # ), shell=True)
+
     background_processes.append(subprocess.Popen(
         'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 '
         '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '
-        'true %s --application=%s' % (
+        'true %s --require_indexes=no '
+        '--support_datastore_emulator=yes --application=%s' % (
             common.GOOGLE_APP_ENGINE_SDK_HOME, clear_datastore_arg,
             enable_console_arg, disable_host_checking_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             app_yaml_filepath, 'migration-toy-app'), shell=True))
+
+    # os.path.join(common.CURR_DIR, 'WEB_INF')
 
     # Wait for the servers to come up.
     while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):

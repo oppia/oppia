@@ -22,6 +22,7 @@ from core.platform import models
 import feconf
 import main
 
+import redis
 import webapp2
 
 
@@ -34,5 +35,19 @@ URLS = [
         incoming_emails.IncomingReplyEmailHandler),
 ]
 
-app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+from google.cloud import ndb
+
+client = ndb.Client()
+
+global_cache = ndb.RedisCache(
+    redis.StrictRedis(host=feconf.REDISHOST, port=feconf.REDISPORT))
+
+def ndb_wsgi_middleware(wsgi_app):
+    def middleware(environ, start_response):
+        with client.context(global_cache=global_cache):
+            return wsgi_app(environ, start_response)
+
+    return middleware
+
+app = ndb_wsgi_middleware(  # pylint: disable=invalid-name
     webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))

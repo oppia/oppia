@@ -155,7 +155,6 @@ indexes:
   - name: entity_id
   - name: entity_type
   - name: last_updated
-    direction: desc
 
 - kind: GeneralFeedbackThreadModel
   properties:

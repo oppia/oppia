@@ -409,19 +409,19 @@ def main(args=None):
             'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
     # Install third party libraries to third_party/
-    command = [
-        sys.executable, '-m', 'pip', 'install', '-r'
-        'requirements.txt', '--target', THIRD_PARTY_DIR]
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        python_utils.PRINT(stdout)
-    else:
-        python_utils.PRINT(stderr)
-        python_utils.PRINT(
-            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
-        raise Exception('Error installing python third party packages.')
+    # command = [
+    #     sys.executable, '-m', 'pip', 'install', '-r'
+    #     'requirements.txt', '--target', THIRD_PARTY_DIR]
+    # process = subprocess.Popen(
+    #     command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # stdout, stderr = process.communicate()
+    # if process.returncode == 0:
+    #     python_utils.PRINT(stdout)
+    # else:
+    #     python_utils.PRINT(stderr)
+    #     python_utils.PRINT(
+    #         'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+    #     raise Exception('Error installing python third party packages.')
 
     # Install static frontend libraries to third_party/static
     download_manifest_files(MANIFEST_FILE_PATH)
