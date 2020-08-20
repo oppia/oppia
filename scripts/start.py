@@ -85,7 +85,8 @@ _PARSER.add_argument(
     action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
-
+# This list contains the sub processes triggered by this script.
+SUBPROCESSES = []
 
 def cleanup():
     """Wait for the servers to go down and set constants back to default
@@ -97,6 +98,9 @@ def cleanup():
     while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
     build.set_constants_to_default()
+    python_utils.PRINT("Shutting down emulator...")
+    for p in SUBPROCESSES:
+        p.kill()
     common.stop_redis_server()
 
 
@@ -157,25 +161,21 @@ def main(args=None):
         common.start_redis_server()
 
     python_utils.PRINT('Starting GAE development server')
+    #Start the local Google Cloud Datastore emulator.
+    SUBPROCESSES.append(subprocess.Popen(
+        '%s beta emulators datastore start --host-port=localhost:8081'
+        ' --no-store-on-disk --quiet' % (
+            common.GCLOUD_PATH
+        ), shell=True))
+
     background_processes.append(subprocess.Popen(
         'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 '
         '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '
-        'true %s --application=%s' % (
+        'true %s' % (
             common.GOOGLE_APP_ENGINE_SDK_HOME, clear_datastore_arg,
             enable_console_arg, disable_host_checking_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            app_yaml_filepath, 'migration-toy-app'), shell=True))
-    # background_processes.append(subprocess.Popen(
-    #     'python %s/dev_appserver.py --clear_datastore=yes %s %s --admin_host 0.0.0.0 '
-    #     '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '
-    #     'true %s --require_indexes=no '
-    #     '--support_datastore_emulator=yes --application=%s' % (
-    #         common.GOOGLE_CLOUD_SDK_BIN,
-    #         enable_console_arg, disable_host_checking_arg, no_auto_restart,
-    #         python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-    #         app_yaml_filepath, ), shell=True))
-
-    # os.path.join(common.CURR_DIR, 'WEB_INF')
+            app_yaml_filepath), shell=True))
 
     # Wait for the servers to come up.
     while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):

@@ -22,6 +22,7 @@ import sys
 
 import pkg_resources
 from google.appengine.ext import vendor
+from constants import constants
 
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
@@ -45,3 +46,11 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
 vendor.add(os.path.join(ROOT_PATH, 'third_party'))
 pkg_resources.working_set.add_entry(os.path.join(ROOT_PATH, 'third_party'))
 
+if not constants.DEV_MODE:
+    pass
+else:
+    os.environ['DATASTORE_DATASET'] = 'migration-toy-app'
+    os.environ['DATASTORE_EMULATOR_HOST'] = 'localhost:8081'
+    os.environ['DATASTORE_EMULATOR_HOST_PATH'] = 'localhost:8081/datastore'
+    os.environ['DATASTORE_HOST'] = 'http://localhost:8081'
+    os.environ['DATASTORE_PROJECT_ID']= 'migration-toy-app'
