@@ -19,13 +19,17 @@
 import { RatioExpressionInputRulesService } from
 // eslint-disable-next-line max-len
   'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
+import { TestBed } from '@angular/core/testing';
 
 describe('Ratio expression input rules service', () => {
   let reirs: RatioExpressionInputRulesService = null;
   let inputString;
 
   beforeEach(() => {
-    reirs = new RatioExpressionInputRulesService();
+    TestBed.configureTestingModule({
+      providers: [RatioExpressionInputRulesService]
+    });
+    reirs = TestBed.get(RatioExpressionInputRulesService);
   });
 
   it('should have a correct Equals rule', () => {

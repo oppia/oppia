@@ -1,4 +1,4 @@
-<input type="text" ng-model="$ctrl.currentValue" class="form-control" ui-validate="'$ctrl.isValidRatio()'">
+<input type="text" ng-model="$ctrl.localValue.label" class="form-control" ui-validate="'$ctrl.isValidRatio($value)'">
 
 <div class="oppia-form-error oppia-ratio-error">
   <[$ctrl.warningText]>

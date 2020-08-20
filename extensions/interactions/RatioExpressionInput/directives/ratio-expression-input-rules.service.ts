@@ -19,6 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { RatioInputAnswer } from 'interactions/answer-defs';
 import {
   RatioInputRulesInputs
@@ -28,6 +29,7 @@ import {
   providedIn: 'root'
 })
 export class RatioExpressionInputRulesService {
+  constructor(private ratioObjectFactory: RatioObjectFactory) {}
   Equals(answer: RatioInputAnswer, inputs: RatioInputRulesInputs):
   boolean {
     return answer === inputs.x;
@@ -39,23 +41,11 @@ export class RatioExpressionInputRulesService {
     return answer.length === inputs.x.length;
   }
 
-  static convertToSimplestForm(answer: RatioInputAnswer): RatioInputAnswer {
-    var gcd = (x: number, y: number) => {
-      return y === 0 ? x : gcd(y, x % y);
-    };
-    var gcdResult = answer.reduce(gcd);
-    if (gcdResult === 1) {
-      return answer;
-    } else {
-      return answer.map(currentValue => currentValue / gcdResult);
-    }
-  }
-
   IsEquivalent(
       answer: RatioInputAnswer,
       inputs: RatioInputRulesInputs): boolean {
     // eslint-disable-next-line max-len
-    return answer === RatioExpressionInputRulesService.convertToSimplestForm(inputs.x);
+    return answer === this.ratioObjectFactory.fromList(inputs.x).convertToSimplestForm();
   }
 }
 

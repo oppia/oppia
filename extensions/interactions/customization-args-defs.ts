@@ -349,10 +349,16 @@ export interface RatioExpressionInputCustomizationArgsBackendDict {
   customPlaceholder?: {
     value: SubtitledUnicodeBackendDict;
   };
+  noOfTerms: {
+    value: number;
+  };
 }
 export interface RatioExpressionInputCustomizationArgs {
   customPlaceholder?: {
     value: SubtitledUnicode;
+  };
+  noOfTerms: {
+    value: number;
   };
 }
 

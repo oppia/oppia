@@ -74,6 +74,9 @@ describe('RatioExpressionInputValidationService', () => {
     customizationArgs = {
       customPlaceholder: {
         value: new SubtitledUnicode('', '')
+      },
+      noOfTerms: {
+        value: 0
       }
     };
 

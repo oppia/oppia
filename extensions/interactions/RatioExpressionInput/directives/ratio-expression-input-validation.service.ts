@@ -25,6 +25,8 @@ import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { RatioExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
+import { RatioObjectFactory } from
+  'domain/objects/RatioObjectFactory';
 import { RatioExpressionInputRulesService } from
   './ratio-expression-input-rules.service';
 import { Outcome } from
@@ -37,8 +39,9 @@ import { AppConstants } from 'app.constants';
 })
 export class RatioExpressionInputValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private rof: RatioObjectFactory,
+    private baseInteractionValidationServiceInstance:
+      baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
       customizationArgs: RatioExpressionInputCustomizationArgs): Warning[] {
@@ -51,7 +54,7 @@ export class RatioExpressionInputValidationService {
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     let warningsList = [];
     let ratioRulesService = (
-      new RatioExpressionInputRulesService());
+      new RatioExpressionInputRulesService(this.rof));
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));

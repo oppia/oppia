@@ -1206,7 +1206,7 @@ class RatioExpression(BaseObject):
 
     SCHEMA = {
         'type': 'list',
-        'items': PositiveInt.SCHEMA
+        'items': PositiveInt.SCHEMA,
         'validators': [{
            'id': 'has_length_at_least',
            'min_value': 2

@@ -1023,6 +1023,20 @@
           "content_id": null,
           "unicode_str": ""
         }
+      },
+      {
+        "description": "Minmium number of terms required",
+        "name": "noOfTerms",
+        "schema": {
+          "type": "int",
+          "validators": [
+            {
+              "min_value": 0,
+              "id": "is_at_least"
+            }
+          ]
+        },
+        "default_value": 0
       }
     ],
     "is_terminal": false,

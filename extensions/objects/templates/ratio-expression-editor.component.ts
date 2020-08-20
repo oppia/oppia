@@ -16,43 +16,40 @@
  * @fileoverview Component for ratio editor.
  */
 
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+require('domain/objects/RatioObjectFactory.ts');
 
 angular.module('oppia').component('ratioExpressionEditor', {
   bindings: {
     value: '='
   },
   template: require('./ratio-expression-editor.component.html'),
-  controller: ['$scope',
-    function($scope) {
+  controller: ['$scope', 'RatioObjectFactory',
+    function($scope, RatioObjectFactory) {
       const ctrl = this;
       ctrl.warningText = '';
 
-      ctrl.isValidRatio = function() {
-        var RATIO_REGEX = /^\s*(\d+\s*(:\s*\d+)+)\s*$/;
-        var INVALID_CHARS_REGEX = /[^\d^:]$/;
-        if (ctrl.currentValue.length === 0) {
-          ctrl.warningText =
-              ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_FORMAT;
-        } else if (INVALID_CHARS_REGEX.test(ctrl.currentValue)) {
-          ctrl.warningText =
-              ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_CHARS;
-        } else if (!RATIO_REGEX.test(ctrl.currentValue)) {
-          ctrl.warningText =
-              ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_FORMAT;
-        } else {
-          ctrl.value = ctrl.currentValue.toString().replace(/\s/g, '');
-          ctrl.warningText = '';
+      ctrl.isValidRatio = function(value) {
+        if (value.length === 0) {
+          ctrl.warningText = 'Please enter a non-empty fraction value.';
+          return false;
         }
-        return true;
+        try {
+          ctrl.value = RatioObjectFactory.fromRawInputString(value);
+          ctrl.warningText = '';
+          return true;
+        } catch (parsingError) {
+          ctrl.warningText = parsingError.message;
+          return false;
+        }
       };
 
       ctrl.$onInit = function() {
         if (ctrl.value === null) {
           ctrl.value = '';
         }
-        ctrl.currentValue = ctrl.value.toString();
+        ctrl.localValue = {
+          label: RatioObjectFactory.fromList(ctrl.value).toString()
+        };
       };
     }
   ]

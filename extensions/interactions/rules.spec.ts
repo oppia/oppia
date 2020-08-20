@@ -56,6 +56,7 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { RatioExpressionInputRulesService } from
   'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
+import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { ImageClickAnswer, MathExpressionAnswer } from './answer-defs';
@@ -76,11 +77,12 @@ describe('Rule spec services', function() {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value('RatioObjectFactory', new RatioObjectFactory());
     $provide.value('SetInputRulesService', new SetInputRulesService());
     $provide.value('AlgebraicExpressionInputRulesService',
       new AlgebraicExpressionInputRulesService());
     $provide.value('RatioExpressionInputRulesService',
-      new RatioExpressionInputRulesService());
+      new RatioExpressionInputRulesService(new RatioObjectFactory()));
     $provide.value(
       'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());

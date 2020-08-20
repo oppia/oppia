@@ -46,6 +46,17 @@ class RatioExpressionInput(base.BaseInteraction):
             'content_id': None,
             'unicode_str': ''
         }
+    }, {
+        'name': 'noOfTerms',
+        'description': 'Require the learner\'s answer to have constraint on no of terms.',
+        'schema': {
+            'type': 'int',
+            'validators': [{
+                'id': 'is_at_least',
+                'min_value': 0,
+            }],
+        },
+        'default_value': 0,
     }]
 
     _answer_visualization_specs = []

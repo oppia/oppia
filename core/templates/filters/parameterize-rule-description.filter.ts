@@ -18,6 +18,7 @@
 
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('domain/objects/RatioObjectFactory.ts');
 require('filters/format-rte-preview.filter.ts');
 
 // Filter that changes {{...}} tags into the corresponding parameter input
@@ -26,8 +27,10 @@ require('filters/format-rte-preview.filter.ts');
 angular.module('oppia').filter('parameterizeRuleDescription', [
   '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
   'NumberWithUnitsObjectFactory', 'POSITION_OF_TERMS_MAPPING',
+  'RatioObjectFactory',
   function($filter, INTERACTION_SPECS, FractionObjectFactory,
-      NumberWithUnitsObjectFactory, POSITION_OF_TERMS_MAPPING) {
+      NumberWithUnitsObjectFactory, POSITION_OF_TERMS_MAPPING,
+      RatioObjectFactory) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -161,7 +164,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           varType === 'CodeString' || varType === 'UnicodeString' ||
           varType === 'LogicErrorCategory' || varType === 'NormalizedString' ||
           varType === 'AlgebraicExpression' || varType === 'MathEquation' ||
-          varType === 'NumericExpression' || varType === 'RatioExpression') {
+          varType === 'NumericExpression') {
           replacementText = inputs[varName];
         } else if (varType === 'PositionOfTerms') {
           for (var i = 0; i < POSITION_OF_TERMS_MAPPING.length; i++) {
@@ -178,6 +181,9 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
             replacementText += inputs[varName][i].code;
           }
           replacementText += ']';
+        } else if (varType === 'RatioExpression') {
+          replacementText = RatioObjectFactory
+            .fromList(inputs[varName]).toString();
         } else {
           throw new Error('Unknown variable type in rule description');
         }
