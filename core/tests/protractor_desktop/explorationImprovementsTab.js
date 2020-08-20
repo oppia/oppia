@@ -45,6 +45,10 @@ describe('Improvements tab', function() {
     await users.logout();
   });
 
+  afterEach(async() => {
+    await general.checkForConsoleErrors([]);
+  });
+
   it('should not be present in an unpublished exploration', async() => {
     await users.createUser(
       'drafter@improvementsTab.com', 'improvementsTabDrafter');
