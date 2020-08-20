@@ -80,14 +80,15 @@ describe('Improvements tab', function() {
       spyOn(taskRegistryService, 'getOpenNeedsGuidingResponsesTasks'));
     this.siaTasksSpy = (
       spyOn(taskRegistryService, 'getOpenSuccessiveIncorrectAnswersTasks'));
-    this.stateTasksSpy = spyOn(taskRegistryService, 'getAllStateTasks');
+    this.stateTasksSpy = spyOn(taskRegistryService, 'getStateTasks');
+    this.allStateTasksSpy = spyOn(taskRegistryService, 'getAllStateTasks');
 
     this.expStatsSpy.and.returnValue(emptyStats);
     this.hbrTasksSpy.and.returnValue([]);
     this.iflTasksSpy.and.returnValue([]);
     this.ngrTasksSpy.and.returnValue([]);
     this.siaTasksSpy.and.returnValue([]);
-    this.stateTasksSpy.and.returnValue({});
+    this.allStateTasksSpy.and.returnValue([]);
   });
 
   it('should provide the time machine image URL', () => {
@@ -235,9 +236,13 @@ describe('Improvements tab', function() {
             new StateStats(0, 0, numStarts, 0, 0, numCompletions)
           ],
         ])));
-      this.stateTasksSpy.and.returnValue({
-        Introduction: {ngrTask: newNgrTask(), siaTask: newSiaTask()}
-      });
+      this.allStateTasksSpy.and.returnValue([
+        {
+          stateName: 'Introduction',
+          ngrTask: newNgrTask(),
+          siaTask: newSiaTask()
+        }
+      ]);
 
       $ctrl.$onInit();
       flushMicrotasks();
@@ -252,10 +257,18 @@ describe('Improvements tab', function() {
           ['Introduction', new StateStats(0, 0, 0, 0, 0, 0)],
           ['End', new StateStats(0, 0, 0, 0, 0, 0)],
         ])));
-      this.stateTasksSpy.and.returnValue({
-        Introduction: {ngrTask: newNgrTask(true), siaTask: newSiaTask(false)},
-        End: {ngrTask: newNgrTask(true), siaTask: newSiaTask(true)},
-      });
+      this.allStateTasksSpy.and.returnValue([
+        {
+          stateName: 'Introduction',
+          ngrTask: newNgrTask(true),
+          siaTask: newSiaTask(false)
+        },
+        {
+          stateName: 'End',
+          ngrTask: newNgrTask(true),
+          siaTask: newSiaTask(true)
+        },
+      ]);
 
       $ctrl.$onInit();
       flushMicrotasks();
@@ -271,10 +284,18 @@ describe('Improvements tab', function() {
           ['Introduction', new StateStats(0, 0, 0, 0, 0, 0)],
           ['End', new StateStats(0, 0, 0, 0, 0, 0)],
         ])));
-      this.stateTasksSpy.and.returnValue({
-        Introduction: {ngrTask: newNgrTask(true), siaTask: newSiaTask(false)},
-        End: {ngrTask: newNgrTask(true), siaTask: newSiaTask(true)},
-      });
+      this.allStateTasksSpy.and.returnValue([
+        {
+          stateName: 'Introduction',
+          ngrTask: newNgrTask(true),
+          siaTask: newSiaTask(false)
+        },
+        {
+          stateName: 'End',
+          ngrTask: newNgrTask(true),
+          siaTask: newSiaTask(true)
+        },
+      ]);
 
       $ctrl.$onInit();
       flushMicrotasks();
