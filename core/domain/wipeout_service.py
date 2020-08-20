@@ -29,6 +29,8 @@ from core.domain import wipeout_domain
 from core.platform import models
 import python_utils
 
+from google.appengine.ext import ndb
+
 current_user_services = models.Registry.import_current_user_services()
 (
     base_models, collection_models, exp_models,
