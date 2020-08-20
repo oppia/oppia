@@ -474,7 +474,7 @@ describe('Exploration improvements task registrar service', () => {
       taskRegistryService.initialize(
         config, makeStates(), makeExpStats(), [], new Map(), new Map(), []);
 
-      expect(Object.keys(taskRegistryService.makeStateTasksDictionary()))
+      expect(Object.keys(taskRegistryService.makeStateTasksObject()))
         .toEqual(jasmine.arrayContaining(['Introduction', 'Middle', 'End']));
     });
   });

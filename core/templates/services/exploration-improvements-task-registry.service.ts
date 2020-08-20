@@ -20,7 +20,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { group } from 'd3-array';
-import { Dictionary, fromPairs } from 'lodash';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { States } from 'domain/exploration/StatesObjectFactory';
@@ -311,8 +310,12 @@ export class ExplorationImprovementsTaskRegistryService {
       ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
   }
 
-  makeStateTasksDictionary(): Dictionary<StateTasks> {
-    return fromPairs([...this.tasksByState]);
+  makeStateTasksObject(): {[stateName: string]: StateTasks} {
+    const obj = {};
+    for (const [stateName, stateTasks] of this.tasksByState) {
+      obj[stateName] = stateTasks;
+    }
+    return obj;
   }
 
   private validateInitializationArgs(

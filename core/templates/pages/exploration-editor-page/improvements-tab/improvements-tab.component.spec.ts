@@ -80,8 +80,7 @@ describe('Improvements tab', function() {
       spyOn(taskRegistryService, 'getOpenNeedsGuidingResponsesTasks'));
     this.siaTasksSpy = (
       spyOn(taskRegistryService, 'getOpenSuccessiveIncorrectAnswersTasks'));
-    this.stateTasksSpy = (
-      spyOn(taskRegistryService, 'makeStateTasksDictionary'));
+    this.stateTasksSpy = spyOn(taskRegistryService, 'makeStateTasksObject');
 
     this.expStatsSpy.and.returnValue(emptyStats);
     this.hbrTasksSpy.and.returnValue([]);

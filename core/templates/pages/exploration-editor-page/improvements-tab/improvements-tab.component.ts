@@ -93,7 +93,7 @@ angular.module('oppia').component('improvementsTab', {
 
             this.stateTasksDictionary = (
               ExplorationImprovementsTaskRegistryService
-                .makeStateTasksDictionary());
+                .makeStateTasksObject());
 
             const stateRetentions: Map<string, number> = new Map(
               Object.keys(this.stateTasksDictionary).map(stateName => {
