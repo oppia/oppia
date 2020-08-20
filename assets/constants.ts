@@ -87,6 +87,11 @@ export = {
 
   "TASK_TARGET_TYPE_STATE": "state",
 
+  // Regex to validate the format of Math rich-text component SVGs. If this is
+  // changed in the future, the existing filenames should be handled as well.
+  // eslint-disable-next-line max-len
+  "MATH_SVG_FILENAME_RE": "mathImg_[A-Za-z0-9+/_-]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
+
   // The SVG tag-specific attribute whitelist is based on the list of tags and
   // and attributes specified in this project:
   // https://github.com/cure53/DOMPurify
