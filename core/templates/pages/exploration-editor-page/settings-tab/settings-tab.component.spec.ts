@@ -42,6 +42,7 @@ import { UserExplorationPermissionsService } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -118,6 +119,8 @@ describe('Settings Tab Component', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService',
       TestBed.get(StateInteractionIdService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));

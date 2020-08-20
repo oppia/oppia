@@ -36,6 +36,7 @@ import { StateCustomizationArgsService } from
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Training Panel Component', function() {
   var ctrl = null;
@@ -130,6 +131,8 @@ describe('Training Panel Component', function() {
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
   }));

@@ -48,6 +48,8 @@ import { StateWrittenTranslationsService } from
 
 import * as d3 from 'd3';
 import { of } from 'rxjs';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 require('pages/exploration-editor-page/editor-tab/graph-directives/' +
   'state-graph-visualization.directive.ts');
@@ -112,6 +114,8 @@ describe('State Graph Visualization directive', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService',
       TestBed.get(StateInteractionIdService));
     $provide.value('StateRecordedVoiceoversService',

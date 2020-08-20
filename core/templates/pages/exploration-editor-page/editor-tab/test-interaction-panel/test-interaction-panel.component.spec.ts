@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { TestBed } from '@angular/core/testing';
+
 /**
  * @fileoverview Unit tests for testInteractionPanel.
  */
@@ -30,6 +33,12 @@ describe('Test Interaction Panel directive', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     CurrentInteractionService = $injector.get('CurrentInteractionService');

@@ -54,6 +54,7 @@ import { AlertsService } from 'services/alerts.service';
 
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 require('pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
@@ -117,6 +118,8 @@ describe('Audio translation bar directive', function() {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateEditorService', TestBed.get(StateEditorService));
     $provide.value(
       'StateCustomizationArgsService',

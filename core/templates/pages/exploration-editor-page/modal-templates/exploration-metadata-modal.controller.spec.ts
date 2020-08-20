@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { TestBed } from '@angular/core/testing';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+
 /**
  * @fileoverview Unit tests for ExplorationMetadataModalController.
  */
@@ -29,6 +32,8 @@ describe('Exploration Metadata Modal Controller', function() {
   var ExplorationTitleService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('ExplorationDataService', {
       autosaveChangeList: function() {}
     });

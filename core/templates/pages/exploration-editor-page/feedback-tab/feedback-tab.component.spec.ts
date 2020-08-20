@@ -23,6 +23,7 @@ import { AlertsService } from 'services/alerts.service';
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
@@ -48,6 +49,8 @@ describe('Feedback Tab Component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateObjectFactory', TestBed.get(StateObjectFactory));
     $provide.value(
       'SuggestionModalService', TestBed.get(SuggestionModalService));

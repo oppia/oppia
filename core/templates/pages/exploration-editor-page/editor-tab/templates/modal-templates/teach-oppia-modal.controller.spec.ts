@@ -37,6 +37,7 @@ import { StateSolutionService } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('Teach Oppia Modal Controller', function() {
   var $httpBackend = null;
@@ -142,6 +143,8 @@ describe('Teach Oppia Modal Controller', function() {
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     mockExternalSaveEventEmitter = new EventEmitter();

@@ -26,6 +26,7 @@ import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import { EventEmitter } from '@angular/core';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 var MockWindow = function() {
   var language = 'en';
@@ -62,6 +63,8 @@ describe('Translator Overview component', function() {
     $provide.value('LanguageUtilService', languageUtilService);
     $provide.value('StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
     mockWindow = new MockWindow();

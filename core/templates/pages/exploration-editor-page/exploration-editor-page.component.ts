@@ -121,6 +121,8 @@ require(
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require(
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
+require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -169,6 +171,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+    'StateEditorRefreshService',
     'StateClassifierMappingService', 'StateEditorService',
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
@@ -188,6 +191,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         PageTitleService, LoaderService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+        StateEditorRefreshService,
         StateClassifierMappingService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
@@ -356,7 +360,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
           if (ExplorationStatesService.getState(
             StateEditorService.getActiveStateName())) {
-            $scope.$broadcast('refreshStateEditor');
+            StateEditorRefreshService.onRefreshStateEditor.emit();
           }
 
           StateTutorialFirstTimeService.initEditor(
@@ -397,7 +401,7 @@ angular.module('oppia').component('explorationEditorPage', {
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
 
           ExplorationWarningsService.updateWarnings();
-          $scope.$broadcast('refreshStateEditor');
+          StateEditorRefreshService.onRefreshStateEditor.emit();
         });
       };
 

@@ -31,6 +31,7 @@ import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
 
 import { Subscription } from 'rxjs';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('State Translation Status Graph Component', function() {
   var $rootScope = null;
@@ -53,6 +54,8 @@ describe('State Translation Status Graph Component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AlertsService', TestBed.get(AlertsService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value(
       'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));
