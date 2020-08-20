@@ -257,18 +257,19 @@ describe('Improvements tab', function() {
           ['Introduction', new StateStats(0, 0, 0, 0, 0, 0)],
           ['End', new StateStats(0, 0, 0, 0, 0, 0)],
         ])));
-      this.allStateTasksSpy.and.returnValue([
-        {
+      const stateTasks = {
+        Introduction: {
           stateName: 'Introduction',
           ngrTask: newNgrTask(true),
           siaTask: newSiaTask(false)
         },
-        {
+        End: {
           stateName: 'End',
           ngrTask: newNgrTask(true),
           siaTask: newSiaTask(true)
         },
-      ]);
+      };
+      this.stateTasksSpy.and.callFake(stateName => stateTasks[stateName]);
 
       $ctrl.$onInit();
       flushMicrotasks();
