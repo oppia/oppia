@@ -48,7 +48,6 @@ angular.module('oppia').directive('adminMiscTab', [
           '/senddummymailtoadminhandler');
         var MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
         var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
-        var EXPLORATIONS_LATEX_SVG_HANDLER = '/explorationslatexsvghandler';
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
