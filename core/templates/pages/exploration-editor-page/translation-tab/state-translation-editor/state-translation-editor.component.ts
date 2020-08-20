@@ -19,25 +19,31 @@
 import { WRITTEN_TRANSLATION_TYPE_HTML } from
   'domain/exploration/WrittenTranslationObjectFactory';
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
-    '$scope', '$uibModal', 'EditabilityService', 'ExplorationStatesService',
+    '$scope', '$uibModal', 'EditabilityService',
+    'ExternalSaveService', 'ExplorationStatesService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService', 'UrlInterpolationService',
     'WrittenTranslationObjectFactory',
     function(
-        $scope, $uibModal, EditabilityService, ExplorationStatesService,
+        $scope, $uibModal, EditabilityService,
+        ExternalSaveService, ExplorationStatesService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
         TranslationTabActiveContentIdService, UrlInterpolationService,
         WrittenTranslationObjectFactory) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var showMarkAudioAsNeedingUpdateModalIfRequired = function(
           contentId, languageCode) {
         var stateName = StateEditorService.getActiveStateName();
@@ -157,18 +163,27 @@ angular.module('oppia').component('stateTranslationEditor', {
         $scope.HTML_SCHEMA = {
           type: 'html'
         };
-        $scope.$on('activeContentIdChanged', function() {
-          initEditor();
-        });
-        $scope.$on('activeLanguageChanged', function() {
-          initEditor();
-        });
+        ctrl.directiveSubscriptions.add(
+          TranslationTabActiveContentIdService.onActiveContentIdChanged.
+            subscribe(
+              () => initEditor()
+            )
+        );
+        ctrl.directiveSubscriptions.add(
+          TranslationLanguageService.onActiveLanguageChanged.subscribe(
+            () => initEditor()
+          )
+        );
         initEditor();
-        $scope.$on('externalSave', function() {
-          if ($scope.translationEditorIsOpen) {
-            saveTranslation();
-          }
-        });
+        ctrl.directiveSubscriptions.add(
+          ExternalSaveService.onExternalSave.subscribe(()=> {
+            if ($scope.translationEditorIsOpen) {
+              saveTranslation();
+            }
+          }));
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

@@ -42,20 +42,15 @@ const login = async function(context, page) {
     console.log('Logging into Oppia...');
     // eslint-disable-next-line dot-notation
     await page.goto(context.url, { waitUntil: 'networkidle0' });
+    await page.waitForSelector('#admin');
     await page.click('#admin');
-    await Promise.all([
-      page.waitForNavigation(),
-      page.click('#submit-login'),
-    ]);
-
+    await page.click('#submit-login');
+    await page.waitForSelector('#username');
     await page.type('#username', 'username1');
     await page.click('#terms-checkbox');
-
-    await Promise.all([
-      page.waitForNavigation(),
-      await page.waitForSelector('#signup-submit'),
-      await page.click('#signup-submit')
-    ]);
+    await page.waitForSelector('#signup-submit');
+    await page.click('#signup-submit');
+    await page.waitForSelector('.oppia-navbar-dropdown-toggle');
     // eslint-disable-next-line no-console
     console.log('Successfully Logged in');
   } catch (e) {

@@ -25,7 +25,7 @@ require(
   'lazy-loading.component.ts');
 require(
   'pages/contributor-dashboard-page/contributions-and-review/' +
-  'contributions-and-review.directive.ts');
+  'contributions-and-review.component.ts');
 require(
   'pages/contributor-dashboard-page/translation-language-selector/' +
   'translation-language-selector.component.ts');
@@ -34,10 +34,10 @@ require(
   'question-opportunities.directive.ts');
 require(
   'pages/contributor-dashboard-page/translation-opportunities/' +
-  'translation-opportunities.directive.ts');
+  'translation-opportunities.component.ts');
 require(
   'pages/contributor-dashboard-page/voiceover-opportunities/' +
-  'voiceover-opportunities.directive.ts');
+  'voiceover-opportunities.component.ts');
 
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
