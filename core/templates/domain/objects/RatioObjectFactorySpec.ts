@@ -80,7 +80,7 @@ describe('Ratio Object Factory', () => {
       ratio.fromRawInputString(':1:3');
     }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
-      ratio.fromRawInputString('1:2:3:4::5');
+      ratio.fromRawInputString('1:2:3:4:5:');
     }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
       ratio.fromRawInputString('1:');
