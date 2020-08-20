@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import re
 
 from constants import constants
@@ -750,7 +751,7 @@ class PlatformParameter(python_utils.OBJECT):
                             SERVER_MODES.prod in server_modes):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
-                            ' production environment.')
+                            ' production environments.')
                 elif self._feature_stage == FEATURE_STAGES.test:
                     if SERVER_MODES.prod in server_modes:
                         raise utils.ValidationError(
@@ -797,14 +798,34 @@ class PlatformParameter(python_utils.OBJECT):
             param_dict['feature_stage'],
         )
 
-    @staticmethod
-    def get_memcache_key(name):
-        """Returns the key for the platform parameter in memcache service.
-
-        Args:
-            name: str. The name of the platform parameter.
+    def serialize(self):
+        """Returns the object serialized as a JSON string.
 
         Returns:
-            str. The key for memcache service.
+            str. JSON-encoded string encoding all of the information composing
+            the object.
         """
-        return 'PLATFORM_PARAMETER:%s' % name
+        platform_parameter_dict = self.to_dict()
+
+        return json.dumps(platform_parameter_dict)
+
+    @classmethod
+    def deserialize(cls, json_string):
+        """Returns a PlatformParameter domain object decoded from a JSON
+        string.
+
+        Args:
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a PlatformParameter.
+                Only call on strings that were created using serialize().
+
+        Returns:
+            PlatformParameter. The corresponding PlatformParameter domain
+            object.
+        """
+        platform_parameter_dict = json.loads(json_string)
+
+        platform_parameter = cls.from_dict(
+            platform_parameter_dict)
+
+        return platform_parameter

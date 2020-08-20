@@ -41,7 +41,7 @@ require(
   'exploration-objective-editor.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
-  'exploration-save-and-publish-buttons.directive.ts');
+  'exploration-save-and-publish-buttons.component.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.component.ts');
@@ -476,13 +476,18 @@ angular.module('oppia').component('explorationEditorPage', {
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
-        $scope.$on(
-          'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
+        ctrl.directiveSubscriptions.add(
+          // eslint-disable-next-line max-len
+          StateTutorialFirstTimeService.onEnterEditorForTheFirstTime.subscribe(() => {
+            ctrl.showWelcomeExplorationModal();
+          })
+        );
         ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
             () => {
               ctrl.startTutorial();
-            }));
+            })
+        );
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
 
