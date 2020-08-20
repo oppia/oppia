@@ -68,18 +68,10 @@ describe('RatioExpression', function() {
       .toBe('Your answer has two colons (:) next to each other.');
   });
 
-  it('should initialize ctrl.warningText with invalid ratio', function() {
-    RationExpressionCtrl.isValidRatio('1:2/3');
+  it('should initialize ctrl.warningText with invalid zero ratio', function() {
+    RationExpressionCtrl.isValidRatio('1:0');
     expect(RationExpressionCtrl.warningText)
-      .toBe('For this question, each element in your ratio should be a whole' +
-      'numbers (not a fraction or a decimal).');
-  });
-
-  it('should initialize ctrl.warningText with invalid ratio', function() {
-    RationExpressionCtrl.isValidRatio('1:2.3');
-    expect(RationExpressionCtrl.warningText)
-      .toBe('For this question, each element in your ratio should be a whole' +
-      'numbers (not a fraction or a decimal).');
+      .toBe('Ratio cannot have 0 as a element.');
   });
 
   it('should return ctrl.value', function() {

@@ -85,6 +85,10 @@ export class RatioObjectFactory {
     rawInput = rawInput.trim();
     numbersList = rawInput.split(':').map(Number);
     var ratio = new Ratio(numbersList);
+    if (ratio.numbers.some(elements => elements === 0)) {
+      throw new Error(
+        ObjectsDomainConstants.RATIO_PARSING_ERRORS.NON_ZERO_RATIO);
+    }
     if (!this.arrayEquals(ratio.convertToSimplestForm(), ratio.numbers)) {
       throw new Error(
         ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_FORM);
