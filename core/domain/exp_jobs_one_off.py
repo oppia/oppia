@@ -267,56 +267,6 @@ class ExplorationMathSvgFilenameValidationOneOffJob(
         yield ('Detailed information on invalid tags. ', invalid_tags_info)
 
 
-class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that migrates all the math tags in the exploration to the new schema
-    but does not save the migrated exploration. The new schema has the attribute
-    math-content-with-value which includes a field for storing reference to
-    SVGs. This job is used to verify that the actual migration will be possible
-    for all the explorations.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        exploration_status = (
-            rights_manager.get_exploration_rights(
-                item.id).status)
-        for state_name, state in exploration.states.items():
-            html_string = ''.join(
-                state.get_all_html_content_strings())
-
-            converted_html_string = (
-                html_validation_service.add_math_content_to_math_rte_components(
-                    html_string))
-
-            error_list = (
-                html_validation_service.
-                validate_math_tags_in_html_with_attribute_math_content(
-                    converted_html_string))
-            if len(error_list) > 0:
-                key = (
-                    'exp_id: %s, exp_status: %s failed validation after '
-                    'migration' % (
-                        item.id, exploration_status))
-                value_dict = {
-                    'state_name': state_name,
-                    'error_list': error_list,
-                    'no_of_invalid_tags': len(error_list)
-                }
-                yield (key, value_dict)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
 class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that outputs a list of private explorations which are viewable."""
 
