@@ -204,7 +204,7 @@ export class Interaction {
 
     Object.keys(customizationArgs).forEach(caName =>
       traverseValueAndRetrieveContentIdsFromSubtitled(
-        customizationArgs[caName])
+        customizationArgs[caName].value)
     );
 
     return contentIds;

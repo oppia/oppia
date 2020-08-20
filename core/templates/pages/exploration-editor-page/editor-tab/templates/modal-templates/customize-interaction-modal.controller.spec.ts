@@ -58,6 +58,7 @@ describe('Customize Interaction Modal Controller', function() {
   var stateEditorService = null;
   var stateInteractionIdService = null;
   var stateNextContentIdIndexService = null;
+  const showMarkAllAudioAsNeedingUpdateModalIfRequired = () => {};
   var testSubscriptions: Subscription;
   const schemaBasedFormsSpy = jasmine.createSpy(
     'schemaBasedFormsSpy');
@@ -123,7 +124,8 @@ describe('Customize Interaction Modal Controller', function() {
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
-        StateNextContentIdIndexService: stateNextContentIdIndexService
+        StateNextContentIdIndexService: stateNextContentIdIndexService,
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
       });
     }));
 
@@ -341,7 +343,8 @@ describe('Customize Interaction Modal Controller', function() {
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
-        StateNextContentIdIndexService: stateNextContentIdIndexService
+        StateNextContentIdIndexService: stateNextContentIdIndexService,
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
       });
     }));
 
@@ -431,7 +434,8 @@ describe('Customize Interaction Modal Controller', function() {
           StateCustomizationArgsService: stateCustomizationArgsService,
           StateEditorService: stateEditorService,
           StateInteractionIdService: stateInteractionIdService,
-          StateNextContentIdIndexService: stateNextContentIdIndexService
+          StateNextContentIdIndexService: stateNextContentIdIndexService,
+          showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
         });
       }).toThrowError(
         'Interaction is missing customization argument highlightRegionsOnHover'
@@ -505,7 +509,8 @@ describe('Customize Interaction Modal Controller', function() {
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
         StateNextContentIdIndexService: stateNextContentIdIndexService,
-        INTERACTION_SPECS: INTERACTION_SPECS
+        INTERACTION_SPECS: INTERACTION_SPECS,
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
       });
     });
     stateNextContentIdIndexService.displayed = 0;
@@ -523,6 +528,60 @@ describe('Customize Interaction Modal Controller', function() {
       }]}
     });
     expect(stateNextContentIdIndexService.displayed).toEqual(2);
+
+    // Change customizationArgs to the older one in order to not affect other
+    // specs.
+    stateCustomizationArgsService.displayed = {};
+  });
+
+  it('should call showMarkAllAudioAsNeedingUpdateModalIfRequired ' +
+     'on updated customization arguments when saving', () => {
+    const mockShowMarkAllAudioAsNeedingUpdateModalIfRequired = (
+      jasmine.createSpy());
+
+    angular.mock.inject(function($injector, $controller) {
+      var $rootScope = $injector.get('$rootScope');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
+
+      stateCustomizationArgsService.init(stateName, {
+        placeholder: {
+          value: new SubtitledUnicode('old value', 'ca_placeholder')
+        },
+        rows: {value: 1}
+      });
+      stateInteractionIdService.init(stateName, 'TextInput');
+
+      $scope = $rootScope.$new();
+
+      $controller('CustomizeInteractionModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        InteractionDetailsCacheService: interactionDetailsCacheService,
+        InteractionObjectFactory: interactionObjectFactory,
+        StateCustomizationArgsService: stateCustomizationArgsService,
+        StateEditorService: stateEditorService,
+        StateInteractionIdService: stateInteractionIdService,
+        StateNextContentIdIndexService: stateNextContentIdIndexService,
+        showMarkAllAudioAsNeedingUpdateModalIfRequired:
+          mockShowMarkAllAudioAsNeedingUpdateModalIfRequired
+      });
+    });
+    stateNextContentIdIndexService.displayed = 0;
+    stateCustomizationArgsService.displayed = {
+      placeholder: {
+        value: new SubtitledUnicode('new value', 'ca_placeholder')
+      },
+      rows: {value: 1}
+    };
+
+    $scope.save();
+    expect(
+      mockShowMarkAllAudioAsNeedingUpdateModalIfRequired
+    ).toHaveBeenCalledWith(['ca_placeholder']);
 
     // Change customizationArgs to the older one in order to not affect other
     // specs.
