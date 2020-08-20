@@ -589,6 +589,8 @@ import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledVariableLengthListOfRuleInputsObjectFactory } from
+  'domain/exploration/SubtitledVariableLengthListOfRuleInputsObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
@@ -899,6 +901,8 @@ export class UpgradedServices {
       new SubtitledHtmlObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
       new SubtitledUnicodeObjectFactory();
+    upgradedServices['SubtitledVariableLengthListOfRuleInputsObjectFactory'] =
+      new SubtitledVariableLengthListOfRuleInputsObjectFactory();
     upgradedServices['SuccessiveIncorrectAnswersTaskObjectFactory'] =
       new SuccessiveIncorrectAnswersTaskObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
@@ -1152,7 +1156,8 @@ export class UpgradedServices {
     // Topological level: 2.
     upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
       upgradedServices['OutcomeObjectFactory'],
-      upgradedServices['RuleObjectFactory']);
+      upgradedServices['RuleObjectFactory'],
+      upgradedServices['SubtitledVariableLengthListOfRuleInputsObjectFactory']);
     upgradedServices['CkEditorCopyContentService'] =
       new CkEditorCopyContentService(
         upgradedServices['HtmlEscaperService'],);

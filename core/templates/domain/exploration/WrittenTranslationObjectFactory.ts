@@ -22,9 +22,20 @@ import { Injectable } from '@angular/core';
 
 export const WRITTEN_TRANSLATION_TYPE_HTML = 'html';
 export const WRITTEN_TRANSLATION_TYPE_UNICODE = 'unicode';
+// eslint-disable-next-line max-len
+export const WRITTEN_TRANSLATION_TYPE_LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_STRING_VALUE = (
+  'ListOfDictsWithKeyXAndNormalizedStringValue');
+// eslint-disable-next-line max-len
+export const WRITTEN_TRANSLATION_TYPE_LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE = (
+  'ListOfDictsWithKeyXAndSetOfUnicodeStringValue');
 
-type WrittenTranslationDataFormat = typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
-  typeof WRITTEN_TRANSLATION_TYPE_HTML;
+type WrittenTranslationDataFormat = (
+  typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
+  typeof WRITTEN_TRANSLATION_TYPE_HTML |
+  // eslint-disable-next-line max-len
+  typeof WRITTEN_TRANSLATION_TYPE_LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_STRING_VALUE |
+  // eslint-disable-next-line max-len
+  typeof WRITTEN_TRANSLATION_TYPE_LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE);
 
 export interface TranslationBackendDict {
   'data_format': WrittenTranslationDataFormat;

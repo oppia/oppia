@@ -628,6 +628,8 @@ import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledVariableLengthListOfRuleInputsObjectFactory } from
+  'domain/exploration/SubtitledVariableLengthListOfRuleInputsObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
@@ -999,6 +1001,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   static subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
   static subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
+  static subtitledVariableLengthListOfRuleInputsObjectFactory: SubtitledVariableLengthListOfRuleInputsObjectFactory;
   static subtopicObjectFactory: SubtopicObjectFactory;
   static subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory;
   static subtopicPageObjectFactory: SubtopicPageObjectFactory;
@@ -1329,6 +1332,7 @@ private storySummaryObjectFactory: StorySummaryObjectFactory,
 private storyViewerBackendApiService: StoryViewerBackendApiService,
 private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
 private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
+private subtitledVariableLengthListOfRuleInputsObjectFactory: SubtitledVariableLengthListOfRuleInputsObjectFactory,
 private subtopicObjectFactory: SubtopicObjectFactory,
 private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory,
 private subtopicPageObjectFactory: SubtopicPageObjectFactory,
@@ -1660,6 +1664,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.storyViewerBackendApiService = this.storyViewerBackendApiService;
     OppiaAngularRootComponent.subtitledHtmlObjectFactory = this.subtitledHtmlObjectFactory;
     OppiaAngularRootComponent.subtitledUnicodeObjectFactory = this.subtitledUnicodeObjectFactory;
+    OppiaAngularRootComponent.subtitledVariableLengthListOfRuleInputsObjectFactory = this.subtitledVariableLengthListOfRuleInputsObjectFactory;
     OppiaAngularRootComponent.subtopicObjectFactory = this.subtopicObjectFactory;
     OppiaAngularRootComponent.subtopicPageContentsObjectFactory = this.subtopicPageContentsObjectFactory;
     OppiaAngularRootComponent.subtopicPageObjectFactory = this.subtopicPageObjectFactory;

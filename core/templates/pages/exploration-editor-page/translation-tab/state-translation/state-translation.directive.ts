@@ -16,6 +16,8 @@
  * @fileoverview Directive containing the exploration material to be translated.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/state-directives/response-header/response-header.directive.ts');
 require(
