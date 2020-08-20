@@ -39,7 +39,6 @@ class InvalidDraftConversionException(Exception):
     conversion function if it is not possible to upgrade a draft, and indicates
     that try_upgrading_draft_to_exp_version should return None.
     """
-
     pass
 
 
@@ -178,6 +177,30 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v39_dict_to_v40_dict(cls, draft_change_list):
+        """Converts draft change list from version 39 to 40.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                # Converting the answer group rules requires access to the
+                # state's next_content_id_index property to generate
+                # content_ids. Since we do not yet support passing
+                # an exploration state of a given version into draft conversion
+                # functions, we throw an Exception to indicate that the
+                # conversion cannot be completed.
+                raise InvalidDraftConversionException('Conversion cannot be '
+                    'completed.')
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v38_dict_to_v39_dict(cls, draft_change_list):
         """Converts draft change list from version 38 to 39.
 
@@ -281,7 +304,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.
-                raise InvalidDraftConversionException('Conversion cannot be completed.')
+                raise InvalidDraftConversionException('Conversion cannot be '
+                    'completed.')
         return draft_change_list
 
     @classmethod
@@ -316,7 +340,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         'IsMathematicallyEquivalentTo')))
             if interaction_id_change_condition or (
                     answer_groups_change_condition):
-                raise InvalidDraftConversionException('Conversion cannot be completed.')
+                raise InvalidDraftConversionException('Conversion cannot be '
+                    'completed.')
 
         return draft_change_list
 

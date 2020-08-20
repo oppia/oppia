@@ -121,7 +121,6 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'IsEqualToOrdering': [{
                     'x': [
@@ -157,7 +156,6 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'HasElementXBeforeElementY': [{
                     'x': '',
@@ -188,7 +186,6 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': '',
@@ -308,7 +305,6 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'IsEqualToOrdering': [{
                     'x': []
@@ -385,7 +381,6 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': '1'
@@ -443,7 +438,6 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': '0'
@@ -514,7 +508,6 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': '0'
@@ -591,7 +584,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': ['<p>This is value1 for ItemSelection</p>']
@@ -646,7 +638,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': ['<p>This is value1 for ItemSelection</p>']
@@ -718,7 +709,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': ['<p>This is value1 for ItemSelection</p>']

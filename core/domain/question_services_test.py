@@ -25,6 +25,7 @@ from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_domain
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -822,7 +823,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
                             'needs_update': False,
-                            'duration_secs': 0.0}}}})
+                            'duration_secs': 0.0
+                        }
+                    },
+                    'rule_inputs_Contains_1': {}
+                }
+            }
+        )
 
     def test_migrate_question_state_from_v31_to_latest(self):
         answer_group = {
@@ -1197,9 +1204,14 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
             question.question_state_data.interaction.id, 'MathEquationInput')
-        self.assertEqual(answer_groups[0].rule_types_to_inputs, {
-            'MatchesExactlyWith': [{'x': 'x=y', 'y': 'both'}]
-        })
+        self.assertEqual(
+            answer_groups[0].rule_types_to_inputs[
+                'MatchesExactlyWith'].to_dict(),
+            {
+                'content_id': None,
+                'rule_inputs': [{'x': 'x=y', 'y': 'both'}] 
+            }
+        )
 
         answer_group = {
             'outcome': {
@@ -1299,9 +1311,14 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question.question_state_data.interaction.id,
             'AlgebraicExpressionInput')
-        self.assertEqual(answer_groups[0].rule_types_to_inputs, {
-            'MatchesExactlyWith': [{'x': 'x+y'}]
-        })
+        self.assertEqual(
+            answer_groups[0].rule_types_to_inputs[
+                'MatchesExactlyWith'].to_dict(),
+            {
+                'content_id': None,
+                'rule_inputs': [{'x': 'x+y'}]
+            }
+        )
 
         answer_group = {
             'outcome': {
@@ -1397,9 +1414,14 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question.question_state_data.interaction.id,
             'NumericExpressionInput')
-        self.assertEqual(answer_groups[0].rule_types_to_inputs, {
-            'MatchesExactlyWith': [{'x': '1.2 + 3'}]
-        })
+        self.assertEqual(
+            answer_groups[0].rule_types_to_inputs[
+                'MatchesExactlyWith'].to_dict(),
+            {
+                'content_id': None,
+                'rule_inputs': [{'x': '1.2 + 3'}]
+            }
+        )
 
         answer_groups_list = [{
             'outcome': {
@@ -1508,9 +1530,14 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data.interaction.id,
             'AlgebraicExpressionInput')
         self.assertEqual(len(answer_groups), 1)
-        self.assertEqual(answer_groups[0].rule_types_to_inputs, {
-            'MatchesExactlyWith': [{'x': 'x+y'}]
-        })
+        self.assertEqual(
+            answer_groups[0].rule_types_to_inputs[
+                'MatchesExactlyWith'].to_dict(),
+            {
+                'content_id': None,
+                'rule_inputs': [{'x': 'x+y'}]
+            }
+        )
         state_data = question.question_state_data
         self.assertEqual(sorted(
             state_data.recorded_voiceovers.voiceovers_mapping.keys()), [
@@ -1914,9 +1941,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             .interaction.answer_groups[0]
             .rule_types_to_inputs)
         self.assertEqual(
-            migrated_rule_types_to_inputs,
+            migrated_rule_types_to_inputs['Equals'].to_dict(),
             {
-                'Equals': [{'x': 'test'}]
+                'content_id': 'rule_inputs_Equals_2',
+                'rule_inputs': [{'x': 'test'}]
             })
 
     def test_migrate_question_state_from_v37_to_latest(self):
@@ -2093,8 +2121,101 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         answer_group = question.question_state_data.interaction.answer_groups[0]
         self.assertEqual(
-            answer_group.rule_types_to_inputs, {
-                'MatchesExactlyWith': [{
+            answer_group.rule_types_to_inputs['MatchesExactlyWith'].to_dict(), {
+                'content_id': None,
+                'rule_inputs': [{
                     'x': '((x)^(2))/(2.5)-(alpha)/(beta)'
+                }]
+            })
+
+    def test_migrate_question_state_from_v39_to_latest(self):
+        answer_group = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 'test'}]
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [answer_group],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': {},
+                'id': 'TextInput'
+            },
+            'next_content_id_index': 3,
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+        question_model = question_models.QuestionModel(
+            id='question_id',
+            question_state_data=question_state_dict,
+            language_code='en',
+            version=0,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=39)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        answer_group = question.question_state_data.interaction.answer_groups[0]
+        self.assertEqual(
+            answer_group.rule_types_to_inputs['Equals'].to_dict(), {
+                'content_id': 'rule_inputs_Equals_3',
+                'rule_inputs': [{
+                    'x': 'test'
                 }]
             })

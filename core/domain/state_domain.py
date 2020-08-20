@@ -46,14 +46,16 @@ class AnswerGroup(python_utils.OBJECT):
     """
 
     def __init__(
-            self, outcome, rule_types_to_inputs, rule_input_translations,
+            self, outcome, rule_types_to_inputs,
             training_data, tagged_skill_misconception_id):
         """Initializes a AnswerGroup domain object.
 
         Args:
             outcome: Outcome. The outcome corresponding to the answer group.
             rule_types_to_inputs: dict. A dictionary mapping rule type (str) to
-                a list of rule inputs. Each rule input is a dictionary mapping
+                a SubtitledVariableLengthListOfRuleInputs domain object, which
+                contains a list of rule inputs and a content id.
+                Each rule input is a dictionary mapping
                 the rule input name (str) to the rule input value. The rule
                 input names can be deduced from the relevant description field
                 in extensions/interactions/rule_templates.json -- they are
@@ -61,16 +63,6 @@ class AnswerGroup(python_utils.OBJECT):
                 E.g. For 2 TextInput rules of type 'Equals' and with the inputs
                 {'x': 'Yes'} and {'x': 'Y'}, rule_types_to_inputs will equal
                 { 'Equals': [{'x': 'Yes'}, {'x': 'Y'}] }.
-            rule_input_translations: dict. A dictionary mapping rule_type (str)
-                to a dictionary that maps abbreviated language code (str) to a
-                list of translated rule inputs. Each rule input is a dictionary
-                mapping the rule input name (str) to the rule input value. Note
-                that the number of rule inputs for each rule type can differ for
-                different languages. However, there will always be at least one
-                rule input for each rule type found in rule_types_to_inputs.
-                E.g. For a rule input translation in French (fr) of the rules
-                found in the example above, rule_input_translations will equal
-                { 'fr': { 'Equals': [{'x': 'Oui'}] } }.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
             tagged_skill_misconception_id: str or None. The format is
@@ -81,7 +73,6 @@ class AnswerGroup(python_utils.OBJECT):
                 tests a particular skill.
         """
         self.rule_types_to_inputs = rule_types_to_inputs
-        self.rule_input_translations = rule_input_translations
         self.outcome = outcome
         self.training_data = training_data
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
@@ -92,9 +83,14 @@ class AnswerGroup(python_utils.OBJECT):
         Returns:
             dict. A dict, mapping all fields of AnswerGroup instance.
         """
+
+        rule_types_to_inputs_dict = {}
+        for rule_type in self.rule_types_to_inputs:
+            rule_types_to_inputs_dict[rule_type] = (
+                self.rule_types_to_inputs[rule_type].to_dict())
+
         return {
-            'rule_types_to_inputs': self.rule_types_to_inputs,
-            'rule_input_translations': self.rule_input_translations,
+            'rule_types_to_inputs': rule_types_to_inputs_dict,
             'outcome': self.outcome.to_dict(),
             'training_data': self.training_data,
             'tagged_skill_misconception_id': self.tagged_skill_misconception_id
@@ -111,10 +107,16 @@ class AnswerGroup(python_utils.OBJECT):
         Returns:
             AnswerGroup. The corresponding AnswerGroup domain object.
         """
+        rule_types_to_inputs = {}
+        for rule_type in answer_group_dict['rule_types_to_inputs']:
+            rule_types_to_inputs[rule_type] = (
+                SubtitledVariableLengthListOfRuleInputs.from_dict(
+                    answer_group_dict['rule_types_to_inputs'][rule_type])
+            )
+
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
-            answer_group_dict['rule_types_to_inputs'],
-            answer_group_dict['rule_input_translations'],
+            rule_types_to_inputs,
             answer_group_dict['training_data'],
             answer_group_dict['tagged_skill_misconception_id']
         )
@@ -140,10 +142,8 @@ class AnswerGroup(python_utils.OBJECT):
                 'Expected answer group rule_types_to_inputs to be a dict, '
                 'received %s' % self.rule_types_to_inputs)
 
-        if not isinstance(self.rule_input_translations, dict):
-            raise utils.ValidationError(
-                'Expected answer group rule_input_translations to be '
-                'a dict, received %s' % self.rule_input_translations)
+        for rule_type in self.rule_types_to_inputs:
+            self.rule_types_to_inputs[rule_type].validate()
 
         if self.tagged_skill_misconception_id is not None:
             if not isinstance(
@@ -160,14 +160,15 @@ class AnswerGroup(python_utils.OBJECT):
 
         number_of_rules = 0
         for rule_type in self.rule_types_to_inputs:
-            number_of_rules += len(self.rule_types_to_inputs[rule_type])
+            number_of_rules += len(
+                self.rule_types_to_inputs[rule_type].rule_inputs)
 
             if rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_type)
 
             rule_params_list = interaction.get_rule_param_list(rule_type)
-            for rule_input in self.rule_types_to_inputs[rule_type]:
+            for rule_input in self.rule_types_to_inputs[rule_type].rule_inputs:
                 self._validate_rule_input(
                     rule_input,
                     rule_type,
@@ -196,9 +197,8 @@ class AnswerGroup(python_utils.OBJECT):
                 extensions/interactions/rule_templates.json where the keys
                 and value schema are enclosed in {{...}} braces.
             rule_type: str. The rule type, e.g. "CodeContains" or "Equals".
-            rule_params_list: list(str, object(*)). A list of parameters used by
-                the rule represented by this RuleSpec instance, to be used to
-                validate the inputs of this RuleSpec. Each element of the list
+            rule_params_list: list(str, object(*)). A list of parameters used to
+                validate the inputs of this rule. Each element of the list
                 represents a single parameter and is a tuple with two elements:
                     0: The name (string) of the parameter.
                     1: The typed object instance for that
@@ -206,11 +206,11 @@ class AnswerGroup(python_utils.OBJECT):
             exp_param_specs_dict: dict. A dict of specified parameters used in
                 this exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property (obj_type).
-                RuleSpec inputs may have a parameter value which refers to one
+                Rule inputs may have a parameter value which refers to one
                 of these exploration parameters.
 
         Raises:
-            ValidationError. One or more attributes of the RuleSpec are
+            ValidationError. One or more attributes of the rule inputs are
                 invalid.
         """
         if not isinstance(rule_input, dict):
@@ -224,13 +224,13 @@ class AnswerGroup(python_utils.OBJECT):
         # Check if there are input keys which are not rule parameters.
         if leftover_input_keys:
             logging.warning(
-                'RuleSpec \'%s\' has inputs which are not recognized '
+                'Rule type \'%s\' has inputs which are not recognized '
                 'parameter names: %s' % (rule_type, leftover_input_keys))
 
         # Check if there are missing parameters.
         if leftover_param_names:
             raise utils.ValidationError(
-                'RuleSpec \'%s\' is missing inputs: %s'
+                'Rule type \'%s\' is missing inputs: %s'
                 % (rule_type, leftover_param_names))
 
         rule_params_dict = {rp[0]: rp[1] for rp in rule_params_list}
@@ -248,7 +248,7 @@ class AnswerGroup(python_utils.OBJECT):
                     start_brace_index:end_brace_index]
                 if param_spec_name not in exp_param_specs_dict:
                     raise utils.ValidationError(
-                        'RuleSpec \'%s\' has an input with name \'%s\' which '
+                        'Rule type \'%s\' has an input with name \'%s\' which '
                         'refers to an unknown parameter within the '
                         'exploration: %s' % (
                             rule_type, param_name, param_spec_name))
@@ -280,7 +280,7 @@ class AnswerGroup(python_utils.OBJECT):
             return html
 
         for rule_type in self.rule_types_to_inputs:
-            for rule_input in self.rule_types_to_inputs[rule_type]:
+            for rule_input in self.rule_types_to_inputs[rule_type].rule_inputs:
                 AnswerGroup._convert_html_in_rule_input(
                     rule_input, rule_type, collect_html_conversion_fn)
 
@@ -319,9 +319,10 @@ class AnswerGroup(python_utils.OBJECT):
         else:
             for rule_type in answer_group_dict['rule_types_to_inputs']:
                 for rule_input_index, rule_input in enumerate(
-                        answer_group_dict['rule_types_to_inputs'][rule_type]):
+                        answer_group_dict['rule_types_to_inputs'][rule_type][
+                            'rule_inputs']):
                     answer_group_dict['rule_types_to_inputs'][
-                        rule_type][rule_input_index] = (
+                        rule_type]['rule_inputs'][rule_input_index] = (
                             AnswerGroup._convert_html_in_rule_input(
                                 rule_input, rule_type, conversion_fn)
                         )
@@ -1577,8 +1578,14 @@ class Voiceover(python_utils.OBJECT):
 class WrittenTranslation(python_utils.OBJECT):
     """Value object representing a written translation for a content."""
 
-    DATA_FORMAT_HTML = 'html'
-    DATA_FORMAT_UNICODE = 'unicode'
+    DATA_FORMATS = {
+        'HTML': 'html',
+        'UNICODE': 'unicode',
+        'LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_STRING_VALUE':
+            'ListOfDictsWithKeyXAndNormalizedStringValue',
+        'LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE':
+            'ListOfDictsWithKeyXAndSetOfUnicodeStringValue'
+    }
 
     def __init__(self, data_format, translation, needs_update):
         """Initializes a WrittenTranslation domain object.
@@ -1596,7 +1603,7 @@ class WrittenTranslation(python_utils.OBJECT):
         self.translation = translation
         self.needs_update = needs_update
 
-        if data_format == self.DATA_FORMAT_HTML:
+        if data_format == self.DATA_FORMATS['HTML']:
             self.translation = html_cleaner.clean(self.translation)
 
     def to_dict(self):
@@ -1639,14 +1646,25 @@ class WrittenTranslation(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid data_format: %s' % self.data_format)
 
-        if not (self.data_format == self.DATA_FORMAT_UNICODE or
-                self.data_format == self.DATA_FORMAT_HTML):
+        if self.data_format not in self.DATA_FORMATS.values():
             raise utils.ValidationError(
                 'Invalid data_format: %s' % self.data_format)
-
-        if not isinstance(self.translation, python_utils.BASESTRING):
+        if (self.data_format ==
+            self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_STRING_VALUE'] # pylint disable=line-too-long
+        ):
+            schema_utils.normalize_against_schema(
+                self.translation,
+                {'type': 'custom', 'obj_type': 'NormalizedString'})
+        elif (self.data_format ==
+              self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE'] # pylint disable=line-too-long
+        ):
+            schema_utils.normalize_against_schema(
+                self.translation,
+                {'type': 'custom', 'obj_type': 'SetOfUnicodeString'})
+        elif not isinstance(self.translation, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Invalid translation: %s' % self.translation)
+                'Invalid translation: %s for data_format %s' % (
+                    self.translation, self.data_format))
 
         if not isinstance(self.needs_update, bool):
             raise utils.ValidationError(
@@ -1741,7 +1759,7 @@ class WrittenTranslations(python_utils.OBJECT):
             html: str. The translated html.
         """
         written_translation = WrittenTranslation(
-            WrittenTranslation.DATA_FORMAT_HTML, html, False)
+            WrittenTranslation.DATA_FORMATS['HTML'], html, False)
         self.translations_mapping[content_id][language_code] = (
             written_translation)
 
@@ -1891,7 +1909,7 @@ class WrittenTranslations(python_utils.OBJECT):
         for translations in self.translations_mapping.values():
             for written_translation in translations.values():
                 if (written_translation.data_format ==
-                        WrittenTranslation.DATA_FORMAT_HTML):
+                        WrittenTranslation.DATA_FORMATS['HTML']):
                     html_string_list.append(written_translation.translation)
         return html_string_list
 
@@ -1915,7 +1933,7 @@ class WrittenTranslations(python_utils.OBJECT):
                     language_code_to_written_translation.keys()):
                 if (written_translations_dict['translations_mapping'][
                         content_id][language_code]['data_format'] ==
-                        WrittenTranslation.DATA_FORMAT_HTML):
+                        WrittenTranslation.DATA_FORMATS['HTML']):
                     written_translations_dict['translations_mapping'][
                         content_id][language_code]['translation'] = (
                             conversion_fn(written_translations_dict[
@@ -2236,6 +2254,94 @@ class SubtitledUnicode(python_utils.OBJECT):
         return cls(content_id, '')
 
 
+class SubtitledVariableLengthListOfRuleInputs(python_utils.OBJECT):
+    """Value object representing a subtitled variable-lengthed list of rule
+    inputs.
+    """
+
+    def __init__(self, content_id, rule_inputs):
+        """Initializes a SubtitledVariableLengthListOfRuleInputs domain object.
+
+        Args:
+            content_id: str. A unique id referring to the other assets for this
+                content.
+            rule_inputs: list(dict). User-submitted rule inputs.
+        """
+        self.content_id = content_id
+        self.rule_inputs = rule_inputs
+        self.validate()
+
+    def to_dict(self):
+        """Returns a dict representing this
+        SubtitledVariableLengthListOfRuleInputs domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of
+            SubtitledVariableLengthListOfRuleInputs instance.
+        """
+        return {
+            'content_id': self.content_id,
+            'rule_inputs': self.rule_inputs
+        }
+
+    @classmethod
+    def from_dict(cls, subtitled_variable_length_list_of_rule_inputs_dict):
+        """Return a SubtitledVariableLengthListOfRuleInputs domain object from a
+        dict.
+
+        Args:
+            subtitled_variable_length_list_of_rule_inputs_dict: dict. The dict
+                representation of SubtitledVariableLengthListOfRuleInputs
+                object.
+
+        Returns:
+            SubtitledVariableLengthListOfRuleInputs. The corresponding domain
+            object.
+        """
+        return cls(
+            subtitled_variable_length_list_of_rule_inputs_dict['content_id'],
+            subtitled_variable_length_list_of_rule_inputs_dict['rule_inputs']
+        )
+
+    def validate(self):
+        """Validates properties of the SubtitledVariableLengthListOfRuleInputs.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                SubtitledVariableLengthListOfRuleInputs are invalid.
+        """
+        if (self.content_id is not None and
+            not isinstance(self.content_id, python_utils.BASESTRING)
+        ):
+            raise utils.ValidationError(
+                'Expected content id to be a string, received %s' %
+                self.content_id)
+
+        if not isinstance(self.rule_inputs, list):
+            raise utils.ValidationError(
+                'Invalid rule inputs: %s' % self.rule_inputs)
+        
+        for rule_input in self.rule_inputs:
+            if not isinstance(rule_input, dict):
+                raise utils.ValidationError(
+                    'Invalid rule inputs: %s' % self.rule_inputs)
+
+    @classmethod
+    def create_default_subtitled_variable_length_list_of_rule_inputs(
+            cls, content_id):
+        """Create a default SubtitledVariableLengthListOfRuleInputs domain
+        object.
+
+        Args:
+            content_id: str. The id of the content.
+
+        Returns:
+            SubtitledVariableLengthListOfRuleInputs. A default
+            SubtitledVariableLengthListOfRuleInputs domain object.
+        """
+        return cls(content_id, [])
+
+
 class State(python_utils.OBJECT):
     """Domain object for a state."""
 
@@ -2321,6 +2427,17 @@ class State(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % feedback_content_id)
             content_id_list.append(feedback_content_id)
+
+            for rule_type in answer_group.rule_types_to_inputs:
+                rule_inputs_content_id = (
+                    answer_group.rule_types_to_inputs[rule_type].content_id)
+                if rule_inputs_content_id is not None:
+                    if rule_inputs_content_id in content_id_list:
+                        raise utils.ValidationError(
+                            'Found a duplicate content '
+                            'id %s' % rule_inputs_content_id)
+                    content_id_list.append(rule_inputs_content_id)
+
         if self.interaction.default_outcome:
             default_outcome_content_id = (
                 self.interaction.default_outcome.feedback.content_id)
@@ -2665,15 +2782,28 @@ class State(python_utils.OBJECT):
         old_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
+        
+        for answer_group in self.interaction.answer_groups:
+            rule_types_to_inputs = answer_group.rule_types_to_inputs
+            for rule_input in rule_types_to_inputs.values():
+                if rule_input.content_id is not None:
+                    old_content_id_list.append(rule_inputs.content_id)
+
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
+            rule_types_to_inputs = {}
+
             # Normalize the rule params.
             for rule_type in answer_group_dict['rule_types_to_inputs']:
-                rule_types_to_inputs = answer_group_dict[
+                subtitled_rule_inputs_dict = answer_group_dict[
                     'rule_types_to_inputs'][rule_type]
-                for rule_input_index, rule_input in enumerate(
-                        rule_types_to_inputs):
+                rule_types_to_inputs[rule_type] = (
+                    SubtitledVariableLengthListOfRuleInputs.from_dict(
+                        subtitled_rule_inputs_dict)
+                )
+                rule_inputs = subtitled_rule_inputs_dict['rule_inputs']
+                for rule_input_index, rule_input in enumerate(rule_inputs):
                     if not isinstance(rule_input, dict):
                         raise Exception(
                             'Expected rule_input to be a dict, received %s'
@@ -2698,12 +2828,12 @@ class State(python_utils.OBJECT):
                                     '%s has the wrong type. It should '
                                     'be a %s.' % (value, param_type.__name__))
                         answer_group_dict['rule_types_to_inputs'][rule_type][
-                            rule_input_index][param_name] = normalized_param
+                            'rule_inputs'][rule_input_index][
+                                param_name] = normalized_param
 
             answer_group = AnswerGroup(
                 Outcome.from_dict(answer_group_dict['outcome']),
-                answer_group_dict['rule_types_to_inputs'],
-                answer_group_dict['rule_input_translations'],
+                rule_types_to_inputs,
                 answer_group_dict['training_data'],
                 answer_group_dict['tagged_skill_misconception_id'])
             interaction_answer_groups.append(answer_group)
@@ -2712,6 +2842,12 @@ class State(python_utils.OBJECT):
         new_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
+        for answer_group in self.interaction.answer_groups:
+            rule_types_to_inputs = answer_group.rule_types_to_inputs
+            for rule_input in rule_types_to_inputs.values():
+                if rule_input.content_id is not None:
+                    new_content_id_list.append(rule_inputs.content_id)
+        
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 

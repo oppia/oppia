@@ -129,40 +129,63 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
                 'new_value': [{
-                    'rule_input_translations': {},
                     'rule_types_to_inputs': {
-                        'ContainsAtLeastOneOf': [{
-                            'x': [html_content]
-                        }],
-                        'DoesNotContainAtLeastOneOf': [{
-                            'x': [html_content]
-                        }],
-                        'Equals': [{
-                            'x': [html_content]
-                        }, {
-                            'x': 1
-                        }],
-                        'HasElementXAtPositionY': [{
-                            'x': html_content,
-                            'y': 2
-                        }],
-                        'HasElementXBeforeElementY': [{
-                            'x': html_content,
-                            'y': html_content
-                        }],
-                        'IsEqualToOrdering': [{
-                            'x': [
-                                [html_content]
-                            ]
-                        }],
-                        'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
-                            'x': [
-                                [html_content]
-                            ]
-                        }],
-                        'IsProperSubsetOf': [{
-                            'x': [html_content]
-                        }]
+                        'ContainsAtLeastOneOf': {
+                            'content_id': None,
+                            'rule_inputs': [{
+                                'x': [html_content]
+                            }]
+                        },
+                        'DoesNotContainAtLeastOneOf': {
+                            'content_id': None,
+                            'rule_inputs': [{
+                                'x': [html_content]
+                            }]
+                        },
+                        'Equals': {
+                            'content_id': None,
+                            'rule_inputs': [{
+                                'x': [html_content]
+                            }, {
+                                'x': 1
+                            }]
+                        },
+                        'HasElementXAtPositionY': {
+                            'content_id': None,
+                            'rule_inputs': [{
+                                'x': html_content,
+                                'y': 2
+                            }]
+                        },
+                        'HasElementXBeforeElementY': {
+                            'content_id': None,
+                            'rule_inputs': [{
+                                'x': html_content,
+                                'y': html_content
+                            }]
+                        },
+                        'IsEqualToOrdering': {
+                            'content_id': None,
+                            'rule_inputs': [{
+                                'x': [
+                                    [html_content]
+                                ]
+                            }]
+                        },
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition': {
+                            'content_id': None,
+                            'rule_inputs': [{
+                                'x': [
+                                    [html_content]
+                                ]
+                            }]
+                        },
+                        'IsProperSubsetOf': {
+                            'content_id': None,
+                            'rule_inputs': [{
+                                'x': [html_content]
+                            }]
+                        }
                     },
                     'outcome': {
                         'dest': 'Introduction',
@@ -362,6 +385,45 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_upgrade_services.DraftUpgradeUtil, conversion_fn_name),
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
+
+    def test_convert_states_v39_dict_to_40_dict(self):
+        draft_change_list_1_v39 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'answer_groups',
+                'new_value': {}
+            })
+        ]
+        draft_change_list_2_v39 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
+        # Migrate exploration to state schema version 40.
+        self.create_and_migrate_new_exploration('39', '40')
+        migrated_draft_change_list_1_v40 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_1_v39, 1, 2, self.EXP_ID))
+        self.assertIsNone(migrated_draft_change_list_1_v40)
+
+        migrated_draft_change_list_2_v40 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_2_v39, 1, 2, self.EXP_ID))
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_2_v39_dict_list = [
+            change.to_dict() for change in draft_change_list_2_v39
+        ]
+        migrated_draft_change_list_2_v40_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_2_v40
+        ]
+        self.assertEqual(
+            draft_change_list_2_v39_dict_list,
+            migrated_draft_change_list_2_v40_dict_list)
 
     def test_convert_states_v38_dict_to_v39_dict(self):
         draft_change_list_v38 = [

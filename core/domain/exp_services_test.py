@@ -116,7 +116,6 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 category='Architecture', language_code='en')
 
         interaction_answer_groups = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': 'abc'
@@ -1611,7 +1610,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{'x': 0}, {'x': 1}]
             },
@@ -1635,7 +1633,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{'x': 0}]
             },
@@ -1654,7 +1651,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{
                     'x': [
@@ -2438,7 +2434,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         # List of answer groups to add into an interaction.
         self.interaction_answer_groups = [{
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'Equals': [{'x': 0}]
             },
@@ -5042,7 +5037,6 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
             'rule_types_to_inputs': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -5059,7 +5053,6 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
             'rule_types_to_inputs': {},
             'training_data': [],
             'tagged_skill_misconception_id': None

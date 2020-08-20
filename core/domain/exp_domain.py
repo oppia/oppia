@@ -3064,6 +3064,58 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v39_dict_to_v40_dict(cls, states_dict):
+        """Converts from version 39 to 40. Version 40 removes the field
+        rule_input_translations in AnswerGroup, and assigns translatable rules
+        with content ids.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            new_content_ids = []
+            next_content_id_index = state_dict['next_content_id_index']
+
+            answer_group_dicts = state_dict['interaction']['answer_groups']
+            for i, answer_group_dict in enumerate(answer_group_dicts):
+                # Add a content id field to the values stored in
+                # rule_types_to_inputs dict format. If it is a translatbale
+                # rule, assign a content id.
+                rule_types_to_inputs = answer_group_dict['rule_types_to_inputs']
+                for rule_type in rule_types_to_inputs:
+                    rule_types_to_inputs[rule_type] = {
+                        'rule_inputs': rule_types_to_inputs[rule_type],
+                        'content_id': None
+                    }
+
+                    interaction_id = state_dict['interaction']['id']
+                    if (
+                        interaction_id == 'TextInput' or
+                        interaction_id == 'SetInput'
+                    ):
+                        new_content_id = 'rule_inputs_%s_%i' % (
+                            rule_type, next_content_id_index)
+                        rule_types_to_inputs[rule_type]['content_id'] = (
+                            new_content_id)
+                        new_content_ids.append(new_content_id)
+                        next_content_id_index += 1
+
+            for new_content_id in new_content_ids:
+                state_dict[
+                    'written_translations'][
+                        'translations_mapping'][new_content_id] = {}
+                state_dict[
+                    'recorded_voiceovers'][
+                        'voiceovers_mapping'][new_content_id] = {}
+            state_dict['next_content_id_index'] = next_content_id_index
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -3098,7 +3150,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 44
+    CURRENT_EXP_SCHEMA_VERSION = 45
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4129,6 +4181,28 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v44_dict_to_v45_dict(cls, exploration_dict):
+        """Converts a v44 exploration dict into a v45 exploration dict.
+        Removes the field rule_input_translations in AnswerGroup, and assigns
+        translatable rules with content ids.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v44.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v44.
+        """
+        exploration_dict['schema_version'] = 45
+
+        exploration_dict['states'] = cls._convert_states_v39_dict_to_v40_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 40
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4380,6 +4454,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v43_dict_to_v44_dict(
                 exploration_dict)
             exploration_schema_version = 44
+        
+        if exploration_schema_version == 44:
+            exploration_dict = cls._convert_v44_dict_to_v45_dict(
+                exploration_dict)
+            exploration_schema_version = 45
 
         return (exploration_dict, initial_schema_version)
 

@@ -1388,7 +1388,6 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': invalid_html_content2,
@@ -1677,7 +1676,6 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': valid_html_content,
@@ -1867,7 +1865,6 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': valid_html_content,
@@ -2012,7 +2009,6 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'HasElementXAtPositionY': [{
                     'x': valid_html_content1,
@@ -2041,7 +2037,6 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             'tagged_skill_misconception_id': None
         }
         item_selection_answer_group = {
-            'rule_input_translations': {},
             'rule_types_to_inputs': {
                 'ContainsAtLeastOneOf': [{
                     'x': [valid_html_content1]

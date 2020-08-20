@@ -127,7 +127,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                             },
                             'labelled_as_correct': False
                         },
-                        'rule_input_translations': {},
                         'rule_types_to_inputs': {
                             'Contains': [{
                                 'x': '®®'

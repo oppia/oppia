@@ -760,6 +760,58 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v39_dict_to_v40_dict(cls, question_state_dict):
+        """Converts from version 39 to 40. Version 40 removes the field
+        rule_input_translations in AnswerGroup, and assigns translatable rules
+        with content ids.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        new_content_ids = []
+        next_content_id_index = question_state_dict['next_content_id_index']
+
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for i, answer_group_dict in enumerate(answer_group_dicts):
+            # Add a content id field to the values stored in
+            # rule_types_to_inputs dict format. If it is a translatbale
+            # rule, assign a content id.
+            rule_types_to_inputs = answer_group_dict['rule_types_to_inputs']
+            for rule_type in rule_types_to_inputs:
+                rule_types_to_inputs[rule_type] = {
+                    'rule_inputs': rule_types_to_inputs[rule_type],
+                    'content_id': None
+                }
+
+                interaction_id = question_state_dict['interaction']['id']
+                if (
+                    interaction_id == 'TextInput' or
+                    interaction_id == 'SetInput'
+                ):
+                    new_content_id = 'rule_inputs_%s_%i' % (
+                        rule_type, next_content_id_index)
+                    rule_types_to_inputs[rule_type]['content_id'] = (
+                        new_content_id)
+                    new_content_ids.append(new_content_id)
+                    next_content_id_index += 1
+
+        for new_content_id in new_content_ids:
+            question_state_dict[
+                'written_translations'][
+                    'translations_mapping'][new_content_id] = {}
+            question_state_dict[
+                'recorded_voiceovers'][
+                    'voiceovers_mapping'][new_content_id] = {}
+        question_state_dict['next_content_id_index'] = next_content_id_index
+    
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
