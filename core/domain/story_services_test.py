@@ -768,7 +768,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, 'story_id_2', change_list,
                 'Added chapter.')
 
-
     def test_cannot_update_story_acquired_skill_ids_with_invalid_node_id(self):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,

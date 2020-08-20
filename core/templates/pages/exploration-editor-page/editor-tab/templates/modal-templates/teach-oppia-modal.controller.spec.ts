@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for TeachOppiaModalController.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
@@ -51,9 +52,12 @@ describe('Teach Oppia Modal Controller', function() {
   var stateInteractionIdService = null;
   var stateObjectFactory = null;
   var explorationStatesService = null;
+  var externalSaveService = null;
   var responsesService = null;
   var trainingDataService = null;
   var trainingModalService = null;
+
+  var mockExternalSaveEventEmitter = null;
 
   var explorationId = 'exp1';
   var stateName = 'Introduction';
@@ -74,12 +78,14 @@ describe('Teach Oppia Modal Controller', function() {
         }
       },
       answer_groups: [{
-        rule_specs: [{
-          inputs: {
-            x: 'Correct Answer'
-          },
-          rule_type: 'Equals'
-        }],
+        rule_input_translations: {},
+        rule_types_to_inputs: {
+          Equals: [
+            {
+              x: 'Correct Answer'
+            }
+          ]
+        },
         outcome: {
           dest: 'outcome 1',
           feedback: {
@@ -138,6 +144,10 @@ describe('Teach Oppia Modal Controller', function() {
       'StateCustomizationArgsService', stateCustomizationArgsService);
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
   }));
 
   describe('when successfully fetching top unresolved answers', function() {
@@ -153,6 +163,7 @@ describe('Teach Oppia Modal Controller', function() {
       explorationStatesService = $injector.get('ExplorationStatesService');
       stateEditorService = $injector.get('StateEditorService');
       responsesService = $injector.get('ResponsesService');
+      externalSaveService = $injector.get('ExternalSaveService');
       trainingDataService = $injector.get('TrainingDataService');
       trainingModalService = $injector.get('TrainingModalService');
 
@@ -270,6 +281,7 @@ describe('Teach Oppia Modal Controller', function() {
       explorationStatesService = $injector.get('ExplorationStatesService');
       stateEditorService = $injector.get('StateEditorService');
       responsesService = $injector.get('ResponsesService');
+      externalSaveService = $injector.get('ExternalSaveService');
       trainingDataService = $injector.get('TrainingDataService');
       trainingModalService = $injector.get('TrainingModalService');
 

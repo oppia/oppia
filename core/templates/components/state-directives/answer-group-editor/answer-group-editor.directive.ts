@@ -43,6 +43,7 @@ require(
   'state-property.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
+require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -63,7 +64,12 @@ angular.module('oppia').directive('answerGroupEditor', [
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         onSaveTaggedMisconception: '=',
         outcome: '=',
-        rules: '=',
+        // Answer group editor takes in a list of rules. Note that the actual
+        // stored rules are not in this format -- see the AnswerGroup domain
+        // object for the actual format of how rules are stored. AnswerGroup
+        // contains a method updateRuleTypesToInputs() which accepts a list of
+        // rules. This method should be used to update the rule structure.
+        getRules: '&rules',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         suppressWarnings: '&'
       },
@@ -73,14 +79,14 @@ angular.module('oppia').directive('answerGroupEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'INTERACTION_SPECS',
-        'StateEditorService', 'RuleObjectFactory',
+        'AlertsService', 'ContextService', 'ExternalSaveService',
+        'INTERACTION_SPECS', 'StateEditorService', 'RuleObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'ResponsesService',
         function(
             $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, INTERACTION_SPECS,
-            StateEditorService, RuleObjectFactory,
+            AlertsService, ContextService, ExternalSaveService,
+            INTERACTION_SPECS, StateEditorService, RuleObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
           var ctrl = this;
@@ -286,14 +292,18 @@ angular.module('oppia').directive('answerGroupEditor', [
             // choice interaction's customization arguments.
             // TODO(sll): Remove the need for this watcher, or make it less
             // ad hoc.
-            $scope.$on('updateAnswerChoices', function() {
-              ctrl.answerChoices = ctrl.getAnswerChoices();
-            });
-            $scope.$on('externalSave', function() {
-              if (ctrl.isRuleEditorOpen()) {
-                ctrl.saveRules();
-              }
-            });
+            ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(() => {
+                if (ctrl.isRuleEditorOpen()) {
+                  ctrl.saveRules();
+                }
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onUpdateAnswerChoices.subscribe(() => {
+                ctrl.answerChoices = ctrl.getAnswerChoices();
+              })
+            );
             ctrl.directiveSubscriptions.add(
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 () => {
@@ -305,6 +315,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                 }
               )
             );
+            ctrl.rules = ctrl.getRules();
             ctrl.rulesMemento = null;
             ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
             ctrl.editAnswerGroupForm = {};

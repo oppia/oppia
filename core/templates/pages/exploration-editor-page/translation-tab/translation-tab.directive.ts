@@ -30,7 +30,7 @@ require(
   'state-translation-status-graph/state-translation-status-graph.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translator-overview/' +
-  'translator-overview.directive.ts');
+  'translator-overview.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -326,8 +326,11 @@ angular.module('oppia').directive('translationTab', [
               .then(function(explorationPermissions) {
                 permissions = explorationPermissions;
               });
-            $scope.$on('enterTranslationForTheFirstTime',
-              $scope.showWelcomeTranslationModal
+            ctrl.directiveSubscriptions.add(
+              // eslint-disable-next-line max-len
+              StateTutorialFirstTimeService.onEnterTranslationForTheFirstTime.subscribe(
+                () => $scope.showWelcomeTranslationModal()
+              )
             );
             ctrl.directiveSubscriptions.add(
               StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
@@ -336,6 +339,9 @@ angular.module('oppia').directive('translationTab', [
                 }
               )
             );
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();

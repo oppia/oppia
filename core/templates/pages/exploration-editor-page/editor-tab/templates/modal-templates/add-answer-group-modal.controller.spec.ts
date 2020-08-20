@@ -26,6 +26,8 @@ import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
+import { Subscription } from 'rxjs';
+
 describe('Add Answer Group Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -39,6 +41,10 @@ describe('Add Answer Group Modal Controller', function() {
   var currentInteractionId = 'Continue';
   var existingContentIds = [];
   var stateName = 'State Name';
+
+  var testSubscriptions: Subscription;
+
+  const saveOutcomeDestDetailsSpy = jasmine.createSpy('saveOutcomeDestDetails');
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -73,6 +79,16 @@ describe('Add Answer Group Modal Controller', function() {
       stateName: stateName
     });
   }));
+
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(stateEditorService.onSaveOutcomeDestDetails.subscribe(
+      saveOutcomeDestDetailsSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
 
   it('should evaluate scope variables values correctly', function() {
     expect(true).toBe(true);
@@ -126,10 +142,9 @@ describe('Add Answer Group Modal Controller', function() {
   });
 
   it('should save response', function() {
-    spyOn($scope, '$broadcast').and.callThrough();
     $scope.saveResponse(null);
 
-    expect($scope.$broadcast).toHaveBeenCalledTimes(2);
+    expect(saveOutcomeDestDetailsSpy).toHaveBeenCalled();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       tmpRule: $scope.tmpRule,
       tmpOutcome: $scope.tmpOutcome,

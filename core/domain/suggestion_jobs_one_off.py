@@ -70,16 +70,14 @@ class SuggestionSvgFilenameValidationOneOffJob(
 
     @staticmethod
     def map(item):
+        if item.target_type != suggestion_models.TARGET_TYPE_EXPLORATION:
+            return
+        if item.suggestion_type != (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+            return
         suggestion = suggestion_services.get_suggestion_from_model(item)
         html_string_list = suggestion.get_all_html_content_strings()
         html_string = ''.join(html_string_list)
-
-        if suggestion.target_type != suggestion_models.TARGET_TYPE_EXPLORATION:
-            return
-        if suggestion.suggestion_type != (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
-            return
-
         invalid_math_tags = (
             html_validation_service.
             validate_math_tags_in_html_with_attribute_math_content(html_string))

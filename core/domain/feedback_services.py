@@ -671,7 +671,7 @@ def get_thread(thread_id, strict=True):
     Args:
         thread_id: str. The id of the thread.
         strict: bool. Whether to fail noisily if no entity with the given id
-                exists in the datastore. Default is True.
+            exists in the datastore. Default is True.
 
     Returns:
         FeedbackThread. The resulting FeedbackThread domain object.

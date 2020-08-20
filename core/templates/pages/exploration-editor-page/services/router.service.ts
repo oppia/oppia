@@ -24,17 +24,18 @@ require(
   'exploration-init-state-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/exploration-improvements.service.ts');
+require('services/external-save.service.ts');
 
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$q', '$rootScope', '$timeout', '$window',
   'ExplorationImprovementsService', 'ExplorationInitStateNameService',
-  'ExplorationStatesService', 'StateEditorService',
+  'ExplorationStatesService', 'ExternalSaveService', 'StateEditorService',
   function(
       $interval, $location, $q, $rootScope, $timeout, $window,
       ExplorationImprovementsService, ExplorationInitStateNameService,
-      ExplorationStatesService, StateEditorService) {
+      ExplorationStatesService, ExternalSaveService, StateEditorService) {
     var TABS = {
       MAIN: {name: 'main', path: '/main'},
       TRANSLATION: {name: 'translation', path: '/translation'},
@@ -45,7 +46,8 @@ angular.module('oppia').factory('RouterService', [
       HISTORY: {name: 'history', path: '/history'},
       FEEDBACK: {name: 'feedback', path: '/feedback'},
     };
-
+    /** @private */
+    var centerGraphEventEmitter = new EventEmitter();
     var SLUG_GUI = 'gui';
     var SLUG_PREVIEW = 'preview';
     // PREVIEW_TAB_WAIT_TIME_MSEC is the minimum duration to wait
@@ -72,6 +74,8 @@ angular.module('oppia').factory('RouterService', [
     var refreshStatisticsTabEventEmitter = new EventEmitter();
     /** @private */
     var refreshTranslationTabEventEmitter = new EventEmitter();
+    /** @private */
+    var refreshVersionHistoryEventEmitter = new EventEmitter();
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -88,7 +92,8 @@ angular.module('oppia').factory('RouterService', [
 
       // TODO(oparry): Determine whether this is necessary, since
       // _savePendingChanges() is called by each of the navigateTo... functions.
-      $rootScope.$broadcast('externalSave');
+
+      ExternalSaveService.onExternalSave.emit();
 
       if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
         activeTabName = TABS.TRANSLATION.name;
@@ -123,7 +128,7 @@ angular.module('oppia').factory('RouterService', [
           });
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
-        $rootScope.$broadcast('refreshVersionHistory', {
+        refreshVersionHistoryEventEmitter.emit({
           forceRefresh: false
         });
         activeTabName = TABS.HISTORY.name;
@@ -151,7 +156,7 @@ angular.module('oppia').factory('RouterService', [
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
               // Fire an event to center the Graph in the Editor.
-              $rootScope.$broadcast('centerGraph');
+              centerGraphEventEmitter.emit();
             }
           } else {
             $location.path(pathBase +
@@ -162,15 +167,7 @@ angular.module('oppia').factory('RouterService', [
     };
 
     var _savePendingChanges = function() {
-      try {
-        $rootScope.$broadcast('externalSave');
-      } catch (e) {
-        // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-        // null" error. To get around this we must use $apply().
-        $rootScope.$apply(function() {
-          $rootScope.$broadcast('externalSave');
-        });
-      }
+      ExternalSaveService.onExternalSave.emit();
     };
 
     var _getCurrentStateFromLocationPath = function() {
@@ -269,6 +266,9 @@ angular.module('oppia').factory('RouterService', [
         _savePendingChanges();
         $location.path(TABS.FEEDBACK.path);
       },
+      get onCenterGraph() {
+        return centerGraphEventEmitter;
+      },
       get onRefreshSettingsTab() {
         return refreshSettingsTabEventEmitter;
       },
@@ -277,6 +277,9 @@ angular.module('oppia').factory('RouterService', [
       },
       get onRefreshTranslationTab() {
         return refreshTranslationTabEventEmitter;
+      },
+      get onRefreshVersionHistory() {
+        return refreshVersionHistoryEventEmitter;
       }
     };
 

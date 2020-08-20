@@ -20,13 +20,13 @@ require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 
 interface InteractionValidator {
   'id': string;
-  'min_value'?: number;
-  'max_value'?: number;
+  'min_value': number;
+  'max_value': number;
 }
 
 interface ApplyValidationCustomScope extends ng.IScope {
-  $ctrl?: {
-    validators?: () => InteractionValidator[];
+  $ctrl: {
+    validators: () => InteractionValidator[];
   }
 }
 

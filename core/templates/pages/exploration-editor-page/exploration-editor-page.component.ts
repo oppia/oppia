@@ -41,7 +41,7 @@ require(
   'exploration-objective-editor.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
-  'exploration-save-and-publish-buttons.directive.ts');
+  'exploration-save-and-publish-buttons.component.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.component.ts');
@@ -112,6 +112,7 @@ require(
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -162,7 +163,8 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationFeaturesService', 'ExplorationImprovementsService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
-    'ExplorationParamSpecsService', 'ExplorationRightsService',
+    'ExplorationParamSpecsService', 'ExplorationPropertyService',
+    'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
@@ -171,7 +173,6 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
-    'EVENT_EXPLORATION_PROPERTY_CHANGED',
     function(
         $q, $scope, $templateCache, $timeout, $uibModal,
         AutosaveInfoModalsService, ChangeListService, ContextService,
@@ -181,7 +182,8 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationFeaturesService, ExplorationImprovementsService,
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
-        ExplorationParamSpecsService, ExplorationRightsService,
+        ExplorationParamSpecsService, ExplorationPropertyService,
+        ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         PageTitleService, LoaderService, ParamChangesObjectFactory,
@@ -189,8 +191,7 @@ angular.module('oppia').component('explorationEditorPage', {
         StateClassifierMappingService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
-        UserEmailPreferencesService, UserExplorationPermissionsService,
-        EVENT_EXPLORATION_PROPERTY_CHANGED) {
+        UserEmailPreferencesService, UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
@@ -348,7 +349,8 @@ angular.module('oppia').component('explorationEditorPage', {
             return;
           }
           RouterService.onRefreshStatisticsTab.emit();
-          $scope.$broadcast('refreshVersionHistory', {
+
+          RouterService.onRefreshVersionHistory.emit({
             forceRefresh: true
           });
 
@@ -452,7 +454,20 @@ angular.module('oppia').component('explorationEditorPage', {
       };
 
       ctrl.$onInit = function() {
-        $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
+        ctrl.directiveSubscriptions.add(
+          ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
+            () => {
+              setPageTitle();
+            }
+          )
+        );
+        ctrl.directiveSubscriptions.add(
+          ExplorationSaveService.onInitExplorationPage.subscribe(
+            (successCallback) => {
+              ctrl.initExplorationPage().then(successCallback);
+            }
+          )
+        );
         ctrl.directiveSubscriptions.add(
           ExplorationStatesService.onRefreshGraph.subscribe(() => {
             GraphDataService.recompute();
@@ -461,13 +476,18 @@ angular.module('oppia').component('explorationEditorPage', {
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
-        $scope.$on(
-          'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
+        ctrl.directiveSubscriptions.add(
+          // eslint-disable-next-line max-len
+          StateTutorialFirstTimeService.onEnterEditorForTheFirstTime.subscribe(() => {
+            ctrl.showWelcomeExplorationModal();
+          })
+        );
         ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
             () => {
               ctrl.startTutorial();
-            }));
+            })
+        );
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
 

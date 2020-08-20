@@ -64,7 +64,7 @@ export class CodeReplPredictionService {
   ];
 
   getTokenizedProgram(
-      programTokens: Array<string[]>, tokenToId: object): string[] {
+      programTokens: string[][], tokenToId: object): string[] {
     // Tokenize Python programs in dataset for winnowing.
     const tokenizedProgram = [];
 
@@ -94,7 +94,7 @@ export class CodeReplPredictionService {
     return tokenizedProgram;
   }
 
-  getTokenizedProgramForCV(programTokens: Array<string[]>): string[] {
+  getTokenizedProgramForCV(programTokens: string[][]): string[] {
     // Tokenize Python programs in dataset for winnowing.
     const tokenizedProgram = [];
 
@@ -121,7 +121,7 @@ export class CodeReplPredictionService {
   }
 
   calcJaccardIndex(
-      multisetA: Array<number>, multisetB: Array<number>): number {
+      multisetA: number[], multisetB: number[]): number {
     // Calculate jaccard index between two multisets.
     multisetA.sort((x, y) => {
       return x > y ? 1 : -1;
@@ -172,7 +172,7 @@ export class CodeReplPredictionService {
   }
 
   getProgramSimilarity(
-      fingerprintA: Array<number[]>, fingerprintB: Array<number[]>): number {
+      fingerprintA: number[][], fingerprintB: number[][]): number {
     // Calculate similarity between two programs' fingerprints.
     const multisetA = [];
     const multisetB = [];
@@ -188,7 +188,7 @@ export class CodeReplPredictionService {
     return this.calcJaccardIndex(multisetA, multisetB);
   }
 
-  findNearestNeighborsIndexes(knnData: KNN, program: string): Array<number[]> {
+  findNearestNeighborsIndexes(knnData: KNN, program: string): number[][] {
     // Find index of nearest neighbor programs to given program.
     const K = knnData.K;
     const T = knnData.T;

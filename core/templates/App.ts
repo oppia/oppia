@@ -141,9 +141,10 @@ angular.module('oppia').config([
       'QuestionBackendApiService', 'QuestionSummaryForOneSkillObjectFactory',
       'QuestionSummaryObjectFactory', 'RatingComputationService',
       'ReadOnlyCollectionBackendApiService',
-      'ReadOnlySubtopicPageObjectFactory', 'RubricObjectFactory',
-      'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
-      'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
+      'ReadOnlySubtopicPageObjectFactory', 'ReviewTestBackendApiService',
+      'RubricObjectFactory', 'SchemaDefaultValueService',
+      'SchemaUndefinedLastElementService', 'SidebarStatusService',
+      'SiteAnalyticsService', 'SkillObjectFactory',
       'SkillRightsBackendApiService', 'SkillRightsObjectFactory',
       'SolutionObjectFactory', 'SolutionValidityService',
       'SpeechSynthesisChunkerService', 'StateCardObjectFactory',
@@ -217,7 +218,7 @@ angular.module('oppia').config([
               return $q(function(resolve, reject) {
                 // Get CSRF token before sending the request.
                 CsrfTokenService.getTokenAsync().then(function(token) {
-                  if ((config.data instanceof FormData )) {
+                  if ((config.data instanceof FormData)) {
                     var hasPayload = false;
                     // Check whether the FormData has payload in it.
                     for (var key of config.data.keys()) {

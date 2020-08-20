@@ -140,7 +140,7 @@ export class ItemSelectionInputValidationService {
       });
 
       answerGroups.forEach((answerGroup, answerIndex) => {
-        var rules = answerGroup.rules;
+        var rules = answerGroup.getRulesAsList();
         rules.forEach((rule, ruleIndex) => {
           var ruleInputs = (<string[]>rule.inputs.x);
           ruleInputs.forEach((ruleInput) => {
@@ -188,7 +188,7 @@ export class ItemSelectionInputValidationService {
     }
 
     answerGroups.forEach((answerGroup, answerIndex) => {
-      var rules = answerGroup.rules;
+      var rules = answerGroup.getRulesAsList();
       rules.forEach((rule, ruleIndex) => {
         var ruleInputs = (<string[]>rule.inputs.x);
         ruleInputs.forEach((ruleInput) => {

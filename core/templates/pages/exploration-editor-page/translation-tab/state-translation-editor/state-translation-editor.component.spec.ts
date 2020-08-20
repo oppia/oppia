@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for stateTranslationEditor.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -31,6 +32,7 @@ import { WrittenTranslationObjectFactory } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 describe('State Translation Editor Component', function() {
+  var ctrl = null;
   var $q = null;
   var $rootScope = null;
   var $scope = null;
@@ -43,6 +45,11 @@ describe('State Translation Editor Component', function() {
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
   var writtenTranslationObjectFactory = null;
+
+  var mockExternalSaveEventEmitter = null;
+
+  var mockActiveContentIdChangedEventEmitter = new EventEmitter();
+  var mockActiveLanguageChangedEventEmitter = new EventEmitter();
 
   var stateName = 'State1';
   var state = {
@@ -63,7 +70,8 @@ describe('State Translation Editor Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_specs: [],
+        rule_input_translations: {},
+        rule_types_to_inputs: {},
         tagged_skill_misconception_id: ''
       }, {
         outcome: {
@@ -76,7 +84,8 @@ describe('State Translation Editor Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_specs: [],
+        rule_input_translations: {},
+        rule_types_to_inputs: {},
         tagged_skill_misconception_id: ''
       }],
       confirmed_unclassified_answers: null,
@@ -111,6 +120,7 @@ describe('State Translation Editor Component', function() {
     },
   };
   var stateObj = null;
+  var ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -124,6 +134,10 @@ describe('State Translation Editor Component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
     $provide.value('StateRecordedVoiceoversService', TestBed.get(
       StateRecordedVoiceoversService));
     $provide.value('StateWrittenTranslationsService',
@@ -149,6 +163,13 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
 
+      spyOnProperty(translationLanguageService,
+        'onActiveLanguageChanged').and.returnValue(
+        mockActiveLanguageChangedEventEmitter);
+      spyOnProperty(translationTabActiveContentIdService,
+        'onActiveContentIdChanged').and.returnValue(
+        mockActiveLanguageChangedEventEmitter);
+
       stateWrittenTranslationsService.init(stateName, {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
@@ -162,7 +183,7 @@ describe('State Translation Editor Component', function() {
       });
 
       $scope = $rootScope.$new();
-      var ctrl = $componentController('stateTranslationEditor', {
+      ctrl = $componentController('stateTranslationEditor', {
         $scope: $scope,
         StateEditorService: stateEditorService,
         StateWrittenTranslationsService: stateWrittenTranslationsService,
@@ -170,6 +191,10 @@ describe('State Translation Editor Component', function() {
       });
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should evaluate $scope properties after controller initialization',
       function() {
@@ -203,7 +228,7 @@ describe('State Translation Editor Component', function() {
         .returnValue('es');
       spyOn($uibModal, 'open');
 
-      $rootScope.$broadcast('externalSave');
+      mockExternalSaveEventEmitter.emit();
 
       expect($uibModal.open).not.toHaveBeenCalled();
     });
@@ -234,7 +259,7 @@ describe('State Translation Editor Component', function() {
         stateObj.recordedVoiceovers.getBindableVoiceovers('content_1')
           .en.needsUpdate).toBe(false);
 
-      $rootScope.$broadcast('externalSave');
+      mockExternalSaveEventEmitter.emit();
       $scope.$apply();
 
       expect(
@@ -268,7 +293,7 @@ describe('State Translation Editor Component', function() {
         stateObj.recordedVoiceovers.getBindableVoiceovers('content_1')
           .en.needsUpdate).toBe(false);
 
-      $rootScope.$broadcast('externalSave');
+      mockExternalSaveEventEmitter.emit();
       $scope.$apply();
 
       expect(
@@ -309,7 +334,7 @@ describe('State Translation Editor Component', function() {
 
     it('should init editor when changing active content id language',
       function() {
-        $rootScope.$broadcast('activeContentIdChanged');
+        mockActiveContentIdChangedEventEmitter.emit();
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
           writtenTranslationObjectFactory.createFromBackendDict({
@@ -320,7 +345,7 @@ describe('State Translation Editor Component', function() {
       });
 
     it('should init editor when changing active language', function() {
-      $rootScope.$broadcast('activeLanguageChanged');
+      mockActiveLanguageChangedEventEmitter.emit();
       expect($scope.translationEditorIsOpen).toBe(false);
       expect($scope.activeWrittenTranslation).toEqual(
         writtenTranslationObjectFactory.createFromBackendDict({
@@ -363,7 +388,7 @@ describe('State Translation Editor Component', function() {
       });
 
       $scope = $rootScope.$new();
-      var ctrl = $componentController('stateTranslationEditor', {
+      ctrl = $componentController('stateTranslationEditor', {
         $scope: $scope,
         StateEditorService: stateEditorService,
         StateWrittenTranslationsService: stateWrittenTranslationsService,
@@ -371,6 +396,10 @@ describe('State Translation Editor Component', function() {
       });
       ctrl.$onInit();
     }));
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
 
     it('should evaluate $scope properties after controller initialization',
       function() {

@@ -144,7 +144,7 @@ export class StoryNode {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  prepublishValidate(): Array<string> {
+  prepublishValidate(): string[] {
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Chapter ' + this._title + ' should have a thumbnail.');
