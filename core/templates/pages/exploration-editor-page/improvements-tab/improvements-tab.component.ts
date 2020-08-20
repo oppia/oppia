@@ -91,12 +91,12 @@ angular.module('oppia').component('improvementsTab', {
               }
             };
 
-            this.stateTasksDictionary = (
+            this.stateTasksObject = (
               ExplorationImprovementsTaskRegistryService
                 .makeStateTasksObject());
 
             const stateRetentions: Map<string, number> = new Map(
-              Object.keys(this.stateTasksDictionary).map(stateName => {
+              Object.keys(this.stateTasksObject).map(stateName => {
                 const {numCompletions, totalHitCount} = (
                   expStats.getStateStats(stateName));
                 const retentionRate = (
@@ -107,12 +107,12 @@ angular.module('oppia').component('improvementsTab', {
               return stateRetentions.get(stateName);
             };
             this.getStateNumCardLevelTasks = (stateName: string) => {
-              const {ngrTask, siaTask} = this.stateTasksDictionary[stateName];
+              const {ngrTask, siaTask} = this.stateTasksObject[stateName];
               return (ngrTask.isOpen() ? 1 : 0) + (siaTask.isOpen() ? 1 : 0);
             };
 
             const stateVisibility: Map<string, boolean> = new Map(
-              Object.keys(this.stateTasksDictionary).map(
+              Object.keys(this.stateTasksObject).map(
                 stateName => [stateName, true]));
             this.isStateTasksVisible = (stateName: string) => {
               return stateVisibility.get(stateName);
