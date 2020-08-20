@@ -1699,8 +1699,8 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                         # Comments must end with the proper punctuation.
                         last_char_is_invalid = previous_line[-1] not in (
                             ALLOWED_TERMINATING_PUNCTUATIONS)
-                        if (last_char_is_invalid and not
-                                (excluded_phrase_is_present_at_end or
+                        if (last_char_is_invalid and not (
+                                excluded_phrase_is_present_at_end or
                                 excluded_phrase_at_beginning_of_prev_line)):
                             self.add_message(
                                 'invalid-punctuation-used',
