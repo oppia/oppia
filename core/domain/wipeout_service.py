@@ -29,8 +29,6 @@ from core.domain import wipeout_domain
 from core.platform import models
 import python_utils
 
-from google.appengine.ext import ndb
-
 current_user_services = models.Registry.import_current_user_services()
 (
     base_models, collection_models, exp_models,
@@ -394,6 +392,9 @@ def _pseudonymize_activity_models(
     def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
 
+        This function is run in a transaction, with the maximum number of
+        activity_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
+
         Args:
             activity_related_models: list(BaseModel). Models whose user IDs
                 should be pseudonymized.
@@ -405,24 +406,24 @@ def _pseudonymize_activity_models(
             if isinstance(model, snapshot_model_class)]
         for metadata_model in metadata_models:
             metadata_model.committer_id = pseudonymized_user_id
-        snapshot_model_class.put_multi(metadata_models)
 
         commit_log_models = [
             model for model in activity_related_models
             if isinstance(model, commit_log_model_class)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_user_id
-        commit_log_model_class.put_multi(commit_log_models)
+        ndb.put_multi(metadata_models + commit_log_models)
 
-    activity_mappings = (
+    activity_ids_to_pids = (
         pending_deletion_request.activity_mappings[activity_category])
-    for activity_id, pseudonymized_user_id in activity_mappings.items():
+    for activity_id, pseudonymized_user_id in activity_ids_to_pids.items():
         activity_related_models = [
             model for model in snapshot_metadata_models
-            if model.get_unversioned_instance_id() == activity_id]
-        activity_related_models += [
+            if model.get_unversioned_instance_id() == activity_id
+        ] + [
             model for model in commit_log_models
-            if getattr(model, commit_log_model_field_name) == activity_id]
+            if getattr(model, commit_log_model_field_name) == activity_id
+        ]
         for i in python_utils.RANGE(
                 0,
                 len(activity_related_models),
