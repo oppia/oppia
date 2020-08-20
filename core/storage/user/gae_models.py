@@ -1974,37 +1974,6 @@ class UserContributionScoringModel(base_models.BaseModel):
         return cls.get_by_id(instance_id)
 
     @classmethod
-    def get_by_score_identifiers(cls, user_score_identifiers):
-        """Gets the user score models corresponding to the identifiers.
-
-        Args:
-            user_score_identifiers: list(FullyQualifiedUserScoreIdentifier).
-                Contains unique (user_id, score_category) pairs that
-                correspond to the id of the user and the suggestion
-                score_category to retrieve the user score model for.
-
-        Returns:
-            list(UserContributionScoringModel|None). A list of the
-            UserContributionScoringModels corresponding to the user score
-            identifiers.
-        """
-        user_ids = [
-            user_score_identifier.user_id for user_score_identifier in
-            user_score_identifiers
-        ]
-        score_categories = [
-            user_score_identifier.score_category for user_score_identifier in
-            user_score_identifiers
-        ]
-        instance_ids = [
-            cls._get_instance_id(user_id, score_category)
-            for user_id, score_category in python_utils.ZIP(
-                user_ids, score_categories)
-        ]
-
-        return cls.get_multi(instance_ids)
-
-    @classmethod
     def create(cls, user_id, score_category, score):
         """Creates a new UserContributionScoringModel entry.
 
@@ -2033,56 +2002,6 @@ class UserContributionScoringModel(base_models.BaseModel):
             score=score)
         user_scoring_model.put()
         return user_scoring_model
-
-    @classmethod
-    def create_multi(cls, user_score_identifiers, score):
-        """Creates new UserContributionScoringModel entries.
-
-        Args:
-            user_score_identifiers: list(FullyQualifiedUserScoreIdentifier). A
-                list of unique (user_id, score_category) pairs that correspond
-                to the id of the users and the suggestion score categories to
-                create the scoring models for.
-            score: float. The score of the users.
-
-        Returns:
-            list(UserContributionScoringModel). The user scoring models that
-            were created.
-
-        Raises:
-            Exception. There is already an entry with the given id.
-        """
-        user_ids = [
-            user_score_identifier.user_id for user_score_identifier in
-            user_score_identifiers
-        ]
-        score_categories = [
-            user_score_identifier.score_category for user_score_identifier in
-            user_score_identifiers
-        ]
-        instance_ids = [
-            cls._get_instance_id(user_id, score_category)
-            for user_id, score_category in python_utils.ZIP(
-                user_ids, score_categories)
-        ]
-        user_scoring_models = cls.get_multi(instance_ids)
-        for index, user_scoring_model in enumerate(user_scoring_models):
-            if user_scoring_model:
-                raise Exception(
-                    'There is already a UserContributionScoringModel entry with'
-                    ' the given id: %s' % instance_ids[index]
-                )
-
-        new_user_scoring_models = [
-            cls(
-                id=instance_id, user_id=user_id, score_category=score_category,
-                score=score
-            )
-            for instance_id, user_id, score_category in python_utils.ZIP(
-                instance_ids, user_ids, score_categories)
-        ]
-        cls.put_multi(new_user_scoring_models)
-        return new_user_scoring_models
 
 
 class UserContributionRightsModel(base_models.BaseModel):

@@ -320,7 +320,7 @@ class UserContributionScoring(python_utils.OBJECT):
         """
         self.score += increment_by
 
-    def user_can_review_the_category(self):
+    def check_if_user_can_review_the_category(self):
         """Checks if user can review suggestions in category score_category.
         If the user has score above the minimum required score, then the user
         is allowed to review.
@@ -331,7 +331,7 @@ class UserContributionScoring(python_utils.OBJECT):
         """
         return self.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
 
-    def email_has_been_sent(self):
+    def check_if_email_has_been_sent(self):
         """Checks whether the email has been sent.
 
         Returns:
@@ -406,25 +406,3 @@ class UserContributionRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected can_review_questions to be a boolean value, '
                 'found: %s' % type(self.can_review_questions))
-
-
-class FullyQualifiedUserScoreIdentifier(python_utils.OBJECT):
-    """Domain object representing the full identifier of a user's contribution
-    score for a specific category.
-
-    Attributes:
-        user_id: str. The ID of the user.
-        score_category: str. The category of the suggestion which the score
-            applies.
-    """
-
-    def __init__(self, user_id, score_category):
-        self.user_id = user_id
-        self.score_category = score_category
-
-    def __hash__(self):
-        return hash((self.user_id, self.score_category))
-
-    def __eq__(self, other):
-        return (self.user_id, self.score_category) == (
-            other.user_id, other.score_category)

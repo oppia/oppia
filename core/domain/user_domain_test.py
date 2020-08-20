@@ -397,55 +397,55 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserContributionScoringTests, self).setUp()
-        self.user_contribution_scoring = user_domain.UserContributionScoring(
+        self.user_scoring = user_domain.UserContributionScoring(
             'user_id0', 'category0', 0, False)
 
     def test_initialization(self):
         """Testing init method."""
-        self.assertEqual(self.user_contribution_scoring.user_id, 'user_id0')
+        self.assertEqual(self.user_scoring.user_id, 'user_id0')
         self.assertEqual(
-            self.user_contribution_scoring.score_category, 'category0')
-        self.assertEqual(self.user_contribution_scoring.score, 0)
+            self.user_scoring.score_category, 'category0')
+        self.assertEqual(self.user_scoring.score, 0)
         self.assertEqual(
-            self.user_contribution_scoring.has_email_been_sent, False)
+            self.user_scoring.has_email_been_sent, False)
 
     def test_get_score_category(self):
         self.assertEqual(
-            self.user_contribution_scoring.get_score_category(), 'category0')
+            self.user_scoring.get_score_category(), 'category0')
 
     def test_get_user_id(self):
         self.assertEqual(
-            self.user_contribution_scoring.get_user_id(), 'user_id0')
+            self.user_scoring.get_user_id(), 'user_id0')
 
     def test_get_score(self):
-        self.assertEqual(self.user_contribution_scoring.get_score(), 0)
+        self.assertEqual(self.user_scoring.get_score(), 0)
 
     def test_increment_score(self):
-        self.assertEqual(self.user_contribution_scoring.get_score(), 0)
+        self.assertEqual(self.user_scoring.get_score(), 0)
 
-        self.user_contribution_scoring.increment_score(4)
-        self.assertEqual(self.user_contribution_scoring.get_score(), 4)
+        self.user_scoring.increment_score(4)
+        self.assertEqual(self.user_scoring.get_score(), 4)
 
-        self.user_contribution_scoring.increment_score(-3)
-        self.assertEqual(self.user_contribution_scoring.get_score(), 1)
+        self.user_scoring.increment_score(-3)
+        self.assertEqual(self.user_scoring.get_score(), 1)
 
-    def test_user_can_review_the_category(self):
-        self.assertEqual(self.user_contribution_scoring.get_score(), 0)
+    def test_check_if_user_can_review_the_category(self):
+        self.assertEqual(self.user_scoring.get_score(), 0)
         self.assertFalse(
-            self.user_contribution_scoring.user_can_review_the_category())
+            self.user_scoring.check_if_user_can_review_the_category())
 
-        self.user_contribution_scoring.increment_score(
+        self.user_scoring.increment_score(
             feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
 
         self.assertTrue(
-            self.user_contribution_scoring.user_can_review_the_category())
+            self.user_scoring.check_if_user_can_review_the_category())
 
     def test_mark_email_as_sent(self):
-        self.assertFalse(self.user_contribution_scoring.email_has_been_sent())
+        self.assertFalse(self.user_scoring.check_if_email_has_been_sent())
 
-        self.user_contribution_scoring.mark_email_as_sent()
+        self.user_scoring.mark_email_as_sent()
 
-        self.assertTrue(self.user_contribution_scoring.email_has_been_sent())
+        self.assertTrue(self.user_scoring.email_has_been_sent())
 
 
 class UserContributionRightsTests(test_utils.GenericTestBase):
