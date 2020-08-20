@@ -48,17 +48,17 @@ describe('FeatureStatusSummaryObjectFactory', () => {
       const summary = factory.createFromBackendDict({
         [FeatureNames.DummyFeature]: true
       });
-      const summaryDict = summary.toSummaryDict();
+      const checker = summary.toStatusChecker();
 
-      expect(summaryDict.DummyFeature.isEnabled).toBeTrue();
+      expect(checker.DummyFeature.isEnabled).toBeTrue();
     });
 
     it('should throw if the feature status is missing in backend dict.', () => {
       const summary = factory.createFromBackendDict({});
-      const summaryDict = summary.toSummaryDict();
+      const checker = summary.toStatusChecker();
 
       expect(
-        () => summaryDict.DummyFeature.isEnabled
+        () => checker.DummyFeature.isEnabled
       ).toThrowError(
         `Feature \'${FeatureNames.DummyFeature}\' does not exist.`);
     });

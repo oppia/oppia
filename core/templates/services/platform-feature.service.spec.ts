@@ -266,6 +266,26 @@ describe('PlatformFeatureService', () => {
       })
     );
 
+    it('should load from server if the stored features don\'t match with' +
+      ' feature list', fakeAsync(() => {
+      const sessionId = 'session_id';
+      mockCookie(`SACSID=${sessionId}`);
+      mockSessionStore({
+        SAVED_FEATURE_FLAGS: JSON.stringify({
+          sessionId: sessionId,
+          timestamp: Date.now(),
+          featureStatusSummary: {}
+        })
+      });
+
+      platformFeatureService = TestBed.get(PlatformFeatureService);
+
+      flushMicrotasks();
+
+      expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
+      expect(platformFeatureService.isInitialzedWithError).toBeFalse();
+    }));
+
     it('should request only once if there are more than one call to ' +
       '.initialize.', fakeAsync(() => {
       platformFeatureService = TestBed.get(PlatformFeatureService);
@@ -287,7 +307,7 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(
-        platformFeatureService.featureSummary.DummyFeature.isEnabled
+        platformFeatureService.status.DummyFeature.isEnabled
       ).toBeFalse();
       expect(platformFeatureService.isInitialzedWithError).toBeTrue();
     }));
@@ -311,7 +331,7 @@ describe('PlatformFeatureService', () => {
       flushMicrotasks();
 
       expect(
-        platformFeatureService.featureSummary.DummyFeature.isEnabled
+        platformFeatureService.status.DummyFeature.isEnabled
       ).toBeTrue();
       expect(platformFeatureService.isInitialzedWithError).toBeFalse();
     }));
@@ -320,7 +340,7 @@ describe('PlatformFeatureService', () => {
       () => {
         platformFeatureService = TestBed.get(PlatformFeatureService);
         expect(
-          () => platformFeatureService.featureSummary.DummyFeature.isEnabled
+          () => platformFeatureService.status.DummyFeature.isEnabled
         ).toThrowError(
           'The platform feature service has not been initialized.');
       })
