@@ -133,15 +133,15 @@ export class ExtractImageFilenamesFromStateService {
 
     /**
      * Extracts the filepath object from the filepath-value attribute of the
-     * oppia-noninteractive-image tags in the strHtml(given string).
-     * @param {string} strHtml - The string from which the object of
+     * oppia-noninteractive-image tags in the htmlString(given string).
+     * @param {string} htmlString - The string from which the object of
      *                           filepath should be extracted.
      */
     _extractFilepathValueFromOppiaNonInteractiveImageTag(
-        strHtml: string): string[] {
+        htmlString: string): string[] {
       let filenames = [];
       let unescapedHtmlString = (
-        this.htmlEscaperService.escapedStrToUnescapedStr(strHtml));
+        this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
       let dummyDocument = (
         new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
 
@@ -155,6 +155,30 @@ export class ExtractImageFilenamesFromStateService {
         let filename = JSON.parse(
           imageTagList[i].getAttribute('filepath-with-value'));
         filenames.push(filename);
+      }
+      return filenames;
+    }
+
+    /**
+     * Extracts the SVG filename from the math-content attribute of the
+     * oppia-noninteractive-math tags in the htmlString(given string).
+     * @param {string} htmlString - The string from which the object of
+     *                           filepath should be extracted.
+     */
+    _extractSvgFilenameFromOppiaNonInteractiveMathTag(
+        htmlString: string): string[] {
+      let filenames = [];
+      let unescapedHtmlString = (
+        this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
+      let dummyDocument = (
+        new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
+
+      let mathTagList = dummyDocument.getElementsByTagName(
+        'oppia-noninteractive-math');
+      for (let i = 0; i < mathTagList.length; i++) {
+        let mathContentWithValue = JSON.parse(
+          mathTagList[i].getAttribute('math_content-with-value'));
+        filenames.push(mathContentWithValue.svg_filename);
       }
       return filenames;
     }
@@ -179,6 +203,8 @@ export class ExtractImageFilenamesFromStateService {
       allHtmlOfState.forEach((htmlStr) => {
         filenamesInState = filenamesInState.concat(
           this._extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+        filenamesInState = filenamesInState.concat(
+          this._extractSvgFilenameFromOppiaNonInteractiveMathTag(htmlStr));
       });
       return filenamesInState;
     }
