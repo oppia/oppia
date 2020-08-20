@@ -71,6 +71,7 @@ describe('Translation tab component', function() {
 
   var openTranslationTutorialEmitter = new EventEmitter();
   var refreshTranslationTabEmitter = new EventEmitter();
+  var enterTranslationForTheFirstTimeEmitter = new EventEmitter();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
@@ -125,6 +126,9 @@ describe('Translation tab component', function() {
       'Introduction');
     spyOnProperty(stateTutorialFirstTimeService, 'onOpenTranslationTutorial')
       .and.returnValue(openTranslationTutorialEmitter);
+    spyOnProperty(
+      stateTutorialFirstTimeService, 'onEnterTranslationForTheFirstTime')
+      .and.returnValue(enterTranslationForTheFirstTimeEmitter);
     spyOnProperty(routerService, 'onRefreshTranslationTab')
       .and.returnValue(refreshTranslationTabEmitter);
 
@@ -346,7 +350,7 @@ describe('Translation tab component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('exp1')
       });
-      $scope.showWelcomeTranslationModal();
+      enterTranslationForTheFirstTimeEmitter.emit();
       $scope.$apply();
 
       expect(editabilityService.onStartTutorial).toHaveBeenCalled();
@@ -356,11 +360,13 @@ describe('Translation tab component', function() {
 
   it('should finish translation tutorial when welcome translation modal is' +
     ' dismissed', function() {
+    ctrl.$onInit();
+
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject('exp1')
     });
-    $scope.showWelcomeTranslationModal();
+    enterTranslationForTheFirstTimeEmitter.emit();
     $scope.$apply();
 
     expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)

@@ -318,8 +318,11 @@ angular.module('oppia').component('translationTab', {
           .then(function(explorationPermissions) {
             permissions = explorationPermissions;
           });
-        $scope.$on('enterTranslationForTheFirstTime',
-          $scope.showWelcomeTranslationModal
+        ctrl.directiveSubscriptions.add(
+          // eslint-disable-next-line max-len
+          StateTutorialFirstTimeService.onEnterTranslationForTheFirstTime.subscribe(
+            () => $scope.showWelcomeTranslationModal()
+          )
         );
         ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
