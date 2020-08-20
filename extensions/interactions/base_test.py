@@ -357,7 +357,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         for interaction_id in all_interaction_ids:
             # Ignoring the RatioExpressionInput for now as there's no creator
             # for the interaction yet.Once added this needs to be removed.
-            if(interaction_id != u'RatioExpressionInput'):
+            if interaction_id != u'RatioExpressionInput':
                 # Check that the interaction id is valid.
                 self.assertTrue(self._is_camel_cased(interaction_id))
                 hyphenated_interaction_id = (
@@ -373,9 +373,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 #    * A python file called {InteractionName}.py.
                 #    * An __init__.py file used to import the Python file.
                 #    * A TypeScript file called {InteractionName}.ts.
-                #    * A directory name 'directives' containing TS and HTML files
-                #      for directives
-                #    * A directory named 'static' containing at least a .png file.
+                #    * A directory name 'directives' containing TS and HTML
+                #       files for directives
+                #    * A directory named 'static' containing at least a .png
+                #       file.
                 #  Optional:
                 #    * A JS file called protractor.js.
                 interaction_dir_contents = (
@@ -393,7 +394,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 try:
                     self.assertTrue(os.path.isfile(os.path.join(
                         interaction_dir,
-                        '%s-prediction.service.ts' % hyphenated_interaction_id)))
+                        '%s-prediction.service.ts' % hyphenated_interaction_id))) # pylint: disable=line-too-long
                     interaction_dir_optional_dirs_and_files_count += 1
                 except Exception:
                     pass
@@ -411,7 +412,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     len(interaction_dir_contents)
                 )
 
-                py_file = os.path.join(interaction_dir, '%s.py' % interaction_id)
+                py_file = os.path.join(
+                    interaction_dir, '%s.py' % interaction_id)
                 ts_file = os.path.join(
                     interaction_dir, '%s.ts' % interaction_id)
 
@@ -431,7 +433,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 #  Required:
                 #    * A TS file called
                 #    oppia-interactive-{InteractionName}.directive.ts.
-                #    * A TS file called OppiaResponse{InteractionName}.directive.ts.
+                #    * A TS file called
+                #      OppiaResponse{InteractionName}.directive.ts.
                 #    * A TS file called
                 #    oppia-short-response-{InteractionName}.directive.ts.
                 #    * A TS file called {InteractionName}-rules.service.ts.
@@ -445,7 +448,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 #  Optional:
                 #    * A TS file called
                 #      {InteractionName}-validation.service.specs.ts.
-                #    * A TS file called {InteractionName}-rules.service.specs.ts.
+                #    * A TS file called
+                #      {InteractionName}-rules.service.specs.ts.
 
                 hyphenated_interaction_id = (
                     utils.camelcase_to_hyphenated(interaction_id))
@@ -457,7 +461,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         directives_dir, 'oppia-response-%s.component.ts'
                         % hyphenated_interaction_id)
                     short_response_ts_file = os.path.join(
-                        directives_dir, 'oppia-short-response-%s.component.ts' % (
+                        directives_dir, 'oppia-short-response-%s.component.ts' % ( # pylint: disable=line-too-long
                             hyphenated_interaction_id))
                     rules_service_ts_file = os.path.join(
                         directives_dir, '%s-rules.service.ts'
@@ -467,10 +471,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         % hyphenated_interaction_id)
                     interaction_html = os.path.join(
                         directives_dir,
-                        '%s-interaction.component.html' % hyphenated_interaction_id)
+                        '%s-interaction.component.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
                     response_html = os.path.join(
                         directives_dir,
-                        '%s-response.component.html' % hyphenated_interaction_id)
+                        '%s-response.component.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
                     short_response_html = os.path.join(
                         directives_dir,
                         '%s-short-response.component.html' %
@@ -483,7 +487,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         directives_dir, 'oppia-response-%s.directive.ts'
                         % hyphenated_interaction_id)
                     short_response_ts_file = os.path.join(
-                        directives_dir, 'oppia-short-response-%s.directive.ts' % (
+                        directives_dir, 'oppia-short-response-%s.directive.ts' % ( # pylint: disable=line-too-long
                             hyphenated_interaction_id))
                     rules_service_ts_file = os.path.join(
                         directives_dir, '%s-rules.service.ts'
@@ -493,10 +497,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         % hyphenated_interaction_id)
                     interaction_html = os.path.join(
                         directives_dir,
-                        '%s-interaction.directive.html' % hyphenated_interaction_id)
+                        '%s-interaction.directive.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
                     response_html = os.path.join(
                         directives_dir,
-                        '%s-response.directive.html' % hyphenated_interaction_id)
+                        '%s-response.directive.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
                     short_response_html = os.path.join(
                         directives_dir,
                         '%s-short-response.directive.html' %
@@ -595,12 +599,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertNotIn(
                     '</script>', validation_service_ts_file_content)
 
-                interaction = interaction_registry.Registry.get_interaction_by_id(
-                    interaction_id)
+                interaction = interaction_registry.Registry.get_interaction_by_id(interaction_id) # pylint: disable=line-too-long
 
-                # Check that the specified interaction id is the same as the class
-                # name.
-                self.assertTrue(interaction_id, msg=interaction.__class__.__name__)
+                # Check that the specified interaction id is the same as the
+                # class name.
+                self.assertTrue(
+                    interaction_id, msg=interaction.__class__.__name__)
 
                 # Check that the configuration file contains the correct
                 # top-level keys, and that these keys have the correct types.
@@ -610,7 +614,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     if item_type == python_utils.BASESTRING:
                         self.assertTrue(getattr(interaction, item))
 
-                self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
+                self.assertIn(
+                    interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
 
                 if interaction.is_linear or interaction.is_terminal:
                     self.assertIsNone(interaction.answer_type)
@@ -653,11 +658,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                             interaction.instructions, python_utils.BASESTRING))
                     self.assertIsNotNone(interaction.instructions)
                     self.assertIsNotNone(interaction.narrow_instructions)
-    
+
                 # Check that terminal interactions are not linear.
                 if interaction.is_terminal:
                     self.assertFalse(interaction.is_linear)
-    
+
                 # Check that only linear interactions have a
                 # default_outcome_heading property.
                 if interaction.is_linear:
@@ -669,7 +674,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 else:
                     self.assertIsNone(interaction.default_outcome_heading)
 
-                # Check that interactions that can have solution cannot be linear.
+                # Check that interactions that can have solution cannot be
+                # linear.
                 if interaction.can_have_solution:
                     self.assertFalse(interaction.is_linear)
 
@@ -744,10 +750,10 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
         if list(missing_interaction_ids) != [
-                'MathExpressionInput', 'RatioExpressionInput' 
+                'MathExpressionInput', 'RatioExpressionInput'
             ]:
             # Ignoring the RatioExpressionInput for now as there's no creator
-            # for the interaction yet.Once added this needs to be removed.            
+            # for the interaction yet.Once added this needs to be removed.
             # Ignoring the lack of the MathExpressionInput since it is going
             # to be deprecated and explorations that use it will now be using
             # one of AlgebraicExpressionInput, NumericExpressionInput, or
