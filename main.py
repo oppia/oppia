@@ -41,6 +41,7 @@ from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
+from core.controllers import platform_feature
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
@@ -820,6 +821,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
+
+    get_redirect_route(
+        r'/platform_features_evaluation_handler',
+        platform_feature.PlatformFeaturesEvaluationHandler),
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
