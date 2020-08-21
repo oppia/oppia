@@ -20,12 +20,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AdminPageConstants } from
-  'pages/admin-page/admin-page.constants';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
 import { PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule-object.factory';
+import { AdminPageConstants } from
+  'pages/admin-page/admin-page.constants';
 
 @Injectable({
   providedIn: 'root'

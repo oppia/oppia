@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { FeatureStatusSummaryObjectFactory, FeatureNames } from
-  './feature-status-summary-object.factory';
+  'domain/platform_feature/feature-status-summary-object.factory';
 
 describe('FeatureStatusSummaryObjectFactory', () => {
   let factory: FeatureStatusSummaryObjectFactory;

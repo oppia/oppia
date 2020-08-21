@@ -20,12 +20,12 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AdminPageConstants } from
-  'pages/admin-page/admin-page.constants';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformParameterRuleObjectFactory } from
   'domain/platform_feature/platform-parameter-rule-object.factory';
+import { AdminPageConstants } from
+  'pages/admin-page/admin-page.constants';
 
 describe('PlatformFeatureAdminBackendApiService', () => {
   let featureAdminService: PlatformFeatureAdminBackendApiService = null;

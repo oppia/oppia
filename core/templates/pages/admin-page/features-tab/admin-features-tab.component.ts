@@ -31,18 +31,18 @@ import {
   PlatformParameterFilterObjectFactory,
   PlatformParameterFilter,
 } from 'domain/platform_feature/platform-parameter-filter-object.factory';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlatformParameter, FeatureStage } from
   'domain/platform_feature/platform-parameter-object.factory';
 import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule-object.factory';
 import { AdminFeaturesTabConstants } from
   'pages/admin-page/features-tab/admin-features-tab.constants';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 @Component({
   selector: 'admin-features-tab',

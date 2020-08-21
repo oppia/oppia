@@ -21,9 +21,9 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { PlatformFeatureDomainConstants } from
-  './platform-feature-domain.constants';
+  'domain/platform_feature/platform-feature-domain.constants';
 import { PlatformFeatureDummyBackendApiService } from
-  './platform-feature-dummy-backend-api.service';
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 
 describe('PlatformFeatureDummyBackendApiService', () => {
   let httpTestingController: HttpTestingController;

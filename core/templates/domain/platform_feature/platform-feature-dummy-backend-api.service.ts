@@ -16,9 +16,9 @@
  * @fileoverview Service to check the status of dummy handler in backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';

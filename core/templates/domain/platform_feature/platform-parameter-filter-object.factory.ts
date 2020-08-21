@@ -16,10 +16,10 @@
  * @fileoverview Factory for creating PlatformParameterFilter domain objects.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
-
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import cloneDeep from 'lodash/cloneDeep';
 
 export enum PlatformParameterFilterType {
   ServerMode = 'server_mode',

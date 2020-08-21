@@ -16,8 +16,8 @@
  * @fileoverview Factory for creating ClientContext domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface ClientContextBackendDict {
   'client_type': string;

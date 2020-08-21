@@ -35,20 +35,20 @@ import { isEqual } from 'lodash';
 
 import { ClientContext, ClientContextObjectFactory } from
   'domain/platform_feature/client-context-object.factory';
-import { PlatformFeatureBackendApiService } from
-  'domain/platform_feature/platform-feature-backend-api.service';
 import {
   FeatureNames,
   FeatureStatusSummary,
   FeatureStatusSummaryObjectFactory,
   FeatureStatusChecker
 } from 'domain/platform_feature/feature-status-summary-object.factory';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PlatformFeatureBackendApiService } from
+  'domain/platform_feature/platform-feature-backend-api.service';
+import { BrowserCheckerService } from
+  'domain/utilities/browser-checker.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { BrowserCheckerService } from
-  'domain/utilities/browser-checker.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 interface FeatureFlagsCacheItem {
   timestamp: number;

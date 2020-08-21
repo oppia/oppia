@@ -16,19 +16,19 @@
  * @fileoverview Unit tests for PlatformFeatureService.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks, tick } from
   '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformFeatureService } from
-  'services/platform-feature.service';
-import { PlatformFeatureBackendApiService } from
-  'domain/platform_feature/platform-feature-backend-api.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { FeatureNames, FeatureStatusSummaryObjectFactory } from
   'domain/platform_feature/feature-status-summary-object.factory';
+import { PlatformFeatureBackendApiService } from
+  'domain/platform_feature/platform-feature-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PlatformFeatureService } from
+  'services/platform-feature.service';
 
 
 describe('PlatformFeatureService', () => {
