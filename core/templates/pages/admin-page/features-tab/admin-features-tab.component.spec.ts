@@ -73,7 +73,8 @@ describe('Admin page feature tab', function() {
     let promptResult = 'mock msg';
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       confirm: () => confirmResult,
-      prompt: () => promptResult
+      prompt: () => promptResult,
+      alert: () => null
     });
     mockConfirmResult = val => confirmResult = val;
     mockPromptResult = msg => promptResult = msg;
@@ -382,6 +383,22 @@ describe('Admin page feature tab', function() {
       })
     );
 
+    it('should not proceed if there is any validation issue', fakeAsync(() => {
+      mockPromptResult(null);
+
+      const featureFlag = component.featureFlags[0];
+
+      // Two identical rules.
+      component.addNewRuleToTop(featureFlag);
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).not.toHaveBeenCalled();
+      expect(setStatusSpy).not.toHaveBeenCalled();
+    }));
+
     it('should show error if the update fails', fakeAsync(() => {
       mockPromptResult('mock msg');
 
@@ -491,5 +508,129 @@ describe('Admin page feature tab', function() {
           .toBeTrue();
       }
     );
+  });
+
+  describe('.validateFeatureFlag', () => {
+    it('should return empty array if no issue', () => {
+      const issues = component.validateFeatureFlag(
+        paramFactory.createFromBackendDict({
+          data_type: 'bool',
+          default_value: false,
+          description: 'This is a dummy feature flag.',
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: 'dummy_feature',
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
+                },
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [['=', ServerMode.Prod]]
+                }
+              ],
+              value_when_matched: true,
+            },
+            {
+              filters: [],
+              value_when_matched: true
+            }
+          ],
+        })
+      );
+
+      expect(issues).toEqual([]);
+    });
+
+    it('should return issues if there are identical rules', () => {
+      const issues = component.validateFeatureFlag(
+        paramFactory.createFromBackendDict({
+          data_type: 'bool',
+          default_value: false,
+          description: 'This is a dummy feature flag.',
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: 'dummy_feature',
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [],
+              value_when_matched: true
+            },
+            {
+              filters: [],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual(['The 1-th & 2-th rules are identical.']);
+    });
+
+    it('should return issues if there are identical filters', () => {
+      const issues = component.validateFeatureFlag(
+        paramFactory.createFromBackendDict({
+          data_type: 'bool',
+          default_value: false,
+          description: 'This is a dummy feature flag.',
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: 'dummy_feature',
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [['=', ServerMode.Dev]]
+                },
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [['=', ServerMode.Dev]]
+                }
+              ],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual([
+        'In the 1-th rule: the 1-th & 2-th filters are identical.']);
+    });
+
+    it('should return issues if there are identical conditions', () => {
+      const issues = component.validateFeatureFlag(
+        paramFactory.createFromBackendDict({
+          data_type: 'bool',
+          default_value: false,
+          description: 'This is a dummy feature flag.',
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: 'dummy_feature',
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Dev]]
+                },
+              ],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual([
+        'In the 1-th rule, 1-th filter: the 1-th & 2-th conditions' +
+        ' are identical.']);
+    });
   });
 });

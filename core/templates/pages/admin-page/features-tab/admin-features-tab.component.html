@@ -111,7 +111,7 @@
                               <ng-container *ngIf="filterTypeToContext[filter.type].inputRegex">
                                 <span class="oppia-feature-tab-input-error"
                                       *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">
-                                  <span>!</span>
+                                  <div class="input-error-symbol">!</div>
                                   <div class="tooltip">
                                     Expected to match {{filterTypeToContext[filter.type].inputRegex}}
                                   </div>
@@ -247,7 +247,7 @@
     position: relative;
   }
 
-  .oppia-feature-tab-input-error span {
+  .oppia-feature-tab-input-error .input-error-symbol {
     color: #ff6347;
     font-weight: bold;
   }
@@ -256,6 +256,7 @@
     background-color: #f5f5f5;
     border: 1px solid #ff6347;
     border-radius: 3px;
+    display: none;
     font-size: 14px;
     left: -50%;
     opacity: 0;
@@ -265,6 +266,7 @@
   }
 
   .oppia-feature-tab-input-error:hover .tooltip {
+    display: inherit;
     opacity: 1;
   }
 </style>
