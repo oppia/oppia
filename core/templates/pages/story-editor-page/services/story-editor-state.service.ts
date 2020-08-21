@@ -102,7 +102,6 @@ angular.module('oppia').factory('StoryEditorStateService', [
             _setTopicName(newBackendStoryObject.topicName);
             _setStoryPublicationStatus(
               newBackendStoryObject.storyIsPublished);
-            console.log(newBackendStoryObject);
             _setSkillSummaries(newBackendStoryObject.skillSummaries);
             _updateStory(newBackendStoryObject.story);
             _storyIsLoading = false;
