@@ -97,7 +97,7 @@ describe('RatioExpressionInputValidationService', () => {
     hasNumberOfTermsEqualTo = rof.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
-        x: 3
+        x: [1, 2, 3]
       }
     });
 
@@ -119,8 +119,18 @@ describe('RatioExpressionInputValidationService', () => {
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'Equals\' rule with a matching' +
+      ' input.'
+    }, {
+      type: WARNING_TYPES.ERROR,
       message: 'Rule 3 from answer group 1 will never be matched because' +
       ' it is preceded by a \'Equals\' rule with a matching' +
+      ' input.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 3 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
       ' input.'
     }
     ]);
@@ -133,15 +143,14 @@ describe('RatioExpressionInputValidationService', () => {
 
     // The second rule will never get matched.
     answerGroups[0].updateRuleTypesToInputs(
-      [isEquivalentNonSimplified]);
+      [isEquivalent, isEquivalentNonSimplified]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
-      ' input.'
+      ' provided input is not in its simplest form.'
     }
     ]);
 
@@ -174,7 +183,7 @@ describe('RatioExpressionInputValidationService', () => {
 
     // The second rule will never get matched.
     answerGroups[0].updateRuleTypesToInputs(
-      [equals, equalsTwoTerms]);
+      [equalsTwoTerms, equals]);
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
