@@ -19,7 +19,7 @@
 import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 
 
-fdescribe('RatioExpression', function() {
+describe('RatioExpression', function() {
   var RationExpressionCtrl = null;
   var ratioObjectFactory = null;
   beforeEach(angular.mock.module('oppia'));
