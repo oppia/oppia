@@ -189,12 +189,6 @@
       "translatable": false
     }
   },
-  "MathExpressionInput": {
-    "IsMathematicallyEquivalentTo": {
-      "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}",
-      "translatable": false
-    }
-  },
   "MultipleChoiceInput": {
     "Equals": {
       "description": "is equal to {{x|NonnegativeInt}}",

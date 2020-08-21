@@ -49,7 +49,6 @@ import {
   ItemSelectionInputCustomizationArgsBackendDict,
   LogicProofCustomizationArgs,
   MathEquationInputCustomizationArgs,
-  MathExpressionInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgsBackendDict,
   MusicNotesInputCustomizationArgs,
@@ -377,8 +376,6 @@ export class InteractionObjectFactory {
         return <LogicProofCustomizationArgs> cloneDeep(caBackendDict);
       case 'MathEquationInput':
         return <MathEquationInputCustomizationArgs> cloneDeep(caBackendDict);
-      case 'MathExpressionInput':
-        return <MathExpressionInputCustomizationArgs> cloneDeep(caBackendDict);
       case 'MultipleChoiceInput':
         return this._createFromIMultipleChoiceInputCustomizationArgsBackendDict(
           <MultipleChoiceInputCustomizationArgsBackendDict> caBackendDict);
