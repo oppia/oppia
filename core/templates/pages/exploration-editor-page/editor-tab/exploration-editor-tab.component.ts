@@ -279,6 +279,9 @@ angular.module('oppia').component('explorationEditorTab', {
         }, true);
         ctrl.interactionIsShown = false;
       };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
+      };
     }
   ]
 });
