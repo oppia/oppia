@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
-from core.domain import expression_parser
+from constants import constants
 import python_utils
 import schema_utils
 
@@ -971,23 +971,6 @@ class SetOfHtmlString(BaseObject):
     }
 
 
-class MathExpression(BaseObject):
-    """Math expression class."""
-
-    description = 'A math expression.'
-
-    SCHEMA = {
-        'type': 'dict',
-        'properties': [{
-            'name': 'ascii',
-            'schema': UnicodeString.SCHEMA,
-        }, {
-            'name': 'latex',
-            'schema': UnicodeString.SCHEMA,
-        }]
-    }
-
-
 class Fraction(BaseObject):
     """Fraction class."""
 
@@ -1144,7 +1127,23 @@ class AlgebraicIdentifier(BaseObject):
 
     SCHEMA = {
         'type': 'unicode',
-        'choices': expression_parser.VALID_ALGEBRAIC_IDENTIFIERS
+        'choices': constants.VALID_ALGEBRAIC_IDENTIFIERS
+    }
+
+
+class SetOfAlgebraicIdentifier(BaseObject):
+    """Class for sets of AlgebraicIdentifiers."""
+
+    description = (
+        'A set (a list with unique elements) of algebraic identifiers.')
+    default_value = []
+
+    SCHEMA = {
+        'type': 'list',
+        'items': AlgebraicIdentifier.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
+        }]
     }
 
 

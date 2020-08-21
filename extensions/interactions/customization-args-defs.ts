@@ -376,11 +376,7 @@ export interface TextInputCustomizationArgs {
 }
 
 
-export interface MathExpressionInputCustomizationArgsBackendDict { }
-export interface MathExpressionInputCustomizationArgs { }
-
-
-export interface NumericExpressionInputCustomizationArgsBackendDict { }
+interface NumericExpressionInputCustomizationArgsBackendDict { }
 export interface NumericExpressionInputCustomizationArgs { }
 
 
@@ -405,7 +401,6 @@ export type InteractionCustomizationArgsBackendDict = (
   ItemSelectionInputCustomizationArgsBackendDict |
   LogicProofCustomizationArgsBackendDict |
   MathEquationInputCustomizationArgsBackendDict |
-  MathExpressionInputCustomizationArgsBackendDict |
   MultipleChoiceInputCustomizationArgsBackendDict |
   MusicNotesInputCustomizationArgsBackendDict |
   NumberWithUnitsCustomizationArgsBackendDict |
@@ -428,7 +423,6 @@ export type InteractionCustomizationArgs = (
   ItemSelectionInputCustomizationArgs |
   LogicProofCustomizationArgs |
   MathEquationInputCustomizationArgs |
-  MathExpressionInputCustomizationArgs |
   MultipleChoiceInputCustomizationArgs |
   MusicNotesInputCustomizationArgs |
   NumberWithUnitsCustomizationArgs |

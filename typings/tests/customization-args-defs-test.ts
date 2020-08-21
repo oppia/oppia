@@ -42,8 +42,6 @@ import {
   LogicProofCustomizationArgsBackendDict,
   MathEquationInputCustomizationArgs,
   MathEquationInputCustomizationArgsBackendDict,
-  MathExpressionInputCustomizationArgs,
-  MathExpressionInputCustomizationArgsBackendDict,
   MultipleChoiceInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgsBackendDict,
   MusicNotesInputCustomizationArgs,
@@ -181,14 +179,6 @@ type TestMathEquationInputCustomizationArgsInterfacesMatch = AssertTrue<
     MathEquationInputCustomizationArgsBackendDict,
     {},
     MathEquationInputCustomizationArgs
-  >
->;
-
-type TestMathExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
-  IsExactAfterReplacement<
-    MathExpressionInputCustomizationArgsBackendDict,
-    {},
-    MathExpressionInputCustomizationArgs
   >
 >;
 
