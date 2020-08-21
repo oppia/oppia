@@ -804,6 +804,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.SetOfAlgebraicIdentifier, mappings,
             invalid_values_with_error_messages)
 
+
 class SchemaValidityTests(test_utils.GenericTestBase):
 
     def test_schemas_used_to_define_objects_are_valid(self):

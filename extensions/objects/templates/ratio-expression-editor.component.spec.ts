@@ -19,7 +19,7 @@
 import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 
 
-describe('RatioExpression', function() {
+fdescribe('RatioExpression', function() {
   var RationExpressionCtrl = null;
   var ratioObjectFactory = null;
   beforeEach(angular.mock.module('oppia'));
@@ -38,13 +38,14 @@ describe('RatioExpression', function() {
   });
 
   it('should initialize ctrl.warningText with invalid ratio', function() {
-    RationExpressionCtrl.isValidRatio('1:2:');
+    RationExpressionCtrl.isValidRatio('1:1:2.3');
     expect(RationExpressionCtrl.warningText)
-      .toBe('Please enter a valid ratio (e.g. 1:2 or 1:2:3).');
+      .toBe('For this question, each element in your ratio should be a ' +
+      'wholenumbers (not a fraction or a decimal).');
   });
 
   it('should initialize ctrl.warningText with invalid ratio', function() {
-    RationExpressionCtrl.isValidRatio('');
+    RationExpressionCtrl.isValidRatio('1:2:3:');
     expect(RationExpressionCtrl.warningText)
       .toBe('Please enter a valid ratio (e.g. 1:2 or 1:2:3).');
   });
