@@ -344,12 +344,12 @@ export class InteractionObjectFactory {
   _createFromRatioExpressionInputCustomizationArgsBackendDict(
       caBackendDict: RatioExpressionInputCustomizationArgsBackendDict
   ): RatioExpressionInputCustomizationArgs {
-    const { customPlaceholder, noOfTerms } = caBackendDict;
+    const { numberOfTerms, placeholder } = caBackendDict;
     return {
-      noOfTerms,
-      customPlaceholder: {
+      numberOfTerms,
+      placeholder: {
         value: this.subtitledUnicodeFactory.createFromBackendDict(
-          customPlaceholder.value)
+          placeholder.value)
       }
     };
   }

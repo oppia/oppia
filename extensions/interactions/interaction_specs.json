@@ -1020,7 +1020,7 @@
     "customization_arg_specs": [
       {
         "description": "Custom placeholder text (optional)",
-        "name": "customPlaceholder",
+        "name": "placeholder",
         "schema": {
           "type": "custom",
           "obj_type": "SubtitledUnicode"
@@ -1032,7 +1032,7 @@
       },
       {
         "description": "Minimum number of terms required",
-        "name": "noOfTerms",
+        "name": "numberOfTerms",
         "schema": {
           "type": "int",
           "validators": [

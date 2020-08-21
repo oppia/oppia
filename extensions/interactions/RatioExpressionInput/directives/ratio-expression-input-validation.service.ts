@@ -55,15 +55,14 @@ export class RatioExpressionInputValidationService {
     let warningsList = [];
     let ratioRulesService = (
       new RatioExpressionInputRulesService(this.rof));
-    var minimumNoOfTerms =
-      customizationArgs.noOfTerms.value;
+    var minimumNumberOfTerms =
+      customizationArgs.numberOfTerms.value;
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
-
 
     // This validations ensures that there are no redundant rules present in the
     // answer groups.
@@ -82,9 +81,9 @@ export class RatioExpressionInputValidationService {
         for (let seenRule of seenRules) {
           let seenInput = <number[]> seenRule.inputs.x;
           let seenRuleType = <string> seenRule.type;
-          if (minimumNoOfTerms > 2) {
-            var ratio: Ratio = this.rof.fromList(currentInput);
-            if (ratio.getNoOfTerms() < minimumNoOfTerms) {
+          if (minimumNumberOfTerms > 2) {
+            var ratio: Ratio = this.rof.fromList(seenInput);
+            if (ratio.getNumberOfTerms() < minimumNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (

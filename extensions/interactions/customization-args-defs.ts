@@ -346,18 +346,18 @@ export interface PencilCodeEditorCustomizationArgs {
 }
 
 export interface RatioExpressionInputCustomizationArgsBackendDict {
-  customPlaceholder?: {
+  placeholder: {
     value: SubtitledUnicodeBackendDict;
   };
-  noOfTerms: {
+  numberOfTerms: {
     value: number;
   };
 }
 export interface RatioExpressionInputCustomizationArgs {
-  customPlaceholder?: {
+  placeholder: {
     value: SubtitledUnicode;
   };
-  noOfTerms: {
+  numberOfTerms: {
     value: number;
   };
 }

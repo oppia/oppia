@@ -35,7 +35,7 @@ export class Ratio {
       return this.numbers.join(':');
     }
 
-    getNoOfTerms(): number {
+    getNumberOfTerms(): number {
       return this.numbers.length;
     }
     convertToSimplestForm(): number[] {
@@ -43,11 +43,7 @@ export class Ratio {
         return y === 0 ? x : gcd(y, x % y);
       };
       var gcdResult = this.numbers.reduce(gcd);
-      if (gcdResult === 0) {
-        return this.numbers;
-      } else {
-        return this.numbers.map(currentValue => currentValue / gcdResult);
-      }
+      return this.numbers.map(currentValue => currentValue / gcdResult);
     }
 }
 
@@ -70,11 +66,10 @@ export class RatioObjectFactory {
       throw new Error(
         ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_COLONS);
     }
-    // eslint-disable-next-line max-len
     var INVALID_RATIO_REGEX = /\d+[\.\/]{1,}\d*/g;
     if (INVALID_RATIO_REGEX.test(rawInput)) {
       throw new Error(
-        ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_RATIO);
+        ObjectsDomainConstants.RATIO_PARSING_ERRORS.NON_INTEGER_ELEMENTS);
     }
     var RATIO_REGEX = /^(\s)*(\d+((\s)*:(\s)*\d+)+)(\s)*$/;
     if (!RATIO_REGEX.test(rawInput)) {
@@ -87,11 +82,7 @@ export class RatioObjectFactory {
     var ratio = new Ratio(numbersList);
     if (ratio.numbers.some(elements => elements === 0)) {
       throw new Error(
-        ObjectsDomainConstants.RATIO_PARSING_ERRORS.NON_ZERO_RATIO);
-    }
-    if (!this.arrayEquals(ratio.convertToSimplestForm(), ratio.numbers)) {
-      throw new Error(
-        ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_FORM);
+        ObjectsDomainConstants.RATIO_PARSING_ERRORS.INCLUDES_ZERO);
     }
     return ratio.numbers;
   }

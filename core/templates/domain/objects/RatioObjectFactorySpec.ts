@@ -46,10 +46,10 @@ describe('Ratio Object Factory', () => {
   });
 
   it('should return the correct lenght of list', () => {
-    expect(new Ratio([1, 2, 3]).getNoOfTerms()).toBe(3);
-    expect(new Ratio([1, 2]).getNoOfTerms()).toBe(2);
-    expect(new Ratio([1, 2, 3, 4]).getNoOfTerms()).toBe(4);
-    expect(new Ratio([1, 2, 3, 4, 5]).getNoOfTerms()).toBe(5);
+    expect(new Ratio([1, 2, 3]).getNumberOfTerms()).toBe(3);
+    expect(new Ratio([1, 2]).getNumberOfTerms()).toBe(2);
+    expect(new Ratio([1, 2, 3, 4]).getNumberOfTerms()).toBe(4);
+    expect(new Ratio([1, 2, 3, 4, 5]).getNumberOfTerms()).toBe(5);
   });
 
   it('should parse valid strings', () => {

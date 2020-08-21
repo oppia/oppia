@@ -44,8 +44,8 @@ export class RatioExpressionInputRulesService {
   IsEquivalent(
       answer: RatioInputAnswer,
       inputs: RatioInputRulesInputs): boolean {
-    // eslint-disable-next-line max-len
-    var simplifiedInput = this.ratioObjectFactory.fromList(inputs.x).convertToSimplestForm();
+    var simplifiedInput = this.ratioObjectFactory.fromList(
+      inputs.x).convertToSimplestForm();
     return this.ratioObjectFactory.arrayEquals(answer, simplifiedInput);
   }
 }

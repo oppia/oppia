@@ -36,7 +36,7 @@ class RatioExpressionInput(base.BaseInteraction):
     show_generic_submit_button = True
 
     _customization_arg_specs = [{
-        'name': 'customPlaceholder',
+        'name': 'placeholder',
         'description': 'Custom placeholder text (optional)',
         'schema': {
             'type': 'custom',
@@ -47,8 +47,9 @@ class RatioExpressionInput(base.BaseInteraction):
             'unicode_str': ''
         }
     }, {
-        'name': 'noOfTerms',
-        'description': 'Minimum number of terms required by the learner\'s.',
+        'name': 'numberOfTerms',
+        'description': 'The number of elements that the answer must have.'+
+            'If set to 0, a ratio of any length will be accepted.',
         'schema': {
             'type': 'int',
             'validators': [{
