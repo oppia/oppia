@@ -37,8 +37,6 @@ require(
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-const RULE_TEMPLATES = require('interactions/rule_templates.json');
-
 angular.module('oppia').factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateRecordedVoiceoversService',
   'StateWrittenTranslationsService', 'TranslationLanguageService',
@@ -86,7 +84,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       if (availableLanguages.indexOf(langCode) !== -1) {
         var writtenTranslation = (
           writtenTranslations.getWrittenTranslation(contentId, langCode));
-        if (writtenTranslation.translation !== '') {
+        if (writtenTranslation.getHtml() !== '') {
           availabilityStatus.available = true;
           availabilityStatus.needsUpdate = writtenTranslation.needsUpdate;
         }

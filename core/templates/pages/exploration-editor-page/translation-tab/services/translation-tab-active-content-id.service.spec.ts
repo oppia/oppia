@@ -49,13 +49,13 @@ describe('Translation tab active content id service', function() {
 
   it('should correctly set and get active content id', function() {
     expect(ttacis.getActiveContentId()).toBeNull();
-    ttacis.setActiveContent('content', 'html');
+    ttacis.setActiveContentId('content');
     expect(ttacis.getActiveContentId()).toBe('content');
   });
 
   it('should throw error on setting invalid content id', function() {
     expect(function() {
-      ttacis.setActiveContent('feedback_2', 'html');
+      ttacis.setActiveContentId('feedback_2');
     }).toThrowError(
       'Invalid active content id: feedback_2');
   });
