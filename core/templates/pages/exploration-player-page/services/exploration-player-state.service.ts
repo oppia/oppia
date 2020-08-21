@@ -139,15 +139,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       currentEngineService = ExplorationEngineService;
     };
 
-    var doesMathExpressionInputInteractionExist = function(states) {
-      for (var state in states) {
-        if (states[state].interaction.id === 'MathExpressionInput') {
-          return true;
-        }
-      }
-      return false;
-    };
-
     var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
       $q.all([
@@ -158,11 +149,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
         var featuresData = combinedData[1];
-        if (doesMathExpressionInputInteractionExist(explorationData.states)) {
-          Guppy.init({
-            symbols: ['/third_party/static/guppy-7509f3/sym/symbols.json',
-              oppiaSymbolsUrl]});
-        }
         ExplorationFeaturesService.init(explorationData, featuresData);
         ExplorationEngineService.init(
           explorationData, null, null, null, callback);
@@ -200,13 +186,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         var explorationData = combinedData[0];
         var pretestQuestionsData = combinedData[1];
         var featuresData = combinedData[2];
-        if (
-          doesMathExpressionInputInteractionExist(
-            explorationData.exploration.states)) {
-          Guppy.init({
-            symbols: ['/third_party/static/guppy-7509f3/sym/symbols.json',
-              oppiaSymbolsUrl]});
-        }
         ExplorationFeaturesService.init(explorationData, featuresData);
         if (pretestQuestionsData.length > 0) {
           setPretestMode();
