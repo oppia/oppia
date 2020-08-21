@@ -1988,6 +1988,15 @@ pre.oppia-pre-wrapped-text {
   z-index: 50;
 }
 
+.oppia-clear {
+  clear: both;
+}
+
+.oppia-form-error-text {
+  color: #ff0000;
+  font-size: smaller;
+}
+
 .oppia-editor-trash-icon {
   opacity: 0.2;
   -webkit-transition: all 200ms;
