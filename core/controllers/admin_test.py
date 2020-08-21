@@ -852,7 +852,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['error'],
                 'Feature in dev stage cannot be enabled in test or production '
-                'environment.')
+                'environments.')
 
         platform_parameter_registry.Registry.parameter_registry.pop(
             feature.name)
