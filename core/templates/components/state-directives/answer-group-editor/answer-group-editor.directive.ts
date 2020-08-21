@@ -46,6 +46,13 @@ require('services/context.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
+import { SubtitledVariableLengthListOfRuleInputs } from
+  'domain/exploration/SubtitledVariableLengthListOfRuleInputsObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { cloneDeep } from 'lodash';
+
+const RULE_TEMPLATES = require('interactions/rule_templates.json');
 
 angular.module('oppia').directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -56,7 +63,8 @@ angular.module('oppia').directive('answerGroupEditor', [
         addState: '=',
         displayFeedback: '=',
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
-        getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
+        getOnSaveAnswerGroupRuleTypesToInputsFn:
+          '&onSaveAnswerGroupRuleTypesToInputs',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
         taggedSkillMisconceptionId: '=',
@@ -64,12 +72,7 @@ angular.module('oppia').directive('answerGroupEditor', [
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         onSaveTaggedMisconception: '=',
         outcome: '=',
-        // Answer group editor takes in a list of rules. Note that the actual
-        // stored rules are not in this format -- see the AnswerGroup domain
-        // object for the actual format of how rules are stored. AnswerGroup
-        // contains a method updateRuleTypesToInputs() which accepts a list of
-        // rules. This method should be used to update the rule structure.
-        getRules: '&rules',
+        ruleTypesToInputs: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         suppressWarnings: '&'
       },
@@ -219,55 +222,82 @@ angular.module('oppia').directive('answerGroupEditor', [
 
             // Save the state of the rules before adding a new one (in case the
             // user cancels the addition).
-            ctrl.rulesMemento = angular.copy(ctrl.rules);
+            ctrl.ruleTypesToInputsMemento = cloneDeep(
+              ctrl.ruleTypesToInputs);
 
             // TODO(bhenning): Should use functionality in ruleEditor.js, but
             // move it to ResponsesService in StateResponses.js to properly
             // form a new rule.
-            ctrl.rules.push(RuleObjectFactory.createNew(ruleType, inputs));
-            ctrl.changeActiveRuleIndex(ctrl.rules.length - 1);
+
+            if (!ctrl.ruleTypesToInputs.hasOwnProperty(ruleType)) {
+              this.ruleTypesToInputs[ruleType] = (
+                new SubtitledVariableLengthListOfRuleInputs([], null));
+              var ruleIsTranslatable = RULE_TEMPLATES[
+                interactionId][ruleType].translatable;
+              if (ruleIsTranslatable &&
+                  !ctrl.ruleTypesToInputs.hasOwnProperty(ruleType)
+              ) {
+                // Assign a content_id.
+
+              }
+            }
+            this.ruleTypesToInputs[ruleType].ruleInputs.push(inputs);
+
+            ctrl.changeActiveRuleType(ruleType);
+            ctrl.changeActiveRuleInputIndex(
+              this.ruleTypesToInputs[ruleType].ruleInputs.length - 1);
+            ctrl.activeRule = new Rule(ruleType, inputs);
           };
 
-          ctrl.deleteRule = function(index) {
-            ctrl.rules.splice(index, 1);
-            ctrl.saveRules();
-
-            if (ctrl.rules.length === 0) {
-              AlertsService.addWarning(
-                'All answer groups must have at least one rule.');
+          ctrl.deleteRule = function(ruleType, ruleInputIndex) {
+            ctrl.ruleTypesToInputs[ruleType].ruleInputs.splice(
+              ruleInputIndex, 1);
+            if (ctrl.ruleTypesToInputs[ruleType].ruleInputs.length === 0) {
+              delete ctrl.ruleTypesToInputs[ruleType];
             }
+            ctrl.saveRules();
           };
 
           ctrl.cancelActiveRuleEdit = function() {
-            ctrl.rules.splice(0, ctrl.rules.length);
-            for (var i = 0; i < ctrl.rulesMemento.length; i++) {
-              ctrl.rules.push(ctrl.rulesMemento[i]);
-            }
+            ctrl.ruleTypesToInputs = angular.copy(
+              ctrl.ruleTypesToInputsMemento);
             ctrl.saveRules();
           };
 
           ctrl.saveRules = function() {
-            ctrl.changeActiveRuleIndex(-1);
-            ctrl.rulesMemento = null;
-            ctrl.getOnSaveAnswerGroupRulesFn()(ctrl.rules);
+            ctrl.changeActiveRuleType(null);
+            ctrl.changeActiveRuleInputIndex(-1);
+            ctrl.activeRule = null;
+            ctrl.ruleTypesToInputsMemento = null;
+
+            ctrl.getOnSaveAnswerGroupRuleTypesToInputsFn()(
+              ctrl.ruleTypesToInputs);
           };
 
-          ctrl.changeActiveRuleIndex = function(newIndex) {
-            ResponsesService.changeActiveRuleIndex(newIndex);
-            ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
+          ctrl.changeActiveRuleType = function(newRuleType) {
+            ResponsesService.changeActiveRuleType(newRuleType);
+            ctrl.activeRuleType = newRuleType;
           };
 
-          ctrl.openRuleEditor = function(index) {
+          ctrl.changeActiveRuleInputIndex = function(newIndex) {
+            ResponsesService.changeActiveRuleInputIndex(newIndex);
+            ctrl.activeRuleInputIndex = newIndex;
+          };
+
+          ctrl.openRuleEditor = function(ruleType, ruleInputIndex, ruleInput) {
             if (!ctrl.isEditable) {
               // The rule editor may not be opened in a read-only editor view.
               return;
             }
-            ctrl.rulesMemento = angular.copy(ctrl.rules);
-            ctrl.changeActiveRuleIndex(index);
+            ctrl.ruleTypesToInputsMemento = cloneDeep(
+              ctrl.ruleTypesToInputs);
+            ctrl.changeActiveRuleType(ruleType);
+            ctrl.changeActiveRuleInputIndex(ruleInputIndex);
+            ctrl.activeRule = new Rule(ruleType, ruleInput);
           };
 
           ctrl.isRuleEditorOpen = function() {
-            return ctrl.activeRuleIndex !== -1;
+            return ctrl.activeDisplayedRuleIndex !== -1;
           };
 
           ctrl.isCurrentInteractionTrainable = function() {
@@ -284,6 +314,22 @@ angular.module('oppia').directive('answerGroupEditor', [
 
           ctrl.isMLEnabled = function() {
             return ENABLE_ML_CLASSIFIERS;
+          };
+
+          ctrl.constructRule = function(ruleType, ruleInput) {
+            return new Rule(ruleType, ruleInput);
+          };
+
+          ctrl.getRuleTypes = function() {
+            return AnswerGroup.getRuleTypesInDisplayOrder(
+              ctrl.ruleTypesToInputs);
+          };
+
+          ctrl.hasMultipleRules = function() {
+            return Object.values(ctrl.ruleTypesToInputs).map(
+              (subtitledRuleInputs: SubtitledVariableLengthListOfRuleInputs) =>
+                subtitledRuleInputs.ruleInputs.length
+            ).reduce((a, b) => a + b) > 1;
           };
 
           ctrl.$onInit = function() {
@@ -315,9 +361,12 @@ angular.module('oppia').directive('answerGroupEditor', [
                 }
               )
             );
-            ctrl.rules = ctrl.getRules();
-            ctrl.rulesMemento = null;
-            ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
+
+            ctrl.activeRuleType = ResponsesService.getActiveRuleType();
+            ctrl.activeRuleInputIndex = (
+              ResponsesService.getActiveRuleInputIndex());
+            ctrl.activeRule = null;
+
             ctrl.editAnswerGroupForm = {};
             ctrl.answerChoices = ctrl.getAnswerChoices();
           };

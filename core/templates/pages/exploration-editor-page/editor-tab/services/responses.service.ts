@@ -66,7 +66,8 @@ angular.module('oppia').factory('ResponsesService', [
     // index equal to the number of answer groups (answerGroups.length), then it
     // is referring to the default outcome.
     var _activeAnswerGroupIndex = null;
-    var _activeRuleIndex = -1;
+    var _activeRuleType = null;
+    var _activeRuleInputIndex = -1;
     var _answerGroups = null;
     var _defaultOutcome = null;
     var _confirmedUnclassifiedAnswers = null;
@@ -130,6 +131,9 @@ angular.module('oppia').factory('ResponsesService', [
       if (answerGroup) {
         if (updates.hasOwnProperty('rules')) {
           answerGroup.updateRuleTypesToInputs(updates.rules);
+        }
+        if (updates.hasOwnProperty('ruleTypesToInputs')) {
+          answerGroup.ruleTypesToInputs = updates.ruleTypesToInputs;
         }
         if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
           answerGroup.taggedSkillMisconceptionId =
@@ -213,7 +217,8 @@ angular.module('oppia').factory('ResponsesService', [
         _confirmedUnclassifiedAnswersMemento = angular.copy(
           _confirmedUnclassifiedAnswers);
         _activeAnswerGroupIndex = -1;
-        _activeRuleIndex = 0;
+        _activeRuleType = 0;
+        _activeRuleInputIndex = 0;
       },
       getAnswerGroups: function() {
         return angular.copy(_answerGroups);
@@ -233,8 +238,11 @@ angular.module('oppia').factory('ResponsesService', [
       getAnswerChoices: function() {
         return angular.copy(_answerChoices);
       },
-      getActiveRuleIndex: function() {
-        return _activeRuleIndex;
+      getActiveRuleType: function() {
+        return _activeRuleType;
+      },
+      getActiveRuleInputIndex: function() {
+        return _activeRuleInputIndex;
       },
       getActiveAnswerGroupIndex: function() {
         return _activeAnswerGroupIndex;
@@ -273,7 +281,8 @@ angular.module('oppia').factory('ResponsesService', [
         _confirmedUnclassifiedAnswersMemento = angular.copy(
           _confirmedUnclassifiedAnswers);
         _activeAnswerGroupIndex = -1;
-        _activeRuleIndex = 0;
+        _activeRuleType = null;
+        _activeRuleInputIndex = -1;
 
         if (callback) {
           callback(_answerGroupsMemento, _defaultOutcomeMemento);
@@ -287,10 +296,14 @@ angular.module('oppia').factory('ResponsesService', [
           _activeAnswerGroupIndex = newIndex;
         }
 
-        _activeRuleIndex = -1;
+        _activeRuleType = null;
+        _activeRuleInputIndex = -1;
       },
-      changeActiveRuleIndex: function(newIndex) {
-        _activeRuleIndex = newIndex;
+      changeActiveRuleType: function(newRuleType) {
+        _activeRuleType = newRuleType;
+      },
+      changeActiveRuleInputIndex: function(newIndex) {
+        _activeRuleInputIndex = newIndex;
       },
       updateAnswerGroup: function(index, updates, callback) {
         _updateAnswerGroup(index, updates, callback);

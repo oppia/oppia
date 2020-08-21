@@ -200,6 +200,8 @@ angular.module('oppia').directive('stateTranslation', [
               if (activeContent instanceof SubtitledUnicode) {
                 activeDataFormat = WRITTEN_TRANSLATION_TYPE_UNICODE;
               }
+            } else if (tabId === $scope.TAB_ID_RULES) {
+
             }
 
             TranslationTabActiveContentIdService.setActiveContent(
@@ -467,16 +469,31 @@ angular.module('oppia').directive('stateTranslation', [
             return translatableContents;
           };
 
-          $scope.filterForTranslatableRules = function(ruleTypesToInputs) {
-            const interactionId = $scope.stateInteractionId;
-            const translatableRuleTypesToInputs = Object.keys(ruleTypesToInputs)
-              .filter(ruleType =>
-                RULE_TEMPLATES[interactionId][ruleType].translatable)
-              .reduce((obj, key) => {
-                obj[key] = ruleTypesToInputs[key];
-                return obj;
-              }, {});
-            return translatableRuleTypesToInputs;
+          /**
+           * Get all translatable rule inputs from all AnswerGroups.
+           * @returns {Object} - A object containing the answer group index,
+           *  rule type, rule inputs, and content id.
+           */
+          $scope.getInteractionTranslatableRuleInputs = function() {
+            const translatableRuleInputs = [];
+            $scope.stateAnswerGroups.forEach((answerGroup, i) => {
+              Object.keys(answerGroup.ruleTypesToInputs).forEach(ruleType => {
+                const contentId = (
+                  answerGroup.ruleTypesToInputs[ruleType].contentId);
+                if (contentId === null) {
+                  return;
+                }
+
+                translatableRuleInputs.push({
+                  answerGroupIndex: i,
+                  ruleInputs:
+                    answerGroup.ruleTypesToInputs[ruleType].ruleInputs,
+                  ruleType,
+                  contentId
+                });
+              });
+            });
+            return translatableRuleInputs;
           };
 
           $scope.initStateTranslation = function() {
@@ -497,6 +514,8 @@ angular.module('oppia').directive('stateTranslation', [
               .getInteractionCustomizationArgsMemento($scope.stateName);
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
+            $scope.activeRuleType = null;
+
             var currentCustomizationArgs = ExplorationStatesService
               .getInteractionCustomizationArgsMemento($scope.stateName);
             $scope.answerChoices = StateEditorService.getAnswerChoices(
@@ -510,6 +529,9 @@ angular.module('oppia').directive('stateTranslation', [
               $scope.getInteractionCustomizationArgTranslatableContents(
                 $scope.stateInteractionCustomizationArgs)
             );
+            $scope.interactionTranslatableRuleInputs = (
+              $scope.getInteractionTranslatableRuleInputs());
+            console.log($scope.interactionTranslatableRuleInputs)
 
             if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
               $scope.needsUpdateTooltipMessage = 'Audio needs update to ' +

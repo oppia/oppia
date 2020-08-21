@@ -97,17 +97,10 @@ export class AnswerGroup {
     rules.forEach(this.addRule.bind(this));
   }
 
-  /**
-   * This method should be used to iterate through all rules encoded by the
-   * ruleTypesToInputs field. To update the ruleTypesToInputs, the
-   * updateRuleTypesToInputs() methods takes in a list of Rules.
-   */
-  getRulesAsList(): Rule[] {
-    const rules = [];
-
+  static getRuleTypesInDisplayOrder(ruleTypesToInputs: RuleInputs) {
     // Sort rule types so that Equals always is first, followed by all other
     // rule types sorted alphabetically.
-    const sortedRuleTypes = Object.keys(this.ruleTypesToInputs).sort(
+    return Object.keys(ruleTypesToInputs).sort(
       (x, y) => {
         if (x === 'Equals') {
           return -1;
@@ -117,11 +110,22 @@ export class AnswerGroup {
         return x < y ? -1 : 1;
       }
     );
-    sortedRuleTypes.forEach(ruleType => {
-      this.ruleTypesToInputs[ruleType].ruleInputs.forEach(ruleInput => {
-        rules.push(this._ruleObjectFactory.createNew(ruleType, ruleInput));
+  }
+
+  /**
+   * This method should be used to iterate through all rules encoded by the
+   * ruleTypesToInputs field. To update the ruleTypesToInputs, the
+   * updateRuleTypesToInputs() methods takes in a list of Rules.
+   */
+  getRulesAsList(): Rule[] {
+    const rules = [];
+
+    AnswerGroup.getRuleTypesInDisplayOrder(this.ruleTypesToInputs).forEach(
+      ruleType => {
+        this.ruleTypesToInputs[ruleType].ruleInputs.forEach(ruleInput => {
+          rules.push(this._ruleObjectFactory.createNew(ruleType, ruleInput));
+        });
       });
-    });
 
     return rules;
   }

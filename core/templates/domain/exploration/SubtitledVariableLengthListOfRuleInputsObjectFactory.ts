@@ -20,17 +20,17 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import { RuleInputs } from 'domain/exploration/RuleObjectFactory';
 
 export interface SubtitledVariableLengthListOfRuleInputsBackendDict {
   'content_id': string;
-  'rule_inputs': InteractionRuleInputs[];
+  'rule_inputs': RuleInputs[];
 }
 
 export class SubtitledVariableLengthListOfRuleInputs {
   // A null content_id indicates that the rule inputs are not translatble.
   constructor(
-    public ruleInputs: InteractionRuleInputs[],
+    public ruleInputs: RuleInputs[],
     public contentId: string | null
   ) {}
 
@@ -56,7 +56,7 @@ export class SubtitledVariableLengthListOfRuleInputsObjectFactory {
   }
 
   createDefault(
-      ruleInputs: InteractionRuleInputs[], contentId: string
+      ruleInputs: RuleInputs[], contentId: string
   ): SubtitledVariableLengthListOfRuleInputs {
     return new SubtitledVariableLengthListOfRuleInputs(ruleInputs, contentId);
   }

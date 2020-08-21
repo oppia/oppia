@@ -416,9 +416,10 @@ angular.module('oppia').directive('stateResponses', [
             });
           };
 
-          $scope.saveActiveAnswerGroupRules = function(updatedRules) {
+          $scope.saveActiveAnswerGroupRuleTypesToInputs = function(
+              updatedRuleTypesToInputs) {
             ResponsesService.updateActiveAnswerGroup({
-              rules: updatedRules
+              ruleTypesToInputs: updatedRuleTypesToInputs
             }, function(newAnswerGroups) {
               $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
               $scope.refreshWarnings()();
