@@ -46,12 +46,6 @@ THIRD_PARTY_LIBS = [
         'type_defs_filename_prefix': 'skulpt-defs-'
     },
     {
-        'name': 'Math Expressions',
-        'dependency_key': 'mathExpressions',
-        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
-        'type_defs_filename_prefix': 'math-expressions-defs-'
-    },
-    {
         'name': 'MIDI',
         'dependency_key': 'midiJs',
         'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,

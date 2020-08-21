@@ -56,8 +56,8 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
-import { ImageClickAnswer, MathExpressionAnswer } from './answer-defs';
-import { ImageClickRuleInputs, MathExpressionRuleInputs } from './rule-input-defs';
+import { ImageClickAnswer } from './answer-defs';
+import { ImageClickRuleInputs } from './rule-input-defs';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
@@ -118,14 +118,6 @@ describe('Rule spec services', function() {
       IsInRegion: function(
           answer: ImageClickAnswer, inputs: ImageClickRuleInputs) {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
-      }
-    });
-    $provide.value('MathExpressionInputRulesService', {
-      IsMathematicallyEquivalentTo: function(
-          answer: MathExpressionAnswer, inputs: MathExpressionRuleInputs) {
-        return (
-          MathExpression.fromLatex(answer.latex).equals(
-            MathExpression.fromLatex(inputs.x)));
       }
     });
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());

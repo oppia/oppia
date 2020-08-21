@@ -740,11 +740,6 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
-        if list(missing_interaction_ids) != ['MathExpressionInput']:
-            # Ignoring the lack of the MathExpressionInput since it is going
-            # to be deprecated and explorations that use it will now be using
-            # one of AlgebraicExpressionInput, NumericExpressionInput, or
-            # MathEquationInput.
-            self.assertEqual(len(missing_interaction_ids), 0, msg=(
-                'Missing interaction IDs in demo exploration: %s' %
-                missing_interaction_ids))
+        self.assertEqual(len(missing_interaction_ids), 0, msg=(
+            'Missing interaction IDs in demo exploration: %s' %
+            missing_interaction_ids))

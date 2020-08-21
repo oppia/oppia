@@ -971,23 +971,6 @@ class SetOfHtmlString(BaseObject):
     }
 
 
-class MathExpression(BaseObject):
-    """Math expression class."""
-
-    description = 'A math expression.'
-
-    SCHEMA = {
-        'type': 'dict',
-        'properties': [{
-            'name': 'ascii',
-            'schema': UnicodeString.SCHEMA,
-        }, {
-            'name': 'latex',
-            'schema': UnicodeString.SCHEMA,
-        }]
-    }
-
-
 class Fraction(BaseObject):
     """Fraction class."""
 

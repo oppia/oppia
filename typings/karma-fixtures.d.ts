@@ -160,9 +160,6 @@ interface RuleTemplates {
     ContainsSomeOf: RuleDescription;
     OmitsSomeOf: RuleDescription;
   };
-  MathExpressionInput: {
-    IsMathematicallyEquivalentTo: RuleDescription;
-  };
   MultipleChoiceInput: {
     Equals: RuleDescription;
   };
