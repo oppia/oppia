@@ -126,7 +126,7 @@
     "cropperjs": "^1.5.6",
     "d3": "^5.9.2",
     "d3-array": "^2.4.0",
-    "d3-color": "^1.4.1",
+    "d3-color": "^2.0.0",
     "d3-hexbin": "^0.2.2",
     "d3-scale": "^3.2.1",
     "default-passive-events": "^2.0.0",
