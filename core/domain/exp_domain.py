@@ -3097,6 +3097,9 @@ class Exploration(python_utils.OBJECT):
                     }
 
                     interaction_id = state_dict['interaction']['id']
+                    # All rules of TextInput and SetInput are translatable as of
+                    # this state schema version. All other rules are not
+                    # translatable.
                     if (
                             interaction_id == 'TextInput' or
                             interaction_id == 'SetInput'

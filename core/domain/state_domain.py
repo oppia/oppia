@@ -1652,13 +1652,15 @@ class WrittenTranslation(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid data_format: %s' % self.data_format)
         if (self.data_format ==
-                self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_STRING_VALUE'] # pylint: disable=line-too-long
+                self.DATA_FORMATS[
+                    'LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_STRING_VALUE']
            ):
             schema_utils.normalize_against_schema(
                 self.translation,
                 {'type': 'custom', 'obj_type': 'NormalizedString'})
         elif (self.data_format ==
-              self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE'] # pylint: disable=line-too-long
+              self.DATA_FORMATS[
+                  'LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE']
              ):
             schema_utils.normalize_against_schema(
                 self.translation,
@@ -2258,7 +2260,10 @@ class SubtitledUnicode(python_utils.OBJECT):
 
 class SubtitledVariableLengthListOfRuleInputs(python_utils.OBJECT):
     """Value object representing a subtitled variable-lengthed list of rule
-    inputs.
+    inputs. This object is used in translating rule inputs, which will vary
+    in length language to language. For example, there may be multiple ways of
+    sayings "my name is" in Spanish, and the Spanish rule input would require
+    a different lengthed list of rule inputs.
     """
 
     def __init__(self, content_id, rule_inputs):
@@ -2316,7 +2321,7 @@ class SubtitledVariableLengthListOfRuleInputs(python_utils.OBJECT):
                 not isinstance(self.content_id, python_utils.BASESTRING)
            ):
             raise utils.ValidationError(
-                'Expected content id to be a string, received %s' %
+                'Expected content_id to be a string, received %s' %
                 self.content_id)
 
         if not isinstance(self.rule_inputs, list):

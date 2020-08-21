@@ -3841,6 +3841,21 @@ class SubtitledVariableLengthListOfRuleInputsDomainUnitTests(
                 'rule_inputs': []
             })
 
+    def test_validation(self):
+        with self.assertRaisesRegexp(
+                Exception, 'Expected content_id to be a string, '):
+            state_domain.SubtitledVariableLengthListOfRuleInputs(2, {})
+
+        with self.assertRaisesRegexp(
+                Exception, 'Invalid rule inputs'):
+            state_domain.SubtitledVariableLengthListOfRuleInputs(
+                'content_id', {})
+
+        with self.assertRaisesRegexp(
+                Exception, 'Invalid rule inputs'):
+            state_domain.SubtitledVariableLengthListOfRuleInputs(
+                'content_id', [2])
+
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""

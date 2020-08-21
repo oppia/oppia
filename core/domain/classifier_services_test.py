@@ -98,8 +98,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         # Modify such that job creation is triggered.
         new_answer_group = copy.deepcopy(state.interaction.answer_groups[1])
+        new_answer_group.rule_types_to_subtitled_inputs[
+            'StartsWith'].content_id = 'unique_content_id'
         new_answer_group.outcome.feedback.content_id = 'new_feedback'
         state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
+        state.recorded_voiceovers.voiceovers_mapping['unique_content_id'] = {}
         state.interaction.answer_groups.insert(3, new_answer_group)
         answer_groups = []
         for answer_group in state.interaction.answer_groups:
@@ -183,8 +186,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         # Modify such that job creation is triggered.
         new_answer_group = copy.deepcopy(state.interaction.answer_groups[1])
+        new_answer_group.rule_types_to_subtitled_inputs[
+            'StartsWith'].content_id = 'unique_content_id'
         new_answer_group.outcome.feedback.content_id = 'new_feedback'
         state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
+        state.recorded_voiceovers.voiceovers_mapping['unique_content_id'] = {}
         state.interaction.answer_groups.insert(3, new_answer_group)
         answer_groups = []
         for answer_group in state.interaction.answer_groups:
