@@ -510,7 +510,6 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION, self.private_exp_id,
             self.owner_id, 'Thread subject', 'Thread text')
 
-
     def test_can_not_comment_on_feedback_threads_with_disabled_exp_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
