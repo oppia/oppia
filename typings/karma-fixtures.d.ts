@@ -100,6 +100,9 @@ interface RuleTemplates {
   AlgebraicExpressionInput: {
     MatchesExactlyWith: RuleDescription;
     IsEquivalentTo: RuleDescription;
+    ContainsSomeOf: RuleDescription;
+    OmitsSomeOf: RuleDescription;
+    MatchesWithGeneralForm: RuleDescription;
   };
   CodeRepl: {
     CodeEquals: RuleDescription;
@@ -154,6 +157,8 @@ interface RuleTemplates {
   MathEquationInput: {
     MatchesExactlyWith: RuleDescription;
     IsEquivalentTo: RuleDescription;
+    ContainsSomeOf: RuleDescription;
+    OmitsSomeOf: RuleDescription;
   };
   MathExpressionInput: {
     IsMathematicallyEquivalentTo: RuleDescription;
