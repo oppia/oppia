@@ -2735,15 +2735,11 @@ class GeneralFeedbackThreadUserModelValidator(BaseModelValidator):
     """Class for validating GeneralFeedbackThreadUserModels."""
 
     @classmethod
-    def _get_model_id_regex(cls, unused_item):
+    def _get_model_id_regex(cls, item):
         # Valid id: [user_id].[thread_id]
-        thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_]{1,%s}' % (
-            ('|').join(
-                choice[:feedback_models.THREAD_ID_PREFIX_MAX_LEN]
-                for choice in suggestion_models.TARGET_TYPE_CHOICES),
-            base_models.ID_LENGTH, feedback_models.THREAD_ID_SUFFIX_MAX_LEN)
-        regex_string = '^%s\\.%s$' % (USER_ID_REGEX, thread_id_string)
-        return regex_string
+        id_string = '%s\\.%s' % (item.user_id, item.thread_id)
+
+        return id_string
 
     @classmethod
     def _get_external_id_relationships(cls, item):

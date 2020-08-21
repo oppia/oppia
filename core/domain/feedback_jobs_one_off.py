@@ -118,7 +118,7 @@ class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function for this job."""
 
         # This job creates new models and the models on which this job maps over
-        # belongs to the same class. We have added a check to validate the model
+        # belong to the same class. We have added a check to validate the model
         # id to avoid running this job on new models.
         # The old models have the following pattern:
         # <entity_type>.<entity_id>.<date-time>.<random-string>
