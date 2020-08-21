@@ -1,5 +1,5 @@
 <div class="oppia-topic-viewer-container" style="position: relative;">
-  <div class="oppia-topic-viewer-tabs-container">
+  <div class="oppia-topic-viewer-tabs-container" headroom>
     <div class="topic-viewer-tabs-list">
       <ul class="topic-viewer-tabs">
         <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
@@ -71,7 +71,7 @@
   }
 
   .topic-viewer-page-content {
-    margin-top: -200px;
+    margin-top: -100px;
   }
 
   .oppia-navbar {
@@ -87,8 +87,13 @@
     box-shadow: 3px 3px 6px rgba(0,0,0, 0.5);
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     margin: 0 auto;
-    position: relative;
+    position: fixed;
     width: 100%;
+    z-index: 1000;
+  }
+
+  .oppia-topic-viewer-container .headroom--unpinned {
+    transform: translateY(-150%);
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
