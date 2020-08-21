@@ -97,7 +97,7 @@ describe('RatioExpressionInputValidationService', () => {
     hasNumberOfTermsEqualTo = rof.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
-        x: [1, 2, 3]
+        y: 3
       }
     });
 
@@ -157,7 +157,7 @@ describe('RatioExpressionInputValidationService', () => {
     let hasNumberOfTermsEqualTo2 = rof.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
-        x: [1, 2, 4]
+        x: 3
       }
     });
 

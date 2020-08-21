@@ -22,7 +22,8 @@ import { Injectable } from '@angular/core';
 import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { RatioInputAnswer } from 'interactions/answer-defs';
 import {
-  RatioInputRulesInputs
+  RatioInputEqualRuleInputs,
+  RatioInputHasNumberOfTermsEqualToRuleInputs
 } from 'interactions/rule-input-defs';
 
 @Injectable({
@@ -30,20 +31,20 @@ import {
 })
 export class RatioExpressionInputRulesService {
   constructor(private ratioObjectFactory: RatioObjectFactory) {}
-  Equals(answer: RatioInputAnswer, inputs: RatioInputRulesInputs):
+  Equals(answer: RatioInputAnswer, inputs: RatioInputEqualRuleInputs):
   boolean {
     return this.ratioObjectFactory.arrayEquals(answer, inputs.x);
   }
 
   HasNumberOfTermsEqualTo(
       answer: RatioInputAnswer,
-      inputs: RatioInputRulesInputs): boolean {
-    return answer.length === inputs.x.length;
+      inputs: RatioInputHasNumberOfTermsEqualToRuleInputs): boolean {
+    return answer.length === inputs.y;
   }
 
   IsEquivalent(
       answer: RatioInputAnswer,
-      inputs: RatioInputRulesInputs): boolean {
+      inputs: RatioInputEqualRuleInputs): boolean {
     var simplifiedInput = this.ratioObjectFactory.fromList(
       inputs.x).convertToSimplestForm();
     return this.ratioObjectFactory.arrayEquals(answer, simplifiedInput);

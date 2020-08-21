@@ -214,9 +214,17 @@ export interface PencilCodeEditorRuleInputs {
   x: string;
 }
 
-export interface RatioInputRulesInputs {
+export interface RatioInputEqualRuleInputs {
   x: number[];
 }
+
+export interface RatioInputHasNumberOfTermsEqualToRuleInputs {
+  y: number;
+}
+
+export type RatioInputRuleInputs = (
+  RatioInputEqualRuleInputs |
+  RatioInputHasNumberOfTermsEqualToRuleInputs);
 
 export interface SetInputRuleInputs {
   x: string[];
@@ -246,6 +254,6 @@ export type InteractionRuleInputs = (
   NumberWithUnitsRuleInputs |
   NumericInputRuleInputs |
   PencilCodeEditorRuleInputs |
-  RatioInputRulesInputs|
+  RatioInputRuleInputs|
   SetInputRuleInputs |
   TextInputRuleInputs);
