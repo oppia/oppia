@@ -33,7 +33,6 @@ import feconf
 import python_utils
 
 from google.cloud import ndb
-from google.cloud import datastore
 
 (feedback_models, email_models, suggestion_models) = (
     models.Registry.import_models(

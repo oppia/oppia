@@ -25,7 +25,6 @@ from core.platform import models
 import feconf
 
 from google.cloud import ndb
-from google.cloud import datastore
 
 transaction_services = models.Registry.import_transaction_services()
 

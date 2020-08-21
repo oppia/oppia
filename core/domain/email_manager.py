@@ -34,8 +34,6 @@ import feconf
 import python_utils
 import utils
 
-from google.cloud import datastore
-
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()

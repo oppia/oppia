@@ -35,7 +35,6 @@ import feconf
 import python_utils
 
 from google.cloud import ndb
-from google.cloud import datastore
 
 from mapreduce import input_readers
 

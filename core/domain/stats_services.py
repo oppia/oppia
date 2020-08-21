@@ -33,7 +33,6 @@ import feconf
 import utils
 
 from google.cloud import ndb
-from google.cloud import datastore
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()

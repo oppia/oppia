@@ -30,7 +30,6 @@ import python_utils
 import utils
 
 from google.cloud import ndb
-from google.cloud import datastore
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 

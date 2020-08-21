@@ -27,7 +27,6 @@ from core.domain import wipeout_domain
 from core.platform import models
 import python_utils
 
-from google.cloud import datastore
 
 current_user_services = models.Registry.import_current_user_services()
 (

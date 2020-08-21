@@ -26,7 +26,6 @@ import utils
 
 from google.appengine.datastore import datastore_query
 
-from google.cloud import datastore
 from google.cloud import ndb
 
 

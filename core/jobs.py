@@ -32,7 +32,6 @@ import utils
 
 from google.appengine.api import app_identity
 from google.cloud import ndb
-from google.cloud import datastore
 
 from mapreduce import base_handler
 from mapreduce import context

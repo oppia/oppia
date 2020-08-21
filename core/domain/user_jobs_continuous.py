@@ -30,7 +30,6 @@ import python_utils
 import utils
 
 from google.cloud import ndb
-from google.cloud import datastore
 
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([

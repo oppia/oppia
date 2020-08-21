@@ -26,7 +26,6 @@ import feconf
 import python_utils
 
 from google.cloud import ndb
-from google.cloud import datastore
 
 (base_models, feedback_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.feedback, models.NAMES.exploration

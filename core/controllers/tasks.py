@@ -28,7 +28,6 @@ from core.domain import suggestion_services
 from core.platform import models
 
 from google.cloud import ndb
-from google.cloud import datastore
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
@@ -69,9 +68,8 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
 
         email_manager.send_feedback_message_email(user_id, messages)
 
-        with datastore.Client().transaction():
-            feedback_services.pop_feedback_message_references(user_id,
-                len(references))
+        feedback_services.pop_feedback_message_references(user_id,
+            len(references))
 
 
 class SuggestionEmailHandler(base.BaseHandler):
