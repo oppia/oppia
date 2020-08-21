@@ -3843,16 +3843,16 @@ class SubtitledVariableLengthListOfRuleInputsDomainUnitTests(
 
     def test_validation(self):
         with self.assertRaisesRegexp(
-                Exception, 'Expected content_id to be a string, '):
+            Exception, 'Expected content_id to be a string, '):
             state_domain.SubtitledVariableLengthListOfRuleInputs(2, {})
 
         with self.assertRaisesRegexp(
-                Exception, 'Invalid rule inputs'):
+            Exception, 'Invalid rule inputs'):
             state_domain.SubtitledVariableLengthListOfRuleInputs(
                 'content_id', {})
 
         with self.assertRaisesRegexp(
-                Exception, 'Invalid rule inputs'):
+            Exception, 'Invalid rule inputs'):
             state_domain.SubtitledVariableLengthListOfRuleInputs(
                 'content_id', [2])
 
