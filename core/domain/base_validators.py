@@ -49,7 +49,7 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
     """Value object providing the class and ids to fetch an external model."""
 
     def __init__(
-            self, field_name, class_name, model_ids):
+            self, field_name, model_class, model_ids):
         """Initializes an ExternalModelFetcherDetails domain object.
 
         Args:
@@ -58,12 +58,12 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
                 reference. For example: 'exp_ids': ExplorationModel, exp_ids
                 is the field name to identify the external model
                 ExplorationModel.
-            class_name: str. The name of the external model class.
+            model_class: ClassObject. The external model class.
             model_ids: list(str). The list of external model ids to fetch the
                 external models.
         """
         self.field_name = field_name
-        self.class_name = class_name
+        self.model_class = model_class
         self.model_ids = model_ids
 
 
@@ -71,15 +71,15 @@ class ExternalModelReference(python_utils.OBJECT):
     """Value object representing an external model linked to a storage model."""
 
     def __init__(
-            self, class_name, model_id, model_instance):
+            self, model_class, model_id, model_instance):
         """Initializes an ExternalModelReference domain object.
 
         Args:
-            class_name: str. The name of model class.
+            model_class: ClassObject. The model class.
             model_id: str. The id of the model.
             model_instance: ndb.Model. The gae model object.
         """
-        self.class_name = class_name
+        self.model_class = model_class
         self.model_id = model_id
         self.model_instance = model_instance
 
@@ -207,7 +207,7 @@ class BaseModelValidator(python_utils.OBJECT):
                 model = external_model_reference.model_instance
 
                 if model is None or model.deleted:
-                    model_class = external_model_reference.class_name
+                    model_class = external_model_reference.model_class
                     model_id = external_model_reference.model_id
                     cls._add_error(
                         '%s %s' % (field_name, ERROR_CATEGORY_FIELD_CHECK),
@@ -228,10 +228,12 @@ class BaseModelValidator(python_utils.OBJECT):
         """
         multiple_models_ids_to_fetch = {}
 
-        for external_model_fetcher in cls._get_external_id_relationships(item):
-            multiple_models_ids_to_fetch[external_model_fetcher.field_name] = (
-                external_model_fetcher.class_name,
-                external_model_fetcher.model_ids)
+        for external_model_fetcher_details in (
+                cls._get_external_id_relationships(item)):
+            multiple_models_ids_to_fetch[
+                external_model_fetcher_details.field_name] = (
+                    external_model_fetcher_details.model_class,
+                    external_model_fetcher_details.model_ids)
 
         fetched_model_instances_for_all_ids = (
             datastore_services.fetch_multiple_entities_by_ids_and_models(
@@ -382,7 +384,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
                 external_model = external_model_reference.model_instance
 
                 if external_model is None or external_model.deleted:
-                    model_class = external_model_reference.class_name
+                    model_class = external_model_reference.model_class
                     model_id = external_model_reference.model_id
                     cls._add_error(
                         '%s %s' % (
@@ -488,7 +490,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
             external_model = external_model_reference.model_instance
 
             if external_model is None or external_model.deleted:
-                model_class = external_model_reference.class_name
+                model_class = external_model_reference.model_class
                 model_id = external_model_reference.model_id
                 cls._add_error(
                     '%s_ids %s' % (key_to_fetch, ERROR_CATEGORY_FIELD_CHECK),
@@ -719,7 +721,7 @@ class BaseUserModelValidator(BaseModelValidator):
             exploration_model = exploration_model_reference.model_instance
 
             if exploration_model is None or exploration_model.deleted:
-                model_class = exploration_model_reference.class_name
+                model_class = exploration_model_reference.model_class
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
@@ -769,7 +771,7 @@ class BaseUserModelValidator(BaseModelValidator):
             collection_model = collection_model_reference.model_instance
 
             if collection_model is None or collection_model.deleted:
-                model_class = collection_model_reference.class_name
+                model_class = collection_model_reference.model_class
                 model_id = collection_model_reference.model_id
                 cls._add_error(
                     'collection_ids %s' % ERROR_CATEGORY_FIELD_CHECK,

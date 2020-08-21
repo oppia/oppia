@@ -265,7 +265,7 @@ class ClassifierTrainingJobModelValidator(base_validators.BaseModelValidator):
         for exp_model_reference in exp_model_references:
             exp_model = exp_model_reference.model_instance
             if exp_model is None or exp_model.deleted:
-                model_class = exp_model_reference.class_name
+                model_class = exp_model_reference.model_class
                 model_id = exp_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -310,7 +310,7 @@ class ClassifierTrainingJobModelValidator(base_validators.BaseModelValidator):
         for exp_model_reference in exp_model_references:
             exp_model = exp_model_reference.model_instance
             if exp_model is None or exp_model.deleted:
-                model_class = exp_model_reference.class_name
+                model_class = exp_model_reference.model_class
                 model_id = exp_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -383,7 +383,7 @@ class TrainingJobExplorationMappingModelValidator(
         for exp_model_reference in exp_model_references:
             exp_model = exp_model_reference.model_instance
             if exp_model is None or exp_model.deleted:
-                model_class = exp_model_reference.class_name
+                model_class = exp_model_reference.model_class
                 model_id = exp_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -428,7 +428,7 @@ class TrainingJobExplorationMappingModelValidator(
         for exp_model_reference in exp_model_references:
             exp_model = exp_model_reference.model_instance
             if exp_model is None or exp_model.deleted:
-                model_class = exp_model_reference.class_name
+                model_class = exp_model_reference.model_class
                 model_id = exp_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -737,7 +737,7 @@ class CollectionSummaryModelValidator(
         for collection_model_reference in collection_model_references:
             collection_model = collection_model_reference.model_instance
             if collection_model is None or collection_model.deleted:
-                model_class = collection_model_reference.class_name
+                model_class = collection_model_reference.model_class
                 model_id = collection_model_reference.model_id
                 cls._add_error(
                     'collection_ids %s' % (
@@ -859,7 +859,7 @@ class ExplorationOpportunitySummaryModelValidator(
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
-                model_class = exploration_model_reference.class_name
+                model_class = exploration_model_reference.model_class
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -907,7 +907,7 @@ class ExplorationOpportunitySummaryModelValidator(
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
-                model_class = exploration_model_reference.class_name
+                model_class = exploration_model_reference.model_class
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -953,7 +953,7 @@ class ExplorationOpportunitySummaryModelValidator(
         for story_model_reference in story_model_references:
             story_model = story_model_reference.model_instance
             if story_model is None or story_model.deleted:
-                model_class = story_model_reference.class_name
+                model_class = story_model_reference.model_class
                 model_id = story_model_reference.model_id
                 cls._add_error(
                     'story_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -1044,7 +1044,7 @@ class SkillOpportunityModelValidator(base_validators.BaseSummaryModelValidator):
         for skill_model_reference in skill_model_references:
             skill_model = skill_model_reference.model_instance
             if skill_model is None or skill_model.deleted:
-                model_class = skill_model_reference.class_name
+                model_class = skill_model_reference.model_class
                 model_id = skill_model_reference.model_id
                 cls._add_error(
                     'skill_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -1212,7 +1212,7 @@ class SentEmailModelValidator(base_validators.BaseModelValidator):
         for sender_model_reference in sender_model_references:
             sender_model = sender_model_reference.model_instance
             if sender_model is None or sender_model.deleted:
-                model_class = sender_model_reference.class_name
+                model_class = sender_model_reference.model_class
                 model_id = sender_model_reference.model_id
                 cls._add_error(
                     'sender_id %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -1256,7 +1256,7 @@ class SentEmailModelValidator(base_validators.BaseModelValidator):
         for recipient_model_reference in recipient_model_references:
             recipient_model = recipient_model_reference.model_instance
             if recipient_model is None or recipient_model.deleted:
-                model_class = recipient_model_reference.class_name
+                model_class = recipient_model_reference.model_class
                 model_id = recipient_model_reference.model_id
                 cls._add_error(
                     'recipient_id %s' % (
@@ -1339,7 +1339,7 @@ class BulkEmailModelValidator(base_validators.BaseModelValidator):
         for sender_model_reference in sender_model_references:
             sender_model = sender_model_reference.model_instance
             if sender_model is None or sender_model.deleted:
-                model_class = sender_model_reference.class_name
+                model_class = sender_model_reference.model_class
                 model_id = sender_model_reference.model_id
                 cls._add_error(
                     'sender_id %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -1720,7 +1720,7 @@ class ExpSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
-                model_class = exploration_model_reference.class_name
+                model_class = exploration_model_reference.model_class
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -1907,7 +1907,7 @@ class GeneralFeedbackMessageModelValidator(base_validators.BaseModelValidator):
             feedback_thread_model = (
                 feedback_thread_model_reference.model_instance)
             if feedback_thread_model is None or feedback_thread_model.deleted:
-                model_class = feedback_thread_model_reference.class_name
+                model_class = feedback_thread_model_reference.model_class
                 model_id = feedback_thread_model_reference.model_id
                 cls._add_error(
                     'feedback_thread_ids %s' % (
@@ -2260,7 +2260,7 @@ class ExplorationMathRichTextInfoModelValidator(
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
-                model_class = exploration_model_reference.class_name
+                model_class = exploration_model_reference.model_class
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -2452,7 +2452,7 @@ class QuestionSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         for question_model_reference in question_model_references:
             question_model = question_model_reference.model_instance
             if question_model is None or question_model.deleted:
-                model_class = question_model_reference.class_name
+                model_class = question_model_reference.model_class
                 model_id = question_model_reference.model_id
                 cls._add_error(
                     'question_ids %s' % (
@@ -2731,7 +2731,7 @@ class SkillSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         for skill_model_reference in skill_model_references:
             skill_model = skill_model_reference.model_instance
             if not skill_model or skill_model.deleted:
-                model_class = skill_model_reference.class_name
+                model_class = skill_model_reference.model_class
                 model_id = skill_model_reference.model_id
                 cls._add_error(
                     'skill_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -2774,7 +2774,7 @@ class SkillSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         for skill_model_reference in skill_model_references:
             skill_model = skill_model_reference.model_instance
             if not skill_model or skill_model.deleted:
-                model_class = skill_model_reference.class_name
+                model_class = skill_model_reference.model_class
                 model_id = skill_model_reference.model_id
                 cls._add_error(
                     'skill_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -2959,7 +2959,7 @@ class StorySummaryModelValidator(base_validators.BaseSummaryModelValidator):
         for story_model_reference in story_model_references:
             story_model = story_model_reference.model_instance
             if story_model is None or story_model.deleted:
-                model_class = story_model_reference.class_name
+                model_class = story_model_reference.model_class
                 model_id = story_model_reference.model_id
                 cls._add_error(
                     'story_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -3088,7 +3088,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
         for target_model_reference in target_model_references:
             target_model = target_model_reference.model_instance
             if target_model is None or target_model.deleted:
-                model_class = target_model_reference.class_name
+                model_class = target_model_reference.model_class
                 model_id = target_model_reference.model_id
                 cls._add_error(
                     '%s_ids %s' % (
@@ -3171,7 +3171,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
             for target_model_reference in target_model_references:
                 target_model = target_model_reference.model_instance
                 if target_model is None or target_model.deleted:
-                    model_class = target_model_reference.class_name
+                    model_class = target_model_reference.model_class
                     model_id = target_model_reference.model_id
                     cls._add_error(
                         '%s_ids %s' % (
@@ -3534,7 +3534,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         for topic_model_reference in topic_model_references:
             topic_model = topic_model_reference.model_instance
             if topic_model is None or topic_model.deleted:
-                model_class = topic_model_reference.class_name
+                model_class = topic_model_reference.model_class
                 model_id = topic_model_reference.model_id
                 cls._add_error(
                     'topic_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -3582,7 +3582,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         for topic_model_reference in topic_model_references:
             topic_model = topic_model_reference.model_instance
             if topic_model is None or topic_model.deleted:
-                model_class = topic_model_reference.class_name
+                model_class = topic_model_reference.model_class
                 model_id = topic_model_reference.model_id
                 cls._add_error(
                     'topic_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -3632,7 +3632,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         for topic_model_reference in topic_model_references:
             topic_model = topic_model_reference.model_instance
             if topic_model is None or topic_model.deleted:
-                model_class = topic_model_reference.class_name
+                model_class = topic_model_reference.model_class
                 model_id = topic_model_reference.model_id
                 cls._add_error(
                     'topic_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -3678,7 +3678,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         for topic_model_reference in topic_model_references:
             topic_model = topic_model_reference.model_instance
             if topic_model is None or topic_model.deleted:
-                model_class = topic_model_reference.class_name
+                model_class = topic_model_reference.model_class
                 model_id = topic_model_reference.model_id
                 cls._add_error(
                     'topic_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -3728,7 +3728,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         for topic_model_reference in topic_model_references:
             topic_model = topic_model_reference.model_instance
             if topic_model is None or topic_model.deleted:
-                model_class = topic_model_reference.class_name
+                model_class = topic_model_reference.model_class
                 model_id = topic_model_reference.model_id
                 cls._add_error(
                     'topic_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -4090,7 +4090,7 @@ class ExpUserLastPlaythroughModelValidator(
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
-                model_class = exploration_model_reference.class_name
+                model_class = exploration_model_reference.model_class
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -4134,7 +4134,7 @@ class ExpUserLastPlaythroughModelValidator(
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
-                model_class = exploration_model_reference.class_name
+                model_class = exploration_model_reference.model_class
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -4319,7 +4319,7 @@ class UserSubscriptionsModelValidator(base_validators.BaseUserModelValidator):
         for subscriber_model_reference in subscriber_model_references:
             subscriber_model = subscriber_model_reference.model_instance
             if subscriber_model is None or subscriber_model.deleted:
-                model_class = subscriber_model_reference.class_name
+                model_class = subscriber_model_reference.model_class
                 model_id = subscriber_model_reference.model_id
                 cls._add_error(
                     'subscriber_ids %s' % (
@@ -4401,7 +4401,7 @@ class UserSubscribersModelValidator(base_validators.BaseUserModelValidator):
         for subscription_model_reference in subscription_model_references:
             subscription_model = subscription_model_reference.model_instance
             if subscription_model is None or subscription_model.deleted:
-                model_class = subscription_model_reference.class_name
+                model_class = subscription_model_reference.model_class
                 model_id = subscription_model_reference.model_id
                 cls._add_error(
                     'subscription_ids %s' % (
@@ -4638,7 +4638,7 @@ class ExplorationUserDataModelValidator(base_validators.BaseUserModelValidator):
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
-                model_class = exploration_model_reference.class_name
+                model_class = exploration_model_reference.model_class
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -4724,7 +4724,7 @@ class CollectionProgressModelValidator(base_validators.BaseUserModelValidator):
                 completed_activities_model_reference.model_instance)
             if completed_activities_model is None or (
                     completed_activities_model.deleted):
-                model_class = completed_activities_model_reference.class_name
+                model_class = completed_activities_model_reference.model_class
                 model_id = completed_activities_model_reference.model_id
                 cls._add_error(
                     'completed_activities_ids %s' % (
@@ -4751,7 +4751,7 @@ class CollectionProgressModelValidator(base_validators.BaseUserModelValidator):
         for collection_model_reference in collection_model_references:
             collection_model = collection_model_reference.model_instance
             if collection_model is None or collection_model.deleted:
-                model_class = collection_model_reference.class_name
+                model_class = collection_model_reference.model_class
                 model_id = collection_model_reference.model_id
                 cls._add_error(
                     'collection_ids %s' % (
@@ -4826,7 +4826,7 @@ class StoryProgressModelValidator(base_validators.BaseUserModelValidator):
         for story_model_reference in story_model_references:
             story_model = story_model_reference.model_instance
             if story_model is None or story_model.deleted:
-                model_class = story_model_reference.class_name
+                model_class = story_model_reference.model_class
                 model_id = story_model_reference.model_id
                 cls._add_error(
                     'story_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -4878,7 +4878,7 @@ class StoryProgressModelValidator(base_validators.BaseUserModelValidator):
         for story_model_reference in story_model_references:
             story_model = story_model_reference.model_instance
             if story_model is None or story_model.deleted:
-                model_class = story_model_reference.class_name
+                model_class = story_model_reference.model_class
                 model_id = story_model_reference.model_id
                 cls._add_error(
                     'story_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
@@ -4998,7 +4998,7 @@ class UserQueryModelValidator(base_validators.BaseUserModelValidator):
         for email_model_reference in email_model_references:
             email_model = email_model_reference.model_instance
             if email_model is None or email_model.deleted:
-                model_class = email_model_reference.class_name
+                model_class = email_model_reference.model_class
                 model_id = email_model_reference.model_id
                 cls._add_error(
                     'sent_email_model_ids %s' % (
@@ -5087,7 +5087,7 @@ class UserBulkEmailsModelValidator(base_validators.BaseUserModelValidator):
         for email_model_reference in email_model_references:
             email_model = email_model_reference.model_instance
             if email_model is None or email_model.deleted:
-                model_class = email_model_reference.class_name
+                model_class = email_model_reference.model_class
                 model_id = email_model_reference.model_id
                 cls._add_error(
                     'sent_email_model_ids %s' % (
@@ -5472,7 +5472,7 @@ class PlaythroughModelValidator(base_validators.BaseModelValidator):
             exp_issues_model = exp_issues_model_reference.model_instance
 
             if exp_issues_model is None or exp_issues_model.deleted:
-                model_class = exp_issues_model_reference.class_name
+                model_class = exp_issues_model_reference.model_class
                 model_id = exp_issues_model_reference.model_id
                 cls._add_error(
                     'exp_issues_ids %s' % (
