@@ -3843,6 +3843,7 @@ class SubtitledVariableLengthListOfRuleInputsDomainUnitTests(
                 'rule_inputs': []
             })
 
+
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
 

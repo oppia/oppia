@@ -1658,7 +1658,7 @@ class WrittenTranslation(python_utils.OBJECT):
                 self.translation,
                 {'type': 'custom', 'obj_type': 'NormalizedString'})
         elif (self.data_format ==
-                self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE'] # pylint: disable=line-too-long
+              self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE'] # pylint: disable=line-too-long
              ):
             schema_utils.normalize_against_schema(
                 self.translation,
@@ -2314,7 +2314,7 @@ class SubtitledVariableLengthListOfRuleInputs(python_utils.OBJECT):
         """
         if (self.content_id is not None and
                 not isinstance(self.content_id, python_utils.BASESTRING)
-        ):
+           ):
             raise utils.ValidationError(
                 'Expected content id to be a string, received %s' %
                 self.content_id)
