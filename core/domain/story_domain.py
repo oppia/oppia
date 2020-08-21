@@ -594,7 +594,14 @@ class StoryContents(python_utils.OBJECT):
         Returns:
             list(StoryNode). The ordered list of nodes.
         """
-        return self.nodes
+        initial_index = self.get_node_index(self.initial_node_id)
+        current_node = self.nodes[initial_index]
+        ordered_nodes_list = [current_node]
+        while current_node.destination_node_ids:
+            next_node_id = current_node.destination_node_ids[0]
+            current_node = self.nodes[self.get_node_index(next_node_id)]
+            ordered_nodes_list.append(current_node)
+        return ordered_nodes_list
 
     def get_all_linked_exp_ids(self):
         """Returns a list of exploration id linked to each of the nodes of
