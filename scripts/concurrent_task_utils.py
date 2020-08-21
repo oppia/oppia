@@ -53,8 +53,8 @@ class TaskResult(python_utils.OBJECT):
         Args:
             name: str. Name of the check running.
             failed: bool. Status of the check currently running.
-            error_messages: list(str). List of summary messages returned by
-                the objects.
+            error_messages: list(str). List of error messages that are stripped
+                to keep main part of messages.
             full_messages: list(str). List of full messages returned by the
                 objects.
         """
@@ -65,12 +65,11 @@ class TaskResult(python_utils.OBJECT):
 
     @property
     def all_messages(self):
-        """Returns the full list with the message if the current check is
-        failing or passing.
+        """Returns a list of message with pass or fail status for the current
+        check.
 
         Returns:
-            list(str). List of full messages corresponding to currently running
-            task.
+            list(str). List of full messages corresponding to the given task.
         """
         if self.name:
             failed_message = (

@@ -97,7 +97,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         files_to_lint = self.all_filepaths
         num_files_with_errors = 0
         failed = False
-        error_messages = []
+        stripped_error_messages = []
         full_error_messages = []
         name = 'Stylelint'
 
@@ -124,12 +124,12 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         if num_files_with_errors:
             for result in result_list:
                 full_error_messages.append(result)
-                error_messages.append(
+                stripped_error_messages.append(
                     self._get_trimmed_error_output(result))
             failed = True
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, stripped_error_messages, full_error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
