@@ -35,13 +35,13 @@ import { InteractionCustomizationArgs } from
 // TODO(sll): Add validation.
 export class StateCustomizationArgsService extends
   StatePropertyService<InteractionCustomizationArgs> {
-  private _schemaBasedFormsShownEventEmitter = new EventEmitter();
+  private _schemaBasedFormsShownEventEmitter = new EventEmitter<void>();
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveInteractionCustomizationArgs';
   }
 
-  get onSchemaBasedFormsShown() {
+  get onSchemaBasedFormsShown(): EventEmitter<void> {
     return this._schemaBasedFormsShownEventEmitter;
   }
 }

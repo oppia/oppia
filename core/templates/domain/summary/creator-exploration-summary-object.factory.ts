@@ -82,7 +82,8 @@ export class CreatorExplorationSummary {
 })
 export class CreatorExplorationSummaryObjectFactory {
   createFromBackendDict(
-      expSummaryBacknedDict: CreatorExplorationSummaryBackendDict) {
+      expSummaryBacknedDict: CreatorExplorationSummaryBackendDict):
+      CreatorExplorationSummary {
     return new CreatorExplorationSummary(
       expSummaryBacknedDict.category, expSummaryBacknedDict.community_owned,
       expSummaryBacknedDict.id, expSummaryBacknedDict.language_code,

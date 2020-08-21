@@ -39,7 +39,7 @@ export class SkillMasteryViewerComponent implements OnInit {
     private skillMasteryBackendApiService: SkillMasteryBackendApiService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.skillMasteryDegree = 0.0;
 
     this.skillMasteryBackendApiService.fetchSkillMasteryDegrees(

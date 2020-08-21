@@ -77,14 +77,14 @@ export class AnswerGroup {
     };
   }
 
-  addRule(rule: Rule) {
+  addRule(rule: Rule): void {
     if (!this.ruleTypesToInputs.hasOwnProperty(rule.type)) {
       this.ruleTypesToInputs[rule.type] = [];
     }
     this.ruleTypesToInputs[rule.type].push(rule.inputs);
   }
 
-  updateRuleTypesToInputs(rules: Rule[]) {
+  updateRuleTypesToInputs(rules: Rule[]): void {
     this.ruleTypesToInputs = {};
     rules.forEach(this.addRule.bind(this));
   }

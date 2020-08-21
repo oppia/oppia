@@ -220,7 +220,7 @@ export class StoryObjectFactory {
 
   // Create an interstitial story that would be displayed in the editor until
   // the actual story is fetched from the backend.
-  createInterstitialStory() {
+  createInterstitialStory(): Story {
     return new Story(
       null, 'Story title loading', 'Story description loading',
       'Story notes loading', null, 'en', 1, null, null, null, null);

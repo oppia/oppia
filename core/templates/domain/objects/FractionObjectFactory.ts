@@ -144,7 +144,7 @@ export class FractionObjectFactory {
     return new Fraction(isNegative, wholeNumber, numerator, denominator);
   }
 
-  fromDict(fractionDict: FractionAnswer) {
+  fromDict(fractionDict: FractionAnswer): Fraction {
     return new Fraction(
       fractionDict.isNegative,
       fractionDict.wholeNumber,

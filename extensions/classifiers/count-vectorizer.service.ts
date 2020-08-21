@@ -26,11 +26,15 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+interface Vocabulary {
+  [char: string]: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class CountVectorizerService {
-  vectorize(tokens, vocabulary) {
+  vectorize(tokens: string[], vocabulary: Vocabulary): number[] {
     var vectorLength = Object.keys(vocabulary).length;
     var vector = [];
     for (var i = 0; i < vectorLength; i++) {

@@ -43,7 +43,7 @@ export class ProfileSummary {
 })
 export class ProfileSummaryObjectFactory {
   createFromSubscriberBackendDict(
-      sumamryBackendDict: SubscriberSummaryBackendDict) {
+      sumamryBackendDict: SubscriberSummaryBackendDict): ProfileSummary {
     return new ProfileSummary(
       sumamryBackendDict.subscriber_picture_data_url,
       sumamryBackendDict.subscriber_username,
@@ -51,7 +51,7 @@ export class ProfileSummaryObjectFactory {
   }
 
   createFromCreatorBackendDict(
-      sumamryBackendDict: CreatorSummaryBackendDict) {
+      sumamryBackendDict: CreatorSummaryBackendDict): ProfileSummary {
     return new ProfileSummary(
       sumamryBackendDict.creator_picture_data_url,
       sumamryBackendDict.creator_username,

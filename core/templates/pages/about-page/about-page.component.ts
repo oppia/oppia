@@ -71,17 +71,17 @@ export class AboutPageComponent implements OnInit {
     return results;
   }
 
-  onTabClick(tabName: string) {
+  onTabClick(tabName: string): Window {
     this.windowRef.nativeWindow.location.hash = '#' + tabName;
     this.activeTabName = tabName;
     return this.windowRef.nativeWindow;
   }
 
-  getStaticImageUrl(imagePath: string) {
+  getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.activeTabName = this.TAB_ID_ABOUT;
     this.allCredits = [];
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');

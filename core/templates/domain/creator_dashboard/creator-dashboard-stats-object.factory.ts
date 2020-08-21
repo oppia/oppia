@@ -39,7 +39,8 @@ export class CreatorDashboardStats {
 })
 export class CreatorDashboardStatsObjectFactory {
   createFromBackendDict(
-      dashboardStatsBackendDict: CreatorDashboardStatsBackendDict) {
+      dashboardStatsBackendDict: CreatorDashboardStatsBackendDict):
+      CreatorDashboardStats {
     return new CreatorDashboardStats(
       dashboardStatsBackendDict.average_ratings,
       dashboardStatsBackendDict.num_ratings,

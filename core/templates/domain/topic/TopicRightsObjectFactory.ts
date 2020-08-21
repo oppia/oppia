@@ -67,7 +67,7 @@ export class TopicRights {
   // Reassigns all values within this topic to match the existing
   // topic rights. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic rights.
-  copyFromTopicRights(otherTopicRights: TopicRights) {
+  copyFromTopicRights(otherTopicRights: TopicRights): void {
     this._published = otherTopicRights.isPublished();
     this._canEditTopic = otherTopicRights.canEditTopic();
     this._canPublishTopic = otherTopicRights.canPublishTopic();
@@ -81,7 +81,7 @@ export class TopicRightsObjectFactory {
   // This function takes a JSON object which represents a backend
   // topic python dict.
   createFromBackendDict(
-      topicRightsBackendObject: TopicRightsBackendDict) {
+      topicRightsBackendObject: TopicRightsBackendDict): TopicRights {
     return new TopicRights(
       topicRightsBackendObject.published,
       topicRightsBackendObject.can_publish_topic,

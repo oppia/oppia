@@ -70,7 +70,7 @@ export class WorkedExampleObjectFactory {
     );
   }
 
-  create(question: SubtitledHtml, explanation: SubtitledHtml) {
+  create(question: SubtitledHtml, explanation: SubtitledHtml): WorkedExample {
     return new WorkedExample(question, explanation);
   }
 }

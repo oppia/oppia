@@ -53,7 +53,7 @@ export class ClassroomBackendApiService {
     private classroomDataObjectFactory: ClassroomDataObjectFactory
   ) {}
 
-  private _initializeTranslationEventEmitter = new EventEmitter();
+  private _initializeTranslationEventEmitter = new EventEmitter<void>();
 
   _fetchClassroomData(classroomUrlFragment: string,
       successCallback: (value: ClassroomData) => void,
@@ -110,7 +110,7 @@ export class ClassroomBackendApiService {
     });
   }
 
-  get onInitializeTranslation() {
+  get onInitializeTranslation(): EventEmitter<void> {
     return this._initializeTranslationEventEmitter;
   }
 }

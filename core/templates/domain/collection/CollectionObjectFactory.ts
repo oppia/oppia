@@ -112,7 +112,7 @@ export class Collection {
     return this.playthrough;
   }
 
-  setCategory(category: string) {
+  setCategory(category: string): void {
     this.category = category;
   }
 

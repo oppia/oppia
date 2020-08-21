@@ -122,7 +122,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   private _topicsAndSkillsDashboardReinitializedEventEmitter =
-    new EventEmitter();
+    new EventEmitter<boolean>();
 
   fetchDashboardData(): Promise<TopicsAndSkillDashboardData> {
     return this.http.get<TopicsAndSkillsDashboardDataBackendDict>(
@@ -183,7 +183,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
 
   fetchSkillsDashboardData(
       filter: TopicsAndSkillsDashboardFilter,
-      itemsPerPage, nextCursor): Promise<SkillsDashboardData> {
+      itemsPerPage: number, nextCursor: string): Promise<SkillsDashboardData> {
     return this.http.post<SkillsDashboardDataBackendDict>(
       TopicsAndSkillsDashboardDomainConstants.SKILL_DASHBOARD_DATA_URL, {
         classroom_name: filter.classroom,
@@ -217,7 +217,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
     });
   }
 
-  get onTopicsAndSkillsDashboardReinitialized() {
+  get onTopicsAndSkillsDashboardReinitialized(): EventEmitter<boolean> {
     return this._topicsAndSkillsDashboardReinitializedEventEmitter;
   }
 }

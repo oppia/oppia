@@ -33,7 +33,7 @@ export class ExplorationEmbedButtonModalComponent implements OnInit {
     private activeModal: NgbActiveModal,
     private siteAnalyticsService: SiteAnalyticsService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.siteAnalyticsService.registerOpenEmbedInfoEvent(this.explorationId);
   }
 

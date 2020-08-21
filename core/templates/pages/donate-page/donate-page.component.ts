@@ -44,7 +44,7 @@ export class DonatePageComponent implements OnInit {
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef
   ) {}
-  ngOnInit() {
+  ngOnInit(): void {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/opp_donate_text.svg');
@@ -52,7 +52,7 @@ export class DonatePageComponent implements OnInit {
       'Donate | Make a Positive Impact | Oppia');
   }
 
-  onDonateThroughAmazon() {
+  onDonateThroughAmazon(): boolean {
     this.siteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = (
@@ -61,7 +61,7 @@ export class DonatePageComponent implements OnInit {
     return false;
   }
 
-  onDonateThroughPayPal() {
+  onDonateThroughPayPal(): void {
     // Redirection to PayPal will be initiated at the same time as this
     // function is run, but should be slow enough to allow this function
     // time to complete. It is not possible to do $http.post() in

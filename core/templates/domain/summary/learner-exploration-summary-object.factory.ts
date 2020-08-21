@@ -78,7 +78,8 @@ export class LearnerExplorationSummary {
 })
 export class LearnerExplorationSummaryObjectFactory {
   createFromBackendDict(
-      expSummaryBacknedDict: LearnerExplorationSummaryBackendDict) {
+      expSummaryBacknedDict: LearnerExplorationSummaryBackendDict):
+      LearnerExplorationSummary {
     return new LearnerExplorationSummary(
       expSummaryBacknedDict.category, expSummaryBacknedDict.community_owned,
       expSummaryBacknedDict.id, expSummaryBacknedDict.language_code,

@@ -36,7 +36,7 @@ export class CkEditorCopyToolbarComponent {
     ckEditorCopyContentService.copyModeActive = false;
   }
 
-  toggleToolActive() {
+  toggleToolActive(): void {
     this.ckEditorCopyContentService.toggleCopyMode();
 
     if (this.ckEditorCopyContentService.copyModeActive) {

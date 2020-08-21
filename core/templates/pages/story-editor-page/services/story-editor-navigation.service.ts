@@ -34,25 +34,25 @@ export class StoryEditorNavigationService {
     chapterIndex: number = null;
     constructor(private windowRef: WindowRef) {}
 
-    getActiveTab() {
+    getActiveTab(): string {
       return this.activeTab;
     }
-    setChapterId(id) {
+    setChapterId(id: string): void {
       this.chapterId = id;
     }
-    getChapterIndex() {
+    getChapterIndex(): number {
       return this.chapterIndex;
     }
-    getChapterId() {
+    getChapterId(): string {
       return this.chapterId;
     }
-    navigateToChapterEditorWithId(id, index) {
+    navigateToChapterEditorWithId(id: string, index: number): void {
       this.activeTab = CHAPTER_EDITOR;
       this.setChapterId(id);
       this.chapterIndex = index;
       this.windowRef.nativeWindow.location.hash = '/chapter_editor/' + id;
     }
-    checkIfPresentInChapterEditor() {
+    checkIfPresentInChapterEditor(): boolean {
       const chapterId = this.windowRef.nativeWindow.location.hash.split('/')[2];
       if (chapterId) {
         this.chapterId = chapterId;
@@ -60,19 +60,19 @@ export class StoryEditorNavigationService {
       }
       return false;
     }
-    checkIfPresentInStoryPreviewTab() {
+    checkIfPresentInStoryPreviewTab(): boolean {
       return (
         this.windowRef.nativeWindow.location.hash.split('/')[1] ===
           'story_preview');
     }
-    navigateToChapterEditor() {
+    navigateToChapterEditor(): void {
       this.navigateToChapterEditorWithId(this.chapterId, null);
     }
-    navigateToStoryEditor() {
+    navigateToStoryEditor(): void {
       this.activeTab = STORY_EDITOR;
       this.windowRef.nativeWindow.location.hash = '';
     }
-    navigateToStoryPreviewTab() {
+    navigateToStoryPreviewTab(): void {
       this.windowRef.nativeWindow.location.hash = '/story_preview/';
       this.activeTab = STORY_PREVIEW;
     }

@@ -104,7 +104,8 @@ export class WrittenTranslations {
     delete this.translationsMapping[contentId];
   }
 
-  addWrittenTranslation(contentId: string, languageCode: string, html: string) {
+  addWrittenTranslation(
+      contentId: string, languageCode: string, html: string): void {
     var writtenTranslations = this.translationsMapping[contentId];
     if (writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');
@@ -114,7 +115,7 @@ export class WrittenTranslations {
   }
 
   updateWrittenTranslationHtml(
-      contentId: string, languageCode: string, html: string) {
+      contentId: string, languageCode: string, html: string): void {
     var writtenTranslations = this.translationsMapping[contentId];
     if (!writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Unable to find the given language code.');

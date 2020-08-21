@@ -31,7 +31,7 @@ export class NewlyCreatedStory {
    * @param {String} description - description of the story.
    * @param {String} urlFragment - url fragment of the story.
    */
-  constructor(title, description, urlFragment) {
+  constructor(title: string, description: string, urlFragment: string) {
     this.title = title;
     this.description = description;
     this.urlFragment = urlFragment;

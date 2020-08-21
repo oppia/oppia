@@ -40,7 +40,9 @@ export class TopicsAndSkillsDashboardFilter {
    * @param {ETopicPublishedOptions} status - One of the values
    *   in ETopicPublishedOptions.
    */
-  constructor(classroom, keywords, sort, status) {
+  constructor(
+      classroom: string, keywords: string[],
+      sort: ETopicSortOptions, status: ETopicPublishedOptions) {
     this.classroom = classroom;
     this.keywords = keywords;
     this.sort = sort;

@@ -52,6 +52,11 @@ export interface SolutionBackendDict {
   'explanation': ExplanationBackendDict;
 }
 
+interface ShortAnswerResponse {
+  prefix: string;
+  answer: string;
+}
+
 export class Solution {
   ehfs: ExplorationHtmlFormatterService;
   shof: SubtitledHtmlObjectFactory;
@@ -118,7 +123,8 @@ export class Solution {
     this.explanation = explanation;
   }
 
-  getOppiaShortAnswerResponseHtml(interaction: Interaction) {
+  getOppiaShortAnswerResponseHtml(interaction: Interaction):
+  ShortAnswerResponse {
     return {
       prefix: (this.answerIsExclusive ? 'The only' : 'One'),
       answer: this.ehfs.getShortAnswerHtml(

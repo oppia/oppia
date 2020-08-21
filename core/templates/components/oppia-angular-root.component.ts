@@ -1363,7 +1363,7 @@ private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
 private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
   ) {}
 
-  public ngAfterViewInit() {
+  public ngAfterViewInit(): void {
     OppiaAngularRootComponent.adminBackendApiService = this.adminBackendApiService;
     OppiaAngularRootComponent.adminDataService = this.adminDataService;
     OppiaAngularRootComponent.adminRouterService = this.adminRouterService;

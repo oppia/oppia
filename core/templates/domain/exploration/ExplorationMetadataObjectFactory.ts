@@ -38,7 +38,8 @@ export class ExplorationMetadata {
 })
 export class ExplorationMetadataObjectFactory {
   static createFromBackendDict(
-      explorationMetadataBackendDict: ExplorationMetaDataBackendDict) {
+      explorationMetadataBackendDict: ExplorationMetaDataBackendDict):
+      ExplorationMetadata {
     return new ExplorationMetadata(
       explorationMetadataBackendDict.id,
       explorationMetadataBackendDict.objective,

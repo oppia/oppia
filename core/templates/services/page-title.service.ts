@@ -28,7 +28,7 @@ export class PageTitleService {
   pageSubtitleForMobile: string = null;
   constructor(private titleService: Title) {}
 
-  setPageTitle(title: string) {
+  setPageTitle(title: string): void {
     this.titleService.setTitle(title);
   }
 

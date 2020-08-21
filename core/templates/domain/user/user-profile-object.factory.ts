@@ -65,7 +65,7 @@ export class UserProfileObjectFactory {
     private learnerExplorationSummaryObjectFactory:
     LearnerExplorationSummaryObjectFactory) {}
 
-  createFromBackendDict(backendDict: UserProfileBackendDict) {
+  createFromBackendDict(backendDict: UserProfileBackendDict): UserProfile {
     return new UserProfile(
       backendDict.username,
       backendDict.profile_is_of_current_user,

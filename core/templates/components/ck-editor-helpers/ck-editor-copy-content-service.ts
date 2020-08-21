@@ -148,7 +148,7 @@ export class CkEditorCopyContentService {
     }
   }
 
-  toggleCopyMode() {
+  toggleCopyMode(): void {
     this.copyModeActive = !this.copyModeActive;
   }
 
@@ -156,7 +156,7 @@ export class CkEditorCopyContentService {
    * Broadcasts to subject to copy target.
    * @param {HTMLElement} target The element to copy.
    */
-  broadcastCopy(target: HTMLElement) {
+  broadcastCopy(target: HTMLElement): void {
     if (!this.copyModeActive) {
       return;
     }
@@ -172,7 +172,7 @@ export class CkEditorCopyContentService {
    */
   bindPasteHandler(
       editor: CKEDITOR.editor | Partial<CKEDITOR.editor>
-  ) {
+  ): void {
     this.ckEditorIdToSubscription[editor.id] = this.copyEventEmitter.subscribe(
       ({rootElement, containedWidgetTagName}: CkEditorCopyEvent) => {
         if (!rootElement) {

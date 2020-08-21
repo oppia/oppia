@@ -35,7 +35,7 @@ export class SkillMastery {
     return this._skillMasteryDict[skillId];
   }
 
-  setMasteryDegree(skillId: string, masteryDegree: number) {
+  setMasteryDegree(skillId: string, masteryDegree: number): void {
     this._skillMasteryDict[skillId] = masteryDegree;
   }
 
