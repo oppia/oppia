@@ -28,6 +28,12 @@ describe('Keyboard Shortcuts', () => {
   var searchBar = document.createElement('input');
   var categoryBar = document.createElement('select');
 
+  var mockWindow = {
+    location: {
+      href: ''
+    }
+  }
+
   const windowRef = new WindowRef();
   const keyboardShortcutService = new KeyboardShortcutService(windowRef);
 
@@ -44,24 +50,53 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(searchBar);
     document.body.append(categoryBar);
 
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        href: ''
-      }
-    });
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
   });
 
 
   it('should navigate to the corresponding page' +
     ' when the navigation key is pressed', () => {
     keyboardShortcutService.bindNavigationShortcuts();
+
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
+    
     Mousetrap.trigger('ctrl+0');
+    expect(mockWindow.location.href).toEqual('/get-started');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
+    
     Mousetrap.trigger('ctrl+1');
+    expect(mockWindow.location.href).toEqual('/community-library');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
+    
+    
     Mousetrap.trigger('ctrl+2');
+    expect(mockWindow.location.href).toEqual('/learner-dashboard');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
+
+
     Mousetrap.trigger('ctrl+3');
+    expect(mockWindow.location.href).toEqual('/creator-dashboard');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
+
     Mousetrap.trigger('ctrl+4');
+    expect(mockWindow.location.href).toEqual('/about');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
+
     Mousetrap.trigger('ctrl+5');
+    expect(mockWindow.location.href).toEqual('/notifications');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
+
     Mousetrap.trigger('ctrl+6');
+    expect(mockWindow.location.href).toEqual('/preferences');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
   });
 
   it('should move the focus to the corresponding element' +
