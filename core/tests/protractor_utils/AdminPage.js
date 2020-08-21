@@ -217,6 +217,12 @@ var AdminPage = function() {
         .element(by.css('.protractor-test-value-selector')),
       'Enabled');
 
+    await action.click(
+      'Add condition button',
+      featureElement
+        .element(by.css('.protractor-test-add-condition-button'))
+    );
+
     await this.saveChangeOfFeature(featureElement);
   };
 
