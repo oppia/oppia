@@ -16,10 +16,17 @@
  * @fileoverview Unit tests for the custom OSK letters component.
  */
 
+import { GuppyInitializationService } from
+  'services/guppy-initialization.service.ts';
+
 describe('OnScreenKeyboard', function() {
   let ctrl = null, $window = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'GuppyInitializationService', new GuppyInitializationService());
+  }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $window = $injector.get('$window');
     ctrl = $componentController('customOskLettersEditor');
