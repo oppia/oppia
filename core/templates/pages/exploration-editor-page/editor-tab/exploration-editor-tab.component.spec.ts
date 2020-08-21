@@ -325,6 +325,10 @@ describe('Exploration editor tab component', function() {
     ctrl.$onInit();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should evaluate controller properties after its initialization',
     function() {
       expect(ctrl.interactionIsShown).toBe(false);
