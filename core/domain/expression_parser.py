@@ -34,7 +34,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import re
-import string
 
 from constants import constants
 import python_utils
@@ -42,8 +41,6 @@ import python_utils
 _OPENING_PARENS = ['[', '{', '(']
 _CLOSING_PARENS = [')', '}', ']']
 _VALID_OPERATORS = _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
-VALID_ALGEBRAIC_IDENTIFIERS = (
-    list(string.ascii_letters) + constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys())
 
 _TOKEN_CATEGORY_IDENTIFIER = 'identifier'
 _TOKEN_CATEGORY_FUNCTION = 'function'
@@ -250,7 +247,7 @@ class Token(python_utils.OBJECT):
         Returns:
             bool. Whether the given string represents a valid identifier.
         """
-        return text in VALID_ALGEBRAIC_IDENTIFIERS
+        return text in constants.VALID_ALGEBRAIC_IDENTIFIERS
 
     def is_number(self, text):
         """Checks if the given token represents a valid real number without a

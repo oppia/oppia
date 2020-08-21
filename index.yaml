@@ -33,11 +33,6 @@ indexes:
   - name: commit_message
   - name: commit_type
 
-- kind: DeleteExpCopiesRealtimeModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
-
 - kind: ExpCopiesRealtimeModel
   properties:
   - name: realtime_layer
@@ -204,6 +199,11 @@ indexes:
 
 - kind: JobModel
   properties:
+  - name: status
+  - name: next_scheduled_check_time
+
+- kind: JobModel
+  properties:
   - name: status_code
   - name: time_queued_msec
     direction: desc
@@ -312,7 +312,7 @@ indexes:
   - name: user_id
   - name: score
 
-- kind: UserImpactRealtimeModel
+- kind: UserContributionScoringModel
   properties:
   - name: realtime_layer
   - name: created_on
