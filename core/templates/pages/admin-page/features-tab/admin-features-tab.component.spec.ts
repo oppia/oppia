@@ -45,7 +45,7 @@ let dummyFeatureStatus = false;
 const mockDummyFeatureStatus = (status: boolean) => dummyFeatureStatus = status;
 
 class MockPlatformFeatureService {
-  get featureSummary() {
+  get status() {
     return {
       DummyFeature: {
         get isEnabled() {
