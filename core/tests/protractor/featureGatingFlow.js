@@ -26,9 +26,21 @@ describe('Feature Gating Flow', function() {
   const ADMIN_USER2_EMAIL = 'admin2@featureGatingFlow.com';
   const ADMIN_USERNAME2 = 'featuregating2';
 
-  const indicator = element(
+  // Indicator in Angular component that is visible if the dummy_feature
+  // is enabled, and the feature status is successfully loaded in the
+  // Angular component.
+  const agDummyFeatureIndicator = element(
     by.css('.protractor-test-angular-dummy-feature-indicator'));
-  const indicatorAjs = element(
+
+  // Indicator in Angular component that is visible if the dummy_feature
+  // is enabled, and the backend dummy handler is also enabled.
+  const agDummyHandlerIndicator = agDummyFeatureIndicator.element(
+    by.css('.protractor-test-angular-dummy-handler-indicator'));
+
+  // Indicator in AngularJS directive that is visible if the dummy_feature
+  // is enabled, and the feature status is successfully loaded in the
+  // AngularJS directive.
+  const ajsDummyFeatureIndicator = element(
     by.css('.protractor-test-angularjs-dummy-feature-indicator'));
 
   let adminPage = null;
@@ -54,13 +66,15 @@ describe('Feature Gating Flow', function() {
     await adminPage.saveChangeOfFeature(dummy);
   });
 
-  it('should not show indicators gated by dummy feature', async() => {
-    await users.login(ADMIN_USER1_EMAIL, true);
-    await adminPage.getFeaturesTab();
+  it('should not show indicators gated by dummy feature when disabled',
+    async() => {
+      await users.login(ADMIN_USER1_EMAIL, true);
+      await adminPage.getFeaturesTab();
 
-    expect(await indicator.isPresent()).toBe(false);
-    expect(await indicatorAjs.isPresent()).toBe(false);
-  });
+      expect(await agDummyFeatureIndicator.isPresent()).toBe(false);
+      expect(await ajsDummyFeatureIndicator.isPresent()).toBe(false);
+    }
+  );
 
   it('should show dummy feature in the features tab', async() => {
     await users.login(ADMIN_USER1_EMAIL, true);
@@ -84,9 +98,8 @@ describe('Feature Gating Flow', function() {
 
     await adminPage.getFeaturesTab();
 
-    expect(await indicator.isPresent()).toBe(true);
-    expect(await indicatorAjs.isPresent()).toBe(true);
-    expect(await indicator.isElementPresent(
-      by.css('.protractor-test-angular-dummy-handler-indicator'))).toBe(true);
+    expect(await agDummyFeatureIndicator.isPresent()).toBe(true);
+    expect(await agDummyHandlerIndicator.isPresent()).toBe(true);
+    expect(await ajsDummyFeatureIndicator.isPresent()).toBe(true);
   });
 });

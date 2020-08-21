@@ -116,31 +116,93 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self._enable_dummy_feature()
+    def tearDown(self):
+        feature_services.update_feature_flag_rules(
+            param_list.PARAM_NAMES.dummy_feature, self.user_id,
+            'clear rule', []
+        )
 
-    def _enable_dummy_feature(self):
+        super(PlatformFeatureDummyHandlerTest, self).tearDown()
+
+    def _set_dummy_feature_status_for_mode(self, is_enabled, mode):
         """Enables the dummy_feature for the dev environment."""
         feature_services.update_feature_flag_rules(
             param_list.PARAM_NAMES.dummy_feature, self.user_id,
             'update rule for testing purpose',
             [{
-                'value_when_matched': True,
+                'value_when_matched': is_enabled,
                 'filters': [{
                     'type': 'server_mode',
-                    'conditions': [['=', param_domain.SERVER_MODES.dev]]
+                    'conditions': [['=', mode]]
                 }]
             }]
         )
 
-    def test_get_with_dummy_feature_enabled_returns_ok(self):
-        with self.swap(constants, 'DEV_MODE', True):
+    def _mock_dummy_feature_stage(self, stage):
+        """Creates a mock context in which the dummy_feature is at the
+        specified stage.
+        """
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            [param_list.PARAM_NAMES.dummy_feature])
+
+        feature = registry.Registry.parameter_registry.get(
+            param_list.PARAM_NAMES.dummy_feature)
+        return self.swap(feature, '_feature_stage', stage)
+
+    def test_get_with_dummy_feature_enabled_in_dev_returns_ok(self):
+        dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
+        dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
+            param_domain.FEATURE_STAGES.dev)
+
+        with dev_mode_ctx, dummy_feature_dev_stage_context:
+            self._set_dummy_feature_status_for_mode(
+                True, param_domain.SERVER_MODES.dev
+            )
+
             result = self.get_json(
                 '/platform_feature_dummy_handler',
             )
             self.assertEqual(result, {'msg': 'ok'})
 
-    def test_get_with_dummy_feature_disabled_raises_404(self):
-        with self.swap(constants, 'DEV_MODE', False):
+    def test_get_with_dummy_feature_disabled_in_dev_raises_404(self):
+        dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
+        dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
+            param_domain.FEATURE_STAGES.dev)
+
+        with dev_mode_ctx, dummy_feature_dev_stage_context:
+            self._set_dummy_feature_status_for_mode(
+                False, param_domain.SERVER_MODES.dev
+            )
+            self.get_json(
+                '/platform_feature_dummy_handler',
+                expected_status_int=404
+            )
+
+    def test_get_with_dummy_feature_enabled_in_prod_returns_ok(self):
+        dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
+        dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
+            param_domain.FEATURE_STAGES.prod)
+
+        with dev_mode_ctx, dummy_feature_prod_stage_context:
+            self._set_dummy_feature_status_for_mode(
+                True, param_domain.SERVER_MODES.prod
+            )
+
+            result = self.get_json(
+                '/platform_feature_dummy_handler',
+            )
+            self.assertEqual(result, {'msg': 'ok'})
+
+    def test_get_with_dummy_feature_disabled_in_prod_raises_404(self):
+        dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
+        dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
+            param_domain.FEATURE_STAGES.prod)
+
+        with dev_mode_ctx, dummy_feature_prod_stage_context:
+            self._set_dummy_feature_status_for_mode(
+                False, param_domain.SERVER_MODES.prod
+            )
             self.get_json(
                 '/platform_feature_dummy_handler',
                 expected_status_int=404

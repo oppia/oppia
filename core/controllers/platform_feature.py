@@ -57,7 +57,7 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
 
 
 class PlatformFeatureDummyHandler(base.BaseHandler):
-    """Dummy handler for testing feature gating flow."""
+    """Dummy handler for testing e2e feature gating flow."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

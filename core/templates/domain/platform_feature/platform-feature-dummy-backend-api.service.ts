@@ -23,6 +23,11 @@ import { Injectable } from '@angular/core';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
 
+/**
+ * Api service for the backend dummy handler that is gated by the
+ * dummy_feature. This api is used for testing the end-to-end feature gating
+ * flow.
+ */
 @Injectable({
   providedIn: 'root'
 })
