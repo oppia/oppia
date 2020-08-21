@@ -84,7 +84,7 @@ export class AnswerGroup {
     };
   }
 
-  addRule(rule: Rule) {
+  addRule(rule: Rule): void {
     if (!this.ruleTypesToSubtitledInputs.hasOwnProperty(rule.type)) {
       this.ruleTypesToSubtitledInputs[rule.type] = (
         new SubtitledVariableLengthListOfRuleInputs([], null));
@@ -92,12 +92,13 @@ export class AnswerGroup {
     this.ruleTypesToSubtitledInputs[rule.type].ruleInputs.push(rule.inputs);
   }
 
-  updateRuleTypesToSubtitledInputs(rules: Rule[]) {
+  updateRuleTypesToSubtitledInputs(rules: Rule[]): void {
     this.ruleTypesToSubtitledInputs = {};
     rules.forEach(this.addRule.bind(this));
   }
 
-  static getRuleTypesInDisplayOrder(ruleTypesToSubtitledInputs: RuleInputs) {
+  static getRuleTypesInDisplayOrder(
+      ruleTypesToSubtitledInputs: RuleInputs): string[] {
     // Sort rule types so that Equals always is first and tempRule is always
     // last, followed by all other rule types sorted alphabetically. tempRule
     // is used in answer-group-editor to create new rules.

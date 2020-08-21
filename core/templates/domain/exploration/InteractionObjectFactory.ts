@@ -425,7 +425,7 @@ export class InteractionObjectFactory {
   }
 
   generateAnswerGroupsFromBackend(
-      answerGroupBackendDicts: AnswerGroupBackendDict[]) {
+      answerGroupBackendDicts: AnswerGroupBackendDict[]): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
       return this.answerGroupFactory.createFromBackendDict(
@@ -433,13 +433,14 @@ export class InteractionObjectFactory {
     });
   }
 
-  generateHintsFromBackend(hintBackendDicts: HintBackendDict[]) {
+  generateHintsFromBackend(hintBackendDicts: HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });
   }
 
-  generateSolutionFromBackend(solutionBackendDict: SolutionBackendDict) {
+  generateSolutionFromBackend(
+      solutionBackendDict: SolutionBackendDict): Solution {
     return this.solutionFactory.createFromBackendDict(solutionBackendDict);
   }
 }

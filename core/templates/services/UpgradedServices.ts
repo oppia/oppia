@@ -665,12 +665,15 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 
+interface UpgradedServicesDict {
+  [service: string]: unknown;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class UpgradedServices {
-  getUpgradedServices() {
+  getUpgradedServices(): UpgradedServicesDict {
     var upgradedServices = {};
     /* eslint-disable dot-notation */
 
