@@ -1932,7 +1932,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         filenames in the expected pattern.
         """
         filename_pattern_regex = (
-            r'mathImg_[A-Za-z0-9+/_-]+_height_[0-9d]+_width_[0-9d]+_vertical'
+            r'mathImg_[a-z0-9+/_-]+_height_[0-9d]+_width_[0-9d]+_vertical'
             '_[0-9d]+.(svg)$')
         filenames = []
 
@@ -1997,7 +1997,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             extract_svg_filenames_in_math_rte_components(converted_html_string))
         self.assertEqual(len(filenames), 3)
         filename_pattern_regex = (
-            r'mathImg_[A-Za-z0-9+/_-]+_height_[0-9d]+_width_[0-9d]+_vertical'
+            r'mathImg_[a-z0-9+/_-]+_height_[0-9d]+_width_[0-9d]+_vertical'
             '_[0-9d]+.(svg)$')
         for filename in filenames:
             self.assertTrue(re.match(filename_pattern_regex, filename))
