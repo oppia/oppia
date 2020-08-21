@@ -452,6 +452,8 @@ angular.module('oppia').component('stateTranslation', {
           .getInteractionDefaultOutcomeMemento($scope.stateName);
         $scope.stateInteractionId = ExplorationStatesService
           .getInteractionIdMemento($scope.stateName);
+        $scope.stateInteractionCustomizationArgs = ExplorationStatesService
+          .getInteractionCustomizationArgsMemento($scope.stateName);
         $scope.activeHintIndex = null;
         $scope.activeAnswerGroupIndex = null;
         var currentCustomizationArgs = ExplorationStatesService

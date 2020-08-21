@@ -453,13 +453,13 @@ describe('State translation component', function() {
     }));
 
     it('should init state translation when refreshing page', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       refreshStateTranslationEmitter.emit();
 
       expect($scope.isActive('content')).toBe(true);
       expect($scope.isDisabled('content')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('content_1');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('content_1', 'html');
     });
 
     it('should navigate to a given state', function() {
@@ -487,13 +487,13 @@ describe('State translation component', function() {
       });
 
     it('should activate content tab when clicking on tab', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('content');
 
       expect($scope.isActive('content')).toBe(true);
       expect($scope.isDisabled('content')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('content_1');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('content_1', 'html');
       expect($scope.tabStatusColorStyle('content')).toEqual({
         'border-top-color': '#D14836'
       });
@@ -505,13 +505,13 @@ describe('State translation component', function() {
     });
 
     it('should activate feedback tab when clicking on tab', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('feedback');
 
       expect($scope.isActive('feedback')).toBe(true);
       expect($scope.isDisabled('feedback')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('feedback_1');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('feedback_1', 'html');
       expect($scope.tabStatusColorStyle('feedback')).toEqual({
         'border-top-color': '#D14836'
       });
@@ -523,13 +523,13 @@ describe('State translation component', function() {
     });
 
     it('should activate hint tab when clicking on tab', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('hint');
 
       expect($scope.isActive('hint')).toBe(true);
       expect($scope.isDisabled('hint')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('hint_1');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('hint_1', 'html');
       expect($scope.tabStatusColorStyle('hint')).toEqual({
         'border-top-color': '#D14836'
       });
@@ -541,13 +541,13 @@ describe('State translation component', function() {
     });
 
     it('should activate solution tab when clicking on tab', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('solution');
 
       expect($scope.isActive('solution')).toBe(true);
       expect($scope.isDisabled('solution')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('solution_1');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('solution_1', 'html');
       expect($scope.tabStatusColorStyle('solution')).toEqual({
         'border-top-color': '#D14836'
       });
@@ -561,53 +561,53 @@ describe('State translation component', function() {
     it('should change active hint index ', function() {
       $scope.onTabClick('hint');
 
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveHintIndex(1);
 
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('hint_2');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('hint_2', 'html');
     });
 
     it('should not change active hint index if it is equal to the current one',
       function() {
         $scope.onTabClick('hint');
 
-        spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
         $scope.changeActiveHintIndex(0);
 
-        expect(translationTabActiveContentIdService.setActiveContentId).not
+        expect(translationTabActiveContentIdService.setActiveContent).not
           .toHaveBeenCalled();
       });
 
     it('should change active answer group index ', function() {
       $scope.onTabClick('feedback');
 
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveAnswerGroupIndex(1);
 
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('feedback_2');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('feedback_2', 'html');
     });
 
     it('should change active answer group index to default outcome when' +
       ' index provided is equal to answer groups length', function() {
       $scope.onTabClick('feedback');
 
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveAnswerGroupIndex(2);
 
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('default_outcome');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('default_outcome', 'html');
     });
 
     it('should not change active hint index if it is equal to the current one',
       function() {
         $scope.onTabClick('feedback');
 
-        spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
         $scope.changeActiveAnswerGroupIndex(0);
 
-        expect(translationTabActiveContentIdService.setActiveContentId).not
+        expect(translationTabActiveContentIdService.setActiveContent).not
           .toHaveBeenCalled();
       });
 
@@ -617,7 +617,8 @@ describe('State translation component', function() {
         html: 'This is the html'
       });
       expect($scope.getRequiredHtml(subtitledObject)).toBe('Translation');
-      expect($scope.getHtmlSummary(subtitledObject)).toBe('This is the html');
+      expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
+        'This is the html');
     });
 
     it('should get empty content message when text translations haven\'t' +
@@ -705,66 +706,66 @@ describe('State translation component', function() {
     it('should open translation tab busy modal when clicking on content' +
       ' tab', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('content');
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when clicking on feedback' +
       ' tab', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('feedback');
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when clicking on hint' +
       ' tab', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('hint');
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when clicking on solution' +
       ' tab', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('solution');
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when trying to change' +
       ' active hint index ', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveHintIndex(1);
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when trying to change' +
       ' active answer group index ', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveAnswerGroupIndex(1);
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
@@ -774,7 +775,8 @@ describe('State translation component', function() {
         html: 'This is the html'
       });
       expect($scope.getRequiredHtml(subtitledObject)).toBe('This is the html');
-      expect($scope.getHtmlSummary(subtitledObject)).toBe('This is the html');
+      expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
+        'This is the html');
     });
 
     it('should get content message warning that there is not text available' +
@@ -818,13 +820,13 @@ describe('State translation component', function() {
 
     it('should activate feedback tab with default outcome when' +
       ' clicking on tab', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('feedback');
 
       expect($scope.isActive('feedback')).toBe(true);
       expect($scope.isDisabled('feedback')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('default_outcome');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('default_outcome', 'html');
     });
   });
 
