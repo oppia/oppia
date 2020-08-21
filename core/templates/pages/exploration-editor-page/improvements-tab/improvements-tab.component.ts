@@ -38,7 +38,7 @@ angular.module('oppia').component('improvementsTab', {
         ExplorationImprovementsTaskRegistryService, RouterService,
         UrlInterpolationService) {
       this.$onInit = () => {
-        this.isInitialized = false;
+        this.componentIsInitialized = false;
         this.timeMachineImageUrl = (
           UrlInterpolationService.getStaticImageUrl('/icons/time_machine.svg'));
         this.navigateToStateEditor = (stateName: string) => {
@@ -128,7 +128,7 @@ angular.module('oppia').component('improvementsTab', {
               stateVisibility.set(stateName, !stateVisibility.get(stateName));
             };
 
-            this.isInitialized = true;
+            this.componentIsInitialized = true;
           });
       };
     },

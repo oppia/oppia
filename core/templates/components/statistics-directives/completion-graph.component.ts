@@ -27,7 +27,7 @@ angular.module('oppia').component('completionGraph', {
       this.completionBarStyle = {
         'stroke-dasharray': ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH,
         'stroke-dashoffset': (
-          (1 - this.completionRate) *
+          (1.0 - this.completionRate) *
           ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH),
       };
     };

@@ -114,7 +114,7 @@ describe('Improvements tab', function() {
     flushMicrotasks();
     $scope.$apply();
 
-    expect($ctrl.isInitialized).toBeTrue();
+    expect($ctrl.componentIsInitialized).toBeTrue();
   }));
 
   it('should not initialize if improvements tab is disabled', fakeAsync(() => {
@@ -125,7 +125,7 @@ describe('Improvements tab', function() {
     flushMicrotasks();
     $scope.$apply();
 
-    expect($ctrl.isInitialized).toBeFalse();
+    expect($ctrl.componentIsInitialized).toBeFalse();
   }));
 
   describe('Post-initialization', () => {
