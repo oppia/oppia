@@ -20,6 +20,8 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
+import { ReadOnlyTopic } from
+  'domain/topic_viewer/read-only-topic-object.factory';
 import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
 import { Subtopic, SkillIdToDescriptionMap } from
   'domain/topic/SubtopicObjectFactory';
@@ -85,7 +87,7 @@ export class TopicViewerPageComponent implements OnInit {
     this.loaderService.showLoadingScreen('Loading');
     this.topicViewerBackendApiService.fetchTopicData(
       this.topicUrlFragment, this.classroomUrlFragment).then(
-      readOnlyTopic => {
+      (readOnlyTopic: ReadOnlyTopic) => {
         this.topicId = readOnlyTopic.getTopicId();
         this.topicName = readOnlyTopic.getTopicName();
         this.topicDescription = readOnlyTopic.getTopicDescription();

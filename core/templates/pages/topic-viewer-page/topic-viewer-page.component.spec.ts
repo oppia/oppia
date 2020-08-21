@@ -18,6 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ReadOnlyTopicObjectFactory } from
@@ -32,6 +33,12 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { PageTitleService } from 'services/page-title.service';
 
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined):string {
+    return value;
+  }
+}
 
 describe('Topic viewer page', () => {
   let httpTestingController = null;
@@ -68,17 +75,19 @@ describe('Topic viewer page', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      declarations: [TopicViewerPageComponent, MockTranslatePipe],
       imports: [HttpClientTestingModule],
-      providers: [TopicViewerPageComponent]
-    });
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
     httpTestingController = TestBed.get(HttpTestingController);
     alertsService = TestBed.get(AlertsService);
     pageTitleService = TestBed.get(PageTitleService);
     topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
     urlService = TestBed.get(UrlService);
     windowDimensionsService = TestBed.get(WindowDimensionsService);
-    topicViewerPageComponent = TestBed.get(TopicViewerPageComponent);
     readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
+    let fixture = TestBed.createComponent(TopicViewerPageComponent);
+    topicViewerPageComponent = fixture.componentInstance;
   });
 
   afterEach(() => {
