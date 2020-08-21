@@ -570,7 +570,8 @@ angular.module('oppia').directive('questionsList', [
                 controller: 'ConfirmOrCancelModalController'
               }).result.then(function(commitMsg) {
                 commitMessage = commitMsg;
-                if (ctrl.skillLinkageModificationsArray.length > 0) {
+                if (ctrl.skillLinkageModificationsArray &&
+                    ctrl.skillLinkageModificationsArray.length > 0) {
                   ctrl.updateSkillLinkage(commitMessage);
                 } else {
                   ContextService.resetImageSaveDestination();
