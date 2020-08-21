@@ -60,12 +60,12 @@
 </style>
 
 <div class="h-100">
-  <div ng-if="$ctrl.ruleTypesToInputs">
+  <div ng-if="$ctrl.ruleTypesToSubtitledInputs">
     <strong>
       If the learner's answer...
     </strong>
     <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist" ng-repeat="ruleType in $ctrl.getRuleTypes()">
-      <li ng-repeat="ruleInput in $ctrl.ruleTypesToInputs[ruleType].ruleInputs" ng-class="{'active': $ctrl.activeRuleType === ruleType, 'oppia-answer-rule-block': $last}" class="mt-0 oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block">
+      <li ng-repeat="ruleInput in $ctrl.ruleTypesToSubtitledInputs[ruleType].ruleInputs" ng-class="{'active': $ctrl.activeRuleType === ruleType, 'oppia-answer-rule-block': $last}" class="mt-0 oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block">
         <a ng-click="$ctrl.openRuleEditor(ruleType, $index, ruleInput)" ng-hide="$ctrl.activeRuleType === ruleType && $ctrl.activeRuleInputIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !$ctrl.isEditable}">
           <div class="oppia-rule-header">
             <span ng-if="$index > 0">or</span>
@@ -106,7 +106,7 @@
     </div>
   </div>
 
-  <br ng-if="ruleTypesToInputs">
+  <br ng-if="ruleTypesToSubtitledInputs">
 
   <outcome-editor is-editable="$ctrl.isEditable"
                   display-feedback="$ctrl.displayFeedback"
@@ -123,7 +123,7 @@
                                  on-save-tagged-misconception="$ctrl.onSaveTaggedMisconception"
                                  on-save-answer-group-feedback="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
                                  outcome="$ctrl.outcome"
-                                 rule-types-to-inputs="$ctrl.ruleTypesToInputs"
+                                 rule-types-to-inputs="$ctrl.ruleTypesToSubtitledInputs"
                                  tagged-skill-misconception-id="$ctrl.taggedSkillMisconceptionId">
   </question-misconception-editor>
 </div>

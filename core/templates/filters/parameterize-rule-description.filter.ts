@@ -37,6 +37,11 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
         console.error('Cannot find interaction with id ' + interactionId);
         return '';
       }
+
+      if (rule.type === 'tempRule') {
+        return '';
+      }
+
       var description = INTERACTION_SPECS[interactionId].rule_descriptions[
         rule.type];
       if (!description) {

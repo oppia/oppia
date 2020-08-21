@@ -77,6 +77,10 @@ describe('Testing filters', function() {
       ).toEqual(
         'is equal to \'$xyz should not become $$xyz\', ' +
         'without taking case into account');
+
+      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
+        'tempRule', choicesMultipleChoice)
+      ).toEqual('');
     }));
 
   it('should correctly display RTE components in Answer Group Header',
