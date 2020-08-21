@@ -120,7 +120,7 @@ angular.module('oppia').directive('storySummaryTile', [
                 ctrl.completedStoriesCount++;
               }
             }
-            ctrl.storyProgress = parseInt(
+            ctrl.storyProgress = Math.floor(
               (ctrl.completedStoriesCount / ctrl.nodeCount) * 100);
 
             ctrl.chaptersDisplayed = 3;
