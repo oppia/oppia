@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import caching_services
 from core.domain import platform_parameter_domain
 from core.platform import models
 import feconf
@@ -27,7 +28,6 @@ import python_utils
 
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
-memcache_services = models.Registry.import_memcache_services()
 
 DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
@@ -143,11 +143,11 @@ class Registry(python_utils.OBJECT):
         else:
             raise Exception('Platform parameter not found: %s.' % name)
 
-        memcache_key = (
-            platform_parameter_domain.PlatformParameter.get_memcache_key(name))
-        memcache_services.set_multi({
-            memcache_key: parameter,
-        })
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            {
+                name: parameter,
+            })
         return parameter
 
     @classmethod
@@ -191,8 +191,8 @@ class Registry(python_utils.OBJECT):
             }]
         )
 
-        memcache_services.delete(
-            platform_parameter_domain.PlatformParameter.get_memcache_key(name))
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, [name])
 
     @classmethod
     def get_all_platform_parameter_names(cls):
@@ -279,10 +279,9 @@ class Registry(python_utils.OBJECT):
             PlatformParameter|None. The loaded instance, None if it's not found
             in cache.
         """
-        memcache_key = (
-            platform_parameter_domain.PlatformParameter.get_memcache_key(name))
-        cached_parameter = memcache_services.get_multi([memcache_key]).get(
-            memcache_key)
+        cached_parameter = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, [name]
+        ).get(name)
         return cached_parameter
 
     @classmethod
