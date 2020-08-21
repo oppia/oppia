@@ -62,37 +62,37 @@ describe('Keyboard Shortcuts', () => {
     expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+0');
-    expect(mockWindow.location.href).toEqual('/get-started');
+    expect(windowRef.nativeWindow.location.href).toEqual('/get-started');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+1');
-    expect(mockWindow.location.href).toEqual('/community-library');
+    expect(windowRef.nativeWindow.location.href).toEqual('/community-library');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+2');
-    expect(mockWindow.location.href).toEqual('/learner-dashboard');
+    expect(windowRef.nativeWindow.location.href).toEqual('/learner-dashboard');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+3');
-    expect(mockWindow.location.href).toEqual('/creator-dashboard');
+    expect(windowRef.nativeWindow.location.href).toEqual('/creator-dashboard');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+4');
-    expect(mockWindow.location.href).toEqual('/about');
+    expect(windowRef.nativeWindow.location.href).toEqual('/about');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+5');
-    expect(mockWindow.location.href).toEqual('/notifications');
+    expect(windowRef.nativeWindow.location.href).toEqual('/notifications');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+6');
-    expect(mockWindow.location.href).toEqual('/preferences');
+    expect(windowRef.nativeWindow.location.href).toEqual('/preferences');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
   });
