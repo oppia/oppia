@@ -66,8 +66,9 @@ describe('Improvements tab', function() {
     $ctrl = $componentController('improvementsTab');
   }));
 
-  const emptyStats = new ExplorationStats('id', 1, 0, 0, 0, new Map([
-    ['Introduction', new StateStats(0, 0, 0, 0, 0, 0)],
+  const emptyStateStats = new StateStats(0, 0, 0, 0, 0, 0);
+  const emptyExpStats = new ExplorationStats('id', 1, 0, 0, 0, new Map([
+    ['Introduction', emptyStateStats],
   ]));
 
   beforeEach(() => {
@@ -83,7 +84,7 @@ describe('Improvements tab', function() {
     this.stateTasksSpy = spyOn(taskRegistryService, 'getStateTasks');
     this.allStateTasksSpy = spyOn(taskRegistryService, 'getAllStateTasks');
 
-    this.expStatsSpy.and.returnValue(emptyStats);
+    this.expStatsSpy.and.returnValue(emptyExpStats);
     this.hbrTasksSpy.and.returnValue([]);
     this.iflTasksSpy.and.returnValue([]);
     this.ngrTasksSpy.and.returnValue([]);
@@ -252,19 +253,21 @@ describe('Improvements tab', function() {
     it('should provide the number of open cards in a state', fakeAsync(() => {
       this.expStatsSpy.and.returnValue(
         new ExplorationStats('id', 1, 0, 0, 0, new Map([
-          ['Introduction', new StateStats(0, 0, 0, 0, 0, 0)],
-          ['End', new StateStats(0, 0, 0, 0, 0, 0)],
+          ['Introduction', emptyStateStats],
+          ['End', emptyStateStats],
         ])));
       const stateTasks = {
         Introduction: {
           stateName: 'Introduction',
           ngrTask: newNgrTask(true),
-          siaTask: newSiaTask(false)
+          siaTask: newSiaTask(false),
+          supportingStats: {stateStats: emptyStateStats},
         },
         End: {
           stateName: 'End',
           ngrTask: newNgrTask(true),
-          siaTask: newSiaTask(true)
+          siaTask: newSiaTask(true),
+          supportingStats: {stateStats: emptyStateStats},
         },
       };
       this.stateTasksSpy.and.callFake(stateName => stateTasks[stateName]);
@@ -280,21 +283,21 @@ describe('Improvements tab', function() {
     it('can toggle the visibility of state tasks', fakeAsync(() => {
       this.expStatsSpy.and.returnValue(
         new ExplorationStats('id', 1, 0, 0, 0, new Map([
-          ['Introduction', new StateStats(0, 0, 0, 0, 0, 0)],
-          ['End', new StateStats(0, 0, 0, 0, 0, 0)],
+          ['Introduction', emptyStateStats],
+          ['End', emptyStateStats],
         ])));
       this.allStateTasksSpy.and.returnValue([
         {
           stateName: 'Introduction',
           ngrTask: newNgrTask(),
           siaTask: newSiaTask(),
-          supportingStats: {stateStats: new StateStats(0, 0, 0, 0, 0, 0)},
+          supportingStats: {stateStats: emptyStateStats},
         },
         {
           stateName: 'End',
           ngrTask: newNgrTask(),
           siaTask: newSiaTask(),
-          supportingStats: {stateStats: new StateStats(0, 0, 0, 0, 0, 0)},
+          supportingStats: {stateStats: emptyStateStats},
         },
       ]);
 
