@@ -322,7 +322,8 @@ def _collect_activity_ids_from_snapshots_and_commit(
         snapshot_metadata_models.extend(
             snapshot_model_class.query(ndb.OR(
                 snapshot_model_class.committer_id == user_id,
-                snapshot_model_class.mentioned_user_ids == user_id
+                snapshot_model_class.commit_cmds_user_ids == user_id,
+                snapshot_model_class.content_user_ids == user_id,
             )).fetch()
         )
     snapshot_metadata_ids = set(
@@ -391,7 +392,7 @@ def _pseudonymize_activity_models(
             _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
         save_pending_deletion_request(pending_deletion_request)
 
-    def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
+    def _pseudonymize_models(activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -400,25 +401,25 @@ def _pseudonymize_activity_models(
         Args:
             activity_related_models: list(BaseModel). Models whose user IDs
                 should be pseudonymized.
-            pseudonymized_user_id: str. New pseudonymized user ID to be used for
+            pseudonymized_id: str. New pseudonymized user ID to be used for
                 the models.
         """
         metadata_models = [
             model for model in activity_related_models
             if isinstance(model, snapshot_model_class)]
         for metadata_model in metadata_models:
-            metadata_model.committer_id = pseudonymized_user_id
+            metadata_model.committer_id = pseudonymized_id
 
         commit_log_models = [
             model for model in activity_related_models
             if isinstance(model, commit_log_model_class)]
         for commit_log_model in commit_log_models:
-            commit_log_model.user_id = pseudonymized_user_id
+            commit_log_model.user_id = pseudonymized_id
         ndb.put_multi(metadata_models + commit_log_models)
 
     activity_ids_to_pids = (
         pending_deletion_request.activity_mappings[activity_category])
-    for activity_id, pseudonymized_user_id in activity_ids_to_pids.items():
+    for activity_id, pseudonymized_id in activity_ids_to_pids.items():
         activity_related_models = [
             model for model in snapshot_metadata_models
             if model.get_unversioned_instance_id() == activity_id
@@ -433,11 +434,10 @@ def _pseudonymize_activity_models(
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
                 activity_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-                pseudonymized_user_id)
+                pseudonymized_id)
 
 
-def _pseudonymize_collection_models(
-        pending_deletion_request):
+def _pseudonymize_collection_models(pending_deletion_request):
     """Pseudonymize the collection models for the user with user_id.
 
     Args:
@@ -461,12 +461,13 @@ def _pseudonymize_collection_models(
 
     # The activity_mappings field might have only been partially generated, so
     # we fill in the missing part for this activity category.
-    if models.NAMES.topic not in pending_deletion_request.activity_mappings:
+    if (models.NAMES.collection not in
+            pending_deletion_request.activity_mappings):
         pending_deletion_request.activity_mappings[models.NAMES.collection] = (
             _generate_activity_to_pseudonymized_ids_mapping(collection_ids))
         save_pending_deletion_request(pending_deletion_request)
 
-    def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
+    def _pseudonymize_models(activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -475,28 +476,47 @@ def _pseudonymize_collection_models(
         Args:
             activity_related_models: list(BaseModel). Models whose user IDs
                 should be pseudonymized.
-            pseudonymized_user_id: str. New pseudonymized user ID to be used for
+            pseudonymized_id: str. New pseudonymized user ID to be used for
                 the models.
         """
         snapshot_metadata_models = [
             model for model in activity_related_models
-            if isinstance(model, topic_models.TopicSnapshotMetadataModel) or
-               isinstance(model, topic_models.TopicRightsSnapshotMetadataModel)
+            if isinstance(
+                model,
+                (
+                    collection_models.CollectionSnapshotMetadataModel,
+                    collection_models.CollectionRightsSnapshotMetadataModel
+                )
+            )
         ]
         for snapshot_metadata_model in snapshot_metadata_models:
-            snapshot_metadata_model.committer_id = pseudonymized_user_id
+            content_user_id = snapshot_metadata_model.content_user_ids
+            if user_id in content_user_id:
+                snapshot_metadata_model.content_user_ids = [
+                    pseudonymized_id if model_user_id == user_id else user_id
+                    for model_user_id in content_user_id
+                ]
+            commit_cmds_user_id = snapshot_metadata_model.commit_cmds_user_id
+            if user_id in commit_cmds_user_id:
+                snapshot_metadata_model.commit_cmds_user_id = [
+                    pseudonymized_id if model_user_id == user_id else user_id
+                    for model_user_id in commit_cmds_user_id
+                ]
+            if user_id == snapshot_metadata_model.committer_id:
+                snapshot_metadata_model.committer_id = pseudonymized_id
 
         commit_log_models = [
             model for model in activity_related_models
-            if isinstance(model, topic_models.TopicCommitLogEntryModel)]
+            if isinstance(
+                model, collection_models.CollectionCommitLogEntryModel)]
         for commit_log_model in commit_log_models:
-            commit_log_model.user_id = pseudonymized_user_id
+            commit_log_model.user_id = pseudonymized_id
 
         ndb.put_multi(snapshot_metadata_models + commit_log_models)
 
     collection_ids_to_pids = (
-        pending_deletion_request.activity_mappings[models.NAMES.topic])
-    for collection_id, pseudonymized_user_id in collection_ids_to_pids.items():
+        pending_deletion_request.activity_mappings[models.NAMES.collection])
+    for collection_id, pseudonymized_id in collection_ids_to_pids.items():
         collection_related_models = [
             model for model in snapshot_metadata_models
             if model.get_unversioned_instance_id() == collection_id
@@ -512,11 +532,10 @@ def _pseudonymize_collection_models(
                 _pseudonymize_models,
                 collection_related_models[
                     i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-                pseudonymized_user_id)
+                pseudonymized_id)
 
 
-def _pseudonymize_topic_models(
-        pending_deletion_request):
+def _pseudonymize_topic_models(pending_deletion_request):
     """Pseudonymize the activity models for the user with user_id.
 
     Args:
@@ -545,7 +564,7 @@ def _pseudonymize_topic_models(
             _generate_activity_to_pseudonymized_ids_mapping(topic_ids))
         save_pending_deletion_request(pending_deletion_request)
 
-    def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
+    def _pseudonymize_models(activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -554,28 +573,33 @@ def _pseudonymize_topic_models(
         Args:
             activity_related_models: list(BaseModel). Models whose user IDs
                 should be pseudonymized.
-            pseudonymized_user_id: str. New pseudonymized user ID to be used for
+            pseudonymized_id: str. New pseudonymized user ID to be used for
                 the models.
         """
         snapshot_metadata_models = [
             model for model in activity_related_models
-            if isinstance(model, topic_models.TopicSnapshotMetadataModel) or
-               isinstance(model, topic_models.TopicRightsSnapshotMetadataModel)
+            if isinstance(
+                model,
+                (
+                    topic_models.TopicSnapshotMetadataModel,
+                    topic_models.TopicRightsSnapshotMetadataModel
+                )
+            )
         ]
         for snapshot_metadata_model in snapshot_metadata_models:
-            snapshot_metadata_model.committer_id = pseudonymized_user_id
+            snapshot_metadata_model.committer_id = pseudonymized_id
 
         commit_log_models = [
             model for model in activity_related_models
             if isinstance(model, topic_models.TopicCommitLogEntryModel)]
         for commit_log_model in commit_log_models:
-            commit_log_model.user_id = pseudonymized_user_id
+            commit_log_model.user_id = pseudonymized_id
 
         ndb.put_multi(snapshot_metadata_models + commit_log_models)
 
     topic_ids_to_pids = (
         pending_deletion_request.activity_mappings[models.NAMES.topic])
-    for topic_id, pseudonymized_user_id in topic_ids_to_pids.items():
+    for topic_id, pseudonymized_id in topic_ids_to_pids.items():
         topic_related_models = [
             model for model in snapshot_metadata_models
             if model.get_unversioned_instance_id() == topic_id
@@ -590,7 +614,7 @@ def _pseudonymize_topic_models(
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
                 topic_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-                pseudonymized_user_id)
+                pseudonymized_id)
 
 
 def _pseudonymize_feedback_models(pending_deletion_request):
@@ -636,7 +660,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
         )
         save_pending_deletion_request(pending_deletion_request)
 
-    def _pseudonymize_models(feedback_related_models, pseudonymized_user_id):
+    def _pseudonymize_models(feedback_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
@@ -645,7 +669,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
         Args:
             feedback_related_models: list(BaseModel). Models whose user IDs
                 should be pseudonymized.
-            pseudonymized_user_id: str. New pseudonymized user ID to be used for
+            pseudonymized_id: str. New pseudonymized user ID to be used for
                 the models.
         """
         feedback_thread_models = [
@@ -653,26 +677,26 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             if isinstance(model, feedback_thread_model_class)]
         for feedback_thread_model in feedback_thread_models:
             if feedback_thread_model.original_author_id == user_id:
-                feedback_thread_model.original_author_id = pseudonymized_user_id
+                feedback_thread_model.original_author_id = pseudonymized_id
             if feedback_thread_model.last_nonempty_message_author_id == user_id:
                 feedback_thread_model.last_nonempty_message_author_id = (
-                    pseudonymized_user_id)
+                    pseudonymized_id)
 
         feedback_message_models = [
             model for model in feedback_related_models
             if isinstance(model, feedback_message_model_class)]
         for feedback_message_model in feedback_message_models:
-            feedback_message_model.author_id = pseudonymized_user_id
+            feedback_message_model.author_id = pseudonymized_id
 
         general_suggestion_models = [
             model for model in feedback_related_models
             if isinstance(model, suggestion_model_class)]
         for general_suggestion_model in general_suggestion_models:
             if general_suggestion_model.author_id == user_id:
-                general_suggestion_model.author_id = pseudonymized_user_id
+                general_suggestion_model.author_id = pseudonymized_id
             if general_suggestion_model.final_reviewer_id == user_id:
                 general_suggestion_model.final_reviewer_id = (
-                    pseudonymized_user_id)
+                    pseudonymized_id)
 
         ndb.put_multi(
             feedback_thread_models +
@@ -682,7 +706,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
 
     feedback_ids_to_pids = (
         pending_deletion_request.activity_mappings[models.NAMES.feedback])
-    for feedback_id, pseudonymized_user_id in feedback_ids_to_pids.items():
+    for feedback_id, pseudonymized_id in feedback_ids_to_pids.items():
         feedback_related_models = [
             model for model in feedback_thread_models
             if model.id == feedback_id
@@ -700,7 +724,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
                 feedback_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-                pseudonymized_user_id)
+                pseudonymized_id)
 
 
 def _pseudonymize_suggestion_models(pending_deletion_request):
