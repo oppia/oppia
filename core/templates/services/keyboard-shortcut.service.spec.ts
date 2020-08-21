@@ -60,23 +60,21 @@ describe('Keyboard Shortcuts', () => {
 
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
-    
+
     Mousetrap.trigger('ctrl+0');
     expect(mockWindow.location.href).toEqual('/get-started');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
-    
+
     Mousetrap.trigger('ctrl+1');
     expect(mockWindow.location.href).toEqual('/community-library');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
-    
-    
+
     Mousetrap.trigger('ctrl+2');
     expect(mockWindow.location.href).toEqual('/learner-dashboard');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
-
 
     Mousetrap.trigger('ctrl+3');
     expect(mockWindow.location.href).toEqual('/creator-dashboard');
