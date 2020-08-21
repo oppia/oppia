@@ -149,6 +149,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                   getDefaultInputValue('Real')];
               case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
+              case 'SetOfAlgebraicIdentifier':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
                 return [];

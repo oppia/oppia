@@ -7,6 +7,18 @@
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|AlgebraicExpression}}",
       "translatable": false
+    },
+    "ContainsSomeOf": {
+      "description": "contains at least one of the terms present in {{x|AlgebraicExpression}}",
+      "translatable": false
+    },
+    "OmitsSomeOf": {
+      "description": "omits at least one of the terms present in {{x|AlgebraicExpression}}",
+      "translatable": false
+    },
+    "MatchesWithGeneralForm": {
+      "description": "matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}",
+      "translatable": false
     }
   },
   "CodeRepl": {
@@ -162,6 +174,18 @@
     },
     "IsEquivalentTo": {
       "description": "is equivalent to {{x|MathEquation}}",
+      "translatable": false
+    },
+    "ContainsSomeOf": {
+      "description": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
+      "translatable": false
+    },
+    "OmitsSomeOf": {
+      "description": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
+      "translatable": false
+    },
+    "MatchesWithGeneralForm": {
+      "description": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}",
       "translatable": false
     }
   },
