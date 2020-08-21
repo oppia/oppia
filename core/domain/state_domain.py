@@ -2785,9 +2785,9 @@ class State(python_utils.OBJECT):
         
         for answer_group in self.interaction.answer_groups:
             rule_types_to_inputs = answer_group.rule_types_to_inputs
-            for rule_input in rule_types_to_inputs.values():
-                if rule_input.content_id is not None:
-                    old_content_id_list.append(rule_inputs.content_id)
+            for subtitled_rule_inputs in rule_types_to_inputs.values():
+                if subtitled_rule_inputs.content_id is not None:
+                    old_content_id_list.append(subtitled_rule_inputs.content_id)
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
@@ -2844,9 +2844,9 @@ class State(python_utils.OBJECT):
                 self.interaction.answer_groups)]
         for answer_group in self.interaction.answer_groups:
             rule_types_to_inputs = answer_group.rule_types_to_inputs
-            for rule_input in rule_types_to_inputs.values():
-                if rule_input.content_id is not None:
-                    new_content_id_list.append(rule_inputs.content_id)
+            for subtitled_rule_input in rule_types_to_inputs.values():
+                if subtitled_rule_input.content_id is not None:
+                    new_content_id_list.append(subtitled_rule_input.content_id)
         
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)

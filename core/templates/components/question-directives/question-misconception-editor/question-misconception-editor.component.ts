@@ -37,7 +37,7 @@ angular.module('oppia').component('questionMisconceptionEditor', {
     getTaggedSkillMisconceptionId: '&taggedSkillMisconceptionId',
     isEditable: '=',
     outcome: '=',
-    rules: '=',
+    ruleTypesToInputs: '=',
   },
   template: require('./question-misconception-editor.component.html'),
   controller: [

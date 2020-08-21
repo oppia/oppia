@@ -27,7 +27,7 @@
   <button class="btn btn-success float-right" ng-disabled="$ctrl.selectedMisconception === null" ng-click="$ctrl.updateMisconception()">Save Misconception</button>
 </div>
 <button type="button"
-        ng-if="!$ctrl.misconceptionName && $ctrl.isEditable && $ctrl.rules && !$ctrl.outcome.labelledAsCorrect && $ctrl.containsMisconceptions()"
+        ng-if="!$ctrl.misconceptionName && $ctrl.isEditable && $ctrl.ruleTypesToInputs && !$ctrl.outcome.labelledAsCorrect && $ctrl.containsMisconceptions()"
         class="btn btn-primary btn-lg oppia-add-rule-button protractor-test-add-answer"
         style="padding-top: 5px;"
         ng-click="$ctrl.tagAnswerGroupWithMisconception()">

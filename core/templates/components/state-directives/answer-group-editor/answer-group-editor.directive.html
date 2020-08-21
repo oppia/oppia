@@ -84,7 +84,7 @@
         <div ng-if="$ctrl.activeRuleType === ruleType && $ctrl.activeRuleInputIndex === $index">
           <div class="oppia-editor-card-section">
             <div class="oppia-rule-body-container">
-              <rule-editor rule="$ctrl.activeRule" is-editable="$ctrl.isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="$ctrl.cancelActiveRuleEdit()" on-save-rule="$ctrl.saveRules()" class="protractor-test-answer-body">
+              <rule-editor rule="$ctrl.activeRule" is-editable="$ctrl.isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="$ctrl.cancelActiveRuleEdit()" on-save-rule="$ctrl.saveActiveRule()" class="protractor-test-answer-body">
               </rule-editor>
             </div>
           </div>
@@ -120,7 +120,7 @@
                                  on-save-tagged-misconception="$ctrl.onSaveTaggedMisconception"
                                  on-save-answer-group-feedback="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
                                  outcome="$ctrl.outcome"
-                                 rules="$ctrl.displayedRules"
+                                 rule-types-to-inputs="$ctrl.ruleTypesToInputs"
                                  tagged-skill-misconception-id="$ctrl.taggedSkillMisconceptionId">
   </question-misconception-editor>
 </div>

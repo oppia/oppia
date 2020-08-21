@@ -98,13 +98,14 @@ export class AnswerGroup {
   }
 
   static getRuleTypesInDisplayOrder(ruleTypesToInputs: RuleInputs) {
-    // Sort rule types so that Equals always is first, followed by all other
-    // rule types sorted alphabetically.
+    // Sort rule types so that Equals always is first and tempRule is always
+    // last, followed by all other rule types sorted alphabetically. tempRule
+    // is used in answer-group-editor to create new rules.
     return Object.keys(ruleTypesToInputs).sort(
       (x, y) => {
-        if (x === 'Equals') {
+        if (x === 'Equals' || y === 'tempRule') {
           return -1;
-        } else if (y === 'Equals') {
+        } else if (y === 'Equals' || x === 'tempRule') {
           return 1;
         }
         return x < y ? -1 : 1;

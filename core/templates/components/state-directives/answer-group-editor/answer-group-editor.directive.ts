@@ -71,6 +71,7 @@ angular.module('oppia').directive('answerGroupEditor', [
         isEditable: '=',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         onSaveTaggedMisconception: '=',
+        onSaveNextContentIdIndex: '=',
         outcome: '=',
         ruleTypesToInputs: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
@@ -82,14 +83,20 @@ angular.module('oppia').directive('answerGroupEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'ExternalSaveService',
-        'INTERACTION_SPECS', 'StateEditorService', 'RuleObjectFactory',
+        'AlertsService', 'COMPONENT_NAME_INTERACTION_RULE',
+        'ContextService', 'ExternalSaveService',
+        'GenerateContentIdService',
+        'INTERACTION_SPECS', 'StateEditorService',
+        'StateNextContentIdIndexService', 'RuleObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'ResponsesService',
         function(
             $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, ExternalSaveService,
-            INTERACTION_SPECS, StateEditorService, RuleObjectFactory,
+            AlertsService, COMPONENT_NAME_INTERACTION_RULE,
+            ContextService, ExternalSaveService,
+            GenerateContentIdService,
+            INTERACTION_SPECS, StateEditorService,
+            StateNextContentIdIndexService, RuleObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
           var ctrl = this;
@@ -229,23 +236,13 @@ angular.module('oppia').directive('answerGroupEditor', [
             // move it to ResponsesService in StateResponses.js to properly
             // form a new rule.
 
-            if (!ctrl.ruleTypesToInputs.hasOwnProperty(ruleType)) {
-              this.ruleTypesToInputs[ruleType] = (
-                new SubtitledVariableLengthListOfRuleInputs([], null));
-              var ruleIsTranslatable = RULE_TEMPLATES[
-                interactionId][ruleType].translatable;
-              if (ruleIsTranslatable &&
-                  !ctrl.ruleTypesToInputs.hasOwnProperty(ruleType)
-              ) {
-                // Assign a content_id.
+            // Set the rule type to 'tempRule' until the rule is saved and
+            // we know its rule type for sure.
+            this.ruleTypesToInputs.tempRule = (
+              new SubtitledVariableLengthListOfRuleInputs([inputs], null));
+            ctrl.changeActiveRuleType('tempRule');
+            ctrl.changeActiveRuleInputIndex(0);
 
-              }
-            }
-            this.ruleTypesToInputs[ruleType].ruleInputs.push(inputs);
-
-            ctrl.changeActiveRuleType(ruleType);
-            ctrl.changeActiveRuleInputIndex(
-              this.ruleTypesToInputs[ruleType].ruleInputs.length - 1);
             ctrl.activeRule = new Rule(ruleType, inputs);
           };
 
@@ -255,12 +252,14 @@ angular.module('oppia').directive('answerGroupEditor', [
             if (ctrl.ruleTypesToInputs[ruleType].ruleInputs.length === 0) {
               delete ctrl.ruleTypesToInputs[ruleType];
             }
+            ctrl.activeRule = null;
             ctrl.saveRules();
           };
 
           ctrl.cancelActiveRuleEdit = function() {
             ctrl.ruleTypesToInputs = angular.copy(
               ctrl.ruleTypesToInputsMemento);
+            ctrl.activeRule = null;
             ctrl.saveRules();
           };
 
@@ -272,6 +271,33 @@ angular.module('oppia').directive('answerGroupEditor', [
 
             ctrl.getOnSaveAnswerGroupRuleTypesToInputsFn()(
               ctrl.ruleTypesToInputs);
+          };
+
+          ctrl.saveActiveRule = function() {
+            delete ctrl.ruleTypesToInputs.tempRule;
+            const ruleType = ctrl.activeRule.type;
+            const ruleInputs = ctrl.activeRule.inputs;
+
+            if (!ctrl.ruleTypesToInputs.hasOwnProperty(ruleType)) {
+              this.ruleTypesToInputs[ruleType] = (
+                new SubtitledVariableLengthListOfRuleInputs([], null));
+
+              const interactionId = ctrl.getCurrentInteractionId();
+              const ruleIsTranslatable = RULE_TEMPLATES[interactionId][
+                ruleType].translatable;
+              if (ruleIsTranslatable) {
+                // Assign a content_id.
+                ctrl.ruleTypesToInputs[ruleType].contentId = (
+                  GenerateContentIdService.getNextStateId(
+                    COMPONENT_NAME_INTERACTION_RULE)
+                );
+                StateNextContentIdIndexService.saveDisplayedValue();
+                ctrl.onSaveNextContentIdIndex(
+                  StateNextContentIdIndexService.displayed);
+              }
+            }
+            ctrl.ruleTypesToInputs[ruleType].ruleInputs.push(ruleInputs);
+            ctrl.saveRules();
           };
 
           ctrl.changeActiveRuleType = function(newRuleType) {

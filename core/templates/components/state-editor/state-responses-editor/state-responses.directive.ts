@@ -89,6 +89,7 @@ require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
+const RULE_TEMPLATES = require('interactions/rule_templates.json');
 
 angular.module('oppia').directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -111,11 +112,13 @@ angular.module('oppia').directive('stateResponses', [
       controller: [
         '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'AnswerGroupObjectFactory', 'ContextService',
-        'EditabilityService', 'ExternalSaveService', 'ResponsesService',
+        'EditabilityService', 'ExternalSaveService', 'GenerateContentIdService',
+        'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolicitAnswerDetailsService',
         'UrlInterpolationService', 'WindowDimensionsService',
+        'COMPONENT_NAME_INTERACTION_RULE',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
@@ -123,11 +126,13 @@ angular.module('oppia').directive('stateResponses', [
         function(
             $filter, $rootScope, $scope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService,
-            EditabilityService, ExternalSaveService, ResponsesService,
+            EditabilityService, ExternalSaveService, GenerateContentIdService,
+            ResponsesService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
             StateSolicitAnswerDetailsService,
             UrlInterpolationService, WindowDimensionsService,
+            COMPONENT_NAME_INTERACTION_RULE,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
@@ -138,8 +143,6 @@ angular.module('oppia').directive('stateResponses', [
             if (StateEditorService.isInQuestionMode()) {
               return;
             }
-            var explorationId = ContextService.getExplorationId();
-            var currentStateName = $scope.stateName;
           };
 
           $scope.isInQuestionMode = function() {
@@ -328,6 +331,18 @@ angular.module('oppia').directive('stateResponses', [
                 result.tmpOutcome, [],
                 result.tmpTaggedSkillMisconceptionId);
               newAnswerGroup.addRule(result.tmpRule);
+              if (RULE_TEMPLATES[currentInteractionId][result.tmpRule.type]
+                .translatable
+              ) {
+                newAnswerGroup.ruleTypesToInputs[result.tmpRule.type]
+                  .contentId = (
+                    GenerateContentIdService.getNextStateId(
+                      COMPONENT_NAME_INTERACTION_RULE)
+                  );
+                StateNextContentIdIndexService.saveDisplayedValue();
+                $scope.onSaveNextContentIdIndex(
+                  StateNextContentIdIndexService.displayed);
+              }
               $scope.answerGroups.push(newAnswerGroup);
               ResponsesService.save(
                 $scope.answerGroups, $scope.defaultOutcome,

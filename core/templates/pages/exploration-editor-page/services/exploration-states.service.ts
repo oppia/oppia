@@ -44,6 +44,8 @@ require('services/context.service.ts');
 require('services/validators.service.ts');
 
 import { EventEmitter } from '@angular/core';
+import { SubtitledVariableLengthListOfRuleInputs } from
+  'domain/exploration/SubtitledVariableLengthListOfRuleInputsObjectFactory';
 
 angular.module('oppia').factory('ExplorationStatesService', [
   '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
@@ -140,6 +142,14 @@ angular.module('oppia').factory('ExplorationStatesService', [
         var contentIds = new Set();
         answerGroups.forEach(function(answerGroup) {
           contentIds.add(answerGroup.outcome.feedback.getContentId());
+          Object.values(answerGroup.ruleTypesToInputs).forEach(
+            (subtitledRuleInputs:
+              SubtitledVariableLengthListOfRuleInputs) => {
+              if (subtitledRuleInputs.contentId !== null) {
+                contentIds.add(subtitledRuleInputs.contentId);
+              }
+            }
+          );
         });
         return contentIds;
       },
