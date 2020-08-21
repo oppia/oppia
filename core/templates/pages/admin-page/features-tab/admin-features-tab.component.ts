@@ -239,7 +239,7 @@ export class AdminFeaturesTabComponent implements OnInit {
   }
 
   get isDummyFeatureEnabled(): boolean {
-    return this.featureService.featureSummary.DummyFeature.isEnabled;
+    return this.featureService.status.DummyFeature.isEnabled;
   }
 
   async reloadDummyHandlerStatusAsync(): Promise<void> {

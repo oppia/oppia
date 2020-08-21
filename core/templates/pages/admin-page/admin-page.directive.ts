@@ -82,7 +82,7 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
           };
 
           ctrl.isDummyFeatureEnabled = function() {
-            return PlatformFeatureService.featureSummary.DummyFeature.isEnabled;
+            return PlatformFeatureService.status.DummyFeature.isEnabled;
           };
 
           ctrl.$onInit = function() {
