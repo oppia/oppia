@@ -671,8 +671,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_3)
         ]
         expected_list = [
-            story_domain.StoryNode.from_dict(node_2),
             story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
             story_domain.StoryNode.from_dict(node_3)
         ]
 
