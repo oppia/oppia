@@ -47,6 +47,7 @@ require('objects/templates/position-of-terms-editor.component.ts');
 require('objects/templates/ratio-expression-editor.component.ts');
 require('objects/templates/real-editor.directive.ts');
 require('objects/templates/sanitized-url-editor.directive.ts');
+require('objects/templates/set-of-algebraic-identifier-editor.component.ts');
 require('objects/templates/set-of-html-string-editor.directive.ts');
 require('objects/templates/set-of-unicode-string-editor.directive.ts');
 require('objects/templates/skill-selector-editor.directive.ts');

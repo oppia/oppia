@@ -13,7 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the angular js library.
+ * @fileoverview Service provides emitter for external save
  */
 
-module.exports = require('static/angularjs-1.7.9/angular.js');
+import { Injectable, EventEmitter } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExternalSaveService {
+  private _externalSaveEventEmitter = new EventEmitter();
+
+  get onExternalSave() {
+    return this._externalSaveEventEmitter;
+  }
+}
+
+angular.module('oppia').factory('ExternalSaveService',
+  downgradeInjectable(ExternalSaveService));

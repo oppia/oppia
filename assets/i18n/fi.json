@@ -487,7 +487,7 @@
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia on vapaa, avoimen lähdekoodin oppimisalusta täynnä interaktiivisia toimintoja nimeltä \"tutkimukset\". Valitettavasti Oppia edellyttää, että JavaScript on käytössä selaimessasi, jotta se toimisi kunnolla ja selaimessasi JavaScript on poistettu käytöstä. Jos tarvitse apua JavaScriptin käytöönotossa, <a href=\"<[hrefUrl]>\">klikkaa tästä.</a>",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Kiitos.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_TITLE": "Tarvitsemme JavaScriptiä selaimessasi",
-	"I18N_SPLASH_PAGE_TITLE": "Oppia: Opeta, Opi, Tutki",
+	"I18N_SPLASH_PAGE_TITLE": "Oppia | Ilmaiset online- ja interaktiiviset oppitunnit kaikille",
 	"I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION": "Tutkimuksia on helppo luoda. Ne ovat helposti muokattavia perustuen henkilökohtaiseen opiskelijapalautteeseen ja suuntauksiin ympäri maailmaa olevien oppijoiden kokemuksissa.",
 	"I18N_SPLASH_SITE_FEEDBACK": "Sivuston palaute",
 	"I18N_SPLASH_SUBTITLE": "Oppia helpottaa vuorovaikutteisten opetusten luomista, jotka kehittävät ja sitouttavat.",

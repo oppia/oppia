@@ -24,6 +24,7 @@ should therefore be independent of the specific storage models used.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import re
 import string
 
@@ -321,7 +322,7 @@ class Collection(python_utils.OBJECT):
         """Return a Collection domain object from a dict.
 
         Args:
-            collection_dict: dict. The dictionary representation of  the
+            collection_dict: dict. The dictionary representation of the
                 collection.
             collection_version: int. The version of the collection.
             collection_created_on: datetime.datetime. Date and time when the
@@ -344,6 +345,64 @@ class Collection(python_utils.OBJECT):
             collection_created_on, collection_last_updated)
 
         return collection
+
+    @classmethod
+    def deserialize(cls, json_string):
+        """Returns a Collection domain object decoded from a JSON string.
+
+        Args:
+            json_string: str. A JSON-encoded utf-8 string that can be
+                decoded into a dictionary representing a Collection. Only call
+                on strings that were created using serialize().
+
+        Returns:
+            Collection. The corresponding Collection domain object.
+        """
+        collection_dict = json.loads(json_string.decode('utf-8'))
+
+        created_on = (
+            utils.convert_string_to_naive_datetime_object(
+                collection_dict['created_on'])
+            if 'created_on' in collection_dict else None)
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                collection_dict['last_updated'])
+            if 'last_updated' in collection_dict else None)
+        collection = cls.from_dict(
+            collection_dict,
+            collection_version=collection_dict['version'],
+            collection_created_on=created_on,
+            collection_last_updated=last_updated)
+
+        return collection
+
+    def serialize(self):
+        """Returns the object serialized as a JSON string.
+
+        Returns:
+            str. JSON-encoded utf-8 string encoding all of the information
+            composing the object.
+        """
+        collection_dict = self.to_dict()
+        # The only reason we add the version parameter separately is that our
+        # yaml encoding/decoding of this object does not handle the version
+        # parameter.
+        # NOTE: If this changes in the future (i.e the version parameter is
+        # added as part of the yaml representation of this object), all YAML
+        # files must add a version parameter to their files with the correct
+        # version of this object. The line below must then be moved to
+        # to_dict().
+        collection_dict['version'] = self.version
+
+        if self.created_on:
+            collection_dict['created_on'] = (
+                utils.convert_naive_datetime_to_string(self.created_on))
+
+        if self.last_updated:
+            collection_dict['last_updated'] = (
+                utils.convert_naive_datetime_to_string(self.last_updated))
+
+        return json.dumps(collection_dict).encode('utf-8')
 
     def to_yaml(self):
         """Convert the Collection domain object into YAML.
