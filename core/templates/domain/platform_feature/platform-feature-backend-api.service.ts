@@ -16,19 +16,19 @@
  * @fileoverview Service to get feature flags.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
+import { ClientContext } from
+  'domain/platform_feature/client-context-object.factory';
 import {
   FeatureStatusSummary,
   FeatureStatusSummaryBackendDict,
   FeatureStatusSummaryObjectFactory,
 } from 'domain/platform_feature/feature-status-summary-object.factory';
-import { ClientContext } from
-  'domain/platform_feature/client-context-object.factory';
+import { PlatformFeatureDomainConstants } from
+  'domain/platform_feature/platform-feature-domain.constants';
 
 @Injectable({
   providedIn: 'root'

@@ -63,13 +63,20 @@ export class BrowserCheckerService {
   }
 
   /**
-   * Detects the type of browser from it's userAgent.
+   * Detects the type of browser from its user agent.
+   *
+   * Note that the returned string of this method should not be changed
+   * since they are directly used for comparison in platform parameter
+   * evaluation.
    *
    * @returns {string} - The name of the browser that is being used.
    */
   detectBrowserType(): string {
     const userAgent = this.windowRef.nativeWindow.navigator.userAgent;
 
+    // Per https://docs.microsoft.com/en-us/microsoft-edge/web-platform/user-agent-string
+    // there are two types of tokens, 'edg' & 'Edge', for the Edge browser in
+    // its user agent.
     if (userAgent.includes('edg') || userAgent.includes('Edge')) {
       return 'Edge';
     }

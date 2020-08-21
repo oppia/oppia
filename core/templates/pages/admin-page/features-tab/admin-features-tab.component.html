@@ -1,0 +1,270 @@
+<div *ngFor="let featureFlag of featureFlags; index as featureIndex;" class="container oppia-page-card oppia-long-text">
+  <h2 style="border-bottom: 1px solid #dee2e6;">{{featureFlag.name}}</h2>
+  <div class="row" style="margin-top: 5px">
+    <div class="col-2"><b>Description:</b></div>
+    <div class="col-10" style="overflow-wrap: anywhere;">{{featureFlag.description}}</div>
+  </div>
+  <div class="row" style="margin-top: 5px">
+    <div class="col-2"><b>Feature Stage:</b></div>
+    <div class="col-10">{{featureFlag.featureStage}}</div>
+  </div>
+  <div class="row" style="margin-top: 5px">
+    <div class="col-2"><b>Default:</b></div>
+    <div class="col-10">{{featureFlag.defaultValue ? 'Enabled' : 'Disabled'}}</div>
+  </div>
+  <div class="row" style="margin-top: 5px">
+    <div class="col-2">
+      <b>Rules:</b>
+    </div>
+  </div>
+  <div class="oppia-feature-tab-center" style="margin-bottom: 15px;">
+    <button class="btn btn-secondary" (click)="addNewRuleToTop(featureFlag)">
+      Add Rule To Top
+    </button>
+  </div>
+  <div class="row" style="margin-top: 5px">
+    <!-- <div class="col-1"></div> -->
+    <div class="col-12">
+      <div *ngIf="featureFlag.rules.length === 0" class="oppia-feature-tab-center" style="margin-bottom: 15px;">
+        No rule.
+      </div>
+      <!-- Rules -->
+      <div *ngFor="let rule of featureFlag.rules; index as ruleIndex" class="container" style="margin-bottom: 15px;">
+        <div class="row">
+          <div class="col-1"></div>
+          <div class="col-10" style="border: 1px solid #a8a8a8; padding-top: 10px; padding-bottom: 10px;">
+            <div class="row">
+              <div class="col-2"><b>If Matched:</b></div>
+              <div class="col-10">
+                <select [(ngModel)]="rule.valueWhenMatched">
+                  <option [ngValue]="true">Enabled</option>
+                  <option [ngValue]="false">Disabled</option>
+                </select>
+              </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+              <div class="col-12"><b>Filters:</b></div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+              <div class="col-12">
+                <div *ngIf="rule.filters.length === 0" class="oppia-feature-tab-center">No filter.</div>
+                <!-- Filters -->
+                <div *ngFor="let filter of rule.filters; index as filterIndex" class="container">
+                  <div *ngIf="filterIndex > 0" class="row">
+                    <div class="col-12 oppia-feature-tab-conjunction-indicator">
+                      <div class="horizontal-line"></div>
+                      AND
+                      <div class="horizontal-line"></div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-1"></div>
+                    <div class="col-10" style="border: 1px solid #dee2e6; padding-top: 10px; padding-bottom: 10px;">
+                      <div class="row">
+                        <div class="col-2"><b>Type:</b></div>
+                        <div class="col-10">
+                          <select [(ngModel)]="filter.type"
+                                  (change)="clearFilterConditions(filter)">
+                            <option *ngFor="let filterType of availableFilterTypes"
+                                    [value]="filterType.toString()">
+                              {{filterTypeToContext[filterType].displayName}}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
+                        <div class="col-2"><b>Conditions:</b></div>
+                      </div>
+                      <!-- Conditions -->
+                      <ng-container *ngFor="let condition of filter.conditions; index as conditionIndex">
+                        <div class="row" *ngIf="conditionIndex > 0">
+                          <div class="col-2"></div>
+                          <div class="col-8 oppia-feature-tab-conjunction-indicator">
+                            <div class="horizontal-line"></div>
+                            OR
+                            <div class="horizontal-line"></div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-4"></div>
+                          <div class="col-4" style="display: flex; align-items: center; justify-content: space-around;">
+                            <select [(ngModel)]="filter.conditions[conditionIndex][0]" style="margin-right: 5px;">
+                              <option *ngFor="let op of filterTypeToContext[filter.type].operators"
+                                      [value]="op">
+                                {{op}}
+                              </option>
+                            </select>
+                            <ng-container *ngIf="!!filterTypeToContext[filter.type].options">
+                              <select [(ngModel)]="filter.conditions[conditionIndex][1]">
+                                <ng-container *ngFor="let option of filterTypeToContext[filter.type].options">
+                                  <option *ngIf="!filterTypeToContext[filter.type].optionFilter || filterTypeToContext[filter.type].optionFilter(featureFlag, option)"
+                                          [value]="option">
+                                    {{option}}
+                                  </option>
+                                </ng-container>
+                              </select>
+                            </ng-container>
+                            <ng-container *ngIf="!filterTypeToContext[filter.type].options">
+                              <input [(ngModel)]="filter.conditions[conditionIndex][1]"
+                                     [placeholder]="filterTypeToContext[filter.type].placeholder"
+                                     style="max-width: 100px;">
+                              <ng-container *ngIf="filterTypeToContext[filter.type].inputRegex">
+                                <span class="oppia-feature-tab-input-error"
+                                      *ngIf="!filterTypeToContext[filter.type].inputRegex.test(filter.conditions[conditionIndex][1])">
+                                  <span>!</span>
+                                  <div class="tooltip">
+                                    Expected to match {{filterTypeToContext[filter.type].inputRegex}}
+                                  </div>
+                                </span>
+                              </ng-container>
+                            </ng-container>
+                          </div>
+                          <div class="col-4">
+                            <button class="btn btn-secondary" (click)="removeCondition(filter, conditionIndex)" style="margin-right: 20px;">x</button>
+                          </div>
+                        </div>
+                      </ng-container>
+                      <div *ngIf="filter.conditions.length === 0" class="oppia-feature-tab-center">
+                        No condition specified.
+                      </div>
+                      <div class="oppia-feature-tab-center" style="margin-top: 10px;">
+                        <button class="btn btn-secondary" style="margin-top: 10px;" (click)="addNewCondition(filter)">
+                          Add New Condition To Bottom
+                        </button>
+                      </div>
+                    </div>
+                    <div class="col-1 oppia-feature-tab-center">
+                      <button class="btn btn-secondary" (click)="removeFilter(rule, filterIndex)">x</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="oppia-feature-tab-center" style="margin-top: 30px; margin-bottom: 15px;">
+                  <button class="btn btn-secondary" (click)="addNewFilter(rule)">Add New Filter To Bottom</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-1 oppia-feature-tab-center">
+            <div class="row">
+              <div class="col-6" style="display: flex; flex-direction: column; justify-content: space-around; min-height: 100px; padding: 1px">
+                <button class="btn btn-secondary"
+                        *ngIf="ruleIndex > 0"
+                        (click)="moveRuleUp(featureFlag, ruleIndex)">
+                  ↑
+                </button>
+                <button class="btn btn-secondary"
+                        *ngIf="ruleIndex + 1 < featureFlag.rules.length"
+                        (click)="moveRuleDown(featureFlag, ruleIndex)">
+                  ↓
+                </button>
+              </div>
+              <div class="col-6 oppia-feature-tab-vertical-center" style="padding: 1px">
+                <button class="btn btn-secondary" (click)="removeRule(featureFlag, ruleIndex)">x</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-feature-tab-center" style="margin-bottom: 15px;">
+    <button class="btn btn-secondary" style="margin-top: 5;" (click)="addNewRuleToBottom(featureFlag)">
+      Add Rule To Bottom
+    </button>
+  </div>
+  <div class="row oppia-feature-tab-control-buttons-container" style="margin-top: 10px;">
+    <!-- Control Buttons -->
+    <button
+            class="btn btn-primary"
+            (click)="updateFeatureRulesAsync(featureFlag)"
+            [disabled]="!isFeatureFlagRulesChanged(featureFlag)">
+      Save
+    </button>
+    <button
+            class="btn btn-secondary"
+            style="margin-left: 5px;"
+            (click)="clearChanges(featureFlag)"
+            [disabled]="!isFeatureFlagRulesChanged(featureFlag)">
+      Clear Changes
+    </button>
+  </div>
+</div>
+
+<div *ngIf="featureFlags.length === 0" class="oppia-page-card oppia-long-text" style="max-width: 1050px">
+  No platform features are available.
+</div>
+
+<style>
+  .oppia-feature-tab-center {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  .oppia-feature-tab-horizon-center {
+    display: flex;
+    justify-content: center;
+  }
+
+  .oppia-feature-tab-vertical-center {
+    align-items: center;
+    display: flex;
+  }
+
+  .oppia-feature-tab-control-buttons-container {
+    align-items: center;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+  }
+
+  .oppia-feature-tab-condition-container {
+    align-items: center;
+    display: flex;
+    width: 100%;
+  }
+
+  .oppia-feature-tab-conjunction-indicator {
+    align-items: center;
+    display: flex;
+    font-size: 12px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .oppia-feature-tab-conjunction-indicator > .horizontal-line {
+    border-bottom: 1px dotted #dee2e6;
+    flex-grow: 1;
+    height: 0;
+  }
+
+  .oppia-feature-tab-input-error {
+    margin-left: 15px;
+    position: relative;
+  }
+
+  .oppia-feature-tab-input-error span {
+    color: #ff6347;
+    font-weight: bold;
+  }
+
+  .oppia-feature-tab-input-error .tooltip {
+    background-color: #f5f5f5;
+    border: 1px solid #ff6347;
+    border-radius: 3px;
+    font-size: 14px;
+    left: -50%;
+    opacity: 0;
+    padding: 5px;
+    position: absolute;
+    width: 200px;
+  }
+
+  .oppia-feature-tab-input-error:hover .tooltip {
+    opacity: 1;
+  }
+</style>

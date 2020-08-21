@@ -39,17 +39,15 @@ ALLOWED_SERVER_MODES = [
     SERVER_MODES.dev, SERVER_MODES.test, SERVER_MODES.prod]
 ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
-ALLOWED_CLIENT_TYPES = ['Web', 'Android']
-ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Unknown']
-
-# The ordering of elements in ALLOWED_APP_VERSION_FLAVOR implies the ordering
-# of corresponding flavors, which is used in app_version_flavor filter for order
-# comparison, with following ordering: 'test' < 'alpha' < 'beta' < 'release'.
-ALLOWED_APP_VERSION_FLAVOR = ['test', 'alpha', 'beta', 'release']
+ALLOWED_CLIENT_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES
+ALLOWED_BROWSER_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES
+ALLOWED_APP_VERSION_FLAVORS = (
+    constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS)
 
 APP_VERSION_WITH_HASH_REGEXP = re.compile(
-    r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+(?:-(.+))?)?$')
-APP_VERSION_WITHOUT_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)$')
+    constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP)
+APP_VERSION_WITHOUT_HASH_REGEXP = re.compile(
+    constants.PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP)
 
 
 class PlatformParameterChange(change_domain.BaseChange):
@@ -151,11 +149,11 @@ class EvaluationContext(python_utils.OBJECT):
                         self._app_version, APP_VERSION_WITH_HASH_REGEXP))
             elif (
                     match.group(2) is not None and
-                    match.group(2) not in ALLOWED_APP_VERSION_FLAVOR):
+                    match.group(2) not in ALLOWED_APP_VERSION_FLAVORS):
                 raise utils.ValidationError(
                     'Invalid version flavor \'%s\', must be one of %s if'
                     ' specified.' % (
-                        match.group(2), ALLOWED_APP_VERSION_FLAVOR))
+                        match.group(2), ALLOWED_APP_VERSION_FLAVORS))
 
         if self._user_locale not in ALLOWED_USER_LOCALES:
             raise utils.ValidationError(
@@ -314,10 +312,10 @@ class PlatformParameterFilter(python_utils.OBJECT):
                             client_type, ALLOWED_CLIENT_TYPES))
         elif self._type == 'app_version_flavor':
             for _, flavor in self._conditions:
-                if flavor not in ALLOWED_APP_VERSION_FLAVOR:
+                if flavor not in ALLOWED_APP_VERSION_FLAVORS:
                     raise utils.ValidationError(
                         'Invalid app version flavor \'%s\', must be one of'
-                        ' %s.' % (flavor, ALLOWED_APP_VERSION_FLAVOR))
+                        ' %s.' % (flavor, ALLOWED_APP_VERSION_FLAVORS))
         elif self._type == 'app_version':
             for _, version in self._conditions:
                 if not APP_VERSION_WITHOUT_HASH_REGEXP.match(version):
@@ -392,8 +390,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
         smaller.
 
         Args:
-            version_a: str. The version string (e.g. '1.0.0.0').
-            version_b: str. The version string (e.g. '1.0.0.0').
+            version_a: str. The version string (e.g. '1.0.0').
+            version_b: str. The version string (e.g. '1.0.0').
 
         Returns:
             bool. True if the first version is smaller.
@@ -463,8 +461,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
             bool. True if the first flavor is smaller.
         """
         return (
-            ALLOWED_APP_VERSION_FLAVOR.index(flavor_a) <
-            ALLOWED_APP_VERSION_FLAVOR.index(flavor_b)
+            ALLOWED_APP_VERSION_FLAVORS.index(flavor_a) <
+            ALLOWED_APP_VERSION_FLAVORS.index(flavor_b)
         )
 
 
@@ -751,7 +749,7 @@ class PlatformParameter(python_utils.OBJECT):
                             SERVER_MODES.prod in server_modes):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
-                            ' production environment.')
+                            ' production environments.')
                 elif self._feature_stage == FEATURE_STAGES.test:
                     if SERVER_MODES.prod in server_modes:
                         raise utils.ValidationError(

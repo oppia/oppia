@@ -16,40 +16,40 @@
  * @fileoverview Component for the feature tab in the admin panel.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
+
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import {
+  PlatformParameterFilterType,
+  PlatformParameterFilterObjectFactory,
+  PlatformParameterFilter,
+} from 'domain/platform_feature/platform-parameter-filter-object.factory';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { PlatformParameter, FeatureStage } from
+  'domain/platform_feature/platform-parameter-object.factory';
+import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
+  'domain/platform_feature/platform-parameter-rule-object.factory';
 import { AdminFeaturesTabConstants } from
-  './admin-features-tab.constants';
+  'pages/admin-page/features-tab/admin-features-tab.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
-import { PlatformParameter, FeatureStage } from
-  'domain/platform_feature/platform-parameter-object.factory';
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureDummyBackendApiService } from
-  'domain/platform_feature/platform-feature-dummy-backend-api.service';
-import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
-  'domain/platform_feature/platform-parameter-rule-object.factory';
-import {
-  PlatformParameterFilterType,
-  PlatformParameterFilterObjectFactory,
-  PlatformParameterFilter,
-  ServerMode,
-} from 'domain/platform_feature/platform-parameter-filter-object.factory';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-
-import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'admin-features-tab',
-  templateUrl: './admin-features-tab.directive.html'
+  templateUrl: './admin-features-tab.component.html'
 })
 export class AdminFeaturesTabComponent implements OnInit {
-  @Input() setStatusMessage: (msg: string) => void;
+  @Output() setStatusMessage = new EventEmitter<string>();
 
   readonly availableFilterTypes: PlatformParameterFilterType[] = Object
     .keys(PlatformParameterFilterType)
@@ -74,9 +74,11 @@ export class AdminFeaturesTabComponent implements OnInit {
           case FeatureStage.DEV:
             return option === 'dev';
           case FeatureStage.TEST:
-            return option !== 'prod';
+            return option === 'dev' || option === 'test';
           case FeatureStage.PROD:
             return true;
+          default:
+            return false;
         }
       }
     },
@@ -106,8 +108,19 @@ export class AdminFeaturesTabComponent implements OnInit {
       options: AdminFeaturesTabConstants.ALLOWED_APP_VERSION_FLAVORS,
       operators: ['=', '<', '>', '<=', '>=']
     }
-
   };
+
+  private readonly defaultNewFilter: PlatformParameterFilter =
+    this.filterFactory.createFromBackendDict({
+      type: PlatformParameterFilterType.ServerMode,
+      conditions: []
+    });
+
+  private readonly defaultNewRule: PlatformParameterRule =
+    this.ruleFactory.createFromBackendDict({
+      filters: [this.defaultNewFilter.toBackendDict()],
+      value_when_matched: false
+    });
 
   featureFlags: PlatformParameter[] = [];
   featureFlagNameToBackupMap: Map<string, PlatformParameter>;
@@ -135,36 +148,15 @@ export class AdminFeaturesTabComponent implements OnInit {
   }
 
   addNewRuleToTop(feature: PlatformParameter): void {
-    feature.rules.unshift(
-      this.ruleFactory.createFromBackendDict({
-        filters: [{
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [['=', ServerMode.Dev.toString()]]
-        }],
-        value_when_matched: false
-      })
-    );
+    feature.rules.unshift(cloneDeep(this.defaultNewRule));
   }
 
   addNewRuleToBottom(feature: PlatformParameter): void {
-    feature.rules.push(
-      this.ruleFactory.createFromBackendDict({
-        filters: [{
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [['=', ServerMode.Dev.toString()]]
-        }],
-        value_when_matched: false
-      })
-    );
+    feature.rules.push(cloneDeep(this.defaultNewRule));
   }
 
   addNewFilter(rule: PlatformParameterRule): void {
-    rule.filters.push(
-      this.filterFactory.createFromBackendDict({
-        type: PlatformParameterFilterType.ServerMode,
-        conditions: []
-      })
-    );
+    rule.filters.push(cloneDeep(this.defaultNewFilter));
   }
 
   addNewCondition(filter: PlatformParameterFilter): void {
@@ -219,12 +211,14 @@ export class AdminFeaturesTabComponent implements OnInit {
       await this.apiService.updateFeatureFlag(
         feature.name, commitMessage, feature.rules);
 
-      this.setStatusMessage('Saved successfully.');
+      this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
+
+      this.setStatusMessage.emit('Saved successfully.');
     } catch (e) {
       if (e.error && e.error.error) {
-        this.setStatusMessage(`Update failed: ${e.error.error}`);
+        this.setStatusMessage.emit(`Update failed: ${e.error.error}`);
       } else {
-        this.setStatusMessage('Update failed.');
+        this.setStatusMessage.emit('Update failed.');
       }
     } finally {
       this.adminTaskManager.finishTask();
@@ -237,10 +231,10 @@ export class AdminFeaturesTabComponent implements OnInit {
       return;
     }
     const backup = this.featureFlagNameToBackupMap.get(featureFlag.name);
-    featureFlag.rules = backup.rules;
+    featureFlag.rules = cloneDeep(backup.rules);
   }
 
-  onFilterTypeSelectionChanged(filter: PlatformParameterFilter): void {
+  clearFilterConditions(filter: PlatformParameterFilter): void {
     filter.conditions.splice(0);
   }
 
@@ -252,6 +246,11 @@ export class AdminFeaturesTabComponent implements OnInit {
     if (this.isDummyFeatureEnabled) {
       this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
     }
+  }
+
+  isFeatureFlagRulesChanged(feature: PlatformParameter) {
+    const original = this.featureFlagNameToBackupMap.get(feature.name);
+    return !isEqual(original.rules, feature.rules);
   }
 
   ngOnInit() {

@@ -20,13 +20,14 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ClientContextObjectFactory } from './client-context-object.factory';
+import { ClientContextObjectFactory } from
+  'domain/platform_feature/client-context-object.factory';
 import { FeatureStatusSummaryObjectFactory } from
   'domain/platform_feature/feature-status-summary-object.factory';
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
+import { PlatformFeatureDomainConstants } from
+  'domain/platform_feature/platform-feature-domain.constants';
 
 describe('PlatformFeatureBackendApiService', () => {
   let httpTestingController: HttpTestingController;
