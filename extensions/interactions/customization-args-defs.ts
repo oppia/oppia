@@ -376,7 +376,7 @@ export interface TextInputCustomizationArgs {
 }
 
 
-interface NumericExpressionInputCustomizationArgsBackendDict { }
+export interface NumericExpressionInputCustomizationArgsBackendDict { }
 export interface NumericExpressionInputCustomizationArgs { }
 
 
