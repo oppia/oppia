@@ -46,23 +46,20 @@ class AnswerGroup(python_utils.OBJECT):
     """
 
     def __init__(
-            self, outcome, rule_types_to_inputs,
+            self, outcome, rule_types_to_subtitled_inputs,
             training_data, tagged_skill_misconception_id):
         """Initializes a AnswerGroup domain object.
 
         Args:
             outcome: Outcome. The outcome corresponding to the answer group.
-            rule_types_to_inputs: dict. A dictionary mapping rule type (str) to
-                a SubtitledVariableLengthListOfRuleInputs domain object, which
-                contains a list of rule inputs and a content id.
-                Each rule input is a dictionary mapping
-                the rule input name (str) to the rule input value. The rule
-                input names can be deduced from the relevant description field
-                in extensions/interactions/rule_templates.json -- they are
+            rule_types_to_subtitled_inputs: dict. A dictionary mapping rule type
+                (str) to a SubtitledVariableLengthListOfRuleInputs domain
+                object, which contains a list of rule inputs and a content id.
+                Each rule input is a dictionary mapping the rule input name
+                (str) to the rule input value. The rule input names can be
+                deduced from the relevant description field in
+                extensions/interactions/rule_templates.json -- they are
                 enclosed in {{...}} braces.
-                E.g. For 2 TextInput rules of type 'Equals' and with the inputs
-                {'x': 'Yes'} and {'x': 'Y'}, rule_types_to_inputs will equal
-                { 'Equals': [{'x': 'Yes'}, {'x': 'Y'}] }.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
             tagged_skill_misconception_id: str or None. The format is
@@ -72,7 +69,7 @@ class AnswerGroup(python_utils.OBJECT):
                 only when a state is part of a Question object that
                 tests a particular skill.
         """
-        self.rule_types_to_inputs = rule_types_to_inputs
+        self.rule_types_to_subtitled_inputs = rule_types_to_subtitled_inputs
         self.outcome = outcome
         self.training_data = training_data
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
@@ -84,13 +81,13 @@ class AnswerGroup(python_utils.OBJECT):
             dict. A dict, mapping all fields of AnswerGroup instance.
         """
 
-        rule_types_to_inputs_dict = {}
-        for rule_type in self.rule_types_to_inputs:
-            rule_types_to_inputs_dict[rule_type] = (
-                self.rule_types_to_inputs[rule_type].to_dict())
+        rule_types_to_subtitled_inputs_dict = {}
+        for rule_type in self.rule_types_to_subtitled_inputs:
+            rule_types_to_subtitled_inputs_dict[rule_type] = (
+                self.rule_types_to_subtitled_inputs[rule_type].to_dict())
 
         return {
-            'rule_types_to_inputs': rule_types_to_inputs_dict,
+            'rule_types_to_subtitled_inputs': rule_types_to_subtitled_inputs_dict,
             'outcome': self.outcome.to_dict(),
             'training_data': self.training_data,
             'tagged_skill_misconception_id': self.tagged_skill_misconception_id
@@ -107,16 +104,17 @@ class AnswerGroup(python_utils.OBJECT):
         Returns:
             AnswerGroup. The corresponding AnswerGroup domain object.
         """
-        rule_types_to_inputs = {}
-        for rule_type in answer_group_dict['rule_types_to_inputs']:
-            rule_types_to_inputs[rule_type] = (
+        rule_types_to_subtitled_inputs = {}
+        for rule_type in answer_group_dict['rule_types_to_subtitled_inputs']:
+            rule_types_to_subtitled_inputs[rule_type] = (
                 SubtitledVariableLengthListOfRuleInputs.from_dict(
-                    answer_group_dict['rule_types_to_inputs'][rule_type])
+                    answer_group_dict['rule_types_to_subtitled_inputs'][
+                        rule_type])
             )
 
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
-            rule_types_to_inputs,
+            rule_types_to_subtitled_inputs,
             answer_group_dict['training_data'],
             answer_group_dict['tagged_skill_misconception_id']
         )
@@ -137,13 +135,13 @@ class AnswerGroup(python_utils.OBJECT):
             ValidationError. The AnswerGroup contains more than one classifier
                 rule.
         """
-        if not isinstance(self.rule_types_to_inputs, dict):
+        if not isinstance(self.rule_types_to_subtitled_inputs, dict):
             raise utils.ValidationError(
-                'Expected answer group rule_types_to_inputs to be a dict, '
-                'received %s' % self.rule_types_to_inputs)
+                'Expected answer group rule_types_to_subtitled_inputs to be a '
+                'dict, received %s' % self.rule_types_to_subtitled_inputs)
 
-        for rule_type in self.rule_types_to_inputs:
-            self.rule_types_to_inputs[rule_type].validate()
+        for rule_type in self.rule_types_to_subtitled_inputs:
+            self.rule_types_to_subtitled_inputs[rule_type].validate()
 
         if self.tagged_skill_misconception_id is not None:
             if not isinstance(
@@ -159,16 +157,16 @@ class AnswerGroup(python_utils.OBJECT):
                     % self.tagged_skill_misconception_id)
 
         number_of_rules = 0
-        for rule_type in self.rule_types_to_inputs:
+        for rule_type in self.rule_types_to_subtitled_inputs:
             number_of_rules += len(
-                self.rule_types_to_inputs[rule_type].rule_inputs)
+                self.rule_types_to_subtitled_inputs[rule_type].rule_inputs)
 
             if rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_type)
 
             rule_params_list = interaction.get_rule_param_list(rule_type)
-            for rule_input in self.rule_types_to_inputs[rule_type].rule_inputs:
+            for rule_input in self.rule_types_to_subtitled_inputs[rule_type].rule_inputs:
                 self._validate_rule_input(
                     rule_input,
                     rule_type,
@@ -279,8 +277,8 @@ class AnswerGroup(python_utils.OBJECT):
             html_list.append(html)
             return html
 
-        for rule_type in self.rule_types_to_inputs:
-            for rule_input in self.rule_types_to_inputs[rule_type].rule_inputs:
+        for rule_type in self.rule_types_to_subtitled_inputs:
+            for rule_input in self.rule_types_to_subtitled_inputs[rule_type].rule_inputs:
                 AnswerGroup._convert_html_in_rule_input(
                     rule_input, rule_type, collect_html_conversion_fn)
 
@@ -317,11 +315,12 @@ class AnswerGroup(python_utils.OBJECT):
                         conversion_fn)
                 )
         else:
-            for rule_type in answer_group_dict['rule_types_to_inputs']:
+            for rule_type in answer_group_dict[
+                    'rule_types_to_subtitled_inputs']:
                 for rule_input_index, rule_input in enumerate(
-                        answer_group_dict['rule_types_to_inputs'][rule_type][
-                            'rule_inputs']):
-                    answer_group_dict['rule_types_to_inputs'][
+                        answer_group_dict['rule_types_to_subtitled_inputs'][
+                            rule_type]['rule_inputs']):
+                    answer_group_dict['rule_types_to_subtitled_inputs'][
                         rule_type]['rule_inputs'][rule_input_index] = (
                             AnswerGroup._convert_html_in_rule_input(
                                 rule_input, rule_type, conversion_fn)
@@ -2428,9 +2427,9 @@ class State(python_utils.OBJECT):
                     'Found a duplicate content id %s' % feedback_content_id)
             content_id_list.append(feedback_content_id)
 
-            for rule_type in answer_group.rule_types_to_inputs:
+            for rule_type in answer_group.rule_types_to_subtitled_inputs:
                 rule_inputs_content_id = (
-                    answer_group.rule_types_to_inputs[rule_type].content_id)
+                    answer_group.rule_types_to_subtitled_inputs[rule_type].content_id)
                 if rule_inputs_content_id is not None:
                     if rule_inputs_content_id in content_id_list:
                         raise utils.ValidationError(
@@ -2784,21 +2783,23 @@ class State(python_utils.OBJECT):
                 self.interaction.answer_groups)]
         
         for answer_group in self.interaction.answer_groups:
-            rule_types_to_inputs = answer_group.rule_types_to_inputs
-            for subtitled_rule_inputs in rule_types_to_inputs.values():
-                if subtitled_rule_inputs.content_id is not None:
-                    old_content_id_list.append(subtitled_rule_inputs.content_id)
+            rule_types_to_subtitled_inputs = (
+                answer_group.rule_types_to_subtitled_inputs)
+            for subtitled_rule_input in rule_types_to_subtitled_inputs.values():
+                if subtitled_rule_input.content_id is not None:
+                    old_content_id_list.append(subtitled_rule_input.content_id)
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
-            rule_types_to_inputs = {}
+            rule_types_to_subtitled_inputs = {}
 
             # Normalize the rule params.
-            for rule_type in answer_group_dict['rule_types_to_inputs']:
+            for rule_type in answer_group_dict[
+                    'rule_types_to_subtitled_inputs']:
                 subtitled_rule_inputs_dict = answer_group_dict[
-                    'rule_types_to_inputs'][rule_type]
-                rule_types_to_inputs[rule_type] = (
+                    'rule_types_to_subtitled_inputs'][rule_type]
+                rule_types_to_subtitled_inputs[rule_type] = (
                     SubtitledVariableLengthListOfRuleInputs.from_dict(
                         subtitled_rule_inputs_dict)
                 )
@@ -2827,13 +2828,13 @@ class State(python_utils.OBJECT):
                                 raise Exception(
                                     '%s has the wrong type. It should '
                                     'be a %s.' % (value, param_type.__name__))
-                        answer_group_dict['rule_types_to_inputs'][rule_type][
-                            'rule_inputs'][rule_input_index][
+                        answer_group_dict['rule_types_to_subtitled_inputs'][
+                            rule_type]['rule_inputs'][rule_input_index][
                                 param_name] = normalized_param
 
             answer_group = AnswerGroup(
                 Outcome.from_dict(answer_group_dict['outcome']),
-                rule_types_to_inputs,
+                rule_types_to_subtitled_inputs,
                 answer_group_dict['training_data'],
                 answer_group_dict['tagged_skill_misconception_id'])
             interaction_answer_groups.append(answer_group)
@@ -2843,8 +2844,9 @@ class State(python_utils.OBJECT):
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
         for answer_group in self.interaction.answer_groups:
-            rule_types_to_inputs = answer_group.rule_types_to_inputs
-            for subtitled_rule_input in rule_types_to_inputs.values():
+            rule_types_to_subtitled_inputs = (
+                answer_group.rule_types_to_subtitled_inputs)
+            for subtitled_rule_input in rule_types_to_subtitled_inputs.values():
                 if subtitled_rule_input.content_id is not None:
                     new_content_id_list.append(subtitled_rule_input.content_id)
         

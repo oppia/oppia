@@ -92,7 +92,7 @@ describe('ItemSelectionInputValidationService', () => {
       }
     };
     const goodAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
-    goodAnswerGroup.updateRuleTypesToInputs([rof.createFromBackendDict({
+    goodAnswerGroup.updateRuleTypesToSubtitledInputs([rof.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: ['Selection 1', 'Selection 2']
@@ -102,7 +102,7 @@ describe('ItemSelectionInputValidationService', () => {
 
     const threeInputsAnswerGroup = agof.createNew(
       goodDefaultOutcome, null, null);
-    threeInputsAnswerGroup.updateRuleTypesToInputs([
+    threeInputsAnswerGroup.updateRuleTypesToSubtitledInputs([
       rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
@@ -113,7 +113,7 @@ describe('ItemSelectionInputValidationService', () => {
     ThreeInputsAnswerGroups = [threeInputsAnswerGroup];
 
     const oneInputAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
-    oneInputAnswerGroup.updateRuleTypesToInputs([
+    oneInputAnswerGroup.updateRuleTypesToSubtitledInputs([
       rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
@@ -124,7 +124,7 @@ describe('ItemSelectionInputValidationService', () => {
     OneInputAnswerGroups = [oneInputAnswerGroup];
 
     const noInputAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
-    noInputAnswerGroup.updateRuleTypesToInputs([
+    noInputAnswerGroup.updateRuleTypesToSubtitledInputs([
       rof.createFromBackendDict({
         rule_type: 'ContainsAtLeastOneOf',
         inputs: {
@@ -136,7 +136,7 @@ describe('ItemSelectionInputValidationService', () => {
 
     const isProperSubsetValidOptionAnswerGroup = agof.createNew(
       goodDefaultOutcome, null, null);
-    isProperSubsetValidOptionAnswerGroup.updateRuleTypesToInputs([
+    isProperSubsetValidOptionAnswerGroup.updateRuleTypesToSubtitledInputs([
       rof.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
         inputs: {

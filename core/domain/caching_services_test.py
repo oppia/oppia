@@ -127,7 +127,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                             },
                             'labelled_as_correct': False
                         },
-                        'rule_types_to_inputs': {
+                        'rule_types_to_subtitled_inputs': {
                             'Contains': {
                                 'content_id': None,
                                 'rule_inputs': [{
@@ -152,33 +152,31 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '{"param_changes": [], "category": "", "auto_tts_enabled": true, "tags"'
         ': [], "states_schema_version": 40, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "i'
-        'nteraction": {"solution": null, "answer_groups": [{"rule_types_to_inpu'
-        'ts": {"Contains": {"rule_inputs": [{"x": "\\u00ae\\u00ae"}], "content_id'
-        '": null}}, "tagged_skill_misconception_id": null, "outcome": {"param_c'
-        'hanges": [], "feedback": {"content_id": "feedback_2", "html": "<p>This'
-        ' is great! \\u00ae\\u00ae</p>"}, "dest": "Introduction", "refresher_expl'
-        'oration_id": null, "missing_prerequisite_skill_id": null, "labelled_as'
-        '_correct": false}, "training_data": []}], "default_outcome": {"param_c'
-        'hanges": [], "feedback": {"content_id": "default_outcome", "html": ""}'
-        ', "dest": "Introduction", "refresher_exploration_id": null, "missing_p'
-        'rerequisite_skill_id": null, "labelled_as_correct": false}, "customiza'
-        'tion_args": {"rows": {"value": 1}, "placeholder": {"value": {"unicode_'
-        'str": "\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d", '
-        '"content_id"'
-        ': "ca_placeholder_0"}}}, "confirmed_unclassified_answers": [], "id": "'
-        'TextInput", "hints": [{"hint_content": {"content_id": "hint_3", "html"'
-        ': "<p>This is a copyright character \\u00a9.</p>"}}]}, "recorded_voiceo'
-        'vers": {"voiceovers_mapping": {"feedback_2": {}, "content": {}, "hint_'
-        '3": {}, "default_outcome": {}, "ca_placeholder_0": {}}}, "classifier_m'
-        'odel_id": null, "content": {"content_id": "content", "html": "<p>Unico'
-        'de Characters \\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\'
-        'ude0d</p>"}, '
-        '"written_translations": {"translations_mapping": {"feedback_2": {}, "c'
-        'ontent": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder_0": '
-        '{}}}, "next_content_id_index": 4, "solicit_answer_details": false}}, "'
-        'version": 0, "correctness_feedback_enabled": false, "language_code": "'
-        'en", "objective": "", "init_state_name": "Introduction", "blurb": "", '
-        '"author_notes": ""}')
+        'nteraction": {"solution": null, "answer_groups": [{"tagged_skill_misco'
+        'nception_id": null, "outcome": {"param_changes": [], "feedback": {"con'
+        'tent_id": "feedback_2", "html": "<p>This is great! \\u00ae\\u00ae</p>"'
+        '}, "dest": "Introduction", "refresher_exploration_id": null, "missing_'
+        'prerequisite_skill_id": null, "labelled_as_correct": false}, "training'
+        '_data": [], "rule_types_to_subtitled_inputs": {"Contains": {"rule_inpu'
+        'ts": [{"x": "\\u00ae\\u00ae"}], "content_id": null}}}], "default_outco'
+        'me": {"param_changes": [], "feedback": {"content_id": "default_outcome'
+        '", "html": ""}, "dest": "Introduction", "refresher_exploration_id": nu'
+        'll, "missing_prerequisite_skill_id": null, "labelled_as_correct": fals'
+        'e}, "customization_args": {"rows": {"value": 1}, "placeholder": {"valu'
+        'e": {"unicode_str": "\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d'
+        '\\ude0d", "content_id": "ca_placeholder_0"}}}, "confirmed_unclassified'
+        '_answers": [], "id": "TextInput", "hints": [{"hint_content": {"content'
+        '_id": "hint_3", "html": "<p>This is a copyright character \\u00a9.</p>'
+        '"}}]}, "recorded_voiceovers": {"voiceovers_mapping": {"feedback_2": {}'
+        ', "content": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder_'
+        '0": {}}}, "classifier_model_id": null, "content": {"content_id": "cont'
+        'ent", "html": "<p>Unicode Characters \\ud83d\\ude0d\\ud83d\\ude0d\\ud8'
+        '3d\\ude0d\\ud83d\\ude0d</p>"}, "written_translations": {"translations_'
+        'mapping": {"feedback_2": {}, "content": {}, "hint_3": {}, "default_out'
+        'come": {}, "ca_placeholder_0": {}}}, "next_content_id_index": 4, "soli'
+        'cit_answer_details": false}}, "version": 0, "correctness_feedback_enab'
+        'led": false, "language_code": "en", "objective": "", "init_state_name"'
+        ': "Introduction", "blurb": "", "author_notes": ""}')
 
     def test_retrieved_memory_profile_contains_correct_elements(self):
         memory_profile = caching_services.get_memory_cache_stats()

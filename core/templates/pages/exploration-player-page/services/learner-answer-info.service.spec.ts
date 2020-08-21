@@ -79,13 +79,15 @@ describe('Learner answer info service', function() {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Equals: [
-              {
-                x: 10
-              }
-            ]
+          rule_types_to_subtitled_inputs: {
+            Equals: {
+              content_id: null,
+              rule_inputs: [
+                {
+                  x: 10
+                }
+              ]
+            }
           }
         }, {
           outcome: {
@@ -99,21 +101,26 @@ describe('Learner answer info service', function() {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Equals: [
-              {
-                x: 5
-              },
-              {
-                x: 6
-              }
-            ],
-            NotEquals: [
-              {
-                x: 7
-              }
-            ]
+          rule_types_to_subtitled_inputs: {
+            Equals: {
+              content_id: null,
+              rule_inputs: [
+                {
+                  x: 5
+                },
+                {
+                  x: 6
+                }
+              ]
+            },
+            NotEquals: {
+              content_id: null,
+              rule_inputs: [
+                {
+                  x: 7
+                }
+              ]
+            }
           }
         }],
         default_outcome: {

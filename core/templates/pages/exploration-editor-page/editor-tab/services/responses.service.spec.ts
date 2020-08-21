@@ -19,6 +19,8 @@
 import { EventEmitter } from '@angular/core';
 
 import { UpgradedServices } from 'services/UpgradedServices';
+import { SubtitledVariableLengthListOfRuleInputs } from
+  'domain/exploration/SubtitledVariableLengthListOfRuleInputsObjectFactory';
 
 describe('Responses Service', function() {
   var ResponsesService = null;
@@ -70,8 +72,7 @@ describe('Responses Service', function() {
             html: ''
           },
         },
-        rule_input_translations: {},
-        rule_types_to_inputs: {},
+        rule_types_to_subtitled_inputs: {},
       }],
       default_outcome: {
         dest: 'Hola',
@@ -101,14 +102,16 @@ describe('Responses Service', function() {
             html: ''
           },
         },
-        rule_input_translations: {},
-        rule_types_to_inputs: {
-          '': [
-            {
-              x: ['c', 'd', 'e'],
-              y: ['a', 'b', 'c']
-            }
-          ]
+        rule_types_to_subtitled_inputs: {
+          '': {
+            content_id: null,
+            rule_inputs: [
+              {
+                x: ['c', 'd', 'e'],
+                y: ['a', 'b', 'c']
+              }
+            ]
+          }
         }
       }],
       default_outcome: {
@@ -135,7 +138,8 @@ describe('Responses Service', function() {
     ResponsesService.init(interactionData);
     StateInteractionIdService.init('stateName', 'TextInput');
     expect(ResponsesService.getActiveAnswerGroupIndex()).toBe(-1);
-    expect(ResponsesService.getActiveRuleIndex()).toBe(0);
+    expect(ResponsesService.getActiveRuleType()).toBe(null);
+    expect(ResponsesService.getActiveRuleInputIndex()).toBe(-1);
     expect(ResponsesService.getActiveAnswerGroupIndex()).toBe(-1);
     expect(ResponsesService.getAnswerGroups()).toEqual(
       interactionData.answerGroups);
@@ -204,7 +208,7 @@ describe('Responses Service', function() {
 
     // Reassign only updated properties.
     var expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0].updateRuleTypesToInputs(updatedAnswerGroup.rules);
+    expectedAnswerGroup[0].updateRuleTypesToSubtitledInputs(updatedAnswerGroup.rules);
     expectedAnswerGroup[0].taggedSkillMisconceptionId =
       updatedAnswerGroup.taggedSkillMisconceptionId;
     expectedAnswerGroup[0].outcome.feedback = updatedAnswerGroup.feedback;
@@ -242,16 +246,20 @@ describe('Responses Service', function() {
     };
     var callbackSpy = jasmine.createSpy('callback');
     ResponsesService.changeActiveAnswerGroupIndex(0);
-    expect(ResponsesService.getActiveRuleIndex()).toBe(-1);
 
-    ResponsesService.changeActiveRuleIndex(1);
-    expect(ResponsesService.getActiveRuleIndex()).toBe(1);
+    expect(ResponsesService.getActiveRuleType()).toBe(null);
+    ResponsesService.changeActiveRuleType('Contains');
+    expect(ResponsesService.getActiveRuleType()).toBe('Contains');
+
+    expect(ResponsesService.getActiveRuleInputIndex()).toBe(-1);
+    ResponsesService.changeActiveRuleInputIndex(0);
+    expect(ResponsesService.getActiveRuleInputIndex()).toBe(0);
 
     ResponsesService.updateActiveAnswerGroup(updatedAnswerGroup, callbackSpy);
 
     // Reassign only updated properties.
     var expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0].updateRuleTypesToInputs(updatedAnswerGroup.rules);
+    expectedAnswerGroup[0].updateRuleTypesToSubtitledInputs(updatedAnswerGroup.rules);
     expectedAnswerGroup[0].taggedSkillMisconceptionId =
       updatedAnswerGroup.taggedSkillMisconceptionId;
     expectedAnswerGroup[0].outcome.feedback = updatedAnswerGroup.feedback;
@@ -291,10 +299,14 @@ describe('Responses Service', function() {
     };
     var callbackSpy = jasmine.createSpy('callback');
     ResponsesService.changeActiveAnswerGroupIndex(1);
-    expect(ResponsesService.getActiveRuleIndex()).toBe(-1);
 
-    ResponsesService.changeActiveRuleIndex(1);
-    expect(ResponsesService.getActiveRuleIndex()).toBe(1);
+    expect(ResponsesService.getActiveRuleType()).toBe(null);
+    ResponsesService.changeActiveRuleType('Contains');
+    expect(ResponsesService.getActiveRuleType()).toBe('Contains');
+
+    expect(ResponsesService.getActiveRuleInputIndex()).toBe(-1);
+    ResponsesService.changeActiveRuleInputIndex(0);
+    expect(ResponsesService.getActiveRuleInputIndex()).toBe(0);
 
     ResponsesService.updateActiveAnswerGroup(updatedAnswerGroup, callbackSpy);
 
@@ -349,7 +361,8 @@ describe('Responses Service', function() {
 
     var expectedRules = ['c'];
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleTypesToInputs[''][0].x = expectedRules;
+    expectedAnswerGroup[0].ruleTypesToSubtitledInputs[
+      ''].ruleInputs[0].x = expectedRules;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerGroup(0)).toEqual(
@@ -382,8 +395,10 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleTypesToInputs[''][0].x = ['f', 'd', 'e'];
-    expectedAnswerGroup[0].ruleTypesToInputs[''][0].y = ['d', 'e', 'f'];
+    expectedAnswerGroup[0].ruleTypesToSubtitledInputs[
+      ''].ruleInputs[0].x = ['f', 'd', 'e'];
+    expectedAnswerGroup[0].ruleTypesToSubtitledInputs[
+      ''].ruleInputs[0].y = ['d', 'e', 'f'];
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerGroup(0)).toEqual(
@@ -395,11 +410,10 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and rule type is' +
     ' HasElementXAtPositionY', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
-    delete interactionDataWithRules.answerGroups[0].ruleTypesToInputs[''];
-    interactionDataWithRules.answerGroups[0].ruleTypesToInputs = {
-      HasElementXAtPositionY: [{
-        x: 'b', y: 3
-      }]
+    delete interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs[''];
+    interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs = {
+      HasElementXAtPositionY:
+        new SubtitledVariableLengthListOfRuleInputs([{ x: 'b', y: 3 }], null)
     };
 
     ResponsesService.init(interactionDataWithRules);
@@ -423,8 +437,10 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleTypesToInputs.HasElementXAtPositionY[0].x = 'c';
-    expectedAnswerGroup[0].ruleTypesToInputs.HasElementXAtPositionY[0].y = 1;
+    expectedAnswerGroup[0].ruleTypesToSubtitledInputs.HasElementXAtPositionY.ruleInputs[
+      0].x = 'c';
+    expectedAnswerGroup[0].ruleTypesToSubtitledInputs.HasElementXAtPositionY.ruleInputs[
+      0].y = 1;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -434,11 +450,10 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and rule type is' +
     ' HasElementXBeforeElementY', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
-    delete interactionDataWithRules.answerGroups[0].ruleTypesToInputs[''];
-    interactionDataWithRules.answerGroups[0].ruleTypesToInputs = {
-      HasElementXBeforeElementY: [{
-        x: 'a', y: 'b'
-      }]
+    delete interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs[''];
+    interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs = {
+      HasElementXBeforeElementY:
+        new SubtitledVariableLengthListOfRuleInputs([{ x: 'a', y: 'b' }], null)
     };
 
     ResponsesService.init(interactionDataWithRules);
@@ -465,9 +480,9 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    const ruleTypesToInputs = expectedAnswerGroup[0].ruleTypesToInputs;
-    ruleTypesToInputs.HasElementXBeforeElementY[0].x = 'a';
-    ruleTypesToInputs.HasElementXBeforeElementY[0].y = 'd';
+    const ruleTypesToSubtitledInputs = expectedAnswerGroup[0].ruleTypesToSubtitledInputs;
+    ruleTypesToSubtitledInputs.HasElementXBeforeElementY.ruleInputs[0].x = 'a';
+    ruleTypesToSubtitledInputs.HasElementXBeforeElementY.ruleInputs[0].y = 'd';
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -477,11 +492,11 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and choices had changed', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
     // Any other method from DragAndDropSortInputRulesService.
-    delete interactionDataWithRules.answerGroups[0].ruleTypesToInputs[''];
-    interactionDataWithRules.answerGroups[0].ruleTypesToInputs = {
-      IsEqualToOrderingWithOneItemAtIncorrectPosition: [{
-        x: [['a'], ['b'], ['c']]
-      }]
+    delete interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs[''];
+    interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs = {
+      IsEqualToOrderingWithOneItemAtIncorrectPosition:
+        new SubtitledVariableLengthListOfRuleInputs(
+          [{ x: [['a'], ['b'], ['c']] }], null)
     };
     ResponsesService.init(interactionDataWithRules);
     StateEditorService.setInteraction(interactionDataWithRules);
@@ -505,9 +520,11 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    const ruleTypesToInputs = expectedAnswerGroup[0].ruleTypesToInputs;
-    ruleTypesToInputs.IsEqualToOrderingWithOneItemAtIncorrectPosition[0].x = (
-      [['d'], ['e'], ['f']]);
+    const ruleTypesToSubtitledInputs = expectedAnswerGroup[0].ruleTypesToSubtitledInputs;
+    (ruleTypesToSubtitledInputs.IsEqualToOrderingWithOneItemAtIncorrectPosition
+      .ruleInputs[0].x = (
+        [['d'], ['e'], ['f']])
+    );
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);

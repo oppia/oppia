@@ -65,9 +65,11 @@ describe('StateTopAnswersStatsService', () => {
     param_changes: [],
     interaction: {
       answer_groups: [{
-        rule_input_translations: {},
-        rule_types_to_inputs: {
-          Contains: [{x: 'hola'}]
+        rule_types_to_subtitled_inputs: {
+          Contains: {
+            content_id: null,
+            rule_inputs: [{x: 'hola'}]
+          }
         },
         outcome: {
           dest: 'Me Llamo',
@@ -314,7 +316,7 @@ describe('StateTopAnswersStatsService', () => {
       .not.toContain(joC({answer: 'hola'}));
 
     const updatedState = states.getState('Hola');
-    updatedState.interaction.answerGroups[0].updateRuleTypesToInputs([
+    updatedState.interaction.answerGroups[0].updateRuleTypesToSubtitledInputs([
       ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
     ]);
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);

@@ -157,13 +157,15 @@ describe('ExplorationStatesService', function() {
         param_changes: [],
         interaction: {
           answer_groups: [{
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Contains: [
-                {
-                  x: 'hola'
-                }
-              ]
+            rule_types_to_subtitled_inputs: {
+              Contains: {
+                content_id: null,
+                rule_inputs: [
+                  {
+                    x: 'hola'
+                  }
+                ]
+              }
             },
             outcome: {
               dest: 'Me Llamo',

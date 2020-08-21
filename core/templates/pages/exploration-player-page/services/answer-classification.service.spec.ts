@@ -94,13 +94,15 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 10
-                }
-              ]
+            rule_types_to_subtitled_inputs: {
+              Equals: {
+                content_id: null,
+                rule_inputs: [
+                  {
+                    x: 10
+                  }
+                ]
+              }
             }
           }, {
             outcome: {
@@ -114,21 +116,26 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 5
-                },
-                {
-                  x: 6
-                }
-              ],
-              NotEquals: [
-                {
-                  x: 7
-                }
-              ]
+            rule_types_to_subtitled_inputs: {
+              Equals: {
+                content_id: null,
+                rule_inputs: [
+                  {
+                    x: 5
+                  },
+                  {
+                    x: 6
+                  }
+                ]
+              },
+              NotEquals: {
+                content_id: null,
+                rule_inputs: [
+                  {
+                    x: 7
+                  }
+                ]
+              }
             }
           }],
           default_outcome: {
@@ -224,13 +231,15 @@ describe('Answer Classification Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Equals: [
-              {
-                x: 10
-              }
-            ]
+          rule_types_to_subtitled_inputs: {
+            Equals: {
+              content_id: null,
+              rule_inputs: [
+                {
+                  x: 10
+                }
+              ]
+            }
           }
         }];
 
@@ -286,13 +295,15 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 10
-                }
-              ]
+            rule_types_to_subtitled_inputs: {
+              Equals: {
+                content_id: null,
+                rule_inputs: [
+                  {
+                    x: 10
+                  }
+                ]
+              }
             }
           }, {
             outcome: {
@@ -306,16 +317,18 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 5
-                },
-                {
-                  x: 7
-                }
-              ]
+            rule_types_to_subtitled_inputs: {
+              Equals: {
+                content_id: null,
+                rule_inputs: [
+                  {
+                    x: 5
+                  },
+                  {
+                    x: 7
+                  }
+                ]
+              }
             }
           }],
           default_outcome: {
@@ -413,13 +426,15 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             training_data: ['abc', 'input'],
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [
-                {
-                  x: 'equal'
-                }
-              ]
+            rule_types_to_subtitled_inputs: {
+              Equals: {
+                content_id: null,
+                rule_inputs: [
+                  {
+                    x: 'equal'
+                  }
+                ]
+              }
             }
           }, {
             outcome: {
@@ -434,13 +449,15 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             training_data: ['xyz'],
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Contains: [
-                {
-                  x: 'npu'
-                }
-              ]
+            rule_types_to_subtitled_inputs: {
+              Contains: {
+                content_id: null,
+                rule_inputs: [
+                  {
+                    x: 'npu'
+                  }
+                ]
+              }
             },
           }],
           default_outcome: {

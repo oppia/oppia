@@ -196,13 +196,15 @@ describe('TrainingDataService', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Contains: [
-                {
-                  x: 'Test'
-                }
-              ]
+            rule_types_to_subtitled_inputs: {
+              Contains: {
+                content_id: null,
+                rule_inputs: [
+                  {
+                    x: 'Test'
+                  }
+                ]
+              }
             },
             outcome: {
               dest: 'State',

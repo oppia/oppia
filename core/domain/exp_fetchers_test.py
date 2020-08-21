@@ -654,7 +654,7 @@ title: Old Title
             exploration.states['Introduction'].interaction.id,
             'MathEquationInput')
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs[
+            answer_groups[0].rule_types_to_subtitled_inputs[
                 'MatchesExactlyWith'].to_dict(),
             {
                 'content_id': None,
@@ -769,7 +769,7 @@ title: Old Title
             exploration.states['Introduction'].interaction.id,
             'AlgebraicExpressionInput')
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs[
+            answer_groups[0].rule_types_to_subtitled_inputs[
                 'MatchesExactlyWith'].to_dict(),
             {
                 'content_id': None,
@@ -870,7 +870,7 @@ title: Old Title
             exploration.states['Introduction'].interaction.id,
             'NumericExpressionInput')
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs[
+            answer_groups[0].rule_types_to_subtitled_inputs[
                 'MatchesExactlyWith'].to_dict(),
             {
                 'content_id': None,
@@ -984,7 +984,7 @@ title: Old Title
             exploration.states['Introduction'].interaction.id,
             'AlgebraicExpressionInput')
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs[
+            answer_groups[0].rule_types_to_subtitled_inputs[
                 'MatchesExactlyWith'].to_dict(),
             {
                 'content_id': None,

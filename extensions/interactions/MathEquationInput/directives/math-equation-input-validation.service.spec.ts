@@ -101,7 +101,7 @@ describe('MathEquationInputValidationService', () => {
 
   it('should catch redundancy of rules with matching inputs', () => {
     // The second rule will never get matched.
-    answerGroups[0].updateRuleTypesToInputs(
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
       [isEquivalentTo, matchesExactlyWith]);
 
     warnings = validatorService.getAllWarnings(currentState,
@@ -127,7 +127,7 @@ describe('MathEquationInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].updateRuleTypesToInputs([isEquivalentTo1, isEquivalentTo2]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs([isEquivalentTo1, isEquivalentTo2]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -154,7 +154,7 @@ describe('MathEquationInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].updateRuleTypesToInputs(
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
       [matchesExactlyWith1, matchesExactlyWith2]);
 
     warnings = validatorService.getAllWarnings(currentState,
@@ -181,7 +181,7 @@ describe('MathEquationInputValidationService', () => {
       }
     });
 
-    answerGroups[0].updateRuleTypesToInputs(
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
       [isEquivalentTo, matchesExactlyWith]);
 
     warnings = validatorService.getAllWarnings(currentState,
@@ -190,7 +190,7 @@ describe('MathEquationInputValidationService', () => {
   });
 
   it('should warn if there are missing custom variables', function() {
-    answerGroups[0].updateRuleTypesToInputs([
+    answerGroups[0].updateRuleTypesToSubtitledInputs([
       rof.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
@@ -215,7 +215,7 @@ describe('MathEquationInputValidationService', () => {
   });
 
   it('should warn if there are too many custom variables', function() {
-    answerGroups[0].updateRuleTypesToInputs([
+    answerGroups[0].updateRuleTypesToSubtitledInputs([
       rof.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {

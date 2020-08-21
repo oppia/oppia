@@ -779,26 +779,31 @@ class Question(python_utils.OBJECT):
         answer_group_dicts = question_state_dict['interaction']['answer_groups']
         for i, answer_group_dict in enumerate(answer_group_dicts):
             # Add a content id field to the values stored in
-            # rule_types_to_inputs dict format. If it is a translatbale
+            # rule_types_to_inputs dict format, and rename the field to
+            # rule_types_to_subtitled_inputs. If it is a translatbale
             # rule, assign a content id.
             rule_types_to_inputs = answer_group_dict['rule_types_to_inputs']
+            rule_types_to_subtitled_inputs = {}
             for rule_type in rule_types_to_inputs:
-                rule_types_to_inputs[rule_type] = {
+                rule_types_to_subtitled_inputs[rule_type] = {
                     'rule_inputs': rule_types_to_inputs[rule_type],
                     'content_id': None
                 }
 
-                interaction_id = question_state_dict['interaction']['id']
+                interaction_id = state_dict['interaction']['id']
                 if (
                     interaction_id == 'TextInput' or
                     interaction_id == 'SetInput'
                 ):
                     new_content_id = 'rule_inputs_%s_%i' % (
                         rule_type, next_content_id_index)
-                    rule_types_to_inputs[rule_type]['content_id'] = (
-                        new_content_id)
+                    rule_types_to_subtitled_inputs[rule_type][
+                        'content_id'] = new_content_id
                     new_content_ids.append(new_content_id)
                     next_content_id_index += 1
+            answer_group_dict['rule_types_to_subtitled_inputs'] = (
+                rule_types_to_subtitled_inputs)
+            del answer_group_dict['rule_types_to_inputs']
 
         for new_content_id in new_content_ids:
             question_state_dict[

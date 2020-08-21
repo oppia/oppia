@@ -82,7 +82,6 @@ angular.module('oppia').factory('ChangeListService', [
     };
 
     var autosaveChangeListOnChange = function(explorationChangeList) {
-      console.log(explorationChangeList)
       // Asynchronously send an autosave request, and check for errors in the
       // response:
       // If error is present -> Check for the type of error occurred

@@ -87,7 +87,7 @@ angular.module('oppia').directive('stateTranslation', [
         'TranslationTabActiveModeService', 'COMPONENT_NAME_CONTENT',
         'COMPONENT_NAME_FEEDBACK',
         'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
-        'COMPONENT_NAME_INTERACTION_RULE', 'COMPONENT_NAME_HINT',
+        'COMPONENT_NAME_INTERACTION_RULE_INPUTS', 'COMPONENT_NAME_HINT',
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
@@ -102,7 +102,7 @@ angular.module('oppia').directive('stateTranslation', [
             TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK,
             COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS,
-            COMPONENT_NAME_INTERACTION_RULE, COMPONENT_NAME_HINT,
+            COMPONENT_NAME_INTERACTION_RULE_INPUTS, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
             RULE_SUMMARY_WRAP_CHARACTER_COUNT
         ) {
@@ -477,9 +477,9 @@ angular.module('oppia').directive('stateTranslation', [
           $scope.getInteractionTranslatableRuleInputs = function() {
             const translatableRuleInputs = [];
             $scope.stateAnswerGroups.forEach((answerGroup, i) => {
-              Object.keys(answerGroup.ruleTypesToInputs).forEach(ruleType => {
+              Object.keys(answerGroup.ruleTypesToSubtitledInputs).forEach(ruleType => {
                 const contentId = (
-                  answerGroup.ruleTypesToInputs[ruleType].contentId);
+                  answerGroup.ruleTypesToSubtitledInputs[ruleType].contentId);
                 if (contentId === null) {
                   return;
                 }
@@ -487,7 +487,7 @@ angular.module('oppia').directive('stateTranslation', [
                 translatableRuleInputs.push({
                   answerGroupIndex: i,
                   ruleInputs:
-                    answerGroup.ruleTypesToInputs[ruleType].ruleInputs,
+                    answerGroup.ruleTypesToSubtitledInputs[ruleType].ruleInputs,
                   ruleType,
                   contentId
                 });
@@ -548,7 +548,7 @@ angular.module('oppia').directive('stateTranslation', [
             $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
             $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
             $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
-            $scope.TAB_ID_RULES = COMPONENT_NAME_INTERACTION_RULE;
+            $scope.TAB_ID_RULES = COMPONENT_NAME_INTERACTION_RULE_INPUTS;
             $scope.TAB_ID_CUSTOMIZATION_ARGS = (
               COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
 

@@ -232,13 +232,15 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'Second'
               },
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Equals: [
-                  {
-                    x: 0
-                  }
-                ]
+              rule_types_to_subtitled_inputs: {
+                Equals: {
+                  content_id: null,
+                  rule_inputs: [
+                    {
+                      x: 0
+                    }
+                  ]
+                }
               },
               training_data: []
             },
@@ -255,13 +257,15 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'First'
               },
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Equals: [
-                  {
-                    x: 1
-                  }
-                ]
+              rule_types_to_subtitled_inputs: {
+                Equals: {
+                  content_id: null,
+                  rule_inputs: [
+                    {
+                      x: 1
+                    }
+                  ]
+                }
               },
               training_data: []
             }],
@@ -324,13 +328,15 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'Third'
               },
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Equals: [
-                  {
-                    x: 0
-                  }
-                ]
+              rule_types_to_subtitled_inputs: {
+                Equals: {
+                  content_id: null,
+                  rule_inputs: [
+                    {
+                      x: 0
+                    }
+                  ]
+                }
               },
               training_data: []
             }],

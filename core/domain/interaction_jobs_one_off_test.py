@@ -121,7 +121,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'IsEqualToOrdering': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -159,7 +159,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'HasElementXBeforeElementY': {
                     'content_id': None,
                         'rule_inputs': [{
@@ -198,7 +198,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'HasElementXAtPositionY': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -320,7 +320,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'IsEqualToOrdering': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -399,7 +399,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -459,7 +459,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -532,7 +532,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -611,7 +611,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -668,7 +668,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -742,7 +742,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{

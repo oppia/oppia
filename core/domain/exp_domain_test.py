@@ -519,7 +519,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -549,16 +549,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Validate RuleSpec.
-        answer_group.rule_types_to_inputs['Contains'].rule_inputs[0] = {}
+        answer_group.rule_types_to_subtitled_inputs[
+          'Contains'].rule_inputs[0] = {}
         self._assert_validation_error(
             exploration, 'Rule type \'Contains\' is missing inputs')
 
-        answer_group.rule_types_to_inputs[
+        answer_group.rule_types_to_subtitled_inputs[
             'Contains'].rule_inputs[0] = 'Inputs string'
         self._assert_validation_error(
             exploration, 'Invalid rule inputs:')
 
-        answer_group.rule_types_to_inputs = {
+        answer_group.rule_types_to_subtitled_inputs = {
             'FakeRuleType': (
                 state_domain.SubtitledVariableLengthListOfRuleInputs(
                     None,  [{'x': 'Test'}])
@@ -566,7 +567,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         self._assert_validation_error(exploration, 'Unrecognized rule type')
 
-        answer_group.rule_types_to_inputs = {
+        answer_group.rule_types_to_subtitled_inputs = {
             'Contains': (
                 state_domain.SubtitledVariableLengthListOfRuleInputs(
                     None,  [{'x': 15}])
@@ -577,7 +578,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ):
             exploration.validate()
 
-        answer_group.rule_types_to_inputs['Contains'].rule_inputs[0] = {
+        answer_group.rule_types_to_subtitled_inputs['Contains'].rule_inputs[0] = {
             'x': '{{ExampleParam}}'
         }
 
@@ -778,7 +779,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -807,7 +808,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -827,11 +828,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'to be <skill_id>-<misconception_id>, received '
             'invalid_tagged_skill_misconception_id')
 
-        init_state.interaction.answer_groups[0].rule_types_to_inputs = []
+        init_state.interaction.answer_groups[
+            0].rule_types_to_subtitled_inputs = []
         self._assert_validation_error(
             exploration,
-            'Expected answer group rule_types_to_inputs to be a dict')
-        init_state.interaction.answer_groups[0].rule_types_to_inputs = {}
+            'Expected answer group rule_types_to_subtitled_inputs to be a dict')
+        init_state.interaction.answer_groups[0].rule_types_to_subtitled_inputs = {}
 
         first_answer_group = init_state.interaction.answer_groups[0]
         first_answer_group.tagged_skill_misconception_id = None
@@ -1235,7 +1237,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -1614,7 +1616,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -6557,7 +6559,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: rule_inputs_Equals_3
             rule_inputs:
@@ -7128,7 +7130,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: rule_inputs_Equals_3
             rule_inputs:
@@ -7287,7 +7289,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: rule_inputs_Equals_3
             rule_inputs:
@@ -7469,7 +7471,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: rule_inputs_Equals_3
             rule_inputs:
@@ -7640,7 +7642,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: rule_inputs_Equals_3
             rule_inputs:
@@ -7833,7 +7835,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: rule_inputs_Equals_3
             rule_inputs:
@@ -8132,7 +8134,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: null
             rule_inputs:
@@ -8410,7 +8412,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: rule_inputs_Equals_3
             rule_inputs:
@@ -9068,7 +9070,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: null
             rule_inputs:
@@ -9085,7 +9087,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: null
             rule_inputs:
@@ -9166,7 +9168,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: null
             rule_inputs:
@@ -9502,7 +9504,7 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_types_to_inputs:
+        rule_types_to_subtitled_inputs:
           Equals:
             content_id: rule_inputs_Equals_3
             rule_inputs:
@@ -9931,7 +9933,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state1.update_interaction_solution(solution)
 
         answer_group_list2 = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -9955,7 +9957,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -9978,7 +9980,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{

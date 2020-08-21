@@ -142,7 +142,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         var contentIds = new Set();
         answerGroups.forEach(function(answerGroup) {
           contentIds.add(answerGroup.outcome.feedback.getContentId());
-          Object.values(answerGroup.ruleTypesToInputs).forEach(
+          Object.values(answerGroup.ruleTypesToSubtitledInputs).forEach(
             (subtitledRuleInputs:
               SubtitledVariableLengthListOfRuleInputs) => {
               if (subtitledRuleInputs.contentId !== null) {

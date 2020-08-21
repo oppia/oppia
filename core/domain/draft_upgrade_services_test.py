@@ -129,7 +129,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
                 'new_value': [{
-                    'rule_types_to_inputs': {
+                    'rule_types_to_subtitled_inputs': {
                         'ContainsAtLeastOneOf': {
                             'content_id': None,
                             'rule_inputs': [{

@@ -118,7 +118,7 @@ angular.module('oppia').directive('stateResponses', [
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolicitAnswerDetailsService',
         'UrlInterpolationService', 'WindowDimensionsService',
-        'COMPONENT_NAME_INTERACTION_RULE',
+        'COMPONENT_NAME_INTERACTION_RULE_INPUTS',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
@@ -132,7 +132,7 @@ angular.module('oppia').directive('stateResponses', [
             StateInteractionIdService, StateNextContentIdIndexService,
             StateSolicitAnswerDetailsService,
             UrlInterpolationService, WindowDimensionsService,
-            COMPONENT_NAME_INTERACTION_RULE,
+            COMPONENT_NAME_INTERACTION_RULE_INPUTS,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
@@ -334,10 +334,10 @@ angular.module('oppia').directive('stateResponses', [
               if (RULE_TEMPLATES[currentInteractionId][result.tmpRule.type]
                 .translatable
               ) {
-                newAnswerGroup.ruleTypesToInputs[result.tmpRule.type]
+                newAnswerGroup.ruleTypesToSubtitledInputs[result.tmpRule.type]
                   .contentId = (
                     GenerateContentIdService.getNextStateId(
-                      COMPONENT_NAME_INTERACTION_RULE)
+                      COMPONENT_NAME_INTERACTION_RULE_INPUTS)
                   );
                 StateNextContentIdIndexService.saveDisplayedValue();
                 $scope.onSaveNextContentIdIndex(
@@ -431,10 +431,10 @@ angular.module('oppia').directive('stateResponses', [
             });
           };
 
-          $scope.saveActiveAnswerGroupRuleTypesToInputs = function(
-              updatedRuleTypesToInputs) {
+          $scope.saveActiveAnswerGroupRuleTypesToSubtitledInputs = function(
+              updatedRuleTypesToSubtitledInputs) {
             ResponsesService.updateActiveAnswerGroup({
-              ruleTypesToInputs: updatedRuleTypesToInputs
+              ruleTypesToSubtitledInputs: updatedRuleTypesToSubtitledInputs
             }, function(newAnswerGroups) {
               $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
               $scope.refreshWarnings()();
@@ -479,7 +479,7 @@ angular.module('oppia').directive('stateResponses', [
             var outcome = answerGroup.outcome;
             var hasFeedback = outcome.hasNonemptyFeedback();
 
-            if (answerGroup.ruleTypesToInputs) {
+            if (answerGroup.ruleTypesToSubtitledInputs) {
               var firstRule = $filter('convertToPlainText')(
                 $filter('parameterizeRuleDescription')(
                   answerGroup.getRulesAsList()[0],

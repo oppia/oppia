@@ -81,13 +81,15 @@ describe('Skill preview tab', function() {
             param_changes: [],
             refresher_exploration_id: null
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Equals: [
-              {
-                x: 10
-              }
-            ]
+          rule_types_to_subtitled_inputs: {
+            Equals: {
+              content_id: null,
+              rule_inputs: [
+                {
+                  x: 10
+                }
+              ]
+            }
           }
         }],
         confirmed_unclassified_answers: [],

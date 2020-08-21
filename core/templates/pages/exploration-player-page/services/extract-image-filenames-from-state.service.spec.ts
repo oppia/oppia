@@ -192,13 +192,15 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  Equals: [
-                    {
-                      x: 0
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  Equals: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: 0
+                      }
+                    ]
+                  }
                 }
               },
               {
@@ -212,13 +214,15 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  Equals: [
-                    {
-                      x: 1
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  Equals: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: 1
+                      }
+                    ]
+                  }
                 }
               }
             ],
@@ -303,17 +307,19 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  Equals: [
-                    {
-                      x: [
-                        '<p><oppia-noninteractive-image filepath-with-value' +
-                        '=\&amp;quot;s4Choice1.png&amp;quot;\></oppia-nonin' +
-                        'teractive-image></p>'
-                      ]
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  Equals: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: [
+                          '<p><oppia-noninteractive-image filepath-with-value' +
+                          '=\&amp;quot;s4Choice1.png&amp;quot;\></oppia-nonin' +
+                          'teractive-image></p>'
+                        ]
+                      }
+                    ]
+                  }
                 }
               },
               {
@@ -327,17 +333,19 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  Equals: [
-                    {
-                      x: [
-                        '<p><oppia-noninteractive-image filepath-with-value=' +
-                        '"&amp;quot;s4Choice2.png&amp;quot;">' +
-                        '</oppia-noninteractive-image></p>'
-                      ]
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  Equals: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: [
+                          '<p><oppia-noninteractive-image filepath-with-value' +
+                          '="&amp;quot;s4Choice2.png&amp;quot;">' +
+                          '</oppia-noninteractive-image></p>'
+                        ]
+                      }
+                    ]
+                  }
                 }
               }
             ]
@@ -395,13 +403,15 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  IsInRegion: [
-                    {
-                      x: 'classdef'
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  IsInRegion: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: 'classdef'
+                      }
+                    ]
+                  }
                 }
               },
               {
@@ -416,13 +426,15 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  IsInRegion: [
-                    {
-                      x: 'instancefunc'
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  IsInRegion: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: 'instancefunc'
+                      }
+                    ]
+                  }
                 }
               },
               {
@@ -436,13 +448,15 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  IsInRegion: [
-                    {
-                      x: 'docstring'
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  IsInRegion: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: 'docstring'
+                      }
+                    ]
+                  }
                 }
               },
               {
@@ -457,13 +471,15 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  IsInRegion: [
-                    {
-                      x: 'classfunc'
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  IsInRegion: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: 'classfunc'
+                      }
+                    ]
+                  }
                 }
               },
               {
@@ -478,13 +494,15 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  IsInRegion: [
-                    {
-                      x: 'ctor'
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  IsInRegion: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: 'ctor'
+                      }
+                    ]
+                  }
                 }
               }
             ],
@@ -605,13 +623,15 @@ describe('Extracting Image file names in the state service', () => {
               }
             },
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Contains: [
-                  {
-                    x: '1'
-                  }
-                ]
+              rule_types_to_subtitled_inputs: {
+                Contains: {
+                  content_id: null,
+                  rule_inputs: [
+                    {
+                      x: '1'
+                    }
+                  ]
+                }
               },
               outcome: {
                 dest: 'State 1',
@@ -624,13 +644,15 @@ describe('Extracting Image file names in the state service', () => {
                 refresher_exploration_id: null
               }
             }, {
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Contains: [
-                  {
-                    x: '2'
-                  }
-                ]
+              rule_types_to_subtitled_inputs: {
+                Contains: {
+                  content_id: null,
+                  rule_inputs: [
+                    {
+                      x: '2'
+                    }
+                  ]
+                }
               },
               outcome: {
                 dest: 'State 1',

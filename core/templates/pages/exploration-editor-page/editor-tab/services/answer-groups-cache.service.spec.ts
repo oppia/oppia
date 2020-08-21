@@ -24,8 +24,7 @@ import { AnswerGroupsCacheService } from
 describe('Answer Groups Cache Service', () => {
   describe('AnswerGroupsCache', () => {
     var answerGroup = {
-      rule_input_translations: {},
-      rule_types_to_inputs: {},
+      rule_types_to_subtitled_inputs: {},
       outcome: {
         dest: 'default',
         feedback: {

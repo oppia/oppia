@@ -1205,7 +1205,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question.question_state_data.interaction.id, 'MathEquationInput')
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs[
+            answer_groups[0].rule_types_to_subtitled_inputs[
                 'MatchesExactlyWith'].to_dict(),
             {
                 'content_id': None,
@@ -1312,7 +1312,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data.interaction.id,
             'AlgebraicExpressionInput')
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs[
+            answer_groups[0].rule_types_to_subtitled_inputs[
                 'MatchesExactlyWith'].to_dict(),
             {
                 'content_id': None,
@@ -1415,7 +1415,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data.interaction.id,
             'NumericExpressionInput')
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs[
+            answer_groups[0].rule_types_to_subtitled_inputs[
                 'MatchesExactlyWith'].to_dict(),
             {
                 'content_id': None,
@@ -1531,7 +1531,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'AlgebraicExpressionInput')
         self.assertEqual(len(answer_groups), 1)
         self.assertEqual(
-            answer_groups[0].rule_types_to_inputs[
+            answer_groups[0].rule_types_to_subtitled_inputs[
                 'MatchesExactlyWith'].to_dict(),
             {
                 'content_id': None,
@@ -1935,13 +1935,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        migrated_rule_types_to_inputs = (
+        migrated_rule_types_to_subtitled_inputs = (
             question
             .question_state_data
             .interaction.answer_groups[0]
-            .rule_types_to_inputs)
+            .rule_types_to_subtitled_inputs)
         self.assertEqual(
-            migrated_rule_types_to_inputs['Equals'].to_dict(),
+            migrated_rule_types_to_subtitled_inputs['Equals'].to_dict(),
             {
                 'content_id': 'rule_inputs_Equals_2',
                 'rule_inputs': [{'x': 'test'}]
@@ -2121,7 +2121,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         answer_group = question.question_state_data.interaction.answer_groups[0]
         self.assertEqual(
-            answer_group.rule_types_to_inputs['MatchesExactlyWith'].to_dict(), {
+            answer_group.rule_types_to_subtitled_inputs['MatchesExactlyWith'].to_dict(), {
                 'content_id': None,
                 'rule_inputs': [{
                     'x': '((x)^(2))/(2.5)-(alpha)/(beta)'
@@ -2216,7 +2216,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         answer_group = question.question_state_data.interaction.answer_groups[0]
         self.assertEqual(
-            answer_group.rule_types_to_inputs['Equals'].to_dict(), {
+            answer_group.rule_types_to_subtitled_inputs['Equals'].to_dict(), {
                 'content_id': 'rule_inputs_Equals_3',
                 'rule_inputs': [{
                     'x': 'test'

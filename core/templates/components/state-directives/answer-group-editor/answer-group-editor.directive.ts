@@ -63,8 +63,8 @@ angular.module('oppia').directive('answerGroupEditor', [
         addState: '=',
         displayFeedback: '=',
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
-        getOnSaveAnswerGroupRuleTypesToInputsFn:
-          '&onSaveAnswerGroupRuleTypesToInputs',
+        getOnSaveAnswerGroupRuleTypesToSubtitledInputsFn:
+          '&onSaveAnswerGroupRuleTypesToSubtitledInputs',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
         taggedSkillMisconceptionId: '=',
@@ -73,7 +73,7 @@ angular.module('oppia').directive('answerGroupEditor', [
         onSaveTaggedMisconception: '=',
         onSaveNextContentIdIndex: '=',
         outcome: '=',
-        ruleTypesToInputs: '=',
+        ruleTypesToSubtitledInputs: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         suppressWarnings: '&'
       },
@@ -83,7 +83,7 @@ angular.module('oppia').directive('answerGroupEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'COMPONENT_NAME_INTERACTION_RULE',
+        'AlertsService', 'COMPONENT_NAME_INTERACTION_RULE_INPUTS',
         'ContextService', 'ExternalSaveService',
         'GenerateContentIdService',
         'INTERACTION_SPECS', 'StateEditorService',
@@ -92,7 +92,7 @@ angular.module('oppia').directive('answerGroupEditor', [
         'ResponsesService',
         function(
             $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, COMPONENT_NAME_INTERACTION_RULE,
+            AlertsService, COMPONENT_NAME_INTERACTION_RULE_INPUTS,
             ContextService, ExternalSaveService,
             GenerateContentIdService,
             INTERACTION_SPECS, StateEditorService,
@@ -229,8 +229,8 @@ angular.module('oppia').directive('answerGroupEditor', [
 
             // Save the state of the rules before adding a new one (in case the
             // user cancels the addition).
-            ctrl.ruleTypesToInputsMemento = cloneDeep(
-              ctrl.ruleTypesToInputs);
+            ctrl.ruleTypesToSubtitledInputsMemento = cloneDeep(
+              ctrl.ruleTypesToSubtitledInputs);
 
             // TODO(bhenning): Should use functionality in ruleEditor.js, but
             // move it to ResponsesService in StateResponses.js to properly
@@ -238,7 +238,7 @@ angular.module('oppia').directive('answerGroupEditor', [
 
             // Set the rule type to 'tempRule' until the rule is saved and
             // we know its rule type for sure.
-            this.ruleTypesToInputs.tempRule = (
+            this.ruleTypesToSubtitledInputs.tempRule = (
               new SubtitledVariableLengthListOfRuleInputs([inputs], null));
             ctrl.changeActiveRuleType('tempRule');
             ctrl.changeActiveRuleInputIndex(0);
@@ -247,18 +247,18 @@ angular.module('oppia').directive('answerGroupEditor', [
           };
 
           ctrl.deleteRule = function(ruleType, ruleInputIndex) {
-            ctrl.ruleTypesToInputs[ruleType].ruleInputs.splice(
+            ctrl.ruleTypesToSubtitledInputs[ruleType].ruleInputs.splice(
               ruleInputIndex, 1);
-            if (ctrl.ruleTypesToInputs[ruleType].ruleInputs.length === 0) {
-              delete ctrl.ruleTypesToInputs[ruleType];
+            if (ctrl.ruleTypesToSubtitledInputs[ruleType].ruleInputs.length === 0) {
+              delete ctrl.ruleTypesToSubtitledInputs[ruleType];
             }
             ctrl.activeRule = null;
             ctrl.saveRules();
           };
 
           ctrl.cancelActiveRuleEdit = function() {
-            ctrl.ruleTypesToInputs = angular.copy(
-              ctrl.ruleTypesToInputsMemento);
+            ctrl.ruleTypesToSubtitledInputs = angular.copy(
+              ctrl.ruleTypesToSubtitledInputsMemento);
             ctrl.activeRule = null;
             ctrl.saveRules();
           };
@@ -267,19 +267,19 @@ angular.module('oppia').directive('answerGroupEditor', [
             ctrl.changeActiveRuleType(null);
             ctrl.changeActiveRuleInputIndex(-1);
             ctrl.activeRule = null;
-            ctrl.ruleTypesToInputsMemento = null;
+            ctrl.ruleTypesToSubtitledInputsMemento = null;
 
-            ctrl.getOnSaveAnswerGroupRuleTypesToInputsFn()(
-              ctrl.ruleTypesToInputs);
+            ctrl.getOnSaveAnswerGroupRuleTypesToSubtitledInputsFn()(
+              ctrl.ruleTypesToSubtitledInputs);
           };
 
           ctrl.saveActiveRule = function() {
-            delete ctrl.ruleTypesToInputs.tempRule;
+            delete ctrl.ruleTypesToSubtitledInputs.tempRule;
             const ruleType = ctrl.activeRule.type;
             const ruleInputs = ctrl.activeRule.inputs;
 
-            if (!ctrl.ruleTypesToInputs.hasOwnProperty(ruleType)) {
-              this.ruleTypesToInputs[ruleType] = (
+            if (!ctrl.ruleTypesToSubtitledInputs.hasOwnProperty(ruleType)) {
+              this.ruleTypesToSubtitledInputs[ruleType] = (
                 new SubtitledVariableLengthListOfRuleInputs([], null));
 
               const interactionId = ctrl.getCurrentInteractionId();
@@ -287,16 +287,16 @@ angular.module('oppia').directive('answerGroupEditor', [
                 ruleType].translatable;
               if (ruleIsTranslatable) {
                 // Assign a content_id.
-                ctrl.ruleTypesToInputs[ruleType].contentId = (
+                ctrl.ruleTypesToSubtitledInputs[ruleType].contentId = (
                   GenerateContentIdService.getNextStateId(
-                    COMPONENT_NAME_INTERACTION_RULE)
+                    COMPONENT_NAME_INTERACTION_RULE_INPUTS)
                 );
                 StateNextContentIdIndexService.saveDisplayedValue();
                 ctrl.onSaveNextContentIdIndex(
                   StateNextContentIdIndexService.displayed);
               }
             }
-            ctrl.ruleTypesToInputs[ruleType].ruleInputs.push(ruleInputs);
+            ctrl.ruleTypesToSubtitledInputs[ruleType].ruleInputs.push(ruleInputs);
             ctrl.saveRules();
           };
 
@@ -315,8 +315,8 @@ angular.module('oppia').directive('answerGroupEditor', [
               // The rule editor may not be opened in a read-only editor view.
               return;
             }
-            ctrl.ruleTypesToInputsMemento = cloneDeep(
-              ctrl.ruleTypesToInputs);
+            ctrl.ruleTypesToSubtitledInputsMemento = cloneDeep(
+              ctrl.ruleTypesToSubtitledInputs);
             ctrl.changeActiveRuleType(ruleType);
             ctrl.changeActiveRuleInputIndex(ruleInputIndex);
             ctrl.activeRule = new Rule(ruleType, ruleInput);
@@ -348,11 +348,11 @@ angular.module('oppia').directive('answerGroupEditor', [
 
           ctrl.getRuleTypes = function() {
             return AnswerGroup.getRuleTypesInDisplayOrder(
-              ctrl.ruleTypesToInputs);
+              ctrl.ruleTypesToSubtitledInputs);
           };
 
           ctrl.hasMultipleRules = function() {
-            return Object.values(ctrl.ruleTypesToInputs).map(
+            return Object.values(ctrl.ruleTypesToSubtitledInputs).map(
               (subtitledRuleInputs: SubtitledVariableLengthListOfRuleInputs) =>
                 subtitledRuleInputs.ruleInputs.length
             ).reduce((a, b) => a + b) > 1;

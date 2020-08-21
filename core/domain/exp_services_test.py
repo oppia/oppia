@@ -116,7 +116,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 category='Architecture', language_code='en')
 
         interaction_answer_groups = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -1613,7 +1613,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{'x': 0}, {'x': 1}]
@@ -1639,7 +1639,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{'x': 0}]
@@ -1660,7 +1660,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -2446,7 +2446,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         # List of answer groups to add into an interaction.
         self.interaction_answer_groups = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{'x': 0}]
@@ -2782,10 +2782,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         init_state = exploration.init_state
         init_interaction = init_state.interaction
-        rule_types_to_inputs = init_interaction.answer_groups[
-            0].rule_types_to_inputs
+        rule_types_to_subtitled_inputs = init_interaction.answer_groups[
+            0].rule_types_to_subtitled_inputs
         outcome = init_interaction.answer_groups[0].outcome
-        self.assertEqual(rule_types_to_inputs['Equals'].to_dict(), {
+        self.assertEqual(rule_types_to_subtitled_inputs['Equals'].to_dict(), {
             'content_id': None,
             'rule_inputs': [{'x': 0}]
         })
@@ -2833,7 +2833,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
-        self.interaction_answer_groups[0]['rule_types_to_inputs'][
+        self.interaction_answer_groups[0]['rule_types_to_subtitled_inputs'][
             'Equals']['rule_inputs'][0]['x'] = 'abc'
         with self.assertRaisesRegexp(
             Exception,
@@ -5053,7 +5053,7 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {},
+            'rule_types_to_subtitled_inputs': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -5069,7 +5069,7 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {},
+            'rule_types_to_subtitled_inputs': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
         }

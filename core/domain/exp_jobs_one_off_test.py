@@ -1388,7 +1388,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'HasElementXAtPositionY': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -1688,7 +1688,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'HasElementXAtPositionY': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -1889,7 +1889,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'HasElementXAtPositionY': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -2045,7 +2045,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'HasElementXAtPositionY': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -2085,7 +2085,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             'tagged_skill_misconception_id': None
         }
         item_selection_answer_group = {
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'ContainsAtLeastOneOf': {
                     'content_id': None,
                     'rule_inputs': [{

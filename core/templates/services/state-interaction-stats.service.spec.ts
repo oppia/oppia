@@ -72,9 +72,11 @@ describe('State Interaction Stats Service', () => {
       interaction: {
         answer_groups: [
           {
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [{x: 'hola!'}]
+            rule_types_to_subtitled_inputs: {
+              Equals: {
+                content_id: null,
+                rule_inputs: [{x: 'hola!'}]
+              }
             },
             outcome: {
               dest: 'Me Llamo',
@@ -88,9 +90,11 @@ describe('State Interaction Stats Service', () => {
             tagged_skill_misconception_id: null,
           },
           {
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Contains: [{x: 'hola'}]
+            rule_types_to_subtitled_inputs: {
+              Contains: {
+                content_id: null,
+                rule_inputs: [{x: 'hola'}]
+              }
             },
             outcome: {
               dest: 'Me Llamo',
@@ -104,9 +108,11 @@ describe('State Interaction Stats Service', () => {
             tagged_skill_misconception_id: null,
           },
           {
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              FuzzyEquals: [{x: 'hola'}]
+            rule_types_to_subtitled_inputs: {
+              FuzzyEquals: {
+                content_id: null,
+                rule_inputs: [{x: 'hola'}]
+              }
             },
             outcome: {
               dest: 'Me Llamo',

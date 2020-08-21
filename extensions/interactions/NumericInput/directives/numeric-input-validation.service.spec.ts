@@ -86,7 +86,7 @@ describe('NumericInputValidationService', () => {
       }
     });
     const answerGroup = agof.createNew(goodDefaultOutcome, null, null);
-    answerGroup.updateRuleTypesToInputs(
+    answerGroup.updateRuleTypesToSubtitledInputs(
       [equalsZeroRule, betweenNegativeOneAndOneRule]);
     answerGroups = [answerGroup];
   });
@@ -99,7 +99,7 @@ describe('NumericInputValidationService', () => {
   });
 
   it('should catch redundant rules', () => {
-    answerGroups[0].updateRuleTypesToInputs(
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
       [betweenNegativeOneAndOneRule, equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
@@ -111,7 +111,7 @@ describe('NumericInputValidationService', () => {
   });
 
   it('should catch identical rules as redundant', () => {
-    answerGroups[0].updateRuleTypesToInputs([equalsZeroRule, equalsZeroRule]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs([equalsZeroRule, equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -123,8 +123,8 @@ describe('NumericInputValidationService', () => {
 
   it('should catch redundant rules in separate answer groups', () => {
     answerGroups[1] = cloneDeep(answerGroups[0]);
-    answerGroups[0].updateRuleTypesToInputs([betweenNegativeOneAndOneRule]);
-    answerGroups[1].updateRuleTypesToInputs([equalsZeroRule]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs([betweenNegativeOneAndOneRule]);
+    answerGroups[1].updateRuleTypesToSubtitledInputs([equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -136,7 +136,7 @@ describe('NumericInputValidationService', () => {
 
   it('should catch redundant rules caused by greater/less than range',
     () => {
-      answerGroups[0].updateRuleTypesToInputs(
+      answerGroups[0].updateRuleTypesToSubtitledInputs(
         [lessThanOneRule, equalsZeroRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);

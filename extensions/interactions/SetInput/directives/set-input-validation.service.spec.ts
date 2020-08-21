@@ -82,7 +82,7 @@ describe('SetInputValidationService', () => {
 
     createAnswerGroupByRules = (rules) => {
       const answerGroup = agof.createNew(goodDefaultOutcome, null, null);
-      answerGroup.updateRuleTypesToInputs(rules);
+      answerGroup.updateRuleTypesToSubtitledInputs(rules);
       return answerGroup;
     };
   });

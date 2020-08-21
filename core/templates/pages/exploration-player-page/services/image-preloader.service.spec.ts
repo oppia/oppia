@@ -311,13 +311,15 @@ describe('Image preloader service', function() {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  Equals: [
-                    {
-                      x: 0
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  Equals: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: 0
+                      }
+                    ]
+                  }
                 }
               },
               {
@@ -332,13 +334,15 @@ describe('Image preloader service', function() {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  Equals: [
-                    {
-                      x: 1
-                    }
-                  ]
+                rule_types_to_subtitled_inputs: {
+                  Equals: {
+                    content_id: null,
+                    rule_inputs: [
+                      {
+                        x: 1
+                      }
+                    ]
+                  }
                 }
               }
             ],
@@ -396,13 +400,15 @@ describe('Image preloader service', function() {
               }
             },
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Contains: [
-                  {
-                    x: '1'
-                  }
-                ]
+              rule_types_to_subtitled_inputs: {
+                Contains: {
+                  content_id: null,
+                  rule_inputs: [
+                    {
+                      x: '1'
+                    }
+                  ]
+                }
               },
               outcome: {
                 dest: 'State 1',
@@ -416,13 +422,15 @@ describe('Image preloader service', function() {
                 missing_prerequisite_skill_id: null
               }
             }, {
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Contains: [
-                  {
-                    x: '2'
-                  }
-                ]
+              rule_types_to_subtitled_inputs: {
+                Contains: {
+                  content_id: null,
+                  rule_inputs: [
+                    {
+                      x: '2'
+                    }
+                  ]
+                }
               },
               outcome: {
                 dest: 'State 1',

@@ -104,7 +104,7 @@ describe('ImageClickInputValidationService', () => {
     };
 
     const goodAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
-    goodAnswerGroup.updateRuleTypesToInputs([rof.createFromBackendDict({
+    goodAnswerGroup.updateRuleTypesToSubtitledInputs([rof.createFromBackendDict({
       rule_type: 'IsInRegion',
       inputs: {
         x: 'SecondLabel'
@@ -115,7 +115,7 @@ describe('ImageClickInputValidationService', () => {
 
   it('should expect a customization argument for image and regions',
     () => {
-      goodAnswerGroups[0].updateRuleTypesToInputs([]);
+      goodAnswerGroups[0].updateRuleTypesToSubtitledInputs([]);
       expect(() => {
         validatorService.getAllWarnings(
           // This throws "Argument of type '{}' is not assignable to
@@ -176,7 +176,7 @@ describe('ImageClickInputValidationService', () => {
     }]);
 
     customizationArguments.imageAndRegions.value.labeledRegions = [];
-    goodAnswerGroups[0].updateRuleTypesToInputs([]);
+    goodAnswerGroups[0].updateRuleTypesToSubtitledInputs([]);
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -188,7 +188,8 @@ describe('ImageClickInputValidationService', () => {
 
   it('should expect rule types to reference valid region labels', () => {
     (<ImageClickRuleInputs>
-      goodAnswerGroups[0].ruleTypesToInputs.IsInRegion[0]).x = 'FakeLabel';
+      goodAnswerGroups[0].ruleTypesToSubtitledInputs.IsInRegion.ruleInputs[0]
+    ).x = 'FakeLabel';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

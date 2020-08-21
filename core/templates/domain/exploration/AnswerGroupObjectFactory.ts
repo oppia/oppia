@@ -40,7 +40,7 @@ interface RuleInputsBackendDict {
 }
 
 export interface AnswerGroupBackendDict {
-  'rule_types_to_inputs': RuleInputsBackendDict;
+  'rule_types_to_subtitled_inputs': RuleInputsBackendDict;
   'outcome': OutcomeBackendDict;
   'training_data': InteractionAnswer;
   'tagged_skill_misconception_id': string;
@@ -49,16 +49,16 @@ export interface AnswerGroupBackendDict {
 export class AnswerGroup {
   private _ruleObjectFactory;
 
-  ruleTypesToInputs: RuleInputs;
+  ruleTypesToSubtitledInputs: RuleInputs;
   outcome: Outcome;
   trainingData: InteractionAnswer;
   taggedSkillMisconceptionId: string;
   constructor(
-      ruleTypesToInputs: RuleInputs,
+      ruleTypesToSubtitledInputs: RuleInputs,
       outcome: Outcome, trainingData: InteractionAnswer,
       taggedSkillMisconceptionId: string,
       _ruleObjectFactory: RuleObjectFactory) {
-    this.ruleTypesToInputs = ruleTypesToInputs;
+    this.ruleTypesToSubtitledInputs = ruleTypesToSubtitledInputs;
     this.outcome = outcome;
     this.trainingData = trainingData;
     this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
@@ -66,18 +66,18 @@ export class AnswerGroup {
   }
 
   toBackendDict(): AnswerGroupBackendDict {
-    const ruleTypesToInputsBackendDict = {};
+    const ruleTypesToSubtitledInputsBackendDict = {};
 
-    Object.keys(this.ruleTypesToInputs).forEach(
+    Object.keys(this.ruleTypesToSubtitledInputs).forEach(
       ruleType => {
-        ruleTypesToInputsBackendDict[ruleType] = (
-          this.ruleTypesToInputs[ruleType].toBackendDict()
+        ruleTypesToSubtitledInputsBackendDict[ruleType] = (
+          this.ruleTypesToSubtitledInputs[ruleType].toBackendDict()
         );
       }
     );
 
     return {
-      rule_types_to_inputs: ruleTypesToInputsBackendDict,
+      rule_types_to_subtitled_inputs: ruleTypesToSubtitledInputsBackendDict,
       outcome: this.outcome.toBackendDict(),
       training_data: this.trainingData,
       tagged_skill_misconception_id: this.taggedSkillMisconceptionId
@@ -85,23 +85,23 @@ export class AnswerGroup {
   }
 
   addRule(rule: Rule) {
-    if (!this.ruleTypesToInputs.hasOwnProperty(rule.type)) {
-      this.ruleTypesToInputs[rule.type] = (
+    if (!this.ruleTypesToSubtitledInputs.hasOwnProperty(rule.type)) {
+      this.ruleTypesToSubtitledInputs[rule.type] = (
         new SubtitledVariableLengthListOfRuleInputs([], null));
     }
-    this.ruleTypesToInputs[rule.type].ruleInputs.push(rule.inputs);
+    this.ruleTypesToSubtitledInputs[rule.type].ruleInputs.push(rule.inputs);
   }
 
-  updateRuleTypesToInputs(rules: Rule[]) {
-    this.ruleTypesToInputs = {};
+  updateRuleTypesToSubtitledInputs(rules: Rule[]) {
+    this.ruleTypesToSubtitledInputs = {};
     rules.forEach(this.addRule.bind(this));
   }
 
-  static getRuleTypesInDisplayOrder(ruleTypesToInputs: RuleInputs) {
+  static getRuleTypesInDisplayOrder(ruleTypesToSubtitledInputs: RuleInputs) {
     // Sort rule types so that Equals always is first and tempRule is always
     // last, followed by all other rule types sorted alphabetically. tempRule
     // is used in answer-group-editor to create new rules.
-    return Object.keys(ruleTypesToInputs).sort(
+    return Object.keys(ruleTypesToSubtitledInputs).sort(
       (x, y) => {
         if (x === 'Equals' || y === 'tempRule') {
           return -1;
@@ -115,15 +115,15 @@ export class AnswerGroup {
 
   /**
    * This method should be used to iterate through all rules encoded by the
-   * ruleTypesToInputs field. To update the ruleTypesToInputs, the
-   * updateRuleTypesToInputs() methods takes in a list of Rules.
+   * ruleTypesToSubtitledInputs field. To update the ruleTypesToSubtitledInputs, the
+   * updateRuleTypesToSubtitledInputs() methods takes in a list of Rules.
    */
   getRulesAsList(): Rule[] {
     const rules = [];
 
-    AnswerGroup.getRuleTypesInDisplayOrder(this.ruleTypesToInputs).forEach(
+    AnswerGroup.getRuleTypesInDisplayOrder(this.ruleTypesToSubtitledInputs).forEach(
       ruleType => {
-        this.ruleTypesToInputs[ruleType].ruleInputs.forEach(ruleInput => {
+        this.ruleTypesToSubtitledInputs[ruleType].ruleInputs.forEach(ruleInput => {
           rules.push(this._ruleObjectFactory.createNew(ruleType, ruleInput));
         });
       });
@@ -142,8 +142,8 @@ export class AnswerGroupObjectFactory {
     private subtitledVariableLengthListOfRuleInputsObjectFactory:
       SubtitledVariableLengthListOfRuleInputsObjectFactory) {}
   /**
-   * Creates a AnswerGroup object, with empty ruleTypesToInputs. The
-   * updateRuleTypesToInputs() should be subsequently used to populate the
+   * Creates a AnswerGroup object, with empty ruleTypesToSubtitledInputs. The
+   * updateRuleTypesToSubtitledInputs() should be subsequently used to populate the
    * rules.
    * @param outcome The AnswerGroup outcome.
    * @param trainingData The AnswerGroup training data.
@@ -160,19 +160,19 @@ export class AnswerGroupObjectFactory {
 
   createFromBackendDict(
       answerGroupBackendDict: AnswerGroupBackendDict): AnswerGroup {
-    const ruleTypesToInputs = {};
-    Object.keys(answerGroupBackendDict.rule_types_to_inputs).forEach(
+    const ruleTypesToSubtitledInputs = {};
+    Object.keys(answerGroupBackendDict.rule_types_to_subtitled_inputs).forEach(
       ruleType => {
-        ruleTypesToInputs[ruleType] = (
+        ruleTypesToSubtitledInputs[ruleType] = (
           this.subtitledVariableLengthListOfRuleInputsObjectFactory
             .createFromBackendDict(
-              answerGroupBackendDict.rule_types_to_inputs[ruleType])
+              answerGroupBackendDict.rule_types_to_subtitled_inputs[ruleType])
         );
       }
     );
 
     return new AnswerGroup(
-      ruleTypesToInputs,
+      ruleTypesToSubtitledInputs,
       this.outcomeObjectFactory.createFromBackendDict(
         answerGroupBackendDict.outcome),
       answerGroupBackendDict.training_data,

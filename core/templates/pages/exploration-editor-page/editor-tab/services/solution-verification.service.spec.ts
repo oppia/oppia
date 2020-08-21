@@ -111,13 +111,15 @@ describe('Solution Verification Service', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Contains: [
-                {
-                  x: 'abc'
-                }
-              ]
+            rule_types_to_subtitled_inputs: {
+              Contains: {
+                content_id: null,
+                rule_inputs: [
+                  {
+                    x: 'abc'
+                  }
+                ]
+              }
             },
           }],
           customization_args: {
@@ -178,8 +180,7 @@ describe('Solution Verification Service', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            rule_input_translations: {},
-            rule_types_to_inputs: {},
+            rule_types_to_subtitled_inputs: {},
             outcome: {
               dest: 'default',
               feedback: {

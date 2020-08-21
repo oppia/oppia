@@ -113,7 +113,7 @@ export class AppConstants {
   public static COMPONENT_NAME_FEEDBACK = 'feedback';
   public static COMPONENT_NAME_HINT = 'hint';
   public static COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS = 'ca';
-  public static COMPONENT_NAME_INTERACTION_RULE = 'rule_inputs';
+  public static COMPONENT_NAME_INTERACTION_RULE_INPUTS = 'rule_inputs';
   public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_WORKED_EXAMPLE = {
     QUESTION: 'worked_example_question',

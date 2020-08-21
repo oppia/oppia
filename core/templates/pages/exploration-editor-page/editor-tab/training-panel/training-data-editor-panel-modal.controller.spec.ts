@@ -75,8 +75,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_types_to_subtitled_inputs: {},
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -124,14 +123,16 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            '': [
-              {
-                x: ['c', 'd', 'e'],
-                y: ['a', 'b', 'c']
-              }
-            ]
+          rule_types_to_subtitled_inputs: {
+            '': {
+              content_id: null,
+              rule_inputs: [
+                {
+                  x: ['c', 'd', 'e'],
+                  y: ['a', 'b', 'c']
+                }
+              ]
+            }
           },
           training_data: ['Answer1', 'Answer2']
         }],
@@ -279,8 +280,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_types_to_subtitled_inputs: {},
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -328,8 +328,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {},
+          rule_types_to_subtitled_inputs: {},
           training_data: ['Answer1', 'Answer2']
         }],
         default_outcome: {
@@ -411,8 +410,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_types_to_subtitled_inputs: {},
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -460,8 +458,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_input_translations: {},
-          rule_types_to_inputs: {},
+          rule_types_to_subtitled_inputs: {},
           training_data: ['Answer1']
         }],
         default_outcome: {

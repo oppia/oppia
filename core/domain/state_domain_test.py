@@ -92,7 +92,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'IsEqualToOrdering': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -401,7 +401,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -512,7 +512,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
         state_answer_groups = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -623,7 +623,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_answer_groups = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'ContainsAtLeastOneOf': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -729,7 +729,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_answer_groups = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -1099,7 +1099,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -1246,7 +1246,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -1701,7 +1701,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'HasElementXAtPositionY': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -1752,7 +1752,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'HasElementXAtPositionY': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -1970,7 +1970,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
         answer_group_with_old_math_schema = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'ContainsAtLeastOneOf': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -2012,7 +2012,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         answer_group_with_new_math_schema = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'ContainsAtLeastOneOf': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -2226,7 +2226,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -2249,7 +2249,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Equals': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -2392,7 +2392,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group_with_old_math_schema = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'ContainsAtLeastOneOf': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -2498,7 +2498,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group_with_old_math_schema = [{
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'ContainsAtLeastOneOf': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -3197,7 +3197,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -3562,7 +3562,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -3596,7 +3596,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_answer_groups(
                 'invalid_answer_groups')
 
-    def test_cannot_update_answer_groups_with_non_dict_rule_types_to_inputs(
+    def test_cannot_update_answer_groups_with_non_dict_rule_types_to_subtitled_inputs(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         answer_groups_list = [{
@@ -3611,7 +3611,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [[]]
@@ -3640,7 +3640,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{
@@ -3681,7 +3681,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_types_to_inputs': {
+            'rule_types_to_subtitled_inputs': {
                 'Contains': {
                     'content_id': None,
                     'rule_inputs': [{

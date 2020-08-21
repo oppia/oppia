@@ -130,10 +130,11 @@ angular.module('oppia').factory('ResponsesService', [
 
       if (answerGroup) {
         if (updates.hasOwnProperty('rules')) {
-          answerGroup.updateRuleTypesToInputs(updates.rules);
+          answerGroup.updateRuleTypesToSubtitledInputs(updates.rules);
         }
-        if (updates.hasOwnProperty('ruleTypesToInputs')) {
-          answerGroup.ruleTypesToInputs = updates.ruleTypesToInputs;
+        if (updates.hasOwnProperty('ruleTypesToSubtitledInputs')) {
+          answerGroup.ruleTypesToSubtitledInputs = (
+            updates.ruleTypesToSubtitledInputs);
         }
         if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
           answerGroup.taggedSkillMisconceptionId =
@@ -217,8 +218,8 @@ angular.module('oppia').factory('ResponsesService', [
         _confirmedUnclassifiedAnswersMemento = angular.copy(
           _confirmedUnclassifiedAnswers);
         _activeAnswerGroupIndex = -1;
-        _activeRuleType = 0;
-        _activeRuleInputIndex = 0;
+        _activeRuleType = null;
+        _activeRuleInputIndex = -1;
       },
       getAnswerGroups: function() {
         return angular.copy(_answerGroups);
