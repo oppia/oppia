@@ -835,7 +835,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration,
             'Expected answer group rule_types_to_subtitled_inputs to be a dict'
         )
-        init_state.interaction.answer_groups[0].rule_types_to_subtitled_inputs = {}
+        init_state.interaction.answer_groups[
+            0].rule_types_to_subtitled_inputs = {}
 
         first_answer_group = init_state.interaction.answer_groups[0]
         first_answer_group.tagged_skill_misconception_id = None

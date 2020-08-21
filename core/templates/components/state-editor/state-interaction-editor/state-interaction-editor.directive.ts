@@ -21,9 +21,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('directives/angular-html-bind.directive.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
-  'customize-interaction-modal.controller.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -33,16 +30,11 @@ require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'interaction-details-cache.service.ts');
 require(
-  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
-require(
   'components/state-editor/state-editor-properties-services/' +
   'state-content.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-customization-args.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-next-content-id-index.service');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -59,9 +51,6 @@ require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-
-import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -77,11 +66,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
       scope: {
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionId: '=',
-        onSaveNextContentIdIndex: '=',
         onSaveSolution: '=',
         onSaveStateContent: '=',
-        recomputeGraph: '=',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '<'
+        recomputeGraph: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-interaction-editor/' +
@@ -90,25 +77,20 @@ angular.module('oppia').directive('stateInteractionEditor', [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
         'AlertsService', 'HtmlEscaperService', 'StateEditorService',
         'INTERACTION_SPECS', 'StateInteractionIdService',
-        'StateCustomizationArgsService', 'StateNextContentIdIndexService',
-        'EditabilityService',
+        'StateCustomizationArgsService', 'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
-        'ExplorationHtmlFormatterService', 'ResponsesService',
-        'SubtitledHtmlObjectFactory', 'StateSolutionService',
-        'StateHintsService', 'StateContentService',
-        'WindowDimensionsService', function(
+        'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
+        'StateSolutionService', 'StateHintsService',
+        'StateContentService', function(
             $scope, $http, $rootScope, $uibModal, $injector, $filter,
             AlertsService, HtmlEscaperService, StateEditorService,
             INTERACTION_SPECS, StateInteractionIdService,
-            StateCustomizationArgsService, StateNextContentIdIndexService,
-            EditabilityService,
+            StateCustomizationArgsService, EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
-            ExplorationHtmlFormatterService, ResponsesService,
-            SubtitledHtmlObjectFactory, StateSolutionService,
-            StateHintsService, StateContentService,
-            WindowDimensionsService) {
+            ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
+            StateSolutionService, StateHintsService,
+            StateContentService) {
           var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
           var DEFAULT_TERMINAL_STATE_CONTENT =
             'Congratulations, you have finished!';
 
@@ -141,20 +123,18 @@ angular.module('oppia').directive('stateInteractionEditor', [
               interactionCustomizationArgs, false);
           };
 
-          var _updateInteractionPreview = function() {
+          var _updateInteractionPreviewAndAnswerChoices = function() {
             $scope.interactionId = StateInteractionIdService.savedMemento;
 
             var currentCustomizationArgs =
               StateCustomizationArgsService.savedMemento;
             $scope.interactionPreviewHtml = _getInteractionPreviewTag(
               currentCustomizationArgs);
-          };
 
-          var _updateAnswerChoices = function() {
-            StateEditorService.onUpdateAnswerChoices.emit(
+            $rootScope.$broadcast(
+              'updateAnswerChoices',
               StateEditorService.getAnswerChoices(
-                $scope.interactionId,
-                StateCustomizationArgsService.savedMemento));
+                $scope.interactionId, currentCustomizationArgs));
           };
 
           // If a terminal interaction is selected for a state with no content,
@@ -175,15 +155,6 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           $scope.onCustomizationModalSavePostHook = function() {
-            let nextContentIdIndexHasChanged = (
-              StateNextContentIdIndexService.displayed !==
-              StateNextContentIdIndexService.savedMemento);
-            if (nextContentIdIndexHasChanged) {
-              StateNextContentIdIndexService.saveDisplayedValue();
-              $scope.onSaveNextContentIdIndex(
-                StateNextContentIdIndexService.displayed);
-            }
-
             var hasInteractionIdChanged = (
               StateInteractionIdService.displayed !==
               StateInteractionIdService.savedMemento);
@@ -208,18 +179,13 @@ angular.module('oppia').directive('stateInteractionEditor', [
             // This must be called here so that the rules are updated before the
             // state graph is recomputed.
             if (hasInteractionIdChanged) {
-              StateInteractionIdService.onInteractionIdChanged.emit(
-                StateInteractionIdService.savedMemento
-              );
+              $rootScope.$broadcast(
+                'onInteractionIdChanged',
+                StateInteractionIdService.savedMemento);
             }
 
             $scope.recomputeGraph();
-            _updateInteractionPreview();
-            $rootScope.$broadcast(
-              'handleCustomArgsUpdate',
-              StateEditorService.getAnswerChoices(
-                $scope.interactionId,
-                StateCustomizationArgsService.savedMemento));
+            _updateInteractionPreviewAndAnswerChoices();
           };
 
           $scope.openInteractionCustomizerModal = function() {
@@ -230,17 +196,204 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/editor-tab/templates/' +
                   'modal-templates/customize-interaction-modal.template.html'),
-                resolve: {
-                  showMarkAllAudioAsNeedingUpdateModalIfRequired: () =>
-                    $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired
-                },
                 backdrop: true,
-                controller: 'CustomizeInteractionModalController'
+                resolve: {},
+                controller: [
+                  '$controller', '$injector', '$scope', '$uibModalInstance',
+                  'EditorFirstTimeEventsService',
+                  'InteractionDetailsCacheService',
+                  'StateCustomizationArgsService', 'StateEditorService',
+                  'StateInteractionIdService', 'StateSolutionService',
+                  'UrlInterpolationService', 'ALLOWED_INTERACTION_CATEGORIES',
+                  'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
+                  'INTERACTION_SPECS',
+                  function(
+                      $controller, $injector, $scope, $uibModalInstance,
+                      EditorFirstTimeEventsService,
+                      InteractionDetailsCacheService,
+                      StateCustomizationArgsService, StateEditorService,
+                      StateInteractionIdService, StateSolutionService,
+                      UrlInterpolationService, ALLOWED_INTERACTION_CATEGORIES,
+                      ALLOWED_QUESTION_INTERACTION_CATEGORIES,
+                      INTERACTION_SPECS) {
+                    $controller('ConfirmOrCancelModalController', {
+                      $scope: $scope,
+                      $uibModalInstance: $uibModalInstance
+                    });
+                    EditorFirstTimeEventsService
+                      .registerFirstClickAddInteractionEvent();
+
+                    // This binds the services to the HTML template, so that
+                    // their displayed values can be used in the HTML.
+                    $scope.StateInteractionIdService =
+                      StateInteractionIdService;
+                    $scope.StateCustomizationArgsService = (
+                      StateCustomizationArgsService);
+
+                    $scope.getInteractionThumbnailImageUrl = function(
+                        interactionId) {
+                      return (
+                        UrlInterpolationService.getInteractionThumbnailImageUrl(
+                          interactionId));
+                    };
+
+                    $scope.INTERACTION_SPECS = INTERACTION_SPECS;
+
+                    if (StateEditorService.isInQuestionMode()) {
+                      $scope.ALLOWED_INTERACTION_CATEGORIES = (
+                        ALLOWED_QUESTION_INTERACTION_CATEGORIES);
+                    } else {
+                      $scope.ALLOWED_INTERACTION_CATEGORIES = (
+                        ALLOWED_INTERACTION_CATEGORIES);
+                    }
+
+                    if (StateInteractionIdService.savedMemento) {
+                      $scope.customizationModalReopened = true;
+                      var interactionSpec = INTERACTION_SPECS[
+                        StateInteractionIdService.savedMemento];
+                      $scope.customizationArgSpecs = (
+                        interactionSpec.customization_arg_specs);
+
+                      StateInteractionIdService.displayed = angular.copy(
+                        StateInteractionIdService.savedMemento);
+                      StateCustomizationArgsService.displayed = {};
+                      // Ensure that StateCustomizationArgsService.displayed is
+                      // fully populated.
+                      for (
+                        var i = 0; i < $scope.customizationArgSpecs.length;
+                        i++) {
+                        var argName = $scope.customizationArgSpecs[i].name;
+                        StateCustomizationArgsService.displayed[argName] = {
+                          value: (
+                            StateCustomizationArgsService.savedMemento
+                              .hasOwnProperty(argName) ?
+                              angular.copy(
+                                StateCustomizationArgsService.savedMemento[
+                                  argName].value) :
+                              angular.copy(
+                                $scope.customizationArgSpecs[i].default_value)
+                          )
+                        };
+                      }
+
+                      $scope.$broadcast('schemaBasedFormsShown');
+                      $scope.form = {};
+                      $scope.hasCustomizationArgs = (Object.keys(
+                        StateCustomizationArgsService.displayed).length > 0);
+                    }
+
+                    $scope.getCustomizationArgsWarningsList = function() {
+                      var validationServiceName =
+                        INTERACTION_SPECS[
+                          $scope.StateInteractionIdService.displayed].id +
+                        'ValidationService';
+                      var validationService = $injector.get(
+                        validationServiceName);
+                      var warningsList =
+                        validationService.getCustomizationArgsWarnings(
+                          StateCustomizationArgsService.displayed);
+                      return warningsList;
+                    };
+
+                    $scope.getCustomizationArgsWarningMessage = function() {
+                      var warningsList = (
+                        $scope.getCustomizationArgsWarningsList());
+                      var warningMessage = '';
+                      if (warningsList.length !== 0) {
+                        warningMessage = warningsList[0].message;
+                      }
+                      return warningMessage;
+                    };
+
+                    $scope.onChangeInteractionId = function(newInteractionId) {
+                      EditorFirstTimeEventsService
+                        .registerFirstSelectInteractionTypeEvent();
+
+                      var interactionSpec = INTERACTION_SPECS[newInteractionId];
+                      $scope.customizationArgSpecs = (
+                        interactionSpec.customization_arg_specs);
+
+                      StateInteractionIdService.displayed = newInteractionId;
+                      StateCustomizationArgsService.displayed = {};
+                      if (
+                        InteractionDetailsCacheService.contains(
+                          newInteractionId)) {
+                        StateCustomizationArgsService.displayed = (
+                          InteractionDetailsCacheService.get(
+                            newInteractionId).customization);
+                      } else {
+                        $scope.customizationArgSpecs.forEach(function(caSpec) {
+                          StateCustomizationArgsService.displayed[caSpec.name] =
+                            {
+                              value: angular.copy(caSpec.default_value)
+                            };
+                        });
+                      }
+
+                      if (Object.keys(
+                        StateCustomizationArgsService.displayed).length === 0) {
+                        $scope.save();
+                        $scope.hasCustomizationArgs = false;
+                      } else {
+                        $scope.hasCustomizationArgs = true;
+                      }
+
+                      $scope.$broadcast('schemaBasedFormsShown');
+                      $scope.form = {};
+                    };
+
+                    $scope.returnToInteractionSelector = function() {
+                      InteractionDetailsCacheService.set(
+                        StateInteractionIdService.displayed,
+                        StateCustomizationArgsService.displayed);
+
+                      StateInteractionIdService.displayed = null;
+                      StateCustomizationArgsService.displayed = {};
+                    };
+
+                    $scope.isSaveInteractionButtonEnabled = function() {
+                      return $scope.hasCustomizationArgs &&
+                        $scope.StateInteractionIdService.displayed &&
+                        $scope.form.schemaForm.$valid &&
+                        $scope.getCustomizationArgsWarningsList().length === 0;
+                    };
+
+                    $scope.getSaveInteractionButtonTooltip = function() {
+                      if (!$scope.hasCustomizationArgs) {
+                        return 'No customization arguments';
+                      }
+                      if (!$scope.StateInteractionIdService.displayed) {
+                        return 'No interaction being displayed';
+                      }
+
+                      var warningsList =
+                        $scope.getCustomizationArgsWarningsList();
+                      var warningMessages = warningsList.map(function(warning) {
+                        return warning.message;
+                      });
+
+                      if (warningMessages.length === 0) {
+                        if ($scope.form.schemaForm.$invalid) {
+                          return 'Some of the form entries are invalid.';
+                        } else {
+                          return '';
+                        }
+                      } else {
+                        return warningMessages.join(' ');
+                      }
+                    };
+
+                    $scope.save = function() {
+                      EditorFirstTimeEventsService
+                        .registerFirstSaveInteractionEvent();
+                      $uibModalInstance.close();
+                    };
+                  }
+                ]
               }).result.then(
                 $scope.onCustomizationModalSavePostHook, function() {
                   StateInteractionIdService.restoreFromMemento();
                   StateCustomizationArgsService.restoreFromMemento();
-                  StateNextContentIdIndexService.restoreFromMemento();
                 });
             }
           };
@@ -270,64 +423,48 @@ angular.module('oppia').directive('stateInteractionEditor', [
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
 
-              StateInteractionIdService.onInteractionIdChanged.emit(
-                StateInteractionIdService.savedMemento
-              );
+              $rootScope.$broadcast(
+                'onInteractionIdChanged',
+                StateInteractionIdService.savedMemento);
               $scope.recomputeGraph();
-              _updateInteractionPreview();
-              _updateAnswerChoices();
+              _updateInteractionPreviewAndAnswerChoices();
             }, function() {
               AlertsService.clearWarnings();
             });
           };
-
-          $scope.toggleInteractionEditor = function() {
-            $scope.interactionEditorIsShown = !$scope.interactionEditorIsShown;
-          };
-
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
-            $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-            $scope.interactionEditorIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
+
             $scope.StateInteractionIdService = StateInteractionIdService;
             $scope.hasLoaded = false;
             $scope.customizationModalReopened = false;
-            ctrl.directiveSubscriptions.add(
-              StateEditorService.onStateEditorInitialized.subscribe(
-                (stateData) => {
-                  if (stateData === undefined || $.isEmptyObject(stateData)) {
-                    throw new Error(
-                      'Expected stateData to be defined but ' +
-                      'received ' + stateData);
-                  }
-                  $scope.hasLoaded = false;
-                  InteractionDetailsCacheService.reset();
-                  ResponsesService.onInitializeAnswerGroups.emit({
-                    interactionId: stateData.interaction.id,
-                    answerGroups: stateData.interaction.answerGroups,
-                    defaultOutcome: stateData.interaction.defaultOutcome,
-                    confirmedUnclassifiedAnswers: (
-                      stateData.interaction.confirmedUnclassifiedAnswers)
-                  });
 
-                  _updateInteractionPreview();
-                  _updateAnswerChoices();
-                  $scope.hasLoaded = true;
-                }
-              )
-            );
+            $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/avatar/user_blue_72px.png');
+            $scope.userBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/avatar/user_black_72px.png');
+            $scope.$on('stateEditorInitialized', function(evt, stateData) {
+              if (stateData === undefined || $.isEmptyObject(stateData)) {
+                throw new Error(
+                  'Expected stateData to be defined but ' +
+                  'received ' + stateData);
+              }
+              $scope.hasLoaded = false;
+              InteractionDetailsCacheService.reset();
+              $rootScope.$broadcast('initializeAnswerGroups', {
+                interactionId: stateData.interaction.id,
+                answerGroups: stateData.interaction.answerGroups,
+                defaultOutcome: stateData.interaction.defaultOutcome,
+                confirmedUnclassifiedAnswers: (
+                  stateData.interaction.confirmedUnclassifiedAnswers)
+              });
 
-            $scope.getStaticImageUrl = function(imagePath) {
-              return UrlInterpolationService.getStaticImageUrl(imagePath);
-            };
+              _updateInteractionPreviewAndAnswerChoices();
+              $scope.hasLoaded = true;
+            });
 
             $rootScope.$broadcast('interactionEditorInitialized');
             StateEditorService.updateStateInteractionEditorInitialised();
-          };
-
-          ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

@@ -1648,18 +1648,18 @@ class WrittenTranslation(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid data_format: %s' % self.data_format)
 
-        if self.data_format not in self.DATA_FORMATS.values():
+        if self.data_format not in self.DATA_FORMATS.values(): # pylint: disable=dict-values-not-iterating
             raise utils.ValidationError(
                 'Invalid data_format: %s' % self.data_format)
         if (self.data_format ==
-            self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_STRING_VALUE'] # pylint: disable=line-too-long
-        ):
+                self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_STRING_VALUE'] # pylint: disable=line-too-long
+           ):
             schema_utils.normalize_against_schema(
                 self.translation,
                 {'type': 'custom', 'obj_type': 'NormalizedString'})
         elif (self.data_format ==
-              self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE'] # pylint: disable=line-too-long
-        ):
+                self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE'] # pylint: disable=line-too-long
+             ):
             schema_utils.normalize_against_schema(
                 self.translation,
                 {'type': 'custom', 'obj_type': 'SetOfUnicodeString'})
@@ -2313,7 +2313,7 @@ class SubtitledVariableLengthListOfRuleInputs(python_utils.OBJECT):
                 SubtitledVariableLengthListOfRuleInputs are invalid.
         """
         if (self.content_id is not None and
-            not isinstance(self.content_id, python_utils.BASESTRING)
+                not isinstance(self.content_id, python_utils.BASESTRING)
         ):
             raise utils.ValidationError(
                 'Expected content id to be a string, received %s' %

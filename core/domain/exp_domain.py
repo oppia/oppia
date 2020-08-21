@@ -3066,8 +3066,9 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_states_v39_dict_to_v40_dict(cls, states_dict):
         """Converts from version 39 to 40. Version 40 removes the field
-        rule_input_translations in AnswerGroup, and assigns translatable rules
-        with content ids.
+        rule_input_translations in AnswerGroup, and adds subtitled rule inputs
+        to rule_types_to_inputs, which is then renamed to
+        rule_types_to_subtitled_inputs.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
