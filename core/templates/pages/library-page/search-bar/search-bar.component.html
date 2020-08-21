@@ -9,7 +9,7 @@
           </span>
         </div>
         <input type="text" class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
-               ng-attr-placeholder="<[$ctrl.searchBarPlaceholder]>" ng-model="$ctrl.searchQuery"
+               ng-attr-placeholder="<[$ctrl.searchBarPlaceholder]>" ng-model="$ctrl.searchQuery" ng-change="$ctrl.onSearchQueryChangeExec()"
                ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }" aria-label="Search bar">
       </div>
     </div>
