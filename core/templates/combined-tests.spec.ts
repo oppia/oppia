@@ -62,6 +62,13 @@ getTestBed().initTestEnvironment(
   platformBrowserDynamicTesting()
 );
 
+jasmine.getEnv().addReporter({
+  specDone: function(result) {
+    // eslint-disable-next-line no-console
+    console.log('Spec: ' + result.fullName + ' was ' + result.status);
+  }
+});
+
 // Then we find all the tests, as well as any controller, directive,
 // service/factory files.
 // All files from the services_sources folder are exempted, because they
