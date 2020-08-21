@@ -80,7 +80,7 @@
         <button class="icon-tool toolbar-button thin-button protractor-test-create-line"
                 ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createLine()"
                 tooltip-placement="right" uib-tooltip="Line" ng-disabled="!$ctrl.areAllToolsEnabled()">
-          <i class="fas fa-slash" style="font-size: 19px;"></i>
+          <i class="fas fa-slash oppia-slash-icon"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-rectangle"
                 ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createRect()"
@@ -97,13 +97,11 @@
                 tooltip-placement="left" uib-tooltip="Text" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="fas fa-font"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/closed_polygon.svg);"
+        <button class="icon-tool toolbar-button thin-button oppia-closed-polygon-icon" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
                 ng-click="$ctrl.createClosedPolygon()" tooltip-placement="right" uib-tooltip="Closed Polygon"
                 ng-disabled="!$ctrl.isClosedPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/open_polygon.svg);"
+        <button class="icon-tool toolbar-button thin-button oppia-open-polygon-icon" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabled()}"
                 ng-click="$ctrl.createOpenPolygon()" tooltip-placement="left" uib-tooltip="Open Polygon"
                 ng-disabled="!$ctrl.isOpenPolygonEnabled()">
         </button>
@@ -147,13 +145,11 @@
             </div>
           </div>
           <div>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
-                    style="background-image:url(/assets/svg_diagram_editor/bring_forward.svg);"
+            <button class="icon-tool toolbar-button thin-button oppia-bring-forward-icon" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
                     ng-click="$ctrl.bringObjectForward()" tooltip-placement="left" uib-tooltip="Bring Forward"
                     ng-disabled="!$ctrl.objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
-                    style="background-image:url(/assets/svg_diagram_editor/send_backward.svg);"
+            <button class="icon-tool toolbar-button thin-button oppia-send-backward-icon" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
                     ng-click="$ctrl.sendObjectBackward()" tooltip-placement="right" uib-tooltip="Send Backward"
                     ng-disabled="!$ctrl.objectIsSelected">
             </button>
@@ -200,11 +196,11 @@
       </div>
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.italic" ng-change="$ctrl.onItalicToggle()">
-        <span style="padding-left: 3px;">Italic</span>
+        <span class="oppia-font-styles-text">Italic</span>
       </div>
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.bold" ng-change="$ctrl.onBoldToggle()">
-        <span style="padding-left: 3px;">Bold</span>
+        <span class="oppia-font-styles-text">Bold</span>
       </div>
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <select ng-model="$ctrl.fabricjsOptions.fontFamily" ng-options="font for font in $ctrl.fontFamily"
@@ -239,15 +235,15 @@
   </div>
 </div>
 <style>
-  .diagram-editor-size-toolbar .input-box {
+  svg-filename-editor .diagram-editor-size-toolbar .input-box {
     display: inline-block;
   }
 
-  .diagram-editor-saved-image-container {
+  svg-filename-editor .diagram-editor-saved-image-container {
     position: relative;
   }
 
-  .diagram-editor-saved-image-container .edit-icon {
+  svg-filename-editor .diagram-editor-saved-image-container .edit-icon {
     color: #000000;
     cursor: pointer;
     position: absolute;
@@ -256,24 +252,24 @@
     top: 6px;
   }
 
-  .svg-editor {
+  svg-filename-editor .svg-editor {
     background-color: #ffffff;
     min-height: 430px;
     position: relative;
   }
 
-  .svg-editor>* {
+  svg-filename-editor .svg-editor>* {
     position: absolute
   }
 
-  .svg-editor,
-  .svg-editor * {
+  svg-filename-editor .svg-editor,
+  svg-filename-editor .svg-editor * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box
   }
 
-  .svg-editor .fabric-canvas {
+  svg-filename-editor .svg-editor .fabric-canvas {
     border: 1px solid #555555;
     bottom: 31px;
     cursor: default;
@@ -308,17 +304,17 @@
     width: 7px;
   }
 
-  .svg-editor .fabric-canvas::-webkit-scrollbar-thumb {
+  svg-filename-editor .svg-editor .fabric-canvas::-webkit-scrollbar-thumb {
     background-color: #7c7c7c;
     border-radius: 4px;
   }
 
-  .svg-editor .fabric-canvas .fabric-canvas-container {
+  svg-filename-editor .svg-editor .fabric-canvas .fabric-canvas-container {
     height: 368px;
     width: 494px;
   }
 
-  .svg-editor .horizontal-toolbar {
+  svg-filename-editor .svg-editor .horizontal-toolbar {
     background-color: #ffffff;
     border: 1px solid #555555;
     height: 31px;
@@ -326,15 +322,15 @@
     right: 0;
   }
 
-  .svg-editor .horizontal-toolbar.bottom-toolbar {
+  svg-filename-editor .svg-editor .horizontal-toolbar.bottom-toolbar {
     bottom: 0;
   }
 
-  .svg-editor .horizontal-toolbar.top-toolbar {
+  svg-filename-editor .svg-editor .horizontal-toolbar.top-toolbar {
     top: 0;
   }
 
-  .svg-editor .horizontal-toolbar .input-tag {
+  svg-filename-editor .svg-editor .horizontal-toolbar .input-tag {
     border-radius: 3px;
     float: left;
     font-size: 13px;
@@ -345,7 +341,7 @@
     position: relative;
   }
 
-  .svg-editor .horizontal-toolbar .info-tag {
+  svg-filename-editor .svg-editor .horizontal-toolbar .info-tag {
     font-size: 13px;
     padding-left: 3px;
     padding-top: 5px;
@@ -357,7 +353,7 @@
     }
   }
 
-  .svg-editor .vertical-toolbar {
+  svg-filename-editor .svg-editor .vertical-toolbar {
     background-color: #ffffff;
     border: 1px solid #555555;
     bottom: 0;
@@ -366,31 +362,31 @@
     width: 62px;
   }
 
-  .svg-editor .vertical-toolbar .fat-button {
+  svg-filename-editor .svg-editor .vertical-toolbar .fat-button {
     clear: both;
     font-size: 13px;
     width: 57px
   }
 
-  .svg-editor .vertical-toolbar .icon-tool {
+  svg-filename-editor .svg-editor .vertical-toolbar .icon-tool {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 100% auto;
     font-size: 24px;
   }
 
-  .svg-editor .vertical-toolbar .icon-tool.disabled {
+  svg-filename-editor .svg-editor .vertical-toolbar .icon-tool.disabled {
     filter: alpha(opacity=40);
     opacity: 0.4;
   }
 
-  .svg-editor .vertical-toolbar .thin-button {
+  svg-filename-editor .svg-editor .vertical-toolbar .thin-button {
     float: left;
     position: relative;
     width: 26px;
   }
 
-  .svg-editor .vertical-toolbar .toolbar-button {
+  svg-filename-editor .svg-editor .vertical-toolbar .toolbar-button {
     background-color: #ffffff;
     border: 2px solid transparent;
     border-radius: 3px;
@@ -401,11 +397,11 @@
     text-align: center;
   }
 
-  .svg-editor .vertical-toolbar .toolbar-button .bezier-curve {
+  svg-filename-editor .svg-editor .vertical-toolbar .toolbar-button .bezier-curve {
     font-size: 21px;
   }
 
-  .svg-editor .vertical-toolbar .toolbar-button .pie-chart {
+  svg-filename-editor .svg-editor .vertical-toolbar .toolbar-button .pie-chart {
     font-size: 22px;
   }
 
@@ -417,14 +413,14 @@
     background-color: #555555;
   }
 
-  .svg-editor .vertical-toolbar .vert-bottom-toolbar {
+  svg-filename-editor .svg-editor .vertical-toolbar .vert-bottom-toolbar {
     bottom: 0;
     left: 0;
     position: absolute;
     right: 0
   }
 
-  .svg-editor .color-well {
+  svg-filename-editor .svg-editor .color-well {
     float: left;
     font-size: 10px;
     padding-bottom: 3px;
@@ -432,7 +428,7 @@
     width: 60px
   }
 
-  .svg-editor .color-well .colorPicker {
+  svg-filename-editor .svg-editor .color-well .colorPicker {
     background-color: #000000;
     border: 1px solid #000000;
     border-radius: 3px;
@@ -442,14 +438,38 @@
     width: 28px;
   }
 
-  .svg-editor .color-well .alphaSquare {
+  svg-filename-editor .svg-editor .color-well .alphaSquare {
     background-color: #000000;
     height: 13px;
     width: 13px;
   }
 
-  .svg-editor .color-well .alphaSquare.bottom {
+  svg-filename-editor .svg-editor .color-well .alphaSquare.bottom {
     left: 50%;
     position: absolute;
+  }
+
+  svg-filename-editor .oppia-slash-icon {
+    font-size: 19px;
+  }
+
+  svg-filename-editor .oppia-closed-polygon-icon {
+    background-image: url(/assets/svg_diagram_editor/closed_polygon.svg);
+  }
+
+  svg-filename-editor .oppia-open-polygon-icon {
+    background-image: url(/assets/svg_diagram_editor/open_polygon.svg);
+  }
+
+  svg-filename-editor .oppia-bring-forward-icon {
+    background-image: url(/assets/svg_diagram_editor/bring_forward.svg);
+  }
+
+  svg-filename-editor .oppia-send-backward-icon {
+    background-image: url(/assets/svg_diagram_editor/send_backward.svg);
+  }
+
+  svg-filename-editor .oppia-font-styles-text {
+    padding-left: 3px;
   }
 </style>

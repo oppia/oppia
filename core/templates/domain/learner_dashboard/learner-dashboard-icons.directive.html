@@ -8,7 +8,7 @@
    tooltip-placement="left">
 </i>
 <div ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId()) && isContainerNarrow()" class="btn-group dropdown oppia-learner-dashboard-icon" uib-dropdown>
-  <ul style="left:-150px;top:0" class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+  <ul class="dropdown-menu oppia-dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
     <li role="menuitem" ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())">
       <a><['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]></a>
     </li>
@@ -39,8 +39,12 @@
    tooltip-placement="left">
 </i>
 <style>
-  .library-incomplete-activity-tooltip .tooltip-inner {
+  learner-dashboard-icons .library-incomplete-activity-tooltip .tooltip-inner {
     max-width: none;
     white-space: nowrap;
+  }
+  learner-dashboard-icons .oppia-dropdown-menu {
+    left: -150px;
+    top: 0;
   }
 </style>

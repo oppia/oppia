@@ -1,7 +1,7 @@
 <div class="oppia-activities-infinity-grid-container" infinite-scroll="
      $ctrl.showMoreActivities()" infinite-scroll-distance="1"
      infinite-scroll-disabled="$ctrl.endOfPageIsReached || $ctrl.searchResultsAreLoading">
-  <div ng-repeat="activity in $ctrl.allActivitiesInOrder track by $index" style="display: inline-block;">
+  <div ng-repeat="activity in $ctrl.allActivitiesInOrder track by $index" class="d-inline-block">
     <collection-summary-tile ng-if="activity.activity_type === 'collection'"
                              collection-id="activity.id"
                              collection-title="activity.title"
