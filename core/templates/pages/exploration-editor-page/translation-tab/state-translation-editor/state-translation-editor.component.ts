@@ -16,6 +16,9 @@
  * @fileoverview Component for the state translation editor.
  */
 
+import { WRITTEN_TRANSLATION_TYPE_HTML } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+
 import { Subscription } from 'rxjs';
 
 require(
@@ -109,8 +112,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           .displayed.getWrittenTranslation(contentId, languageCode));
         var newWrittenTranslation = writtenTranslation;
         if (oldWrittenTranslation === null || (
-          (oldWrittenTranslation.translation !==
-           newWrittenTranslation.translation) ||
+          oldWrittenTranslation.getHtml() !== newWrittenTranslation.getHtml() ||
           (oldWrittenTranslation.needsUpdate !== (
             newWrittenTranslation.needsUpdate)))
         ) {
@@ -131,7 +133,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           if (!$scope.activeWrittenTranslation) {
             $scope.activeWrittenTranslation = (
               WrittenTranslationObjectFactory
-                .createNew($scope.dataFormat, ''));
+                .createNew(WRITTEN_TRANSLATION_TYPE_HTML, ''));
           }
         }
       };
@@ -141,14 +143,13 @@ angular.module('oppia').component('stateTranslationEditor', {
           StateWrittenTranslationsService.displayed);
         if (displayedWrittenTranslations.hasWrittenTranslation(
           contentId, languageCode)) {
-          displayedWrittenTranslations.updateWrittenTranslation(
+          displayedWrittenTranslations.updateWrittenTranslationHtml(
             contentId, languageCode,
-            $scope.activeWrittenTranslation.translation);
+            $scope.activeWrittenTranslation.getHtml());
         } else {
           displayedWrittenTranslations.addWrittenTranslation(
             contentId, languageCode,
-            $scope.dataFormat,
-            $scope.activeWrittenTranslation.translation);
+            $scope.activeWrittenTranslation.getHtml());
         }
 
         saveTranslation();
@@ -159,22 +160,13 @@ angular.module('oppia').component('stateTranslationEditor', {
         initEditor();
       };
       ctrl.$onInit = function() {
-        $scope.dataFormat = (
-          TranslationTabActiveContentIdService.getActiveDataFormat());
         $scope.HTML_SCHEMA = {
           type: 'html'
         };
-        $scope.UNICODE_SCHEMA = {
-          type: 'unicode'
-        };
-
         ctrl.directiveSubscriptions.add(
           TranslationTabActiveContentIdService.onActiveContentIdChanged.
             subscribe(
-              (dataFormat) => {
-                $scope.dataFormat = dataFormat;
-                initEditor();
-              }
+              () => initEditor()
             )
         );
         ctrl.directiveSubscriptions.add(
