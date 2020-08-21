@@ -281,7 +281,7 @@ describe('Translation tab component', function() {
     expect($scope.translationTutorial).toBe(false);
   });
 
-  it('should skip tutorial when it has already started',
+  it('should skip tutorial when the skip tutorial button is clicked',
     function() {
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
