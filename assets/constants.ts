@@ -91,7 +91,7 @@ export = {
   // changed in the future, the existing filenames on the server should be
   // handled as well.
   // eslint-disable-next-line max-len
-  "MATH_SVG_FILENAME_REGEX": "mathImg_[A-Za-z0-9+/_-]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
+  "MATH_SVG_FILENAME_REGEX": "mathImg_[a-z0-9_]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
 
   // The SVG tag-specific attribute whitelist is based on the list of tags and
   // and attributes specified in this project:
