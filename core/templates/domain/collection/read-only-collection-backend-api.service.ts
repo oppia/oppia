@@ -63,7 +63,7 @@ export class ReadOnlyCollectionBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
   private _collectionCache: CollectionCache = {};
   private _collectionDetailsCache: CollectionDetailsCache = {};
-  private _collectionLoadedEventEmitter = new EventEmitter();
+  private _collectionLoadedEventEmitter = new EventEmitter<void>();
 
   private _fetchCollection(
       collectionId: string,
@@ -179,7 +179,7 @@ export class ReadOnlyCollectionBackendApiService {
     this._collectionCache = {};
   }
 
-  get onCollectionLoad() {
+  get onCollectionLoad(): EventEmitter<void> {
     return this._collectionLoadedEventEmitter;
   }
 }

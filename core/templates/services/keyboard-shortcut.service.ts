@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service.ts';
 })
 export class KeyboardShortcutService {
   constructor(private windowRef: WindowRef) {}
-  bindExplorationPlayerShortcuts() {
+  bindExplorationPlayerShortcuts(): void {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
     });
@@ -53,7 +53,7 @@ export class KeyboardShortcutService {
     });
   }
 
-  bindLibraryPageShortcuts() {
+  bindLibraryPageShortcuts(): void {
     Mousetrap.bind('/', function() {
       var searchBar = <HTMLElement>document.querySelector(
         '.oppia-search-bar-text-input');
@@ -73,7 +73,7 @@ export class KeyboardShortcutService {
   }
 
 
-  bindNavigationShortcuts() {
+  bindNavigationShortcuts(): void {
     Mousetrap.bind('ctrl+0', () => {
       this.windowRef.nativeWindow.location.href = '/get-started';
     });

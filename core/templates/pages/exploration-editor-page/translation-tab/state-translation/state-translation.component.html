@@ -179,7 +179,7 @@
     </div>
   </div>
   <div ng-if="isVoiceoverModeActive()" id="tutorialTranslationAudioBar" class="oppia-audio-translation-bar">
-    <audio-translation-bar is-translation-tab-busy="isTranslationTabBusy"></audio-translation-bar>
+    <audio-translation-bar is-translation-tab-busy="$ctrl.isTranslationTabBusy"></audio-translation-bar>
   </div>
   <div ng-if="!isVoiceoverModeActive()">
     <state-translation-editor></state-translation-editor>

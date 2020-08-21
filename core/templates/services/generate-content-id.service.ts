@@ -64,7 +64,7 @@ export class GenerateContentIdService {
     }
   }
 
-  _getNextStateId(prefix: string) {
+  _getNextStateId(prefix: string): string {
     // This function is used to generate content_ids for content that live in
     // the State domain. This includes hints, feedback, and customization args.
     const contentIdIndex = this.stateNextContentIdIndexService.displayed;
@@ -77,7 +77,7 @@ export class GenerateContentIdService {
     return this._getNextId(existingComponentIds, componentName);
   }
 
-  getNextStateId(prefix: string) {
+  getNextStateId(prefix: string): string {
     return this._getNextStateId(prefix);
   }
 }
