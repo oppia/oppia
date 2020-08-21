@@ -1988,6 +1988,15 @@ pre.oppia-pre-wrapped-text {
   z-index: 50;
 }
 
+.oppia-clear {
+  clear: both;
+}
+
+.oppia-form-error-text {
+  color: #ff0000;
+  font-size: smaller;
+}
+
 .oppia-editor-trash-icon {
   opacity: 0.2;
   -webkit-transition: all 200ms;
@@ -4357,25 +4366,6 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 .oppia-save-exploration-wide-modal .legend-graph {
   right: -25px;
-}
-
-.oppia-mathexpression-input-mobile-overlay {
-  opacity: 0;
-  position: absolute;
-  z-index: 2;
-}
-
-.oppia-mathexpression-input-hidden-text {
-  /* In some versions of Chrome on Android, typing in a 0 input
-  field can cause the previous character to be selected.
-  Set to 1px and 0 opacity instead of 0 to prevent this issue. */
-  border: 0;
-  height: 1px;
-  margin: 0;
-  margin-left: -5px;
-  opacity: 0;
-  padding: 0;
-  width: 1px;
 }
 
 .oppia-rte-component-container {

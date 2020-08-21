@@ -124,13 +124,6 @@ describe('InteractionSpecsService', () => {
       ).toBeFalse();
     });
 
-    it('should return false for MathExpressionInput', () => {
-      expect(
-        this.interactionSpecsService.isInteractionTrainable(
-          'MathExpressionInput')
-      ).toBeFalse();
-    });
-
     it('should return false for FractionInput', () => {
       expect(
         this.interactionSpecsService.isInteractionTrainable('FractionInput')
