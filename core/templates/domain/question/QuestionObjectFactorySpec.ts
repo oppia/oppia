@@ -42,6 +42,8 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { SubtitledVariableLengthListOfRuleInputsObjectFactory } from
+  'domain/exploration/SubtitledVariableLengthListOfRuleInputsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -58,9 +60,15 @@ describe('Question object factory', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
+      'AnswerGroupObjectFactory',
+      new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(
+          new SubtitledHtmlObjectFactory()
+        ),
+        new RuleObjectFactory(),
+        new SubtitledVariableLengthListOfRuleInputsObjectFactory()
+      )
+    );
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(

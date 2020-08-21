@@ -29,7 +29,7 @@ export const WRITTEN_TRANSLATION_TYPE_LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_ST
 export const WRITTEN_TRANSLATION_TYPE_LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE = (
   'ListOfDictsWithKeyXAndSetOfUnicodeStringValue');
 
-type WrittenTranslationDataFormat = (
+export type WrittenTranslationDataFormat = (
   typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
   typeof WRITTEN_TRANSLATION_TYPE_HTML |
   // eslint-disable-next-line max-len

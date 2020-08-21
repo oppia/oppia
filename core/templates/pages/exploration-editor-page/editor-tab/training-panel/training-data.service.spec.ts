@@ -62,6 +62,8 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { SubtitledVariableLengthListOfRuleInputsObjectFactory } from
+  'domain/exploration/SubtitledVariableLengthListOfRuleInputsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -114,9 +116,15 @@ describe('TrainingDataService', function() {
       $provide.value(
         'AnswerGroupsCacheService', new AnswerGroupsCacheService());
       $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-          new RuleObjectFactory()));
+        'AnswerGroupObjectFactory',
+        new AnswerGroupObjectFactory(
+          new OutcomeObjectFactory(
+            new SubtitledHtmlObjectFactory()
+          ),
+          new RuleObjectFactory(),
+          new SubtitledVariableLengthListOfRuleInputsObjectFactory()
+        )
+      );
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
