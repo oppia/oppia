@@ -92,19 +92,19 @@ describe('Ratio Object Factory', () => {
     // Invalid Ratio.
     expect(() => {
       ratio.fromRawInputString('1:3/2');
-    }).toThrowError(errors.INVALID_RATIO);
+    }).toThrowError(errors.NON_INTEGER_ELEMENTS);
     expect(() => {
       ratio.fromRawInputString('1:1/2:3/2');
-    }).toThrowError(errors.INVALID_RATIO);
+    }).toThrowError(errors.NON_INTEGER_ELEMENTS);
     expect(() => {
       ratio.fromRawInputString('1/2:2:3:4:5');
-    }).toThrowError(errors.INVALID_RATIO);
+    }).toThrowError(errors.NON_INTEGER_ELEMENTS);
     expect(() => {
       ratio.fromRawInputString('1:2.2');
-    }).toThrowError(errors.INVALID_RATIO);
+    }).toThrowError(errors.NON_INTEGER_ELEMENTS);
     expect(() => {
       ratio.fromRawInputString('1.2:2');
-    }).toThrowError(errors.INVALID_RATIO);
+    }).toThrowError(errors.NON_INTEGER_ELEMENTS);
     // Invalid Colons.
     expect(() => {
       ratio.fromRawInputString('1::2::3');
@@ -115,23 +115,16 @@ describe('Ratio Object Factory', () => {
     expect(() => {
       ratio.fromRawInputString('1:2:::3');
     }).toThrowError(errors.INVALID_COLONS);
-    // Simplest from.
-    expect(() => {
-      ratio.fromRawInputString('2:4:6');
-    }).toThrowError(errors.INVALID_FORM);
-    expect(() => {
-      ratio.fromRawInputString('3:6:9');
-    }).toThrowError(errors.INVALID_FORM);
     // Ratio with zero.
     expect(() => {
       ratio.fromRawInputString('1:0');
-    }).toThrowError(errors.NON_ZERO_RATIO);
+    }).toThrowError(errors.INCLUDES_ZERO);
     expect(() => {
       ratio.fromRawInputString('0:0');
-    }).toThrowError(errors.NON_ZERO_RATIO);
+    }).toThrowError(errors.INCLUDES_ZERO);
     expect(() => {
       ratio.fromRawInputString('0:1');
-    }).toThrowError(errors.NON_ZERO_RATIO);
+    }).toThrowError(errors.INCLUDES_ZERO);
   });
 
   it('should covert to simplest form', () => {

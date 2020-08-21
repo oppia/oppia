@@ -54,7 +54,7 @@ export class RatioObjectFactory {
   fromRawInputString(rawInput: string): number[] {
     if (rawInput.length === 0) {
       throw new Error(
-        ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_RATIO);
+        ObjectsDomainConstants.RATIO_PARSING_ERRORS.INVALID_FORMAT);
     }
     var INVALID_CHARS_REGEX = /[^\d^:^\.^\/^\s]/g;
     if (INVALID_CHARS_REGEX.test(rawInput)) {

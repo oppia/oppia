@@ -23,8 +23,8 @@ from extensions.interactions import base
 class RatioExpressionInput(base.BaseInteraction):
     """Interaction for ratio input."""
 
-    name = 'Ratio Input'
-    description = 'Allows learners to enter integers in ratio format.'
+    name = 'Ratio Expression Input'
+    description = 'Allow learners to enter ratios.'
     display_mode = base.DISPLAY_MODE_INLINE
     is_trainable = False
     _dependency_ids = []
@@ -48,8 +48,8 @@ class RatioExpressionInput(base.BaseInteraction):
         }
     }, {
         'name': 'numberOfTerms',
-        'description': 'The number of elements that the answer must have.'+
-            'If set to 0, a ratio of any length will be accepted.',
+        'description': 'The number of elements that the answer must have.' +
+                       'If set to 0, a ratio of any length will be accepted.',
         'schema': {
             'type': 'int',
             'validators': [{

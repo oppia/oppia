@@ -37,7 +37,7 @@ describe('RatioExpression', function() {
     expect(RationExpressionCtrl.value).not.toBeNull();
   });
 
-  it('should initialize ctrl.warningText with invalid ratio', function() {
+  it('should initialize ctrl.warningText with non integer ratio', function() {
     RationExpressionCtrl.isValidRatio('1:1:2.3');
     expect(RationExpressionCtrl.warningText)
       .toBe('For this question, each element in your ratio should be a ' +
@@ -57,10 +57,10 @@ describe('RatioExpression', function() {
       '(e.g. 1:2 or 1:2:3).');
   });
 
-  it('should initialize ctrl.warningText with invalid form', function() {
-    RationExpressionCtrl.isValidRatio('2:4:6');
+  it('should initialize ctrl.warningText with empty ratio', function() {
+    RationExpressionCtrl.isValidRatio('');
     expect(RationExpressionCtrl.warningText)
-      .toBe('It seems like the input can be reduced further.');
+      .toBe('Please enter a valid ratio (e.g. 1:2 or 1:2:3).');
   });
 
   it('should initialize ctrl.warningText with invalid colons', function() {
