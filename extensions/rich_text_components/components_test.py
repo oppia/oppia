@@ -137,14 +137,14 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             'math_content-with-value': {
                 u'raw_latex': u'123456',
                 u'svg_filename': (
-                    u'mathImg_20207261338_r3ir43lmfd_height_2d456_width_6d1'
+                    u'mathImg_20201216_331234_r3ir43lmfd_height_2d456_width_6d1'
                     '24_vertical_0d231.svg')
             }
         }, {
             'math_content-with-value': {
                 u'raw_latex': u'\\frac{x}{y}',
                 u'svg_filename': (
-                    u'mathImg_20207261338_imzlvnf23a_height_4d123_width_23d'
+                    u'mathImg_20200216_133832_imzlvnf23a_height_4d123_width_23d'
                     '122_vertical_2d123.svg')
             }
         }]
