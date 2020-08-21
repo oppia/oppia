@@ -147,6 +147,8 @@ describe('Admin page feature tab', function() {
 
       component.removeRule(featureFlag, 0);
 
+      // Original rules order: ['original', '1']
+      // Verifies it's ['1'] after removing 'original'.
       expect(featureFlag.rules.length).toBe(1);
       expect(featureFlag.rules[0].valueWhenMatched).toEqual('1');
     });
@@ -162,6 +164,8 @@ describe('Admin page feature tab', function() {
 
       component.moveRuleUp(featureFlag, 1);
 
+      // Original rules order: ['original', '1', '2']
+      // Verifies it's ['1', 'original', '2'] after removing '1' up.
       expect(featureFlag.rules[0].valueWhenMatched).toEqual('1');
       expect(featureFlag.rules[1].valueWhenMatched).toEqual('original');
       expect(featureFlag.rules[2].valueWhenMatched).toEqual('2');
@@ -178,6 +182,8 @@ describe('Admin page feature tab', function() {
 
       component.moveRuleDown(featureFlag, 1);
 
+      // Original rules order: ['original', '1', '2']
+      // Verifies it's ['original', '2', '1'] after removing '1' down.
       expect(featureFlag.rules[0].valueWhenMatched).toEqual('original');
       expect(featureFlag.rules[1].valueWhenMatched).toEqual('2');
       expect(featureFlag.rules[2].valueWhenMatched).toEqual('1');
@@ -194,6 +200,9 @@ describe('Admin page feature tab', function() {
       rule.filters[1].type = PlatformParameterFilterType.UserLocale;
 
       expect(rule.filters.length).toBe(2);
+      // Original filter list: ['server_mode']
+      // Verifies it's ['server_mode', 'user_locale'] after adding a new filter
+      // to the end.
       expect(rule.filters[0].type)
         .toEqual(PlatformParameterFilterType.ServerMode);
       expect(rule.filters[1].type)
@@ -209,6 +218,8 @@ describe('Admin page feature tab', function() {
 
       component.removeFilter(rule, 0);
 
+      // Original filter list: ['server_mode', 'user_locale']
+      // Verifies it's ['user_locale'] after removing the first filter.
       expect(rule.filters.length).toBe(1);
       expect(rule.filters[0].type)
         .toEqual(PlatformParameterFilterType.UserLocale);
@@ -223,6 +234,9 @@ describe('Admin page feature tab', function() {
       filter.conditions[1] = ['=', 'mock'];
 
       expect(filter.conditions.length).toBe(2);
+
+      // Original condition list: ['=dev']
+      // Verifies it's ['=dev', '=mock'] after adding.
       expect(filter.conditions[0])
         .toEqual(['=', ServerMode.Dev.toString()]);
       expect(filter.conditions[1])
@@ -238,6 +252,8 @@ describe('Admin page feature tab', function() {
 
       component.removeCondition(filter, 0);
 
+      // Original condition list: ['=dev', '=mock']
+      // Verifies it's ['user_locale'] after removing the first condition.
       expect(filter.conditions.length).toBe(1);
       expect(filter.conditions[0]).toEqual(['=', 'mock']);
     });
@@ -316,6 +332,22 @@ describe('Admin page feature tab', function() {
 
       expect(component.featureFlagNameToBackupMap.get(featureFlag.name))
         .toEqual(featureFlag);
+    }));
+
+    it('should not update feature backup if update fails', fakeAsync(() => {
+      mockPromptResult('mock msg');
+      updateApiSpy.and.rejectWith('error');
+
+      const featureFlag = component.featureFlags[0];
+      const originalFeatureFlag = cloneDeep(featureFlag);
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(component.featureFlagNameToBackupMap.get(featureFlag.name))
+        .toEqual(originalFeatureFlag);
     }));
 
     it('should not proceed if there is another task running', fakeAsync(() => {
@@ -436,5 +468,28 @@ describe('Admin page feature tab', function() {
       )
         .toEqual([]);
     });
+  });
+
+  describe('.isFeatureFlagRulesChanged', () => {
+    it('should return false if the feature is the same as the backup instance',
+      () => {
+        const featureFlag = component.featureFlags[0];
+
+        expect(component.isFeatureFlagRulesChanged(featureFlag))
+          .toBeFalse();
+      }
+    );
+
+    it(
+      'should return true if the feature is different from the backup instance',
+      () => {
+        const featureFlag = component.featureFlags[0];
+
+        component.addNewRuleToTop(featureFlag);
+
+        expect(component.isFeatureFlagRulesChanged(featureFlag))
+          .toBeTrue();
+      }
+    );
   });
 });

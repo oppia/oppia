@@ -45,8 +45,9 @@ ALLOWED_APP_VERSION_FLAVORS = (
     constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS)
 
 APP_VERSION_WITH_HASH_REGEXP = re.compile(
-    r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+(?:-(.+))?)?$')
-APP_VERSION_WITHOUT_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)$')
+    constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP)
+APP_VERSION_WITHOUT_HASH_REGEXP = re.compile(
+    constants.PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP)
 
 
 class PlatformParameterChange(change_domain.BaseChange):
@@ -389,8 +390,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
         smaller.
 
         Args:
-            version_a: str. The version string (e.g. '1.0.0.0').
-            version_b: str. The version string (e.g. '1.0.0.0').
+            version_a: str. The version string (e.g. '1.0.0').
+            version_b: str. The version string (e.g. '1.0.0').
 
         Returns:
             bool. True if the first version is smaller.

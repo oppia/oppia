@@ -5436,6 +5436,10 @@ export = {
   // order comparison, with ordering: 'test' < 'alpha' < 'beta' < 'release'.
   "PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS": [
     "test", "alpha", "beta", "release"],
+  "PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP":
+    "^(\\d+(?:\\.\\d+){2})$",
+  "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
+    "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
 
   "DEV_MODE": true
 };

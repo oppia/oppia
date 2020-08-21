@@ -20,6 +20,7 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 
 import { AdminFeaturesTabConstants } from
   'pages/admin-page/features-tab/admin-features-tab.constants';
@@ -34,7 +35,6 @@ import {
   PlatformParameterFilterType,
   PlatformParameterFilterObjectFactory,
   PlatformParameterFilter,
-  ServerMode,
 } from 'domain/platform_feature/platform-parameter-filter-object.factory';
 import { PlatformParameter, FeatureStage } from
   'domain/platform_feature/platform-parameter-object.factory';
@@ -107,20 +107,17 @@ export class AdminFeaturesTabComponent implements OnInit {
     }
   };
 
-  private readonly defaultFilterForNewRule: PlatformParameterFilter =
+  private readonly defaultNewFilter: PlatformParameterFilter =
     this.filterFactory.createFromBackendDict({
       type: PlatformParameterFilterType.ServerMode,
-      conditions: [['=', ServerMode.Dev.toString()]]
+      conditions: []
     });
 
   private readonly defaultNewRule: PlatformParameterRule =
     this.ruleFactory.createFromBackendDict({
-      filters: [this.defaultFilterForNewRule.toBackendDict()],
+      filters: [this.defaultNewFilter.toBackendDict()],
       value_when_matched: false
     });
-
-  private readonly defaultNewFilterType =
-    PlatformParameterFilterType.ServerMode;
 
   featureFlags: PlatformParameter[] = [];
   featureFlagNameToBackupMap: Map<string, PlatformParameter>;
@@ -152,12 +149,7 @@ export class AdminFeaturesTabComponent implements OnInit {
   }
 
   addNewFilter(rule: PlatformParameterRule): void {
-    rule.filters.push(
-      this.filterFactory.createFromBackendDict({
-        type: this.defaultNewFilterType,
-        conditions: []
-      })
-    );
+    rule.filters.push(cloneDeep(this.defaultNewFilter));
   }
 
   addNewCondition(filter: PlatformParameterFilter): void {
@@ -237,6 +229,11 @@ export class AdminFeaturesTabComponent implements OnInit {
 
   clearFilterConditions(filter: PlatformParameterFilter): void {
     filter.conditions.splice(0);
+  }
+
+  isFeatureFlagRulesChanged(feature: PlatformParameter) {
+    const original = this.featureFlagNameToBackupMap.get(feature.name);
+    return !isEqual(original.rules, feature.rules);
   }
 
   ngOnInit() {
