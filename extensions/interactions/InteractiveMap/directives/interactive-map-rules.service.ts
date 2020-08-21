@@ -52,14 +52,14 @@ export class InteractiveMapRulesService {
 
   Within(
       answer: InteractiveMapAnswer,
-      inputs: InteractiveMapRuleInputs) {
+      inputs: InteractiveMapRuleInputs): boolean {
     var actualDistance = InteractiveMapRulesService.getDistanceInKm(
       inputs.p, answer);
     return actualDistance <= inputs.d;
   }
   NotWithin(
       answer: InteractiveMapAnswer,
-      inputs: InteractiveMapRuleInputs) {
+      inputs: InteractiveMapRuleInputs): boolean {
     var actualDistance = InteractiveMapRulesService.getDistanceInKm(
       inputs.p, answer);
     return actualDistance > inputs.d;
