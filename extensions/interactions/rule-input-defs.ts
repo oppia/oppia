@@ -23,9 +23,20 @@ import {
   GraphAnswer } from
   'interactions/answer-defs';
 
-export interface AlgebraicExpressionRuleInputs {
+// AlgebraicExpressionInput interaction has multiple types of inputs based on
+// rule type.
+export interface AlgebraicExpressionRuleInputsWithPlaceholder {
+  x: string;
+  y: string[];
+}
+
+export interface AlgebraicExpressionRuleInputsWithoutPlaceholder {
   x: string;
 }
+
+export type AlgebraicExpressionRuleInputs = (
+  AlgebraicExpressionRuleInputsWithPlaceholder |
+  AlgebraicExpressionRuleInputsWithoutPlaceholder);
 
 export interface CodeReplRuleInputs {
   x: string;
@@ -102,19 +113,26 @@ export interface LogicProofRuleInputs {
 }
 
 // MathEquation interaction has multiple types of inputs based on
-// rule type.
-export interface MathEquationMatchesExactlyWithRuleInputs {
+// rule type. Parameter y is supposed to represent the side of the equation that
+// needs to be checked.
+export interface MathEquationRuleInputsWithSide {
   x: string;
   y: string;
 }
 
-export interface MathEquationIsEquivalentToRuleInputs {
+export interface MathEquationRuleInputsWithPlaceholder {
+  x: string;
+  y: string[];
+}
+
+export interface MathEquationRuleInputsWithoutSide {
   x: string;
 }
 
 export type MathEquationRuleInputs = (
-  MathEquationMatchesExactlyWithRuleInputs |
-  MathEquationIsEquivalentToRuleInputs);
+  MathEquationRuleInputsWithSide |
+  MathEquationRuleInputsWithoutSide |
+  MathEquationRuleInputsWithPlaceholder);
 
 export interface MultipleChoiceRuleInputs {
   x: number;

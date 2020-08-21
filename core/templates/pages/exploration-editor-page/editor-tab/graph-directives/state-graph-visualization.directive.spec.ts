@@ -16,7 +16,9 @@
  * @fileoverview Unit tests for State Graph Visualization directive.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+
 import { StateGraphLayoutService } from
   'components/graph-services/graph-layout.service';
 import { AnswerGroupsCacheService } from
@@ -49,6 +51,7 @@ import { of } from 'rxjs';
 
 require('pages/exploration-editor-page/editor-tab/graph-directives/' +
   'state-graph-visualization.directive.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 describe('State Graph Visualization directive', function() {
   var ctrl = null;
@@ -57,9 +60,10 @@ describe('State Graph Visualization directive', function() {
   var $rootScope = null;
   var $scope = null;
   var explorationWarningsService = null;
+  var routerService = null;
   var stateGraphLayoutService = null;
   var translationStatusService = null;
-
+  var mockCenterGraphEventEmitter = null;
   var nodes = {
     state_1: {
       depth: 2,
@@ -120,12 +124,18 @@ describe('State Graph Visualization directive', function() {
         return of(new Event('resize'));
       }
     });
+    mockCenterGraphEventEmitter = new EventEmitter();
+    $provide.value(
+      'RouterService', {
+        onCenterGraph: mockCenterGraphEventEmitter
+      });
   }));
   beforeEach(angular.mock.inject(function($injector) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     explorationWarningsService = $injector.get('ExplorationWarningsService');
+    routerService = $injector.get('RouterService');
     translationStatusService = $injector.get('TranslationStatusService');
 
     spyOn(stateGraphLayoutService, 'computeLayout').and.returnValue(nodes);
@@ -318,7 +328,7 @@ describe('State Graph Visualization directive', function() {
       }
     });
 
-    $rootScope.$broadcast('centerGraph');
+    routerService.onCenterGraph.emit();
     $flushPendingTasks();
 
     expect(d3.event.transform.x).toBe(0);
@@ -351,7 +361,7 @@ describe('State Graph Visualization directive', function() {
       }
     });
 
-    $rootScope.$broadcast('centerGraph');
+    routerService.onCenterGraph.emit();
     $flushPendingTasks();
 
     expect(d3.event.transform.x).toBe(10);
