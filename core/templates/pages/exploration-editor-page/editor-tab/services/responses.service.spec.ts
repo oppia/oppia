@@ -208,7 +208,8 @@ describe('Responses Service', function() {
 
     // Reassign only updated properties.
     var expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0].updateRuleTypesToSubtitledInputs(updatedAnswerGroup.rules);
+    expectedAnswerGroup[0].updateRuleTypesToSubtitledInputs(
+      updatedAnswerGroup.rules);
     expectedAnswerGroup[0].taggedSkillMisconceptionId =
       updatedAnswerGroup.taggedSkillMisconceptionId;
     expectedAnswerGroup[0].outcome.feedback = updatedAnswerGroup.feedback;
@@ -259,7 +260,8 @@ describe('Responses Service', function() {
 
     // Reassign only updated properties.
     var expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0].updateRuleTypesToSubtitledInputs(updatedAnswerGroup.rules);
+    expectedAnswerGroup[0].updateRuleTypesToSubtitledInputs(
+      updatedAnswerGroup.rules);
     expectedAnswerGroup[0].taggedSkillMisconceptionId =
       updatedAnswerGroup.taggedSkillMisconceptionId;
     expectedAnswerGroup[0].outcome.feedback = updatedAnswerGroup.feedback;
@@ -410,7 +412,8 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and rule type is' +
     ' HasElementXAtPositionY', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
-    delete interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs[''];
+    delete interactionDataWithRules.answerGroups[
+      0].ruleTypesToSubtitledInputs[''];
     interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs = {
       HasElementXAtPositionY:
         new SubtitledVariableLengthListOfRuleInputs([{ x: 'b', y: 3 }], null)
@@ -437,10 +440,10 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleTypesToSubtitledInputs.HasElementXAtPositionY.ruleInputs[
-      0].x = 'c';
-    expectedAnswerGroup[0].ruleTypesToSubtitledInputs.HasElementXAtPositionY.ruleInputs[
-      0].y = 1;
+    (expectedAnswerGroup[0].ruleTypesToSubtitledInputs.HasElementXAtPositionY
+      .ruleInputs[0].x = 'c');
+    (expectedAnswerGroup[0].ruleTypesToSubtitledInputs.HasElementXAtPositionY
+      .ruleInputs[0].y = 1);
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -450,7 +453,8 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and rule type is' +
     ' HasElementXBeforeElementY', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
-    delete interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs[''];
+    delete interactionDataWithRules.answerGroups[
+      0].ruleTypesToSubtitledInputs[''];
     interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs = {
       HasElementXBeforeElementY:
         new SubtitledVariableLengthListOfRuleInputs([{ x: 'a', y: 'b' }], null)
@@ -480,7 +484,8 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    const ruleTypesToSubtitledInputs = expectedAnswerGroup[0].ruleTypesToSubtitledInputs;
+    const ruleTypesToSubtitledInputs = expectedAnswerGroup[
+      0].ruleTypesToSubtitledInputs;
     ruleTypesToSubtitledInputs.HasElementXBeforeElementY.ruleInputs[0].x = 'a';
     ruleTypesToSubtitledInputs.HasElementXBeforeElementY.ruleInputs[0].y = 'd';
 
@@ -492,7 +497,8 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and choices had changed', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
     // Any other method from DragAndDropSortInputRulesService.
-    delete interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs[''];
+    delete interactionDataWithRules.answerGroups[
+      0].ruleTypesToSubtitledInputs[''];
     interactionDataWithRules.answerGroups[0].ruleTypesToSubtitledInputs = {
       IsEqualToOrderingWithOneItemAtIncorrectPosition:
         new SubtitledVariableLengthListOfRuleInputs(
@@ -520,7 +526,8 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    const ruleTypesToSubtitledInputs = expectedAnswerGroup[0].ruleTypesToSubtitledInputs;
+    const ruleTypesToSubtitledInputs = expectedAnswerGroup[
+      0].ruleTypesToSubtitledInputs;
     (ruleTypesToSubtitledInputs.IsEqualToOrderingWithOneItemAtIncorrectPosition
       .ruleInputs[0].x = (
         [['d'], ['e'], ['f']])

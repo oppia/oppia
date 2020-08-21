@@ -3082,7 +3082,7 @@ class Exploration(python_utils.OBJECT):
             next_content_id_index = state_dict['next_content_id_index']
 
             answer_group_dicts = state_dict['interaction']['answer_groups']
-            for i, answer_group_dict in enumerate(answer_group_dicts):
+            for answer_group_dict in answer_group_dicts:
                 # Add a content id field to the values stored in
                 # rule_types_to_inputs dict format, and rename the field to
                 # rule_types_to_subtitled_inputs. If it is a translatbale
@@ -3097,8 +3097,8 @@ class Exploration(python_utils.OBJECT):
 
                     interaction_id = state_dict['interaction']['id']
                     if (
-                        interaction_id == 'TextInput' or
-                        interaction_id == 'SetInput'
+                            interaction_id == 'TextInput' or
+                            interaction_id == 'SetInput'
                     ):
                         new_content_id = 'rule_inputs_%s_%i' % (
                             rule_type, next_content_id_index)
@@ -4459,7 +4459,7 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v43_dict_to_v44_dict(
                 exploration_dict)
             exploration_schema_version = 44
-        
+
         if exploration_schema_version == 44:
             exploration_dict = cls._convert_v44_dict_to_v45_dict(
                 exploration_dict)

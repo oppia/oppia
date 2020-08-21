@@ -115,17 +115,20 @@ export class AnswerGroup {
 
   /**
    * This method should be used to iterate through all rules encoded by the
-   * ruleTypesToSubtitledInputs field. To update the ruleTypesToSubtitledInputs, the
-   * updateRuleTypesToSubtitledInputs() methods takes in a list of Rules.
+   * ruleTypesToSubtitledInputs field. To update the ruleTypesToSubtitledInputs,
+   * the updateRuleTypesToSubtitledInputs() methods takes in a list of Rules.
    */
   getRulesAsList(): Rule[] {
     const rules = [];
 
-    AnswerGroup.getRuleTypesInDisplayOrder(this.ruleTypesToSubtitledInputs).forEach(
+    AnswerGroup.getRuleTypesInDisplayOrder(
+      this.ruleTypesToSubtitledInputs
+    ).forEach(
       ruleType => {
-        this.ruleTypesToSubtitledInputs[ruleType].ruleInputs.forEach(ruleInput => {
-          rules.push(this._ruleObjectFactory.createNew(ruleType, ruleInput));
-        });
+        this.ruleTypesToSubtitledInputs[ruleType].ruleInputs.forEach(
+          ruleInput => {
+            rules.push(this._ruleObjectFactory.createNew(ruleType, ruleInput));
+          });
       });
 
     return rules;
@@ -143,8 +146,8 @@ export class AnswerGroupObjectFactory {
       SubtitledVariableLengthListOfRuleInputsObjectFactory) {}
   /**
    * Creates a AnswerGroup object, with empty ruleTypesToSubtitledInputs. The
-   * updateRuleTypesToSubtitledInputs() should be subsequently used to populate the
-   * rules.
+   * updateRuleTypesToSubtitledInputs() should be subsequently used to populate
+   * the rules.
    * @param outcome The AnswerGroup outcome.
    * @param trainingData The AnswerGroup training data.
    * @param taggedSkillMisconceptionId The AnswerGroup tagged skill

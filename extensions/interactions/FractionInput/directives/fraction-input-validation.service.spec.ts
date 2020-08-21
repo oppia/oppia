@@ -217,7 +217,8 @@ describe('FractionInputValidationService', () => {
     });
 
     const answerGroup = agof.createNew(goodDefaultOutcome, false, null);
-    answerGroup.updateRuleTypesToSubtitledInputs([equalsOneRule, lessThanTwoRule]);
+    answerGroup.updateRuleTypesToSubtitledInputs(
+      [equalsOneRule, lessThanTwoRule]);
     answerGroups = [answerGroup];
   });
 
@@ -231,7 +232,8 @@ describe('FractionInputValidationService', () => {
   });
 
   it('should catch redundant rules', function() {
-    answerGroups[0].updateRuleTypesToSubtitledInputs([lessThanTwoRule, equalsOneRule]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
+      [lessThanTwoRule, equalsOneRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -259,7 +261,8 @@ describe('FractionInputValidationService', () => {
     answerGroup1.updateRuleTypesToSubtitledInputs([equalsOneRule]);
 
     const answerGroup4 = agof.createNew(goodDefaultOutcome, false, null);
-    answerGroup1.updateRuleTypesToSubtitledInputs([equivalentToOneAndSimplestFormRule]);
+    answerGroup1.updateRuleTypesToSubtitledInputs(
+      [equivalentToOneAndSimplestFormRule]);
 
     const warnings2 = validatorService.getAllWarnings(
       currentState, customizationArgs, [answerGroup3, answerGroup4],
@@ -467,7 +470,8 @@ describe('FractionInputValidationService', () => {
     customizationArgs.requireSimplestForm = false;
     answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].updateRuleTypesToSubtitledInputs([numeratorEqualsFiveRule]);
-    answerGroups[1].updateRuleTypesToSubtitledInputs([denominatorEqualsFiveRule]);
+    answerGroups[1].updateRuleTypesToSubtitledInputs(
+      [denominatorEqualsFiveRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -523,7 +527,8 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([]);
 
       answerGroups[1] = cloneDeep(answerGroups[0]);
-      answerGroups[0].updateRuleTypesToSubtitledInputs([denominatorEqualsFiveRule]);
+      answerGroups[0].updateRuleTypesToSubtitledInputs(
+        [denominatorEqualsFiveRule]);
       answerGroups[1].updateRuleTypesToSubtitledInputs(
         [HasFractionalPartExactlyEqualToTwoFifthsRule]);
       var warnings = validatorService.getAllWarnings(

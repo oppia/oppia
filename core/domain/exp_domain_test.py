@@ -550,7 +550,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Validate RuleSpec.
         answer_group.rule_types_to_subtitled_inputs[
-          'Contains'].rule_inputs[0] = {}
+            'Contains'].rule_inputs[0] = {}
         self._assert_validation_error(
             exploration, 'Rule type \'Contains\' is missing inputs')
 
@@ -562,7 +562,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_group.rule_types_to_subtitled_inputs = {
             'FakeRuleType': (
                 state_domain.SubtitledVariableLengthListOfRuleInputs(
-                    None,  [{'x': 'Test'}])
+                    None, [{'x': 'Test'}])
             )
         }
         self._assert_validation_error(exploration, 'Unrecognized rule type')
@@ -570,7 +570,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_group.rule_types_to_subtitled_inputs = {
             'Contains': (
                 state_domain.SubtitledVariableLengthListOfRuleInputs(
-                    None,  [{'x': 15}])
+                    None, [{'x': 15}])
             )
         }
         with self.assertRaisesRegexp(
@@ -578,9 +578,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ):
             exploration.validate()
 
-        answer_group.rule_types_to_subtitled_inputs['Contains'].rule_inputs[0] = {
-            'x': '{{ExampleParam}}'
-        }
+        answer_group.rule_types_to_subtitled_inputs[
+            'Contains'].rule_inputs[0] = {
+                'x': '{{ExampleParam}}'
+            }
 
         self._assert_validation_error(
             exploration,
@@ -832,7 +833,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             0].rule_types_to_subtitled_inputs = []
         self._assert_validation_error(
             exploration,
-            'Expected answer group rule_types_to_subtitled_inputs to be a dict')
+            'Expected answer group rule_types_to_subtitled_inputs to be a dict'
+        )
         init_state.interaction.answer_groups[0].rule_types_to_subtitled_inputs = {}
 
         first_answer_group = init_state.interaction.answer_groups[0]

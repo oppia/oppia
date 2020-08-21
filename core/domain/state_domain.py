@@ -87,7 +87,8 @@ class AnswerGroup(python_utils.OBJECT):
                 self.rule_types_to_subtitled_inputs[rule_type].to_dict())
 
         return {
-            'rule_types_to_subtitled_inputs': rule_types_to_subtitled_inputs_dict,
+            'rule_types_to_subtitled_inputs':
+                rule_types_to_subtitled_inputs_dict,
             'outcome': self.outcome.to_dict(),
             'training_data': self.training_data,
             'tagged_skill_misconception_id': self.tagged_skill_misconception_id
@@ -166,7 +167,8 @@ class AnswerGroup(python_utils.OBJECT):
                     'Unrecognized rule type: %s' % rule_type)
 
             rule_params_list = interaction.get_rule_param_list(rule_type)
-            for rule_input in self.rule_types_to_subtitled_inputs[rule_type].rule_inputs:
+            for rule_input in self.rule_types_to_subtitled_inputs[
+                    rule_type].rule_inputs:
                 self._validate_rule_input(
                     rule_input,
                     rule_type,
@@ -278,7 +280,8 @@ class AnswerGroup(python_utils.OBJECT):
             return html
 
         for rule_type in self.rule_types_to_subtitled_inputs:
-            for rule_input in self.rule_types_to_subtitled_inputs[rule_type].rule_inputs:
+            for rule_input in self.rule_types_to_subtitled_inputs[
+                    rule_type].rule_inputs:
                 AnswerGroup._convert_html_in_rule_input(
                     rule_input, rule_type, collect_html_conversion_fn)
 
@@ -1649,13 +1652,13 @@ class WrittenTranslation(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid data_format: %s' % self.data_format)
         if (self.data_format ==
-            self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_STRING_VALUE'] # pylint disable=line-too-long
+            self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_NORMALIZED_STRING_VALUE'] # pylint: disable=line-too-long
         ):
             schema_utils.normalize_against_schema(
                 self.translation,
                 {'type': 'custom', 'obj_type': 'NormalizedString'})
         elif (self.data_format ==
-              self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE'] # pylint disable=line-too-long
+              self.DATA_FORMATS['LIST_OF_DICTS_WITH_KEY_X_AND_SET_OF_UNICODE_STRING_VALUE'] # pylint: disable=line-too-long
         ):
             schema_utils.normalize_against_schema(
                 self.translation,
@@ -2319,7 +2322,7 @@ class SubtitledVariableLengthListOfRuleInputs(python_utils.OBJECT):
         if not isinstance(self.rule_inputs, list):
             raise utils.ValidationError(
                 'Invalid rule inputs: %s' % self.rule_inputs)
-        
+
         for rule_input in self.rule_inputs:
             if not isinstance(rule_input, dict):
                 raise utils.ValidationError(
@@ -2429,7 +2432,8 @@ class State(python_utils.OBJECT):
 
             for rule_type in answer_group.rule_types_to_subtitled_inputs:
                 rule_inputs_content_id = (
-                    answer_group.rule_types_to_subtitled_inputs[rule_type].content_id)
+                    answer_group.rule_types_to_subtitled_inputs[
+                        rule_type].content_id)
                 if rule_inputs_content_id is not None:
                     if rule_inputs_content_id in content_id_list:
                         raise utils.ValidationError(
@@ -2781,7 +2785,7 @@ class State(python_utils.OBJECT):
         old_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
-        
+
         for answer_group in self.interaction.answer_groups:
             rule_types_to_subtitled_inputs = (
                 answer_group.rule_types_to_subtitled_inputs)
@@ -2849,7 +2853,7 @@ class State(python_utils.OBJECT):
             for subtitled_rule_input in rule_types_to_subtitled_inputs.values():
                 if subtitled_rule_input.content_id is not None:
                     new_content_id_list.append(subtitled_rule_input.content_id)
-        
+
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 

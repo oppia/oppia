@@ -109,8 +109,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'HasElementXBeforeElementY': {
                     'content_id': None,
                     'rule_inputs': [{
-                        'x': '<p>x input for HasElementXAtPositionY rule_spec </p>',
-                        'y': '<p>y input for HasElementXAtPositionY rule_spec </p>'
+                        'x': (
+                            '<p>x input for HasElementXAtPositionY rule_spec '
+                            '</p>'),
+                        'y': (
+                            '<p>y input for HasElementXAtPositionY rule_spec '
+                            '</p>')
                     }]
                 },
                 'IsEqualToOrderingWithOneItemAtIncorrectPosition': {
@@ -534,7 +538,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'DoesNotContainAtLeastOneOf': {
                     'content_id': None,
                     'rule_inputs': [{
-                        'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
+                        'x':
+                            ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
                     }]
                 }
             },
@@ -633,7 +638,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'DoesNotContainAtLeastOneOf': {
                     'content_id': None,
                     'rule_inputs': [{
-                        'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
+                        'x':
+                            ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
                     }]
                 },
                 'Equals': {
@@ -3596,7 +3602,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_answer_groups(
                 'invalid_answer_groups')
 
-    def test_cannot_update_answer_groups_with_non_dict_rule_types_to_subtitled_inputs(
+    def test_cannot_update_answer_groups_with_non_dict_rule_types_to_inputs(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         answer_groups_list = [{

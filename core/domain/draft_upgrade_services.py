@@ -39,6 +39,7 @@ class InvalidDraftConversionException(Exception):
     conversion function if it is not possible to upgrade a draft, and indicates
     that try_upgrading_draft_to_exp_version should return None.
     """
+
     pass
 
 
@@ -196,8 +197,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.
-                raise InvalidDraftConversionException('Conversion cannot be '
-                    'completed.')
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
@@ -304,8 +305,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.
-                raise InvalidDraftConversionException('Conversion cannot be '
-                    'completed.')
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
@@ -340,8 +341,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         'IsMathematicallyEquivalentTo')))
             if interaction_id_change_condition or (
                     answer_groups_change_condition):
-                raise InvalidDraftConversionException('Conversion cannot be '
-                    'completed.')
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
 
         return draft_change_list
 

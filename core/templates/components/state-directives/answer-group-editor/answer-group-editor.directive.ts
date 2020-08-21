@@ -250,7 +250,9 @@ angular.module('oppia').directive('answerGroupEditor', [
           ctrl.deleteRule = function(ruleType, ruleInputIndex) {
             ctrl.ruleTypesToSubtitledInputs[ruleType].ruleInputs.splice(
               ruleInputIndex, 1);
-            if (ctrl.ruleTypesToSubtitledInputs[ruleType].ruleInputs.length === 0) {
+            if (ctrl.ruleTypesToSubtitledInputs[
+              ruleType].ruleInputs.length === 0
+            ) {
               delete ctrl.ruleTypesToSubtitledInputs[ruleType];
             }
             ctrl.activeRule = null;
@@ -297,7 +299,8 @@ angular.module('oppia').directive('answerGroupEditor', [
                   StateNextContentIdIndexService.displayed);
               }
             }
-            ctrl.ruleTypesToSubtitledInputs[ruleType].ruleInputs.push(ruleInputs);
+            ctrl.ruleTypesToSubtitledInputs[
+              ruleType].ruleInputs.push(ruleInputs);
             ctrl.saveRules();
           };
 

@@ -127,7 +127,8 @@ describe('MathEquationInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].updateRuleTypesToSubtitledInputs([isEquivalentTo1, isEquivalentTo2]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
+      [isEquivalentTo1, isEquivalentTo2]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);

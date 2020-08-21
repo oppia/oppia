@@ -124,7 +124,8 @@ describe('NumberWithUnitsValidationService', () => {
     });
 
     const answerGroup = agof.createNew(goodDefaultOutcome, false, null);
-    answerGroup.updateRuleTypesToSubtitledInputs([equalsTwoRule, equalsTwoByThreeRule]);
+    answerGroup.updateRuleTypesToSubtitledInputs(
+      [equalsTwoRule, equalsTwoByThreeRule]);
     answerGroups = [answerGroup];
   });
 
@@ -135,7 +136,8 @@ describe('NumberWithUnitsValidationService', () => {
   });
 
   it('should catch equals followed by equals same value', () => {
-    answerGroups[0].updateRuleTypesToSubtitledInputs([equalsTwoRule, equalsTwoRule]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
+      [equalsTwoRule, equalsTwoRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{

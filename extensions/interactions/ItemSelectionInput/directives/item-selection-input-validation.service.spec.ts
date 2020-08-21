@@ -92,12 +92,13 @@ describe('ItemSelectionInputValidationService', () => {
       }
     };
     const goodAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
-    goodAnswerGroup.updateRuleTypesToSubtitledInputs([rof.createFromBackendDict({
-      rule_type: 'Equals',
-      inputs: {
-        x: ['Selection 1', 'Selection 2']
-      }
-    })]);
+    goodAnswerGroup.updateRuleTypesToSubtitledInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: ['Selection 1', 'Selection 2']
+        }
+      })]);
     goodAnswerGroups = [goodAnswerGroup];
 
     const threeInputsAnswerGroup = agof.createNew(

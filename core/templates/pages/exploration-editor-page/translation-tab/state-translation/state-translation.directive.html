@@ -6,64 +6,33 @@
     <ul id="tutorialTranslationState" class="oppia-translation-tabs">
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_CONTENT)}" class="protractor-test-accessibility-translation-content" aria-label="Content of the card" role="button">
         <a ng-click="onTabClick(TAB_ID_CONTENT)" href="" ng-style="tabStatusColorStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text protractor-test-translation-content-tab">
-          <span ng-show="tabNeedUpdatesStatus(TAB_ID_CONTENT)" class="oppia-tab-needs-update"
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_CONTENT)" style="color: red"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Content
         </a>
       </li>
-      <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_CUSTOMIZATION_ARGS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_CUSTOMIZATION_ARGS)}" class="" aria-label="Interaction content" role="button">
-        <a ng-click="onTabClick(TAB_ID_CUSTOMIZATION_ARGS)" ng-style="tabStatusColorStyle(TAB_ID_CUSTOMIZATION_ARGS)" href="" class="oppia-translation-tabs-text">
-          <span ng-show="tabNeedUpdatesStatus(TAB_ID_CUSTOMIZATION_ARGS)" class="oppia-tab-needs-update"
-                uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
-          </span>Interaction
-        </a>
-      </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}" class="protractor-test-accessibility-translation-feedback" aria-label="Feedback responses for answer groups" role="button">
         <a ng-click="onTabClick(TAB_ID_FEEDBACK)" ng-style="tabStatusColorStyle(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text protractor-test-translation-feedback-tab">
-          <span ng-show="tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" class="oppia-tab-needs-update"
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" style="color: red"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Feedback
         </a>
       </li>
-      <li ng-if="!isVoiceoverModeActive()" ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_RULES), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_RULES)}" aria-label="Rules for the interaction" role="button">
-        <a ng-click="onTabClick(TAB_ID_RULES)" href="" ng-style="tabStatusColorStyle(TAB_ID_RULES)" class="oppia-translation-tabs-text">
-          <span ng-show="tabNeedUpdatesStatus(TAB_ID_RULES)" style="color: red"
-                uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
-          </span>Rules
-        </a>
-      </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_HINTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_HINTS)}" class="protractor-test-accessibility-translation-hint" aria-label="Hints for the state" role="button">
         <a ng-click="onTabClick(TAB_ID_HINTS)" href="" ng-style="tabStatusColorStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text protractor-test-translation-hints-tab">
-          <span ng-show="tabNeedUpdatesStatus(TAB_ID_HINTS)" class="oppia-tab-needs-update"
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_HINTS)" style="color: red"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Hints
         </a>
       </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_SOLUTION), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_SOLUTION)}" class="protractor-test-accessibility-translation-solution" aria-label="Solutions for the state" role="button">
         <a ng-click="onTabClick(TAB_ID_SOLUTION)" href="" ng-style="tabStatusColorStyle(TAB_ID_SOLUTION)" class="oppia-translation-tabs-text protractor-test-translation-solution-tab" >
-          <span ng-show="tabNeedUpdatesStatus(TAB_ID_SOLUTION)" class="oppia-tab-needs-update"
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_SOLUTION)" style="color: red"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Solution
         </a>
       </li>
     </ul>
-  </div>
-
-  <div ng-if="!isVoiceoverModeActive() && isActive(TAB_ID_RULES)">
-    <div class="oppia-state-content-header">Prompt</div>
-    <div class="translation-state-content">
-      <span>
-        <span ng-if="!getRequiredHtml(stateContent)" class="oppia-placeholder">
-          <[getEmptyContentMessage()]>
-        </span>
-        <span>
-          <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                            html-data="getRequiredHtml(stateContent)"
-                            class="oppia-rte-editor">
-          </angular-html-bind>
-        </span>
-      </span>
-    </div>
   </div>
 
   <div ng-if="!isVoiceoverModeActive()" class="oppia-state-content-header">Original content</div>
@@ -81,52 +50,6 @@
           </angular-html-bind>
         </span>
       </span>
-    </div>
-    <div ng-if="isActive(TAB_ID_CUSTOMIZATION_ARGS)" class="translation-state-content">
-      <h3>Preview - {{INTERACTION_SPECS[stateInteractionId].name}}</h3>
-      <angular-html-bind html-data="interactionPreviewHtml" style="pointer-events: none;">
-      </angular-html-bind>
-      <h3>Content</h3>
-      <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-        <li class="oppia-rule-block oppia-prevent-selection"
-            ng-repeat="caContent in interactionCustomizationArgTranslatableContent track by $index"
-            ng-class="{'active': activeCustomizationArgContentIndex === $index}"
-            style="margin-top: 0;">
-          <a ng-click="changeActiveCustomizationArgContentIndex($index)"
-             class="oppia-rule-tab"
-             ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
-             ng-style="contentIdStatusColorStyle(caContent.content.getContentId())">
-            <response-header index="$index"
-                             summary="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
-                             short-summary="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
-                             is-active="$index === activeCustomizationArgContentIndex"
-                             show-warning="contentIdNeedUpdates(caContent.content.getContentId())">
-            </response-header>
-          </a>
-          <div ng-if="activeCustomizationArgContentIndex === $index">
-            <div class="oppia-editor-card-section" ng-if="caContent.content._html">
-              <span ng-if="!getRequiredHtml(caContent.content)" class="oppia-placeholder">
-                <[getEmptyContentMessage()]>
-              </span>
-              <span>
-                <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                   ng-click="onContentClick($event)"
-                                   html-data="getRequiredHtml(caContent.content)"
-                                   class="oppia-rte-editor">
-                </angular-html-bind>
-              </span>
-            </div>
-            <div class="oppia-editor-card-section" ng-if="caContent.content._unicode">
-              <span ng-if="!caContent.content.getUnicode()" class="oppia-placeholder">
-                <[getEmptyContentMessage()]>
-              </span>
-              <span>
-                <p><[caContent.content.getUnicode()]></p>
-              </span>
-            </div>
-          </div>
-        </li>
-      </ul>
     </div>
     <div ng-if="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
       <div>
@@ -206,58 +129,6 @@
         </ul>
       </div>
     </div>
-    <div ng-if="isActive(TAB_ID_RULES)" class="translation-state-content">
-      <h3>{{INTERACTION_SPECS[stateInteractionId].name}} Rules</h3>
-      <div ng-repeat="answerGroup in stateAnswerGroups track by $index">
-        <p>If the answer...</p>
-        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-          <li class="oppia-rule-block oppia-prevent-selection"
-              ng-repeat="(ruleType, ruleInputs) in filterForTranslatableRules(answerGroup.ruleTypesToInputs)"  
-              style="margin-top: 0;">
-            <a ng-click=""
-               class="oppia-rule-tab"
-               ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
-               ng-style="contentIdStatusColorStyle(hint.hintContent.getContentId())">
-               <response-header index="$index"
-                                summary="summarizeRulesOfType(ruleType, ruleInputs)"
-                                short-summary="summarizeRulesOfType(ruleType, ruleInputs)"
-                                is-active="$index === activeAnswerGroupIndex"
-                                outcome="answerGroup.outcome"
-                                num-rules="answerGroup.rules.length"
-                                is-response="true"
-                                show-warning="contentIdNeedUpdates(answerGroup.outcome.feedback.getContentId())"
-                                navigate-to-state="navigateToState"
-                                correctness-feedback-enabled="ExplorationCorrectnessFeedbackService.isEnabled()">
-                </response-header>
-            </a>
-            <!-- <div ng-if="activeHintIndex === $index">
-              <div class="oppia-editor-card-section protractor-test-hint-<[$index]>-text">
-                <span ng-if="!getRequiredHtml(hint.hintContent)" class="oppia-placeholder">
-                  <[getEmptyContentMessage()]>
-                </span>
-                <span>
-                  <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                     ng-click="onContentClick($event)"
-                                     html-data="getRequiredHtml(hint.hintContent)"
-                                     class="oppia-rte-editor">
-                  </angular-html-bind>
-                </span>
-              </div>
-            </div> -->
-          </li>
-        </ul>
-
-        <div>
-          <span>
-            Oppia responds with
-          </span>
-          <span>
-            "<angular-html-bind class="oppia-outcome-feedback-preview" html-data="answerGroup.outcome.feedback.getHtml()">
-            </angular-html-bind>"
-          </span>
-        </div>
-      </div>
-    </div>
     <div ng-if="isActive(TAB_ID_HINTS)" class="translation-state-content">
       <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
         <li class="oppia-rule-block oppia-prevent-selection protractor-test-translation-hint"
@@ -270,8 +141,8 @@
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(hint.hintContent.getContentId())">
             <response-header index="$index"
-                             summary="getSubtitledContentSummary(hint.hintContent)"
-                             short-summary="getSubtitledContentSummary(hint.hintContent)"
+                             summary="getHtmlSummary(hint.hintContent)"
+                             short-summary="getHtmlSummary(hint.hintContent)"
                              is-active="$index === activeHintIndex"
                              show-warning="contentIdNeedUpdates(hint.hintContent.getContentId())">
             </response-header>
@@ -317,9 +188,6 @@
 
 
 <style>
-  .oppia-tab-needs-update {
-    color: #ff0000;
-  }
   .oppia-state-content-header {
     background: #ccc;
     font-size: 12px;
@@ -421,8 +289,5 @@
   }
   .oppia-rte-editor-focused *:hover {
     background-color: rgba(233, 241, 242);
-  }
-  .oppia-outcome-feedback-preview p {
-    display: inline;
   }
 </style>

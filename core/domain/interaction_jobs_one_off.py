@@ -53,7 +53,9 @@ class DragAndDropSortInputInteractionOneOffJob(
             if state.interaction.id == 'DragAndDropSortInput':
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
-                    for rule_type in answer_group.rule_types_to_subtitled_inputs:
+                    rule_types_to_subtitled_inputs = (
+                        answer_group.rule_types_to_subtitled_inputs)
+                    for rule_type in rule_types_to_subtitled_inputs:
                         for rule_input_index, rule_input in enumerate(
                                 answer_group.rule_types_to_subtitled_inputs[
                                     rule_type].rule_inputs):
@@ -102,7 +104,9 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     state.interaction.customization_args['choices'].value)
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
-                    for rule_type in answer_group.rule_types_to_subtitled_inputs:
+                    rule_types_to_subtitled_inputs = (
+                        answer_group.rule_types_to_subtitled_inputs)
+                    for rule_type in rule_types_to_subtitled_inputs:
                         for rule_input_index, rule_input in enumerate(
                                 answer_group.rule_types_to_subtitled_inputs[
                                     rule_type].rule_inputs):

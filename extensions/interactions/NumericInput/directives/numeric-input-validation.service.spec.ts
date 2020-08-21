@@ -111,7 +111,8 @@ describe('NumericInputValidationService', () => {
   });
 
   it('should catch identical rules as redundant', () => {
-    answerGroups[0].updateRuleTypesToSubtitledInputs([equalsZeroRule, equalsZeroRule]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
+      [equalsZeroRule, equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -123,7 +124,8 @@ describe('NumericInputValidationService', () => {
 
   it('should catch redundant rules in separate answer groups', () => {
     answerGroups[1] = cloneDeep(answerGroups[0]);
-    answerGroups[0].updateRuleTypesToSubtitledInputs([betweenNegativeOneAndOneRule]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
+      [betweenNegativeOneAndOneRule]);
     answerGroups[1].updateRuleTypesToSubtitledInputs([equalsZeroRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);

@@ -162,7 +162,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'rule_types_to_subtitled_inputs': {
                 'HasElementXBeforeElementY': {
                     'content_id': None,
-                        'rule_inputs': [{
+                    'rule_inputs': [{
                         'x': '',
                         'y': ''
                     }]

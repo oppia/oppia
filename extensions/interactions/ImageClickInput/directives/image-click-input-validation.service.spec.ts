@@ -104,12 +104,13 @@ describe('ImageClickInputValidationService', () => {
     };
 
     const goodAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
-    goodAnswerGroup.updateRuleTypesToSubtitledInputs([rof.createFromBackendDict({
-      rule_type: 'IsInRegion',
-      inputs: {
-        x: 'SecondLabel'
-      }
-    })]);
+    goodAnswerGroup.updateRuleTypesToSubtitledInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'IsInRegion',
+        inputs: {
+          x: 'SecondLabel'
+        }
+      })]);
     goodAnswerGroups = [goodAnswerGroup];
   });
 

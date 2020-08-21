@@ -164,7 +164,8 @@ describe('DragAndDropSortInputValidationService', () => {
       agof.createNew(goodDefaultOutcome, null, null),
       agof.createNew(customOutcome, null, null)
     ];
-    answerGroups[0].updateRuleTypesToSubtitledInputs([equalsListWithAllowedValuesRule]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
+      [equalsListWithAllowedValuesRule]);
     answerGroups[1].updateRuleTypesToSubtitledInputs([goodRule1, goodRule2]);
   });
 
@@ -202,7 +203,8 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect all items to be nonempty', () => {
     // Add rule containing empty items.
-    answerGroups[0].updateRuleTypesToSubtitledInputs([equalsListWithEmptyValuesRule]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
+      [equalsListWithEmptyValuesRule]);
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -218,7 +220,8 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect all items to be unique', () => {
     // Add rule containing duplicate items.
-    answerGroups[0].updateRuleTypesToSubtitledInputs([equalsListWithDuplicatesRule]);
+    answerGroups[0].updateRuleTypesToSubtitledInputs(
+      [equalsListWithDuplicatesRule]);
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -326,7 +329,8 @@ describe('DragAndDropSortInputValidationService', () => {
   it(
     'should catch selected choices not present in custom args for ' +
     'hasElementXAtPositionY rule', () => {
-      answerGroups[0].updateRuleTypesToSubtitledInputs([hasElementXAtPositionYRule]);
+      answerGroups[0].updateRuleTypesToSubtitledInputs(
+        [hasElementXAtPositionYRule]);
 
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -346,7 +350,8 @@ describe('DragAndDropSortInputValidationService', () => {
     'IsEqualToOrderingWithOneItemAtIncorrectPosition rule is used but ' +
     'multiple choices in the same position are note allowed',
     () => {
-      answerGroups[0].updateRuleTypesToSubtitledInputs([equalsListWithValuesRule]);
+      answerGroups[0].updateRuleTypesToSubtitledInputs(
+        [equalsListWithValuesRule]);
       customizationArgs.allowMultipleItemsInSamePosition.value = false;
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);

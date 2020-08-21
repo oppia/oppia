@@ -25,7 +25,6 @@ from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -1209,7 +1208,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'MatchesExactlyWith'].to_dict(),
             {
                 'content_id': None,
-                'rule_inputs': [{'x': 'x=y', 'y': 'both'}] 
+                'rule_inputs': [{'x': 'x=y', 'y': 'both'}]
             }
         )
 
@@ -2121,7 +2120,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         answer_group = question.question_state_data.interaction.answer_groups[0]
         self.assertEqual(
-            answer_group.rule_types_to_subtitled_inputs['MatchesExactlyWith'].to_dict(), {
+            answer_group.rule_types_to_subtitled_inputs[
+                'MatchesExactlyWith'].to_dict(),
+            {
                 'content_id': None,
                 'rule_inputs': [{
                     'x': '((x)^(2))/(2.5)-(alpha)/(beta)'
