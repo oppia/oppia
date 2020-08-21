@@ -56,7 +56,7 @@ describe('Donate page', () => {
   });
 
   let component;
-  
+
   beforeEach(() => {
     const donatePageComponent = TestBed.createComponent(DonatePageComponent);
     component = donatePageComponent.componentInstance;

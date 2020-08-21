@@ -37,7 +37,6 @@ import { StateClassifierMappingService } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 describe('Answer Classification Service', () => {
-
   const stateName = 'Test State';
   const rules = {
     Equals: (answer, inputs) => inputs.x === answer,
@@ -45,8 +44,8 @@ describe('Answer Classification Service', () => {
     Contains: (answer, inputs) => (
       answer.toLowerCase().includes(inputs.x.toLowerCase()))
   };
-  
-  let answerClassificationResultObjectFactory: 
+
+  let answerClassificationResultObjectFactory:
     AnswerClassificationResultObjectFactory;
   let answerClassificationService: AnswerClassificationService;
   let appService: AppService;
@@ -55,26 +54,29 @@ describe('Answer Classification Service', () => {
   let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   let stateClassifierMappingService: StateClassifierMappingService;
   let stateObjectFactory: StateObjectFactory;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
-    answerClassificationResultObjectFactory = TestBed.get(AnswerClassificationResultObjectFactory);
+    answerClassificationResultObjectFactory = TestBed.get(
+      AnswerClassificationResultObjectFactory);
     answerClassificationService = TestBed.get(AnswerClassificationService);
     appService = TestBed.get(AppService);
     interactionSpecsService = TestBed.get(InteractionSpecsService);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    predictionAlgorithmRegistryService = TestBed.get(PredictionAlgorithmRegistryService);
+    predictionAlgorithmRegistryService = TestBed.get(
+      PredictionAlgorithmRegistryService);
     stateClassifierMappingService = TestBed.get(StateClassifierMappingService);
     stateObjectFactory = TestBed.get(StateObjectFactory);
   });
 
   describe('with string classifier disabled', () => {
-
     let stateDict;
 
     beforeEach(() => {
-      spyOn(interactionSpecsService, 'isInteractionTrainable').and.returnValue(false);
+      spyOn(
+        interactionSpecsService, 'isInteractionTrainable'
+      ).and.returnValue(false);
       spyOn(appService, 'isMachineLearningClassificationEnabled')
         .and.returnValue(false);
 
@@ -181,7 +183,6 @@ describe('Answer Classification Service', () => {
 
     it('should return the first matching answer group and first matching ' +
         'rule spec', () => {
-
       const state = (
         stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
@@ -219,8 +220,11 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 7, rules)
       ).toEqual(
         answerClassificationResultObjectFactory.createNew(
-          outcomeObjectFactory.createNew('default', 'default_outcome', '', []), 2,
-          ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
+          outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
+          2,
+          ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
+        )
+      );
     });
 
     it(
@@ -261,7 +265,6 @@ describe('Answer Classification Service', () => {
   });
 
   describe('with string classifier enabled', () => {
-
     let stateDict;
 
     beforeEach(() => {
@@ -392,7 +395,9 @@ describe('Answer Classification Service', () => {
       'should query the prediction service if no answer group matches and ' +
         'interaction is trainable',
       () => {
-        spyOn(interactionSpecsService, 'isInteractionTrainable').and.returnValue(true);
+        spyOn(
+          interactionSpecsService, 'isInteractionTrainable'
+        ).and.returnValue(true);
 
         const state = (
           stateObjectFactory.createFromBackendDict(stateName, stateDict));
@@ -410,7 +415,9 @@ describe('Answer Classification Service', () => {
       'should return the default rule if no answer group matches and ' +
         'interaction is not trainable',
       () => {
-        spyOn(interactionSpecsService, 'isInteractionTrainable').and.returnValue(false);
+        spyOn(
+          interactionSpecsService, 'isInteractionTrainable'
+        ).and.returnValue(false);
 
         const state = (
           stateObjectFactory.createFromBackendDict(stateName, stateDict));
@@ -420,17 +427,22 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 0, rules)
         ).toEqual(
           answerClassificationResultObjectFactory.createNew(
-            outcomeObjectFactory.createNew('default', 'default_outcome', '', []), 2,
-            ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
+            outcomeObjectFactory.createNew(
+              'default', 'default_outcome', '', []),
+            2,
+            ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
+          )
+        );
       });
   });
 
   describe('with training data classification', () => {
-
     let stateDict;
 
     beforeEach(() => {
-      spyOn(interactionSpecsService, 'isInteractionTrainable').and.returnValue(true);
+      spyOn(
+        interactionSpecsService, 'isInteractionTrainable'
+      ).and.returnValue(true);
       spyOn(appService, 'isMachineLearningClassificationEnabled')
         .and.returnValue(true);
 

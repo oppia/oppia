@@ -24,10 +24,9 @@ import { ThreadMessageObjectFactory } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 
 describe('SuggestionThreadObjectFactory', () => {
-  
   let suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
   let threadMessageObjectFactory: ThreadMessageObjectFactory;
-  
+
   beforeEach(() => {
     suggestionThreadObjectFactory =
       TestBed.get(SuggestionThreadObjectFactory);

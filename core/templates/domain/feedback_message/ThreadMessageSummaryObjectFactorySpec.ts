@@ -22,7 +22,6 @@ import { ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
 describe('Thread message summary object factory', () => {
-
   let threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory;
 
   beforeEach(() => {

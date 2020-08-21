@@ -27,7 +27,6 @@ import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
 
 describe('Prediction Algorithm Registry Service', () => {
-
   let codeReplPredictionService: CodeReplPredictionService;
   let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   let textInputPredictionService: TextInputPredictionService;
@@ -35,47 +34,46 @@ describe('Prediction Algorithm Registry Service', () => {
   beforeEach(() => {
     codeReplPredictionService = TestBed.get(CodeReplPredictionService);
     predictionAlgorithmRegistryService = TestBed.get(
-        PredictionAlgorithmRegistryService);
+      PredictionAlgorithmRegistryService);
     textInputPredictionService = TestBed.get(TextInputPredictionService);
   });
 
   it('should return service for CodeClassifier at schema version 1.', () => {
     expect(
       predictionAlgorithmRegistryService
-      .getPredictionService('CodeClassifier', 1)
+        .getPredictionService('CodeClassifier', 1)
     ).toBe(codeReplPredictionService);
   });
 
   it('should return null for CodeClassifier at schema version 999.', () => {
     expect(
       predictionAlgorithmRegistryService
-      .getPredictionService('CodeClassifier', 999)
+        .getPredictionService('CodeClassifier', 999)
     ).toBeNull();
   });
 
   it('should return service for TextClassifier at schema version 1.', () => {
     expect(
       predictionAlgorithmRegistryService
-      .getPredictionService('TextClassifier', 1)
+        .getPredictionService('TextClassifier', 1)
     ).toBe(textInputPredictionService);
   });
 
   it('should return null for TextClassifier at schema version 999.', () => {
     expect(
       predictionAlgorithmRegistryService
-      .getPredictionService('TextClassifier', 999)
+        .getPredictionService('TextClassifier', 999)
     ).toBeNull();
   });
 
   it('shoud return null for NullClassifier which does not exist.', () => {
     expect(
       predictionAlgorithmRegistryService
-      .getPredictionService('NullClassifier', 1)
+        .getPredictionService('NullClassifier', 1)
     ).toBeNull();
   });
 
   describe('when trying to mock prediction services in tests', () => {
-
     class MockPredictionService {
       predict(classifierData, answer): number {
         return 1;
@@ -91,7 +89,7 @@ describe('Prediction Algorithm Registry Service', () => {
     it('should overwrite corresponding service if one exists.', () => {
       expect(
         predictionAlgorithmRegistryService
-        .getPredictionService('TextClassifier', 1)
+          .getPredictionService('TextClassifier', 1)
       ).toBe(textInputPredictionService);
 
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
@@ -99,14 +97,14 @@ describe('Prediction Algorithm Registry Service', () => {
 
       expect(
         predictionAlgorithmRegistryService
-        .getPredictionService('TextClassifier', 1)
+          .getPredictionService('TextClassifier', 1)
       ).toBe(mockPredictionService);
     });
 
     it('should create new algorithm id entry when it does not exist.', () => {
       expect(
         predictionAlgorithmRegistryService
-        .getPredictionService('NullClassifier', 1)
+          .getPredictionService('NullClassifier', 1)
       ).toBeNull();
 
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
@@ -114,7 +112,7 @@ describe('Prediction Algorithm Registry Service', () => {
 
       expect(
         predictionAlgorithmRegistryService
-        .getPredictionService('NullClassifier', 1)
+          .getPredictionService('NullClassifier', 1)
       ).toBe(mockPredictionService);
     });
 
@@ -123,7 +121,7 @@ describe('Prediction Algorithm Registry Service', () => {
       () => {
         expect(
           predictionAlgorithmRegistryService
-          .getPredictionService('TextClassifier', 999)
+            .getPredictionService('TextClassifier', 999)
         ).toBeNull();
 
         predictionAlgorithmRegistryService.testOnlySetPredictionService(
@@ -131,7 +129,7 @@ describe('Prediction Algorithm Registry Service', () => {
 
         expect(
           predictionAlgorithmRegistryService
-          .getPredictionService('TextClassifier', 999)
+            .getPredictionService('TextClassifier', 999)
         ).toBe(mockPredictionService);
       });
   });

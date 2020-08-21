@@ -21,9 +21,8 @@ import { TestBed } from '@angular/core/testing';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 
 describe('InteractionSpecsService', () => {
-  
   let interactionSpecsService: InteractionSpecsService;
-  
+
   beforeEach(() => {
     interactionSpecsService = TestBed.get(InteractionSpecsService);
   });

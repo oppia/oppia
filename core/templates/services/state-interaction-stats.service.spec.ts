@@ -30,18 +30,16 @@ import { StateInteractionStats, StateInteractionStatsService } from
 import { VisualizationInfoObjectFactory } from
   'domain/exploration/visualization-info-object.factory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import {State, StateBackendDict, StateObjectFactory} from 'domain/state/StateObjectFactory';
-import {InteractionAnswer} from "interactions/answer-defs";
-import {ExplanationBackendDict} from "domain/exploration/SolutionObjectFactory";
+import { State, StateBackendDict, StateObjectFactory } from
+  'domain/state/StateObjectFactory';
 
 const joC = jasmine.objectContaining;
 
 describe('State Interaction Stats Service', () => {
-  
   let httpTestingController: HttpTestingController;
   let stateObjectFactory: StateObjectFactory;
   let stateInteractionStatsService: StateInteractionStatsService;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -61,12 +59,11 @@ describe('State Interaction Stats Service', () => {
   });
 
   afterEach(() => httpTestingController.verify());
-  
+
   const expId = 'expid';
   let mockState: State;
-  
-  beforeEach(() => {
 
+  beforeEach(() => {
     const stateDict: StateBackendDict = {
       classifier_model_id: 'model_id',
       content: {
@@ -293,7 +290,7 @@ describe('State Interaction Stats Service', () => {
         const onFailure = jasmine.createSpy('failure');
 
         stateInteractionStatsService.computeStats(expId, mockState).then(
-            onSuccess, onFailure);
+          onSuccess, onFailure);
 
         const req = httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Hola');
@@ -322,7 +319,7 @@ describe('State Interaction Stats Service', () => {
       const onSuccess = jasmine.createSpy('success');
       const onFailure = jasmine.createSpy('failure');
 
-      mockState.name = 'Fraction'
+      mockState.name = 'Fraction';
       mockState.interaction.id = 'MultipleChoiceInput';
       mockState.interaction.customizationArgs = {
         choices: {
@@ -333,7 +330,7 @@ describe('State Interaction Stats Service', () => {
         }
       };
       stateInteractionStatsService.computeStats(expId, mockState).then(
-          onSuccess, onFailure);
+        onSuccess, onFailure);
 
       const req = httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Fraction');
@@ -361,7 +358,7 @@ describe('State Interaction Stats Service', () => {
         const onSuccess = jasmine.createSpy('success');
         const onFailure = jasmine.createSpy('failure');
 
-        mockState.name = 'Fraction'
+        mockState.name = 'Fraction';
         mockState.interaction.id = 'FractionInput';
         mockState.interaction.customizationArgs = {
           choices: {
@@ -373,7 +370,7 @@ describe('State Interaction Stats Service', () => {
         };
 
         stateInteractionStatsService.computeStats(expId, mockState).then(
-            onSuccess, onFailure);
+          onSuccess, onFailure);
 
         const req = httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Fraction');

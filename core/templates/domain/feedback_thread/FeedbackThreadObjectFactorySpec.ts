@@ -24,7 +24,6 @@ import { ThreadMessageObjectFactory } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 
 describe('FeedbackThreadObjectFactory', () => {
-
   let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
   let threadMessageObjectFactory: ThreadMessageObjectFactory;
 

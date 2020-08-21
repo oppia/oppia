@@ -22,7 +22,6 @@ import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 
 describe('SuggestionObjectFactory', () => {
-
   let suggestionObjectFactory: SuggestionObjectFactory;
 
   beforeEach(() => {

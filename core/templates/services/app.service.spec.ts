@@ -22,7 +22,6 @@ import { AppConstants } from 'app.constants';
 import { AppService } from 'services/app.service';
 
 describe('App Service', () => {
-
   let appService: AppService;
 
   beforeEach(() => {
@@ -30,7 +29,6 @@ describe('App Service', () => {
   });
 
   describe('querying the app for Machine Learning classifiers', () => {
-
     const initialValue = AppConstants.ENABLE_ML_CLASSIFIERS;
 
     afterAll(() => {

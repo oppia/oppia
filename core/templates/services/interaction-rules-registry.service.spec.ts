@@ -78,9 +78,9 @@ import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
 describe('Interaction Rules Registry Service', () => {
-  
   let interactionRulesRegistryService: InteractionRulesRegistryService;
-  let algebraicExpressionInputRulesService
+  let algebraicExpressionInputRulesService:
+    AlgebraicExpressionInputRulesService;
   let codeReplRulesService: CodeReplRulesService;
   let continueRulesService: ContinueRulesService;
   let dragAndDropSortInputRulesService: DragAndDropSortInputRulesService;
@@ -110,8 +110,8 @@ describe('Interaction Rules Registry Service', () => {
       ],
     });
 
-    interactionRulesRegistryService = TestBed.get(
-        InteractionRulesRegistryService);
+    interactionRulesRegistryService = (
+      TestBed.get(InteractionRulesRegistryService));
 
     algebraicExpressionInputRulesService = (
       TestBed.get(AlgebraicExpressionInputRulesService));
@@ -146,30 +146,29 @@ describe('Interaction Rules Registry Service', () => {
 
   it('should throw an error for falsey interaction ids', () => {
     expect(
-        () => interactionRulesRegistryService.getRulesServiceByInteractionId('')
+      () => interactionRulesRegistryService.getRulesServiceByInteractionId('')
     ).toThrowError('Interaction ID must not be empty');
     expect(
-        () => interactionRulesRegistryService.getRulesServiceByInteractionId(
-        null)
+      () => interactionRulesRegistryService.getRulesServiceByInteractionId(null)
     ).toThrowError('Interaction ID must not be empty');
     expect(
-        () => interactionRulesRegistryService.getRulesServiceByInteractionId(
+      () => interactionRulesRegistryService.getRulesServiceByInteractionId(
         undefined)
     ).toThrowError('Interaction ID must not be empty');
   });
 
   it('should throw an error for an interaction id that does not exist', () => {
     expect(
-        () => interactionRulesRegistryService.getRulesServiceByInteractionId(
-            'FakeInput')
+      () => interactionRulesRegistryService.getRulesServiceByInteractionId(
+        'FakeInput')
     ).toThrowError('Unknown interaction ID: FakeInput');
   });
 
   it('should return a non-null service for each interaction spec', () => {
     for (const interactionId in InteractionSpecsConstants.INTERACTION_SPECS) {
       expect(
-          () => interactionRulesRegistryService.getRulesServiceByInteractionId(
-              interactionId)
+        () => interactionRulesRegistryService.getRulesServiceByInteractionId(
+          interactionId)
       ).not.toThrowError();
     }
   });
@@ -185,127 +184,128 @@ describe('Interaction Rules Registry Service', () => {
   it('should return the correct rules service for CodeRepl', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('CodeRepl')
+        .getRulesServiceByInteractionId('CodeRepl')
     ).toBe(codeReplRulesService);
   });
 
   it('should return the correct rules service for Continue', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('Continue')
+        .getRulesServiceByInteractionId('Continue')
     ).toBe(continueRulesService);
   });
 
   it('should return the correct rules service for DragAndDropSortInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('DragAndDropSortInput')
+        .getRulesServiceByInteractionId('DragAndDropSortInput')
     ).toBe(dragAndDropSortInputRulesService);
   });
 
   it('should return the correct rules service for EndExploration', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('EndExploration')
+        .getRulesServiceByInteractionId('EndExploration')
     ).toBe(endExplorationRulesService);
   });
 
   it('should return the correct rules service for FractionInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('FractionInput')
+        .getRulesServiceByInteractionId('FractionInput')
     ).toBe(fractionInputRulesService);
   });
 
   it('should return the correct rules service for GraphInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('GraphInput')
+        .getRulesServiceByInteractionId('GraphInput')
     ).toBe(graphInputRulesService);
   });
 
   it('should return the correct rules service for ImageClickInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('ImageClickInput')
+        .getRulesServiceByInteractionId('ImageClickInput')
     ).toBe(imageClickInputRulesService);
   });
 
   it('should return the correct rules service for InteractiveMap', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('InteractiveMap')
+        .getRulesServiceByInteractionId('InteractiveMap')
     ).toBe(interactiveMapRulesService);
   });
 
   it('should return the correct rules service for ItemSelectionInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('ItemSelectionInput')
+        .getRulesServiceByInteractionId('ItemSelectionInput')
     ).toBe(itemSelectionInputRulesService);
   });
 
   it('should return the correct rules service for LogicProof', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('LogicProof')
+        .getRulesServiceByInteractionId('LogicProof')
     ).toBe(logicProofRulesService);
   });
 
   it('should return the correct rules service for MathEquationInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('MathEquationInput')
+        .getRulesServiceByInteractionId('MathEquationInput')
     ).toBe(mathEquationInputRulesService);
   });
 
   it('should return the correct rules service for MathExpressionInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('MathExpressionInput')
+        .getRulesServiceByInteractionId('MathExpressionInput')
     ).toBe(mathExpressionInputRulesService);
   });
 
   it('should return the correct rules service for MultipleChoiceInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('MultipleChoiceInput')
+        .getRulesServiceByInteractionId('MultipleChoiceInput')
     ).toBe(multipleChoiceInputRulesService);
   });
 
   it('should return the correct rules service for MusicNotesInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('MusicNotesInput')
+        .getRulesServiceByInteractionId('MusicNotesInput')
     ).toBe(musicNotesInputRulesService);
   });
 
   it('should return the correct rules service for NumberWithUnits', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('NumberWithUnits')
+        .getRulesServiceByInteractionId('NumberWithUnits')
     ).toBe(numberWithUnitsRulesService);
   });
 
   it('should return the correct rules service for NumericExpressionInput',
     () => {
-      expect(interactionRulesRegistryService.getRulesServiceByInteractionId(
-        'NumericExpressionInput')).toBe(
-        numericExpressionInputRulesService);
+      expect(
+        interactionRulesRegistryService
+          .getRulesServiceByInteractionId('NumericExpressionInput')
+      ).toBe(numericExpressionInputRulesService);
     }
   );
 
   it('should return the correct rules service for NumericInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('NumericInput')
+        .getRulesServiceByInteractionId('NumericInput')
     ).toBe(numericInputRulesService);
   });
 
   it('should return the correct rules service for PencilCodeEditor', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('PencilCodeEditor')
+        .getRulesServiceByInteractionId('PencilCodeEditor')
     ).toBe(pencilCodeEditorRulesService);
   });
 
@@ -318,7 +318,7 @@ describe('Interaction Rules Registry Service', () => {
   it('should return the correct rules service for TextInput', () => {
     expect(
       interactionRulesRegistryService
-      .getRulesServiceByInteractionId('TextInput')
+        .getRulesServiceByInteractionId('TextInput')
     ).toBe(textInputRulesService);
   });
 });

@@ -42,12 +42,12 @@ describe('retrieving threads service', () => {
   let ThreadDataService = null;
 
   const expId = 'exp1';
-  
+
   let mockFeedbackThreads;
   let mockSuggestionThreads;
   let mockSuggestions;
   let mockMessages;
-  
+
   beforeEach(() => {
     mockFeedbackThreads = [
       {

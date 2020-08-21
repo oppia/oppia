@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { SuggestionsService } from 'services/suggestions.service';
 
 describe('SuggestionsService', () => {
-  let suggestionService
+  let suggestionService: SuggestionsService;
 
   beforeEach(() => {
     suggestionService = TestBed.get(SuggestionsService);
@@ -30,7 +30,22 @@ describe('SuggestionsService', () => {
   describe('getThreadIdFromSuggestionBackendDict', () => {
     it('should return the suggestion id of the backend dict', () => {
       expect(suggestionService.getThreadIdFromSuggestionBackendDict({
-        suggestion_id: 'exploration.exp1.abc1'
+        suggestion_id: 'exploration.exp1.abc1',
+        suggestion_type: 'exploration',
+        target_type: 'state',
+        target_id: '1',
+        status: 'pending',
+        author_name: 'someone',
+        change: {
+          state_name: 'State 1',
+          new_value: {
+            html: 'new value'
+          },
+          old_value: {
+            html: 'old value'
+          }
+        },
+        last_updated_msecs: 10000000
       })).toEqual('exploration.exp1.abc1');
     });
   });
