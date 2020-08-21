@@ -16,7 +16,10 @@
  * @fileoverview Page object for the exploration editor, for use in Protractor
  * tests.
  */
+
+var action = require('./action');
 var waitFor = require('./waitFor.js');
+
 var ExplorationEditorImprovementsTab = require(
   '../protractor_utils/ExplorationEditorImprovementsTab.js');
 var ExplorationEditorFeedbackTab = require(
@@ -248,59 +251,46 @@ var ExplorationEditorPage = function() {
 
   // ---- NAVIGATION ----
 
-  this.navigateToHistoryTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToHistoryTabButton, 'History tab is not clickable');
-    await navigateToHistoryTabButton.click();
+  this.navigateToImprovementsTab = async function() {
+    await action.click(
+      'Improvements tab button', navigateToImprovementsTabButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToImprovementsTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToImprovementsTabButton, 'Improvements tab is not clickable');
-    await navigateToImprovementsTabButton.click();
+  this.navigateToHistoryTab = async function() {
+    await action.click('History tab button', navigateToHistoryTabButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToFeedbackTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToFeedbackTabButton, 'Feedback tab is not clickable');
-    await navigateToFeedbackTabButton.click();
+    await action.click('Feedback tab button', navigateToFeedbackTabButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToMainTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToMainTabButton, 'Main tab is not clickable');
-    await navigateToMainTabButton.click();
-    await waitFor.elementToBeClickable(
-      neutralElement, 'Neutral element is not clickable');
-    await neutralElement.click();
+    await action.click('Main tab button', navigateToMainTabButton);
+    await action.click('Neutral element', neutralElement);
+    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToPreviewTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToPreviewTabButton, 'Preview tab is not clickable');
-    await navigateToPreviewTabButton.click();
+    await action.click('Preview tab button', navigateToPreviewTabButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToSettingsTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToSettingsTabButton, 'Settings tab is not clickable');
-    await navigateToSettingsTabButton.click();
+    await action.click('Settings tab button', navigateToSettingsTabButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToStatsTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToStatsTabButton, 'Stats tab is not clickable');
-    await navigateToStatsTabButton.click();
+    await action.click('Statistics tab button', navigateToStatsTabButton);
+    await waitFor.pageToFullyLoad();
   };
+
   this.navigateToTranslationTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToTranslationTabButton, 'Translation tab is not clickable');
-    await navigateToTranslationTabButton.click();
+    await action.click(
+      'Translation tab button', navigateToTranslationTabButton);
     await waitFor.pageToFullyLoad();
   };
 };
