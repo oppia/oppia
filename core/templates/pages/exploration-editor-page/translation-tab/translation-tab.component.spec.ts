@@ -148,8 +148,7 @@ describe('Translation tab component', function() {
             rows: {value: 1}
           },
           answer_groups: [{
-            rule_types_to_inputs: {},
-            rule_input_translations: {},
+            rule_types_to_subtitled_inputs: {},
             outcome: {
               dest: 'unused',
               feedback: {

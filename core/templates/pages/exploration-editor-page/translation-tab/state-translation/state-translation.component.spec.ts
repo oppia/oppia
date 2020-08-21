@@ -107,8 +107,7 @@ describe('State translation component', function() {
           }
         },
         answer_groups: [{
-          rule_types_to_inputs: {},
-          rule_input_translations: {},
+          rule_types_to_subtitled_inputs: {},
           outcome: {
             dest: 'unused',
             feedback: {
@@ -117,8 +116,7 @@ describe('State translation component', function() {
             },
           }
         }, {
-          rule_types_to_inputs: {},
-          rule_input_translations: {},
+          rule_types_to_subtitled_inputs: {},
           outcome: {
             dest: 'unused',
             feedback: {
