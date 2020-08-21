@@ -73,6 +73,10 @@ export class BrowserCheckerService {
    */
   detectBrowserType(): string {
     const userAgent = this.windowRef.nativeWindow.navigator.userAgent;
+    // Note: The orders of the following if statements should not be changed
+    // unless there is solid reason to do so. For example, the user agent of
+    // Edge browser also contains 'Chrome' so it should be checked prior to
+    // Chrome.
 
     // Per https://docs.microsoft.com/en-us/microsoft-edge/web-platform/user-agent-string
     // there are two types of tokens, 'edg' & 'Edge', for the Edge browser in

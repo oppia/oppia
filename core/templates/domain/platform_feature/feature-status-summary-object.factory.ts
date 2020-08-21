@@ -34,7 +34,7 @@ export interface FeatureStatusSummaryBackendDict {
 }
 
 /**
- * Statuc checker of feature flags, which are keyed on their names defined in
+ * Status checker of feature flags, which are keyed on their names defined in
  * FeatureNames. This provides interface for developer to access feature flag
  * values with feature name hint:
  *   featureStatusChecker.DummyFeature.isEnabled === true

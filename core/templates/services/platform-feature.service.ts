@@ -26,6 +26,10 @@
  *   - there are new features defined in the code base while the cached
  *     summary is out-of-date.
  * In such cases, the values will be re-initialized and they may be changed.
+ *
+ * The values in SessionStorage is not shared between tabs, we don't want
+ * sudden updates in the same tab but it's okay to always load the latest
+ * values in a new tab.
  */
 
 import { Injectable } from '@angular/core';
@@ -280,12 +284,12 @@ export class PlatformFeatureService {
    */
   private generateClientContext(): ClientContext {
     const clientType = 'Web';
-    const broswerType = this.browserCheckerService.detectBrowserType();
+    const browserType = this.browserCheckerService.detectBrowserType();
     const userLocale = (
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
 
     return this.clientContextObjectFactory.create(
-      clientType, broswerType, userLocale);
+      clientType, browserType, userLocale);
   }
 
   /**
