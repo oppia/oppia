@@ -224,6 +224,14 @@ describe('Responses Service', function() {
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerGroup(0)).toEqual(expectedAnswerGroup[0]);
+
+    const updatedAnswerGroup2 = {
+      ruleTypesToSubtitledInputs: {}
+    };
+    ResponsesService.updateAnswerGroup(0, updatedAnswerGroup2, callbackSpy);
+    expectedAnswerGroup[0].ruleTypesToSubtitledInputs = {};
+    expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
+    expect(ResponsesService.getAnswerGroup(0)).toEqual(expectedAnswerGroup[0]);
   });
 
   it('should update active answer group', function() {

@@ -46,11 +46,12 @@ require('services/context.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
-import { SubtitledVariableLengthListOfRuleInputs } from
-  'domain/exploration/SubtitledVariableLengthListOfRuleInputsObjectFactory';
+import { cloneDeep } from 'lodash';
+
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
-import { cloneDeep } from 'lodash';
+import { SubtitledVariableLengthListOfRuleInputs } from
+  'domain/exploration/SubtitledVariableLengthListOfRuleInputsObjectFactory';
 
 const RULE_TEMPLATES = require('interactions/rule_templates.json');
 
@@ -87,6 +88,7 @@ angular.module('oppia').directive('answerGroupEditor', [
         'ContextService', 'ExternalSaveService',
         'GenerateContentIdService',
         'INTERACTION_SPECS', 'StateEditorService',
+        'SubtitledVariableLengthListOfRuleInputsObjectFactory',
         'StateNextContentIdIndexService', 'RuleObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'ResponsesService',
@@ -96,6 +98,7 @@ angular.module('oppia').directive('answerGroupEditor', [
             ContextService, ExternalSaveService,
             GenerateContentIdService,
             INTERACTION_SPECS, StateEditorService,
+            SubtitledVariableLengthListOfRuleInputsObjectFactory,
             StateNextContentIdIndexService, RuleObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
@@ -240,7 +243,8 @@ angular.module('oppia').directive('answerGroupEditor', [
             // Set the rule type to 'tempRule' until the rule is saved and
             // we know its rule type for sure.
             this.ruleTypesToSubtitledInputs.tempRule = (
-              new SubtitledVariableLengthListOfRuleInputs([inputs], null));
+              SubtitledVariableLengthListOfRuleInputsObjectFactory
+                .createDefault([inputs], null));
             ctrl.changeActiveRuleType('tempRule');
             ctrl.changeActiveRuleInputIndex(0);
 
@@ -283,7 +287,8 @@ angular.module('oppia').directive('answerGroupEditor', [
 
             if (!ctrl.ruleTypesToSubtitledInputs.hasOwnProperty(ruleType)) {
               this.ruleTypesToSubtitledInputs[ruleType] = (
-                new SubtitledVariableLengthListOfRuleInputs([], null));
+                SubtitledVariableLengthListOfRuleInputsObjectFactory
+                  .createDefault([], null));
 
               const interactionId = ctrl.getCurrentInteractionId();
               const ruleIsTranslatable = RULE_TEMPLATES[interactionId][
