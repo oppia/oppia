@@ -32,7 +32,7 @@ describe('Keyboard Shortcuts', () => {
     location: {
       href: ''
     }
-  }
+  };
 
   const windowRef = new WindowRef();
   const keyboardShortcutService = new KeyboardShortcutService(windowRef);
