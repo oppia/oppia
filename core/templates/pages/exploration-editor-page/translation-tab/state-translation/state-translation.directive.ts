@@ -57,7 +57,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-
+require('services/exploration-html-formatter.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
