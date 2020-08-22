@@ -927,8 +927,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         ), (
             '<p><oppia-noninteractive-math math_content-with-value="'
             '{&amp;quot;raw_latex&amp;quot;:&amp;quot;abc&amp;quot;'
-            ',&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}">'
-            '</oppia-noninteractive-math></p>'
+            ',&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_202'
+            '07261338_r3ir43lmfd_height_2d456_width_6d124_vertical_0'
+            'd231.svg&amp;quot;}"></oppia-noninteractive-math></p>'
         ), (
             '<p><oppia-noninteractive-math url-with-value="&amp;quot;'
             'http://link.com&amp;quot;></oppia-noninteractive-math></p>'
@@ -1863,7 +1864,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1',
                 html_string_with_filename_having_filename), [])
 
-
     def test_validate_svg_filenames_when_filenames_are_invalid(self):
         """Test the validate_svg_filenames_in_math_rich_text when
         filenames are present but invalid.
@@ -1895,7 +1895,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;qu'
                 'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;img2.'
                 'svg&amp;quot;}"></oppia-noninteractive-math>')])
-
 
     def test_validate_svg_filenames_when_filenames_are_not_present(self):
         """Test the validate_svg_filenames_in_math_rich_text when

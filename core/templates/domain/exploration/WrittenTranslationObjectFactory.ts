@@ -81,7 +81,8 @@ export class WrittenTranslationObjectFactory {
     return new WrittenTranslation(type, html, false);
   }
 
-  createFromBackendDict(translationBackendDict: TranslationBackendDict) {
+  createFromBackendDict(
+      translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
       translationBackendDict.data_format,
       translationBackendDict.translation,

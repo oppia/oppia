@@ -43,6 +43,7 @@ require(
   'state-property.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
+require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -78,14 +79,14 @@ angular.module('oppia').directive('answerGroupEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'INTERACTION_SPECS',
-        'StateEditorService', 'RuleObjectFactory',
+        'AlertsService', 'ContextService', 'ExternalSaveService',
+        'INTERACTION_SPECS', 'StateEditorService', 'RuleObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'ResponsesService',
         function(
             $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, INTERACTION_SPECS,
-            StateEditorService, RuleObjectFactory,
+            AlertsService, ContextService, ExternalSaveService,
+            INTERACTION_SPECS, StateEditorService, RuleObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
           var ctrl = this;
@@ -138,6 +139,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                   getDefaultInputValue('Real')];
               case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
+              case 'SetOfAlgebraicIdentifier':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
                 return [];
@@ -291,14 +293,18 @@ angular.module('oppia').directive('answerGroupEditor', [
             // choice interaction's customization arguments.
             // TODO(sll): Remove the need for this watcher, or make it less
             // ad hoc.
-            $scope.$on('updateAnswerChoices', function() {
-              ctrl.answerChoices = ctrl.getAnswerChoices();
-            });
-            $scope.$on('externalSave', function() {
-              if (ctrl.isRuleEditorOpen()) {
-                ctrl.saveRules();
-              }
-            });
+            ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(() => {
+                if (ctrl.isRuleEditorOpen()) {
+                  ctrl.saveRules();
+                }
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onUpdateAnswerChoices.subscribe(() => {
+                ctrl.answerChoices = ctrl.getAnswerChoices();
+              })
+            );
             ctrl.directiveSubscriptions.add(
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 () => {

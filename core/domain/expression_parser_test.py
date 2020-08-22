@@ -546,8 +546,6 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.is_valid_expression('sqrt(-1)'))
         self.assertTrue(expression_parser.is_valid_expression(
             'sqrt(-abs(-1))^2/abs(5)'))
-
-
         self.assertFalse(expression_parser.is_valid_expression('a+b/'))
         self.assertFalse(expression_parser.is_valid_expression('|x|'))
         self.assertFalse(expression_parser.is_valid_expression('||'))

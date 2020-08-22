@@ -87,7 +87,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return _fetchSuggestions(url, onSuccess);
       },
-      resolveSuggestiontoExploration: function(
+      resolveSuggestionToExploration: function(
           targetId, suggestionId, action, reviewMessage, commitMessage,
           onSuccess) {
         var url = UrlInterpolationService.interpolateUrl(

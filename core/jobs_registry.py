@@ -46,6 +46,7 @@ import python_utils
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
+    activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
     activity_jobs_one_off.FixCommitLastUpdatedOneOffJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     activity_jobs_one_off.RemoveCommitUsernamesOneOffJob,
@@ -61,7 +62,6 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
-    exp_jobs_one_off.MathExpressionValidationOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,

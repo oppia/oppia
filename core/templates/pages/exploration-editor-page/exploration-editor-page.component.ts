@@ -41,7 +41,7 @@ require(
   'exploration-objective-editor.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
-  'exploration-save-and-publish-buttons.directive.ts');
+  'exploration-save-and-publish-buttons.component.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.component.ts');
@@ -71,7 +71,7 @@ require(
 require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts');
 require(
-  'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
+  'pages/exploration-editor-page/translation-tab/translation-tab.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
@@ -112,6 +112,7 @@ require(
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -163,7 +164,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationPropertyService',
-    'ExplorationRightsService',
+    'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
@@ -182,7 +183,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationPropertyService,
-        ExplorationRightsService,
+        ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         PageTitleService, LoaderService, ParamChangesObjectFactory,
@@ -346,7 +347,8 @@ angular.module('oppia').component('explorationEditorPage', {
             return;
           }
           RouterService.onRefreshStatisticsTab.emit();
-          $scope.$broadcast('refreshVersionHistory', {
+
+          RouterService.onRefreshVersionHistory.emit({
             forceRefresh: true
           });
 
@@ -458,6 +460,13 @@ angular.module('oppia').component('explorationEditorPage', {
           )
         );
         ctrl.directiveSubscriptions.add(
+          ExplorationSaveService.onInitExplorationPage.subscribe(
+            (successCallback) => {
+              ctrl.initExplorationPage().then(successCallback);
+            }
+          )
+        );
+        ctrl.directiveSubscriptions.add(
           ExplorationStatesService.onRefreshGraph.subscribe(() => {
             GraphDataService.recompute();
             ExplorationWarningsService.updateWarnings();
@@ -465,13 +474,18 @@ angular.module('oppia').component('explorationEditorPage', {
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
-        $scope.$on(
-          'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
+        ctrl.directiveSubscriptions.add(
+          // eslint-disable-next-line max-len
+          StateTutorialFirstTimeService.onEnterEditorForTheFirstTime.subscribe(() => {
+            ctrl.showWelcomeExplorationModal();
+          })
+        );
         ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
             () => {
               ctrl.startTutorial();
-            }));
+            })
+        );
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
 
