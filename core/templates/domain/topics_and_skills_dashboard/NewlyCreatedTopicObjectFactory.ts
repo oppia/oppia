@@ -31,7 +31,7 @@ export class NewlyCreatedTopic {
    * @param {String} description - description of the topic.
    * @param {String} urlFragment - url fragment of the topic.
    */
-  constructor(name, description, urlFragment) {
+  constructor(name: string, description: string, urlFragment: string) {
     this.name = name;
     this.description = description;
     this.urlFragment = urlFragment;
