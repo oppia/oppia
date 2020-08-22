@@ -66,7 +66,7 @@ export class AdminFeaturesTabComponent implements OnInit {
       displayName: 'Server Mode',
       options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
       operators: ['='],
-      optionFilter: (feature: PlatformParameter, option: string) => {
+      optionFilter: (feature: PlatformParameter, option: string): boolean => {
         switch (feature.featureStage) {
           case FeatureStage.DEV:
             return option === 'dev';
