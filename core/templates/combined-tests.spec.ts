@@ -64,8 +64,12 @@ getTestBed().initTestEnvironment(
 
 jasmine.getEnv().addReporter({
   specDone: function(result) {
-    // eslint-disable-next-line no-console
-    console.log('Spec: ' + result.fullName + ' was ' + result.status);
+    // Specs that are being excluded when using fit or fdescribe will not
+    // be prompt.
+    if (result.status !== 'excluded') {
+      // eslint-disable-next-line no-console
+      console.log('Spec: ' + result.fullName + ' was ' + result.status);
+    }
   }
 });
 
