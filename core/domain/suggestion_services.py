@@ -623,7 +623,6 @@ def _update_user_scoring(user_scoring):
             user_scoring.score, user_scoring.onboard_reviewer_email_sent)
 
 
-
 def get_all_scores_of_user(user_id):
     """Gets all scores for a given user.
 

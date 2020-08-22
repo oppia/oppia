@@ -1841,7 +1841,8 @@ class UserContributionScoringModel(base_models.BaseModel):
     # The score of the user for the above category of suggestions.
     score = ndb.FloatProperty(required=True, indexed=True)
     # Flag to check if email to onboard reviewer has been sent for the category.
-    onboard_reviewer_email_sent = ndb.BooleanProperty(required=True, default=False)
+    onboard_reviewer_email_sent = ndb.BooleanProperty(
+        required=True, default=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -1977,7 +1978,8 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, user_id, score_category, score, onboard_reviewer_email_sent=False):
+            cls, user_id, score_category, score,
+            onboard_reviewer_email_sent=False):
         """Creates a new UserContributionScoringModel entry.
 
         Args:

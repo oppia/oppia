@@ -388,7 +388,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         # Assert that the users score was updated correctly.
         self.assertEqual(
-            user_scoring.score,suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+            user_scoring.score, suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
         # Assert that their score is not high enough to review the category.
         self.assertFalse(user_scoring.can_user_review_category())
         # Assert that the onboarding new reviewer email was not sent.
@@ -813,8 +813,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 return exp
 
     def create_new_user_scoring(self, user_id, score_category, score):
-        """Creates the user scoring model and the user scoring domain object with
-        the given user_id, score_category and score.
+        """Creates the user scoring model and the user scoring domain object
+        with the given user_id, score_category and score.
 
         Args:
             user_id: str. The id of the user.
@@ -824,11 +824,15 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         Returns:
             UserContributionScoring. The user scoring object created.
         """
-        new_user_scoring_model = user_models.UserContributionScoringModel.create(
-            user_id, score_category, score)
+        new_user_scoring_model = (
+            user_models.UserContributionScoringModel.create(
+                user_id, score_category, score
+                )
+        )
 
         return suggestion_services.get_user_scoring_from_model(
-            new_user_scoring_model)
+            new_user_scoring_model
+        )
 
     def setUp(self):
         super(SuggestionGetServicesUnitTests, self).setUp()
@@ -1388,8 +1392,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 class UserContributionScoringUnitTests(test_utils.GenericTestBase):
 
     def create_new_user_scoring(self, user_id, score_category, score):
-        """Creates the user scoring model and the user scoring domain object with
-        the given user_id, score_category and score.
+        """Creates the user scoring model and the user scoring domain object
+         with the given user_id, score_category and score.
 
         Args:
             user_id: str. The id of the user.
@@ -1399,11 +1403,15 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
         Returns:
             UserContributionScoring. The user scoring object created.
         """
-        new_user_scoring_model = user_models.UserContributionScoringModel.create(
-            user_id, score_category, score)
+        new_user_scoring_model = (
+            user_models.UserContributionScoringModel.create(
+                user_id, score_category, score
+            )
+        )
 
         return suggestion_services.get_user_scoring_from_model(
-            new_user_scoring_model)
+            new_user_scoring_model
+        )
 
     def setUp(self):
         super(UserContributionScoringUnitTests, self).setUp()
