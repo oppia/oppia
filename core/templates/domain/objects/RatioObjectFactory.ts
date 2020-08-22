@@ -26,25 +26,25 @@ import { RatioInputAnswer } from
   'interactions/answer-defs';
 
 export class Ratio {
-    numbers: number[];
-    constructor(numbersList: number[]) {
-      this.numbers = numbersList;
-    }
+  numbers: number[];
+  constructor(numbersList: number[]) {
+    this.numbers = numbersList;
+  }
 
-    toString(): string {
-      return this.numbers.join(':');
-    }
+  toString(): string {
+    return this.numbers.join(':');
+  }
 
-    getNumberOfTerms(): number {
-      return this.numbers.length;
-    }
-    convertToSimplestForm(): number[] {
-      var gcd = (x: number, y: number) => {
-        return y === 0 ? x : gcd(y, x % y);
-      };
-      var gcdResult = this.numbers.reduce(gcd);
-      return this.numbers.map(currentValue => currentValue / gcdResult);
-    }
+  getNumberOfTerms(): number {
+    return this.numbers.length;
+  }
+  convertToSimplestForm(): number[] {
+    var gcd = (x: number, y: number) => {
+      return y === 0 ? x : gcd(y, x % y);
+    };
+    var gcdResult = this.numbers.reduce(gcd);
+    return this.numbers.map(currentValue => currentValue / gcdResult);
+  }
 }
 
 @Injectable({
