@@ -387,7 +387,7 @@ def main(args=None):
             try:
                 tests_run_regex_match = re.search(
                     r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
-                    task.output[0].all_messages)
+                    task.task_results[0].all_messages)
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
                 python_utils.PRINT(
@@ -396,7 +396,7 @@ def main(args=None):
             except Exception:
                 python_utils.PRINT(
                     'An unexpected error occurred. '
-                    'Task output:\n%s' % task.output[0].all_messages)
+                    'Task output:\n%s' % task.task_results[0].all_messages)
 
         total_count += test_count
 

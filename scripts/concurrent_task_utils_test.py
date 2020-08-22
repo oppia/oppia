@@ -74,15 +74,15 @@ class TaskResultTests(ConcurrentTaskUtilsTests):
         self.assertTrue(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
 
-    def test_get_task_report_with_failed_message(self):
+    def test_task_report_with_failed_message(self):
         output_object = concurrent_task_utils.TaskResult(
             'Test', True, [], [])
         self.assertEqual(
-            output_object.get_task_report, 'FAILED  Test check failed')
+            output_object.task_report, 'FAILED  Test check failed')
         self.assertTrue(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
         self.assertTrue(
-            isinstance(output_object.get_task_report, python_utils.UNICODE))
+            isinstance(output_object.task_report, python_utils.UNICODE))
 
 
 class CreateTaskTests(ConcurrentTaskUtilsTests):
@@ -138,7 +138,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             task.start()
             task.join()
-        expected_output = [s for s in self.linter_stdout if 'Printing' in s]
+        expected_output = [s for s in self.linter_stdout if 'Report' in s]
         self.assertTrue(len(expected_output) == 1)
 
     def test_task_thread_with_no_test_name(self):

@@ -90,9 +90,9 @@ VALID_TS_EXPECT_ERROR_FILEPATH = os.path.join(
 class JsTsLintTests(test_utils.LinterTestBase):
     """Tests for js_ts_linter file."""
 
-    def validate(self, linter_stdout, expected_messages, failed_count):
+    def validate(self, lint_task_report, expected_messages, failed_count):
         """Assert linter output messages with expected messages."""
-        for stdout in linter_stdout:
+        for stdout in lint_task_report:
             if stdout.failed:
                 for message in expected_messages:
                     self.assert_same_list_elements(
@@ -126,7 +126,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             pre_commit_linter.FileCache, 'read', mock_read)
 
         with readlines_swap, read_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [EXTRA_JS_FILEPATH], [], FILE_CACHE).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
@@ -135,7 +135,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'If you want the above files to be present as js files, add '
             'them to the list JS_FILEPATHS_NOT_TO_BUILD in build.py. '
             'Otherwise, rename them to .ts'])
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_js_and_ts_component_name_and_count_with_two_component(self):
         def mock_compile_all_ts_files():
@@ -153,7 +153,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_COMPONENT_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
@@ -161,7 +161,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         expected_messages = [
             'Please ensure that there is exactly one component '
             'in the file.']
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_directive_scope_with_true_value(self):
         def mock_compile_all_ts_files():
@@ -180,7 +180,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [],
                 [INVALID_SCOPE_TRUE_FILEPATH,
                  INVALID_DIRECTIVE_WITH_NO_RETURN_BLOCK], FILE_CACHE
@@ -190,7 +190,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         expected_messages = [
             'Please ensure that baseContent directive in ',
             ' file does not have scope set to true.']
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_directive_scope_with_no_scope(self):
         def mock_compile_all_ts_files():
@@ -208,7 +208,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_SCOPE_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
@@ -216,7 +216,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         expected_messages = [
             'Please ensure that baseContent directive in ',
             ' file has a scope: {}.']
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_sorted_dependencies_with_unsorted_dependencies(self):
         def mock_compile_all_ts_files():
@@ -234,7 +234,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_SORTED_DEPENDENCIES_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
@@ -249,7 +249,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             ' in file ', 'the stringfied dependencies should be in the '
             'following manner: dollar imports, regular imports and '
             'constant imports, all in sorted order.'])
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_match_line_breaks_in_controller_dependencies(self):
         def mock_compile_all_ts_files():
@@ -267,7 +267,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH],
                 FILE_CACHE).perform_all_lint_checks()
         shutil.rmtree(
@@ -281,7 +281,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'BackgroundMaskService,\nSidebarStatusService,UrlService)\n'
             'for the corresponding controller should exactly match.'
             ]
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_constants_declaration(self):
         def mock_compile_all_ts_files():
@@ -300,7 +300,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_CONSTANT_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
@@ -312,7 +312,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             '(the *.constants.ts file). Please create one in the Angular '
             'constants file if it does not exist there.'
             ])
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_duplicate_constant_declaration_in_separate_files(self):
         def mock_compile_all_ts_files():
@@ -330,7 +330,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_CONSTANT_IN_TS_FILEPATH,
                      INVALID_CONSTANT_IN_TS_FILEPATH],
                 FILE_CACHE).perform_all_lint_checks()
@@ -340,7 +340,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'The constant \'ADMIN_ROLE_HANDLER_URL\' is already declared '
             'in', 'Please import the file where the constant is declared '
             'or rename the constant.']
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_duplicate_constants_in_ajs_file(self):
         def mock_compile_all_ts_files():
@@ -359,13 +359,13 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_CONSTANT_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         expected_messages = ['Duplicate constant declaration found.']
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_constants_declaration_outside_class(self):
         def mock_compile_all_ts_files():
@@ -384,13 +384,13 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_CONSTANT_OUTSIDE_CLASS_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         expected_messages = ['SUCCESS  Constants declaration check passed']
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_constants_declaration_in_non_constant_file(self):
         def mock_compile_all_ts_files():
@@ -408,7 +408,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_CONSTANT_IN_TS_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
@@ -416,14 +416,14 @@ class JsTsLintTests(test_utils.LinterTestBase):
         expected_messages = [
             'Constant declaration found at line 19. Please declare the '
             'constants in a separate constants file.']
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_third_party_linter(self):
-        linter_stdout = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+        lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
             [INVALID_SORTED_DEPENDENCIES_FILEPATH]
         ).perform_all_lint_checks()
         expected_messages = ['Unused injected value IMPORT_STATEMENT']
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_third_party_linter_with_stderr(self):
         with self.assertRaisesRegexp(SystemExit, '1'):
@@ -443,11 +443,11 @@ class JsTsLintTests(test_utils.LinterTestBase):
             ).perform_all_lint_checks()
 
     def test_third_party_linter_with_success_message(self):
-        linter_stdout = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+        lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
             [VALID_TS_FILEPATH]).perform_all_lint_checks()
         expected_messages = (
             ['SUCCESS  ESLint check passed'])
-        self.validate(linter_stdout, expected_messages, 0)
+        self.validate(lint_task_report, expected_messages, 0)
 
     def test_custom_linter_with_no_files(self):
         with self.print_swap:
@@ -486,12 +486,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [excluded_file], FILE_CACHE).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         expected_messages = ['SUCCESS  HTTP requests check passed']
-        self.validate(linter_stdout, expected_messages, 0)
+        self.validate(lint_task_report, expected_messages, 0)
 
     def test_http_client_used_in_backend_api_service_file(self):
         def mock_compile_all_ts_files():
@@ -509,13 +509,13 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_BACKEND_API_SERVICE_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         expected_messages = ['SUCCESS  HTTP requests check passed']
-        self.validate(linter_stdout, expected_messages, 0)
+        self.validate(lint_task_report, expected_messages, 0)
 
     def test_http_client_used_with_error_message(self):
         def mock_compile_all_ts_files():
@@ -533,7 +533,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_HTTP_CLIENT_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
@@ -542,7 +542,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'An instance of HttpClient is found in this file. You are not '
             'allowed to create http requests from files that are not '
             'backend api services.']
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_ts_ignore_found_error(self):
         def mock_compile_all_ts_files():
@@ -562,7 +562,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap, ts_ignore_exceptions_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_TS_IGNORE_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
@@ -579,7 +579,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'explaining the @ts-ignore at line 31. The format '
             'of comment should be -> This throws "...". '
             'This needs to be suppressed because ...'])
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_ts_ignore_found_success(self):
         def mock_compile_all_ts_files():
@@ -601,13 +601,13 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap, ts_ignore_exceptions_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_TS_IGNORE_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         expected_messages = ['SUCCESS  TS ignore check passed']
-        self.validate(linter_stdout, expected_messages, 0)
+        self.validate(lint_task_report, expected_messages, 0)
 
     def test_ts_expect_error_error(self):
         def mock_compile_all_ts_files():
@@ -625,7 +625,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_TS_EXPECT_ERROR_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
@@ -644,7 +644,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             '@ts-expect-error at line 30. The format '
             'of comment should be -> This throws "...". '
             'This needs to be suppressed because ...'])
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_ts_expect_error_success(self):
         def mock_compile_all_ts_files():
@@ -662,13 +662,13 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_TS_EXPECT_ERROR_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         expected_messages = ['SUCCESS  TS expect error check passed']
-        self.validate(linter_stdout, expected_messages, 0)
+        self.validate(lint_task_report, expected_messages, 0)
 
     def test_missing_punctuation_at_end_of_comment(self):
         def mock_compile_all_ts_files():
@@ -686,7 +686,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
-            linter_stdout = js_ts_linter.JsTsLintChecksManager(
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_FORMATTED_COMMENT_FILEPATH], FILE_CACHE
             ).perform_all_lint_checks()
         shutil.rmtree(
@@ -694,7 +694,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         expected_messages = [
             'Line 39: Invalid punctuation used at '
             'the end of the comment.']
-        self.validate(linter_stdout, expected_messages, 1)
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_get_linters_with_success(self):
         custom_linter, third_party = js_ts_linter.get_linters(

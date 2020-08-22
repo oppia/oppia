@@ -60,12 +60,12 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
     def test_perform_all_lint_checks_with_invalid_file(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [INVALID_CSS_FILEPATH])
-        linter_stdout = third_party_linter.lint_css_files()
+        lint_task_report = third_party_linter.lint_css_files()
         self.assert_same_list_elements([
             '19:16',
             'Unexpected whitespace before \":\"   declaration-colon-space-'
-            'before'], linter_stdout.all_messages)
-        self.assertTrue(linter_stdout.failed)
+            'before'], lint_task_report.all_messages)
+        self.assertTrue(lint_task_report.failed)
 
     def test_perform_all_lint_checks_with_invalid_stylelint_path(self):
         def mock_join(*unused_args):
@@ -109,8 +109,8 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
     def test_perform_all_lint_checks_with_valid_file(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [VALID_CSS_FILEPATH])
-        linter_stdout = third_party_linter.lint_css_files()
-        self.assertFalse(linter_stdout.failed)
+        lint_task_report = third_party_linter.lint_css_files()
+        self.assertFalse(lint_task_report.failed)
 
     def test_get_linters(self):
         custom_linter, third_party_linter = css_linter.get_linters(

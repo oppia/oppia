@@ -233,9 +233,9 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 'for more details.'], error_messages.all_messages)
 
     def test_perform_all_lint_checks(self):
-        linter_stdout = other_files_linter.CustomLintChecksManager(
+        lint_task_report = other_files_linter.CustomLintChecksManager(
             FILE_CACHE).perform_all_lint_checks()
-        self.assertTrue(isinstance(linter_stdout, list))
+        self.assertTrue(isinstance(lint_task_report, list))
 
     def test_get_linters_with_success(self):
         custom_linter, third_party_linter = (

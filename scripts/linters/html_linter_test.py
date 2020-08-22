@@ -56,42 +56,42 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
     """Tests for CustomHTMLParser class."""
 
     def test_custom_linter_with_invalid_style_indentation(self):
-        linter_stdout = html_linter.HTMLLintChecksManager(
+        lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_STYLE_INDENTATION_HTML_FILEPATH], FILE_CACHE,
             debug=True).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'invalid_style_indentation.html --> Expected indentation of 6,'
             ' found indentation of 4 for content of style tag on line 7'
-            ], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            ], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_custom_linter_with_invalid_indentation(self):
-        linter_stdout = html_linter.HTMLLintChecksManager(
+        lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_INDENTATION_HTML_FILEPATH], FILE_CACHE,
             debug=True).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'Expected indentation of 10, found indentation of 12 for '
-            'classroom-page tag on line 14'], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            'classroom-page tag on line 14'], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_custom_linter_with_invalid_quotes(self):
-        linter_stdout = html_linter.HTMLLintChecksManager(
+        lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_QUOTES_HTML_FILEPATH], FILE_CACHE,
             debug=True).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'The value color:white; of attribute '
             'style for the tag content on line 12 should be enclosed '
-            'within double quotes.'], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            'within double quotes.'], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_custom_linter_with_invalid_alignment(self):
-        linter_stdout = html_linter.HTMLLintChecksManager(
+        lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_ALIGNMENT_HTML_FILEPATH], FILE_CACHE,
             debug=True).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'Attribute for tag content on line 13 should align with the '
-            'leftmost attribute on line 12'], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            'leftmost attribute on line 12'], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_custom_linter_with_invalid_tags(self):
         with self.assertRaisesRegexp(
@@ -108,14 +108,14 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
                 debug=True).perform_all_lint_checks()
 
     def test_custom_linter_with_mismatched_indentation(self):
-        linter_stdout = html_linter.HTMLLintChecksManager(
+        lint_task_report = html_linter.HTMLLintChecksManager(
             [INVALID_MISMATCH_INDENTATION_HTML_FILEPATH], FILE_CACHE,
             debug=True).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'Indentation for end tag content on line 18 does not match the'
             ' indentation of the start tag content on line 12'
-            ], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            ], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_custom_without_html_end_tag(self):
         with self.assertRaisesRegexp(
@@ -125,13 +125,13 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
                 debug=True).perform_all_lint_checks()
 
     def test_valid_html_file_with_custom_linter(self):
-        linter_stdout = html_linter.HTMLLintChecksManager(
+        lint_task_report = html_linter.HTMLLintChecksManager(
             [VALID_HTML_FILEPATH], FILE_CACHE,
             debug=True).check_html_tags_and_attributes()
         self.assertEqual(
             ['SUCCESS  HTML tag and attribute check passed'],
-            linter_stdout.all_messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 0)
+            lint_task_report.all_messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 0)
 
     def test_custom_linter_with_no_files(self):
         with self.print_swap:
@@ -151,17 +151,17 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_third_party_linter_with_lint_errors(self):
-        linter_stdout = html_linter.ThirdPartyHTMLLintChecksManager(
+        lint_task_report = html_linter.ThirdPartyHTMLLintChecksManager(
             [INVALID_QUOTES_HTML_FILEPATH]).lint_html_files()
         self.assert_same_list_elements(
             ['line 10, col 20, line contains trailing whitespace'],
-            linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_third_party_perform_all_lint_checks(self):
-        linter_stdout = html_linter.ThirdPartyHTMLLintChecksManager(
+        lint_task_report = html_linter.ThirdPartyHTMLLintChecksManager(
             [INVALID_QUOTES_HTML_FILEPATH]).perform_all_lint_checks()
-        self.assertTrue(isinstance(linter_stdout, list))
+        self.assertTrue(isinstance(lint_task_report, list))
 
     def test_get_linters_with_success(self):
         custom_linter, third_party_linter = html_linter.get_linters(

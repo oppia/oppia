@@ -114,16 +114,18 @@ class TaskThread(threading.Thread):
                     # checks.
                     if task_result.name:
                         log(
-                            'Report from %s check' % task_result.name,
+                            'Report from %s check\n'
+                            '----------------------------------------\n'
+                            '%s' % (task_result.name, task_result.task_report),
                             show_time=True)
-                        log('----------------------------------------')
-                        log(task_result.task_report)
                     # The following section will print the output of backend
                     # tests.
                     else:
-                        log('LOG %s:' % self.name, show_time=True)
-                        log(task_result.all_messages)
-                        log('----------------------------------------')
+                        log(
+                            'LOG %s:\n%s\n'
+                            '----------------------------------------' %
+                            (self.name, task_result.all_messages),
+                            show_time=True)
             log(
                 'FINISHED %s: %.1f secs' % (
                     self.name, time.time() - self.start_time), show_time=True)

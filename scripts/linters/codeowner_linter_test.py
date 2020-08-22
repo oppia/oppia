@@ -92,14 +92,14 @@ class CodeOwnerLinterTests(test_utils.LinterTestBase):
         with self.listdir_swap, codeowner_important_paths_swap:
             with codeowner_filepath_swap:
                 linter = codeowner_linter.CodeOwnerLintChecksManager(FILE_CACHE)
-                linter_stdout = linter.check_codeowner_file()
+                lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Rule /.github/stale.yml is not present'
             ' in the CODEOWNER_IMPORTANT_PATHS list in scripts/linters/'
             'pre_commit_linter.py. Please add this rule in the '
             'mentioned list or remove this rule from the \'Critical files'
-            '\' section.'], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            '\' section.'], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_duplicate_important_patterns_at_the_bottom_of_codeowners(self):
         codeowner_path_swap = self.swap(
@@ -108,11 +108,11 @@ class CodeOwnerLinterTests(test_utils.LinterTestBase):
 
         with self.listdir_swap, codeowner_path_swap:
             linter = codeowner_linter.CodeOwnerLintChecksManager(FILE_CACHE)
-            linter_stdout = linter.check_codeowner_file()
+            lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Duplicate pattern(s) found in critical '
-            'rules section.'], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            'rules section.'], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_duplicate_important_patterns_in_list(self):
         mock_codeowner_important_paths = (
@@ -127,11 +127,11 @@ class CodeOwnerLinterTests(test_utils.LinterTestBase):
         with self.listdir_swap, codeowner_important_paths_swap:
             with codeowner_path_swap:
                 linter = codeowner_linter.CodeOwnerLintChecksManager(FILE_CACHE)
-                linter_stdout = linter.check_codeowner_file()
+                lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Duplicate pattern(s) found '
-            'in CODEOWNER_IMPORTANT_PATHS list.'], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            'in CODEOWNER_IMPORTANT_PATHS list.'], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_missing_important_codeowner_path_from_critical_section(self):
         codeowner_path_swap = self.swap(
@@ -140,7 +140,7 @@ class CodeOwnerLinterTests(test_utils.LinterTestBase):
 
         with self.listdir_swap, codeowner_path_swap:
             linter = codeowner_linter.CodeOwnerLintChecksManager(FILE_CACHE)
-            linter_stdout = linter.check_codeowner_file()
+            lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Rule \'/.github/stale.yml\' is not present in '
             'the \'Critical files\' '
@@ -148,8 +148,8 @@ class CodeOwnerLinterTests(test_utils.LinterTestBase):
             'section since it is an important rule. Alternatively please '
             'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
             'scripts/linters/pre_commit_linter.py if it is no longer an '
-            'important rule.'], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            'important rule.'], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_check_codeowner_file_with_success_message(self):
         codeowner_path_swap = self.swap(
@@ -162,9 +162,9 @@ class CodeOwnerLinterTests(test_utils.LinterTestBase):
         with self.print_swap, self.listdir_swap, codeowner_important_paths_swap:
             with codeowner_path_swap:
                 linter = codeowner_linter.CodeOwnerLintChecksManager(FILE_CACHE)
-                linter_stdout = linter.check_codeowner_file()
+                lint_task_report = linter.check_codeowner_file()
         self.assertEqual(
-            ['SUCCESS  CODEOWNERS check passed'], linter_stdout.all_messages)
+            ['SUCCESS  CODEOWNERS check passed'], lint_task_report.all_messages)
 
     def test_check_codeowner_file_without_codeowner_name(self):
         codeowner_swap = self.swap(
@@ -173,11 +173,11 @@ class CodeOwnerLinterTests(test_utils.LinterTestBase):
 
         with self.listdir_swap, codeowner_swap:
             linter = codeowner_linter.CodeOwnerLintChecksManager(FILE_CACHE)
-            linter_stdout = linter.check_codeowner_file()
+            lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements(
             ['Pattern on line 18 doesn\'t have codeowner'],
-            linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_check_codeowner_file_without_full_file_path(self):
         codeowner_swap = self.swap(
@@ -186,11 +186,11 @@ class CodeOwnerLinterTests(test_utils.LinterTestBase):
 
         with self.listdir_swap, codeowner_swap:
             linter = codeowner_linter.CodeOwnerLintChecksManager(FILE_CACHE)
-            linter_stdout = linter.check_codeowner_file()
+            lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Pattern on line 18 is invalid. Use full path '
-            'relative to the root directory'], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            'relative to the root directory'], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_check_codeowner_file_with_wildcard(self):
         codeowner_swap = self.swap(
@@ -199,11 +199,11 @@ class CodeOwnerLinterTests(test_utils.LinterTestBase):
 
         with codeowner_swap:
             linter = codeowner_linter.CodeOwnerLintChecksManager(FILE_CACHE)
-            linter_stdout = linter.check_codeowner_file()
+            lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Pattern on line 18 is invalid. '
-            '\'**\' wildcard not allowed'], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            '\'**\' wildcard not allowed'], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
 
     def test_check_codeowner_file_with_no_valid_match(self):
         codeowner_swap = self.swap(
@@ -212,8 +212,22 @@ class CodeOwnerLinterTests(test_utils.LinterTestBase):
 
         with self.listdir_swap, codeowner_swap:
             linter = codeowner_linter.CodeOwnerLintChecksManager(FILE_CACHE)
-            linter_stdout = linter.check_codeowner_file()
+            lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Pattern on line 18 doesn\'t match '
-            'any file or directory'], linter_stdout.messages)
-        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
+            'any file or directory'], lint_task_report.messages)
+        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
+
+    def test_perform_all_lint_checks_with_valid_file(self):
+        custom_linter = codeowner_linter.CodeOwnerLintChecksManager(
+            FILE_CACHE)
+        self.assertTrue(
+            isinstance(custom_linter.perform_all_lint_checks(), list))
+
+    def test_get_linters(self):
+        custom_linter, third_party_linter = codeowner_linter.get_linters(
+            FILE_CACHE)
+        self.assertTrue(
+            isinstance(
+                custom_linter, codeowner_linter.CodeOwnerLintChecksManager))
+        self.assertEqual(third_party_linter, None)
