@@ -71,7 +71,7 @@ require(
 require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts');
 require(
-  'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
+  'pages/exploration-editor-page/translation-tab/translation-tab.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');

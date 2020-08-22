@@ -50,9 +50,6 @@ import { LogicProofRulesService } from
 import { MathEquationInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
-import { MathExpressionInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
 import { MultipleChoiceInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
@@ -129,8 +126,6 @@ describe('Interaction Rules Registry Service', () => {
     logicProofRulesService = TestBed.get(LogicProofRulesService);
     mathEquationInputRulesService = (
       TestBed.get(MathEquationInputRulesService));
-    mathExpressionInputRulesService = (
-      TestBed.get(MathExpressionInputRulesService));
     multipleChoiceInputRulesService = (
       TestBed.get(MultipleChoiceInputRulesService));
     musicNotesInputRulesService = TestBed.get(MusicNotesInputRulesService);
@@ -256,13 +251,6 @@ describe('Interaction Rules Registry Service', () => {
       interactionRulesRegistryService
         .getRulesServiceByInteractionId('MathEquationInput')
     ).toBe(mathEquationInputRulesService);
-  });
-
-  it('should return the correct rules service for MathExpressionInput', () => {
-    expect(
-      interactionRulesRegistryService
-        .getRulesServiceByInteractionId('MathExpressionInput')
-    ).toBe(mathExpressionInputRulesService);
   });
 
   it('should return the correct rules service for MultipleChoiceInput', () => {

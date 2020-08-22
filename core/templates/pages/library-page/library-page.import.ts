@@ -25,4 +25,4 @@ require('base-components/oppia-root.directive.ts');
 require('base-components/base-content.directive.ts');
 require('pages/library-page/library-page.component.ts');
 require('pages/library-page/library-footer/library-footer.component.ts');
-require('pages/library-page/search-bar/search-bar.directive.ts');
+require('pages/library-page/search-bar/search-bar.component.ts');
