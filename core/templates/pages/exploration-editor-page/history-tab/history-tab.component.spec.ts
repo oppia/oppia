@@ -295,6 +295,10 @@ describe('History tab component', function() {
       expect(windowRef.nativeWindow.location.reload).not.toHaveBeenCalled();
     });
 
+  it('should return if the content is editable', function() {
+    expect(ctrl.isEditable()).toEqual(false);
+  });
+
   it('should filter the history by username', function() {
     var snapshots = [{
       commit_message: 'This is the commit message',

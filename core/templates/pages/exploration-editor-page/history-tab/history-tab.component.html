@@ -67,7 +67,7 @@
               <i class="fa fa-ellipsis-v"></i>
             </div>
             <div class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item protractor-test-revert-version" href="#" ng-if="metadata.versionNumber !== $ctrl.currentVersion && $ctrl.EditabilityService.isEditable()" ng-click="$ctrl.showRevertExplorationModal(versionNumber)">
+              <a class="dropdown-item protractor-test-revert-version" href="#" ng-if="metadata.versionNumber !== $ctrl.currentVersion && $ctrl.isEditable()" ng-click="$ctrl.showRevertExplorationModal(versionNumber)">
                 Revert
               </a>
               <a class="dropdown-item" href="#" ng-click="$ctrl.downloadExplorationWithVersion(versionNumber)"

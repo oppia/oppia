@@ -35,6 +35,7 @@ require('services/editability.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 
 import { Subscription } from 'rxjs';
+import cloneDeep from 'lodash/cloneDeep';
 
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
@@ -134,7 +135,7 @@ angular.module('oppia').component('historyTab', {
                   selected: false
                 });
               }
-              ctrl.totalExplorationVersionMetadata = angular.copy(
+              ctrl.totalExplorationVersionMetadata = cloneDeep(
                 ctrl.explorationVersionMetadata);
               ctrl.totalExplorationVersionMetadata.reverse();
               LoaderService.hideLoadingScreen();
@@ -155,7 +156,7 @@ angular.module('oppia').component('historyTab', {
 
       ctrl.filterByUsername = function() {
         if (!ctrl.username) {
-          ctrl.explorationVersionMetadata = (
+          ctrl.explorationVersionMetadata = cloneDeep(
             ctrl.totalExplorationVersionMetadata);
           ctrl.versionNumbersToDisplay = ctrl.explorationVersionMetadata.length;
           return;
@@ -245,6 +246,10 @@ angular.module('oppia').component('historyTab', {
           (ctrl.displayedCurrentPageNumber) * ctrl.VERSIONS_PER_PAGE);
 
         ctrl.versionNumbersToDisplay = ctrl.explorationVersionMetadata.length;
+      };
+
+      ctrl.isEditable = function() {
+        return ctrl.EditabilityService.isEditable();
       };
 
       ctrl.$onInit = function() {
