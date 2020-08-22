@@ -314,11 +314,11 @@ angular.module('oppia').component('stateTranslation', {
       };
 
       $scope.changeActiveCustomizationArgContentIndex = function(newIndex) {
-        if ($scope.isTranslationTabBusy) {
-          $rootScope.$broadcast('showTranslationTabBusyModal');
+        if (ctrl.isTranslationTabBusy) {
+          StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
         }
-        if ($scope.activeHintIndex === newIndex) {
+        if ($scope.activeCustomizationArgContentIndex === newIndex) {
           return;
         }
         const activeContent = (
