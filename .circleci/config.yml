@@ -254,7 +254,7 @@ jobs:
       - run:
           name: Run e2e contributor dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --contributor_dashboard_enabled
 
 notify:
   webhooks:
