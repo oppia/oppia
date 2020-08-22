@@ -169,12 +169,22 @@ angular.module('oppia').factory('ImageUploadHelperService', [
       generateMathExpressionImageFilename: function(
           height, width, verticalPadding) {
         var date = new Date();
-        return 'mathImg_' +
-          _generateDateTimeStringForFilename() +
-          '_height_' + height +
-          '_width_' + width +
-          '_vertical_' + verticalPadding +
-          '.' + 'svg';
+        var filename = (
+          'mathImg_' +
+            _generateDateTimeStringForFilename() +
+            '_height_' + height +
+            '_width_' + width +
+            '_vertical_' + verticalPadding +
+            '.' + 'svg'
+        );
+        var filenameRegexString = Constants.MATH_SVG_FILENAME_REGEX;
+        var filenameRegex = RegExp(filenameRegexString, 'g');
+        if (filenameRegex.exec(filename)) {
+          return filename;
+        } else {
+          throw new Error(
+            'The Math SVG filename format is invalid.');
+        }
       }
     };
   }
