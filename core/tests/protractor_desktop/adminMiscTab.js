@@ -62,7 +62,6 @@ describe('Admin misc tab', function() {
     await users.createAndLoginAdminUser(
       'miscTabTester@miscTab.com', 'miscTabTester');
 
-    // Creating a dummy topic for the test
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
       'admin-misc-tab-test', 'A topic to test the Admin Page\'s Misc Tab',
@@ -70,7 +69,6 @@ describe('Admin misc tab', function() {
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4].substring(0, 12);
 
-    // Creating a dummy exploration for the test
     await workflow.createExploration();
     url = await browser.getCurrentUrl();
     explorationId = url.split('/')[4].substring(0, 12);
@@ -147,15 +145,11 @@ describe('Admin misc tab', function() {
   });
 
   it('should extract data', async function() {
-    // First we play through the exploration a couple of times to generate data
     await libraryPage.get();
     await libraryPage.playExploration(EXPLORATION_NAME);
     await explorationPlayerPage.submitAnswer.apply(null, CORRECT_ANSWER);
-
-    // Now the test begins -- giving bad data, expecting failure
     await adminPage.extractData('0', '0', '0', '0', true);
     await adminPage.expectExtractionFailure();
-    // Giving actual exploration, expecting successful extraction
     await adminPage.extractData(explorationId, '1', 'Introduction', '0', false);
     await adminPage.expectExtractionSuccess();
   });

@@ -462,8 +462,7 @@ var AdminPage = function() {
       numExtractionHandles = await browser.driver.getAllWindowHandles().length;
       await action.click('Extract Data Submit Button',
         extractDataFormSubmitButton);
-    }
-    else {
+    } else {
       await waitFor.visibilityOf(extractDataStatusMessage,
         'Data extraction status message not showing up!');
       await waitFor.textToBePresentInElement(extractDataStatusMessage,
@@ -472,8 +471,10 @@ var AdminPage = function() {
   };
 
   this.expectExtractionFailure = async function() {
-    var newNumExtractionHandles = await browser.driver.getAllWindowHandles().length;
-    expect(newNumExtractionHandles.length).toEqual(numExtractionHandles.length + 1);
+    var newNumExtractionHandles =
+      await browser.driver.getAllWindowHandles().length;
+    expect(newNumExtractionHandles.length).toEqual(
+      numExtractionHandles.length + 1);
     browser.driver.close();
   };
 
