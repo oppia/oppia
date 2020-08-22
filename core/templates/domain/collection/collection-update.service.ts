@@ -106,8 +106,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
        * undo/redo service.
        */
       addCollectionNode: function(
-          collection, explorationId,
-          explorationSummaryBackendObject) {
+          collection, explorationId, explorationSummaryBackendObject) {
         var oldSummaryBackendObject = angular.copy(
           explorationSummaryBackendObject);
         _applyChange(collection, CMD_ADD_COLLECTION_NODE, {
