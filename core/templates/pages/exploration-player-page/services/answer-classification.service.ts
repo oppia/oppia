@@ -37,6 +37,12 @@ import { PredictionAlgorithmRegistryService }
 import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+
+interface InteractionRulesService {
+  [ruleName: string]: (
+    answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
+}
 
 @Injectable({providedIn: 'root'})
 export class AnswerClassificationService {
@@ -112,7 +118,8 @@ export class AnswerClassificationService {
       stateName: string,
       interactionInOldState: Interaction,
       answer: InteractionAnswer,
-      interactionRulesService): AnswerClassificationResult {
+      interactionRulesService: InteractionRulesService):
+      AnswerClassificationResult {
     var answerClassificationResult = null;
 
     const answerGroups = interactionInOldState.answerGroups;
@@ -182,7 +189,7 @@ export class AnswerClassificationService {
 
   isClassifiedExplicitlyOrGoesToNewState(
       stateName: string, state: State, answer: InteractionAnswer,
-      interactionRulesService): boolean {
+      interactionRulesService: InteractionRulesService): boolean {
     const result = this.getMatchingClassificationResult(
       stateName, state.interaction, answer, interactionRulesService);
     return (

@@ -25,7 +25,8 @@
  * (see the 'Unit Testing' section).
  */
 export const TranslatorProviderForTests = function(
-    $provide, $translateProvider) {
+    $provide: ng.auto.IProvideService,
+    $translateProvider: ng.translate.ITranslateProvider): void {
   $provide.factory('customLoader', ['$q', function($q) {
     return function() {
       return $q.resolve({});

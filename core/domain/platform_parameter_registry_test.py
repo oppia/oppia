@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import caching_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.platform import models
@@ -29,7 +30,6 @@ import utils
 
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
-memcache_services = models.Registry.import_memcache_services()
 
 DATA_TYPES = parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 FEATURE_STAGES = parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
@@ -46,10 +46,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
         # Parameter names that might be used in following tests.
         parameter_names = ('parameter_a', 'parameter_b')
-        memcache_keys = [
-            parameter_domain.PlatformParameter.get_memcache_key(name)
-            for name in parameter_names]
-        memcache_services.delete_multi(memcache_keys)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            parameter_names)
 
     def tearDown(self):
         super(PlatformParameterRegistryTests, self).tearDown()
@@ -227,6 +226,87 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                             {
                                 'type': 'server_mode',
                                 'conditions': [('=', FEATURE_STAGES.dev)]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }
+                ],
+            )
+
+    def test_update_dev_feature_with_rule_enabled_for_test_raises_exception(
+            self):
+        parameter_name = 'parameter_a'
+        registry.Registry.create_feature_flag(
+            parameter_name, 'dev feature', FEATURE_STAGES.dev)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Feature in dev stage cannot be enabled in test or production '
+            'environments.'):
+            registry.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [('=', FEATURE_STAGES.test)]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }
+                ],
+            )
+
+    def test_update_dev_feature_with_rule_enabled_for_prod_raises_exception(
+            self):
+        parameter_name = 'parameter_a'
+        registry.Registry.create_feature_flag(
+            parameter_name, 'dev feature', FEATURE_STAGES.dev)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Feature in dev stage cannot be enabled in test or production '
+            'environments.'):
+            registry.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [('=', FEATURE_STAGES.prod)]
+                            }
+                        ],
+                        'value_when_matched': True
+                    }
+                ],
+            )
+
+    def test_update_test_feature_with_rule_enabled_for_prod_raises_exception(
+            self):
+        parameter_name = 'parameter_a'
+        registry.Registry.create_feature_flag(
+            parameter_name, 'dev feature', FEATURE_STAGES.test)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Feature in test stage cannot be enabled in production '
+            'environment.'):
+            registry.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [('=', FEATURE_STAGES.prod)]
                             }
                         ],
                         'value_when_matched': True
