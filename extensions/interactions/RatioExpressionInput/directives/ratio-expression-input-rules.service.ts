@@ -39,6 +39,8 @@ export class RatioExpressionInputRulesService {
   HasNumberOfTermsEqualTo(
       answer: RatioInputAnswer,
       inputs: RatioInputHasNumberOfTermsEqualToRuleInputs): boolean {
+        console.log(inputs.y);
+        console.log(answer.length);
     return answer.length === inputs.y;
   }
 

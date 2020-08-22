@@ -35,7 +35,7 @@ import { RatioExpressionInputCustomizationArgs } from
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
-describe('RatioExpressionInputValidationService', () => {
+fdescribe('RatioExpressionInputValidationService', () => {
   let validatorService: RatioExpressionInputValidationService;
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
@@ -119,11 +119,15 @@ describe('RatioExpressionInputValidationService', () => {
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
+      ' input.'
+    }, {
+      type: WARNING_TYPES.ERROR,
       message: 'Rule 3 from answer group 1 will never be matched because' +
       ' it is preceded by a \'Equals\' rule with a matching' +
       ' input.'
-    }
-    ]);
+    }]);
     let isEquivalentNonSimplified = rof.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
@@ -149,22 +153,22 @@ describe('RatioExpressionInputValidationService', () => {
     }
     ]);
 
-    let hasNumberOfTermsEqualTo2 = rof.createFromBackendDict({
-      rule_type: 'HasNumberOfTermsEqualTo',
+    let equalFourTerms = rof.createFromBackendDict({
+      rule_type: 'Equals',
       inputs: {
-        y: 3
+        x: [1, 2, 3, 4]
       }
     });
 
     // The second rule will never get matched.
     answerGroups[0].updateRuleTypesToInputs(
-      [hasNumberOfTermsEqualTo, hasNumberOfTermsEqualTo2]);
+      [hasNumberOfTermsEqualTo, equals, equalFourTerms]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
+      message: 'Rule 3 from answer group 1 will never be matched because' +
       ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
       ' input.'
     }]);
@@ -183,7 +187,7 @@ describe('RatioExpressionInputValidationService', () => {
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
+      message: 'Rule 1 from answer group 1 will never be matched because' +
       ' it has less no of terms than required.'
     }]);
   });

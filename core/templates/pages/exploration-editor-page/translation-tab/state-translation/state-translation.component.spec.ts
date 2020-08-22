@@ -69,6 +69,8 @@ import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
 import { EventEmitter } from '@angular/core';
 import { ExternalSaveService } from 'services/external-save.service';
+import { RatioObjectFactory } from
+  'domain/objects/RatioObjectFactory';
 
 describe('State translation component', function() {
   var ctrl = null;
@@ -388,6 +390,7 @@ describe('State translation component', function() {
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     $provide.value('StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
+    $provide.value('RatioObjectFactory', TestBed.get(RatioObjectFactory));
   }));
 
   beforeEach(function() {
