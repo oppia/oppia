@@ -137,7 +137,7 @@ export class RatioExpressionInputValidationService {
                 ' will never be matched because it is preceded ' +
                 'by a \'Equals\' rule with a matching input.')
             });
-          } else if (currentRuleType === 'IsEquivalent' && (
+          } else if (seenRuleType === 'IsEquivalent' && (
             ratioRulesService.IsEquivalent(
               seenInput, {x: currentInput}))) {
             // This rule will make the following inputs with
