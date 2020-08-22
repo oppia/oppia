@@ -23,9 +23,7 @@ import datetime
 import itertools
 import re
 
-from constants import constants
-from core.domain import activity_domain
-from core.domain import base_validators
+from core.domain import base_model_validators
 from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import collection_domain
@@ -120,7 +118,6 @@ ERROR_CATEGORY_LAST_UPDATED_CHECK = 'last updated check'
 ERROR_CATEGORY_LENGTH_CHECK = 'length check'
 ERROR_CATEGORY_NAME_CHECK = 'name check'
 ERROR_CATEGORY_OUTPUT_CHECK = 'output check'
-ERROR_CATEGORY_PROPERTY_FETCH_CHECK = 'fetch properties'
 ERROR_CATEGORY_RATED_ON_CHECK = 'rated on check'
 ERROR_CATEGORY_RATINGS_CHECK = 'ratings check'
 ERROR_CATEGORY_REFERENCE_CHECK = 'reference check'
@@ -129,63 +126,7 @@ ERROR_CATEGORY_STATE_NAME_CHECK = 'state name check'
 ERROR_CATEGORY_SUMMARY_CHECK = 'summary check'
 
 
-class ActivityReferencesModelValidator(base_validators.BaseModelValidator):
-    """Class for validating ActivityReferencesModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        # Valid id: featured.
-        regex_string = '^(%s)$' % '|'.join(
-            feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES)
-        return regex_string
-
-    @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        activity_references_list = []
-
-        try:
-            for reference in item.activity_references:
-                activity_references_list.append(
-                    activity_domain.ActivityReference(
-                        reference['type'], reference['id']))
-        except Exception as e:
-            cls._add_error(
-                ERROR_CATEGORY_PROPERTY_FETCH_CHECK,
-                'Entity id %s: Entity properties cannot be fetched completely '
-                'with the error %s' % (item.id, e))
-            return None
-
-        return activity_domain.ActivityReferences(activity_references_list)
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        exploration_ids = []
-        collection_ids = []
-
-        try:
-            for reference in item.activity_references:
-                if reference['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
-                    exploration_ids.append(reference['id'])
-                elif reference['type'] == constants.ACTIVITY_TYPE_COLLECTION:
-                    collection_ids.append(reference['id'])
-        except Exception as e:
-            cls._add_error(
-                ERROR_CATEGORY_PROPERTY_FETCH_CHECK,
-                'Entity id %s: Entity properties cannot be fetched completely '
-                'with the error %s' % (item.id, e))
-            return {}
-
-        return [
-            base_validators.ExternalModelFetcherDetails(
-                'exploration_ids', exp_models.ExplorationModel,
-                exploration_ids),
-            base_validators.ExternalModelFetcherDetails(
-                'collection_ids', collection_models.CollectionModel,
-                collection_ids)
-        ]
-
-
-class RoleQueryAuditModelValidator(base_validators.BaseModelValidator):
+class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating RoleQueryAuditModels."""
 
     @classmethod
@@ -197,11 +138,12 @@ class RoleQueryAuditModelValidator(base_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_ids', user_models.UserSettingsModel, [item.user_id])]
 
 
-class UsernameChangeAuditModelValidator(base_validators.BaseModelValidator):
+class UsernameChangeAuditModelValidator(
+        base_model_validators.BaseModelValidator):
     """Class for validating UsernameChangeAuditModels."""
 
     @classmethod
@@ -214,12 +156,13 @@ class UsernameChangeAuditModelValidator(base_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
 
 
-class ClassifierTrainingJobModelValidator(base_validators.BaseModelValidator):
+class ClassifierTrainingJobModelValidator(
+        base_model_validators.BaseModelValidator):
     """Class for validating ClassifierTrainingJobModels."""
 
     @classmethod
@@ -236,7 +179,7 @@ class ClassifierTrainingJobModelValidator(base_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel, [item.exp_id])]
 
     @classmethod
@@ -248,7 +191,7 @@ class ClassifierTrainingJobModelValidator(base_validators.BaseModelValidator):
         Args:
             item: ndb.Model. ClassifierTrainingJobModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -269,7 +212,7 @@ class ClassifierTrainingJobModelValidator(base_validators.BaseModelValidator):
                 model_id = exp_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -277,7 +220,8 @@ class ClassifierTrainingJobModelValidator(base_validators.BaseModelValidator):
                 continue
             if item.exp_version > exp_model.version:
                 cls._add_error(
-                    'exp %s' % base_validators.ERROR_CATEGORY_VERSION_CHECK,
+                    'exp %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
                     'Entity id %s: Exploration version %s in entity is greater '
                     'than the version %s of exploration corresponding to '
                     'exp_id %s' % (
@@ -293,7 +237,7 @@ class ClassifierTrainingJobModelValidator(base_validators.BaseModelValidator):
         Args:
             item: ndb.Model. ClassifierTrainingJobModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -314,7 +258,7 @@ class ClassifierTrainingJobModelValidator(base_validators.BaseModelValidator):
                 model_id = exp_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -336,7 +280,7 @@ class ClassifierTrainingJobModelValidator(base_validators.BaseModelValidator):
 
 
 class TrainingJobExplorationMappingModelValidator(
-        base_validators.BaseModelValidator):
+        base_model_validators.BaseModelValidator):
     """Class for validating TrainingJobExplorationMappingModels."""
 
     @classmethod
@@ -354,7 +298,7 @@ class TrainingJobExplorationMappingModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel, [item.exp_id])]
 
     @classmethod
@@ -366,7 +310,7 @@ class TrainingJobExplorationMappingModelValidator(
         Args:
             item: ndb.Model. TrainingJobExplorationMappingModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -387,7 +331,7 @@ class TrainingJobExplorationMappingModelValidator(
                 model_id = exp_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -395,7 +339,8 @@ class TrainingJobExplorationMappingModelValidator(
                 continue
             if item.exp_version > exp_model.version:
                 cls._add_error(
-                    'exp %s' % base_validators.ERROR_CATEGORY_VERSION_CHECK,
+                    'exp %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
                     'Entity id %s: Exploration version %s in entity is greater '
                     'than the version %s of exploration corresponding to '
                     'exp_id %s' % (
@@ -411,7 +356,7 @@ class TrainingJobExplorationMappingModelValidator(
         Args:
             item: ndb.Model. TrainingJobExplorationMappingbModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -432,7 +377,7 @@ class TrainingJobExplorationMappingModelValidator(
                 model_id = exp_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -453,7 +398,7 @@ class TrainingJobExplorationMappingModelValidator(
             cls._validate_state_name]
 
 
-class CollectionModelValidator(base_validators.BaseModelValidator):
+class CollectionModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating CollectionModel."""
 
     @classmethod
@@ -466,35 +411,35 @@ class CollectionModelValidator(base_validators.BaseModelValidator):
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel,
                 [node['exploration_id'] for node in item.collection_contents[
                     'nodes']]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_commit_log_entry_ids',
                 collection_models.CollectionCommitLogEntryModel,
                 ['collection-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_summary_ids',
                 collection_models.CollectionSummaryModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_rights_ids',
                 collection_models.CollectionRightsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 collection_models.CollectionSnapshotMetadataModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 collection_models.CollectionSnapshotContentModel,
                 snapshot_model_ids)]
 
 
 class CollectionSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating CollectionSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'collection'
@@ -506,16 +451,16 @@ class CollectionSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
 
 
 class CollectionSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating CollectionSnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'collection'
@@ -523,13 +468,13 @@ class CollectionSnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids',
                 collection_models.CollectionModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
-class CollectionRightsModelValidator(base_validators.BaseModelValidator):
+class CollectionRightsModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating CollectionRightsModel."""
 
     @classmethod
@@ -538,23 +483,23 @@ class CollectionRightsModelValidator(base_validators.BaseModelValidator):
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids',
                 collection_models.CollectionModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'owner_user_ids',
                 user_models.UserSettingsModel, item.owner_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'editor_user_ids',
                 user_models.UserSettingsModel, item.editor_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'viewer_user_ids',
                 user_models.UserSettingsModel, item.viewer_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 collection_models.CollectionRightsSnapshotMetadataModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 collection_models.CollectionRightsSnapshotContentModel,
                 snapshot_model_ids)]
@@ -584,7 +529,7 @@ class CollectionRightsModelValidator(base_validators.BaseModelValidator):
 
 
 class CollectionRightsSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating CollectionRightsSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'collection rights'
@@ -596,17 +541,17 @@ class CollectionRightsSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_rights_ids',
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id])]
 
 
 class CollectionRightsSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating CollectionRightsSnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'collection rights'
@@ -614,14 +559,14 @@ class CollectionRightsSnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_rights_ids',
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class CollectionCommitLogEntryModelValidator(
-        base_validators.BaseCommitLogEntryModelValidator):
+        base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating CollectionCommitLogEntryModel."""
 
     EXTERNAL_MODEL_NAME = 'collection'
@@ -642,7 +587,7 @@ class CollectionCommitLogEntryModelValidator(
             return collection_domain.CollectionChange
         else:
             cls._add_error(
-                'model %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -650,12 +595,12 @@ class CollectionCommitLogEntryModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         external_id_relationships = [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids',
                 collection_models.CollectionModel, [item.collection_id])]
         if item.id.startswith('rights'):
             external_id_relationships.append(
-                base_validators.ExternalModelFetcherDetails(
+                base_model_validators.ExternalModelFetcherDetails(
                     'collection_rights_ids',
                     collection_models.CollectionRightsModel,
                     [item.collection_id]))
@@ -663,7 +608,7 @@ class CollectionCommitLogEntryModelValidator(
 
 
 class CollectionSummaryModelValidator(
-        base_validators.BaseSummaryModelValidator):
+        base_model_validators.BaseSummaryModelValidator):
     """Class for validating CollectionSummaryModel."""
 
     @classmethod
@@ -673,22 +618,22 @@ class CollectionSummaryModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids',
                 collection_models.CollectionModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_rights_ids',
                 collection_models.CollectionRightsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'owner_user_ids',
                 user_models.UserSettingsModel, item.owner_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'editor_user_ids',
                 user_models.UserSettingsModel, item.editor_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'viewer_user_ids',
                 user_models.UserSettingsModel, item.viewer_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'contributor_user_ids',
                 user_models.UserSettingsModel, item.contributor_ids)]
 
@@ -720,7 +665,7 @@ class CollectionSummaryModelValidator(
         Args:
             item: ndb.Model. CollectionSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -741,7 +686,7 @@ class CollectionSummaryModelValidator(
                 model_id = collection_model_reference.model_id
                 cls._add_error(
                     'collection_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field collection_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -811,7 +756,7 @@ class CollectionSummaryModelValidator(
 
 
 class ExplorationOpportunitySummaryModelValidator(
-        base_validators.BaseSummaryModelValidator):
+        base_model_validators.BaseSummaryModelValidator):
     """Class for validating ExplorationOpportunitySummaryModel."""
 
     @classmethod
@@ -823,13 +768,13 @@ class ExplorationOpportunitySummaryModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids',
                 topic_models.TopicModel, [item.topic_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'story_ids',
                 story_models.StoryModel, [item.story_id])]
 
@@ -842,7 +787,7 @@ class ExplorationOpportunitySummaryModelValidator(
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -863,7 +808,7 @@ class ExplorationOpportunitySummaryModelValidator(
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -890,7 +835,7 @@ class ExplorationOpportunitySummaryModelValidator(
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -911,7 +856,7 @@ class ExplorationOpportunitySummaryModelValidator(
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -936,7 +881,7 @@ class ExplorationOpportunitySummaryModelValidator(
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -956,7 +901,8 @@ class ExplorationOpportunitySummaryModelValidator(
                 model_class = story_model_reference.model_class
                 model_id = story_model_reference.model_id
                 cls._add_error(
-                    'story_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'story_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1004,7 +950,8 @@ class ExplorationOpportunitySummaryModelValidator(
             ]
 
 
-class SkillOpportunityModelValidator(base_validators.BaseSummaryModelValidator):
+class SkillOpportunityModelValidator(
+        base_model_validators.BaseSummaryModelValidator):
     """Class for validating SkillOpportunityModel."""
 
     @classmethod
@@ -1015,7 +962,7 @@ class SkillOpportunityModelValidator(base_validators.BaseSummaryModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel, [item.id])]
 
     @classmethod
@@ -1027,7 +974,7 @@ class SkillOpportunityModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. SkillOpportunityModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -1047,7 +994,8 @@ class SkillOpportunityModelValidator(base_validators.BaseSummaryModelValidator):
                 model_class = skill_model_reference.model_class
                 model_id = skill_model_reference.model_id
                 cls._add_error(
-                    'skill_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'skill_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field skill_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1084,7 +1032,7 @@ class SkillOpportunityModelValidator(base_validators.BaseSummaryModelValidator):
         ]
 
 
-class ConfigPropertyModelValidator(base_validators.BaseModelValidator):
+class ConfigPropertyModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating ConfigPropertyModel."""
 
     @classmethod
@@ -1097,18 +1045,18 @@ class ConfigPropertyModelValidator(base_validators.BaseModelValidator):
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 config_models.ConfigPropertySnapshotMetadataModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 config_models.ConfigPropertySnapshotContentModel,
                 snapshot_model_ids)]
 
 
 class ConfigPropertySnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating ConfigPropertySnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'config property'
@@ -1124,17 +1072,17 @@ class ConfigPropertySnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'config_property_ids',
                 config_models.ConfigPropertyModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id])]
 
 
 class ConfigPropertySnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating ConfigPropertySnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'config property'
@@ -1146,13 +1094,13 @@ class ConfigPropertySnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'config_property_ids',
                 config_models.ConfigPropertyModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
-class SentEmailModelValidator(base_validators.BaseModelValidator):
+class SentEmailModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SentEmailModels."""
 
     @classmethod
@@ -1165,10 +1113,10 @@ class SentEmailModelValidator(base_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'recipient_id',
                 user_models.UserSettingsModel, [item.recipient_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'sender_id', user_models.UserSettingsModel, [item.sender_id])]
 
     @classmethod
@@ -1195,7 +1143,7 @@ class SentEmailModelValidator(base_validators.BaseModelValidator):
         Args:
             item: ndb.Model. SentEmailModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -1215,7 +1163,8 @@ class SentEmailModelValidator(base_validators.BaseModelValidator):
                 model_class = sender_model_reference.model_class
                 model_id = sender_model_reference.model_id
                 cls._add_error(
-                    'sender_id %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'sender_id %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field sender_id having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1239,7 +1188,7 @@ class SentEmailModelValidator(base_validators.BaseModelValidator):
         Args:
             item: ndb.Model. SentEmailModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -1260,7 +1209,7 @@ class SentEmailModelValidator(base_validators.BaseModelValidator):
                 model_id = recipient_model_reference.model_id
                 cls._add_error(
                     'recipient_id %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field recipient_id having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1286,16 +1235,16 @@ class SentEmailModelValidator(base_validators.BaseModelValidator):
             cls._validate_recipient_email]
 
 
-class BulkEmailModelValidator(base_validators.BaseModelValidator):
+class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating BulkEmailModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'recipient_id',
                 user_models.UserSettingsModel, item.recipient_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'sender_id', user_models.UserSettingsModel, [item.sender_id])]
 
     @classmethod
@@ -1322,7 +1271,7 @@ class BulkEmailModelValidator(base_validators.BaseModelValidator):
         Args:
             item: ndb.Model. BulkEmailModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -1342,7 +1291,8 @@ class BulkEmailModelValidator(base_validators.BaseModelValidator):
                 model_class = sender_model_reference.model_class
                 model_id = sender_model_reference.model_id
                 cls._add_error(
-                    'sender_id %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'sender_id %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field sender_id having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1367,7 +1317,7 @@ class BulkEmailModelValidator(base_validators.BaseModelValidator):
 
 
 class GeneralFeedbackEmailReplyToIdModelValidator(
-        base_validators.BaseModelValidator):
+        base_model_validators.BaseModelValidator):
     """Class for validating GeneralFeedbackEmailReplyToIdModels."""
 
     @classmethod
@@ -1382,11 +1332,11 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'item.id.user_id',
                 user_models.UserSettingsModel, [
                     item.id[:item.id.find('.')]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'item.id.thread_id',
                 feedback_models.GeneralFeedbackThreadModel, [
                     item.id[item.id.find('.') + 1:]])]
@@ -1416,7 +1366,7 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
         return [cls._validate_reply_to_id_length]
 
 
-class ExplorationModelValidator(base_validators.BaseModelValidator):
+class ExplorationModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating ExplorationModel."""
 
     @classmethod
@@ -1429,30 +1379,30 @@ class ExplorationModelValidator(base_validators.BaseModelValidator):
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_commit_log_entry_ids',
                 exp_models.ExplorationCommitLogEntryModel,
                 ['exploration-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exp_summary_ids',
                 exp_models.ExpSummaryModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_rights_ids',
                 exp_models.ExplorationRightsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 exp_models.ExplorationSnapshotMetadataModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 exp_models.ExplorationSnapshotContentModel,
                 snapshot_model_ids)]
 
 
 class ExplorationSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'exploration'
@@ -1464,17 +1414,17 @@ class ExplorationSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id])]
 
 
 class ExplorationSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating ExplorationSnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'exploration'
@@ -1482,13 +1432,13 @@ class ExplorationSnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
-class ExplorationRightsModelValidator(base_validators.BaseModelValidator):
+class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating ExplorationRightsModel."""
 
     @classmethod
@@ -1500,27 +1450,27 @@ class ExplorationRightsModelValidator(base_validators.BaseModelValidator):
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'cloned_from_exploration_ids',
                 exp_models.ExplorationModel,
                 cloned_from_exploration_id),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'owner_user_ids',
                 user_models.UserSettingsModel, item.owner_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'editor_user_ids',
                 user_models.UserSettingsModel, item.editor_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'viewer_user_ids',
                 user_models.UserSettingsModel, item.viewer_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 exp_models.ExplorationRightsSnapshotMetadataModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 exp_models.ExplorationRightsSnapshotContentModel,
                 snapshot_model_ids)]
@@ -1550,7 +1500,7 @@ class ExplorationRightsModelValidator(base_validators.BaseModelValidator):
 
 
 class ExplorationRightsSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationRightsSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'exploration rights'
@@ -1562,17 +1512,17 @@ class ExplorationRightsSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_rights_ids',
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id])]
 
 
 class ExplorationRightsSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating ExplorationRightsSnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'exploration rights'
@@ -1580,14 +1530,14 @@ class ExplorationRightsSnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_rights_ids',
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class ExplorationCommitLogEntryModelValidator(
-        base_validators.BaseCommitLogEntryModelValidator):
+        base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating ExplorationCommitLogEntryModel."""
 
     EXTERNAL_MODEL_NAME = 'exploration'
@@ -1608,7 +1558,7 @@ class ExplorationCommitLogEntryModelValidator(
             return exp_domain.ExplorationChange
         else:
             cls._add_error(
-                'model %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -1616,18 +1566,18 @@ class ExplorationCommitLogEntryModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         external_id_relationships = [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel, [item.exploration_id])]
         if item.id.startswith('rights'):
             external_id_relationships.append(
-                base_validators.ExternalModelFetcherDetails(
+                base_model_validators.ExternalModelFetcherDetails(
                     'exploration_rights_ids', exp_models.ExplorationRightsModel,
                     [item.exploration_id]))
         return external_id_relationships
 
 
-class ExpSummaryModelValidator(base_validators.BaseSummaryModelValidator):
+class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
     """Class for validating ExpSummaryModel."""
 
     @classmethod
@@ -1637,22 +1587,22 @@ class ExpSummaryModelValidator(base_validators.BaseSummaryModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_rights_ids',
                 exp_models.ExplorationRightsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'owner_user_ids',
                 user_models.UserSettingsModel, item.owner_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'editor_user_ids',
                 user_models.UserSettingsModel, item.editor_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'viewer_user_ids',
                 user_models.UserSettingsModel, item.viewer_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'contributor_user_ids',
                 user_models.UserSettingsModel, item.contributor_ids)]
 
@@ -1703,7 +1653,7 @@ class ExpSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. ExpSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -1724,7 +1674,7 @@ class ExpSummaryModelValidator(base_validators.BaseSummaryModelValidator):
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1784,7 +1734,8 @@ class ExpSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         return [cls._validate_exploration_model_last_updated]
 
 
-class GeneralFeedbackThreadModelValidator(base_validators.BaseModelValidator):
+class GeneralFeedbackThreadModelValidator(
+        base_model_validators.BaseModelValidator):
     """Class for validating GeneralFeedbackThreadModels."""
 
     @classmethod
@@ -1797,7 +1748,7 @@ class GeneralFeedbackThreadModelValidator(base_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         field_name_to_external_model_references = [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'message_ids',
                 feedback_models.GeneralFeedbackMessageModel,
                 ['%s.%s' % (item.id, i) for i in python_utils.RANGE(
@@ -1805,17 +1756,17 @@ class GeneralFeedbackThreadModelValidator(base_validators.BaseModelValidator):
         ]
         if item.original_author_id:
             field_name_to_external_model_references.append(
-                base_validators.ExternalModelFetcherDetails(
+                base_model_validators.ExternalModelFetcherDetails(
                     'author_ids', user_models.UserSettingsModel,
                     [item.original_author_id]))
         if item.has_suggestion:
             field_name_to_external_model_references.append(
-                base_validators.ExternalModelFetcherDetails(
+                base_model_validators.ExternalModelFetcherDetails(
                     'suggestion_ids', suggestion_models.GeneralSuggestionModel,
                     [item.id]))
         if item.entity_type in TARGET_TYPE_TO_TARGET_MODEL:
             field_name_to_external_model_references.append(
-                base_validators.ExternalModelFetcherDetails(
+                base_model_validators.ExternalModelFetcherDetails(
                     '%s_ids' % item.entity_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.entity_type],
                     [item.entity_id]))
@@ -1830,7 +1781,7 @@ class GeneralFeedbackThreadModelValidator(base_validators.BaseModelValidator):
         """
         if item.entity_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
-                'entity %s' % base_validators.ERROR_CATEGORY_TYPE_CHECK,
+                'entity %s' % base_model_validators.ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Entity type %s is not allowed' % (
                     item.id, item.entity_type))
 
@@ -1859,7 +1810,8 @@ class GeneralFeedbackThreadModelValidator(base_validators.BaseModelValidator):
             cls._validate_has_suggestion]
 
 
-class GeneralFeedbackMessageModelValidator(base_validators.BaseModelValidator):
+class GeneralFeedbackMessageModelValidator(
+        base_model_validators.BaseModelValidator):
     """Class for validating GeneralFeedbackMessageModels."""
 
     @classmethod
@@ -1874,9 +1826,9 @@ class GeneralFeedbackMessageModelValidator(base_validators.BaseModelValidator):
         if item.author_id:
             author_ids = [item.author_id]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'author_ids', user_models.UserSettingsModel, author_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'feedback_thread_ids',
                 feedback_models.GeneralFeedbackThreadModel, [item.thread_id])]
 
@@ -1889,7 +1841,7 @@ class GeneralFeedbackMessageModelValidator(base_validators.BaseModelValidator):
         Args:
             item: ndb.Model. GeneralFeedbackMessageModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -1911,7 +1863,7 @@ class GeneralFeedbackMessageModelValidator(base_validators.BaseModelValidator):
                 model_id = feedback_thread_model_reference.model_id
                 cls._add_error(
                     'feedback_thread_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field feedback_thread_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -1919,7 +1871,8 @@ class GeneralFeedbackMessageModelValidator(base_validators.BaseModelValidator):
                 continue
             if item.message_id >= feedback_thread_model.message_count:
                 cls._add_error(
-                    'message %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                    'message %s' % (
+                        base_model_validators.ERROR_CATEGORY_ID_CHECK),
                     'Entity id %s: message id %s not less than total count '
                     'of messages %s in feedback thread model with id %s '
                     'corresponding to the entity' % (
@@ -1933,7 +1886,7 @@ class GeneralFeedbackMessageModelValidator(base_validators.BaseModelValidator):
 
 
 class GeneralFeedbackThreadUserModelValidator(
-        base_validators.BaseModelValidator):
+        base_model_validators.BaseModelValidator):
     """Class for validating GeneralFeedbackThreadUserModels."""
 
     @classmethod
@@ -1956,24 +1909,25 @@ class GeneralFeedbackThreadUserModelValidator(
                 item.id[index + 1:], message_id) for message_id in (
                     item.message_ids_read_by_user)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'message_ids',
                 feedback_models.GeneralFeedbackMessageModel, message_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_ids', user_models.UserSettingsModel, user_ids)]
 
 
-class FeedbackAnalyticsModelValidator(base_validators.BaseModelValidator):
+class FeedbackAnalyticsModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating FeedbackAnalyticsModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel, [item.id])]
 
 
-class UnsentFeedbackEmailModelValidator(base_validators.BaseModelValidator):
+class UnsentFeedbackEmailModelValidator(
+        base_model_validators.BaseModelValidator):
     """Class for validating UnsentFeedbackEmailModels."""
 
     @classmethod
@@ -1993,9 +1947,9 @@ class UnsentFeedbackEmailModelValidator(base_validators.BaseModelValidator):
                     'Entity id %s: Invalid feedback reference: %s' % (
                         item.id, reference))
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_ids', user_models.UserSettingsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'message_ids', feedback_models.GeneralFeedbackMessageModel,
                 message_ids)]
 
@@ -2027,7 +1981,7 @@ class UnsentFeedbackEmailModelValidator(base_validators.BaseModelValidator):
         return [cls._validate_entity_type_and_entity_id_feedback_reference]
 
 
-class JobModelValidator(base_validators.BaseModelValidator):
+class JobModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating JobModels."""
 
     @classmethod
@@ -2122,7 +2076,8 @@ class JobModelValidator(base_validators.BaseModelValidator):
             cls._validate_output]
 
 
-class ContinuousComputationModelValidator(base_validators.BaseModelValidator):
+class ContinuousComputationModelValidator(
+        base_model_validators.BaseModelValidator):
     """Class for validating ContinuousComputationModels."""
 
     @classmethod
@@ -2172,7 +2127,7 @@ class ContinuousComputationModelValidator(base_validators.BaseModelValidator):
         return [cls._validate_time_fields]
 
 
-class QuestionModelValidator(base_validators.BaseModelValidator):
+class QuestionModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating QuestionModel."""
 
     @classmethod
@@ -2185,48 +2140,49 @@ class QuestionModelValidator(base_validators.BaseModelValidator):
             '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'question_commit_log_entry_ids',
                 question_models.QuestionCommitLogEntryModel,
                 ['question-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'question_summary_ids',
                 question_models.QuestionSummaryModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 question_models.QuestionSnapshotMetadataModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 question_models.QuestionSnapshotContentModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'linked_skill_ids',
                 skill_models.SkillModel, item.linked_skill_ids)]
 
 
-class ExplorationContextModelValidator(base_validators.BaseModelValidator):
+class ExplorationContextModelValidator(
+        base_model_validators.BaseModelValidator):
     """Class for validating ExplorationContextModel."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'story_ids', story_models.StoryModel, [item.story_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exp_ids', exp_models.ExplorationModel, [item.id])]
 
 
 class ExplorationMathRichTextInfoModelValidator(
-        base_validators.BaseModelValidator):
+        base_model_validators.BaseModelValidator):
     """Class for validating ExplorationMathRichTextInfoModel."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel, [item.id])]
 
     @classmethod
@@ -2243,7 +2199,7 @@ class ExplorationMathRichTextInfoModelValidator(
         Args:
             item: ndb.Model. ExplorationMathRichTextInfoModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -2264,7 +2220,7 @@ class ExplorationMathRichTextInfoModelValidator(
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -2328,7 +2284,7 @@ class ExplorationMathRichTextInfoModelValidator(
         return [cls._validate_latex_strings_info]
 
 
-class QuestionSkillLinkModelValidator(base_validators.BaseModelValidator):
+class QuestionSkillLinkModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating QuestionSkillLinkModel."""
 
     @classmethod
@@ -2338,15 +2294,15 @@ class QuestionSkillLinkModelValidator(base_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'question_ids', question_models.QuestionModel,
                 [item.question_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel, [item.skill_id])]
 
 
 class QuestionSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating QuestionSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'question'
@@ -2358,16 +2314,16 @@ class QuestionSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'question_ids', question_models.QuestionModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
 
 
 class QuestionSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating QuestionSnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'question'
@@ -2375,13 +2331,13 @@ class QuestionSnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'question_ids', question_models.QuestionModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class QuestionCommitLogEntryModelValidator(
-        base_validators.BaseCommitLogEntryModelValidator):
+        base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating QuestionCommitLogEntryModel."""
 
     EXTERNAL_MODEL_NAME = 'question'
@@ -2400,7 +2356,7 @@ class QuestionCommitLogEntryModelValidator(
             return question_domain.QuestionChange
         else:
             cls._add_error(
-                'model %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -2408,12 +2364,13 @@ class QuestionCommitLogEntryModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'question_ids', question_models.QuestionModel,
                 [item.question_id])]
 
 
-class QuestionSummaryModelValidator(base_validators.BaseSummaryModelValidator):
+class QuestionSummaryModelValidator(
+        base_model_validators.BaseSummaryModelValidator):
     """Class for validating QuestionSummaryModel."""
 
     @classmethod
@@ -2423,7 +2380,7 @@ class QuestionSummaryModelValidator(base_validators.BaseSummaryModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'question_ids', question_models.QuestionModel, [item.id])]
 
     @classmethod
@@ -2435,7 +2392,7 @@ class QuestionSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. QuestionSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -2456,7 +2413,7 @@ class QuestionSummaryModelValidator(base_validators.BaseSummaryModelValidator):
                 model_id = question_model_reference.model_id
                 cls._add_error(
                     'question_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field question_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -2491,13 +2448,13 @@ class QuestionSummaryModelValidator(base_validators.BaseSummaryModelValidator):
 
 
 class ExplorationRecommendationsModelValidator(
-        base_validators.BaseModelValidator):
+        base_model_validators.BaseModelValidator):
     """Class for validating ExplorationRecommendationsModel."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 [item.id] + item.recommended_exploration_ids)]
 
@@ -2510,7 +2467,8 @@ class ExplorationRecommendationsModelValidator(
         """
         if item.id in item.recommended_exploration_ids:
             cls._add_error(
-                'item exploration %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'item exploration %s' % (
+                    base_model_validators.ERROR_CATEGORY_ID_CHECK),
                 'Entity id %s: The exploration id: %s for which the entity is '
                 'created is also present in the recommended exploration ids '
                 'for entity' % (item.id, item.id))
@@ -2520,7 +2478,7 @@ class ExplorationRecommendationsModelValidator(
         return [cls._validate_item_id_not_in_recommended_exploration_ids]
 
 
-class TopicSimilaritiesModelValidator(base_validators.BaseModelValidator):
+class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating TopicSimilaritiesModel."""
 
     @classmethod
@@ -2565,7 +2523,7 @@ class TopicSimilaritiesModelValidator(base_validators.BaseModelValidator):
         return [cls._validate_topic_similarities]
 
 
-class SkillModelValidator(base_validators.BaseModelValidator):
+class SkillModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SkillModel."""
 
     @classmethod
@@ -2581,21 +2539,21 @@ class SkillModelValidator(base_validators.BaseModelValidator):
         if item.superseding_skill_id:
             superseding_skill_ids = [item.superseding_skill_id]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'skill_commit_log_entry_ids',
                 skill_models.SkillCommitLogEntryModel,
                 ['skill-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'skill_summary_ids', skill_models.SkillSummaryModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'superseding_skill_ids', skill_models.SkillModel,
                 superseding_skill_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 skill_models.SkillSnapshotMetadataModel, snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids', skill_models.SkillSnapshotContentModel,
                 snapshot_model_ids)]
 
@@ -2626,7 +2584,7 @@ class SkillModelValidator(base_validators.BaseModelValidator):
 
 
 class SkillSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating SkillSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'skill'
@@ -2638,16 +2596,16 @@ class SkillSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
 
 
 class SkillSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating SkillSnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'skill'
@@ -2655,13 +2613,13 @@ class SkillSnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class SkillCommitLogEntryModelValidator(
-        base_validators.BaseCommitLogEntryModelValidator):
+        base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating SkillCommitLogEntryModel."""
 
     EXTERNAL_MODEL_NAME = 'skill'
@@ -2680,7 +2638,7 @@ class SkillCommitLogEntryModelValidator(
             return skill_domain.SkillChange
         else:
             cls._add_error(
-                'model %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -2688,11 +2646,12 @@ class SkillCommitLogEntryModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel, [item.skill_id])]
 
 
-class SkillSummaryModelValidator(base_validators.BaseSummaryModelValidator):
+class SkillSummaryModelValidator(
+        base_model_validators.BaseSummaryModelValidator):
     """Class for validating SkillSummaryModel."""
 
     @classmethod
@@ -2702,7 +2661,7 @@ class SkillSummaryModelValidator(base_validators.BaseSummaryModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel, [item.id])]
 
     @classmethod
@@ -2714,7 +2673,7 @@ class SkillSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. SkillSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -2734,7 +2693,8 @@ class SkillSummaryModelValidator(base_validators.BaseSummaryModelValidator):
                 model_class = skill_model_reference.model_class
                 model_id = skill_model_reference.model_id
                 cls._add_error(
-                    'skill_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'skill_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field skill_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -2757,7 +2717,7 @@ class SkillSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. SkillSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -2777,7 +2737,8 @@ class SkillSummaryModelValidator(base_validators.BaseSummaryModelValidator):
                 model_class = skill_model_reference.model_class
                 model_id = skill_model_reference.model_id
                 cls._add_error(
-                    'skill_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'skill_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field skill_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -2815,7 +2776,7 @@ class SkillSummaryModelValidator(base_validators.BaseSummaryModelValidator):
             cls._validate_worked_examples_count]
 
 
-class StoryModelValidator(base_validators.BaseModelValidator):
+class StoryModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating StoryModel."""
 
     @classmethod
@@ -2828,24 +2789,24 @@ class StoryModelValidator(base_validators.BaseModelValidator):
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'story_commit_log_entry_ids',
                 story_models.StoryCommitLogEntryModel,
                 ['story-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'story_summary_ids',
                 story_models.StorySummaryModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 story_models.StorySnapshotMetadataModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 story_models.StorySnapshotContentModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel,
                 [node['exploration_id'] for node in (
@@ -2853,7 +2814,7 @@ class StoryModelValidator(base_validators.BaseModelValidator):
 
 
 class StorySnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating StorySnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'story'
@@ -2865,16 +2826,16 @@ class StorySnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'story_ids', story_models.StoryModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
 
 
 class StorySnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating StorySnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'story'
@@ -2882,13 +2843,13 @@ class StorySnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'story_ids', story_models.StoryModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class StoryCommitLogEntryModelValidator(
-        base_validators.BaseCommitLogEntryModelValidator):
+        base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating StoryCommitLogEntryModel."""
 
     EXTERNAL_MODEL_NAME = 'story'
@@ -2907,7 +2868,7 @@ class StoryCommitLogEntryModelValidator(
             return story_domain.StoryChange
         else:
             cls._add_error(
-                'model %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -2915,12 +2876,13 @@ class StoryCommitLogEntryModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'story_ids', story_models.StoryModel, [item.story_id]),
         ]
 
 
-class StorySummaryModelValidator(base_validators.BaseSummaryModelValidator):
+class StorySummaryModelValidator(
+        base_model_validators.BaseSummaryModelValidator):
     """Class for validating StorySummaryModel."""
 
     @classmethod
@@ -2930,7 +2892,7 @@ class StorySummaryModelValidator(base_validators.BaseSummaryModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'story_ids', story_models.StoryModel, [item.id])]
 
     @classmethod
@@ -2942,7 +2904,7 @@ class StorySummaryModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. StorySummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -2962,7 +2924,8 @@ class StorySummaryModelValidator(base_validators.BaseSummaryModelValidator):
                 model_class = story_model_reference.model_class
                 model_id = story_model_reference.model_id
                 cls._add_error(
-                    'story_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'story_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -2998,7 +2961,7 @@ class StorySummaryModelValidator(base_validators.BaseSummaryModelValidator):
         return [cls._validate_node_titles]
 
 
-class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
+class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating GeneralSuggestionModels."""
 
     @classmethod
@@ -3015,7 +2978,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
             return suggestion_services.get_suggestion_from_model(item)
         else:
             cls._add_error(
-                'target %s' % base_validators.ERROR_CATEGORY_TYPE_CHECK,
+                'target %s' % base_model_validators.ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Target type %s is not allowed' % (
                     item.id, item.target_type))
             return None
@@ -3023,20 +2986,20 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         field_name_to_external_model_references = [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'feedback_thread_ids',
                 feedback_models.GeneralFeedbackThreadModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'author_ids', user_models.UserSettingsModel, [item.author_id])]
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
             field_name_to_external_model_references.append(
-                base_validators.ExternalModelFetcherDetails(
+                base_model_validators.ExternalModelFetcherDetails(
                     '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
                     [item.target_id]))
         if item.final_reviewer_id:
             field_name_to_external_model_references.append(
-                base_validators.ExternalModelFetcherDetails(
+                base_model_validators.ExternalModelFetcherDetails(
                     'reviewer_ids', user_models.UserSettingsModel,
                     [item.final_reviewer_id]))
         return field_name_to_external_model_references
@@ -3050,7 +3013,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
-                'target %s' % base_validators.ERROR_CATEGORY_TYPE_CHECK,
+                'target %s' % base_model_validators.ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Target type %s is not allowed' % (
                     item.id, item.target_type))
 
@@ -3063,7 +3026,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
         Args:
             item: ndb.Model. GeneralSuggestionModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -3076,7 +3039,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
-                'target %s' % base_validators.ERROR_CATEGORY_TYPE_CHECK,
+                'target %s' % base_model_validators.ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Target type %s is not allowed' % (
                     item.id, item.target_type))
             return
@@ -3093,7 +3056,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
                 cls._add_error(
                     '%s_ids %s' % (
                         item.target_type,
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field %s_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3140,7 +3103,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
         Args:
             item: ndb.Model. GeneralSuggestionModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -3153,7 +3116,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
-                'target %s' % base_validators.ERROR_CATEGORY_TYPE_CHECK,
+                'target %s' % base_model_validators.ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Target type %s is not allowed' % (
                     item.id, item.target_type))
             return
@@ -3176,7 +3139,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
                     cls._add_error(
                         '%s_ids %s' % (
                             item.target_type,
-                            base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                            base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s_ids having'
                         ' value %s, expect model %s with id %s but it doesn\'t'
                         ' exist' % (
@@ -3186,7 +3149,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
                 if target_model.category != score_category_sub_type:
                     cls._add_error(
                         'score category sub%s' % (
-                            base_validators.ERROR_CATEGORY_TYPE_CHECK),
+                            base_model_validators.ERROR_CATEGORY_TYPE_CHECK),
                         'Entity id %s: score category sub %s does not match'
                         ' target exploration category %s' % (
                             item.id, score_category_sub_type,
@@ -3214,7 +3177,7 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
 
 
 class GeneralVoiceoverApplicationModelValidator(
-        base_validators.BaseModelValidator):
+        base_model_validators.BaseModelValidator):
     """Class for validating GeneralVoiceoverApplicationModel."""
 
     @classmethod
@@ -3232,23 +3195,23 @@ class GeneralVoiceoverApplicationModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         field_name_to_external_model_references = [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'author_ids', user_models.UserSettingsModel, [item.author_id])]
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
             field_name_to_external_model_references.append(
-                base_validators.ExternalModelFetcherDetails(
+                base_model_validators.ExternalModelFetcherDetails(
                     '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
                     [item.target_id]))
         if item.final_reviewer_id is not None:
             field_name_to_external_model_references.append(
-                base_validators.ExternalModelFetcherDetails(
+                base_model_validators.ExternalModelFetcherDetails(
                     'final_reviewer_ids', user_models.UserSettingsModel,
                     [item.final_reviewer_id]))
         return field_name_to_external_model_references
 
 
-class TopicModelValidator(base_validators.BaseModelValidator):
+class TopicModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating TopicModel."""
 
     @classmethod
@@ -3271,28 +3234,28 @@ class TopicModelValidator(base_validators.BaseModelValidator):
             reference['story_id']
             for reference in item.additional_story_references]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_commit_log_entry_ids',
                 topic_models.TopicCommitLogEntryModel,
                 ['topic-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_summary_ids', topic_models.TopicSummaryModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_rights_ids', topic_models.TopicRightsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 topic_models.TopicSnapshotMetadataModel, snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids', topic_models.TopicSnapshotContentModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'story_ids', story_models.StoryModel,
                 canonical_story_ids + additional_story_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel, skill_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_ids', topic_models.SubtopicPageModel,
                 ['%s-%s' % (
                     item.id, subtopic['id']) for subtopic in item.subtopics])]
@@ -3346,7 +3309,7 @@ class TopicModelValidator(base_validators.BaseModelValidator):
                 if skill_id in subtopic['skill_ids']:
                     cls._add_error(
                         'uncategorized skill %s' % (
-                            base_validators.ERROR_CATEGORY_ID_CHECK),
+                            base_model_validators.ERROR_CATEGORY_ID_CHECK),
                         'Entity id %s: uncategorized skill id %s is present '
                         'in subtopic for entity with id %s' % (
                             item.id, skill_id, subtopic['id']))
@@ -3360,7 +3323,7 @@ class TopicModelValidator(base_validators.BaseModelValidator):
 
 
 class TopicSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating TopicSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'topic'
@@ -3372,16 +3335,16 @@ class TopicSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
 
 
 class TopicSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating TopicSnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'topic'
@@ -3389,12 +3352,12 @@ class TopicSnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
-class TopicRightsModelValidator(base_validators.BaseModelValidator):
+class TopicRightsModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating TopicRightsModel."""
 
     @classmethod
@@ -3403,23 +3366,23 @@ class TopicRightsModelValidator(base_validators.BaseModelValidator):
             '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'manager_user_ids', user_models.UserSettingsModel,
                 item.manager_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 topic_models.TopicRightsSnapshotMetadataModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 topic_models.TopicRightsSnapshotContentModel,
                 snapshot_model_ids)]
 
 
 class TopicRightsSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating TopicRightsSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'topic rights'
@@ -3431,16 +3394,16 @@ class TopicRightsSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_rights_ids', topic_models.TopicRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
 
 
 class TopicRightsSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating TopicRightsSnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'topic rights'
@@ -3448,13 +3411,13 @@ class TopicRightsSnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_rights_ids', topic_models.TopicRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class TopicCommitLogEntryModelValidator(
-        base_validators.BaseCommitLogEntryModelValidator):
+        base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating TopicCommitLogEntryModel."""
 
     EXTERNAL_MODEL_NAME = 'topic'
@@ -3475,7 +3438,7 @@ class TopicCommitLogEntryModelValidator(
             return topic_domain.TopicChange
         else:
             cls._add_error(
-                'model %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -3483,17 +3446,18 @@ class TopicCommitLogEntryModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         external_id_relationships = [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel, [item.topic_id])]
         if item.id.startswith('rights'):
             external_id_relationships.append(
-                base_validators.ExternalModelFetcherDetails(
+                base_model_validators.ExternalModelFetcherDetails(
                     'topic_rights_ids', topic_models.TopicRightsModel,
                     [item.topic_id]))
         return external_id_relationships
 
 
-class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
+class TopicSummaryModelValidator(
+        base_model_validators.BaseSummaryModelValidator):
     """Class for validating TopicSummaryModel."""
 
     @classmethod
@@ -3503,9 +3467,9 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_rights_ids', topic_models.TopicRightsModel, [item.id])]
 
     @classmethod
@@ -3517,7 +3481,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -3537,7 +3501,8 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
                 model_class = topic_model_reference.model_class
                 model_id = topic_model_reference.model_id
                 cls._add_error(
-                    'topic_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'topic_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3565,7 +3530,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -3585,7 +3550,8 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
                 model_class = topic_model_reference.model_class
                 model_id = topic_model_reference.model_id
                 cls._add_error(
-                    'topic_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'topic_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3615,7 +3581,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -3635,7 +3601,8 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
                 model_class = topic_model_reference.model_class
                 model_id = topic_model_reference.model_id
                 cls._add_error(
-                    'topic_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'topic_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3661,7 +3628,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -3681,7 +3648,8 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
                 model_class = topic_model_reference.model_class
                 model_id = topic_model_reference.model_id
                 cls._add_error(
-                    'topic_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'topic_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3711,7 +3679,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -3731,7 +3699,8 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
                 model_class = topic_model_reference.model_class
                 model_id = topic_model_reference.model_id
                 cls._add_error(
-                    'topic_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'topic_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field topic_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -3771,7 +3740,7 @@ class TopicSummaryModelValidator(base_validators.BaseSummaryModelValidator):
             cls._validate_subtopic_count]
 
 
-class SubtopicPageModelValidator(base_validators.BaseModelValidator):
+class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SubtopicPageModel."""
 
     @classmethod
@@ -3788,21 +3757,21 @@ class SubtopicPageModelValidator(base_validators.BaseModelValidator):
             '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_commit_log_entry_ids',
                 topic_models.SubtopicPageCommitLogEntryModel,
                 ['subtopicpage-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 topic_models.SubtopicPageSnapshotMetadataModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 topic_models.SubtopicPageSnapshotContentModel,
                 snapshot_model_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel, [item.topic_id])]
 
     @classmethod
@@ -3811,7 +3780,7 @@ class SubtopicPageModelValidator(base_validators.BaseModelValidator):
 
 
 class SubtopicPageSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating SubtopicPageSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'subtopic page'
@@ -3827,16 +3796,16 @@ class SubtopicPageSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_ids', topic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
 
 
 class SubtopicPageSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating SubtopicPageSnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'subtopic page'
@@ -3848,13 +3817,13 @@ class SubtopicPageSnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_ids', topic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
 class SubtopicPageCommitLogEntryModelValidator(
-        base_validators.BaseCommitLogEntryModelValidator):
+        base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating SubtopicPageCommitLogEntryModel."""
 
     EXTERNAL_MODEL_NAME = 'subtopic page'
@@ -3873,7 +3842,7 @@ class SubtopicPageCommitLogEntryModelValidator(
             return subtopic_page_domain.SubtopicPageChange
         else:
             cls._add_error(
-                'model %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: Entity id does not match regex pattern' % (
                     item.id))
             return None
@@ -3881,12 +3850,12 @@ class SubtopicPageCommitLogEntryModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_ids', topic_models.SubtopicPageModel,
                 [item.subtopic_page_id])]
 
 
-class UserSettingsModelValidator(base_validators.BaseUserModelValidator):
+class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):
     """Class for validating UserSettingsModels."""
 
     @classmethod
@@ -3896,7 +3865,7 @@ class UserSettingsModelValidator(base_validators.BaseUserModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_contributions_ids', user_models.UserContributionsModel,
                 [item.id])]
 
@@ -3941,18 +3910,19 @@ class UserSettingsModelValidator(base_validators.BaseUserModelValidator):
         return [cls._validate_time_fields_of_user_actions]
 
 
-class CompletedActivitiesModelValidator(base_validators.BaseUserModelValidator):
+class CompletedActivitiesModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating CompletedActivitiesModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 item.exploration_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
                 item.collection_ids)]
 
@@ -3986,18 +3956,18 @@ class CompletedActivitiesModelValidator(base_validators.BaseUserModelValidator):
 
 
 class IncompleteActivitiesModelValidator(
-        base_validators.BaseUserModelValidator):
+        base_model_validators.BaseUserModelValidator):
     """Class for validating IncompleteActivitiesModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 item.exploration_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
                 item.collection_ids)]
 
@@ -4031,7 +4001,7 @@ class IncompleteActivitiesModelValidator(
 
 
 class ExpUserLastPlaythroughModelValidator(
-        base_validators.BaseUserModelValidator):
+        base_model_validators.BaseUserModelValidator):
     """Class for validating ExpUserLastPlaythroughModels."""
 
     @classmethod
@@ -4041,10 +4011,10 @@ class ExpUserLastPlaythroughModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel,
                 [item.user_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 [item.exploration_id])]
 
@@ -4060,7 +4030,8 @@ class ExpUserLastPlaythroughModelValidator(
                 learner_progress_services.get_all_incomplete_exp_ids(
                     item.user_id)):
             cls._add_error(
-                'incomplete exp %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'incomplete exp %s' % (
+                    base_model_validators.ERROR_CATEGORY_ID_CHECK),
                 'Entity id %s: Exploration id %s for entity is not marked '
                 'as incomplete' % (item.id, item.exploration_id))
 
@@ -4073,7 +4044,7 @@ class ExpUserLastPlaythroughModelValidator(
         Args:
             item: ndb.Model. ExpUserLastPlaythroughModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -4094,7 +4065,7 @@ class ExpUserLastPlaythroughModelValidator(
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4102,7 +4073,7 @@ class ExpUserLastPlaythroughModelValidator(
                 continue
             if item.last_played_exp_version > exploration_model.version:
                 cls._add_error(
-                    base_validators.ERROR_CATEGORY_VERSION_CHECK,
+                    base_model_validators.ERROR_CATEGORY_VERSION_CHECK,
                     'Entity id %s: last played exp version %s is greater than '
                     'current version %s of exploration with id %s' % (
                         item.id, item.last_played_exp_version,
@@ -4117,7 +4088,7 @@ class ExpUserLastPlaythroughModelValidator(
         Args:
             item: ndb.Model. ExpUserLastPlaythroughModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -4138,7 +4109,7 @@ class ExpUserLastPlaythroughModelValidator(
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4167,18 +4138,19 @@ class ExpUserLastPlaythroughModelValidator(
         ]
 
 
-class LearnerPlaylistModelValidator(base_validators.BaseUserModelValidator):
+class LearnerPlaylistModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating LearnerPlaylistModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 item.exploration_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
                 item.collection_ids)]
 
@@ -4223,7 +4195,8 @@ class LearnerPlaylistModelValidator(base_validators.BaseUserModelValidator):
         ]
 
 
-class UserContributionsModelValidator(base_validators.BaseUserModelValidator):
+class UserContributionsModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating UserContributionsModels."""
 
     @classmethod
@@ -4233,48 +4206,49 @@ class UserContributionsModelValidator(base_validators.BaseUserModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'created_exploration_ids', exp_models.ExplorationModel,
                 item.created_exploration_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'edited_exploration_ids', exp_models.ExplorationModel,
                 item.edited_exploration_ids)]
 
 
 class UserEmailPreferencesModelValidator(
-        base_validators.BaseUserModelValidator):
+        base_model_validators.BaseUserModelValidator):
     """Class for validating UserEmailPreferencesModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
 
-class UserSubscriptionsModelValidator(base_validators.BaseUserModelValidator):
+class UserSubscriptionsModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating UserSubscriptionsModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'activity_ids', exp_models.ExplorationModel, item.activity_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
                 item.collection_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'general_feedback_thread_ids',
                 feedback_models.GeneralFeedbackThreadModel,
                 item.general_feedback_thread_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'creator_ids', user_models.UserSettingsModel, item.creator_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'subscriber_ids', user_models.UserSubscribersModel,
                 item.creator_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'id', user_models.UserSettingsModel, [item.id])]
 
     @classmethod
@@ -4302,7 +4276,7 @@ class UserSubscriptionsModelValidator(base_validators.BaseUserModelValidator):
         Args:
             item: ndb.Model. UserSubscriptionsModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -4323,7 +4297,7 @@ class UserSubscriptionsModelValidator(base_validators.BaseUserModelValidator):
                 model_id = subscriber_model_reference.model_id
                 cls._add_error(
                     'subscriber_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field subscriber_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4331,7 +4305,8 @@ class UserSubscriptionsModelValidator(base_validators.BaseUserModelValidator):
                 continue
             if item.id not in subscriber_model.subscriber_ids:
                 cls._add_error(
-                    'subscriber %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                    'subscriber %s' % (
+                        base_model_validators.ERROR_CATEGORY_ID_CHECK),
                     'Entity id %s: User id is not present in subscriber ids of '
                     'creator with id %s to whom the user has subscribed' % (
                         item.id, subscriber_model.id))
@@ -4345,18 +4320,19 @@ class UserSubscriptionsModelValidator(base_validators.BaseUserModelValidator):
         return [cls._validate_user_id_in_subscriber_ids]
 
 
-class UserSubscribersModelValidator(base_validators.BaseUserModelValidator):
+class UserSubscribersModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating UserSubscribersModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'subscriber_ids', user_models.UserSettingsModel,
                 item.subscriber_ids),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'subscription_ids', user_models.UserSubscriptionsModel,
                 item.subscriber_ids)]
 
@@ -4370,7 +4346,7 @@ class UserSubscribersModelValidator(base_validators.BaseUserModelValidator):
         """
         if item.id in item.subscriber_ids:
             cls._add_error(
-                'subscriber %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'subscriber %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
                 'Entity id %s: User id is present in subscriber ids '
                 'for user' % item.id)
 
@@ -4384,7 +4360,7 @@ class UserSubscribersModelValidator(base_validators.BaseUserModelValidator):
         Args:
             item: ndb.Model. UserSubscribersModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -4405,7 +4381,7 @@ class UserSubscribersModelValidator(base_validators.BaseUserModelValidator):
                 model_id = subscription_model_reference.model_id
                 cls._add_error(
                     'subscription_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field subscription_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4414,7 +4390,7 @@ class UserSubscribersModelValidator(base_validators.BaseUserModelValidator):
             if item.id not in subscription_model.creator_ids:
                 cls._add_error(
                     'subscription creator %s' % (
-                        base_validators.ERROR_CATEGORY_ID_CHECK),
+                        base_model_validators.ERROR_CATEGORY_ID_CHECK),
                     'Entity id %s: User id is not present in creator ids to '
                     'which the subscriber of user with id %s has subscribed' % (
                         item.id, subscription_model.id))
@@ -4429,13 +4405,13 @@ class UserSubscribersModelValidator(base_validators.BaseUserModelValidator):
 
 
 class UserRecentChangesBatchModelValidator(
-        base_validators.BaseUserModelValidator):
+        base_model_validators.BaseUserModelValidator):
     """Class for validating UserRecentChangesBatchModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
     @classmethod
@@ -4459,13 +4435,13 @@ class UserRecentChangesBatchModelValidator(
         return [cls._validate_job_queued_msec]
 
 
-class UserStatsModelValidator(base_validators.BaseUserModelValidator):
+class UserStatsModelValidator(base_model_validators.BaseUserModelValidator):
     """Class for validating UserStatsModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
     @classmethod
@@ -4477,7 +4453,8 @@ class UserStatsModelValidator(base_validators.BaseUserModelValidator):
         """
         if item.schema_version > feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
             cls._add_error(
-                'schema %s' % base_validators.ERROR_CATEGORY_VERSION_CHECK,
+                'schema %s' % (
+                    base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
                 'Entity id %s: schema version %s is greater than '
                 'current version %s' % (
                     item.id, item.schema_version,
@@ -4520,7 +4497,8 @@ class UserStatsModelValidator(base_validators.BaseUserModelValidator):
             cls._validate_weekly_creator_stats_list]
 
 
-class ExplorationUserDataModelValidator(base_validators.BaseUserModelValidator):
+class ExplorationUserDataModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating ExplorationUserDataModels."""
 
     @classmethod
@@ -4530,10 +4508,10 @@ class ExplorationUserDataModelValidator(base_validators.BaseUserModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel,
                 [item.user_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 [item.exploration_id])]
 
@@ -4621,7 +4599,7 @@ class ExplorationUserDataModelValidator(base_validators.BaseUserModelValidator):
         Args:
             item: ndb.Model. ExplorationUserDataModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -4642,7 +4620,7 @@ class ExplorationUserDataModelValidator(base_validators.BaseUserModelValidator):
                 model_id = exploration_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4650,7 +4628,8 @@ class ExplorationUserDataModelValidator(base_validators.BaseUserModelValidator):
                 continue
             if item.draft_change_list_exp_version > exploration_model.version:
                 cls._add_error(
-                    'exp %s' % base_validators.ERROR_CATEGORY_VERSION_CHECK,
+                    'exp %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
                     'Entity id %s: draft change list exp version %s is '
                     'greater than version %s of corresponding exploration '
                     'with id %s' % (
@@ -4670,7 +4649,8 @@ class ExplorationUserDataModelValidator(base_validators.BaseUserModelValidator):
         return [cls._validate_exp_version]
 
 
-class CollectionProgressModelValidator(base_validators.BaseUserModelValidator):
+class CollectionProgressModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating CollectionProgressModels."""
 
     @classmethod
@@ -4680,16 +4660,16 @@ class CollectionProgressModelValidator(base_validators.BaseUserModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel,
                 [item.user_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
                 [item.collection_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel,
                 item.completed_explorations),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'completed_activities_ids',
                 user_models.CompletedActivitiesModel, [item.user_id])]
 
@@ -4703,7 +4683,7 @@ class CollectionProgressModelValidator(base_validators.BaseUserModelValidator):
         Args:
             item: ndb.Model. CollectionProgressModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -4728,7 +4708,7 @@ class CollectionProgressModelValidator(base_validators.BaseUserModelValidator):
                 model_id = completed_activities_model_reference.model_id
                 cls._add_error(
                     'completed_activities_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field completed_activities_ids '
                     'having value %s, expect model %s with id %s but it '
                     'doesn\'t exist' % (
@@ -4755,7 +4735,7 @@ class CollectionProgressModelValidator(base_validators.BaseUserModelValidator):
                 model_id = collection_model_reference.model_id
                 cls._add_error(
                     'collection_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field collection_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4785,7 +4765,7 @@ class CollectionProgressModelValidator(base_validators.BaseUserModelValidator):
         ]
 
 
-class StoryProgressModelValidator(base_validators.BaseUserModelValidator):
+class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
     """Class for validating StoryProgressModels."""
 
     @classmethod
@@ -4795,10 +4775,10 @@ class StoryProgressModelValidator(base_validators.BaseUserModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel,
                 [item.user_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'story_ids', story_models.StoryModel, [item.story_id])]
 
     @classmethod
@@ -4809,7 +4789,7 @@ class StoryProgressModelValidator(base_validators.BaseUserModelValidator):
         Args:
             item: ndb.Model. StoryProgressModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -4829,7 +4809,8 @@ class StoryProgressModelValidator(base_validators.BaseUserModelValidator):
                 model_class = story_model_reference.model_class
                 model_id = story_model_reference.model_id
                 cls._add_error(
-                    'story_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'story_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4859,7 +4840,7 @@ class StoryProgressModelValidator(base_validators.BaseUserModelValidator):
         Args:
             item: ndb.Model. StoryProgressModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -4881,7 +4862,8 @@ class StoryProgressModelValidator(base_validators.BaseUserModelValidator):
                 model_class = story_model_reference.model_class
                 model_id = story_model_reference.model_id
                 cls._add_error(
-                    'story_ids %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'story_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -4950,7 +4932,7 @@ class StoryProgressModelValidator(base_validators.BaseUserModelValidator):
             cls._validate_completed_nodes]
 
 
-class UserQueryModelValidator(base_validators.BaseUserModelValidator):
+class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
     """Class for validating UserQueryModels."""
 
     @classmethod
@@ -4960,10 +4942,10 @@ class UserQueryModelValidator(base_validators.BaseUserModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, (
                     item.user_ids + [item.submitter_id])),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'sent_email_model_ids', email_models.BulkEmailModel,
                 [item.sent_email_model_id])]
 
@@ -4981,7 +4963,7 @@ class UserQueryModelValidator(base_validators.BaseUserModelValidator):
         Args:
             item: ndb.Model. UserQueryModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -5002,7 +4984,7 @@ class UserQueryModelValidator(base_validators.BaseUserModelValidator):
                 model_id = email_model_reference.model_id
                 cls._add_error(
                     'sent_email_model_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field sent_email_model_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -5049,15 +5031,16 @@ class UserQueryModelValidator(base_validators.BaseUserModelValidator):
         return [cls._validate_sender_and_recipient_ids]
 
 
-class UserBulkEmailsModelValidator(base_validators.BaseUserModelValidator):
+class UserBulkEmailsModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating UserBulkEmailsModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'sent_email_model_ids', email_models.BulkEmailModel,
                 item.sent_email_model_ids)]
 
@@ -5070,7 +5053,7 @@ class UserBulkEmailsModelValidator(base_validators.BaseUserModelValidator):
         Args:
             item: ndb.Model. UserBulkEmailsModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -5091,7 +5074,7 @@ class UserBulkEmailsModelValidator(base_validators.BaseUserModelValidator):
                 model_id = email_model_reference.model_id
                 cls._add_error(
                     'sent_email_model_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field sent_email_model_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -5108,7 +5091,8 @@ class UserBulkEmailsModelValidator(base_validators.BaseUserModelValidator):
         return [cls._validate_user_id_in_recipient_id_for_emails]
 
 
-class UserSkillMasteryModelValidator(base_validators.BaseUserModelValidator):
+class UserSkillMasteryModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating UserSkillMasteryModels."""
 
     @classmethod
@@ -5118,10 +5102,10 @@ class UserSkillMasteryModelValidator(base_validators.BaseUserModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel,
                 [item.user_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel, [item.skill_id])]
 
     @classmethod
@@ -5145,7 +5129,7 @@ class UserSkillMasteryModelValidator(base_validators.BaseUserModelValidator):
 
 
 class UserContributionScoringModelValidator(
-        base_validators.BaseUserModelValidator):
+        base_model_validators.BaseUserModelValidator):
     """Class for validating UserContributionScoringModels."""
 
     @classmethod
@@ -5155,7 +5139,7 @@ class UserContributionScoringModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel,
                 [item.user_id])]
 
@@ -5178,7 +5162,7 @@ class UserContributionScoringModelValidator(
 
 
 class UserContributionRightsModelValidator(
-        base_validators.BaseUserModelValidator):
+        base_model_validators.BaseUserModelValidator):
     """Class for validating UserContributionRightsModel."""
 
     @classmethod
@@ -5191,13 +5175,13 @@ class UserContributionRightsModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel,
                 [item.id])]
 
 
 class PendingDeletionRequestModelValidator(
-        base_validators.BaseUserModelValidator):
+        base_model_validators.BaseUserModelValidator):
     """Class for validating PendingDeletionRequestModels."""
 
     @classmethod
@@ -5290,7 +5274,7 @@ class PendingDeletionRequestModelValidator(
             cls._validate_activity_mapping_contains_only_allowed_keys]
 
 
-class TaskEntryModelValidator(base_validators.BaseModelValidator):
+class TaskEntryModelValidator(base_model_validators.BaseModelValidator):
     """One off job for auditing task entries."""
 
     # The name of the model which is to be used in the error messages.
@@ -5305,10 +5289,10 @@ class TaskEntryModelValidator(base_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'resolver_ids', user_models.UserSettingsModel,
                 [item.resolver_id] if item.resolver_id is not None else []),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'entity_ids', exp_models.ExplorationModel, [item.entity_id])]
 
     @classmethod
@@ -5325,7 +5309,7 @@ class TaskEntryModelValidator(base_validators.BaseModelValidator):
         if item.composite_entity_id != expected_composite_entity_id:
             cls._add_error(
                 'composite_entity_id %s' % (
-                    base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                 'Entity id %s: composite_entity_id "%s" should be "%s"' % (
                     item.id,
                     item.composite_entity_id,
@@ -5342,23 +5326,27 @@ class TaskEntryModelValidator(base_validators.BaseModelValidator):
         if item.status == improvements_models.TASK_STATUS_OPEN:
             if item.resolver_id:
                 cls._add_error(
-                    'status %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'status %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: status is open but resolver_id is "%s", '
                     'should be empty.' % (item.id, item.resolver_id))
             if item.resolved_on:
                 cls._add_error(
-                    'status %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'status %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: status is open but resolved_on is "%s", '
                     'should be empty.' % (item.id, item.resolved_on))
         elif item.status == improvements_models.TASK_STATUS_RESOLVED:
             if item.resolver_id is None:
                 cls._add_error(
-                    'status %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'status %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: status is resolved but resolver_id is not '
                     'set' % (item.id,))
             if item.resolved_on is None:
                 cls._add_error(
-                    'status %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                    'status %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: status is resolved but resolved_on is not '
                     'set' % (item.id,))
 
@@ -5376,13 +5364,15 @@ class TaskEntryModelValidator(base_validators.BaseModelValidator):
                 item.entity_id, strict=True, version=item.entity_version)
         except Exception:
             cls._add_error(
-                'target_id %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                'target_id %s' % (
+                    base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                 'Entity id %s: exploration with id "%s" does not exist at '
                 'version %d' % (item.id, item.entity_id, item.entity_version))
             return
         if item.target_id not in exp_model.states.keys():
             cls._add_error(
-                'target_id %s' % base_validators.ERROR_CATEGORY_FIELD_CHECK,
+                'target_id %s' % (
+                    base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                 'Entity id %s: exploration with id "%s" does not have a state '
                 'named "%s" at version %d' % (
                     item.id, item.entity_id, item.target_id,
@@ -5397,7 +5387,7 @@ class TaskEntryModelValidator(base_validators.BaseModelValidator):
         ]
 
 
-class PlaythroughModelValidator(base_validators.BaseModelValidator):
+class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating PlaythroughModel."""
 
     # The playthrough design was finalized at the end of GSOC 2018: 2018-09-01.
@@ -5413,9 +5403,9 @@ class PlaythroughModelValidator(base_validators.BaseModelValidator):
         )
 
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exp_ids', exp_models.ExplorationModel, [item.exp_id]),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'exp_issues_ids', stats_models.ExplorationIssuesModel,
                 [exp_issues_id])]
 
@@ -5441,7 +5431,8 @@ class PlaythroughModelValidator(base_validators.BaseModelValidator):
 
         if item.exp_id not in whitelisted_exp_ids_for_playthroughs:
             cls._add_error(
-                'exploration %s' % base_validators.ERROR_CATEGORY_ID_CHECK,
+                'exploration %s' % (
+                    base_model_validators.ERROR_CATEGORY_ID_CHECK),
                 'Entity id %s: recorded in exploration_id:%s which '
                 'has not been curated for recording.' % (
                     item.id, item.exp_id)
@@ -5454,7 +5445,7 @@ class PlaythroughModelValidator(base_validators.BaseModelValidator):
         Args:
             item: ndb.Model. PlaythroughModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(base_validators.ExternalModelReference))).
+                dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -5476,7 +5467,7 @@ class PlaythroughModelValidator(base_validators.BaseModelValidator):
                 model_id = exp_issues_model_reference.model_id
                 cls._add_error(
                     'exp_issues_ids %s' % (
-                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exp_issues_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -5564,7 +5555,8 @@ class PlaythroughModelValidator(base_validators.BaseModelValidator):
         return [cls._validate_reference]
 
 
-class PseudonymizedUserModelValidator(base_validators.BaseUserModelValidator):
+class PseudonymizedUserModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating PseudonymizedUserModels."""
 
     @classmethod
@@ -5593,17 +5585,18 @@ class PseudonymizedUserModelValidator(base_validators.BaseUserModelValidator):
         return [cls._validate_user_settings_with_same_id_not_exist]
 
 
-class UserAuthDetailsModelValidator(base_validators.BaseUserModelValidator):
+class UserAuthDetailsModelValidator(
+        base_model_validators.BaseUserModelValidator):
     """Class for validating UserAuthDetailsModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
 
-class PlatformParameterModelValidator(base_validators.BaseModelValidator):
+class PlatformParameterModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating PlatformParameterModel."""
 
     @classmethod
@@ -5616,12 +5609,12 @@ class PlatformParameterModelValidator(base_validators.BaseModelValidator):
             '%s-%d' % (item.id, version)
             for version in python_utils.RANGE(1, item.version + 1)]
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 config_models.PlatformParameterSnapshotMetadataModel,
                 snapshot_model_ids
             ),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 config_models.PlatformParameterSnapshotContentModel,
                 snapshot_model_ids
@@ -5630,7 +5623,7 @@ class PlatformParameterModelValidator(base_validators.BaseModelValidator):
 
 
 class PlatformParameterSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating PlatformParameterSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'platform parameter'
@@ -5646,12 +5639,12 @@ class PlatformParameterSnapshotMetadataModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'platform_parameter_ids',
                 config_models.PlatformParameterModel,
                 [item.id[:item.id.find('-')]]
             ),
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel,
                 [item.committer_id]
@@ -5660,7 +5653,7 @@ class PlatformParameterSnapshotMetadataModelValidator(
 
 
 class PlatformParameterSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating PlatformParameterSnapshotContentModel."""
 
     EXTERNAL_MODEL_NAME = 'platform parameter'
@@ -5672,7 +5665,7 @@ class PlatformParameterSnapshotContentModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'platform_parameter_ids',
                 config_models.PlatformParameterModel,
                 [item.id[:item.id.find('-')]]
