@@ -1,8 +1,7 @@
 {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "sourceType": "module",
-    "project": "./tsconfig.json"
+    "sourceType": "module"
   },
   "extends": [
     "eslint:recommended"
@@ -278,8 +277,6 @@
     "@typescript-eslint/no-extra-non-null-assertion": ["error"],
     "@typescript-eslint/no-misused-new": ["error"],
     "@typescript-eslint/explicit-module-boundary-types": ["error"],
-    "@typescript-eslint/no-for-in-array": ["error"],
-    "@typescript-eslint/no-misused-promises": ["error"],
     "wrap-iife": [
       "error",
       "any"
