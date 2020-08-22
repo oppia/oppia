@@ -438,10 +438,10 @@ def _get_task_output(lint_messages, failed, task):
     Returns:
         bool. The boolean to check if the lint checks fail or not.
     """
-    if task.output:
-        for output in task.output:
-            lint_messages += output.messages
-            if output.failed:
+    if task.task_results:
+        for task_result in task.task_results:
+            lint_messages += task_result.messages
+            if task_result.failed:
                 failed = True
     return failed
 

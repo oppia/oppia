@@ -25,10 +25,10 @@ import time
 import traceback
 import python_utils
 
-from scripts.linters import linter_utils
-
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
+SUCCESS_MESSAGE_PREFIX = 'SUCCESS '
+FAILED_MESSAGE_PREFIX = 'FAILED '
 
 
 def log(message, show_time=False):
@@ -45,14 +45,15 @@ def log(message, show_time=False):
 
 
 class TaskResult(python_utils.OBJECT):
-    """Output stream for concurrent_task_utils."""
+    """Task result for concurrent_task_utils."""
 
     def __init__(self, name, failed, error_messages, full_messages):
         """Constructs a TaskResult object.
 
         Args:
             name: str. Name of the check running.
-            failed: bool. Status of the check currently running.
+            failed: bool. The boolean value representing whether the task
+                failed.
             error_messages: list(str). List of error messages that are stripped
                 to keep main part of messages.
             full_messages: list(str). List of full messages returned by the
@@ -74,15 +75,14 @@ class TaskResult(python_utils.OBJECT):
         if self.name:
             failed_message = (
                 '%s %s check %s' % (
-                    (linter_utils.FAILED_MESSAGE_PREFIX, self.name, 'failed')
+                    (FAILED_MESSAGE_PREFIX, self.name, 'failed')
                     if self.failed else (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX,
-                        self.name, 'passed')))
+                        SUCCESS_MESSAGE_PREFIX, self.name, 'passed')))
             self.full_messages.append(failed_message)
         return self.full_messages
 
     @property
-    def get_task_report(self):
+    def task_report(self):
         """Returns all_messages as a string separated by newlines.
 
         Returns:
@@ -97,7 +97,7 @@ class TaskThread(threading.Thread):
     def __init__(self, func, verbose, semaphore, name):
         super(TaskThread, self).__init__()
         self.func = func
-        self.output = None
+        self.task_results = None
         self.exception = None
         self.stacktrace = None
         self.verbose = verbose
@@ -107,22 +107,22 @@ class TaskThread(threading.Thread):
 
     def run(self):
         try:
-            self.output = self.func()
+            self.task_results = self.func()
             if self.verbose:
-                for stdout in self.output:
+                for task_result in self.task_results:
                     # The following section will print the output of the lint
                     # checks.
-                    if stdout.name:
+                    if task_result.name:
                         log(
-                            'Printing %s check\'s status' % stdout.name,
+                            'Report from %s check' % task_result.name,
                             show_time=True)
                         log('----------------------------------------')
-                        log(stdout.get_task_report)
+                        log(task_result.task_report)
                     # The following section will print the output of backend
                     # tests.
                     else:
                         log('LOG %s:' % self.name, show_time=True)
-                        log(stdout.all_messages)
+                        log(task_result.all_messages)
                         log('----------------------------------------')
             log(
                 'FINISHED %s: %.1f secs' % (
