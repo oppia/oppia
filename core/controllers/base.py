@@ -652,6 +652,6 @@ class OppiaMLVMHandler(BaseHandler):
 
         Raises:
             NotImplementedError. The derived child classes must implement the
-            necessary logic as described above.
+                necessary logic as described above.
         """
         raise NotImplementedError

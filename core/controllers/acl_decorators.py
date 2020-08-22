@@ -2865,7 +2865,8 @@ def is_from_oppia_ml(handler):
         request is from a valid VM instance.
     """
     def test_request_originates_from_valid_oppia_ml_instance(self, **kwargs):
-        """Checks if the incoming request is from a valid Oppia-ML VM instance.
+        """Checks if the incoming request is from a valid Oppia-ML VM
+        instance.
 
         Args:
             **kwargs: *. Keyword arguments.
@@ -2875,7 +2876,7 @@ def is_from_oppia_ml(handler):
 
         Raises:
             UnauthorizedUserException. If incoming request is not from a valid
-            Oppia-ML VM instance.
+                Oppia-ML VM instance.
         """
         message, vm_id, signature = (
             self.extract_request_message_vm_id_and_signature())
