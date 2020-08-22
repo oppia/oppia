@@ -52,6 +52,7 @@ var INTERACTIONS = {
   LogicProof: require('./LogicProof/protractor.js'),
   MathEquationInput: require('./MathEquationInput/protractor.js'),
   MultipleChoiceInput: require('./MultipleChoiceInput/protractor.js'),
+  NumericExpressionInput: require('./NumericExpressionInput/protractor.js'),
   NumericInput: require('./NumericInput/protractor.js'),
   NumberWithUnits: require('./NumberWithUnits/protractor.js'),
   TextInput: require('./TextInput/protractor.js'),

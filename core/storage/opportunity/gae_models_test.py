@@ -71,12 +71,6 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             opportunity_models.ExplorationOpportunitySummaryModel
             .has_reference_to_user_id('any_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            opportunity_models.ExplorationOpportunitySummaryModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
     def test_get_all_translation_opportunities(self):
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
@@ -192,12 +186,6 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertFalse(
             opportunity_models.SkillOpportunityModel
             .has_reference_to_user_id('any_id'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            opportunity_models.SkillOpportunityModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_get_skill_opportunities(self):
         results, cursor, more = (

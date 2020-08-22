@@ -39,7 +39,7 @@ def _get_voiceover_application_class(target_type):
         class. The voiceover application class for the given target type.
 
     Raises:
-        Exception: The voiceover application target type is invalid.
+        Exception. The voiceover application target type is invalid.
     """
     target_type_to_classes = (
         suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)

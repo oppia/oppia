@@ -217,6 +217,7 @@ angular.module('oppia').directive('thumbnailUploader', [
               } else {
                 ImageLocalStorageService.saveImage(
                   filename, data.newThumbnailDataUrl);
+                $scope.localStorageBgcolor = data.newBgColor;
                 ImageLocalStorageService.setThumbnailBgColor(data.newBgColor);
               }
             }, function() {

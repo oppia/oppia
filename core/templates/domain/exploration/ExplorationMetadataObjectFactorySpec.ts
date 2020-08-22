@@ -15,29 +15,18 @@
 /**
  * @fileoverview Tests for ExplorationMetadataObjectFactory.
  */
-
-import { TestBed } from '@angular/core/testing';
-
-import { ExplorationMetadataObjectFactory } from
+import { ExplorationMetadata, ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 
-
 describe('Exploration Metadata object factory', () => {
-  let sampleExplorationMetadata = null;
+  let sampleExplorationMetadata: ExplorationMetadata = null;
 
   beforeEach(() => {
-    let sampleExplorationMetadataBackendDict = {
-      collection_node_metadata_list: [{
-        id: '12',
-        objective:
+    let sampleExplorationMetadataBackendDict: ExplorationMetadata = {
+      id: '12',
+      objective:
         'learn how to count permutations accurately and systematically',
-        title: 'Protractor Test'
-      }, {
-        id: '4',
-        objective:
-        'learn how to count permutations accurately and systematically',
-        title: 'Three Balls'
-      }]
+      title: 'Protractor Test'
     };
 
 
@@ -47,17 +36,9 @@ describe('Exploration Metadata object factory', () => {
   });
 
   it('should be able to get all the values', function() {
-    expect(sampleExplorationMetadata.getMetadataList()).toEqual([{
-      id: '12',
-      objective:
-      'learn how to count permutations accurately and systematically',
-      title: 'Protractor Test'
-    }, {
-      id: '4',
-      objective:
-      'learn how to count permutations accurately and systematically',
-      title: 'Three Balls'
-    }]
-    );
+    expect(sampleExplorationMetadata.id).toEqual('12');
+    expect(sampleExplorationMetadata.objective).toEqual(
+      'learn how to count permutations accurately and systematically');
+    expect(sampleExplorationMetadata.title).toEqual('Protractor Test');
   });
 });

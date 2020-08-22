@@ -19,7 +19,6 @@
 import { TestBed } from '@angular/core/testing';
 
 import { InteractionSpecsService } from 'services/interaction-specs.service';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 describe('InteractionSpecsService', () => {
   beforeEach(() => {
@@ -122,13 +121,6 @@ describe('InteractionSpecsService', () => {
     it('should return false for MusicNotesInput', () => {
       expect(
         this.interactionSpecsService.isInteractionTrainable('MusicNotesInput')
-      ).toBeFalse();
-    });
-
-    it('should return false for MathExpressionInput', () => {
-      expect(
-        this.interactionSpecsService.isInteractionTrainable(
-          'MathExpressionInput')
       ).toBeFalse();
     });
 

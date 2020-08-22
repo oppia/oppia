@@ -21,8 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from core.domain import caching_services
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_jobs_one_off
 from core.domain import opportunity_services
@@ -36,7 +36,6 @@ from core.tests import test_utils
 import python_utils
 
 
-memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (opportunity_models, story_models, exp_models) = models.Registry.import_models(
     [models.NAMES.opportunity, models.NAMES.story, models.NAMES.exploration])
@@ -70,17 +69,19 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             self.publish_exploration(self.owner_id, exp.id)
 
         topic_1 = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'topic', 'abbrev', 'description')
+            self.topic_id_1, 'topic', 'abbrev-one', 'description')
         topic_services.save_new_topic(self.owner_id, topic_1)
 
         topic_2 = topic_domain.Topic.create_default_topic(
-            self.topic_id_2, 'topic2', 'abbrev', 'description')
+            self.topic_id_2, 'topic2', 'abbrev-two', 'description')
         topic_services.save_new_topic(self.owner_id, topic_2)
 
         story_1 = story_domain.Story.create_default_story(
-            story_id_1, title='A story', corresponding_topic_id=self.topic_id_1)
+            story_id_1, 'A story', 'description', self.topic_id_1,
+            'story-one')
         story_2 = story_domain.Story.create_default_story(
-            story_id_2, title='A story', corresponding_topic_id=self.topic_id_2)
+            story_id_2, 'A story', 'description', self.topic_id_2,
+            'story-two')
 
         story_services.save_new_story(self.owner_id, story_1)
         story_services.save_new_story(self.owner_id, story_2)
@@ -307,9 +308,8 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
     def test_regeneration_job_with_no_exp_model_for_some_topics(self):
         exp_models.ExplorationModel.get('0').delete(
             self.owner_id, 'Delete exploration', force_deletion=True)
-        exploration_memcache_key = exp_fetchers.get_exploration_memcache_key(
-            '0')
-        memcache_services.delete(exploration_memcache_key)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['0'])
 
         exp_opp_summary_model_regen_job_class = (
             opportunity_jobs_one_off

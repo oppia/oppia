@@ -106,16 +106,6 @@ class TaskEntryModel(base_models.BaseModel):
     resolved_on = ndb.DateTimeProperty(
         default=None, required=False, indexed=True)
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """Only the resolver_id field refers to a user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.resolver_id
-
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether any TaskEntryModel references the given user.
@@ -239,8 +229,8 @@ class TaskEntryModel(base_models.BaseModel):
 
         Raises:
             Exception. A task corresponding to the provided identifier values
-            (entity_type, entity_id, entity_version, task_type, target_type,
-            target_id) already exists in storage.
+                (entity_type, entity_id, entity_version, task_type, target_type,
+                target_id) already exists in storage.
         """
         task_id = cls.generate_task_id(
             entity_type, entity_id, entity_version, task_type, target_type,

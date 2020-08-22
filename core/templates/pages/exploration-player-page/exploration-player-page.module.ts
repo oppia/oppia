@@ -19,15 +19,20 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+import 'third-party-imports/ng-audio.import';
+import 'third-party-imports/ui-tree.import';
+
 angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngAudio', 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
-  'ui.validate', 'ui-leaflet'
+  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui-leaflet',
+  'ui.sortable', 'ui.tree', uiValidate
 ]);
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';

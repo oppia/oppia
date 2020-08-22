@@ -22,6 +22,8 @@ import { CollectionNodeObjectFactory } from
   'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
+import { CollectionPlaythroughObjectFactory } from
+  'domain/collection/CollectionPlaythroughObjectFactory';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionRightsObjectFactory } from
@@ -36,6 +38,8 @@ require('domain/collection/collection-update.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 
+import { Subscription } from 'rxjs';
+
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;
   var collectionObjectFactory = null;
@@ -48,6 +52,9 @@ describe('Collection editor state service', function() {
   var $rootScope = null;
   var $scope = null;
   var $q = null;
+  var testSubscriptions: Subscription;
+
+  const collectionInitializedSpy = jasmine.createSpy('collectionInitialized');
 
   // TODO(bhenning): Consider moving this to a more shareable location.
   var FakeEditableCollectionBackendApiService = function() {
@@ -61,7 +68,8 @@ describe('Collection editor state service', function() {
     var _fetchOrUpdateCollection = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
-          resolve(self.newBackendCollectionObject);
+          resolve(collectionObjectFactory.create(
+            self.newBackendCollectionObject));
         } else {
           reject();
         }
@@ -110,7 +118,8 @@ describe('Collection editor state service', function() {
       'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
     $provide.value(
       'CollectionObjectFactory', new CollectionObjectFactory(
-        new CollectionNodeObjectFactory()));
+        new CollectionNodeObjectFactory(),
+        new CollectionPlaythroughObjectFactory()));
     $provide.value(
       'CollectionRightsObjectFactory', new CollectionRightsObjectFactory());
   }));
@@ -159,7 +168,11 @@ describe('Collection editor state service', function() {
         exploration_id: '0'
       }, {
         exploration_id: '1'
-      }]
+      }],
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      }
     };
     secondBackendCollectionObject = {
       id: '5',
@@ -172,7 +185,11 @@ describe('Collection editor state service', function() {
       version: '3',
       nodes: [{
         exploration_id: '0'
-      }]
+      }],
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      }
     };
 
     var privateCollectionRightsObject = {
@@ -193,6 +210,18 @@ describe('Collection editor state service', function() {
       owner_names: ['A']
     };
   }));
+
+
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      CollectionEditorStateService.onCollectionInitialized.subscribe(
+        collectionInitializedSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
 
   it('should request to load the collection from the backend', function() {
     spyOn(
@@ -217,13 +246,10 @@ describe('Collection editor state service', function() {
 
   it('should fire an init event after loading the first collection',
     function() {
-      spyOn($rootScope, '$broadcast').and.callThrough();
-
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'collectionInitialized');
+      expect(collectionInitializedSpy).toHaveBeenCalled();
     }
   );
 
@@ -232,14 +258,11 @@ describe('Collection editor state service', function() {
     CollectionEditorStateService.loadCollection(5);
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     // Load a second collection.
     CollectionEditorStateService.loadCollection(1);
     $rootScope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'collectionReinitialized');
+    expect(collectionInitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently loading the collection', function() {
@@ -299,10 +322,10 @@ describe('Collection editor state service', function() {
 
   it('should initially return an empty collection rights', function() {
     var collectionRights = CollectionEditorStateService.getCollectionRights();
-    expect(collectionRights.getCollectionId()).toBeUndefined();
-    expect(collectionRights.canEdit()).toBeUndefined();
-    expect(collectionRights.canUnpublish()).toBeUndefined();
-    expect(collectionRights.isPrivate()).toBeUndefined();
+    expect(collectionRights.getCollectionId()).toBeNull();
+    expect(collectionRights.canEdit()).toBeNull();
+    expect(collectionRights.canUnpublish()).toBeNull();
+    expect(collectionRights.isPrivate()).toBeNull();
     expect(collectionRights.getOwnerNames()).toEqual([]);
   });
 
@@ -397,14 +420,11 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
 
-      spyOn($rootScope, '$broadcast').and.callThrough();
-
       var newCollection = collectionObjectFactory.create(
         secondBackendCollectionObject);
       CollectionEditorStateService.setCollection(newCollection);
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'collectionReinitialized');
+      expect(collectionInitializedSpy).toHaveBeenCalled();
     }
   );
 
@@ -457,12 +477,10 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.getCollection(), 'New title');
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
     CollectionEditorStateService.saveCollection('Commit message');
     $rootScope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'collectionReinitialized');
+    expect(collectionInitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently saving the collection', function() {

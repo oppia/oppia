@@ -25,8 +25,8 @@ import { NormalizeWhitespacePipe } from
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 /* eslint-enable max-len */
-import { IPencilCodeEditorAnswer } from 'interactions/answer-defs';
-import { IPencilCodeEditorRuleInputs } from 'interactions/rule-input-defs';
+import { PencilCodeEditorAnswer } from 'interactions/answer-defs';
+import { PencilCodeEditorRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -38,8 +38,8 @@ export class PencilCodeEditorRulesService {
     private cn: CodeNormalizerService) {}
 
   CodeEquals(
-      answer: IPencilCodeEditorAnswer,
-      inputs: IPencilCodeEditorRuleInputs): boolean {
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedCode =
       this.cn.getNormalizedCode(answer.code);
     var normalizedExpectedCode =
@@ -47,8 +47,8 @@ export class PencilCodeEditorRulesService {
     return normalizedCode === normalizedExpectedCode;
   }
   CodeContains(
-      answer: IPencilCodeEditorAnswer,
-      inputs: IPencilCodeEditorRuleInputs): boolean {
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedCode =
       this.cn.getNormalizedCode(answer.code);
     var normalizedSnippet =
@@ -56,8 +56,8 @@ export class PencilCodeEditorRulesService {
     return normalizedCode.indexOf(normalizedSnippet) !== -1;
   }
   CodeDoesNotContain(
-      answer: IPencilCodeEditorAnswer,
-      inputs: IPencilCodeEditorRuleInputs): boolean {
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedCode =
       this.cn.getNormalizedCode(answer.code);
     var normalizedSnippet =
@@ -65,26 +65,26 @@ export class PencilCodeEditorRulesService {
     return normalizedCode.indexOf(normalizedSnippet) === -1;
   }
   OutputEquals(
-      answer: IPencilCodeEditorAnswer,
-      inputs: IPencilCodeEditorRuleInputs): boolean {
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedOutput = this.nwp.transform(answer.output);
     var normalizedExpectedOutput =
       this.nwp.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
   OutputRoughlyEquals(
-      answer: IPencilCodeEditorAnswer,
-      inputs: IPencilCodeEditorRuleInputs): boolean {
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedOutput = this.nwpac.transform(answer.output);
     var normalizedExpectedOutput = this.nwpac.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
-  ResultsInError(answer: IPencilCodeEditorAnswer): boolean {
+  ResultsInError(answer: PencilCodeEditorAnswer): boolean {
     return !!(answer.error.trim());
   }
   ErrorContains(
-      answer: IPencilCodeEditorAnswer,
-      inputs: IPencilCodeEditorRuleInputs): boolean {
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedError = this.nwp.transform(answer.error);
     var normalizedSnippet = this.nwp.transform(inputs.x);
     return normalizedError.indexOf(normalizedSnippet) !== -1;

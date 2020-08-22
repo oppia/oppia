@@ -122,7 +122,8 @@ class TrainedClassifierHandler(base.BaseHandler):
         # signature consistent on both Oppia and Oppia-ml.
         # For more info visit: https://stackoverflow.com/q/40173295
         classifier_data = (
-            classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
+            classifier_services.
+            convert_strings_to_float_numbers_in_classifier_data(
                 message['classifier_data_with_floats_stringified']))
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))

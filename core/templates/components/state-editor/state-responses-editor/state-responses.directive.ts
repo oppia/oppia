@@ -71,6 +71,9 @@ require(
   'state-interaction-id.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -81,6 +84,11 @@ require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/generate-content-id.service.ts');
 require('services/html-escaper.service.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/external-save.service.ts');
+
+import { Subscription } from 'rxjs';
+
 
 angular.module('oppia').directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -91,6 +99,7 @@ angular.module('oppia').directive('stateResponses', [
         onResponsesInitialized: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveNextContentIdIndex: '=',
         onSaveSolicitAnswerDetails: '=',
         navigateToState: '=',
         refreshWarnings: '&',
@@ -102,39 +111,35 @@ angular.module('oppia').directive('stateResponses', [
       controller: [
         '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'AnswerGroupObjectFactory', 'ContextService',
-        'EditabilityService', 'ResponsesService',
+        'EditabilityService', 'ExternalSaveService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
-        'StateInteractionIdService', 'StateSolicitAnswerDetailsService',
-        'UrlInterpolationService', 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
+        'StateInteractionIdService', 'StateNextContentIdIndexService',
+        'StateSolicitAnswerDetailsService',
+        'UrlInterpolationService', 'WindowDimensionsService',
+        'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
             $filter, $rootScope, $scope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService,
-            EditabilityService, ResponsesService,
+            EditabilityService, ExternalSaveService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
-            StateInteractionIdService, StateSolicitAnswerDetailsService,
-            UrlInterpolationService, ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
+            StateInteractionIdService, StateNextContentIdIndexService,
+            StateSolicitAnswerDetailsService,
+            UrlInterpolationService, WindowDimensionsService,
+            ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
             SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _initializeTrainingData = function() {
             if (StateEditorService.isInQuestionMode()) {
               return;
             }
             var explorationId = ContextService.getExplorationId();
             var currentStateName = $scope.stateName;
-          };
-
-          var _getExistingFeedbackContentIds = function() {
-            var existingContentIds = [];
-            $scope.answerGroups.forEach(function(answerGroup) {
-              var contentId = answerGroup.outcome.feedback.getContentId();
-              existingContentIds.push(contentId);
-            });
-            return existingContentIds;
           };
 
           $scope.isInQuestionMode = function() {
@@ -147,7 +152,8 @@ angular.module('oppia').directive('stateResponses', [
             // This array contains the text of each of the possible answers
             // for the interaction.
             var answerChoices = [];
-            var customizationArgs = StateCustomizationArgsService.savedMemento;
+            var customizationArgs = (
+              StateCustomizationArgsService.savedMemento);
             var handledAnswersArray = [];
 
             if (interactionId === 'MultipleChoiceInput') {
@@ -156,8 +162,9 @@ angular.module('oppia').directive('stateResponses', [
               // Collect all answers which have been handled by at least one
               // answer group.
               for (var i = 0; i < answerGroups.length; i++) {
-                for (var j = 0; j < answerGroups[i].rules.length; j++) {
-                  handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
+                const rules = answerGroups[i].getRulesAsList();
+                for (var j = 0; j < rules.length; j++) {
+                  handledAnswersArray.push(rules[j].inputs.x);
                 }
               }
               for (var i = 0; i < numChoices; i++) {
@@ -188,7 +195,7 @@ angular.module('oppia').directive('stateResponses', [
                 });
 
                 answerGroups.forEach(function(answerGroup) {
-                  var rules = answerGroup.rules;
+                  var rules = answerGroup.getRulesAsList();
                   rules.forEach(function(rule) {
                     var ruleInputs = rule.inputs.x;
                     ruleInputs.forEach(function(ruleInput) {
@@ -246,7 +253,7 @@ angular.module('oppia').directive('stateResponses', [
           };
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
-            $rootScope.$broadcast('externalSave');
+            ExternalSaveService.onExternalSave.emit();
             ResponsesService.changeActiveAnswerGroupIndex(newIndex);
             $scope.activeAnswerGroupIndex = (
               ResponsesService.getActiveAnswerGroupIndex());
@@ -299,10 +306,9 @@ angular.module('oppia').directive('stateResponses', [
 
           $scope.openAddAnswerGroupModal = function() {
             AlertsService.clearWarnings();
-            $rootScope.$broadcast('externalSave');
+            ExternalSaveService.onExternalSave.emit();
             var stateName = StateEditorService.getActiveStateName();
             var addState = $scope.addState;
-            var existingContentIds = _getExistingFeedbackContentIds();
             var currentInteractionId = $scope.getCurrentInteractionId();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -313,15 +319,16 @@ angular.module('oppia').directive('stateResponses', [
               resolve: {
                 addState: () => addState,
                 currentInteractionId: () => currentInteractionId,
-                existingContentIds: () => existingContentIds,
                 stateName: () => stateName,
               },
               controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {
               // Create a new answer group.
-              $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-                [result.tmpRule], result.tmpOutcome, [],
-                result.tmpTaggedSkillMisconceptionId));
+              const newAnswerGroup = AnswerGroupObjectFactory.createNew(
+                result.tmpOutcome, [],
+                result.tmpTaggedSkillMisconceptionId);
+              newAnswerGroup.addRule(result.tmpRule);
+              $scope.answerGroups.push(newAnswerGroup);
               ResponsesService.save(
                 $scope.answerGroups, $scope.defaultOutcome,
                 function(newAnswerGroups, newDefaultOutcome) {
@@ -331,6 +338,10 @@ angular.module('oppia').directive('stateResponses', [
                 });
               $scope.changeActiveAnswerGroupIndex(
                 $scope.answerGroups.length - 1);
+
+              StateNextContentIdIndexService.saveDisplayedValue();
+              $scope.onSaveNextContentIdIndex(
+                StateNextContentIdIndexService.displayed);
 
               // After saving it, check if the modal should be reopened right
               // away.
@@ -452,10 +463,11 @@ angular.module('oppia').directive('stateResponses', [
             var outcome = answerGroup.outcome;
             var hasFeedback = outcome.hasNonemptyFeedback();
 
-            if (answerGroup.rules) {
+            if (answerGroup.ruleTypesToInputs) {
               var firstRule = $filter('convertToPlainText')(
                 $filter('parameterizeRuleDescription')(
-                  answerGroup.rules[0], interactionId, answerChoices));
+                  answerGroup.getRulesAsList()[0],
+                  interactionId, answerChoices));
               summary = 'Answer ' + firstRule;
 
               if (hasFeedback && shortenRule) {
@@ -512,78 +524,95 @@ angular.module('oppia').directive('stateResponses', [
             return outcome && (outcome.dest === activeStateName);
           };
 
+          $scope.toggleResponseCard = function() {
+            $scope.responseCardIsShown = !$scope.responseCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
               SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
             $scope.EditabilityService = EditabilityService;
+            $scope.responseCardIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.stateName = StateEditorService.getActiveStateName();
             $scope.enableSolicitAnswerDetailsFeature = (
               ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
             $scope.stateSolicitAnswerDetailsService = (
               StateSolicitAnswerDetailsService);
-            $scope.$on('initializeAnswerGroups', function(evt, data) {
-              ResponsesService.init(data);
-              $scope.answerGroups = ResponsesService.getAnswerGroups();
-              $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
+            ctrl.directiveSubscriptions.add(
+              ResponsesService.onInitializeAnswerGroups.subscribe((data) => {
+                ResponsesService.init(data);
+                $scope.answerGroups = ResponsesService.getAnswerGroups();
+                $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
-              // If the creator selects an interaction which has only one
-              // possible answer, automatically expand the default response.
-              // Otherwise, default to having no responses initially selected.
-              if ($scope.isCurrentInteractionLinear()) {
-                ResponsesService.changeActiveAnswerGroupIndex(0);
-              }
+                // If the creator selects an interaction which has only one
+                // possible answer, automatically expand the default response.
+                // Otherwise, default to having no responses initially selected.
+                if ($scope.isCurrentInteractionLinear()) {
+                  ResponsesService.changeActiveAnswerGroupIndex(0);
+                }
 
-              // Initialize training data for these answer groups.
-              _initializeTrainingData();
+                // Initialize training data for these answer groups.
+                _initializeTrainingData();
 
-              $scope.activeAnswerGroupIndex = (
-                ResponsesService.getActiveAnswerGroupIndex());
-              $rootScope.$broadcast('externalSave');
-            });
+                $scope.activeAnswerGroupIndex = (
+                  ResponsesService.getActiveAnswerGroupIndex());
+                ExternalSaveService.onExternalSave.emit();
+              })
+            );
 
             $scope.getStaticImageUrl = function(imagePath) {
               return UrlInterpolationService.getStaticImageUrl(imagePath);
             };
 
-            $scope.$on('onInteractionIdChanged', function(
-                evt, newInteractionId) {
-              $rootScope.$broadcast('externalSave');
-              ResponsesService.onInteractionIdChanged(
-                newInteractionId, function(newAnswerGroups, newDefaultOutcome) {
-                  $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
-                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
-                  $scope.refreshWarnings()();
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                (newInteractionId) => {
+                  ExternalSaveService.onExternalSave.emit();
+                  ResponsesService.onInteractionIdChanged(newInteractionId,
+                    function(newAnswerGroups, newDefaultOutcome) {
+                      $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                      $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                      $scope.refreshWarnings()();
+                      $scope.answerGroups = ResponsesService.getAnswerGroups();
+                      $scope.defaultOutcome =
+                        ResponsesService.getDefaultOutcome();
+
+                      // Reinitialize training data if the interaction ID is
+                      // changed.
+                      _initializeTrainingData();
+
+                      $scope.activeAnswerGroupIndex = (
+                        ResponsesService.getActiveAnswerGroupIndex());
+                    });
+
+                  // Prompt the user to create a new response if it is not a
+                  // linear or non-terminal interaction and if an actual
+                  // interaction is specified (versus one being deleted).
+                  if (newInteractionId &&
+                      !INTERACTION_SPECS[newInteractionId].is_linear &&
+                      !INTERACTION_SPECS[newInteractionId].is_terminal) {
+                    $scope.openAddAnswerGroupModal();
+                  }
+                }
+              )
+            );
+
+            ctrl.directiveSubscriptions.add(
+              ResponsesService.onAnswerGroupsChanged.subscribe(
+                () => {
                   $scope.answerGroups = ResponsesService.getAnswerGroups();
                   $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
-
-                  // Reinitialize training data if the interaction ID is
-                  // changed.
-                  _initializeTrainingData();
-
-                  $scope.activeAnswerGroupIndex = (
-                    ResponsesService.getActiveAnswerGroupIndex());
-                });
-
-              // Prompt the user to create a new response if it is not a linear
-              // or non-terminal interaction and if an actual interaction is
-              // specified (versus one being deleted).
-              if (newInteractionId &&
-                  !INTERACTION_SPECS[newInteractionId].is_linear &&
-                  !INTERACTION_SPECS[newInteractionId].is_terminal) {
-                $scope.openAddAnswerGroupModal();
-              }
-            });
-
-            $scope.$on('answerGroupChanged', function() {
-              $scope.answerGroups = ResponsesService.getAnswerGroups();
-              $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
-              $scope.activeAnswerGroupIndex = (
-                ResponsesService.getActiveAnswerGroupIndex());
-            });
-
-            $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-              ResponsesService.updateAnswerChoices(newAnswerChoices);
-            });
+                  $scope.activeAnswerGroupIndex =
+                  ResponsesService.getActiveAnswerGroupIndex();
+                }
+              ));
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onUpdateAnswerChoices.subscribe(
+                (newAnswerChoices) => {
+                  ResponsesService.updateAnswerChoices(newAnswerChoices);
+                })
+            );
             $scope.$on(
               'handleCustomArgsUpdate',
               function(evt, newAnswerChoices) {
@@ -605,7 +634,7 @@ angular.module('oppia').directive('stateResponses', [
               revert: 100,
               tolerance: 'pointer',
               start: function(e, ui) {
-                $rootScope.$broadcast('externalSave');
+                ExternalSaveService.onExternalSave.emit();
                 $scope.changeActiveAnswerGroupIndex(-1);
                 ui.placeholder.height(ui.item.height());
               },
@@ -623,6 +652,9 @@ angular.module('oppia').directive('stateResponses', [
               $scope.onResponsesInitialized();
             }
             StateEditorService.updateStateResponsesInitialised();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

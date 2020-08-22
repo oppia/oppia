@@ -34,4 +34,15 @@ class AlgebraicExpressionInput(base.BaseInteraction):
     can_have_solution = True
     show_generic_submit_button = True
 
-    _customization_arg_specs = []
+    _customization_arg_specs = [{
+        'name': 'customOskLetters',
+        'description': (
+            'Shortcut variables that the learner can access in the on-screen '
+            'keyboard. (The order of these variables will be reflected in the '
+            'learner\'s keyboard)'),
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'CustomOskLetters',
+        },
+        'default_value': []
+    }]

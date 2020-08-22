@@ -19,15 +19,20 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'interactions/codemirrorRequires.ts';
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+import 'third-party-imports/dnd-lists.import';
+import 'third-party-imports/ui-tree.import';
+
 angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  require('angular-cookies'), 'dndLists', 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
-  'ui.validate'
+  uiValidate
 ]);
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -38,8 +43,6 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 import { AppConstants } from 'app.constants';
-import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -53,6 +56,12 @@ import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { TopicEditorPageConstants } from
   'pages/topic-editor-page/topic-editor-page.constants';
+import { PracticeTabComponent } from
+  'pages/topic-viewer-page/practice-tab/practice-tab.component';
+import { StoriesListComponent } from
+  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
+import { SubtopicsListComponent } from
+  'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 
 @NgModule({
   imports: [
@@ -61,15 +70,20 @@ import { TopicEditorPageConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    PracticeTabComponent,
+    StoriesListComponent,
+    SubtopicsListComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    PracticeTabComponent,
+    StoriesListComponent,
+    SubtopicsListComponent,
   ],
   providers: [
     AppConstants,
     InteractionsExtensionsConstants,
-    EditorDomainConstants,
     ObjectsDomainConstants,
     QuestionDomainConstants,
     QuestionsListConstants,

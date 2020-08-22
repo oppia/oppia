@@ -141,7 +141,7 @@ def _migrate_state_schema(versioned_question_state):
                 state data.
 
     Raises:
-        Exception: The given state_schema_version is invalid.
+        Exception. The given state_schema_version is invalid.
     """
     state_schema_version = versioned_question_state[
         'state_schema_version']

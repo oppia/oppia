@@ -89,6 +89,6 @@ describe('Entity creation service', function() {
 
   it('should return subtopic Id from URL', function() {
     $location.path('/subtopic_editor/2');
-    expect(TopicEditorRoutingService.getSubtopicIdFromUrl()).toEqual('2');
+    expect(TopicEditorRoutingService.getSubtopicIdFromUrl()).toEqual(2);
   });
 });

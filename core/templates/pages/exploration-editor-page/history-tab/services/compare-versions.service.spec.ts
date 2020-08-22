@@ -34,7 +34,7 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { IExplorationSnapshot, VersionTreeService } from
+import { ExplorationSnapshot, VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -145,6 +145,7 @@ describe('Compare versions service', function() {
             }
           },
           interaction: {
+            id: null,
             answer_groups: [],
             default_outcome: {
               dest: 'default',
@@ -177,7 +178,8 @@ describe('Compare versions service', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: []
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
             };
           });
         statesData[stateName] = newStateData;
@@ -189,7 +191,7 @@ describe('Compare versions service', function() {
       };
     };
 
-    const testSnapshots1: IExplorationSnapshot[] = [{
+    const testSnapshots1: ExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
       committer_id: 'admin',
@@ -698,7 +700,7 @@ describe('Compare versions service', function() {
       }
     );
 
-    var testSnapshots2: IExplorationSnapshot[] = [{
+    var testSnapshots2: ExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
       committer_id: 'admin',
@@ -968,7 +970,7 @@ describe('Compare versions service', function() {
 
     // Represents snapshots and exploration data for tests for links
     // Only includes information accessed by getDiffGraphData().
-    var testSnapshots3: IExplorationSnapshot[] = [{
+    var testSnapshots3: ExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
       committer_id: 'admin',

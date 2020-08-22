@@ -20,24 +20,24 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface IAddStateNameChangeList {
+export interface AddStateNameChangeList {
   'cmd': 'add_state';
   'state_name': string;
 }
 
-export interface IDeleteStateChangeList {
+export interface DeleteStateChangeList {
   'cmd': 'delete_state';
   'state_name': string;
 }
 
-export interface IEditExplorationPropertyChangeList {
+export interface EditExplorationPropertyChangeList {
   'cmd': 'edit_exploration_property';
   'new_value': Object;
   'old_value': Object;
   'property_name': string;
 }
 
-export interface IEditStatePropertyChangeList {
+export interface EditStatePropertyChangeList {
   'cmd': 'edit_state_property';
   'new_value': Object;
   'old_value': Object;
@@ -45,50 +45,50 @@ export interface IEditStatePropertyChangeList {
   'state_name': string;
 }
 
-export interface IRenameStateChangeList {
+export interface RenameStateChangeList {
   'cmd': 'rename_state';
   'new_state_name': string;
   'old_state_name': string;
 }
 
-export interface IRevertChangeList {
+export interface RevertChangeList {
   'cmd': 'AUTO_revert_version_number';
   'version_number': number;
 }
 
-export interface ICreateChangeList {
+export interface CreateChangeList {
   cmd: 'create_new';
   category: string;
   title: string;
 }
 
-export interface IMigrateStatesVersionChangeList {
+export interface MigrateStatesVersionChangeList {
   'cmd': 'migrate_states_schema_to_latest_version';
   'from_version': number;
   'to_version': number;
 }
 
-export type IExplorationChangeList = (
-  IAddStateNameChangeList |
-  IDeleteStateChangeList |
-  IEditExplorationPropertyChangeList |
-  IEditStatePropertyChangeList |
-  IRenameStateChangeList |
-  IRevertChangeList |
-  ICreateChangeList |
-  IMigrateStatesVersionChangeList);
+export type ExplorationChangeList = (
+  AddStateNameChangeList |
+  DeleteStateChangeList |
+  EditExplorationPropertyChangeList |
+  EditStatePropertyChangeList |
+  RenameStateChangeList |
+  RevertChangeList |
+  CreateChangeList |
+  MigrateStatesVersionChangeList);
 
-export interface IExplorationDraftDict {
-  draftChanges: IExplorationChangeList[];
+export interface ExplorationDraftDict {
+  draftChanges: ExplorationChangeList[];
   draftChangeListId: number
 }
 
 export class ExplorationDraft {
-  draftChanges: IExplorationChangeList[];
+  draftChanges: ExplorationChangeList[];
   draftChangeListId: number;
 
   constructor(
-      draftChanges: IExplorationChangeList[], draftChangeListId: number) {
+      draftChanges: ExplorationChangeList[], draftChangeListId: number) {
     this.draftChanges = draftChanges;
     this.draftChangeListId = draftChangeListId;
   }
@@ -106,7 +106,7 @@ export class ExplorationDraft {
     return (currentDraftId === this.draftChangeListId);
   }
 
-  getChanges(): IExplorationChangeList[] {
+  getChanges(): ExplorationChangeList[] {
     return this.draftChanges;
   }
 }
@@ -116,14 +116,14 @@ export class ExplorationDraft {
 })
 export class ExplorationDraftObjectFactory {
   createFromLocalStorageDict(
-      explorationDraftDict: IExplorationDraftDict): ExplorationDraft {
+      explorationDraftDict: ExplorationDraftDict): ExplorationDraft {
     return new ExplorationDraft(
       explorationDraftDict.draftChanges,
       explorationDraftDict.draftChangeListId);
   }
   toLocalStorageDict(
-      changeList: IExplorationChangeList[],
-      draftChangeListId: number): IExplorationDraftDict {
+      changeList: ExplorationChangeList[],
+      draftChangeListId: number): ExplorationDraftDict {
     return {
       draftChanges: changeList,
       draftChangeListId: draftChangeListId

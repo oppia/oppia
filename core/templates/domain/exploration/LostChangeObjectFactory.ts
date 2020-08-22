@@ -27,29 +27,42 @@ import { Outcome } from
 import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
-interface ILostChangeValues {
+interface LostChangeValues {
   'outcome'?: Outcome;
   'dest'?: string;
   'feedback'?: SubtitledHtml;
   'rules'?: Object;
+  'html'?: string;
 }
 
-type ILostChangeValue = string | ILostChangeValues;
+type LostChangeValue = string | string[] | LostChangeValues;
+
+// Properties are optional in 'LostChangeBackendDict' because all of them may
+// not be present in the dict and may change according to the cmd.
+interface LostChangeBackendDict {
+  'cmd': string;
+  'new_state_name'?: string;
+  'old_state_name'?: string;
+  'state_name'?: string;
+  'new_value'?: LostChangeValue;
+  'old_value'?: LostChangeValue;
+  'property_name'?: string;
+}
 
 export class LostChange {
   cmd: string;
   stateName: string;
   newStateName: string;
   oldStateName: string;
-  newValue: ILostChangeValue;
-  oldValue: ILostChangeValue;
+  newValue: LostChangeValue;
+  oldValue: LostChangeValue;
   propertyName: string;
   utilsService: UtilsService;
 
   constructor(
       utilsService: UtilsService, cmd: string, newStateName: string,
-      oldStateName: string, stateName: string, newValue: ILostChangeValue,
-      oldValue: ILostChangeValue, propertyName: string) {
+      oldStateName: string, stateName: string, newValue: LostChangeValue,
+      oldValue: LostChangeValue, propertyName: string) {
     this.utilsService = utilsService;
     this.cmd = cmd;
     this.newStateName = newStateName;
@@ -64,16 +77,16 @@ export class LostChange {
   // object, then simply return that object. In case of an array, return
   // the last item.
   getStatePropertyValue(
-      statePropertyValue: Array<string> | Object): string | Object {
+      statePropertyValue: string[] | Object): string | Object {
     return Array.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   }
 
-  isEndingExploration() {
+  isEndingExploration(): boolean {
     return this.oldValue === null && this.newValue === 'EndExploration';
   }
 
-  isAddingInteraction() {
+  isAddingInteraction(): boolean {
     return this.oldValue === null && this.newValue !== 'EndExploration';
   }
 
@@ -85,47 +98,47 @@ export class LostChange {
     return this.utilsService.isEmpty(this.newValue);
   }
 
-  isOutcomeFeedbackEqual() {
-    if ((<ILostChangeValues> this.newValue).outcome &&
-      (<ILostChangeValues> this.newValue).outcome.feedback &&
-      (<ILostChangeValues> this.oldValue).outcome &&
-      (<ILostChangeValues> this.oldValue).outcome.feedback) {
+  isOutcomeFeedbackEqual(): boolean {
+    if ((<LostChangeValues> this.newValue).outcome &&
+      (<LostChangeValues> this.newValue).outcome.feedback &&
+      (<LostChangeValues> this.oldValue).outcome &&
+      (<LostChangeValues> this.oldValue).outcome.feedback) {
       return (
-        (<ILostChangeValues> this.newValue).outcome.feedback.getHtml() ===
-        (<ILostChangeValues> this.oldValue).outcome.feedback.getHtml());
+        (<LostChangeValues> this.newValue).outcome.feedback.getHtml() ===
+        (<LostChangeValues> this.oldValue).outcome.feedback.getHtml());
     }
     return false;
   }
 
-  isOutcomeDestEqual() {
-    if ((<ILostChangeValues> this.newValue).outcome &&
-      (<ILostChangeValues> this.oldValue).outcome) {
+  isOutcomeDestEqual(): boolean {
+    if ((<LostChangeValues> this.newValue).outcome &&
+      (<LostChangeValues> this.oldValue).outcome) {
       return (
-        (<ILostChangeValues> this.oldValue).outcome.dest ===
-        (<ILostChangeValues> this.newValue).outcome.dest);
+        (<LostChangeValues> this.oldValue).outcome.dest ===
+        (<LostChangeValues> this.newValue).outcome.dest);
     }
     return false;
   }
 
-  isDestEqual() {
-    return (<ILostChangeValues> this.oldValue).dest ===
-      (<ILostChangeValues> this.newValue).dest;
+  isDestEqual(): boolean {
+    return (<LostChangeValues> this.oldValue).dest ===
+      (<LostChangeValues> this.newValue).dest;
   }
 
-  isFeedbackEqual() {
-    if ((<ILostChangeValues> this.newValue).feedback &&
-    (<ILostChangeValues> this.oldValue).feedback) {
+  isFeedbackEqual(): boolean {
+    if ((<LostChangeValues> this.newValue).feedback &&
+    (<LostChangeValues> this.oldValue).feedback) {
       return (
-        (<ILostChangeValues> this.newValue).feedback.getHtml() ===
-        (<ILostChangeValues> this.oldValue).feedback.getHtml());
+        (<LostChangeValues> this.newValue).feedback.getHtml() ===
+        (<LostChangeValues> this.oldValue).feedback.getHtml());
     }
     return false;
   }
 
-  isRulesEqual() {
+  isRulesEqual(): boolean {
     return isEqual(
-      (<ILostChangeValues> this.newValue).rules,
-      (<ILostChangeValues> this.oldValue).rules);
+      (<LostChangeValues> this.newValue).rules,
+      (<LostChangeValues> this.oldValue).rules);
   }
 
   // Detects whether an object of the type 'answer_group' or
@@ -172,7 +185,7 @@ export class LostChangeObjectFactory {
    * @param {String} lostChangeDict - the name of the type to fetch.
    * @returns {LostChange} - The associated type, if any.
    */
-  createNew(lostChangeDict) {
+  createNew(lostChangeDict: LostChangeBackendDict): LostChange {
     return new LostChange(
       this.utilsService,
       lostChangeDict.cmd,

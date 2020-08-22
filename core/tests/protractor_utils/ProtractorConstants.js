@@ -17,6 +17,8 @@
  * tests.
  */
 
-exports.protractorConstants = {
-  SKILL_STATUS_UNASSIGNED: 'Unassigned'
+module.exports = {
+  SKILL_STATUS_UNASSIGNED: 'Unassigned',
+  SKILL_STATUS_ASSIGNED: 'Assigned',
+  TEST_SVG_PATH: '../data/test_svg.svg'
 };

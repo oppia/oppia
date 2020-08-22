@@ -50,9 +50,6 @@ import { LogicProofRulesService } from
 import { MathEquationInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
-import { MathExpressionInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
 import { MultipleChoiceInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
@@ -65,6 +62,9 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service';
+import { NumericExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { PencilCodeEditorRulesService } from
@@ -101,12 +101,12 @@ describe('Interaction Rules Registry Service', () => {
     this.logicProofRulesService = TestBed.get(LogicProofRulesService);
     this.mathEquationInputRulesService = (
       TestBed.get(MathEquationInputRulesService));
-    this.mathExpressionInputRulesService = (
-      TestBed.get(MathExpressionInputRulesService));
     this.multipleChoiceInputRulesService = (
       TestBed.get(MultipleChoiceInputRulesService));
     this.musicNotesInputRulesService = TestBed.get(MusicNotesInputRulesService);
     this.numberWithUnitsRulesService = TestBed.get(NumberWithUnitsRulesService);
+    this.numericExpressionInputRulesService = (
+      TestBed.get(NumericExpressionInputRulesService));
     this.numericInputRulesService = TestBed.get(NumericInputRulesService);
     this.pencilCodeEditorRulesService = (
       TestBed.get(PencilCodeEditorRulesService));
@@ -200,11 +200,6 @@ describe('Interaction Rules Registry Service', () => {
       .toBe(this.mathEquationInputRulesService);
   });
 
-  it('should return the correct rules service for MathExpressionInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('MathExpressionInput'))
-      .toBe(this.mathExpressionInputRulesService);
-  });
-
   it('should return the correct rules service for MultipleChoiceInput', () => {
     expect(this.registry.getRulesServiceByInteractionId('MultipleChoiceInput'))
       .toBe(this.multipleChoiceInputRulesService);
@@ -219,6 +214,14 @@ describe('Interaction Rules Registry Service', () => {
     expect(this.registry.getRulesServiceByInteractionId('NumberWithUnits'))
       .toBe(this.numberWithUnitsRulesService);
   });
+
+  it('should return the correct rules service for NumericExpressionInput',
+    () => {
+      expect(this.registry.getRulesServiceByInteractionId(
+        'NumericExpressionInput')).toBe(
+        this.numericExpressionInputRulesService);
+    }
+  );
 
   it('should return the correct rules service for NumericInput', () => {
     expect(this.registry.getRulesServiceByInteractionId('NumericInput'))

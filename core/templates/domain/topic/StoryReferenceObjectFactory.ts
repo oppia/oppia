@@ -20,7 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface IStoryReferenceBackendDict {
+export interface StoryReferenceBackendDict {
   'story_id': string;
   'story_is_published': boolean;
 }
@@ -49,7 +49,7 @@ export class StoryReference {
 })
 export class StoryReferenceObjectFactory {
   createFromBackendDict(
-      storyReferenceBackendDict: IStoryReferenceBackendDict): StoryReference {
+      storyReferenceBackendDict: StoryReferenceBackendDict): StoryReference {
     return new StoryReference(
       storyReferenceBackendDict.story_id,
       storyReferenceBackendDict.story_is_published);

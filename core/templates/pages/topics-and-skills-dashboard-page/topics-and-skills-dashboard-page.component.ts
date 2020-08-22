@@ -53,6 +53,8 @@ require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-local-storage.service.ts');
 
+import { Subscription } from 'rxjs';
+
 
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
@@ -64,9 +66,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
     'SkillObjectFactory', 'TopicCreationService',
     'TopicsAndSkillsDashboardBackendApiService',
     'TopicsAndSkillsDashboardPageService', 'UrlInterpolationService',
-    'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-    'EVENT_TYPE_SKILL_CREATION_ENABLED',
-    'EVENT_TYPE_TOPIC_CREATION_ENABLED',
     'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
     'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
     'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
@@ -79,14 +78,12 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         SkillObjectFactory, TopicCreationService,
         TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService, UrlInterpolationService,
-        EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-        EVENT_TYPE_SKILL_CREATION_ENABLED,
-        EVENT_TYPE_TOPIC_CREATION_ENABLED,
         FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
         MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
         SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
         TOPIC_SORT_OPTIONS, TOPIC_PUBLISHED_OPTIONS) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var TOPIC_CLASSROOM_UNASSIGNED = 'Unassigned';
 
       /**
@@ -97,43 +94,39 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       ctrl._initDashboard = function(stayInSameTab) {
         TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
           function(response) {
-            ctrl.totalTopicSummaries = response.topic_summary_dicts;
+            ctrl.totalTopicSummaries = response.topicSummaries;
             ctrl.topicSummaries = ctrl.totalTopicSummaries;
             ctrl.totalEntityCountToDisplay = ctrl.topicSummaries.length;
             ctrl.currentCount = ctrl.totalEntityCountToDisplay;
             ctrl.applyFilters();
             ctrl.editableTopicSummaries = (ctrl.topicSummaries.filter(
               function(summary) {
-                return summary.can_edit_topic === true;
+                return summary.canEditTopic === true;
               }
             ));
-            ctrl.totalSkillCount = response.total_skill_count;
+            ctrl.totalSkillCount = response.totalSkillCount;
             ctrl.skillsCategorizedByTopics = (
-              response.categorized_skills_dict);
+              response.categorizedSkillsDict);
             ctrl.untriagedSkillSummaries = (
-              response.untriaged_skill_summary_dicts);
+              response.untriagedSkillSummaries);
             ctrl.totalUntriagedSkillSummaries = (
               ctrl.untriagedSkillSummaries);
             ctrl.mergeableSkillSummaries = (
-              response.mergeable_skill_summary_dicts);
+              response.mergeableSkillSummaries);
             if (!stayInSameTab || !ctrl.activeTab) {
               ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
             }
-            ctrl.userCanCreateTopic = response.can_create_topic;
-            ctrl.userCanCreateSkill = response.can_create_skill;
-            $rootScope.$broadcast(
-              EVENT_TYPE_TOPIC_CREATION_ENABLED, ctrl.userCanCreateTopic);
-            $rootScope.$broadcast(
-              EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
-            ctrl.userCanDeleteTopic = response.can_delete_topic;
-            ctrl.userCanDeleteSkill = response.can_delete_skill;
+            ctrl.userCanCreateTopic = response.canCreateTopic;
+            ctrl.userCanCreateSkill = response.canCreateSkill;
+            ctrl.userCanDeleteTopic = response.canDeleteTopic;
+            ctrl.userCanDeleteSkill = response.canDeleteSkill;
 
             if (ctrl.topicSummaries.length === 0 &&
                       ctrl.untriagedSkillSummaries.length !== 0) {
               ctrl.activeTab = ctrl.TAB_NAME_SKILLS;
               ctrl.initSkillDashboard();
             }
-            ctrl.classrooms = response.all_classroom_names;
+            ctrl.classrooms = response.allClassroomNames;
             // Adding the if checks since karma tests adds
             // the values in the array for every it block.
             if (!ctrl.classrooms.includes(TOPIC_CLASSROOM_UNASSIGNED)) {
@@ -239,8 +232,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
               ctrl.filterObject, ctrl.itemsPerPage, ctrl.nextCursor).then(
               (response) => {
                 ctrl.moreSkillsPresent = response.more;
-                ctrl.nextCursor = response.next_cursor;
-                ctrl.skillSummaries.push(...response.skill_summary_dicts);
+                ctrl.nextCursor = response.nextCursor;
+                ctrl.skillSummaries.push(...response.skillSummaries);
                 ctrl.currentCount = ctrl.skillSummaries.length;
                 if (ctrl.firstTimeFetchingSkills) {
                   ctrl.goToPageNumber(0);
@@ -381,16 +374,22 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
           }
           return arr;
         };
-        $scope.$on(
-          EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, function(
-              evt, stayInSameTab) {
-            ctrl._initDashboard(stayInSameTab);
-          }
+        ctrl.directiveSubscriptions.add(
+          TopicsAndSkillsDashboardBackendApiService.
+            onTopicsAndSkillsDashboardReinitialized.subscribe(
+              (stayInSameTab) => {
+                ctrl._initDashboard(stayInSameTab);
+              }
+            )
         );
         // The _initDashboard function is written separately since it is
         // also called in $scope.$on when some external events are
         // triggered.
         ctrl._initDashboard(false);
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

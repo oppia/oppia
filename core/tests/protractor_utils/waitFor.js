@@ -24,6 +24,9 @@ var until = protractor.ExpectedConditions;
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 
+var toastInfoElement = element(by.css('.toast-info'));
+var toastSuccessElement = element(by.css('.toast-success'));
+
 var alertToBePresent = async function() {
   await browser.wait(
     until.alertIsPresent(), DEFAULT_WAIT_TIME_MSECS,
@@ -76,6 +79,17 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
 };
 
 /**
+ * @param {Object} element - Element is expected to be present on the DOM but
+ *                           This does not mean that the element is visible.
+ * @param {string} errorMessage - Error message when element is not present.
+ */
+var presenceOf = async function(element, errorMessage) {
+  await browser.wait(
+    await until.presenceOf(element),
+    DEFAULT_WAIT_TIME_MSECS, errorMessage);
+};
+
+/**
  * @param {Object} element - Element expected to be present in the DOM and has
  *                           height and width that is greater than 0.
  * @param {string} errorMessage - Error message when element is invisible.
@@ -117,11 +131,44 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
+/**
+ * @param {string} url - URL to redirect
+ */
+var urlRedirection = async function(url) {
+  // Checks that the current URL matches the expected text.
+  await browser.wait(until.urlIs(url), DEFAULT_WAIT_TIME_MSECS,
+    'URL redirection took too long');
+};
+
+var visibilityOfInfoToast = async function(errorMessage) {
+  await visibilityOf(toastInfoElement, errorMessage);
+};
+
+var invisibilityOfInfoToast = async function(errorMessage) {
+  await invisibilityOf(toastInfoElement, errorMessage);
+};
+
+var visibilityOfSuccessToast = async function(errorMessage) {
+  await invisibilityOf(toastSuccessElement, errorMessage);
+};
+
+var modalPopupToAppear = async function() {
+  await visibilityOf(
+    element(by.css('.modal-body')), 'Modal taking too long to appear.');
+};
+
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
+exports.presenceOf = presenceOf;
 exports.visibilityOf = visibilityOf;
+exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;
 exports.newTabToBeCreated = newTabToBeCreated;
+exports.urlRedirection = urlRedirection;
+exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
+exports.visibilityOfInfoToast = visibilityOfInfoToast;
+exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
+exports.modalPopupToAppear = modalPopupToAppear;

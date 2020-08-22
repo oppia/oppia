@@ -30,7 +30,7 @@ from core.domain import image_validation_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import skill_services
+from core.domain import skill_fetchers
 import feconf
 import utils
 
@@ -58,7 +58,7 @@ class QuestionCreationHandler(base.BaseHandler):
             raise self.InvalidInputException('Skill ID(s) aren\'t valid: ', e)
 
         try:
-            skill_services.get_multi_skills(skill_ids)
+            skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -205,7 +205,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
             question_id, strict=False)
 
         associated_skill_dicts = [
-            skill.to_dict() for skill in skill_services.get_multi_skills(
+            skill.to_dict() for skill in skill_fetchers.get_multi_skills(
                 question.linked_skill_ids)]
 
         self.values.update({
@@ -221,6 +221,13 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         if not commit_message:
             raise self.PageNotFoundException
+
+        if (commit_message is not None and
+                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+
         if not self.payload.get('change_list'):
             raise self.PageNotFoundException
         change_list = [

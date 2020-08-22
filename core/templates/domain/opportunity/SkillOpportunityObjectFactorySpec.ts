@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for SkillOpportunityObjectFactory.
  */
 
-import { ISkillOpportunityBackendDict, SkillOpportunityObjectFactory } from
+import { SkillOpportunityBackendDict, SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 
 describe('Skill opportunity object factory', () => {
   describe('SkillOpportunityObjectFactory', () => {
     let skillOpportunityObjectFactory: (
       SkillOpportunityObjectFactory);
-    let backendDict: ISkillOpportunityBackendDict;
+    let backendDict: SkillOpportunityBackendDict;
 
     beforeEach(() => {
       skillOpportunityObjectFactory = (

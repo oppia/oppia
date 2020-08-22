@@ -20,7 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import topic_fetchers
 import feconf
 import python_utils
@@ -65,7 +65,7 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
             if python_utils.UNICODE(subtopic.id) in selected_subtopic_ids:
                 selected_skill_ids.extend(subtopic.skill_ids)
         try:
-            skills = skill_services.get_multi_skills(selected_skill_ids)
+            skills = skill_fetchers.get_multi_skills(selected_skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
         skill_ids_to_descriptions_map = {}

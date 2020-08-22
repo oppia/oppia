@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the UserExplorationPermissionsService.
  */
 
-import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
@@ -38,6 +37,11 @@ describe('User Exploration Permissions Service', () => {
   let samplePermissionsData = {
     can_edit: false,
     can_voiceover: true,
+    can_unpublish: false,
+    can_release_ownership: false,
+    can_publish: false,
+    can_delete: false,
+    can_modify_roles: false,
   };
   let permissionsResponse: ExplorationPermissions;
 

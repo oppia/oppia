@@ -98,12 +98,12 @@ angular.module('oppia').controller('TeachOppiaModalController', [
           state_name: stateName
         }
       }).then(function(response) {
-        $scope.showUnresolvedAnswers(response.unresolved_answers);
+        $scope.showUnresolvedAnswers(response.data.unresolved_answers);
       }, function(response) {
         $log.error(
           'Error occurred while fetching unresolved answers ' +
-          'for exploration ' + _explorationId + 'state ' +
-          _stateName + ': ' + response);
+          'for exploration ' + _explorationId + ' state ' +
+          _stateName + ': ' + response.data);
         $scope.showUnresolvedAnswers([]);
       });
     };
@@ -117,8 +117,7 @@ angular.module('oppia').controller('TeachOppiaModalController', [
         var answer = item.answer;
         var classificationResult = (
           acs.getMatchingClassificationResult(
-            _stateName, _state.interaction, answer,
-            rulesService));
+            _stateName, _state.interaction, answer, rulesService));
         var classificationType = (
           classificationResult.classificationCategorization);
         if (classificationType !== EXPLICIT_CLASSIFICATION &&
@@ -142,44 +141,41 @@ angular.module('oppia').controller('TeachOppiaModalController', [
     };
 
     $scope.confirmAnswerAssignment = function(answerIndex) {
-      var answer = $scope.unresolvedAnswers[answerIndex];
+      var unresolvedAnswer = $scope.unresolvedAnswers[answerIndex];
       $scope.unresolvedAnswers.splice(answerIndex, 1);
 
       var classificationType = (
-        answer.classificationResult.classificationCategorization);
+        unresolvedAnswer.classificationResult.classificationCategorization);
       var truncatedAnswer = $filter(
         'truncateInputBasedOnInteractionAnswerType')(
-        answer.answer, interactionId, 12);
+        unresolvedAnswer.answer, interactionId, 12);
       var successToast = (
         'The answer ' + truncatedAnswer +
         ' has been successfully trained.');
 
       if (classificationType === DEFAULT_OUTCOME_CLASSIFICATION) {
         TrainingDataService.associateWithDefaultResponse(
-          answer.answer);
+          unresolvedAnswer.answer);
         AlertsService.addSuccessMessage(
           successToast, TOAST_TIMEOUT);
         return;
       }
 
       TrainingDataService.associateWithAnswerGroup(
-        answer.classificationResult.answerGroupIndex,
-        answer.answer);
+        unresolvedAnswer.classificationResult.answerGroupIndex,
+        unresolvedAnswer.answer);
       AlertsService.addSuccessMessage(
         successToast, TOAST_TIMEOUT);
     };
 
     $scope.openTrainUnresolvedAnswerModal = function(
         answerIndex) {
-      var selectedAnswerIndex = answerIndex;
       var unresolvedAnswer = (
         $scope.unresolvedAnswers[answerIndex]);
       var answer = unresolvedAnswer.answer;
-      var answerGroupIndex = (
-        unresolvedAnswer.classificationResult.answerGroupIndex);
       return TrainingModalService.openTrainUnresolvedAnswerModal(
         answer, function() {
-          $scope.unresolvedAnswers.splice(selectedAnswerIndex, 1);
+          $scope.unresolvedAnswers.splice(answerIndex, 1);
           var truncatedAnswer = $filter(
             'truncateInputBasedOnInteractionAnswerType')(
             answer, interactionId, 12);

@@ -21,48 +21,69 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  IStoryNodeBackendDict,
+  StoryNodeBackendDict,
   ReadOnlyStoryNodeObjectFactory,
   ReadOnlyStoryNode
 } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 
-interface IStoryPlaythroughBackendDict {
-  'story_nodes': IStoryNodeBackendDict[];
+export interface StoryPlaythroughBackendDict {
+  'story_id': string,
+  'story_nodes': StoryNodeBackendDict[];
+  'story_title': string;
+  'story_description': string;
+  'topic_name': string;
 }
 
 export class StoryPlaythrough {
-  _nodes: ReadOnlyStoryNode[];
+  id: string;
+  nodes: ReadOnlyStoryNode[];
+  title: string;
+  description: string;
+  topicName: string;
 
-  constructor(nodes: ReadOnlyStoryNode[]) {
-    this._nodes = nodes;
+  constructor(
+      id: string,
+      nodes: ReadOnlyStoryNode[],
+      title: string,
+      description: string,
+      topicName: string) {
+    this.id = id;
+    this.nodes = nodes;
+    this.title = title;
+    this.description = description;
+    this.topicName = topicName;
   }
 
   getInitialNode(): ReadOnlyStoryNode {
-    return this._nodes[0];
+    return this.nodes[0];
   }
 
-  getStoryNodeCount(): Number {
-    return this._nodes.length;
+  getStoryNodeCount(): number {
+    return this.nodes.length;
   }
 
   getStoryNodes(): ReadOnlyStoryNode[] {
-    return this._nodes;
+    return this.nodes;
   }
 
   hasFinishedStory(): boolean {
-    return this._nodes.slice(-1)[0].isCompleted();
+    return this.nodes.slice(-1)[0].isCompleted();
   }
 
   getNextPendingNodeId(): string {
-    for (var i = 0; i < this._nodes.length; i++) {
-      if (!this._nodes[i].isCompleted()) {
-        return this._nodes[i].getId();
+    for (var i = 0; i < this.nodes.length; i++) {
+      if (!this.nodes[i].isCompleted()) {
+        return this.nodes[i].getId();
       }
     }
   }
 
   hasStartedStory(): boolean {
-    return this._nodes[0].isCompleted();
+    return this.nodes[0].isCompleted();
+  }
+
+  getStoryId(): string {
+    return this.id;
   }
 }
 
@@ -75,14 +96,17 @@ export class StoryPlaythroughObjectFactory {
 
   createFromBackendDict(
       storyPlaythroughBackendDict:
-      IStoryPlaythroughBackendDict): StoryPlaythrough {
-    var nodeObjects: ReadOnlyStoryNode[] = [];
-    var readOnlyStoryNodeObjectFactory = this.readOnlyStoryNodeObjectFactory;
+      StoryPlaythroughBackendDict): StoryPlaythrough {
+    var nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
+      storyNodeDict => this.readOnlyStoryNodeObjectFactory
+        .createFromBackendDict(storyNodeDict));
 
-    nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
-      readOnlyStoryNodeObjectFactory.createFromBackendDict);
-
-    return new StoryPlaythrough(nodeObjects);
+    return new StoryPlaythrough(
+      storyPlaythroughBackendDict.story_id,
+      nodeObjects,
+      storyPlaythroughBackendDict.story_title,
+      storyPlaythroughBackendDict.story_description,
+      storyPlaythroughBackendDict.topic_name);
   }
 }
 

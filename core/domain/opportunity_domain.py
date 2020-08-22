@@ -124,7 +124,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
         """Validates various properties of the object.
 
         Raises:
-            ValidationError: One or more attributes of the object are invalid.
+            ValidationError. One or more attributes of the object are invalid.
         """
         if not isinstance(self.topic_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -223,7 +223,7 @@ class SkillOpportunity(python_utils.OBJECT):
         """Validates various properties of the object.
 
         Raises:
-            ValidationError: One or more attributes of the object are invalid.
+            ValidationError. One or more attributes of the object are invalid.
         """
         if not isinstance(self.skill_description, python_utils.BASESTRING):
             raise utils.ValidationError(

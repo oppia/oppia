@@ -23,39 +23,41 @@
       <td>
         <[$ctrl.getSerialNumberForTopic($index)]>.
       </td>
-      <td class="topic-primary-information-container">
-        <div class="list-summary list-summary-name protractor-test-topics-list-item">
-          <div>
-            <a class="topic-name protractor-test-topic-name"
-               ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
-              <[topic.name]>
-            </a>
+      <td>
+        <div class="topic-primary-information-container">
+          <div class="list-summary list-summary-name protractor-test-topics-list-item">
+            <div>
+              <a class="topic-name protractor-test-topic-name"
+                 ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
+                <[topic.name]>
+              </a>
+            </div>
+            <div>
+              <span class="topic-classroom protractor-test-topic-classroom">
+                <span ng-if="topic.classroom"><[topic.classroom]></span>
+                <span uib-tooltip="Assign this topic to a classroom from the admin page" tooltip-placement="bottom" ng-if="!topic.classroom">No classroom assigned.</span>
+              </span>
+            </div>
+            <div><span class="topic-description protractor-test-topic-description"><[topic.description]></span></div>
           </div>
-          <div>
-            <span class="topic-classroom protractor-test-topic-classroom">
-              <span ng-if="topic.classroom"><[topic.classroom]></span>
-              <span uib-tooltip="Assign this topic to a classroom from the admin page" tooltip-placement="bottom" ng-if="!topic.classroom">No classroom assigned.</span>
-            </span>
-          </div>
-          <div><span class="topic-description protractor-test-topic-description"><[topic.description]></span></div>
         </div>
       </td>
       <td>
         <p class="text-center list-summary">
-          <span> <[topic.canonical_story_count]> </span>
+          <span> <[topic.canonicalStoryCount]> </span>
         </p>
       </td>
       <td>
         <p class="text-center list-summary">
-          <span> <[topic.subtopic_count]> </span>
+          <span> <[topic.subtopicCount]> </span>
         </p>
       </td>
       <td>
         <p class="list-summary text-center">
-          <span> <[topic.total_skill_count]> </span>
+          <span> <[topic.totalSkillCount]> </span>
           <div ng-show="$ctrl.topic.uncategorized_skill_count"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-               uib-tooltip="This topic has <[topic.uncategorized_skill_count]> uncategorized skill<[topic.uncategorized_skill_count > 1 ? 's' : '']>." tooltip-placement="bottom">
+               uib-tooltip="This topic has <[topic.uncategorizedSkillCount]> uncategorized skill<[topic.uncategorizedSkillCount > 1 ? 's' : '']>." tooltip-placement="bottom">
             <span class="oppia-editor-warnings-count">
               &nbsp;!
             </span>
@@ -63,10 +65,10 @@
         </p>
       </td>
       <td class="text-center topic-list-status">
-        <span class="topic-list-status-text" ng-if="topic.is_published"> Published </span>
-        <span class="topic-list-status-text" ng-if="!topic.is_published"> Not Published </span>
+        <span class="topic-list-status-text" ng-if="topic.isPublished"> Published </span>
+        <span class="topic-list-status-text" ng-if="!topic.isPublished"> Not Published </span>
         <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" ng-click="$ctrl.changeEditOptions(topic.id)"></p>
-        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
+        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-click="$ctrl.changeEditOptions(null)">
           <a class="topic-edit-options-edit protractor-test-edit-topic-button" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
             <i class="fa fa-pen"></i>
             <span>Edit</span>
@@ -117,7 +119,7 @@
         <div class="topic-item-entities">
           <div class="topic-item-entity">
             <div class="topic-item-value">
-              <span><[topic.canonical_story_count]></span>
+              <span><[topic.canonicalStoryCount]></span>
             </div>
             <div class="topic-item-type">
               Stories
@@ -125,7 +127,7 @@
           </div>
           <div class="topic-item-entity">
             <div class="topic-item-value">
-              <span><[topic.subtopic_count]></span>
+              <span><[topic.subtopicCount]></span>
             </div>
             <div class="topic-item-type">
               Subtopics
@@ -133,15 +135,15 @@
           </div>
           <div class="topic-item-entity">
             <div class="topic-item-value">
-              <span><[topic.total_skill_count]></span>
+              <span><[topic.totalSkillCount]></span>
             </div>
             <div class="topic-item-type">
               Skills
             </div>
           </div>
           <div class="topic-item-entity topic-item-status">
-            <div class="topic-item-value" ng-if="topic.is_published">Published</div>
-            <div class="topic-item-value" ng-if="!topic.is_published">Not Published</div>
+            <div class="topic-item-value" ng-if="topic.isPublished">Published</div>
+            <div class="topic-item-value" ng-if="!topic.isPublished">Not Published</div>
           </div>
         </div>
       </div>
@@ -195,7 +197,7 @@
     border: 1px solid #000;
     display: flex;
     flex-wrap: wrap;
-    left: 0;
+    left: -35px;
     position: absolute;
     top: 10px;
     width: 120px;
@@ -208,6 +210,7 @@
     width: 100%;
   }
   topics-list .topic-primary-information-container {
+    height: 100%;
     overflow: auto;
   }
   topics-list .topic-edit-options-edit {
@@ -257,7 +260,6 @@
   topics-list .list-summary:visited {
     color: inherit;
     display: block;
-    height: 2em;
     text-decoration: none;
   }
 
@@ -339,7 +341,10 @@
       width: 25%;
     }
     topics-list .topic-item-status {
+      align-items: center;
       border-right: none;
+      display: flex;
+      justify-content: center;
     }
     topics-list .topic-edit-options {
       left: auto;

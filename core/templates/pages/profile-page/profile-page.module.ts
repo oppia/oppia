@@ -20,10 +20,9 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap'
 ]);
 
 import { Injector, NgModule, StaticProvider } from '@angular/core';
@@ -35,6 +34,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { ProfilePageNavbarComponent } from
+  'pages/profile-page/profile-page-navbar.component';
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -49,10 +50,12 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    ProfilePageNavbarComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    ProfilePageNavbarComponent
   ],
   providers: [
     AppConstants,
@@ -71,7 +74,7 @@ export class ProfilePageModule {
     ProfilePageModule.injector = injector;
   }
   // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+  ngDoBootstrap(): void {}
 }
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';

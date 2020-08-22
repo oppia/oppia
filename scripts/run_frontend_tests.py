@@ -29,7 +29,8 @@ from . import check_frontend_coverage
 from . import common
 from . import install_third_party_libs
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
     python -m scripts.run_frontend_tests
 The root folder MUST be named 'oppia'.
@@ -65,7 +66,6 @@ def main(args=None):
         '../karma_coverage_reports',
         'on your filesystem.',
         'Running test in development environment'])
-
 
     if parsed_args.run_minified_tests:
         python_utils.PRINT('Running test in production environment')
@@ -103,7 +103,7 @@ def main(args=None):
         python_utils.PRINT(
             'If you run into the error "Trying to get the Angular injector",'
             ' please see https://github.com/oppia/oppia/wiki/'
-            'Frontend-test-best-practices#fixing-frontend-test-errors'
+            'Frontend-unit-tests-guide#how-to-handle-common-errors'
             ' for details on how to fix it.')
 
     if parsed_args.check_coverage:

@@ -77,8 +77,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, title='A story',
-            corresponding_topic_id=self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
+            'a-story')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -254,7 +254,6 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_voiceover_applications[0].status,
             suggestion_models.STATUS_IN_REVIEW)
-
 
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(

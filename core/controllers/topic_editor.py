@@ -23,7 +23,11 @@ import logging
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classroom_services
 from core.domain import email_manager
+from core.domain import fs_services
+from core.domain import image_validation_services
+from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -70,10 +74,12 @@ class TopicEditorStoryHandler(base.BaseHandler):
         for summary in canonical_story_summary_dicts:
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
+            summary['completed_node_titles'] = []
 
         for summary in additional_story_summary_dicts:
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
+            summary['completed_node_titles'] = []
 
         self.values.update({
             'canonical_story_summary_dicts': canonical_story_summary_dicts,
@@ -88,14 +94,52 @@ class TopicEditorStoryHandler(base.BaseHandler):
         the topic.
         """
         title = self.payload.get('title')
+        description = self.payload.get('description')
+        thumbnail_filename = self.payload.get('filename')
+        thumbnail_bg_color = self.payload.get('thumbnailBgColor')
+        raw_image = self.request.get('image')
+        story_url_fragment = self.payload.get('story_url_fragment')
 
         story_domain.Story.require_valid_title(title)
+        if story_services.does_story_exist_with_url_fragment(
+                story_url_fragment):
+            raise self.InvalidInputException(
+                'Story url fragment is not unique across the site.')
 
         new_story_id = story_services.get_new_story_id()
         story = story_domain.Story.create_default_story(
-            new_story_id, title, topic_id)
+            new_story_id, title, description, topic_id, story_url_fragment)
         story_services.save_new_story(self.user_id, story)
         topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
+
+        try:
+            file_format = image_validation_services.validate_image_and_filename(
+                raw_image, thumbnail_filename)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        entity_id = new_story_id
+        filename_prefix = 'thumbnail'
+
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+        fs_services.save_original_and_compressed_versions_of_image(
+            thumbnail_filename, feconf.ENTITY_TYPE_STORY, entity_id, raw_image,
+            filename_prefix, image_is_compressible)
+
+        story_services.update_story(
+            self.user_id, new_story_id, [story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'thumbnail_filename',
+                'old_value': None,
+                'new_value': thumbnail_filename
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'thumbnail_bg_color',
+                'old_value': None,
+                'new_value': thumbnail_bg_color
+            }), ], 'Added story thumbnail.')
+
         self.render_json({
             'storyId': new_story_id
         })
@@ -199,9 +243,20 @@ class EditableTopicDataHandler(base.BaseHandler):
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
+        classroom_url_fragment = (
+            classroom_services.get_classroom_url_fragment_for_topic_id(
+                topic_id))
+        skill_question_count_dict = {}
+        for skill_id in topic.get_all_skill_ids():
+            skill_question_count_dict[skill_id] = (
+                question_services.get_total_question_count_for_skill_ids(
+                    [skill_id]))
+
         self.values.update({
+            'classroom_url_fragment': classroom_url_fragment,
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
+            'skill_question_count_dict': skill_question_count_dict,
             'skill_id_to_description_dict': skill_id_to_description_dict,
             'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })
@@ -223,6 +278,13 @@ class EditableTopicDataHandler(base.BaseHandler):
         self._require_valid_version(version, topic.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if (commit_message is not None and
+                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+
         topic_and_subtopic_page_change_dicts = self.payload.get(
             'topic_and_subtopic_page_change_dicts')
         topic_and_subtopic_page_change_list = []
@@ -355,4 +417,40 @@ class TopicPublishHandler(base.BaseHandler):
         except Exception as e:
             raise self.UnauthorizedUserException(e)
 
+        self.render_json(self.values)
+
+
+class TopicUrlFragmentHandler(base.BaseHandler):
+    """A data handler for checking if a topic with given url fragment exists.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, topic_url_fragment):
+        """Handler that receives a topic url fragment and checks whether
+        a topic with the same url fragment exists.
+        """
+        self.values.update({
+            'topic_url_fragment_exists': (
+                topic_services.does_topic_with_url_fragment_exist(
+                    topic_url_fragment))
+        })
+        self.render_json(self.values)
+
+
+class TopicNameHandler(base.BaseHandler):
+    """A data handler for checking if a topic with given name exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, topic_name):
+        """Handler that receives a topic name and checks whether
+        a topic with the same name exists.
+        """
+        self.values.update({
+            'topic_name_exists': (
+                topic_services.does_topic_with_name_exist(topic_name))
+        })
         self.render_json(self.values)

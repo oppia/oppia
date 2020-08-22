@@ -44,7 +44,6 @@ MODEL_CLASS_NAMES_TO_EXCLUDE = {
     'LeaveForRefresherExplorationEventLogEntryModel',
     'ExplorationStatsModel',
     'ExplorationIssuesModel',
-    'PlaythroughModel',
     'LearnerAnswerDetailsModel',
     'ExplorationAnnotationsModel',
     'StateAnswersModel',

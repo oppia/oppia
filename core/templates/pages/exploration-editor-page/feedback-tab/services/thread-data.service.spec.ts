@@ -21,8 +21,6 @@
 // thread-data.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
-
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -403,10 +401,7 @@ describe('retrieving threads service', () => {
       expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
       $httpBackend.expectPOST('/threadhandler/exploration.exp1.abc1')
-        .respond(200);
-      $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1').respond({
-        messages: []
-      });
+        .respond({messages: []});
 
       ThreadDataService.addNewMessageAsync(thread, 'Message', 'close').then(
         () => {
@@ -414,7 +409,7 @@ describe('retrieving threads service', () => {
           done();
         },
         done.fail);
-      $httpBackend.flush(2);
+      $httpBackend.flush(1);
     });
 
   it(
@@ -434,17 +429,15 @@ describe('retrieving threads service', () => {
       expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
       $httpBackend.expectPOST('/threadhandler/exploration.exp1.abc1')
-        .respond(200);
-      $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1').respond({
-        messages: []
-      });
+        .respond({messages: []});
+
       ThreadDataService.addNewMessageAsync(thread, 'Message', 'open').then(
         () => {
           expect(ThreadDataService.getOpenThreadsCount()).toEqual(2);
           done();
         },
         done.fail);
-      $httpBackend.flush(2);
+      $httpBackend.flush(1);
     });
 
   it(
@@ -463,17 +456,15 @@ describe('retrieving threads service', () => {
       expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
       $httpBackend.expectPOST('/threadhandler/exploration.exp1.abc1')
-        .respond(200);
-      $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1').respond({
-        messages: []
-      });
+        .respond({messages: this.mockMessages});
+
       ThreadDataService.addNewMessageAsync(thread, 'Message', 'open').then(
         () => {
           expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
           done();
         },
         done.fail);
-      $httpBackend.flush(2);
+      $httpBackend.flush(1);
     });
 
   it('should successfully resolve a suggestion', done => {

@@ -19,8 +19,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AdminPageData, AdminBackendApiService } from
-  'domain/admin/admin-backend-api.service';
+import {
+  AdminPageData,
+  AdminBackendApiService,
+  LatexToSvgMapping,
+  SuggestionLatexToSvgMapping
+} from 'domain/admin/admin-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +49,24 @@ export class AdminDataService {
 
   getDataAsync(): Promise<AdminPageData> {
     return this._getDataAsync();
+  }
+
+  // TODO(#10045): Remove this function once all the math-rich text
+  // components in explorations have a valid math SVG stored in the
+  // datastore.
+  sendMathSvgsToBackendAsync(
+      latexToSvgMapping: LatexToSvgMapping): Promise<Object> {
+    return this.adminBackendApiService.sendMathSvgsToBackend(latexToSvgMapping);
+  }
+
+  // TODO(#10045): Remove this function once all the math-rich text
+  // components in suggestions have a valid math SVG stored in the
+  // datastore.
+  sendSuggestionMathSvgsToBackendAsync(
+      suggestionLatexToSvgMapping: SuggestionLatexToSvgMapping):
+      Promise<Object> {
+    return this.adminBackendApiService.sendSuggestionMathSvgsToBackend(
+      suggestionLatexToSvgMapping);
   }
 }
 

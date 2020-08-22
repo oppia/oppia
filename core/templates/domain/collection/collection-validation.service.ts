@@ -47,12 +47,13 @@ export class CollectionValidationService {
 
   // Validates that the tags for the collection are in the proper format,
   // returns true if all tags are in the correct format.
-  validateTagFormat(tags: string[]) {
+  validateTagFormat(tags: string[]): boolean {
     // Check to ensure that all tags follow the format specified in
     // TAG_REGEX.
-    // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
+    // TODO(#7434): Use dot notation after we find a way to get
     // rid of the TS2339 error on AppConstants.
-    var tagRegex = new RegExp(AppConstants.TAG_REGEX);
+    // eslint-disable-next-line dot-notation
+    var tagRegex = new RegExp(AppConstants['TAG_REGEX']);
     return tags.every(function(tag) {
       return tag.match(tagRegex);
     });
@@ -60,14 +61,14 @@ export class CollectionValidationService {
 
   // Validates that the tags for the collection do not have duplicates,
   // returns true if there are no duplicates.
-  validateDuplicateTags(tags: string[]) {
+  validateDuplicateTags(tags: string[]): boolean {
     return tags.every((tag: string, idx: number) => {
       return tags.indexOf(tag, idx + 1) === -1;
     });
   }
   // Validates that the tags for the collection are normalized,
   // returns true if all tags were normalized.
-  validateTagsNormalized(tags: string[]) {
+  validateTagsNormalized(tags: string[]): boolean {
     return tags.every((tag: string) => {
       return tag === tag.trim().replace(/\s+/g, ' ');
     });

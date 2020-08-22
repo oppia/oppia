@@ -25,14 +25,14 @@ require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('StoryEditorStateService', [
-  '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',
+  'AlertsService', 'EditableStoryBackendApiService',
   'StoryObjectFactory', 'UndoRedoService',
-  'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
   function(
-      $rootScope, AlertsService, EditableStoryBackendApiService,
-      StoryObjectFactory, UndoRedoService,
-      EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+      AlertsService, EditableStoryBackendApiService,
+      StoryObjectFactory, UndoRedoService) {
     var _story = StoryObjectFactory.createInterstitialStory();
     var _storyIsInitialized = false;
     var _storyIsLoading = false;
@@ -41,13 +41,21 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _storyIsPublished = false;
     var _skillSummaries = [];
     var _expIdsChanged = false;
+    var _storyWithUrlFragmentExists = false;
+    var _classroomUrlFragment = null;
+    var _topicUrlFragment = null;
+
+    var _storyInitializedEventEmitter = new EventEmitter();
+    var _storyReinitializedEventEmitter = new EventEmitter();
+    var _viewStoryNodeEditorEventEmitter = new EventEmitter();
+    var _recalculateAvailableNodesEventEmitter = new EventEmitter();
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
       if (_storyIsInitialized) {
-        $rootScope.$broadcast(EVENT_STORY_REINITIALIZED);
+        _storyReinitializedEventEmitter.emit();
       } else {
-        $rootScope.$broadcast(EVENT_STORY_INITIALIZED);
+        _storyInitializedEventEmitter.emit();
         _storyIsInitialized = true;
       }
     };
@@ -69,6 +77,18 @@ angular.module('oppia').factory('StoryEditorStateService', [
         StoryObjectFactory.createFromBackendDict(newBackendStoryObject));
     };
 
+    var _setStoryWithUrlFragmentExists = function(storyWithUrlFragmentExists) {
+      _storyWithUrlFragmentExists = storyWithUrlFragmentExists;
+    };
+
+    var _setClassroomUrlFragment = function(classroomUrlFragment) {
+      _classroomUrlFragment = classroomUrlFragment;
+    };
+
+    var _setTopicUrlFragment = function(topicUrlFragment) {
+      _topicUrlFragment = topicUrlFragment;
+    };
+
     return {
       /**
        * Loads, or reloads, the story stored by this service given a
@@ -85,6 +105,9 @@ angular.module('oppia').factory('StoryEditorStateService', [
             _setSkillSummaries(newBackendStoryObject.skillSummaries);
             _updateStory(newBackendStoryObject.story);
             _storyIsLoading = false;
+            _setClassroomUrlFragment(
+              newBackendStoryObject.classroomUrlFragment);
+            _setTopicUrlFragment(newBackendStoryObject.topicUrlFragment);
           },
           function(error) {
             AlertsService.addWarning(
@@ -141,8 +164,9 @@ angular.module('oppia').factory('StoryEditorStateService', [
        * Sets the story stored within this service, propogating changes to
        * all bindings to the story returned by getStory(). The first
        * time this is called it will fire a global event based on the
-       * EVENT_STORY_INITIALIZED constant. All subsequent
-       * calls will similarly fire a EVENT_STORY_REINITIALIZED event.
+       * next() function of the _storyInitializedEventEmitter. All subsequent
+       * calls will similarly fire a next() function of the
+       * _storyReinitializedEventEmitter.
        */
       setStory: function(story) {
         _setStory(story);
@@ -193,6 +217,14 @@ angular.module('oppia').factory('StoryEditorStateService', [
         return true;
       },
 
+      getTopicUrlFragment: function() {
+        return _topicUrlFragment;
+      },
+
+      getClassroomUrlFragment: function() {
+        return _classroomUrlFragment;
+      },
+
       changeStoryPublicationStatus: function(
           newStoryStatusIsPublic, successCallback) {
         if (!_storyIsInitialized) {
@@ -221,6 +253,53 @@ angular.module('oppia').factory('StoryEditorStateService', [
        */
       isSavingStory: function() {
         return _storyIsBeingSaved;
+      },
+
+      get onStoryInitialized() {
+        return _storyInitializedEventEmitter;
+      },
+
+      get onStoryReinitialized() {
+        return _storyReinitializedEventEmitter;
+      },
+
+      get onViewStoryNodeEditor() {
+        return _viewStoryNodeEditorEventEmitter;
+      },
+
+      get onRecalculateAvailableNodes() {
+        return _recalculateAvailableNodesEventEmitter;
+      },
+      /**
+       * Returns whether the story URL fragment already exists on the server.
+       */
+      getStoryWithUrlFragmentExists: function() {
+        return _storyWithUrlFragmentExists;
+      },
+
+      /**
+       * Attempts to set the boolean variable _storyWithUrlFragmentExists based
+       * on the value returned by doesStoryWithUrlFragmentExistAsync and
+       * executes the success callback provided. No arguments are passed to the
+       * success callback. Execution of the success callback indicates that the
+       * async backend call was successful and that _storyWithUrlFragmentExists
+       * has been successfully updated.
+       */
+      updateExistenceOfStoryUrlFragment: function(
+          storyUrlFragment, successCallback) {
+        EditableStoryBackendApiService.doesStoryWithUrlFragmentExistAsync(
+          storyUrlFragment).then(
+          function(storyUrlFragmentExists) {
+            _setStoryWithUrlFragmentExists(storyUrlFragmentExists);
+            if (successCallback) {
+              successCallback();
+            }
+          }, function(error) {
+            AlertsService.addWarning(
+              error ||
+              'There was an error when checking if the story url fragment ' +
+              'exists for another story.');
+          });
       }
     };
   }

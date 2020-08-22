@@ -49,7 +49,9 @@ describe('Assign Skill To Topic Modal', function() {
       canonical_story_count: 2,
       subtopic_count: 2,
       total_skill_count: 10,
-      uncategorized_skill_count: 2
+      uncategorized_skill_count: 2,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA'
     });
     $scope = $rootScope.$new();
     $controller('AssignSkillToTopicModalController', {
@@ -59,8 +61,9 @@ describe('Assign Skill To Topic Modal', function() {
     });
   }));
 
-  it('should initialize the variables', function() {
-    expect($scope.topicSummaries).toEqual([topicSummaryDict]);
-    expect($scope.selectedTopicIds).toEqual([]);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.topicSummaries).toEqual([topicSummaryDict]);
+      expect($scope.selectedTopicIds).toEqual([]);
+    });
 });

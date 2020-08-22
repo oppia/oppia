@@ -28,8 +28,7 @@ angular.module('oppia').directive('schemaBasedCustomEditor', [
       scope: {},
       bindToController: {
         localValue: '=',
-        // The class of the object being edited.
-        objType: '='
+        schema: '='
       },
       template: require('./schema-based-custom-editor.directive.html'),
       controllerAs: '$ctrl',

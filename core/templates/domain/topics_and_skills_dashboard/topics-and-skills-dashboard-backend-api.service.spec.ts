@@ -33,6 +33,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
   const TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = (
     '/topics_and_skills_dashboard/data');
   const SKILLS_DASHBOARD_DATA_URL = '/skills_dashboard/data';
+  const ASSIGNED_SKILL_DATA_URL = '/topics_and_skills_dashboard/<skill_id>';
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -87,6 +88,39 @@ describe('Topics and Skills Dashboard backend API service', () => {
         req.flush({});
         expect(successHandler).not.toHaveBeenCalled();
         expect(failHandler).toHaveBeenCalled();
+      })
+    );
+
+    it('should successfully fetch assigned skills data from the backend',
+      fakeAsync(() => {
+        let successHandler = jasmine.createSpy('success');
+        let failHandler = jasmine.createSpy('fail');
+        topicsAndSkillsDashboardBackendApiService.fetchTopicAssignmentsForSkill(
+          'skillId1').then(
+          successHandler, failHandler);
+        let req = httpTestingController.expectOne(ASSIGNED_SKILL_DATA_URL);
+        expect(req.request.method).toEqual('GET');
+        req.flush({});
+        expect(successHandler).toHaveBeenCalled();
+        expect(failHandler).not.toHaveBeenCalled();
+      })
+    );
+
+    it('should use fail handler if fetching assigned skills data failed',
+      fakeAsync(() => {
+        let successHandler = jasmine.createSpy('success');
+        let failHandler = jasmine.createSpy('fail');
+        topicsAndSkillsDashboardBackendApiService.fetchSkillsDashboardData(
+          null, 0, null).then(
+          successHandler, failHandler);
+        let req = httpTestingController.expectOne(ASSIGNED_SKILL_DATA_URL);
+        expect(req.request.method).toEqual('GET');
+        req.flush('Error loading assigned skill data.', {
+          status: 500
+        });
+        expect(successHandler).not.toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith(
+          'Error loading assigned skill data.');
       })
     );
 

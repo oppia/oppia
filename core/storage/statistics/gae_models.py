@@ -99,11 +99,6 @@ class StateCounterModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateCounterModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_or_create(cls, exploration_id, state_name):
         """Gets or creates an entity by exploration_id and state_name.
@@ -151,13 +146,6 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """AnswerSubmittedEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -219,13 +207,6 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationActualStartEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
@@ -280,11 +261,6 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SolutionHitEventLogEntryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -356,9 +332,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -368,13 +344,6 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StartExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -490,9 +459,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -502,13 +471,6 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """MaybeLeaveExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -615,9 +577,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -627,13 +589,6 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CompleteExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -725,13 +680,6 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """RateExplorationEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
         """Generates entity ID for a new rate exploration event based on its
@@ -813,9 +761,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -825,11 +773,6 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateHitEventLogEntryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -914,13 +857,6 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateCompleteEventLogEntryModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
@@ -980,13 +916,6 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """LeaveForRefresherExplorationEventLogEntryModel doesn't have any field
-        with user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -1069,11 +998,6 @@ class ExplorationStatsModel(base_models.BaseModel):
         tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationStatsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -1239,11 +1163,6 @@ class ExplorationIssuesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationIssuesModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
         """Generates an ID for the instance of the form
@@ -1330,11 +1249,6 @@ class PlaythroughModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """PlaythroughModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the playthrough of the form
@@ -1344,10 +1258,10 @@ class PlaythroughModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new PlaythroughModel instance.
+            str. ID of the new PlaythroughModel instance.
 
         Raises:
-            Exception: The id generator for PlaythroughModel is producing too
+            Exception. The id generator for PlaythroughModel is producing too
                 many collisions.
         """
 
@@ -1452,11 +1366,6 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """LearnerAnswerDetailsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_state_reference_for_exploration(cls, exp_id, state_name):
         """Generate the state_reference for the state in an exploration.
@@ -1516,7 +1425,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 instance is being created. For exploration state it will be of
                 the form 'exp_id:state_name', and for question it will be of
                 the form 'question_id'.
-            interaction_id: str.  The ID of the interaction for which the
+            interaction_id: str. The ID of the interaction for which the
                 answer details are received.
             learner_answer_info_list: list(LearnerAnswerInfo). The list of
                 LearnerAnswerInfo objects in dict format, which is defined in
@@ -1599,11 +1508,6 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationAnnotationsModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exploration_id, exploration_version):
@@ -1705,10 +1609,8 @@ class StateAnswersModel(base_models.BaseModel):
     # submitted_answer_list, minus any overhead of the property itself. This
     # value is found by summing the JSON sizes of all answer dicts stored inside
     # submitted_answer_list.
-    # pylint: disable=invalid-name
     accumulated_answer_json_size_bytes = ndb.IntegerProperty(
         indexed=False, required=False, default=0)
-    # pylint: enable=invalid-name
 
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
@@ -1729,11 +1631,6 @@ class StateAnswersModel(base_models.BaseModel):
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateAnswersModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_model(
@@ -2052,11 +1949,6 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StateAnswersCalcOutputModels doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def create_or_update(
             cls, exploration_id, exploration_version, state_name,
@@ -2077,7 +1969,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                 stored as a JSON blob.
 
         Raises:
-            Exception: The calculation_output is too large.
+            Exception. The calculation_output is too large.
         """
         instance_id = cls._get_entity_id(
             exploration_id, exploration_version, state_name, calculation_id)

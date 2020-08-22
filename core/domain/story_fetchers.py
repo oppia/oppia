@@ -25,13 +25,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import caching_services
 from core.domain import story_domain
 from core.platform import models
 import feconf
+import python_utils
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
-memcache_services = models.Registry.import_memcache_services()
 
 
 def _migrate_story_contents_to_latest_schema(versioned_story_contents):
@@ -42,13 +43,13 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
     to account for that new version.
 
     Args:
-        versioned_story_contents: A dict with two keys:
+        versioned_story_contents: dict. A dict with two keys:
           - schema_version: str. The schema version for the story_contents dict.
           - story_contents: dict. The dict comprising the story
               contents.
 
     Raises:
-        Exception: The schema version of the story_contents is outside of what
+        Exception. The schema version of the story_contents is outside of what
             is supported at present.
     """
     story_contents_schema_version = versioned_story_contents['schema_version']
@@ -63,23 +64,6 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
         story_domain.Story.update_story_contents_from_model(
             versioned_story_contents, story_contents_schema_version)
         story_contents_schema_version += 1
-
-
-# Repository GET methods.
-def get_story_memcache_key(story_id, version=None):
-    """Returns a memcache key for the story.
-
-    Args:
-        story_id: str. ID of the story.
-        version: str. Schema version of the story.
-
-    Returns:
-        str. The memcache key of the story.
-    """
-    if version:
-        return 'story-version:%s:%s' % (story_id, version)
-    else:
-        return 'story:%s' % story_id
 
 
 def get_story_from_model(story_model):
@@ -114,7 +98,7 @@ def get_story_from_model(story_model):
             versioned_story_contents['story_contents']),
         versioned_story_contents['schema_version'],
         story_model.language_code, story_model.corresponding_topic_id,
-        story_model.version, story_model.created_on,
+        story_model.version, story_model.url_fragment, story_model.created_on,
         story_model.last_updated)
 
 
@@ -123,10 +107,12 @@ def get_story_summary_from_model(story_summary_model):
     story summary model.
 
     Args:
-        story_summary_model: StorySummaryModel.
+        story_summary_model: StorySummaryModel. The story summary model object
+            to get the corresponding domain object.
 
     Returns:
-        StorySummary.
+        StorySummary. The corresponding domain object to the given story
+        summary model object.
     """
     return story_domain.StorySummary(
         story_summary_model.id, story_summary_model.title,
@@ -136,6 +122,7 @@ def get_story_summary_from_model(story_summary_model):
         story_summary_model.node_titles,
         story_summary_model.thumbnail_bg_color,
         story_summary_model.thumbnail_filename,
+        story_summary_model.url_fragment,
         story_summary_model.story_model_created_on,
         story_summary_model.story_model_last_updated
     )
@@ -155,22 +142,44 @@ def get_story_by_id(story_id, strict=True, version=None):
         Story or None. The domain object representing a story with the
         given id, or None if it does not exist.
     """
-    story_memcache_key = get_story_memcache_key(
-        story_id, version=version)
-    memcached_story = memcache_services.get_multi(
-        [story_memcache_key]).get(story_memcache_key)
+    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    cached_story = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_STORY,
+        sub_namespace,
+        [story_id]).get(story_id)
 
-    if memcached_story is not None:
-        return memcached_story
+    if cached_story is not None:
+        return cached_story
     else:
         story_model = story_models.StoryModel.get(
             story_id, strict=strict, version=version)
         if story_model:
             story = get_story_from_model(story_model)
-            memcache_services.set_multi({story_memcache_key: story})
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_STORY,
+                sub_namespace,
+                {story_id: story})
             return story
         else:
             return None
+
+
+def get_story_by_url_fragment(url_fragment):
+    """Returns a domain object representing a story.
+
+    Args:
+        url_fragment: str. The url fragment of the story.
+
+    Returns:
+        Story or None. The domain object representing a story with the
+        given url_fragment, or None if it does not exist.
+    """
+    story_model = story_models.StoryModel.get_by_url_fragment(url_fragment)
+    if story_model is None:
+        return None
+
+    story = get_story_from_model(story_model)
+    return story
 
 
 def get_story_summary_by_id(story_id, strict=True):
@@ -269,7 +278,7 @@ def get_completed_nodes_in_story(user_id, story_id):
         story_id: str. The id of the story.
 
     Returns:
-        list(StoryNode): The list of the story nodes that the user has
+        list(StoryNode). The list of the story nodes that the user has
         completed.
     """
     story = get_story_by_id(story_id)
@@ -291,8 +300,7 @@ def get_pending_nodes_in_story(user_id, story_id):
         story_id: str. The id of the story.
 
     Returns:
-        list(StoryNode): The list of story nodes, pending
-        for the user.
+        list(StoryNode). The list of story nodes, pending for the user.
     """
     story = get_story_by_id(story_id)
     pending_nodes = []
@@ -343,6 +351,6 @@ def get_node_index_by_story_id_and_node_id(story_id, node_id):
 
     node_index = story.story_contents.get_node_index(node_id)
     if node_index is None:
-        raise Exception('Story node with id %s does not exist '
-                        'in this story.' % node_id)
+        raise Exception(
+            'Story node with id %s does not exist in this story.' % node_id)
     return node_index

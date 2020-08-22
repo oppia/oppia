@@ -22,6 +22,7 @@ import atexit
 import contextlib
 import os
 import re
+import signal
 import subprocess
 import sys
 import time
@@ -32,17 +33,19 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 
-CHROME_DRIVER_VERSION = '77.0.3865.40'
-
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
 PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
+# Path relative to current working directory where portserver socket
+# file will be created.
+PORTSERVER_SOCKET_FILEPATH = os.path.join(
+    os.getcwd(), 'portserver.socket')
+KILL_PORTSERVER_TIMEOUT_SECS = 10
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 WEBDRIVER_HOME_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'webdriver-manager')
 WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
@@ -71,7 +74,8 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
    bash scripts/run_e2e_tests.sh
 
@@ -117,10 +121,8 @@ _PARSER.add_argument(
          'For performing a full test, no argument is required.')
 
 _PARSER.add_argument(
-    '--auto_select_chromedriver',
-    help='Automatically sets the chromedriver version depending on the version '
-         'of Chrome installed in the environment.',
-    action='store_true')
+    '--chrome_driver_version',
+    help='Uses the specified version of the chrome driver ')
 
 _PARSER.add_argument(
     '--debug_mode',
@@ -135,8 +137,20 @@ _PARSER.add_argument(
     action='store_true')
 
 _PARSER.add_argument(
-    '--community_dashboard_enabled', action='store_true',
-    help='Run the test after enabling the community dashboard page.')
+    '--server_log_level',
+    help='Sets the log level for the appengine server. The default value is '
+         'set to critical.',
+    default='critical',
+    choices=['critical', 'error', 'warning', 'info'])
+
+_PARSER.add_argument(
+    '--contributor_dashboard_enabled', action='store_true',
+    help='Run the test after enabling the contributor dashboard page.')
+
+_PARSER.add_argument(
+    '--source_maps',
+    help='Build webpack with source maps.',
+    action='store_true')
 
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
@@ -156,9 +170,11 @@ def ensure_screenshots_dir_is_removed():
 
 
 def cleanup():
-    """Kill the running subprocesses and server fired in this program."""
-    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
-    webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
+    """Kill the running subprocesses and server fired in this program, set
+    constants back to default values.
+    """
+    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
+    webdriver_download_path = '%s/selenium' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
         webdriver_download_path = os.path.abspath(webdriver_download_path)
@@ -171,6 +187,8 @@ def cleanup():
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
+    build.set_constants_to_default()
+    common.stop_redis_server()
 
 
 def is_oppia_server_already_running():
@@ -178,7 +196,7 @@ def is_oppia_server_already_running():
     them is taken, it may indicate there is already one Oppia instance running.
 
     Returns:
-        bool: Whether there is a running Oppia instance.
+        bool. Whether there is a running Oppia instance.
     """
     running = False
     for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
@@ -192,34 +210,18 @@ def is_oppia_server_already_running():
     return running
 
 
-def wait_for_port_to_be_open(port_number):
-    """Wait until the port is open.
-
-    Args:
-        port_number: int. The port number to wait.
-    """
-    waited_seconds = 0
-    while (not common.is_port_open(port_number) and
-           waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
-        time.sleep(1)
-        waited_seconds += 1
-    if (waited_seconds ==
-            MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS and
-            not common.is_port_open(port_number)):
-        python_utils.PRINT(
-            'Failed to start server on port %s, exiting ...' % port_number)
-        sys.exit(1)
-
-
-def run_webpack_compilation():
+def run_webpack_compilation(source_maps=False):
     """Runs webpack compilation."""
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
     for _ in python_utils.RANGE(max_tries):
         try:
+            webpack_config_file = (
+                build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if source_maps
+                else build.WEBPACK_DEV_CONFIG)
             subprocess.check_call([
                 common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-                'webpack.dev.config.ts'])
+                webpack_config_file])
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
@@ -245,18 +247,19 @@ def run_webdriver_manager(parameters):
     p.communicate()
 
 
-def update_community_dashboard_status_in_feconf_file(
-        feconf_file_path, enable_community_dashboard):
-    """Change feconf.py file based on whether the community dashboard is
+def update_contributor_dashboard_status_in_feconf_file(
+        feconf_file_path, enable_contributor_dashboard):
+    """Change feconf.py file based on whether the contributor dashboard is
     enabled.
 
     Args:
         feconf_file_path: str. Path to the feconf.py file.
-        enable_community_dashboard: bool. Represents whether community
+        enable_contributor_dashboard: bool. Represents whether contributor
             dashboard is enabled.
     """
-    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
-    replace = 'COMMUNITY_DASHBOARD_ENABLED = %s' % enable_community_dashboard
+    pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
+    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = %s' % (
+        enable_contributor_dashboard)
     common.inplace_replace_file(feconf_file_path, pattern, replace)
 
 
@@ -268,7 +271,8 @@ def setup_and_install_dependencies(skip_install):
         install_chrome_on_travis.main(args=[])
 
 
-def build_js_files(dev_mode_setting, deparallelize_terser=False):
+def build_js_files(
+        dev_mode_setting, deparallelize_terser=False, source_maps=False):
     """Build the javascript files.
 
     Args:
@@ -276,16 +280,22 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
             in dev mode.
         deparallelize_terser: bool. Represents whether to use webpack
             compilation config that disables parallelism on terser plugin.
+        source_maps: bool. Represents whether to use source maps while
+            building webpack.
     """
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
+        build_args = ['--prod_env']
+
         if deparallelize_terser:
-            build.main(args=['--prod_env', '--deparallelize_terser'])
-        else:
-            build.main(args=['--prod_env'])
+            build_args.append('--deparallelize_terser')
+        if source_maps:
+            build_args.append('--source_maps')
+
+        build.main(args=build_args)
     else:
         build.main(args=[])
-        run_webpack_compilation()
+        run_webpack_compilation(source_maps=source_maps)
 
 
 @contextlib.contextmanager
@@ -352,7 +362,7 @@ def get_parameter_for_sharding(sharding_instances):
         sharding_instances: int. How many sharding instances to be running.
 
     Returns:
-        list(str): A list of parameters to represent the sharding configuration.
+        list(str). A list of parameters to represent the sharding configuration.
     """
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
@@ -370,7 +380,7 @@ def get_parameter_for_dev_mode(dev_mode_setting):
         dev_mode_setting: bool. Whether the test is running on dev_mode.
 
     Returns:
-        str: A string for the testing mode command line parameter.
+        str. A string for the testing mode command line parameter.
     """
     return '--params.devMode=%s' % dev_mode_setting
 
@@ -383,7 +393,7 @@ def get_parameter_for_suite(suite_name):
             is `full`, all tests will run.
 
     Returns:
-        list(str): A list of command line parameters for the suite.
+        list(str). A list of command line parameters for the suite.
     """
     return ['--suite', suite_name]
 
@@ -400,7 +410,7 @@ def get_e2e_test_parameters(
             dev mode.
 
     Returns:
-        list(str): Parameters for running the tests.
+        list(str). Parameters for running the tests.
     """
     sharding_parameters = get_parameter_for_sharding(sharding_instances)
     dev_mode_parameters = get_parameter_for_dev_mode(dev_mode_setting)
@@ -414,21 +424,24 @@ def get_e2e_test_parameters(
     return commands
 
 
-def start_google_app_engine_server(dev_mode_setting):
+def start_google_app_engine_server(dev_mode_setting, log_level):
     """Start the Google App Engine server.
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
             in dev mode.
+        log_level: str. The log level for the google app engine server.
     """
     app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode_setting else '')
 
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
-        '--clear_datastore=yes --dev_appserver_log_level=critical '
-        '--log_level=critical --skip_sdk_update_check=true %s' % (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
-            GOOGLE_APP_ENGINE_PORT, app_yaml_filepath), shell=True)
+        '--clear_datastore=yes --dev_appserver_log_level=%s '
+        '--log_level=%s --skip_sdk_update_check=true %s' % (
+            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
+            GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
+        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH},
+        shell=True)
     SUBPROCESSES.append(p)
 
 
@@ -438,13 +451,91 @@ def get_chrome_driver_version():
     This method follows the steps mentioned here:
     https://chromedriver.chromium.org/downloads/version-selection
     """
-    output = os.popen('google-chrome --version').read()
+    popen_args = ['google-chrome', '--version']
+    if common.is_mac_os():
+        # There are spaces between Google and Chrome in the path. Spaces don't
+        # need to be escaped when we're not using the terminal, ie. shell=False
+        # for Popen by default.
+        popen_args = [
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            '--version'
+        ]
+    try:
+        proc = subprocess.Popen(popen_args, stdout=subprocess.PIPE)
+        output = proc.stdout.readline()
+    except OSError:
+        # For the error message for the mac command, we need to add the
+        # backslashes in. This is because it is likely that a user will try to
+        # run the command on their terminal and, as mentioned above, the mac
+        # get chrome version command has spaces in the path which need to be
+        # escaped for successful terminal use.
+        raise Exception(
+            'Failed to execute "%s" command. '
+            'This is used to determine the chromedriver version to use. '
+            'Please set the chromedriver version manually using '
+            '--chrome_driver_version flag. To determine the chromedriver '
+            'version to be used, please follow the instructions mentioned '
+            'in the following URL:\n'
+            'https://chromedriver.chromium.org/downloads/version-selection' % (
+                ' '.join(arg.replace(' ', r'\ ') for arg in popen_args)
+            )
+        )
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
     chrome_version = '.'.join(chrome_version.split('.')[:-1])
     response = python_utils.url_open(
         'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s'
         % chrome_version)
-    return response.read()
+    chrome_driver_version = response.read()
+    python_utils.PRINT('\n\nCHROME VERSION: %s' % chrome_version)
+    return chrome_driver_version
+
+
+def start_portserver():
+    """Start a portserver in a subprocess.
+
+    The portserver listens at PORTSERVER_SOCKET_FILEPATH and allocates free
+    ports to clients. This prevents race conditions when two clients
+    request ports in quick succession. The local Google App Engine
+    server that we use to serve the development version of Oppia uses
+    python_portpicker, which is compatible with the portserver this
+    function starts, to request ports.
+
+    By "compatible" we mean that python_portpicker requests a port by
+    sending a request consisting of the PID of the requesting process
+    and expects a response consisting of the allocated port number. This
+    is the interface provided by this portserver.
+
+    Returns:
+        subprocess.Popen. The Popen subprocess object.
+    """
+    process = subprocess.Popen([
+        'python', '-m',
+        '.'.join(['scripts', 'run_portserver']),
+        '--portserver_unix_socket_address',
+        PORTSERVER_SOCKET_FILEPATH,
+    ])
+    return process
+
+
+def cleanup_portserver(portserver_process):
+    """Shut down the portserver.
+
+    We wait KILL_PORTSERVER_TIMEOUT_SECS seconds for the portserver to
+    shut down after sending CTRL-C (SIGINT). The portserver is configured
+    to shut down cleanly upon receiving this signal. If the server fails
+    to shut down, we kill the process.
+
+    Args:
+        portserver_process: subprocess.Popen. The Popen subprocess
+            object for the portserver.
+    """
+    portserver_process.send_signal(signal.SIGINT)
+    for _ in python_utils.RANGE(KILL_PORTSERVER_TIMEOUT_SECS):
+        time.sleep(1)
+        if not portserver_process.poll():
+            break
+    if portserver_process.poll():
+        portserver_process.kill()
 
 
 def main(args=None):
@@ -457,25 +548,30 @@ def main(args=None):
         sys.exit(1)
     setup_and_install_dependencies(parsed_args.skip_install)
 
+    common.start_redis_server()
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
 
-    update_community_dashboard_status_in_feconf_file(
-        FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
+    update_contributor_dashboard_status_in_feconf_file(
+        FECONF_FILE_PATH, parsed_args.contributor_dashboard_enabled)
 
-    if not parsed_args.skip_build:
+    if parsed_args.skip_build:
+        build.modify_constants(prod_env=parsed_args.prod_env)
+    else:
         build_js_files(
-            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
-    version = (
-        get_chrome_driver_version() if parsed_args.auto_select_chromedriver
-        else CHROME_DRIVER_VERSION)
+            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser,
+            source_maps=parsed_args.source_maps)
+    version = parsed_args.chrome_driver_version or get_chrome_driver_version()
+    python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
-    start_google_app_engine_server(dev_mode)
+    portserver_process = start_portserver()
+    atexit.register(cleanup_portserver, portserver_process)
+    start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
 
-    wait_for_port_to_be_open(WEB_DRIVER_PORT)
-    wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+    common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
+    common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH]
     if parsed_args.debug_mode:

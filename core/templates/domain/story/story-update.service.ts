@@ -28,7 +28,7 @@ angular.module('oppia').factory('StoryUpdateService', [
   'UndoRedoService', 'CMD_ADD_STORY_NODE', 'CMD_DELETE_STORY_NODE',
   'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS',
   'CMD_UPDATE_STORY_NODE_PROPERTY', 'CMD_UPDATE_STORY_PROPERTY',
-  'INITIAL_NODE_ID', 'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
+  'INITIAL_NODE_ID', 'NODE', 'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
   'STORY_NODE_PROPERTY_DESCRIPTION', 'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS',
   'STORY_NODE_PROPERTY_EXPLORATION_ID',
   'STORY_NODE_PROPERTY_OUTLINE', 'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
@@ -36,12 +36,13 @@ angular.module('oppia').factory('StoryUpdateService', [
   'STORY_NODE_PROPERTY_THUMBNAIL_FILENAME', 'STORY_NODE_PROPERTY_TITLE',
   'STORY_PROPERTY_DESCRIPTION', 'STORY_PROPERTY_LANGUAGE_CODE',
   'STORY_PROPERTY_NOTES', 'STORY_PROPERTY_THUMBNAIL_BG_COLOR',
-  'STORY_PROPERTY_THUMBNAIL_FILENAME', 'STORY_PROPERTY_TITLE', function(
+  'STORY_PROPERTY_THUMBNAIL_FILENAME', 'STORY_PROPERTY_TITLE',
+  'STORY_PROPERTY_URL_FRAGMENT', function(
       AlertsService, ChangeObjectFactory, StoryEditorStateService,
       UndoRedoService, CMD_ADD_STORY_NODE, CMD_DELETE_STORY_NODE,
       CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
       CMD_UPDATE_STORY_NODE_PROPERTY, CMD_UPDATE_STORY_PROPERTY,
-      INITIAL_NODE_ID, STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
+      INITIAL_NODE_ID, NODE, STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
       STORY_NODE_PROPERTY_DESCRIPTION, STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
       STORY_NODE_PROPERTY_EXPLORATION_ID,
       STORY_NODE_PROPERTY_OUTLINE, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
@@ -49,7 +50,8 @@ angular.module('oppia').factory('StoryUpdateService', [
       STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, STORY_NODE_PROPERTY_TITLE,
       STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_LANGUAGE_CODE,
       STORY_PROPERTY_NOTES, STORY_PROPERTY_THUMBNAIL_BG_COLOR,
-      STORY_PROPERTY_THUMBNAIL_FILENAME, STORY_PROPERTY_TITLE) {
+      STORY_PROPERTY_THUMBNAIL_FILENAME, STORY_PROPERTY_TITLE,
+      STORY_PROPERTY_URL_FRAGMENT) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // story.
@@ -133,6 +135,24 @@ angular.module('oppia').factory('StoryUpdateService', [
           }, function(changeDict, story) {
             // ---- Undo ----
             story.setTitle(oldTitle);
+          });
+      },
+
+      /**
+       * Changes the url fragment of a story and records the change in the
+       * undo/redo service.
+       */
+      setStoryUrlFragment: function(story, urlFragment) {
+        var oldUrlFragment = angular.copy(story.getUrlFragment());
+        _applyStoryPropertyChange(
+          story, STORY_PROPERTY_URL_FRAGMENT, oldUrlFragment, urlFragment,
+          function(changeDict, story) {
+            // ---- Apply ----
+            var newUrlFragment = _getNewPropertyValueFromChangeDict(changeDict);
+            story.setUrlFragment(newUrlFragment);
+          }, function(changeDict, story) {
+            // ---- Undo ----
+            story.setUrlFragment(oldUrlFragment);
           });
       },
 
@@ -510,6 +530,21 @@ angular.module('oppia').factory('StoryUpdateService', [
             story.getStoryContents().addDestinationNodeIdToNode(
               nodeId, destinationNodeId);
             StoryEditorStateService.setExpIdsChanged();
+          });
+      },
+      /**
+       * Removes a node of a story and records the change in the
+       * undo/redo service.
+       */
+      rearrangeNodeInStory: function(story, fromIndex, toIndex) {
+        _applyStoryContentsPropertyChange(
+          story, NODE, fromIndex, toIndex,
+          function(changeDict, story) {
+            // ---- Apply ----
+            story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);
+          }, function(changeDict, story) {
+            // ---- Undo ----
+            story.getStoryContents().rearrangeNodeInStory(fromIndex, toIndex);
           });
       },
 

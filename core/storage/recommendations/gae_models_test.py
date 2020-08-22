@@ -38,12 +38,6 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
             recommendations_models.ExplorationRecommendationsModel
             .has_reference_to_user_id('any_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            recommendations_models.ExplorationRecommendationsModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
 
 class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSimilaritiesModel class."""

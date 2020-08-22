@@ -70,6 +70,8 @@ class StoryModel(base_models.VersionedModel):
         ndb.IntegerProperty(required=True, indexed=True))
     # The topic id to which the story belongs.
     corresponding_topic_id = ndb.StringProperty(indexed=True, required=True)
+    # The url fragment for the story.
+    url_fragment = ndb.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -87,11 +89,6 @@ class StoryModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StoryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -125,6 +122,22 @@ class StoryModel(base_models.VersionedModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_by_url_fragment(cls, url_fragment):
+        """Gets StoryModel by url_fragment. Returns None if the story with
+        name url_fragment doesn't exist.
+
+        Args:
+            url_fragment: str. The url fragment of the story.
+
+        Returns:
+            StoryModel|None. The story model of the story or None if not
+            found.
+        """
+        return StoryModel.query().filter(
+            cls.url_fragment == url_fragment).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
 
 
 class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -202,6 +215,8 @@ class StorySummaryModel(base_models.BaseModel):
     # The thumbnail background color of the story.
     thumbnail_bg_color = ndb.StringProperty(indexed=True)
     version = ndb.IntegerProperty(required=True)
+    # The url fragment for the story.
+    url_fragment = ndb.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -227,8 +242,3 @@ class StorySummaryModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StoryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

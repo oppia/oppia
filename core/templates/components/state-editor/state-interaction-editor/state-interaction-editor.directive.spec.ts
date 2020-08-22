@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'exploration-editor-tab.directive.ts');
+  'exploration-editor-tab.component.ts');
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -122,7 +122,8 @@ describe('State Interaction controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
               outcome: {
                 dest: 'default',
                 feedback: {
@@ -171,7 +172,8 @@ describe('State Interaction controller', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
               outcome: {
                 dest: 'default',
                 feedback: {

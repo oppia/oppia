@@ -368,11 +368,11 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 triggered and the total play count is incremented. If he/she
                 rates an exploration, an event of type `rate` is triggered and
                 average rating of the realtime model is refreshed.
-            *args: tuple(*). If event_type is 'start', then this is a 1-element
-                tuple containing:
+            *args: list(*). If event_type is 'start', then this is a 1-element
+                list containing:
                     str. The id of the exploration currently being played.
                 If event_type is 'rate_exploration', then this is a 3-element
-                tuple containing:
+                list containing:
                     str. The id of the exploration currently being played.
                     float. The rating given by user to the exploration.
                     float. The old rating of the exploration, before it is

@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for JobSpecObjectFactory.ts.
  */
 
-import { JobStausSummaryObjectFactory } from
+import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
 
 describe('Job Spec Object Factory', () => {
-  let jsof: JobStausSummaryObjectFactory;
+  let jsof: JobStatusSummaryObjectFactory;
 
   beforeEach(() => {
-    jsof = new JobStausSummaryObjectFactory();
+    jsof = new JobStatusSummaryObjectFactory();
   });
 
   it('should correctly convert backend dict to JobSpec object.', () => {

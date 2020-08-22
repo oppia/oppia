@@ -21,9 +21,9 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IImageClickInputCustomizationArgs } from
+import { ImageClickInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class ImageClickInputValidationService {
       baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IImageClickInputCustomizationArgs): IWarning[] {
+      customizationArgs: ImageClickInputCustomizationArgs): Warning[] {
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs, ['imageAndRegions']);
 
@@ -106,8 +106,8 @@ export class ImageClickInputValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: IImageClickInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      stateName: string, customizationArgs: ImageClickInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
@@ -125,7 +125,7 @@ export class ImageClickInputValidationService {
 
     // Check that each rule refers to a valid region string.
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         if (rules[j].type === 'IsInRegion') {
           var label = <string> rules[j].inputs.x;

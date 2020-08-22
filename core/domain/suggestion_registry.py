@@ -26,7 +26,7 @@ from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
@@ -121,7 +121,7 @@ class BaseSuggestion(python_utils.OBJECT):
         The subclasses must validate the change and score_category fields.
 
         Raises:
-            ValidationError: One or more attributes of the BaseSuggestion object
+            ValidationError. One or more attributes of the BaseSuggestion object
                 are invalid.
         """
         if (
@@ -156,11 +156,27 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
-            if self.final_reviewer_id:
+        if (
+                self.author_id is not None and
+                not user_services.is_user_id_correct(self.author_id)
+        ):
+            raise utils.ValidationError(
+                'Expected author_id to be in a valid user ID format, '
+                'received %s' % self.author_id)
+
+        if self.final_reviewer_id is not None:
+            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
+            if (
+                    not user_services.is_user_id_correct(
+                        self.final_reviewer_id) and
+                    self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
+            ):
+                raise utils.ValidationError(
+                    'Expected final_reviewer_id to be in a valid user ID '
+                    'format, received %s' % self.final_reviewer_id)
 
         if not isinstance(self.score_category, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -259,7 +275,7 @@ class SuggestionEditStateContent(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated):
+            change, score_category, last_updated=None):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -280,7 +296,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """Validates a suggestion object of type SuggestionEditStateContent.
 
         Raises:
-            ValidationError: One or more attributes of the
+            ValidationError. One or more attributes of the
                 SuggestionEditStateContent object are invalid.
         """
         super(SuggestionEditStateContent, self).validate()
@@ -369,7 +385,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             change: ExplorationChange. The new change.
 
         Raises:
-            ValidationError: Invalid new change.
+            ValidationError. Invalid new change.
         """
         if self.change.cmd != change.cmd:
             raise utils.ValidationError(
@@ -398,7 +414,6 @@ class SuggestionEditStateContent(BaseSuggestion):
             html_string_list.append(self.change.old_value['html'])
         return html_string_list
 
-
     def convert_html_in_suggestion_change(self, conversion_fn):
         """Checks for HTML fields in a suggestion change and converts it
         according to the conversion function.
@@ -422,7 +437,7 @@ class SuggestionTranslateContent(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated):
+            change, score_category, last_updated=None):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
@@ -443,7 +458,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         """Validates a suggestion object of type SuggestionTranslateContent.
 
         Raises:
-            ValidationError: One or more attributes of the
+            ValidationError. One or more attributes of the
                 SuggestionTranslateContent object are invalid.
         """
         super(SuggestionTranslateContent, self).validate()
@@ -545,7 +560,7 @@ class SuggestionAddQuestion(BaseSuggestion):
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated):
+            change, score_category, last_updated=None):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
@@ -569,7 +584,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Validates a suggestion object of type SuggestionAddQuestion.
 
         Raises:
-            ValidationError: One or more attributes of the SuggestionAddQuestion
+            ValidationError. One or more attributes of the SuggestionAddQuestion
                 object are invalid.
         """
         super(SuggestionAddQuestion, self).validate()
@@ -642,7 +657,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Question state schema version is not up to date.')
 
         skill_domain.Skill.require_valid_skill_id(self.change.skill_id)
-        skill = skill_services.get_skill_by_id(
+        skill = skill_fetchers.get_skill_by_id(
             self.change.skill_id, strict=False)
         if skill is None:
             raise utils.ValidationError(
@@ -667,7 +682,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
         question_services.add_question(self.author_id, question)
-        skill = skill_services.get_skill_by_id(
+        skill = skill_fetchers.get_skill_by_id(
             self.change.skill_id, strict=False)
         if skill is None:
             raise utils.ValidationError(
@@ -680,7 +695,6 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Populates old value of the change."""
         pass
 
-
     def pre_update_validate(self, change):
         """Performs the pre update validation. This functions need to be called
         before updating the suggestion.
@@ -689,7 +703,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             change: QuestionChange. The new change.
 
         Raises:
-            ValidationError: Invalid new change.
+            ValidationError. Invalid new change.
         """
         if self.change.cmd != change.cmd:
             raise utils.ValidationError(
@@ -731,7 +745,12 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.change.question_dict['question_state_data'] = (
             state_domain.State.convert_html_fields_in_state(
                 self.change.question_dict['question_state_data'],
-                conversion_fn))
+                conversion_fn,
+                state_uses_old_interaction_cust_args_schema=(
+                    self.change.question_dict[
+                        'question_state_data_schema_version'] < 37)
+            )
+        )
 
 
 class BaseVoiceoverApplication(python_utils.OBJECT):
@@ -783,7 +802,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
         """Validates the BaseVoiceoverApplication object.
 
         Raises:
-            ValidationError: One or more attributes of the
+            ValidationError. One or more attributes of the
                 BaseVoiceoverApplication object are invalid.
         """
 

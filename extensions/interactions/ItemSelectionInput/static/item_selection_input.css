@@ -49,6 +49,7 @@ md-checkbox.item-selection-input-checkbox .md-label {
 
 .item-selection-input-container img {
   max-height: 200px;
+  object-fit: contain;
 }
 
 .multiple-choice-option-container {

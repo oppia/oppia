@@ -29,6 +29,7 @@ from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.platform import models
 import feconf
+import utils
 
 (opportunity_models,) = models.Registry.import_models(
     [models.NAMES.opportunity])
@@ -218,8 +219,13 @@ def update_opportunity_with_updated_exploration(exp_id):
         get_exploration_opportunity_summary_from_model(model))
     exploration_opportunity_summary.content_count = content_count
     exploration_opportunity_summary.translation_counts = translation_counts
-    exploration_opportunity_summary.complete_translation_languages = (
-        complete_translation_language_list)
+    exploration_opportunity_summary.incomplete_translation_language_codes = (
+        utils.compute_list_difference(
+            exploration_opportunity_summary
+            .incomplete_translation_language_codes,
+            complete_translation_language_list
+        )
+    )
 
     new_languages_for_voiceover = set(complete_translation_language_list) - set(
         exploration_opportunity_summary.assigned_voice_artist_in_language_codes)
@@ -446,10 +452,15 @@ def get_exploration_opportunity_summaries_by_ids(ids):
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
     opportunities = []
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
-        exp_opportunity_summary = (
-            get_exploration_opportunity_summary_from_model(
-                exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary)
+        if exp_opportunity_summary_model is not None:
+            exp_opportunity_summary = (
+                get_exploration_opportunity_summary_from_model(
+                    exp_opportunity_summary_model))
+            opportunities.append(exp_opportunity_summary)
+        else:
+            logging.warning(
+                'When getting the exploration opportunity summary models for '
+                'ids: %s, one of the models was None.' % ids)
     return opportunities
 
 
@@ -552,7 +563,7 @@ def create_skill_opportunity(skill_id, skill_description):
         skill_description: str. The skill_description of the opportunity.
 
     Raises:
-        Exception: If a SkillOpportunityModel corresponding to the supplied
+        Exception. If a SkillOpportunityModel corresponding to the supplied
             skill_id already exists.
     """
     skill_opportunity_model = (
@@ -649,7 +660,7 @@ def increment_question_counts(skill_ids, delta):
         delta: int. The delta for which to increment each question_count.
     """
     updated_skill_opportunities = (
-        _get_skill_opportunity_with_updated_question_count(skill_ids, delta))
+        _get_skill_opportunities_with_updated_question_counts(skill_ids, delta))
     _save_skill_opportunities(updated_skill_opportunities)
 
 
@@ -675,15 +686,15 @@ def update_skill_opportunities_on_question_linked_skills_change(
     skill_ids_removed_from_question = old_skill_ids_set - new_skill_ids_set
     updated_skill_opportunities = []
     updated_skill_opportunities.extend(
-        _get_skill_opportunity_with_updated_question_count(
+        _get_skill_opportunities_with_updated_question_counts(
             new_skill_ids_added_to_question, 1))
     updated_skill_opportunities.extend(
-        _get_skill_opportunity_with_updated_question_count(
+        _get_skill_opportunities_with_updated_question_counts(
             skill_ids_removed_from_question, -1))
     _save_skill_opportunities(updated_skill_opportunities)
 
 
-def _get_skill_opportunity_with_updated_question_count(skill_ids, delta):
+def _get_skill_opportunities_with_updated_question_counts(skill_ids, delta):
     """Returns a list of SkillOpportunities with corresponding skill_ids
     with question_count(s) updated by delta.
 

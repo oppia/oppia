@@ -24,12 +24,10 @@ import { CamelCaseToHyphensPipe } from
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { InteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
 
-interface InteractionArgs {
-  choices: {
-    value: string;
-  };
-}
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
@@ -38,9 +36,10 @@ interface InteractionArgs {
 })
 export class ExplorationHtmlFormatterService {
   constructor(
-    private camelCaseToHyphens: CamelCaseToHyphensPipe,
-    private extensionTagAssembler: ExtensionTagAssemblerService,
-    private htmlEscaper: HtmlEscaperService) {}
+      private camelCaseToHyphens: CamelCaseToHyphensPipe,
+      private extensionTagAssembler: ExtensionTagAssemblerService,
+      private htmlEscaper: HtmlEscaperService
+  ) {}
   /**
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgSpecs - The various
@@ -56,7 +55,8 @@ export class ExplorationHtmlFormatterService {
    *   the interaction.
    */
   getInteractionHtml(
-      interactionId: string, interactionCustomizationArgSpecs: object,
+      interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
@@ -64,7 +64,7 @@ export class ExplorationHtmlFormatterService {
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
-        element, interactionCustomizationArgSpecs));
+        element, interactionCustomizationArgs));
     element.attr('last-answer', parentHasLastAnswerProperty ?
       'lastAnswer' : 'null');
     if (labelForFocusTarget) {
@@ -75,11 +75,13 @@ export class ExplorationHtmlFormatterService {
 
   getAnswerHtml(
       answer: string, interactionId: string,
-      interactionCustomizationArgs: InteractionArgs): string {
+      interactionCustomizationArgs: InteractionCustomizationArgs): string {
     // TODO(sll): Get rid of this special case for multiple choice.
     var interactionChoices = null;
-    if (interactionCustomizationArgs.choices) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
+
+    if ('choices' in interactionCustomizationArgs) {
+      interactionChoices = interactionCustomizationArgs.choices.value.map(
+        choice => choice.getHtml());
     }
 
     var el = $(
@@ -94,12 +96,14 @@ export class ExplorationHtmlFormatterService {
   }
 
   getShortAnswerHtml(
-      answer: string, interactionId: string,
-      interactionCustomizationArgs: InteractionArgs) : string {
-    // TODO(sll): Get rid of this special case for multiple choice.
+      answer: InteractionAnswer, interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs) : string {
     var interactionChoices = null;
-    if (interactionCustomizationArgs.choices) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
+
+    // TODO(sll): Get rid of this special case for multiple choice.
+    if ('choices' in interactionCustomizationArgs) {
+      interactionChoices = interactionCustomizationArgs.choices.value.map(
+        choice => choice.getHtml());
     }
 
     var el = $(

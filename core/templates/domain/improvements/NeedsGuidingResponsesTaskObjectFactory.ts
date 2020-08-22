@@ -20,14 +20,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
-import { ITaskEntryBackendDict, TaskEntry } from
+import { TaskEntryBackendDict, TaskEntry } from
   'domain/improvements/TaskEntryObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
-export class NeedsGuidingResponsesTask extends TaskEntry {
-  public readonly taskType: 'needs_guiding_responses';
-  constructor(backendDict: ITaskEntryBackendDict) {
+export class NeedsGuidingResponsesTask extends TaskEntry<
+    'needs_guiding_responses'> {
+  constructor(backendDict: TaskEntryBackendDict<'needs_guiding_responses'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
       throw new Error(
@@ -49,7 +49,7 @@ export class NeedsGuidingResponsesTask extends TaskEntry {
     super(backendDict);
   }
 
-  public refreshStatus(topStateAnswersStats: AnswerStats[]): void {
+  public refreshStatus(topStateAnswersStats: readonly AnswerStats[]): void {
     const numUnaddressedTopStateAnswers = (
       topStateAnswersStats.filter(a => !a.isAddressed).length);
     if (numUnaddressedTopStateAnswers === 0) {
@@ -103,7 +103,8 @@ export class NeedsGuidingResponsesTaskObjectFactory {
   }
 
   createFromBackendDict(
-      backendDict: ITaskEntryBackendDict): NeedsGuidingResponsesTask {
+      backendDict: TaskEntryBackendDict<'needs_guiding_responses'>
+  ): NeedsGuidingResponsesTask {
     return new NeedsGuidingResponsesTask(backendDict);
   }
 }

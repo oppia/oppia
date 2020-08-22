@@ -16,16 +16,16 @@
  * @fileoverview Factory for creating frontend skills
  */
 
-export interface ISkillBackendDict {
+export interface SkillBackendDict {
   'all_questions_merged': boolean;
   description: string;
   id: string;
   'language_code': string;
-  misconceptions: IMisconceptionBackendDict[];
+  misconceptions: MisconceptionBackendDict[];
   'next_misconception_id': number;
   'prerequisite_skill_ids': string[];
-  rubrics: IRubricBackendDict[];
-  'skill_contents': IConceptCardBackendDict;
+  rubrics: RubricBackendDict[];
+  'skill_contents': ConceptCardBackendDict;
   'superseding_skill_id': string;
   version: number;
 }
@@ -33,11 +33,11 @@ export interface ISkillBackendDict {
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ConceptCardObjectFactory, ConceptCard, IConceptCardBackendDict } from
+import { ConceptCardObjectFactory, ConceptCard, ConceptCardBackendDict } from
   'domain/skill/ConceptCardObjectFactory';
-import { MisconceptionObjectFactory, Misconception, IMisconceptionBackendDict }
+import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
   from 'domain/skill/MisconceptionObjectFactory';
-import { RubricObjectFactory, Rubric, IRubricBackendDict } from
+import { RubricObjectFactory, Rubric, RubricBackendDict } from
   'domain/skill/RubricObjectFactory';
 import { ValidatorsService } from 'services/validators.service.ts';
 const constants = require('constants.ts');
@@ -117,11 +117,11 @@ export class Skill {
     return this._conceptCard;
   }
 
-  getMisconceptions(): Array<Misconception> {
+  getMisconceptions(): Misconception[] {
     return this._misconceptions.slice();
   }
 
-  getRubrics(): Array<Rubric> {
+  getRubrics(): Rubric[] {
     return this._rubrics.slice();
   }
 
@@ -143,7 +143,7 @@ export class Skill {
     return this._nextMisconceptionId;
   }
 
-  getIncrementedMisconceptionId(id: string) {
+  getIncrementedMisconceptionId(id: string): number {
     return (parseInt(id) + 1);
   }
 
@@ -155,7 +155,7 @@ export class Skill {
     return this._allQuestionsMerged;
   }
 
-  findMisconceptionById(id: string) {
+  findMisconceptionById(id: string): Misconception {
     for (var idx in this._misconceptions) {
       if (this._misconceptions[idx].getId() === id) {
         return this._misconceptions[idx];
@@ -164,7 +164,7 @@ export class Skill {
     throw new Error('Could not find misconception with ID: ' + id);
   }
 
-  deleteMisconception(id: string) {
+  deleteMisconception(id: string): void {
     this._misconceptions.forEach((misc: Misconception) => {
       if (misc.getId() === id) {
         this._misconceptions.splice(this._misconceptions.indexOf(misc), 1);
@@ -172,11 +172,11 @@ export class Skill {
     });
   }
 
-  getMisconceptionAtIndex(idx: number) {
+  getMisconceptionAtIndex(idx: number): Misconception {
     return this._misconceptions[idx];
   }
 
-  getRubricExplanations(difficulty: string) {
+  getRubricExplanations(difficulty: string): string[] {
     for (var idx in this._rubrics) {
       if (this._rubrics[idx].getDifficulty() === difficulty) {
         return this._rubrics[idx].getExplanations();
@@ -185,11 +185,11 @@ export class Skill {
     return null;
   }
 
-  getMisconceptionId(index: number) {
+  getMisconceptionId(index: number): string {
     return this._misconceptions[index].getId();
   }
 
-  updateRubricForDifficulty(difficulty: string, explanations: Array<string>) {
+  updateRubricForDifficulty(difficulty: string, explanations: string[]): void {
     if (this.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
       throw new Error('Invalid difficulty value passed');
     }
@@ -203,7 +203,7 @@ export class Skill {
     this._rubrics.push(rubricObjectFactory.create(difficulty, explanations));
   }
 
-  toBackendDict(): ISkillBackendDict {
+  toBackendDict(): SkillBackendDict {
     return {
       id: this._id,
       description: this._description,
@@ -253,13 +253,13 @@ export class SkillObjectFactory {
       'en', 1, 0, null, false, []);
   }
 
-  hasValidDescription(description: string) {
+  hasValidDescription(description: string): boolean {
     var allowDescriptionToBeBlank = false;
     return this.validatorService.isValidEntityName(
       description, false, allowDescriptionToBeBlank);
   }
 
-  createFromBackendDict(skillBackendDict: ISkillBackendDict): Skill {
+  createFromBackendDict(skillBackendDict: SkillBackendDict): Skill {
     return new Skill(
       skillBackendDict.id,
       skillBackendDict.description,
@@ -277,7 +277,7 @@ export class SkillObjectFactory {
   }
 
   generateMisconceptionsFromBackendDict(
-      misconceptionsBackendDicts: IMisconceptionBackendDict[]) {
+      misconceptionsBackendDicts: MisconceptionBackendDict[]): Misconception[] {
     return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
       return this.misconceptionObjectFactory.createFromBackendDict(
         misconceptionsBackendDict);
@@ -285,7 +285,7 @@ export class SkillObjectFactory {
   }
 
   generateRubricsFromBackendDict(
-      rubricBackendDicts: IRubricBackendDict[]) {
+      rubricBackendDicts: RubricBackendDict[]): Rubric[] {
     return rubricBackendDicts.map((rubricBackendDict) => {
       return this.rubricObjectFactory.createFromBackendDict(rubricBackendDict);
     });
