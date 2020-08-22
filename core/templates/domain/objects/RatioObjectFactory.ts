@@ -88,14 +88,14 @@ export class RatioObjectFactory {
   }
 
   // Checks the equality of arrays value by value.
-  arrayEquals(a: number[], b: number[]) {
+  arrayEquals(a: number[], b: number[]): boolean {
     return Array.isArray(a) &&
       Array.isArray(b) &&
       a.length === b.length &&
       a.every((val, index) => val === b[index]);
   }
 
-  fromList(ratioList: RatioInputAnswer) {
+  fromList(ratioList: RatioInputAnswer): Ratio {
     return new Ratio(ratioList);
   }
 }
