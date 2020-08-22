@@ -137,7 +137,7 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  get onSendStoryData() {
+  get onSendStoryData(): EventEmitter {
     return this._storyDataEventEmitter;
   }
 }

@@ -58,7 +58,8 @@ export class StateEditorService {
   private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
   private _updateAnswerChoicesEventEmitter = new EventEmitter<AnswerChoice[]>();
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
-  private _handleCustomArgsUpdateEventEmitter = new EventEmitter<void>();
+  private _handleCustomArgsUpdateEventEmitter =
+    new EventEmitter<AnswerChoice[]>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -279,7 +280,7 @@ export class StateEditorService {
     return this._saveOutcomeDestDetailsEventEmitter;
   }
 
-  get onHandleCustomArgsUpdate() {
+  get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {
     return this._handleCustomArgsUpdateEventEmitter;
   }
 }
