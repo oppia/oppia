@@ -25,6 +25,7 @@ var path = require('path');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
+  var numExtractionHandles = 0;
   var configTab = element(by.css('.protractor-test-admin-config-tab'));
   var saveAllConfigs = element(by.css('.protractor-test-save-all-configs'));
   var configProperties = element.all(by.css(
@@ -69,6 +70,8 @@ var AdminPage = function() {
     by.css('.protractor-test-extract-data-number-of-answers'));
   var extractDataFormSubmitButton = element(
     by.css('.protractor-test-extract-data-submit-button'));
+  var extractDataStatusMessage = element(
+    by.css('.protractor-test-extract-data-status-message'));
   var regenerateContributionsTopicIdInput = element(
     by.css('.protractor-test-regen-contributions-topic-id'));
   var regenerateContributionsSubmitButton = element(
@@ -441,8 +444,8 @@ var AdminPage = function() {
       statusMessage, 'SVGs generated for all explorations .');
   };
 
-  this.extractDataAndExpectExtraction = async function(expID, expVersion,
-      stateName, numberOfAnswers) {
+  this.extractData = async function(expID, expVersion,
+      stateName, numberOfAnswers, isMeantToFail) {
     await browser.refresh();
     await waitFor.pageToFullyLoad();
     await action.sendKeys('Extract Data Exploration ID Input',
@@ -455,12 +458,27 @@ var AdminPage = function() {
       extractDataNumAnswersInput, numberOfAnswers);
     await action.click('Extract Data Form Submit Button',
       extractDataFormSubmitButton);
-    var handles = await browser.driver.getAllWindowHandles();
-    await action.click('Extract Data Submit Button',
-      extractDataFormSubmitButton);
-    var newHandles = await browser.driver.getAllWindowHandles();
-    expect(newHandles.length).toEqual(handles.length + 1);
+    if (isMeantToFail) {
+      numExtractionHandles = await browser.driver.getAllWindowHandles().length;
+      await action.click('Extract Data Submit Button',
+        extractDataFormSubmitButton);
+    }
+    else {
+      await waitFor.visibilityOf(extractDataStatusMessage,
+        'Data extraction status message not showing up!');
+      await waitFor.textToBePresentInElement(extractDataStatusMessage,
+        'Status: Data extraction query has been submitted. Please wait.');
+    }
+  };
+
+  this.expectExtractionFailure = async function() {
+    var newNumExtractionHandles = await browser.driver.getAllWindowHandles().length;
+    expect(newNumExtractionHandles.length).toEqual(numExtractionHandles.length + 1);
     browser.driver.close();
+  };
+
+  this.expectExtractionSuccess = async function() {
+    await waitFor.fileToBeDownloaded('oppia-attachment.txt');
   };
 
   this.sendTestEmailToAdminAndExpectError = async function() {
