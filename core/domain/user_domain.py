@@ -276,12 +276,11 @@ class LearnerPlaylist(python_utils.OBJECT):
 class UserContributionScoring(python_utils.OBJECT):
     """Domain object for UserContributionScoringModel."""
 
-    def __init__(
-            self, user_id, score_category, score, onboard_reviewer_email_sent):
+    def __init__(self, user_id, score_category, score, onboarding_email_sent):
         self.user_id = user_id
         self.score_category = score_category
         self.score = score
-        self.onboard_reviewer_email_sent = onboard_reviewer_email_sent
+        self.onboarding_email_sent = onboarding_email_sent
 
     def increment_score(self, increment_by):
         """Increments the score of the user in the category by the given amount.
@@ -309,7 +308,7 @@ class UserContributionScoring(python_utils.OBJECT):
 
     def mark_onboarding_email_as_sent(self):
         """Marks the email as sent."""
-        self.onboard_reviewer_email_sent = True
+        self.onboarding_email_sent = True
 
 
 class UserContributionRights(python_utils.OBJECT):

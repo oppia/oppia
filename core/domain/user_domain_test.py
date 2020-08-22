@@ -407,7 +407,7 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
             self.user_scoring.score_category, 'category0')
         self.assertEqual(self.user_scoring.score, 0)
         self.assertEqual(
-            self.user_scoring.onboard_reviewer_email_sent, False)
+            self.user_scoring.onboarding_email_sent, False)
 
     def test_increment_score(self):
         self.assertEqual(self.user_scoring.score, 0)
@@ -428,11 +428,11 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
         self.assertTrue(self.user_scoring.can_user_review_category())
 
     def test_mark_onboarding_email_as_sent(self):
-        self.assertFalse(self.user_scoring.onboard_reviewer_email_sent)
+        self.assertFalse(self.user_scoring.onboarding_email_sent)
 
         self.user_scoring.mark_onboarding_email_as_sent()
 
-        self.assertTrue(self.user_scoring.onboard_reviewer_email_sent)
+        self.assertTrue(self.user_scoring.onboarding_email_sent)
 
 
 class UserContributionRightsTests(test_utils.GenericTestBase):

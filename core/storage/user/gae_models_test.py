@@ -1897,21 +1897,21 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             user_id=self.USER_1_ID,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
-            onboard_reviewer_email_sent=False
+            onboarding_email_sent=False
         ).put()
         user_models.UserContributionScoringModel(
             id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_1_ID),
             user_id=self.USER_1_ID,
             score_category=self.SCORE_CATEGORY_2,
             score=2,
-            onboard_reviewer_email_sent=False
+            onboarding_email_sent=False
         ).put()
         user_models.UserContributionScoringModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_2_ID),
             user_id=self.USER_2_ID,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
-            onboard_reviewer_email_sent=False,
+            onboarding_email_sent=False,
             deleted=True
         ).put()
 
@@ -1926,11 +1926,11 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             self.USER_1_ID)
         expected_data = {
             self.SCORE_CATEGORY_1: {
-                'onboard_reviewer_email_sent': False,
+                'onboarding_email_sent': False,
                 'score': 1.5
             },
             self.SCORE_CATEGORY_2: {
-                'onboard_reviewer_email_sent': False,
+                'onboarding_email_sent': False,
                 'score': 2
             }
         }

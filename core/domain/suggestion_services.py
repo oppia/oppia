@@ -355,7 +355,7 @@ def accept_suggestion(
         # to review.
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
             if user_scoring.can_user_review_category() and (
-                    not user_scoring.onboard_reviewer_email_sent):
+                    not user_scoring.onboarding_email_sent):
                 email_manager.send_mail_to_onboard_new_reviewers(
                     user_id, score_category
                 )
@@ -592,7 +592,7 @@ def get_user_scoring_from_model(user_scoring_model):
     return user_domain.UserContributionScoring(
         user_scoring_model.user_id, user_scoring_model.score_category,
         user_scoring_model.score,
-        user_scoring_model.onboard_reviewer_email_sent
+        user_scoring_model.onboarding_email_sent
     )
 
 
@@ -611,8 +611,8 @@ def _update_user_scoring(user_scoring):
         user_scoring_model.user_id = user_scoring.user_id
         user_scoring_model.score_category = user_scoring.score_category
         user_scoring_model.score = user_scoring.score
-        user_scoring_model.onboard_reviewer_email_sent = (
-            user_scoring.onboard_reviewer_email_sent
+        user_scoring_model.onboarding_email_sent = (
+            user_scoring.onboarding_email_sent
         )
 
         user_scoring_model.put()
@@ -620,7 +620,7 @@ def _update_user_scoring(user_scoring):
     else:
         user_models.UserContributionScoringModel.create(
             user_scoring.user_id, user_scoring.score_category,
-            user_scoring.score, user_scoring.onboard_reviewer_email_sent)
+            user_scoring.score, user_scoring.onboarding_email_sent)
 
 
 def get_all_scores_of_user(user_id):

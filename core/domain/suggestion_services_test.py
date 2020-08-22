@@ -336,12 +336,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
         # Get the user scoring domain object to verify that the
-        # score and onboard_reviewer_email_sent fields have changed after the
+        # score and onboarding_email_sent fields have changed after the
         # suggestion has been accepted.
         user_scoring = suggestion_services.get_user_scoring(
             self.author_id, suggestion.score_category
         )
-        self.assertFalse(user_scoring.onboard_reviewer_email_sent)
+        self.assertFalse(user_scoring.onboarding_email_sent)
         self.assertEqual(user_scoring.score, 0)
 
         # An email is sent to users the first time that they pass the score
@@ -371,7 +371,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         user_scoring = suggestion_services.get_user_scoring(
             self.author_id, suggestion.score_category
         )
-        self.assertTrue(user_scoring.onboard_reviewer_email_sent)
+        self.assertTrue(user_scoring.onboarding_email_sent)
         self.assertEqual(
             user_scoring.score, feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
 
@@ -381,12 +381,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
         # Get the user scoring domain object to verify the score and
-        # that the onboard_reviewer_email_sent field does not change after the
+        # that the onboarding_email_sent field does not change after the
         # suggestion is accepted.
         user_scoring = suggestion_services.get_user_scoring(
             self.author_id, self.score_category
         )
-        self.assertFalse(user_scoring.onboard_reviewer_email_sent)
+        self.assertFalse(user_scoring.onboarding_email_sent)
         self.assertEqual(user_scoring.score, 0)
 
         # An email is sent to users the first time that they pass the score
@@ -415,7 +415,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Assert that their score is not high enough to review the category.
         self.assertFalse(user_scoring.can_user_review_category())
         # Assert that the onboarding new reviewer email was not sent.
-        self.assertFalse(user_scoring.onboard_reviewer_email_sent)
+        self.assertFalse(user_scoring.onboarding_email_sent)
 
     def test_accept_suggestion_creates_user_scoring_model_if_it_does_not_exist(
             self):
