@@ -89,7 +89,6 @@ describe('Interaction Rules Registry Service', () => {
   let itemSelectionInputRulesService: ItemSelectionInputRulesService;
   let logicProofRulesService: LogicProofRulesService;
   let mathEquationInputRulesService: MathEquationInputRulesService;
-  let mathExpressionInputRulesService: MathExpressionInputRulesService;
   let multipleChoiceInputRulesService: MultipleChoiceInputRulesService;
   let musicNotesInputRulesService: MusicNotesInputRulesService;
   let numberWithUnitsRulesService: NumberWithUnitsRulesService;
