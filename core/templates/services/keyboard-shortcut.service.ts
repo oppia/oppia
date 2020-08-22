@@ -24,7 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class KeyboardShortcutService {
-  bindExplorationPlayerShortcuts() {
+  bindExplorationPlayerShortcuts(): void {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
       return false;
@@ -58,7 +58,7 @@ export class KeyboardShortcutService {
     });
   }
 
-  bindLibraryPageShortcuts() {
+  bindLibraryPageShortcuts(): void {
     Mousetrap.bind('/', function() {
       var searchBar = <HTMLElement>document.querySelector(
         '.protractor-test-search-input');
@@ -77,11 +77,11 @@ export class KeyboardShortcutService {
     });
   }
 
-  setHref(href) {
+  setHref(href: string): void {
     window.location.href = href;
   }
 
-  bindNavigationShortcuts() {
+  bindNavigationShortcuts(): void {
     Mousetrap.bind('ctrl+0', () => {
       this.setHref('/get-started');
     });
