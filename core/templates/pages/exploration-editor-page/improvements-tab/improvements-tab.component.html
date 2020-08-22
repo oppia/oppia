@@ -68,7 +68,7 @@
       <hr>
       <div class="improvements-tab-state-groups protractor-test-improvements-tab-state-group"
            ng-repeat="stateTasks in $ctrl.allStateTasks track by stateTasks.stateName"
-           ng-if="$ctrl.getStateNumCardLevelTasks(stateTasks.stateName) > 0">
+           ng-if="$ctrl.getNumCardLevelTasksForState(stateTasks.stateName) > 0">
         <div class="improvements-tab-state-header">
           <div class="improvements-tab-collapse-arrow">
             <a class="improvements-tab-collapse-arrow-button"
@@ -87,11 +87,11 @@
             </div>
             <div class="improvements-tab-state-stats">
               <div class="improvements-tab-state-retention">
-                <[$ctrl.getStateRetention(stateTasks.stateName)]>% Current Retention
+                <[$ctrl.getStateRetentionPercent(stateTasks.stateName)]> Current Retention
               </div>
               <div class="improvements-tab-state-num-issues">
-                <strong><[$ctrl.getStateNumCardLevelTasks(stateTasks.stateName)]></strong>
-                <span ng-pluralize count="$ctrl.getStateNumCardLevelTasks(stateTasks.stateName)"
+                <strong><[$ctrl.getNumCardLevelTasksForState(stateTasks.stateName)]></strong>
+                <span ng-pluralize count="$ctrl.getNumCardLevelTasksForState(stateTasks.stateName)"
                       when="{'one': 'issue found', 'other': 'issues found'}">
                 </span>
               </div>

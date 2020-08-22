@@ -107,28 +107,6 @@ describe('Improvements tab', function() {
     expect(spy).toHaveBeenCalledWith('foo');
   });
 
-  it('should initialize if improvements tab is enabled', fakeAsync(() => {
-    spyOn(explorationImprovementsService, 'isImprovementsTabEnabledAsync')
-      .and.returnValue(Promise.resolve(true));
-
-    $ctrl.$onInit();
-    flushMicrotasks();
-    $scope.$apply();
-
-    expect($ctrl.componentIsInitialized).toBeTrue();
-  }));
-
-  it('should not initialize if improvements tab is disabled', fakeAsync(() => {
-    spyOn(explorationImprovementsService, 'isImprovementsTabEnabledAsync')
-      .and.returnValue(Promise.resolve(false));
-
-    $ctrl.$onInit();
-    flushMicrotasks();
-    $scope.$apply();
-
-    expect($ctrl.componentIsInitialized).toBeFalse();
-  }));
-
   describe('Post-initialization', () => {
     const newTaskEntryBackendDict = (
       <T extends ExplorationTaskType>(taskType: T, isOpen: boolean) => ({
@@ -247,7 +225,7 @@ describe('Improvements tab', function() {
       flushMicrotasks();
       $scope.$apply();
 
-      expect($ctrl.getStateRetention('Introduction')).toBeCloseTo(60);
+      expect($ctrl.getStateRetentionPercent('Introduction')).toEqual('60%');
     }));
 
     it('should provide the number of open cards in a state', fakeAsync(() => {
@@ -276,8 +254,8 @@ describe('Improvements tab', function() {
       flushMicrotasks();
       $scope.$apply();
 
-      expect($ctrl.getStateNumCardLevelTasks('Introduction')).toEqual(1);
-      expect($ctrl.getStateNumCardLevelTasks('End')).toEqual(2);
+      expect($ctrl.getNumCardLevelTasksForState('Introduction')).toEqual(1);
+      expect($ctrl.getNumCardLevelTasksForState('End')).toEqual(2);
     }));
 
     it('can toggle the visibility of state tasks', fakeAsync(() => {

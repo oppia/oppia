@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directive for the improvements tab of the exploration editor.
+ * @requires ExplorationImprovementsService.isImprovementsTabEnabledAsync() to
+ *  have returned true. The component should be disabled by an ngIf until then.
  */
 
 import { ImprovementsConstants } from
@@ -30,106 +32,89 @@ require('services/exploration-improvements-task-registry.service.ts');
 angular.module('oppia').component('improvementsTab', {
   template: require('./improvements-tab.component.html'),
   controller: [
-    '$q', 'ExplorationImprovementsService',
     'ExplorationImprovementsTaskRegistryService', 'RouterService',
     'UrlInterpolationService',
     function(
-        $q, ExplorationImprovementsService,
         ExplorationImprovementsTaskRegistryService, RouterService,
         UrlInterpolationService) {
       this.$onInit = () => {
-        this.componentIsInitialized = false;
         this.timeMachineImageUrl = (
           UrlInterpolationService.getStaticImageUrl('/icons/time_machine.svg'));
         this.navigateToStateEditor = (stateName: string) => {
           RouterService.navigateToMainTab(stateName);
         };
 
-        // AngularJS immediately refreshes directives after $q promises fulfill,
-        // so we convert to one from the "plain" promise returned by the
-        // service.
-        $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
-          .then(improvementsTabIsEnabled => {
-            if (!improvementsTabIsEnabled) {
-              return;
-            }
+        const expStats = (
+          ExplorationImprovementsTaskRegistryService.getExplorationStats());
+        this.completionRate = (
+          (expStats && expStats.numStarts > 0) ?
+            (expStats.numCompletions / expStats.numStarts) : 0);
+        this.completionRateAsPercent = (
+          Math.round(100.0 * this.completionRate) + '%');
 
-            const expStats = (
-              ExplorationImprovementsTaskRegistryService.getExplorationStats());
-            this.completionRate = (
-              (expStats && expStats.numStarts > 0) ?
-                (expStats.numCompletions / expStats.numStarts) : 0);
-            this.completionRateAsPercent = (
-              Math.round(100.0 * this.completionRate) + '%');
+        const hbrTasks = (
+          ExplorationImprovementsTaskRegistryService
+            .getOpenHighBounceRateTasks());
+        const iflTasks = (
+          ExplorationImprovementsTaskRegistryService
+            .getOpenIneffectiveFeedbackLoopTasks());
+        const ngrTasks = (
+          ExplorationImprovementsTaskRegistryService
+            .getOpenNeedsGuidingResponsesTasks());
+        const siaTasks = (
+          ExplorationImprovementsTaskRegistryService
+            .getOpenSuccessiveIncorrectAnswersTasks());
 
-            const hbrTasks = (
-              ExplorationImprovementsTaskRegistryService
-                .getOpenHighBounceRateTasks());
-            const iflTasks = (
-              ExplorationImprovementsTaskRegistryService
-                .getOpenIneffectiveFeedbackLoopTasks());
-            const ngrTasks = (
-              ExplorationImprovementsTaskRegistryService
-                .getOpenNeedsGuidingResponsesTasks());
-            const siaTasks = (
-              ExplorationImprovementsTaskRegistryService
-                .getOpenSuccessiveIncorrectAnswersTasks());
+        this.getNumTasks = () => (
+          hbrTasks.length + iflTasks.length + ngrTasks.length +
+          siaTasks.length);
+        this.getNumExpLevelTasks = () => hbrTasks.length;
+        this.getNumConceptLevelTasks = () => iflTasks.length;
+        this.getNumCardLevelTasks = () => ngrTasks.length + siaTasks.length;
+        this.hasCriticalTasks = () => ngrTasks.length > 0;
+        this.getExplorationHealth = () => {
+          if (this.hasCriticalTasks()) {
+            return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_CRITICAL;
+          } else if (this.getNumTasks() > 0) {
+            return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_WARNING;
+          } else {
+            return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_HEALTHY;
+          }
+        };
+        this.getNumCardLevelTasksForState = (stateName: string) => {
+          const stateTasks = (
+            ExplorationImprovementsTaskRegistryService.getStateTasks(
+              stateName));
+          const ngrTask = stateTasks.ngrTask;
+          const siaTask = stateTasks.siaTask;
+          return (ngrTask.isOpen() ? 1 : 0) + (siaTask.isOpen() ? 1 : 0);
+        };
 
-            this.getNumTasks = () => (
-              hbrTasks.length + iflTasks.length + ngrTasks.length +
-              siaTasks.length);
-            this.getNumExpLevelTasks = () => hbrTasks.length;
-            this.getNumConceptLevelTasks = () => iflTasks.length;
-            this.getNumCardLevelTasks = () => ngrTasks.length + siaTasks.length;
-            this.hasCriticalTasks = () => ngrTasks.length > 0;
-            this.getExplorationHealth = () => {
-              if (this.hasCriticalTasks()) {
-                return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_CRITICAL;
-              } else if (this.getNumTasks() > 0) {
-                return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_WARNING;
-              } else {
-                return ImprovementsConstants.EXPLORATION_HEALTH_TYPE_HEALTHY;
-              }
-            };
-            this.getStateNumCardLevelTasks = (stateName: string) => {
-              const stateTasks = (
-                ExplorationImprovementsTaskRegistryService.getStateTasks(
-                  stateName));
-              const ngrTask = stateTasks.ngrTask;
-              const siaTask = stateTasks.siaTask;
-              return (ngrTask.isOpen() ? 1 : 0) + (siaTask.isOpen() ? 1 : 0);
-            };
+        this.allStateTasks = (
+          ExplorationImprovementsTaskRegistryService.getAllStateTasks());
+        const namesOfStatesWithTasks = (
+          this.allStateTasks.map(stateTasks => stateTasks.stateName));
 
-            this.allStateTasks = (
-              ExplorationImprovementsTaskRegistryService.getAllStateTasks());
+        const stateRetentions: Map<string, number> = (
+          new Map(namesOfStatesWithTasks.map(stateName => {
+            const stateStats = expStats.getStateStats(stateName);
+            const numCompletions = stateStats.numCompletions;
+            const totalHitCount = stateStats.totalHitCount;
+            const retentionRate = Math.round(
+              totalHitCount ? (100.0 * numCompletions / totalHitCount) : 0);
+            return [stateName, retentionRate];
+          })));
 
-            const stateRetentions: Map<string, number> = new Map(
-              this.allStateTasks.map(stateTasks => {
-                const stateStats = stateTasks.supportingStats.stateStats;
-                const numCompletions = stateStats.numCompletions;
-                const totalHitCount = stateStats.totalHitCount;
-                const retentionRate = Math.round(
-                  totalHitCount ? (100.0 * numCompletions / totalHitCount) : 0);
-                return [stateTasks.stateName, retentionRate];
-              }));
+        this.getStateRetentionPercent = (stateName: string) => (
+          stateRetentions.get(stateName) + '%');
 
-            this.getStateRetention = (stateName: string) => {
-              return stateRetentions.get(stateName);
-            };
+        const stateVisibility: Map<string, boolean> = (
+          new Map(namesOfStatesWithTasks.map(stateName => [stateName, true])));
 
-            const stateVisibility: Map<string, boolean> = new Map(
-              this.allStateTasks.map(
-                stateTasks => [stateTasks.stateName, true]));
-
-            this.isStateTasksVisible = (stateName: string) => {
-              return stateVisibility.get(stateName);
-            };
-            this.toggleStateTasks = (stateName: string) => {
-              stateVisibility.set(stateName, !stateVisibility.get(stateName));
-            };
-
-            this.componentIsInitialized = true;
-          });
+        this.isStateTasksVisible = (stateName: string) => (
+          stateVisibility.get(stateName));
+        this.toggleStateTasks = (stateName: string) => (
+          stateVisibility.set(stateName, !stateVisibility.get(stateName)));
       };
     },
   ],
