@@ -118,7 +118,7 @@ export class MathInteractionsService {
   }
 
   validateAlgebraicExpression(
-      expressionString: string, validVariablesList: string[]) {
+      expressionString: string, validVariablesList: string[]): boolean {
     if (!this._validateExpression(expressionString, validVariablesList)) {
       return false;
     }
@@ -144,7 +144,7 @@ export class MathInteractionsService {
     return true;
   }
 
-  validateNumericExpression(expressionString: string) {
+  validateNumericExpression(expressionString: string): boolean {
     if (!this._validateExpression(expressionString, [])) {
       return false;
     }

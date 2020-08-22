@@ -378,6 +378,13 @@
   dependencies:
     "@types/angular" "*"
 
+"@types/angular-translate@^2.16.2":
+  version "2.16.2"
+  resolved "https://registry.yarnpkg.com/@types/angular-translate/-/angular-translate-2.16.2.tgz#2859a9dddde14dbeb4d8de64b1331b243c1d7ff2"
+  integrity sha512-gZhpVXeZxiZgzVy27cqrB5mUxLVuh3bqJNA/yVK0D6JZs9fcjxzmAPKvq9NUIct28bq9eVOeAT/fvQXpTBw3mA==
+  dependencies:
+    "@types/angular" "*"
+
 "@types/angular-ui-bootstrap@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/angular-ui-bootstrap/-/angular-ui-bootstrap-1.0.0.tgz#57b2aebacf528f82826c7af7ff328c6da49d1b63"
