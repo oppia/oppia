@@ -48,6 +48,29 @@ import utils
 )
 
 
+def create_new_user_scoring(user_id, score_category, score):
+    """Creates the user scoring model and the user scoring domain object
+    with the given user_id, score_category and score.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The category of the suggestion.
+        score: float. The score of the user for the given category.
+
+    Returns:
+        UserContributionScoring. The user scoring object created.
+    """
+    new_user_scoring_model = (
+        user_models.UserContributionScoringModel.create(
+            user_id, score_category, score
+            )
+    )
+
+    return suggestion_services.get_user_scoring_from_model(
+        new_user_scoring_model
+    )
+
+
 class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     """Test the functions in suggestion_services."""
 
@@ -812,28 +835,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             if exp.id == exp_id:
                 return exp
 
-    def create_new_user_scoring(self, user_id, score_category, score):
-        """Creates the user scoring model and the user scoring domain object
-        with the given user_id, score_category and score.
-
-        Args:
-            user_id: str. The id of the user.
-            score_category: str. The category of the suggestion.
-            score: float. The score of the user for the given category.
-
-        Returns:
-            UserContributionScoring. The user scoring object created.
-        """
-        new_user_scoring_model = (
-            user_models.UserContributionScoringModel.create(
-                user_id, score_category, score
-                )
-        )
-
-        return suggestion_services.get_user_scoring_from_model(
-            new_user_scoring_model
-        )
-
     def setUp(self):
         super(SuggestionGetServicesUnitTests, self).setUp()
 
@@ -1031,13 +1032,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         # User scoring models for user1.
-        self.create_new_user_scoring('user1', 'category1', 15)
-        self.create_new_user_scoring('user1', 'category2', 15)
-        self.create_new_user_scoring('user1', 'category3', 5)
+        create_new_user_scoring('user1', 'category1', 15)
+        create_new_user_scoring('user1', 'category2', 15)
+        create_new_user_scoring('user1', 'category3', 5)
         # User scoring models for user2.
-        self.create_new_user_scoring('user2', 'category1', 5)
-        self.create_new_user_scoring('user2', 'category2', 5)
-        self.create_new_user_scoring('user2', 'category3', 5)
+        create_new_user_scoring('user2', 'category1', 5)
+        create_new_user_scoring('user2', 'category2', 5)
+        create_new_user_scoring('user2', 'category3', 5)
 
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -1391,28 +1392,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
 class UserContributionScoringUnitTests(test_utils.GenericTestBase):
 
-    def create_new_user_scoring(self, user_id, score_category, score):
-        """Creates the user scoring model and the user scoring domain object
-         with the given user_id, score_category and score.
-
-        Args:
-            user_id: str. The id of the user.
-            score_category: str. The category of the suggestion.
-            score: float. The score of the user for the given category.
-
-        Returns:
-            UserContributionScoring. The user scoring object created.
-        """
-        new_user_scoring_model = (
-            user_models.UserContributionScoringModel.create(
-                user_id, score_category, score
-            )
-        )
-
-        return suggestion_services.get_user_scoring_from_model(
-            new_user_scoring_model
-        )
-
     def setUp(self):
         super(UserContributionScoringUnitTests, self).setUp()
         self.signup('user1@example.com', 'user1')
@@ -1421,17 +1400,17 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
         self.user_2_id = self.get_user_id_from_email('user2@example.com')
 
     def test_get_all_user_ids_who_are_allowed_to_review(self):
-        user_scoring_user1_cat1 = self.create_new_user_scoring(
+        user_scoring_user1_cat1 = create_new_user_scoring(
             self.user_1_id, 'category1', 0
         )
-        user_scoring_user1_cat2 = self.create_new_user_scoring(
+        user_scoring_user1_cat2 = create_new_user_scoring(
             self.user_1_id, 'category2',
             feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
         )
-        user_scoring_user2_cat1 = self.create_new_user_scoring(
+        user_scoring_user2_cat1 = create_new_user_scoring(
             self.user_2_id, 'category1', 0
         )
-        user_scoring_user2_cat2 = self.create_new_user_scoring(
+        user_scoring_user2_cat2 = create_new_user_scoring(
             self.user_2_id, 'category2', 0
         )
 
@@ -1450,9 +1429,9 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
         self.assertFalse(user_scoring_user2_cat2.can_user_review_category())
 
     def test_get_all_scores_of_the_user_with_multiple_scores(self):
-        self.create_new_user_scoring(self.user_1_id, 'category1', 1)
-        self.create_new_user_scoring(self.user_1_id, 'category2', 2)
-        self.create_new_user_scoring(self.user_1_id, 'category3', 3)
+        create_new_user_scoring(self.user_1_id, 'category1', 1)
+        create_new_user_scoring(self.user_1_id, 'category2', 2)
+        create_new_user_scoring(self.user_1_id, 'category3', 3)
 
         expected_scores_dict = {}
         for index in python_utils.RANGE(1, 4):
