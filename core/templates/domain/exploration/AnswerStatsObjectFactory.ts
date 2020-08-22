@@ -58,22 +58,22 @@ export class AnswerStats {
   }
 
   /** @returns {*} */
-  getAnswer() {
+  getAnswer(): InteractionAnswer {
     return this.answer;
   }
 
   /** @returns {string} */
-  getAnswerHtml() {
+  getAnswerHtml(): string {
     return this.answerHtml;
   }
 
   /** @returns {number} */
-  getFrequency() {
+  getFrequency(): number {
     return this.frequency;
   }
 
   /** @returns {boolean} */
-  getIsAddressed() {
+  getIsAddressed(): boolean {
     return this.isAddressed;
   }
 
