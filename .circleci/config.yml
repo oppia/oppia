@@ -180,10 +180,6 @@ jobs:
           name: Run e2e accessibility page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
-      - run:
-          name: Run e2e contributor dashboard test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
 
   e2e_users:
     <<: *job_defaults
@@ -255,6 +251,10 @@ jobs:
           name: Run e2e file upload extensions test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
+      - run:
+          name: Run e2e contributor dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard"
 
 notify:
   webhooks:
