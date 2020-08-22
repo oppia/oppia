@@ -18,7 +18,7 @@
 
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.directive.ts');
+  'opportunities-list.component.ts');
 
 require(
   'pages/contributor-dashboard-page/services/' +
