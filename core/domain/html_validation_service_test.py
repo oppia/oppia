@@ -927,8 +927,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         ), (
             '<p><oppia-noninteractive-math math_content-with-value="'
             '{&amp;quot;raw_latex&amp;quot;:&amp;quot;abc&amp;quot;'
-            ',&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}">'
-            '</oppia-noninteractive-math></p>'
+            ',&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_202'
+            '07261338_r3ir43lmfd_height_2d456_width_6d124_vertical_0'
+            'd231.svg&amp;quot;}"></oppia-noninteractive-math></p>'
         ), (
             '<p><oppia-noninteractive-math url-with-value="&amp;quot;'
             'http://link.com&amp;quot;></oppia-noninteractive-math></p>'
