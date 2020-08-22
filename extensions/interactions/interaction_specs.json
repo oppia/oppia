@@ -1011,7 +1011,7 @@
         }
       },
       {
-        "description": "The number of elements that the answer must have.If set to 0, a ratio of any length will be accepted.",
+        "description": "The number of elements that the answer must have. If set to 0, a ratio of any length will be accepted.",
         "name": "numberOfTerms",
         "schema": {
           "type": "int",
@@ -1030,7 +1030,7 @@
     "rule_descriptions": {
       "Equals": "is equals to {{x|RatioExpression}}",
       "IsEquivalent": "is equivalent to {{x|RatioExpression}}",
-      "HasNumberOfTermsEqualTo": "has number of terms equal to {{x|NonnegativeInt}}"
+      "HasNumberOfTermsEqualTo": "has number of terms equal to {{y|NonnegativeInt}}"
     }
   }
 }

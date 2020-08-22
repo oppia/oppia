@@ -41,7 +41,7 @@ describe('RatioExpression', function() {
     RationExpressionCtrl.isValidRatio('1:1:2.3');
     expect(RationExpressionCtrl.warningText)
       .toBe('For this question, each element in your ratio should be a ' +
-      'wholenumbers (not a fraction or a decimal).');
+      'whole number (not a fraction or a decimal).');
   });
 
   it('should initialize ctrl.warningText with invalid ratio', function() {

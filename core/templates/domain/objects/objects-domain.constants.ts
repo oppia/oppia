@@ -73,8 +73,8 @@ export class ObjectsDomainConstants {
     INVALID_FORMAT:
       'Please enter a valid ratio (e.g. 1:2 or 1:2:3).',
     NON_INTEGER_ELEMENTS:
-      'For this question, each element in your ratio should be a whole' +
-      'numbers (not a fraction or a decimal).',
+      'For this question, each element in your ratio should be a whole ' +
+      'number (not a fraction or a decimal).',
     INCLUDES_ZERO:
       'Ratio cannot have 0 as a element.'
   };

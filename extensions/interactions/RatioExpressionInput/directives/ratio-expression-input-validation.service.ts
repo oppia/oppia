@@ -93,7 +93,7 @@ export class RatioExpressionInputValidationService {
                   'Rule ' + (j + 1) + ' from answer group ' +
                 (i + 1) +
                 ' will never be matched because it has ' +
-                'less no of terms than required.')
+                'fewer number of terms than required.')
               });
             }
           } else {
@@ -105,7 +105,7 @@ export class RatioExpressionInputValidationService {
                   'Rule ' + (j + 1) + ' from answer group ' +
                 (i + 1) +
                 ' will never be matched because it has ' +
-                'less no of terms than required.')
+                'fewer number of terms than required.')
               });
             }
           }

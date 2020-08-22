@@ -43,19 +43,21 @@ describe('Ratio expression input rules service', () => {
       {x: inputList})).toBeFalse();
     expect(reirs.Equals([1, 2, 3, 4],
       {x: inputList})).toBeFalse();
+    expect(reirs.Equals([2, 4, 6],
+      {x: inputList})).toBeFalse();
   });
 
   it('should have a correct HasNumberOfTermsEqualTo rule', () => {
-    inputList = 3;
+    let inputNumber = 3;
 
     expect(reirs.HasNumberOfTermsEqualTo([1, 2, 3],
-      {y: inputList})).toBeTrue();
+      {y: inputNumber})).toBeTrue();
     expect(reirs.HasNumberOfTermsEqualTo([3, 2, 1],
-      {y: inputList})).toBeTrue();
+      {y: inputNumber})).toBeTrue();
     expect(reirs.HasNumberOfTermsEqualTo([1, 2],
-      {y: inputList})).toBeFalse();
+      {y: inputNumber})).toBeFalse();
     expect(reirs.HasNumberOfTermsEqualTo([1, 2, 3, 4],
-      {y: inputList})).toBeFalse();
+      {y: inputNumber})).toBeFalse();
   });
 
   it('should have a correct IsEquivalent rule', () => {

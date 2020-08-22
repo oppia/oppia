@@ -35,7 +35,7 @@ import { RatioExpressionInputCustomizationArgs } from
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
-describe('RatioExpressionInputValidationService', () => {
+fescribe('RatioExpressionInputValidationService', () => {
   let validatorService: RatioExpressionInputValidationService;
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
@@ -194,11 +194,11 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 1 will never be matched because' +
-      ' it has less no of terms than required.'
+      ' it has fewer number of terms than required.'
     }, {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' it has less no of terms than required.'
+      ' it has fewer number of terms than required.'
     }, {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 3 from answer group 1 will never be matched because' +
