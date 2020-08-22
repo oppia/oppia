@@ -66,7 +66,7 @@ export class AdminFeaturesTabComponent implements OnInit {
       displayName: 'Server Mode',
       options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
       operators: ['='],
-      optionFilter: (feature, option) => {
+      optionFilter: (feature: PlatformParameter, option: string) => {
         switch (feature.featureStage) {
           case FeatureStage.DEV:
             return option === 'dev';
@@ -236,7 +236,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     filter.conditions.splice(0);
   }
 
-  isFeatureFlagRulesChanged(feature: PlatformParameter) {
+  isFeatureFlagRulesChanged(feature: PlatformParameter): boolean {
     const original = this.featureFlagNameToBackupMap.get(feature.name);
     return !isEqual(original.rules, feature.rules);
   }
@@ -296,7 +296,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     return issues;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.reloadFeatureFlagsAsync();
   }
 }
