@@ -117,9 +117,9 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             training_job_response_payload_pb2.TrainingJobResponsePayload())
         self.payload_proto.job_result.CopyFrom(self.job_result)
         self.payload_proto.vm_id = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        self.secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload_proto.signature = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(secret),
+            python_utils.convert_to_bytes(self.secret),
             self.payload_proto.job_result.SerializeToString(),
             self.payload_proto.vm_id)
 
@@ -127,10 +127,10 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             'vm_id': feconf.DEFAULT_VM_ID,
             'message': json.dumps({})
         }
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
+
         self.payload_for_fetching_next_job_request['signature'] = (
             classifier_services.generate_signature(
-                python_utils.convert_to_bytes(secret),
+                python_utils.convert_to_bytes(self.secret),
                 self.payload_for_fetching_next_job_request['message'],
                 self.payload_for_fetching_next_job_request['vm_id']))
 
@@ -233,6 +233,10 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
     def test_error_on_invalid_classifier_data_in_message(self):
         # Altering message dict to result in invalid dict.
         self.payload_proto.job_result.ClearField('classifier_frozen_model')
+        self.payload_proto.signature = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(self.secret),
+            self.payload_proto.job_result.SerializeToString(),
+            self.payload_proto.vm_id)
         self.post_blob(
             '/ml/trainedclassifierhandler',
             self.payload_proto.SerializeToString(), expected_status_int=400)

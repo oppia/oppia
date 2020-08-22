@@ -175,7 +175,6 @@ class ExplorationHandler(base.BaseHandler):
             preferred_audio_language_code = (
                 user_settings.preferred_audio_language_code)
 
-
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(

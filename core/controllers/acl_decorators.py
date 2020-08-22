@@ -2864,7 +2864,6 @@ def oppia_ml_access(handler):
         function. The newly decorated function that now can check if incoming
         request is from a valid VM instance.
     """
-
     def test_valid_oppia_ml_instance(self, **kwargs):
         """Checks if the incoming request is from a valid Oppia-ML VM instance.
 

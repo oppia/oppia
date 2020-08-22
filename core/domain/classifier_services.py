@@ -35,7 +35,6 @@ import python_utils
     [models.NAMES.classifier, models.NAMES.exploration])
 
 
-
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
 # in Oppia-ml.
 def generate_signature(secret, message, vm_id):
