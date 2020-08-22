@@ -17,38 +17,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import base64
-import hashlib
-import hmac
-
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classifier_services
-from core.domain import config_domain
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain.proto import training_job_response_payload_pb2
 import feconf
-import python_utils
-
-
-# NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
-# in Oppia-ml.
-def generate_signature(secret, message, vm_id):
-    """Generates digital signature for given data.
-
-    Args:
-        secret: str. The secret used to communicate with Oppia-ml.
-        message: str. The message payload data.
-        vm_id: str. The ID of the VM that generated message.
-
-    Returns:
-        str. The signature of the payload data.
-    """
-    message = '%s|%s' % (base64.b64encode(message), vm_id)
-    return hmac.new(
-        secret, msg=message, digestmod=hashlib.sha256).hexdigest()
 
 
 def validate_job_result_message_proto(job_result_proto):
@@ -67,32 +43,7 @@ def validate_job_result_message_proto(job_result_proto):
     return True
 
 
-def verify_signature(message, vm_id, received_signature):
-    """Function that checks if the signature received from the VM is valid.
-
-    Args:
-        message: dict. The message payload data.
-        vm_id: str. The ID of the VM instance.
-        received_signature: str. The signature received from the VM.
-
-    Returns:
-        bool. Whether the incoming request is valid.
-    """
-    secret = None
-    for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
-        if val['vm_id'] == vm_id:
-            secret = python_utils.convert_to_bytes(val['shared_secret_key'])
-            break
-    if secret is None:
-        return False
-
-    generated_signature = generate_signature(secret, message, vm_id)
-    if generated_signature != received_signature:
-        return False
-    return True
-
-
-class TrainedClassifierHandler(base.BaseHandler):
+class TrainedClassifierHandler(base.OppiaMLVMHandler):
     """This handler stores the result of the training job in datastore and
     updates the status of the job.
     """
@@ -100,22 +51,29 @@ class TrainedClassifierHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
-    def post(self):
-        """Handles POST requests."""
+    def get_request_message_vm_id_and_signature(self):
+        """Returns message, vm_id and signature retrived from incoming request.
+
+        Returns:
+            tuple(str). Message at index 0, vm_id at index 1 and signature at
+            index 2.
+        """
         payload_proto = (
             training_job_response_payload_pb2.TrainingJobResponsePayload())
         payload_proto.ParseFromString(self.request.body)
         signature = payload_proto.signature
         vm_id = payload_proto.vm_id
-        if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
-            raise self.UnauthorizedUserException
+        return payload_proto.job_result.SerializeToString(), vm_id, signature
+
+    @acl_decorators.oppia_ml_access
+    def post(self):
+        """Handles POST requests."""
+        payload_proto = (
+            training_job_response_payload_pb2.TrainingJobResponsePayload())
+        payload_proto.ParseFromString(self.request.body)
 
         if not validate_job_result_message_proto(payload_proto.job_result):
             raise self.InvalidInputException
-        if not verify_signature(
-                payload_proto.job_result.SerializeToString(), vm_id, signature):
-            raise self.UnauthorizedUserException
 
         job_id = payload_proto.job_result.job_id
 
@@ -214,25 +172,28 @@ class TrainedClassifierHandler(base.BaseHandler):
         })
 
 
-class NextJobHandler(base.BaseHandler):
+class NextJobHandler(base.OppiaMLVMHandler):
     """This handler fetches next job to be processed according to the time
     and sends back job_id, algorithm_id and training data to the VM.
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @acl_decorators.open_access
-    def post(self):
-        """Handles POST requests."""
+    def get_request_message_vm_id_and_signature(self):
+        """Returns message, vm_id and signature retrived from incoming request.
+
+        Returns:
+            tuple(str). Message at index 0, vm_id at index 1 and signature at
+            index 2.
+        """
         signature = self.payload.get('signature')
         vm_id = self.payload.get('vm_id')
         message = self.payload.get('message')
+        return message, vm_id, signature
 
-        if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
-            raise self.UnauthorizedUserException
-        if not verify_signature(message, vm_id, signature):
-            raise self.UnauthorizedUserException
-
+    @acl_decorators.oppia_ml_access
+    def post(self):
+        """Handles POST requests."""
         response = {}
         next_job = classifier_services.fetch_next_job()
         if next_job is not None:

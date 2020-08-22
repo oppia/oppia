@@ -17,10 +17,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import base64
 import datetime
+import hashlib
+import hmac
 import logging
 
 from core.domain import classifier_domain
+from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.platform import models
@@ -29,6 +33,50 @@ import python_utils
 
 (classifier_models, exp_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.exploration])
+
+
+
+# NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
+# in Oppia-ml.
+def generate_signature(secret, message, vm_id):
+    """Generates digital signature for given data.
+
+    Args:
+        secret: str. The secret used to communicate with Oppia-ml.
+        message: str. The message payload data.
+        vm_id: str. The ID of the VM that generated message.
+
+    Returns:
+        str. The signature of the payload data.
+    """
+    message = '%s|%s' % (base64.b64encode(message), vm_id)
+    return hmac.new(
+        secret, msg=message, digestmod=hashlib.sha256).hexdigest()
+
+
+def verify_signature(message, vm_id, received_signature):
+    """Function that checks if the signature received from the VM is valid.
+
+    Args:
+        message: dict. The message payload data.
+        vm_id: str. The ID of the VM instance.
+        received_signature: str. The signature received from the VM.
+
+    Returns:
+        bool. Whether the incoming request is valid.
+    """
+    secret = None
+    for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
+        if val['vm_id'] == vm_id:
+            secret = python_utils.convert_to_bytes(val['shared_secret_key'])
+            break
+    if secret is None:
+        return False
+
+    generated_signature = generate_signature(secret, message, vm_id)
+    if generated_signature != received_signature:
+        return False
+    return True
 
 
 def handle_trainable_states(exploration, state_names):

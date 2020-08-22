@@ -31,6 +31,8 @@ import types
 
 from constants import constants
 from core.controllers import base
+from core.controllers import acl_decorators
+from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -1220,3 +1222,71 @@ class CsrfTokenHandlerTests(test_utils.GenericTestBase):
 
         self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
             None, csrf_token))
+
+
+class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
+    """Unit tests for OppiaMLVMHandler class."""
+
+    class IncorrectMockVMHandler(base.OppiaMLVMHandler):
+        """Derived VM Handler class with missing function implementation for
+        get_request_message_vm_id_and_signature function.
+        """
+
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+        @acl_decorators.oppia_ml_access
+        def post(self):
+            return self.render_json({})
+
+    class CorrectMockVMHandler(base.OppiaMLVMHandler):
+        """Derived VM Handler class with get_request_message_vm_id_and_signature
+        function implementation.
+        """
+
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+        def get_request_message_vm_id_and_signature(self):
+            """Returns the message, vm_id and signature retrieved from the
+            incoming requests.
+            """
+            signature = self.payload.get('signature')
+            vm_id = self.payload.get('vm_id')
+            message = self.payload.get('message')
+            return message, vm_id, signature
+
+        @acl_decorators.oppia_ml_access
+        def post(self):
+            self.render_json({'job_id': 'new_job'})
+
+    def setUp(self):
+        super(OppiaMLVMHandlerTests, self).setUp()
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route('/incorrectmock', self.IncorrectMockVMHandler),
+            webapp2.Route('/correctmock', self.CorrectMockVMHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_that_incorrect_derived_class_raises_exception(self):
+        payload = {}
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        payload['message'] = json.dumps('message')
+        payload['signature'] = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(secret),
+            payload['message'], payload['vm_id'])
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/incorrectmock', payload, expected_status_int=500)
+
+    def test_that_correct_derived_class_does_not_raise_exception(self):
+        payload = {}
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        payload['message'] = json.dumps('message')
+        payload['signature'] = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(secret),
+            payload['message'], payload['vm_id'])
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/correctmock', payload, expected_status_int=200)

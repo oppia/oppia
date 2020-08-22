@@ -24,7 +24,6 @@ import json
 import os
 
 from constants import constants
-from core.controllers import classifier
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
@@ -119,7 +118,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_proto.job_result.CopyFrom(self.job_result)
         self.payload_proto.vm_id = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        self.payload_proto.signature = classifier.generate_signature(
+        self.payload_proto.signature = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
             self.payload_proto.job_result.SerializeToString(),
             self.payload_proto.vm_id)
@@ -130,7 +129,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         }
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload_for_fetching_next_job_request['signature'] = (
-            classifier.generate_signature(
+            classifier_services.generate_signature(
                 python_utils.convert_to_bytes(secret),
                 self.payload_for_fetching_next_job_request['message'],
                 self.payload_for_fetching_next_job_request['vm_id']))
@@ -538,7 +537,7 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.payload['vm_id'] = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload['message'] = json.dumps({})
-        self.payload['signature'] = classifier.generate_signature(
+        self.payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
             self.payload['message'], self.payload['vm_id'])
 
@@ -550,21 +549,3 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         json_response = self.post_json(
             '/ml/nextjobhandler', self.payload, expected_status_int=200)
         self.assertEqual(json_response, {})
-
-    def test_error_on_prod_mode_and_default_vm_id(self):
-        # Turn off DEV_MODE.
-        with self.swap(constants, 'DEV_MODE', False):
-            self.post_json(
-                '/ml/nextjobhandler', self.payload, expected_status_int=401)
-
-    def test_error_on_modified_message(self):
-        # Altering data to result in different signatures.
-        self.payload['message'] = 'different'
-        self.post_json(
-            '/ml/nextjobhandler', self.payload, expected_status_int=401)
-
-    def test_error_on_invalid_vm_id(self):
-        # Altering vm_id to result in invalid signature.
-        self.payload['vm_id'] = 1
-        self.post_json(
-            '/ml/nextjobhandler', self.payload, expected_status_int=401)

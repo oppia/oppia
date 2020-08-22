@@ -97,7 +97,7 @@ HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
     'html_field_types_to_rule_specs.json')
 
 # A mapping of interaction ids to classifier properties.
-# TODO(#10217): As of now we support only one interaction per interaction.
+# TODO(#10217): As of now we support only one algorithm per interaction.
 # However, we do have the necessary storage infrastructure to support multiple
 # algorithms per interaction. Hence, whenever we find a secondary algorithm
 # candidate for any of the supported interactions, the logical functions to
@@ -213,7 +213,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 39
+CURRENT_STATE_SCHEMA_VERSION = 38
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
