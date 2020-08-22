@@ -137,8 +137,7 @@ export class CollectionRightsBackendApiService {
         }
       } else {
         this._fetchCollectionRights(
-          collectionId,
-          (collectionRights) => {
+          collectionId, (collectionRights) => {
             // Save the fetched collection rights to avoid future fetches.
             this.collectionRightsCache[collectionId] = collectionRights;
             if (resolve) {

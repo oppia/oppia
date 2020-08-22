@@ -62,8 +62,7 @@ describe('Create new subtopic modal', function() {
     ctrl.init();
     expect(ctrl.topic).toEqual(topic);
     expect(ctrl.SUBTOPIC_PAGE_SCHEMA).toEqual({
-      type: 'html',
-      ui_config: {
+      type: 'html', ui_config: {
         rows: 100
       }});
     expect(ctrl.allowedBgColors).toEqual(['#FFFFFF']);

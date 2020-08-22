@@ -103,8 +103,7 @@ angular.module('oppia').factory('SearchService', [
 
     return {
       getSearchUrlQueryString: function(
-          searchQuery, selectedCategories,
-          selectedLanguageCodes) {
+          searchQuery, selectedCategories, selectedLanguageCodes) {
         return encodeURIComponent(searchQuery) +
           _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
       },

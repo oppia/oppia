@@ -39,8 +39,7 @@ require('services/csrf-token.service.ts');
 require('services/utils.service.ts');
 
 angular.module('oppia').directive('adminPage', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

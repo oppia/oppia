@@ -151,8 +151,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       topicsTable, 'Topics table taking too long to appear');
     await waitFor.visibilityOf(
-      topicsListItems.first(),
-      'Topics list taking too long to appear');
+      topicsListItems.first(), 'Topics list taking too long to appear');
   };
 
   this.mergeSkillWithIndexToSkillWithIndex = async function(

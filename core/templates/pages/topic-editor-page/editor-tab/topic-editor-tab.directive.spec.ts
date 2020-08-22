@@ -147,8 +147,7 @@ describe('Topic editor tab directive', function() {
     TopicEditorStateService.setTopic(topic);
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     spyOnProperty(
-      TopicEditorStateService,
-      'onStorySummariesInitialized').and.returnValue(
+      TopicEditorStateService, 'onStorySummariesInitialized').and.returnValue(
       mockStorySummariesInitializedEventEmitter);
     ctrl.$onInit();
   }));

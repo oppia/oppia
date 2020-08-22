@@ -137,8 +137,7 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
             );
 
             $scope.$on(
-              'leafletDirectiveMap.interactiveMap.mouseover',
-              function() {
+              'leafletDirectiveMap.interactiveMap.mouseover', function() {
                 if (!ctrl.interactionIsActive) {
                   ctrl.setOverlay();
                 }
@@ -151,8 +150,7 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
                 }
               });
             $scope.$on(
-              'leafletDirectiveMap.interactiveMap.click',
-              function(evt, args) {
+              'leafletDirectiveMap.interactiveMap.click', function(evt, args) {
                 if (ctrl.interactionIsActive) {
                   var newLat = args.leafletEvent.latlng.lat;
                   var newLng = args.leafletEvent.latlng.lng;
