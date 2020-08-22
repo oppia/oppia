@@ -19,8 +19,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AdminPageData, AdminBackendApiService } from
-  'domain/admin/admin-backend-api.service';
+import {
+  AdminPageData,
+  AdminBackendApiService,
+  LatexToSvgMapping,
+  SuggestionLatexToSvgMapping
+} from 'domain/admin/admin-backend-api.service';
 
 @Injectable({
   providedIn: 'root'

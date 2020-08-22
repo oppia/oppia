@@ -96,6 +96,24 @@ export interface AdminPageData {
   topicSummaries: TopicSummary[];
 }
 
+export interface LatexToSvgMapping {
+  [expId: string]: {
+    [latexString: string]: {
+      latexId: string;
+      file: Blob;
+    }
+  }
+}
+
+export interface SuggestionLatexToSvgMapping {
+  [suggestionId: string]: {
+    [latexString: string]: {
+      latexId: string;
+      file: Blob;
+    }
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
