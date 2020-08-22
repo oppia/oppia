@@ -35,7 +35,7 @@ import { RatioExpressionInputCustomizationArgs } from
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
-fescribe('RatioExpressionInputValidationService', () => {
+describe('RatioExpressionInputValidationService', () => {
   let validatorService: RatioExpressionInputValidationService;
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
