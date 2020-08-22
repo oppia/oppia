@@ -109,7 +109,7 @@ def create_suggestion(
     return get_suggestion_by_id(thread_id)
 
 
-def create_suggestion_from_model(suggestion_model):
+def get_suggestion_from_model(suggestion_model):
     """Converts the given SuggestionModel to a Suggestion domain object
 
     Args:
@@ -142,7 +142,7 @@ def get_suggestion_by_id(suggestion_id):
     """
     model = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
 
-    return create_suggestion_from_model(model) if model else None
+    return get_suggestion_from_model(model) if model else None
 
 
 def get_suggestions_by_ids(suggestion_ids):
@@ -161,7 +161,7 @@ def get_suggestions_by_ids(suggestion_ids):
     )
 
     return [
-        create_suggestion_from_model(suggestion_model) if suggestion_model
+        get_suggestion_from_model(suggestion_model) if suggestion_model
         else None for suggestion_model in general_suggestion_models
     ]
 
@@ -179,7 +179,7 @@ def query_suggestions(query_fields_and_values):
         values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
     """
     return [
-        create_suggestion_from_model(s) for s in
+        get_suggestion_from_model(s) for s in
         suggestion_models.GeneralSuggestionModel.query_suggestions(
             query_fields_and_values)
     ]
@@ -344,9 +344,6 @@ def accept_suggestion(
         # Get user scoring domain object.
         user_scoring = get_user_scoring(user_id, score_category)
 
-        if user_scoring is None:
-            user_scoring = create_new_user_scoring(user_id, score_category, 0)
-
         # Increment the score of the author due to their suggestion being
         # accepted.
         user_scoring.increment_score(
@@ -357,12 +354,12 @@ def accept_suggestion(
         # created when the score of the user passes the minimum score required
         # to review.
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
-            if user_scoring.check_if_user_can_review_the_category() and (
-                    not user_scoring.check_if_email_has_been_sent()):
+            if user_scoring.can_user_review_category() and (
+                    not user_scoring.onboard_reviewer_email_sent):
                 email_manager.send_mail_to_onboard_new_reviewers(
                     user_id, score_category
                 )
-                user_scoring.mark_email_as_sent()
+                user_scoring.mark_onboarding_email_as_sent()
 
         # Need to update the corresponding user scoring model after we updated
         # the domain object.
@@ -523,7 +520,7 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
         return []
 
     return ([
-        create_suggestion_from_model(s)
+        get_suggestion_from_model(s)
         for s in suggestion_models.GeneralSuggestionModel
         .get_in_review_suggestions_in_score_categories(
             score_categories, user_id)
@@ -543,7 +540,7 @@ def get_reviewable_suggestions(user_id, suggestion_type):
         to review.
     """
     all_suggestions = ([
-        create_suggestion_from_model(s) for s in (
+        get_suggestion_from_model(s) for s in (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
@@ -572,20 +569,20 @@ def get_submitted_suggestions(user_id, suggestion_type):
         submitted.
     """
     return ([
-        create_suggestion_from_model(s) for s in (
+        get_suggestion_from_model(s) for s in (
             suggestion_models.GeneralSuggestionModel
             .get_user_created_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
 
 
-def create_user_scoring_from_model(user_scoring_model):
+def get_user_scoring_from_model(user_scoring_model):
     """Converts the given UserContributionScoringModel to a
     UserContributionScoring domain object.
 
     Args:
         user_scoring_model: UserContributionScoringModel.
-            UserContributionScoringModelobject to be
+            UserContributionScoringModel to be
             converted to UserContributionScoring domain object.
 
     Returns:
@@ -594,26 +591,9 @@ def create_user_scoring_from_model(user_scoring_model):
     """
     return user_domain.UserContributionScoring(
         user_scoring_model.user_id, user_scoring_model.score_category,
-        user_scoring_model.score, user_scoring_model.has_email_been_sent
+        user_scoring_model.score,
+        user_scoring_model.onboard_reviewer_email_sent
     )
-
-
-def create_new_user_scoring(user_id, score_category, score):
-    """Creates the user scoring model and the user scoring domain object with
-    the given user_id, score_category and score.
-
-    Args:
-        user_id: str. The id of the user.
-        score_category: str. The category of the suggestion.
-        score: float. The score of the user for the given category.
-
-    Returns:
-        UserContributionScoring. The user scoring object created.
-    """
-    new_user_scoring_model = user_models.UserContributionScoringModel.create(
-        user_id, score_category, score)
-
-    return create_user_scoring_from_model(new_user_scoring_model)
 
 
 def _update_user_scoring(user_scoring):
@@ -627,12 +607,21 @@ def _update_user_scoring(user_scoring):
         user_scoring.user_id, user_scoring.score_category
     )
 
-    user_scoring_model.user_id = user_scoring.user_id
-    user_scoring_model.score_category = user_scoring.score_category
-    user_scoring_model.score = user_scoring.score
-    user_scoring_model.has_email_been_sent = user_scoring.has_email_been_sent
+    if user_scoring_model:
+        user_scoring_model.user_id = user_scoring.user_id
+        user_scoring_model.score_category = user_scoring.score_category
+        user_scoring_model.score = user_scoring.score
+        user_scoring_model.onboard_reviewer_email_sent = (
+            user_scoring.onboard_reviewer_email_sent
+        )
 
-    user_scoring_model.put()
+        user_scoring_model.put()
+
+    else:
+        user_models.UserContributionScoringModel.create(
+            user_scoring.user_id, user_scoring.score_category,
+            user_scoring.score, user_scoring.onboard_reviewer_email_sent)
+
 
 
 def get_all_scores_of_user(user_id):
@@ -654,7 +643,7 @@ def get_all_scores_of_user(user_id):
     return scores
 
 
-def check_user_can_review_in_category(user_id, score_category):
+def can_user_review_category(user_id, score_category):
     """Checks if user can review suggestions in category score_category.
     If the user has score above the minimum required score, then the user is
     allowed to review.
@@ -667,12 +656,8 @@ def check_user_can_review_in_category(user_id, score_category):
         bool. Whether the user can review suggestions under category
         score_category.
     """
-    user_scoring_model = (
-        user_models.UserContributionScoringModel.get(user_id, score_category)
-    )
-    if user_scoring_model is None:
-        return False
-    return user_scoring_model.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+    user_scoring = get_user_scoring(user_id, score_category)
+    return user_scoring.can_user_review_category()
 
 
 def get_all_user_ids_who_are_allowed_to_review(score_category):
@@ -694,15 +679,25 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
 
 def get_user_scoring(user_id, score_category):
     """Gets the user scoring model from storage and creates the
-    corresponding user scoring domain object if the model exists.
+    corresponding user scoring domain object if the model exists. If the model
+    does not exist a user scoring domain object with the given user_id and
+    score category is created with the initial score and email values.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The category of the suggestion.
+
+    Returns:
+        UserContributionScoring. The user scoring object.
     """
     user_scoring_model = user_models.UserContributionScoringModel.get(
         user_id, score_category)
 
-    return (
-        create_user_scoring_from_model(user_scoring_model) if
-        user_scoring_model else None
-    )
+    if user_scoring_model:
+        return get_user_scoring_from_model(user_scoring_model)
+
+    return user_domain.UserContributionScoring(
+        user_id, score_category, 0, False)
 
 
 def check_can_resubmit_suggestion(suggestion_id, user_id):
@@ -793,7 +788,7 @@ def update_suggestions_with_math_svgs(suggestions_raw_latex_to_image_data_dict):
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids))
 
     for suggestion_model in suggestion_models_to_update:
-        suggestion = create_suggestion_from_model(suggestion_model)
+        suggestion = get_suggestion_from_model(suggestion_model)
         suggestion_id = suggestion.suggestion_id
         exp_id = suggestion.target_id
         raw_latex_to_image_data_dict = (
@@ -859,7 +854,7 @@ def get_latex_strings_to_suggestion_ids_mapping():
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)))
     suggestion_id_to_latex_strings = {}
     for model in exploration_suggestion_models:
-        suggestion = create_suggestion_from_model(model)
+        suggestion = get_suggestion_from_model(model)
         html_string = ''.join(suggestion.get_all_html_content_strings())
         latex_strings_without_svg = (
             html_validation_service.

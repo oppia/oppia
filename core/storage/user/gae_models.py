@@ -1841,7 +1841,7 @@ class UserContributionScoringModel(base_models.BaseModel):
     # The score of the user for the above category of suggestions.
     score = ndb.FloatProperty(required=True, indexed=True)
     # Flag to check if email to onboard reviewer has been sent for the category.
-    has_email_been_sent = ndb.BooleanProperty(required=True, default=False)
+    onboard_reviewer_email_sent = ndb.BooleanProperty(required=True, default=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -1871,7 +1871,9 @@ class UserContributionScoringModel(base_models.BaseModel):
         for scoring_model in scoring_models:
             user_data[scoring_model.score_category] = {
                 'score': scoring_model.score,
-                'has_email_been_sent': scoring_model.has_email_been_sent
+                'onboard_reviewer_email_sent': (
+                    scoring_model.onboard_reviewer_email_sent
+                )
             }
         return user_data
 
@@ -1974,13 +1976,16 @@ class UserContributionScoringModel(base_models.BaseModel):
         return cls.get_by_id(instance_id)
 
     @classmethod
-    def create(cls, user_id, score_category, score):
+    def create(
+            cls, user_id, score_category, score, onboard_reviewer_email_sent=False):
         """Creates a new UserContributionScoringModel entry.
 
         Args:
             user_id: str. The ID of the user.
             score_category: str. The score category of the suggestion.
             score: float. The score of the user.
+            onboard_reviewer_email_sent: bool. Whether the email to onboard the
+                user as a reviewer has been sent.
 
         Returns:
             UserContributionScoringModel. The user scoring model that was
@@ -1999,7 +2004,8 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         user_scoring_model = cls(
             id=instance_id, user_id=user_id, score_category=score_category,
-            score=score)
+            score=score,
+            onboard_reviewer_email_sent=onboard_reviewer_email_sent)
         user_scoring_model.put()
         return user_scoring_model
 

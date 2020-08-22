@@ -41,8 +41,11 @@ import feconf
 import python_utils
 import utils
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+(suggestion_models, feedback_models, user_models) = (
+    models.Registry.import_models(
+        [models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.user]
+    )
+)
 
 
 class SuggestionServicesUnitTests(test_utils.GenericTestBase):
@@ -309,14 +312,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'target_id', self.target_id)])[0]
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
-        # Create a user scoring domain object to verify that the
-        # score and has_email_been_sent fields have changed after the
+        # Get the user scoring domain object to verify that the
+        # score and onboard_reviewer_email_sent fields have changed after the
         # suggestion has been accepted.
-        user_scoring = suggestion_services.create_new_user_scoring(
-            self.author_id, suggestion.score_category, 0
+        user_scoring = suggestion_services.get_user_scoring(
+            self.author_id, suggestion.score_category
         )
-        self.assertFalse(user_scoring.check_if_email_has_been_sent())
-        self.assertEqual(user_scoring.get_score(), 0)
+        self.assertFalse(user_scoring.onboard_reviewer_email_sent)
+        self.assertEqual(user_scoring.score, 0)
 
         # An email is sent to users the first time that they pass the score
         # required to review a suggestion category. By default, when a
@@ -340,26 +343,28 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'target_id', self.target_id)])[0]
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_ACCEPTED)
+        # Assert that the email was sent and that the score increased by the
+        # correct amount.
         user_scoring = suggestion_services.get_user_scoring(
             self.author_id, suggestion.score_category
         )
-        self.assertTrue(user_scoring.check_if_email_has_been_sent())
+        self.assertTrue(user_scoring.onboard_reviewer_email_sent)
         self.assertEqual(
-            user_scoring.get_score(), feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+            user_scoring.score, feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
 
     def test_accept_suggestion_does_not_send_email_if_users_score_is_too_low(
             self):
         self.mock_create_suggestion(self.target_id)
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
-        # Create a user scoring domain object to verify the score and
-        # that the has_email_been_sent_to_user field does not change after the
+        # Get the user scoring domain object to verify the score and
+        # that the onboard_reviewer_email_sent field does not change after the
         # suggestion is accepted.
-        user_scoring = suggestion_services.create_new_user_scoring(
-            self.author_id, self.score_category, 0
+        user_scoring = suggestion_services.get_user_scoring(
+            self.author_id, self.score_category
         )
-        self.assertFalse(user_scoring.check_if_email_has_been_sent())
-        self.assertEqual(user_scoring.get_score(), 0)
+        self.assertFalse(user_scoring.onboard_reviewer_email_sent)
+        self.assertEqual(user_scoring.score, 0)
 
         # An email is sent to users the first time that they pass the score
         # required to review a suggestion category. By default, when a
@@ -383,12 +388,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         # Assert that the users score was updated correctly.
         self.assertEqual(
-            user_scoring.get_score(),
-            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+            user_scoring.score,suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
         # Assert that their score is not high enough to review the category.
-        self.assertFalse(user_scoring.check_if_user_can_review_the_category())
+        self.assertFalse(user_scoring.can_user_review_category())
         # Assert that the onboarding new reviewer email was not sent.
-        self.assertFalse(user_scoring.check_if_email_has_been_sent())
+        self.assertFalse(user_scoring.onboard_reviewer_email_sent)
 
     def test_accept_suggestion_creates_user_scoring_model_if_it_does_not_exist(
             self):
@@ -397,7 +401,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
         # Verify that a user scoring model does not exist.
-        self.assertIsNone(suggestion_services.get_user_scoring(
+        self.assertIsNone(user_models.UserContributionScoringModel.get(
             self.author_id, self.score_category))
 
         with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
@@ -406,7 +410,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'review message')
 
         # Verify that a user scoring model now exists.
-        self.assertIsNotNone(suggestion_services.get_user_scoring(
+        self.assertIsNotNone(user_models.UserContributionScoringModel.get(
             self.author_id, self.score_category))
 
     def test_accept_suggestion_successfully(self):
@@ -808,6 +812,24 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             if exp.id == exp_id:
                 return exp
 
+    def create_new_user_scoring(self, user_id, score_category, score):
+        """Creates the user scoring model and the user scoring domain object with
+        the given user_id, score_category and score.
+
+        Args:
+            user_id: str. The id of the user.
+            score_category: str. The category of the suggestion.
+            score: float. The score of the user for the given category.
+
+        Returns:
+            UserContributionScoring. The user scoring object created.
+        """
+        new_user_scoring_model = user_models.UserContributionScoringModel.create(
+            user_id, score_category, score)
+
+        return suggestion_services.get_user_scoring_from_model(
+            new_user_scoring_model)
+
     def setUp(self):
         super(SuggestionGetServicesUnitTests, self).setUp()
 
@@ -1005,13 +1027,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         # User scoring models for user1.
-        suggestion_services.create_new_user_scoring('user1', 'category1', 15)
-        suggestion_services.create_new_user_scoring('user1', 'category2', 15)
-        suggestion_services.create_new_user_scoring('user1', 'category3', 5)
+        self.create_new_user_scoring('user1', 'category1', 15)
+        self.create_new_user_scoring('user1', 'category2', 15)
+        self.create_new_user_scoring('user1', 'category3', 5)
         # User scoring models for user2.
-        suggestion_services.create_new_user_scoring('user2', 'category1', 5)
-        suggestion_services.create_new_user_scoring('user2', 'category2', 5)
-        suggestion_services.create_new_user_scoring('user2', 'category3', 5)
+        self.create_new_user_scoring('user2', 'category1', 5)
+        self.create_new_user_scoring('user2', 'category2', 5)
+        self.create_new_user_scoring('user2', 'category3', 5)
 
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -1365,6 +1387,24 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
 class UserContributionScoringUnitTests(test_utils.GenericTestBase):
 
+    def create_new_user_scoring(self, user_id, score_category, score):
+        """Creates the user scoring model and the user scoring domain object with
+        the given user_id, score_category and score.
+
+        Args:
+            user_id: str. The id of the user.
+            score_category: str. The category of the suggestion.
+            score: float. The score of the user for the given category.
+
+        Returns:
+            UserContributionScoring. The user scoring object created.
+        """
+        new_user_scoring_model = user_models.UserContributionScoringModel.create(
+            user_id, score_category, score)
+
+        return suggestion_services.get_user_scoring_from_model(
+            new_user_scoring_model)
+
     def setUp(self):
         super(UserContributionScoringUnitTests, self).setUp()
         self.signup('user1@example.com', 'user1')
@@ -1373,17 +1413,17 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
         self.user_2_id = self.get_user_id_from_email('user2@example.com')
 
     def test_get_all_user_ids_who_are_allowed_to_review(self):
-        user_scoring_user1_cat1 = suggestion_services.create_new_user_scoring(
+        user_scoring_user1_cat1 = self.create_new_user_scoring(
             self.user_1_id, 'category1', 0
         )
-        user_scoring_user1_cat2 = suggestion_services.create_new_user_scoring(
+        user_scoring_user1_cat2 = self.create_new_user_scoring(
             self.user_1_id, 'category2',
             feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
         )
-        user_scoring_user2_cat1 = suggestion_services.create_new_user_scoring(
+        user_scoring_user2_cat1 = self.create_new_user_scoring(
             self.user_2_id, 'category1', 0
         )
-        user_scoring_user2_cat2 = suggestion_services.create_new_user_scoring(
+        user_scoring_user2_cat2 = self.create_new_user_scoring(
             self.user_2_id, 'category2', 0
         )
 
@@ -1396,22 +1436,15 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
                 'category2'))
         self.assertEqual(user_ids, [self.user_1_id])
 
-        self.assertTrue(
-            user_scoring_user1_cat2.check_if_user_can_review_the_category())
-        self.assertFalse(
-            user_scoring_user1_cat1.check_if_user_can_review_the_category())
-        self.assertFalse(
-            user_scoring_user2_cat1.check_if_user_can_review_the_category())
-        self.assertFalse(
-            user_scoring_user2_cat2.check_if_user_can_review_the_category())
+        self.assertTrue(user_scoring_user1_cat2.can_user_review_category())
+        self.assertFalse(user_scoring_user1_cat1.can_user_review_category())
+        self.assertFalse(user_scoring_user2_cat1.can_user_review_category())
+        self.assertFalse(user_scoring_user2_cat2.can_user_review_category())
 
     def test_get_all_scores_of_the_user_with_multiple_scores(self):
-        suggestion_services.create_new_user_scoring(
-            self.user_1_id, 'category1', 1)
-        suggestion_services.create_new_user_scoring(
-            self.user_1_id, 'category2', 2)
-        suggestion_services.create_new_user_scoring(
-            self.user_1_id, 'category3', 3)
+        self.create_new_user_scoring(self.user_1_id, 'category1', 1)
+        self.create_new_user_scoring(self.user_1_id, 'category2', 2)
+        self.create_new_user_scoring(self.user_1_id, 'category3', 3)
 
         expected_scores_dict = {}
         for index in python_utils.RANGE(1, 4):

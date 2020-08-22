@@ -276,36 +276,12 @@ class LearnerPlaylist(python_utils.OBJECT):
 class UserContributionScoring(python_utils.OBJECT):
     """Domain object for UserContributionScoringModel."""
 
-    def __init__(self, user_id, score_category, score, has_email_been_sent):
+    def __init__(
+            self, user_id, score_category, score, onboard_reviewer_email_sent):
         self.user_id = user_id
         self.score_category = score_category
         self.score = score
-        self.has_email_been_sent = has_email_been_sent
-
-    def get_score_category(self):
-        """Gets the score category which corresponds to the category of a
-        suggestion where the user has points.
-
-        Returns:
-            str. The score category.
-        """
-        return self.score_category
-
-    def get_user_id(self):
-        """Gets the user id who's scoring information is being represented.
-
-        Returns:
-            str. The user_id.
-        """
-        return self.user_id
-
-    def get_score(self):
-        """Gets the score of the user for the given score category.
-
-        Returns:
-            float. The score of the user in the given category.
-        """
-        return self.score
+        self.onboard_reviewer_email_sent = onboard_reviewer_email_sent
 
     def increment_score(self, increment_by):
         """Increments the score of the user in the category by the given amount.
@@ -320,7 +296,7 @@ class UserContributionScoring(python_utils.OBJECT):
         """
         self.score += increment_by
 
-    def check_if_user_can_review_the_category(self):
+    def can_user_review_category(self):
         """Checks if user can review suggestions in category score_category.
         If the user has score above the minimum required score, then the user
         is allowed to review.
@@ -331,17 +307,9 @@ class UserContributionScoring(python_utils.OBJECT):
         """
         return self.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
 
-    def check_if_email_has_been_sent(self):
-        """Checks whether the email has been sent.
-
-        Returns:
-            bool. Whether the email has been sent.
-        """
-        return self.has_email_been_sent
-
-    def mark_email_as_sent(self):
+    def mark_onboarding_email_as_sent(self):
         """Marks the email as sent."""
-        self.has_email_been_sent = True
+        self.onboard_reviewer_email_sent = True
 
 
 class UserContributionRights(python_utils.OBJECT):

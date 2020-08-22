@@ -3801,7 +3801,7 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instance(cls, item):
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
-            return suggestion_services.create_suggestion_from_model(item)
+            return suggestion_services.get_suggestion_from_model(item)
         else:
             cls._add_error(
                 'target %s' % ERROR_CATEGORY_TYPE_CHECK,

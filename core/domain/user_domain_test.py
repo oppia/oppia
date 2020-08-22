@@ -407,45 +407,32 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
             self.user_scoring.score_category, 'category0')
         self.assertEqual(self.user_scoring.score, 0)
         self.assertEqual(
-            self.user_scoring.has_email_been_sent, False)
-
-    def test_get_score_category(self):
-        self.assertEqual(
-            self.user_scoring.get_score_category(), 'category0')
-
-    def test_get_user_id(self):
-        self.assertEqual(
-            self.user_scoring.get_user_id(), 'user_id0')
-
-    def test_get_score(self):
-        self.assertEqual(self.user_scoring.get_score(), 0)
+            self.user_scoring.onboard_reviewer_email_sent, False)
 
     def test_increment_score(self):
-        self.assertEqual(self.user_scoring.get_score(), 0)
+        self.assertEqual(self.user_scoring.score, 0)
 
         self.user_scoring.increment_score(4)
-        self.assertEqual(self.user_scoring.get_score(), 4)
+        self.assertEqual(self.user_scoring.score, 4)
 
         self.user_scoring.increment_score(-3)
-        self.assertEqual(self.user_scoring.get_score(), 1)
+        self.assertEqual(self.user_scoring.score, 1)
 
-    def test_check_if_user_can_review_the_category(self):
-        self.assertEqual(self.user_scoring.get_score(), 0)
-        self.assertFalse(
-            self.user_scoring.check_if_user_can_review_the_category())
+    def test_can_user_review_category(self):
+        self.assertEqual(self.user_scoring.score, 0)
+        self.assertFalse(self.user_scoring.can_user_review_category())
 
         self.user_scoring.increment_score(
             feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
 
-        self.assertTrue(
-            self.user_scoring.check_if_user_can_review_the_category())
+        self.assertTrue(self.user_scoring.can_user_review_category())
 
-    def test_mark_email_as_sent(self):
-        self.assertFalse(self.user_scoring.check_if_email_has_been_sent())
+    def test_mark_onboarding_email_as_sent(self):
+        self.assertFalse(self.user_scoring.onboard_reviewer_email_sent)
 
-        self.user_scoring.mark_email_as_sent()
+        self.user_scoring.mark_onboarding_email_as_sent()
 
-        self.assertTrue(self.user_scoring.check_if_email_has_been_sent())
+        self.assertTrue(self.user_scoring.onboard_reviewer_email_sent)
 
 
 class UserContributionRightsTests(test_utils.GenericTestBase):
