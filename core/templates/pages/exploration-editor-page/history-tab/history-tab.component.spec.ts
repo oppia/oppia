@@ -60,6 +60,7 @@ describe('History tab component', function() {
   var $scope = null;
   var $uibModal = null;
   var compareVersionsService = null;
+  var editabilityService = null;
   var csrfTokenService = null;
   var dateTimeFormatService = null;
   var windowRef = null;
@@ -85,6 +86,7 @@ describe('History tab component', function() {
 
   beforeEach(function() {
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
+    editabilityService = TestBed.get(EditabilityService);
     windowRef = TestBed.get(WindowRef);
   });
 
@@ -156,6 +158,7 @@ describe('History tab component', function() {
     ctrl = $componentController('historyTab', {
       $scope: $scope,
       DateTimeFormatService: dateTimeFormatService,
+      EditabilityService: editabilityService,
       WindowRef: windowRef
     });
     ctrl.$onInit();
@@ -296,6 +299,7 @@ describe('History tab component', function() {
     });
 
   it('should return if the content is editable', function() {
+    spyOn(editabilityService, 'isEditable').and.returnValue(false);
     expect(ctrl.isEditable()).toEqual(false);
   });
 
