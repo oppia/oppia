@@ -35,7 +35,7 @@ import { RatioExpressionInputCustomizationArgs } from
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
-describe('RatioExpressionInputValidationService', () => {
+fdescribe('RatioExpressionInputValidationService', () => {
   let validatorService: RatioExpressionInputValidationService;
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
@@ -179,16 +179,31 @@ describe('RatioExpressionInputValidationService', () => {
         x: [1, 2]
       }
     });
+    let hasNumberOfTermsEqualToLength2 = rof.createFromBackendDict({
+      rule_type: 'HasNumberOfTermsEqualTo',
+      inputs: {
+        y: 2
+      }
+    });
 
     // The second rule will never get matched.
     answerGroups[0].updateRuleTypesToInputs(
-      [equalsTwoTerms, equals]);
+      [equalsTwoTerms, equals, hasNumberOfTermsEqualToLength2]);
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 1 will never be matched because' +
       ' it has less no of terms than required.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 3 from answer group 1 will never be matched because' +
+      ' it has less no of terms than required.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 3 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
+      ' input.'
     }]);
   });
 });
