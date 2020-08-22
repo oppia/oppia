@@ -1933,8 +1933,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         filenames in the expected pattern.
         """
         filename_pattern_regex = (
-            r'mathImg_[0-9]+_\S{10}_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d'
-            ']+.svg')
+            r'mathImg_[0-9]{8}_[0-9]{6}_[a-z0-9]{10}_height_[0-9d]+_width_[0-'
+            '9d]+_vertical_[0-9d]+.(svg)$')
         filenames = []
 
         filenames.append(
@@ -1998,8 +1998,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             extract_svg_filenames_in_math_rte_components(converted_html_string))
         self.assertEqual(len(filenames), 3)
         filename_pattern_regex = (
-            r'mathImg_[0-9]+_\S{10}_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d'
-            ']+.svg')
+            r'mathImg_[0-9]{8}_[0-9]{6}_[a-z0-9]{10}_height_[0-9d]+_width_[0-9'
+            'd]+_vertical_[0-9d]+.(svg)$')
         for filename in filenames:
             self.assertTrue(re.match(filename_pattern_regex, filename))
 
@@ -2011,32 +2011,32 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
             'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathIm'
-            'g_20207261338jhi1j6rvob_height_1d345_width_3d124_vertical_0d124'
-            '.svg&amp;quot;}"></oppia-noninteractive-math><oppia-noninteract'
+            'g_20200214_33834_jhi1j6rvob_height_1d345_width_3d124_vertical_0d'
+            '124.svg&amp;quot;}"></oppia-noninteractive-math><oppia-noninteract'
             'ive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;'
             ': &amp;quot;+,+,+,+&amp;quot;, &amp;quot;svg_filename&amp;quot;:'
-            ' &amp;quot;mathImg_20207261338r3ir43lmfd_height_2d456_width_6d124'
-            '_vertical_0d231.svg&amp;quot;}"></oppia-noninteractive-math>'
+            ' &amp;quot;mathImg_20201213_338332_r3ir43lmfd_height_2d456_width'
+            '_6d124_vertical_0d231.svg&amp;quot;}"></oppia-noninteractive-math>'
             '<oppia-noninteractive-math math_content-with-value="{&amp;q'
             'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;qu'
-            'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20207'
-            '261338imzlvnf23a_height_4d123_width_23d122_vertical_2d123.svg&a'
+            'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_2020122'
+            '1_331421_imzlvnf23a_height_4d123_width_23d122_vertical_2d123.svg&a'
             'mp;quot;}"></oppia-noninteractive-math>'
             '<oppia-noninteractive-math math_content-with-value="{&amp;q'
             'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;qu'
-            'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20207'
-            '261338imzlvnf23a_height_4d123_width_23d122_vertical_2d123.svg&a'
-            'mp;quot;}"></oppia-noninteractive-math>')
+            'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_2020122'
+            '1_331421_imzlvnf23a_height_4d123_width_23d122_vertical_2d123'
+            '.svg&amp;quot;}"></oppia-noninteractive-math>')
 
         filename1 = (
-            'mathImg_20207261338jhi1j6rvob_height_1d345_width_3d124_vertical_0'
-            'd124.svg')
+            'mathImg_20200214_33834_jhi1j6rvob_height_1d345_width_3d124_vertic'
+            'al_0d124.svg')
         filename2 = (
-            'mathImg_20207261338r3ir43lmfd_height_2d456_width_6d124_vertical_0'
-            'd231.svg')
+            'mathImg_20201213_338332_r3ir43lmfd_height_2d456_width_6d124_verti'
+            'cal_0d231.svg')
         filename3 = (
-            'mathImg_20207261338imzlvnf23a_height_4d123_width_23d122_vertical_'
-            '2d123.svg')
+            'mathImg_20201221_331421_imzlvnf23a_height_4d123_width_23d122_vert'
+            'ical_2d123.svg')
         expected_output = [
             (filename1, '+,-,-,+'), (filename2, '+,+,+,+'),
             (filename3, '(x - a_1)(x - a_2)')]
