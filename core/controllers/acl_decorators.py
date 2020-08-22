@@ -2853,7 +2853,7 @@ def can_play_entity(handler):
     return test_can_play_entity
 
 
-def oppia_ml_access(handler):
+def is_from_oppia_ml(handler):
     """Decorator to check whether the incoming request is from a valid Oppia-ML
     VM instance.
 
@@ -2864,7 +2864,7 @@ def oppia_ml_access(handler):
         function. The newly decorated function that now can check if incoming
         request is from a valid VM instance.
     """
-    def test_valid_oppia_ml_instance(self, **kwargs):
+    def test_request_originates_from_valid_oppia_ml_instance(self, **kwargs):
         """Checks if the incoming request is from a valid Oppia-ML VM instance.
 
         Args:
@@ -2878,7 +2878,7 @@ def oppia_ml_access(handler):
             Oppia-ML VM instance.
         """
         message, vm_id, signature = (
-            self.get_request_message_vm_id_and_signature())
+            self.extract_request_message_vm_id_and_signature())
         if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
             raise self.UnauthorizedUserException
         if not classifier_services.verify_signature(message, vm_id, signature):
@@ -2886,6 +2886,6 @@ def oppia_ml_access(handler):
 
         return handler(self, **kwargs)
 
-    test_valid_oppia_ml_instance.__wrapped__ = True
+    test_request_originates_from_valid_oppia_ml_instance.__wrapped__ = True
 
-    return test_valid_oppia_ml_instance
+    return test_request_originates_from_valid_oppia_ml_instance

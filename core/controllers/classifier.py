@@ -50,8 +50,8 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    def get_request_message_vm_id_and_signature(self):
-        """Returns message, vm_id and signature retrived from incoming request.
+    def extract_request_message_vm_id_and_signature(self):
+        """Returns message, vm_id and signature retrieved from incoming request.
 
         Returns:
             tuple(str). Message at index 0, vm_id at index 1 and signature at
@@ -64,7 +64,7 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
         vm_id = payload_proto.vm_id
         return payload_proto.job_result.SerializeToString(), vm_id, signature
 
-    @acl_decorators.oppia_ml_access
+    @acl_decorators.is_from_oppia_ml
     def post(self):
         """Handles POST requests."""
         payload_proto = (
@@ -178,8 +178,8 @@ class NextJobHandler(base.OppiaMLVMHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    def get_request_message_vm_id_and_signature(self):
-        """Returns message, vm_id and signature retrived from incoming request.
+    def extract_request_message_vm_id_and_signature(self):
+        """Returns message, vm_id and signature retrieved from incoming request.
 
         Returns:
             tuple(str). Message at index 0, vm_id at index 1 and signature at
@@ -190,7 +190,7 @@ class NextJobHandler(base.OppiaMLVMHandler):
         message = self.payload.get('message')
         return message, vm_id, signature
 
-    @acl_decorators.oppia_ml_access
+    @acl_decorators.is_from_oppia_ml
     def post(self):
         """Handles POST requests."""
         response = {}

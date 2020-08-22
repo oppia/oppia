@@ -3431,9 +3431,10 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
     """Tests for oppia_ml_access decorator."""
 
     class MockHandler(base.OppiaMLVMHandler):
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        def get_request_message_vm_id_and_signature(self):
+        def extract_request_message_vm_id_and_signature(self):
             """Returns message, vm_id and signature retrived from incoming
             request.
 
@@ -3446,7 +3447,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             message = self.payload.get('message')
             return message, vm_id, signature
 
-        @acl_decorators.oppia_ml_access
+        @acl_decorators.is_from_oppia_ml
         def post(self):
             self.render_json({'job_id': 'new_job'})
 

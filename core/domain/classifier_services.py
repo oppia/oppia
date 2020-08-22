@@ -43,7 +43,7 @@ def generate_signature(secret, message, vm_id):
     Args:
         secret: str. The secret used to communicate with Oppia-ml.
         message: str. The message payload data.
-        vm_id: str. The ID of the VM that generated message.
+        vm_id: str. The ID of the VM that generated the message.
 
     Returns:
         str. The signature of the payload data.

@@ -1229,23 +1229,23 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
 
     class IncorrectMockVMHandler(base.OppiaMLVMHandler):
         """Derived VM Handler class with missing function implementation for
-        get_request_message_vm_id_and_signature function.
+        extract_request_message_vm_id_and_signature function.
         """
 
         REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-        @acl_decorators.oppia_ml_access
+        @acl_decorators.is_from_oppia_ml
         def post(self):
             return self.render_json({})
 
     class CorrectMockVMHandler(base.OppiaMLVMHandler):
-        """Derived VM Handler class with get_request_message_vm_id_and_signature
-        function implementation.
+        """Derived VM Handler class with
+        extract_request_message_vm_id_and_signature function implementation.
         """
 
         REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-        def get_request_message_vm_id_and_signature(self):
+        def extract_request_message_vm_id_and_signature(self):
             """Returns the message, vm_id and signature retrieved from the
             incoming requests.
             """
@@ -1254,7 +1254,7 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
             message = self.payload.get('message')
             return message, vm_id, signature
 
-        @acl_decorators.oppia_ml_access
+        @acl_decorators.is_from_oppia_ml
         def post(self):
             self.render_json({'job_id': 'new_job'})
 
