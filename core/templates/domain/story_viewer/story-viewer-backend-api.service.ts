@@ -47,6 +47,11 @@ interface StoryChapterCompletionResponse {
   summaries: LearnerExplorationSummary[];
 }
 
+interface StoryDataDict {
+  topicName: string;
+  storyTitle: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -59,7 +64,7 @@ export class StoryViewerBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  private _storyDataEventEmitter = new EventEmitter();
+  private _storyDataEventEmitter = new EventEmitter<StoryDataDict>();
 
   _fetchStoryData(
       topicUrlFragment: string,
@@ -137,7 +142,7 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  get onSendStoryData(): EventEmitter {
+  get onSendStoryData(): EventEmitter<StoryDataDict> {
     return this._storyDataEventEmitter;
   }
 }
