@@ -21,6 +21,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
+import { StateCard } from
+  'domain/state_card/StateCardObjectFactory';
+
+interface HelpCardEventResponse {
+  helpCardHtml: string;
+  hasContinueButton: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -28,10 +35,12 @@ import { PlayerTranscriptService } from
 export class PlayerPositionService {
   constructor(private playerTranscriptService: PlayerTranscriptService) {}
 
-  private _activeCardChangedEventEmitter = new EventEmitter();
+  private _activeCardChangedEventEmitter = new EventEmitter<void>();
   private _currentQuestionChangedEventEmitter = new EventEmitter<number>();
-  private _helpCardAvailableEventEmitter = new EventEmitter();
-  private _newCardOpenedEventEmitter = new EventEmitter();
+  private _newCardAvailableEventEmitter = new EventEmitter<void>();
+  private _helpCardAvailableEventEmitter =
+    new EventEmitter<HelpCardEventResponse>();
+  private _newCardOpenedEventEmitter = new EventEmitter<StateCard>();
 
   displayedCardIndex = null;
   onChangeCallback = null;
@@ -97,23 +106,27 @@ export class PlayerPositionService {
     return this.learnerJustSubmittedAnAnswer;
   }
 
-  get onHelpCardAvailable() {
+  get onNewCardAvailable(): EventEmitter<void> {
+    return this._newCardAvailableEventEmitter;
+  }
+
+  get onHelpCardAvailable(): EventEmitter<HelpCardEventResponse> {
     return this._helpCardAvailableEventEmitter;
   }
 
-  get onNewCardOpened() {
+  get onNewCardOpened(): EventEmitter<StateCard> {
     return this._newCardOpenedEventEmitter;
   }
 
-  changeCurrentQuestion(index: number) {
+  changeCurrentQuestion(index: number): void {
     this._currentQuestionChangedEventEmitter.emit(index);
   }
 
-  get onActiveCardChanged() {
+  get onActiveCardChanged(): EventEmitter<void> {
     return this._activeCardChangedEventEmitter;
   }
 
-  get onCurrentQuestionChange() {
+  get onCurrentQuestionChange(): EventEmitter<number> {
     return this._currentQuestionChangedEventEmitter;
   }
 }
