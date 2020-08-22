@@ -109,7 +109,7 @@ def main():
     # We are using --source_maps here, so that we have at least one CI check
     # that builds using source maps in prod env. This is to ensure that
     # there are no issues while deploying oppia.
-    build.main(args=['--prod_env'])
+    build.main(args=['--prod_env', '--source_maps'])
     common.start_redis_server()
     start_google_app_engine_server()
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
