@@ -24,6 +24,7 @@ import datetime
 import logging
 import os
 
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
@@ -44,7 +45,6 @@ import utils
     models.Registry.import_models([
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
-memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 
@@ -796,7 +796,9 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         exploration_model.language_code = 'invalid_language_code'
         exploration_model.commit(
             self.albert_id, 'Changed language_code.', [])
-        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [self.VALID_EXP_ID])
 
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
@@ -1286,7 +1288,9 @@ class ExplorationContentValidationJobForCKEditorTests(
         exploration_model.states_schema_version = 100
         exploration_model.commit(
             self.albert_id, 'Changed states_schema_version.', [])
-        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [self.VALID_EXP_ID])
 
         job_id = (
             exp_jobs_one_off
@@ -2615,7 +2619,9 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
         exploration_model.states_schema_version = 100
         exploration_model.commit(
             self.albert_id, 'Changed states_schema_version.', [])
-        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            self.VALID_EXP_ID)
 
         job_id = (
             exp_jobs_one_off

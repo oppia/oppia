@@ -42,7 +42,7 @@ export class MusicNotesInputRulesService {
     }
   }
 
-  static _convertSequenceToMidi(sequence): number[] {
+  static _convertSequenceToMidi(sequence: MusicNotesAnswer[]): number[] {
     return sequence.map((note) => {
       return MusicNotesInputRulesService._getMidiNoteValue(note);
     });
