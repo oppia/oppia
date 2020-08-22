@@ -77,18 +77,31 @@ export class RatioExpressionInputValidationService {
       for (let j = 0; j < rules.length; j++) {
         let currentInput = rules[j].inputs.x;
         let currentRuleType = <string> rules[j].type;
-
-        var ratio: Ratio = this.rof.fromList(<number[]> currentInput);
+        var ratio: Ratio = null;
         if (minimumNumberOfTerms > 2) {
-          if (ratio.getNumberOfTerms() < minimumNumberOfTerms) {
-            warningsList.push({
-              type: AppConstants.WARNING_TYPES.ERROR,
-              message: (
-                'Rule ' + (j + 1) + ' from answer group ' +
+          if (currentRuleType === 'HasNumberOfTermsEqualTo') {
+            if (<number> currentInput < minimumNumberOfTerms) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' from answer group ' +
                 (i + 1) +
                 ' will never be matched because it has ' +
                 'less no of terms than required.')
-            });
+              });
+            }
+          } else {
+            ratio = this.rof.fromList(<number[]> currentInput);
+            if (ratio.getNumberOfTerms() < minimumNumberOfTerms) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' from answer group ' +
+                (i + 1) +
+                ' will never be matched because it has ' +
+                'less no of terms than required.')
+              });
+            }
           }
         }
         for (let seenRule of seenRules) {
@@ -105,17 +118,6 @@ export class RatioExpressionInputValidationService {
                 'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
                 ' will never be matched because it is preceded ' +
                 'by a \'Equals\' rule with a matching input.')
-            });
-          } else if (currentRuleType === 'IsEquivalent' && (
-            this.rof.arrayEquals(
-              ratio.convertToSimplestForm(), <number[]> currentInput))
-          ) {
-            warningsList.push({
-              type: AppConstants.WARNING_TYPES.ERROR,
-              message: (
-                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-              ' will never be matched because provided input ' +
-              'is not in its simplest form.')
             });
           } else if (currentRuleType === 'IsEquivalent' && (
             ratioRulesService.IsEquivalent(

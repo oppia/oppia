@@ -119,18 +119,8 @@ describe('RatioExpressionInputValidationService', () => {
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'Equals\' rule with a matching' +
-      ' input.'
-    }, {
-      type: WARNING_TYPES.ERROR,
       message: 'Rule 3 from answer group 1 will never be matched because' +
       ' it is preceded by a \'Equals\' rule with a matching' +
-      ' input.'
-    }, {
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
       ' input.'
     }
     ]);
@@ -151,13 +141,18 @@ describe('RatioExpressionInputValidationService', () => {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +
       ' provided input is not in its simplest form.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because' +
+      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
+      ' input.'
     }
     ]);
 
     let hasNumberOfTermsEqualTo2 = rof.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
-        x: 3
+        y: 3
       }
     });
 

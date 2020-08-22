@@ -371,12 +371,6 @@ import { MathEquationInputRulesService } from
 import { MathEquationInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-validation.service';
-import { MathExpressionInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
-import { MathExpressionInputValidationService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { MessengerService } from 'services/messenger.service';
 import { MetaTagCustomizationService } from
@@ -878,8 +872,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static lostChangeObjectFactory: LostChangeObjectFactory;
   static mathEquationInputRulesService: MathEquationInputRulesService;
   static mathEquationInputValidationService: MathEquationInputValidationService;
-  static mathExpressionInputRulesService: MathExpressionInputRulesService;
-  static mathExpressionInputValidationService: MathExpressionInputValidationService;
   static mathInteractionsService: MathInteractionsService;
   static messengerService: MessengerService;
   static metaTagCustomizationService: MetaTagCustomizationService;
@@ -1211,8 +1203,6 @@ private logicProofValidationService: LogicProofValidationService,
 private lostChangeObjectFactory: LostChangeObjectFactory,
 private mathEquationInputRulesService: MathEquationInputRulesService,
 private mathEquationInputValidationService: MathEquationInputValidationService,
-private mathExpressionInputRulesService: MathExpressionInputRulesService,
-private mathExpressionInputValidationService: MathExpressionInputValidationService,
 private mathInteractionsService: MathInteractionsService,
 private messengerService: MessengerService,
 private metaTagCustomizationService: MetaTagCustomizationService,
@@ -1384,7 +1374,7 @@ private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
 private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
   ) {}
 
-  public ngAfterViewInit() {
+  public ngAfterViewInit(): void {
     OppiaAngularRootComponent.adminBackendApiService = this.adminBackendApiService;
     OppiaAngularRootComponent.adminDataService = this.adminDataService;
     OppiaAngularRootComponent.adminRouterService = this.adminRouterService;
@@ -1545,8 +1535,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.lostChangeObjectFactory = this.lostChangeObjectFactory;
     OppiaAngularRootComponent.mathEquationInputRulesService = this.mathEquationInputRulesService;
     OppiaAngularRootComponent.mathEquationInputValidationService = this.mathEquationInputValidationService;
-    OppiaAngularRootComponent.mathExpressionInputRulesService = this.mathExpressionInputRulesService;
-    OppiaAngularRootComponent.mathExpressionInputValidationService = this.mathExpressionInputValidationService;
     OppiaAngularRootComponent.mathInteractionsService = this.mathInteractionsService;
     OppiaAngularRootComponent.messengerService = this.messengerService;
     OppiaAngularRootComponent.metaTagCustomizationService = this.metaTagCustomizationService;

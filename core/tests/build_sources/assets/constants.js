@@ -475,9 +475,8 @@ var constants = {
         "NumericExpressionInput",
         "AlgebraicExpressionInput",
         "MathEquationInput",
-        "MathExpressionInput",
-        "NumberWithUnits",
-        "RatioExpressionInput"
+        "RatioExpressionInput",
+        "NumberWithUnits"
     ]
   }, {
     "name": "Programming",

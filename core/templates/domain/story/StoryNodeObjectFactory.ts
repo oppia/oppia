@@ -240,7 +240,7 @@ export class StoryNode {
     return this._acquiredSkillIds.slice();
   }
 
-  addAcquiredSkillId(acquiredSkillid): void {
+  addAcquiredSkillId(acquiredSkillid: string): void {
     if (this._acquiredSkillIds.indexOf(acquiredSkillid) !== -1) {
       throw new Error('The given skill is already an acquired skill.');
     }

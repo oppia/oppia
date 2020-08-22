@@ -749,9 +749,7 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
-        if list(missing_interaction_ids) != [
-                'MathExpressionInput', 'RatioExpressionInput'
-            ]:
+        if list(missing_interaction_ids) != ['RatioExpressionInput']:
             # Ignoring the RatioExpressionInput for now as there's no creator
             # for the interaction yet.Once added this needs to be removed.
             # Ignoring the lack of the MathExpressionInput since it is going
