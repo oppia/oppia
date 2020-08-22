@@ -57,9 +57,12 @@ describe('Admin misc tab', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    libraryPage = new LibraryPage.LibraryPage();
 
     await users.createAndLoginAdminUser(
       'miscTabTester@miscTab.com', 'miscTabTester');
+
+    // Creating a dummy topic for the test
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
       'admin-misc-tab-test', 'A topic to test the Admin Page\'s Misc Tab',
@@ -67,16 +70,10 @@ describe('Admin misc tab', function() {
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4].substring(0, 12);
 
+    // Creating a dummy exploration for the test
     await workflow.createExploration();
     url = await browser.getCurrentUrl();
     explorationId = url.split('/')[4].substring(0, 12);
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle(EXPLORATION_NAME);
-    await explorationEditorSettingsTab.setCategory('Algorithm');
-    await explorationEditorSettingsTab.setObjective('Test the admin misc tab');
-    await explorationEditorSettingsTab.setLanguage('English');
-    await explorationEditorPage.navigateToMainTab();
-    await explorationEditorMainTab.setStateName('Introduction');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Select the right option.'));
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
@@ -92,11 +89,14 @@ describe('Admin misc tab', function() {
     await explorationEditorMainTab.moveToState('End');
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.saveChanges();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(EXPLORATION_NAME);
+    await explorationEditorSettingsTab.setCategory('Algorithms');
+    await explorationEditorSettingsTab.setObjective('Test the admin misc tab');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorPage.saveChanges();
     await workflow.publishExploration();
-
-    libraryPage = new LibraryPage.LibraryPage();
-    await libraryPage.get();
-    await libraryPage.playExploration(EXPLORATION_NAME);
 
     await adminPage.get();
     await adminPage.getMiscTab();
@@ -148,13 +148,11 @@ describe('Admin misc tab', function() {
 
   it('should extract data', async function() {
     // First we play through the exploration a couple of times to generate data
-    //await generateDataByPlayingExploration(2);
     await libraryPage.get();
     await libraryPage.playExploration(EXPLORATION_NAME);
-    await explorationPlayerPage.submitAnswer.apply(
-      null, CORRECT_ANSWER);
-    await explorationPlayerPage.clickThroughToNextCard();
-    // Giving bad data, expecting failure
+    await explorationPlayerPage.submitAnswer.apply(null, CORRECT_ANSWER);
+
+    // Now the test begins -- giving bad data, expecting failure
     await adminPage.extractData('0', '0', '0', '0', true);
     await adminPage.expectExtractionFailure();
     // Giving actual exploration, expecting successful extraction
