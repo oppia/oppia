@@ -14,22 +14,12 @@
 
 /**
  * @fileoverview There should be a break after parenthesis
- * @author Oppia
  */
 'use strict';
-
-// -----------------------------------------------------------------------------
-// Requirements
-// -----------------------------------------------------------------------------
 
 var rule = require('../../../lib/rules/break-after-parens'),
 
   RuleTester = require('eslint').RuleTester;
-
-
-// -----------------------------------------------------------------------------
-// Tests
-// -----------------------------------------------------------------------------
 
 var ruleTester = new RuleTester();
 ruleTester.run('break-after-parens', rule, {

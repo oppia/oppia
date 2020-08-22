@@ -13,21 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview ESLint plugin for Oppia codebase
- * @author Oppia
+ * @fileoverview ESLint plugin for Oppia codebase.
  */
 'use strict';
 
-// -----------------------------------------------------------------------------
-// Requirements
-// -----------------------------------------------------------------------------
-
 var requireIndex = require('requireindex');
-
-// -----------------------------------------------------------------------------
-// Plugin Definition
-// -----------------------------------------------------------------------------
-
 
 // Import all rules in lib/rules.
 module.exports.rules = requireIndex(__dirname + '/rules');

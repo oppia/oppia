@@ -13,14 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview There should be a break after parenthesis
- * @author Oppia
+ * @fileoverview Lint check to ensure that there is a break after parenthesis
+ * in case of multiline hanging indentation.
  */
 'use strict';
-
-// -----------------------------------------------------------------------------
-// Rule Definition
-// -----------------------------------------------------------------------------
 
 module.exports = {
   meta: {
@@ -40,16 +36,6 @@ module.exports = {
   create: function(context) {
     const sourceCode = context.getSourceCode();
     const lines = sourceCode.lines;
-
-
-    // ----------------------------------------------------------------------
-    // Helpers
-    // ----------------------------------------------------------------------
-
-
-    // ----------------------------------------------------------------------
-    // Public
-    // ----------------------------------------------------------------------
 
     return {
       Program: function checkParenSpaces(node) {

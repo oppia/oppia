@@ -16,7 +16,6 @@ core/templates/prod/*
 webpack_bundles/*
 core/tests/.browserstack.env
 node_modules/*
-scripts/linters/custom_eslint_checks/node_modules/*
 .coverage*
 !.coveragerc
 coverage.xml
