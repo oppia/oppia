@@ -1928,6 +1928,62 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
                 '&amp;quot;}"></oppia-noninteractive-math>')])
 
+    def test_validate_svg_filenames_format_when_all_filenames_are_valid(self):
+        """Test the validate_svg_filenames_in_math_rich_text when valid
+        filenames are present for each math rich-text components in html.
+        """
+        html_string_with_filename_having_valid_format = (
+            '<p>Feedback1</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';mathImg_20201216_331234_r3ir43lmfd_height_2d456_width_6d1'
+            '24_vertical_0d231.svg&amp;quot;}"></oppia-noninteractive-math>'
+            '<p>Feedback2</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';mathImg_20200216_133832_imzlvnf23a_height_4d123_width_23d'
+            '122_vertical_2d123.svg&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        self.assertEqual(
+            html_validation_service.
+            validate_svg_filename_format_in_math_rich_text(
+                html_string_with_filename_having_valid_format), [])
+
+    def test_validate_svg_filenames_format_when_all_filenames_are_invalid(self):
+        """Test the validate_svg_filenames_in_math_rich_text when valid
+        filenames are present for each math rich-text components in html.
+        """
+        html_string_with_filename_having_invalid_format = (
+            '<p>Feedback1</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';mathImg_20201216*331234_r3ir43lmfd_height_2d456_width_6d1'
+            '24_vertical_0d231.svg&amp;quot;}"></oppia-noninteractive-math>'
+            '<p>Feedback2</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';mathImg_20200216_133832_imzlvnf23a_invalid_4d123_width_23d'
+            '122_vertical_2d123.svg&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        expected_output = [
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quot;ra'
+            'w_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_fil'
+            'ename&amp;quot;: &amp;quot;mathImg_20201216*331234_r3ir43lmfd_hei'
+            'ght_2d456_width_6d124_vertical_0d231.svg&amp;quot;}"></oppia-noni'
+            'nteractive-math>',
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quot;ra'
+            'w_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_fil'
+            'ename&amp;quot;: &amp;quot;mathImg_20200216_133832_imzlvnf23a_inv'
+            'alid_4d123_width_23d122_vertical_2d123.svg&amp;quot;}"></oppia-no'
+            'ninteractive-math>']
+
+        self.assertEqual(
+            sorted(
+                html_validation_service.
+                validate_svg_filename_format_in_math_rich_text(
+                    html_string_with_filename_having_invalid_format)), sorted(
+                        expected_output))
+
     def test_generate_math_svgs_filename(self):
         """Test that the generate_math_svgs_filename method generates the
         filenames in the expected pattern.

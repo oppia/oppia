@@ -33,6 +33,7 @@ from core.domain import fs_services
 from core.domain import image_services
 from core.domain import rte_component_registry
 from extensions.objects.models import objects
+from extensions.rich_text_components import components
 import feconf
 import python_utils
 
@@ -1025,6 +1026,32 @@ def validate_svg_filenames_in_math_rich_text(
             filepath = 'image/%s' % svg_filename
             if not fs.isfile(filepath.encode('utf-8')):
                 error_list.append(python_utils.UNICODE(math_tag))
+    return error_list
+
+
+def validate_svg_filename_format_in_math_rich_text(html_string):
+    """Validates the format of SVG filenames for each math rich-text components
+    and returns a list of all invalid math tags in the given HTML.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). A list of invalid math tags in the HTML string.
+    """
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    error_list = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(unescape_html(
+                math_tag['math_content-with-value'])))
+        try:
+            components.Math.validate({
+                'math_content-with-value': math_content_dict
+            })
+        except Exception:
+            error_list.append(python_utils.UNICODE(math_tag))
     return error_list
 
 
