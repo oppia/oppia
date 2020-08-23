@@ -178,6 +178,13 @@ angular.module('oppia').directive('storyEditor', [
               if ($scope.story.getStoryContents().getNodes().length === 1) {
                 $scope.setNodeToEdit(
                   $scope.story.getStoryContents().getInitialNodeId());
+              } else {
+                var nodesArray = $scope.story.getStoryContents().getNodes();
+                var nodesLength = nodesArray.length;
+                var secondLastNodeId = nodesArray[nodesLength - 2].getId();
+                var lastNodeId = nodesArray[nodesLength - 1].getId();
+                StoryUpdateService.addDestinationNodeIdToNode(
+                  $scope.story, secondLastNodeId, lastNodeId);
               }
               StoryEditorStateService.onRecalculateAvailableNodes.emit();
             }, function() {
