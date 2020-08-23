@@ -367,7 +367,7 @@ class StateTrainingJobsMappingModelValidator(
         Args:
             item: ndb.Model. StateTrainingJobsMappingModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(ExternalModelReference))).
+                dict(str, (list(base_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
@@ -413,7 +413,7 @@ class StateTrainingJobsMappingModelValidator(
         Args:
             item: ndb.Model. StateTrainingJobsMappingModel to validate.
             field_name_to_external_model_references:
-                dict(str, (list(ExternalModelReference))).
+                dict(str, (list(base_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
                 a unique identifier provided by the storage
                 model to which the external model is associated. Each value
