@@ -75,7 +75,7 @@
     </div>
   </md-card>
 
-  <div ng-if="$ctrl.editorIsOpen" class="question-editor-parent" ng-click="$ctrl.logChange()">
+  <div ng-if="$ctrl.editorIsOpen" class="question-editor-parent">
     <div ng-if="!$ctrl.newQuestionIsBeingCreated">
       <h4> <strong> Linked Skills </strong> </h4>
       <md-card class="question-skill-id" ng-repeat="skill in $ctrl.associatedSkillSummaries">
@@ -99,7 +99,7 @@
                      question-changed="$ctrl.questionChanged">
     </question-editor>
     <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && $ctrl.question.getValidationErrorMessage()">
-      <[question.getValidationErrorMessage()]>
+      <[$ctrl.question.getValidationErrorMessage()]>
     </div>
     <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && !$ctrl.question.getValidationErrorMessage() && $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill).length">
       Remaining misconceptions that need to be addressed:
