@@ -24,7 +24,6 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { RatioInputAnswer } from
   'interactions/answer-defs';
-import { element } from 'angular';
 
 export class Ratio {
   numbers: number[];
