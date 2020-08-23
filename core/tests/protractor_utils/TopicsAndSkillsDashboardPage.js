@@ -361,8 +361,9 @@ var TopicsAndSkillsDashboardPage = function() {
     var editor = element(by.css('.protractor-test-concept-card-text'));
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
-
-    await (await browser.switchTo().activeElement()).sendKeys(reviewMaterial);
+    var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
+    await skillReviewMaterialInput.click();
+    await skillReviewMaterialInput.sendKeys(reviewMaterial);
 
     await waitFor.elementToBeClickable(
       confirmSkillCreationButton,

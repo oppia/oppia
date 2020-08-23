@@ -165,6 +165,7 @@ var TopicEditorPage = function() {
   };
 
   this.saveQuestion = async function() {
+    await general.scrollToTop();
     await saveQuestionButton.click();
     await waitFor.invisibilityOf(
       saveQuestionButton, 'Question modal takes too long to disappear');
