@@ -1,6 +1,41 @@
 <div class="question-editor-container">
-  <md-card class="question-data-container">
-    <div class="question-list-container" ng-if="!$ctrl.editorIsOpen">
+  <div ng-if="$ctrl.editorIsOpen" class="question-editor-parent">
+    <div ng-if="!$ctrl.newQuestionIsBeingCreated">
+      <h4> <strong> Linked Skills </strong> </h4>
+      <md-card class="question-skill-id" ng-repeat="skill in $ctrl.associatedSkillSummaries">
+        <div class="skill-description-card">
+          <span ng-click="$ctrl.removeSkill(skill.getId())" aria-hidden="true">
+            <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+          </span>
+          <a ng-href="<[$ctrl.getSkillEditorUrl(skill.getId())]>" target="_blank" rel="noopener">
+            <[skill.getDescription()]>
+          </a>
+        </div>
+      </md-card>
+      <button class="btn btn-success btn-sm" ng-click="$ctrl.addSkill()">Link Another Skill</button>
+      <button class="btn btn-primary btn-sm" ng-click="undo()" ng-if="$ctrl.getSkillLinkageModificationsArray().length > 0">Undo Skill Changes</button>
+    </div>
+    <question-editor question-id="$ctrl.questionId"
+                     misconceptions-by-skill="$ctrl.misconceptionsBySkill"
+                     question-state-data="$ctrl.questionStateData"
+                     question="$ctrl.question"
+                     can-edit-question="$ctrl.canEditQuestion"
+                     question-changed="$ctrl.questionChanged">
+    </question-editor>
+    <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && $ctrl.question.getValidationErrorMessage()">
+      <[$ctrl.question.getValidationErrorMessage()]>
+    </div>
+    <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && !$ctrl.question.getValidationErrorMessage() && $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill).length">
+      Remaining misconceptions that need to be addressed:
+      <ul>
+        <li ng-repeat="misconceptionName in $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill)">
+          <[misconceptionName]>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <md-card class="question-data-container" ng-if="!$ctrl.editorIsOpen">
+    <div class="question-list-container">
       <div class="list-header">
         <h3>Question List</h3>
       </div>
@@ -28,7 +63,9 @@
         <i class="material-icons md-18" ng-if="!$ctrl.isLastPage()" ng-click="$ctrl.goToNextPage()">&#xE5C8;</i>
       </div>
     </div>
-    <div class="save-question-container" ng-if="$ctrl.editorIsOpen">
+  </md-card>
+  <md-card class="question-data-container question-editor-open-container" ng-if="$ctrl.editorIsOpen">
+    <div class="save-question-container">
       <div>
         <div class="list-header">
           <h3>New Question</h3>
@@ -74,43 +111,6 @@
       </div>
     </div>
   </md-card>
-
-  <div ng-if="$ctrl.editorIsOpen" class="question-editor-parent">
-    <div ng-if="!$ctrl.newQuestionIsBeingCreated">
-      <h4> <strong> Linked Skills </strong> </h4>
-      <md-card class="question-skill-id" ng-repeat="skill in $ctrl.associatedSkillSummaries">
-        <div class="skill-description-card">
-          <span ng-click="$ctrl.removeSkill(skill.getId())" aria-hidden="true">
-            <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
-          </span>
-          <a ng-href="<[$ctrl.getSkillEditorUrl(skill.getId())]>" target="_blank" rel="noopener">
-            <[skill.getDescription()]>
-          </a>
-        </div>
-      </md-card>
-      <button class="btn btn-success btn-sm" ng-click="$ctrl.addSkill()">Link Another Skill</button>
-      <button class="btn btn-primary btn-sm" ng-click="undo()" ng-if="getSkillLinkageModificationsArray().length > 0">Undo Skill Changes</button>
-    </div>
-    <question-editor question-id="$ctrl.questionId"
-                     misconceptions-by-skill="$ctrl.misconceptionsBySkill"
-                     question-state-data="$ctrl.questionStateData"
-                     question="$ctrl.question"
-                     can-edit-question="$ctrl.canEditQuestion"
-                     question-changed="$ctrl.questionChanged">
-    </question-editor>
-    <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && $ctrl.question.getValidationErrorMessage()">
-      <[$ctrl.question.getValidationErrorMessage()]>
-    </div>
-    <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && !$ctrl.question.getValidationErrorMessage() && $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill).length">
-      Remaining misconceptions that need to be addressed:
-      <ul>
-        <li ng-repeat="misconceptionName in $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill)">
-          <[misconceptionName]>
-        </li>
-      </ul>
-    </div>
-  </div>
-
   <div class="create-question-container" ng-if="!$ctrl.editorIsOpen">
     <md-card class="oppia-page-card">
       <div>
@@ -118,6 +118,7 @@
           <h3>Create a new question</h3>
         </div>
         <button class="btn add-question-btn protractor-test-create-question-button"
+                ng-disabled="$ctrl.selectSkillModalIsShown() && !$ctrl.getSelectedSkillId()"
                 ng-click="$ctrl.createQuestion()">
           + ADD QUESTION
         </button>
@@ -139,11 +140,12 @@
     margin-top: 2%;
   }
   questions-list .question-data-container {
-    margin-right: 1%;
+    margin: 0;
     max-height: 70vh;
     min-height: 70vh;
     overflow-y: scroll;
-    width: 35%;
+    padding: 20px 15px;
+    width: 60%;
   }
   questions-list .question-editor-container {
     display: flex;
@@ -157,7 +159,7 @@
     padding: 0 20px 20px;
   }
   questions-list .create-question-container {
-    width: 60%;
+    width: 35%;
   }
   questions-list .list-header {
     border-bottom: 2px solid #000;
@@ -175,8 +177,9 @@
     flex-wrap: wrap;
     justify-content: space-between;
   }
-  questions-list  .create-question-header {
+  questions-list .create-question-header {
     border-bottom: none;
+    margin: 0;
   }
   questions-list .question-text {
     width: 90%;
@@ -192,6 +195,9 @@
   }
   questions-list .question-editor-parent {
     width: 60%;
+  }
+  questions-list .question-editor-open-container {
+    width: 35%;
   }
   questions-list .checklist-item {
     display: flex;
@@ -249,5 +255,30 @@
     justify-content: space-between;
     margin-top: 15px;
     padding-top: 20px;
+  }
+  @media screen and (max-width: 768px) {
+    questions-list .question-editor-container {
+      margin-top: 30px;
+      width: 100%;
+    }
+    questions-list .question-data-container {
+      margin-left: 0;
+      margin-right: 0;
+      order: 10;
+      width: 35%;
+    }
+    questions-list .create-question-container {
+      width: 100%;
+    }
+    questions-list .question-editor-parent {
+      width: 100%;
+    }
+
+    questions-list .create-question-header h3 {
+      margin: 0;
+    }
+    questions-list .create-question-container md-card {
+      padding: 0 15px 10px;
+    }
   }
 </style>
