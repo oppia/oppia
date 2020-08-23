@@ -23,9 +23,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class ExternalSaveService {
-  private _externalSaveEventEmitter = new EventEmitter();
+  private _externalSaveEventEmitter = new EventEmitter<void>();
 
-  get onExternalSave() {
+  get onExternalSave(): EventEmitter<void> {
     return this._externalSaveEventEmitter;
   }
 }
