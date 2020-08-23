@@ -43,6 +43,8 @@ def cleanup():
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
     common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
 
+    build.set_constants_to_default()
+
     google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
     processes_to_kill = [
         '.*%s.*' % re.escape(google_app_engine_path),
