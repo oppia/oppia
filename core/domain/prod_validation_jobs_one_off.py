@@ -112,7 +112,8 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
                 validator_module = importlib.import_module(
                     'core.domain.%s' % validator_module_name)
             except ImportError:
-                validator_module = 'prod_validators'
+                validator_module = importlib.import_module(
+                    'core.domain.prod_validators')
             validator = getattr(validator_module, validator_cls_name)
             validator.validate(model_instance)
             if len(validator.errors) > 0:
