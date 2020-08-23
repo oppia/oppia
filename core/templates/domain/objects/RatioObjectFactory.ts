@@ -24,6 +24,7 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { RatioInputAnswer } from
   'interactions/answer-defs';
+import { element } from 'angular';
 
 export class Ratio {
   numbers: number[];
@@ -42,10 +43,10 @@ export class Ratio {
     var gcd = (x: number, y: number) => {
       return y === 0 ? x : gcd(y, x % y);
     };
-    var gcdResult = this.numbers.reduce(gcd);
-    if (gcdResult === 0) {
+    if (this.numbers.some(element => element === 0)) {
       return this.numbers;
     } else {
+      var gcdResult = this.numbers.reduce(gcd);
       return this.numbers.map(currentValue => currentValue / gcdResult);
     }
   }
