@@ -882,7 +882,7 @@ def generate_math_svgs_filename(latex_string_svg_image_dimensions):
     minute = (('0%d') % (date_object.minute))[-2:]
     second = (('0%d') % (date_object.second))[-2:]
 
-    date_time_string = '%s%s%s%s%s%s_%s' % (
+    date_time_string = '%s%s%s_%s%s%s_%s' % (
         year, month, day, hour, minute, second, random_string)
     filename = 'mathImg_%s_height_%s_width_%s_vertical_%s.svg' % (
         date_time_string, latex_string_svg_image_dimensions.
