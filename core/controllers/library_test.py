@@ -141,8 +141,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'A', self.admin_id, title='Title A', category='Category A',
             objective='Objective A')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            self.admin_id, exploration, 'Exploration A', [])
+        exp_services.update_exploration(self.admin_id, 'A', [], 'Exploration A')
 
         # Test that the private exploration isn't displayed.
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
@@ -152,8 +151,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'B', self.admin_id, title='Title B', category='Category B',
             objective='Objective B')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            self.admin_id, exploration, 'Exploration B', [])
+        exp_services.update_exploration(self.admin_id, 'B', [], 'Exploration B')
         rights_manager.publish_exploration(self.admin, 'B')
 
         # Publish exploration A.
