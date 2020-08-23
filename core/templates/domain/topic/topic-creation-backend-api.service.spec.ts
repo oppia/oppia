@@ -66,6 +66,12 @@ describe('Topic creation backend api service', () => {
       filename: 'image.svg',
       imageBlob: imageBlob
     }];
+
+    // This throws "Argument of type '() -> Promise<unknown>'
+    // is not assignable to parameter of type 'PromiseLike<string>'.".
+    // We need to suppress this error because we need to mock the
+    // `getTokenAsync` function for testing purposes.
+    // @ts-expect-error
     spyOn(csrfService, 'getTokenAsync').and.returnValue(() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');

@@ -55,7 +55,7 @@ export class CollectionSummary {
 })
 export class CollectionSummaryObjectFactory {
   createFromBackendDict(
-      collectionSummaryDict: CollectionSummaryBackendDict) {
+      collectionSummaryDict: CollectionSummaryBackendDict): CollectionSummary {
     return new CollectionSummary(
       collectionSummaryDict.category,
       collectionSummaryDict.community_owned,

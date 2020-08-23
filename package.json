@@ -117,6 +117,7 @@
     "@angular/router": "^8.0.0",
     "@angular/upgrade": "^8.0.0",
     "@ng-bootstrap/ng-bootstrap": "^5.3.1",
+    "@types/angular-translate": "^2.16.2",
     "angular": "^1.7.9",
     "angular-cookies": "^1.7.9",
     "angular-route": "^1.7.9",
