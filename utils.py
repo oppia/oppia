@@ -837,6 +837,19 @@ def decompress_from_zlib(data):
     return zlib.decompress(data)
 
 
+def compute_list_difference(list_a, list_b):
+    """Returns the set difference of two lists.
+
+    Args:
+        list_a: list. The first list.
+        list_b: list. The second list.
+
+    Returns:
+        list. List of the set difference of list_a - list_b.
+    """
+    return list(set(list_a) - set(list_b))
+
+
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
 
