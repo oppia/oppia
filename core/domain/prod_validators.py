@@ -384,7 +384,7 @@ class StateTrainingJobsMappingModelValidator(
         for exp_model_reference in exp_model_references:
             exp_model = exp_model_reference.model_instance
             if exp_model is None or exp_model.deleted:
-                model_class = exp_model_reference.class_name
+                model_class = exp_model_reference.model_class
                 model_id = exp_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
@@ -430,7 +430,7 @@ class StateTrainingJobsMappingModelValidator(
         for exp_model_reference in exp_model_references:
             exp_model = exp_model_reference.model_instance
             if exp_model is None or exp_model.deleted:
-                model_class = exp_model_reference.class_name
+                model_class = exp_model_reference.model_class
                 model_id = exp_model_reference.model_id
                 cls._add_error(
                     'exploration_ids %s' % (
