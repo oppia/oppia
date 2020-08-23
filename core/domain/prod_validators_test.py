@@ -578,14 +578,9 @@ class StateTrainingJobsMappingModelValidatorTests(
 
     def test_standard_operation(self):
         expected_output = [
-<<<<<<< HEAD:core/domain/prod_validation_jobs_one_off_test.py
             u'[u\'fully-validated StateTrainingJobsMappingModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-=======
-            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
->>>>>>> 7b67c110a3021e061cf00252b40dce933b659abe:core/domain/prod_validators_test.py
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -600,14 +595,9 @@ class StateTrainingJobsMappingModelValidatorTests(
                 self.model_instance_0.id,
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
-<<<<<<< HEAD:core/domain/prod_validation_jobs_one_off_test.py
             ), u'[u\'fully-validated StateTrainingJobsMappingModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-=======
-            ), u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
->>>>>>> 7b67c110a3021e061cf00252b40dce933b659abe:core/domain/prod_validators_test.py
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -634,14 +624,9 @@ class StateTrainingJobsMappingModelValidatorTests(
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '0, expect model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance_0.id,
-<<<<<<< HEAD:core/domain/prod_validation_jobs_one_off_test.py
             u'[u\'fully-validated StateTrainingJobsMappingModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-=======
-            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
->>>>>>> 7b67c110a3021e061cf00252b40dce933b659abe:core/domain/prod_validators_test.py
 
     def test_invalid_exp_version(self):
         model_instance_with_invalid_exp_version = (
@@ -657,14 +642,9 @@ class StateTrainingJobsMappingModelValidatorTests(
                 'Exploration version 5 in entity is greater than the '
                 'version 1 of exploration corresponding to exp_id 0\']]'
             ) % model_instance_with_invalid_exp_version.id,
-<<<<<<< HEAD:core/domain/prod_validation_jobs_one_off_test.py
             u'[u\'fully-validated StateTrainingJobsMappingModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-=======
-            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
->>>>>>> 7b67c110a3021e061cf00252b40dce933b659abe:core/domain/prod_validators_test.py
 
     def test_invalid_state_name(self):
         model_instance_with_invalid_state_name = (
@@ -680,14 +660,9 @@ class StateTrainingJobsMappingModelValidatorTests(
                 'State name invalid in entity is not present in '
                 'states of exploration corresponding to exp_id 0\']]'
             ) % model_instance_with_invalid_state_name.id,
-<<<<<<< HEAD:core/domain/prod_validation_jobs_one_off_test.py
             u'[u\'fully-validated StateTrainingJobsMappingModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-=======
-            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
->>>>>>> 7b67c110a3021e061cf00252b40dce933b659abe:core/domain/prod_validators_test.py
 
 
 class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):

@@ -355,7 +355,7 @@ class StateTrainingJobsMappingModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            ExternalModelFetcherDetails(
+            base_validators.ExternalModelFetcherDetails(
                 'exploration_ids', exp_models.ExplorationModel, [item.exp_id])]
 
     @classmethod
@@ -387,7 +387,8 @@ class StateTrainingJobsMappingModelValidator(
                 model_class = exp_model_reference.class_name
                 model_id = exp_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
+                    'exploration_ids %s' % (
+                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
@@ -395,7 +396,8 @@ class StateTrainingJobsMappingModelValidator(
                 continue
             if item.exp_version > exp_model.version:
                 cls._add_error(
-                    'exp %s' % ERROR_CATEGORY_VERSION_CHECK,
+                    'exp %s' % (
+                        base_validators.ERROR_CATEGORY_VERSION_CHECK),
                     'Entity id %s: Exploration version %s in entity is greater '
                     'than the version %s of exploration corresponding to '
                     'exp_id %s' % (
@@ -431,7 +433,8 @@ class StateTrainingJobsMappingModelValidator(
                 model_class = exp_model_reference.class_name
                 model_id = exp_model_reference.model_id
                 cls._add_error(
-                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
+                    'exploration_ids %s' % (
+                        base_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
