@@ -22,6 +22,9 @@ workflows:
       - e2e_non_prod_tests:
           requires:
             - setup_and_typescript_tests
+      - e2e_non_prod_new_structure_tests:
+          requires:
+            - setup_and_typescript_tests
       - e2e_navigation_and_misc:
           requires:
             - setup_and_typescript_tests
@@ -228,6 +231,28 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
       - run:
+          name: Run e2e play voiceovers test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
+      - run:
+          name: Run e2e file upload extensions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
+      - run:
+          name: Run e2e contributor dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --contributor_dashboard_enabled
+
+  e2e_non_prod_new_structure_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - check_release_chaneglog_update_branch
+      - merge_target_branch
+      - install_chrome
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
           name: Run e2e topics and skills dashboard test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info
@@ -243,18 +268,6 @@ jobs:
           name: Run e2e topic and story editor test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
-      - run:
-          name: Run e2e play voiceovers test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
-      - run:
-          name: Run e2e file upload extensions test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
-      - run:
-          name: Run e2e contributor dashboard test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --contributor_dashboard_enabled
 
 notify:
   webhooks:
