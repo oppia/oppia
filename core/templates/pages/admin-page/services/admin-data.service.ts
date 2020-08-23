@@ -22,8 +22,6 @@ import { Injectable } from '@angular/core';
 import {
   AdminPageData,
   AdminBackendApiService,
-  LatexToSvgMapping,
-  SuggestionLatexToSvgMapping
 } from 'domain/admin/admin-backend-api.service';
 
 @Injectable({
