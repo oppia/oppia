@@ -117,7 +117,7 @@
           "matchingUrlPattern": "http://[^/]+/creator-dashboard$",
           "assertions": {
             "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 0.9}]
+            "offscreen-images": ["error", {"minScore": 0.5}]
           }
         },
         {
@@ -173,7 +173,7 @@
           "matchingUrlPattern": "http://[^/]+/preferences$",
           "assertions": {
             "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "offscreen-images": ["error", {"minScore": 0.5}]
           }
         },
         {
