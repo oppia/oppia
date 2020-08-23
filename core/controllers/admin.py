@@ -35,6 +35,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_domain
 from core.domain import opportunity_services
+from core.domain import platform_feature_services as feature_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -122,6 +123,8 @@ class AdminHandler(base.BaseHandler):
                     utils.get_human_readable_time_string(
                         computation['last_finished_msec']))
 
+        feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
+
         self.render_json({
             'config_properties': (
                 config_domain.Registry.get_config_property_schemas()),
@@ -145,7 +148,8 @@ class AdminHandler(base.BaseHandler):
                 for role in role_services.VIEWABLE_ROLES
             },
             'topic_summaries': topic_summary_dicts,
-            'role_graph_data': role_services.get_role_graph_data()
+            'role_graph_data': role_services.get_role_graph_data(),
+            'feature_flags': feature_flag_dicts,
         })
 
     @acl_decorators.can_access_admin_page
@@ -246,6 +250,35 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
+            elif self.payload.get('action') == 'update_feature_flag_rules':
+                feature_name = self.payload.get('feature_name')
+                new_rule_dicts = self.payload.get('new_rules')
+                commit_message = self.payload.get('commit_message')
+                if not isinstance(feature_name, python_utils.BASESTRING):
+                    raise self.InvalidInputException(
+                        'feature_name should be string, received \'%s\'.' % (
+                            feature_name))
+                elif not isinstance(commit_message, python_utils.BASESTRING):
+                    raise self.InvalidInputException(
+                        'commit_message should be string, received \'%s\'.' % (
+                            commit_message))
+                elif (not isinstance(new_rule_dicts, list) or not all(
+                        [isinstance(rule_dict, dict)
+                         for rule_dict in new_rule_dicts])):
+                    raise self.InvalidInputException(
+                        'new_rules should be a list of dicts, received'
+                        ' \'%s\'.' % new_rule_dicts)
+                try:
+                    feature_services.update_feature_flag_rules(
+                        feature_name, self.user_id, commit_message,
+                        new_rule_dicts)
+                except (
+                        utils.ValidationError,
+                        feature_services.FeatureFlagNotFoundException) as e:
+                    raise self.InvalidInputException(e)
+                logging.info(
+                    '[ADMIN] %s updated feature %s with new rules: '
+                    '%s.' % (self.user_id, feature_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
             self.render_json({'error': python_utils.UNICODE(e)})
