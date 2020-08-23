@@ -51,7 +51,7 @@ export class SharingLinksComponent implements OnInit {
     private siteAnalyticsService: SiteAnalyticsService,
     private htmlEscaperService: HtmlEscaperService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (this.shareType === 'exploration') {
       this.activityId = this.explorationId;
     } else if (this.shareType === 'collection') {

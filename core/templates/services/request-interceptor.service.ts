@@ -26,9 +26,9 @@ import { switchMap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class MockCsrfTokenService {
-  tokenPromise = null;
+  tokenPromise: PromiseLike<string> = null;
 
-  initializeToken() {
+  initializeToken(): void {
     if (this.tokenPromise !== null) {
       throw new Error('Token request has already been made');
     }
@@ -50,7 +50,7 @@ export class MockCsrfTokenService {
     });
   }
 
-  getTokenAsync() {
+  getTokenAsync(): PromiseLike<string> {
     if (this.tokenPromise === null) {
       throw new Error('Token needs to be initialized');
     }

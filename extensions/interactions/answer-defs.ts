@@ -83,11 +83,6 @@ export interface LogicProofAnswer {
 
 export type MathEquationAnswer = string;
 
-export interface MathExpressionAnswer {
-  ascii: string;
-  latex: string;
-}
-
 export type MultipleChoiceAnswer = number;
 
 export interface MusicNotesAnswer {
@@ -131,7 +126,6 @@ export type InteractionAnswer = (
   InteractiveMapAnswer |
   ItemSelectionAnswer |
   LogicProofAnswer |
-  MathExpressionAnswer |
   MultipleChoiceAnswer |
   MusicNotesAnswer |
   NumericExpressionAnswer |

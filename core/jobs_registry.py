@@ -48,6 +48,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.AddContentUserIdsContentJob,
     activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
+    activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
     activity_jobs_one_off.FixCommitLastUpdatedOneOffJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     activity_jobs_one_off.RemoveCommitUsernamesOneOffJob,
