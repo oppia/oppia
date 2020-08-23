@@ -206,4 +206,15 @@ describe('RatioExpressionInputValidationService', () => {
       ' input.'
     }]);
   });
+
+  it('should catch non-integer value for # terms', () => {
+    customizationArgs.numberOfTerms.value = 1.5;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: ('Number of terms must be integral.')
+    }]);
+  });
 });

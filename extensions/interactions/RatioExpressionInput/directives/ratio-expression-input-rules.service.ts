@@ -47,10 +47,10 @@ export class RatioExpressionInputRulesService {
       inputs: RatioInputEqualRuleInputs): boolean {
     var simplifiedInput = this.ratioObjectFactory.fromList(
       inputs.x).convertToSimplestForm();
-    var simplifiefAnswer = this.ratioObjectFactory.fromList(
+    var simplifiedAnswer = this.ratioObjectFactory.fromList(
       answer).convertToSimplestForm();
     return this.ratioObjectFactory.arrayEquals(
-      simplifiefAnswer, simplifiedInput);
+      simplifiedAnswer, simplifiedInput);
   }
 }
 

@@ -45,7 +45,22 @@ export class RatioExpressionInputValidationService {
 
   getCustomizationArgsWarnings(
       customizationArgs: RatioExpressionInputCustomizationArgs): Warning[] {
-    return [];
+    var isInt = function(n) {
+      return angular.isNumber(n) && n % 1 === 0;
+    };
+    var minimumNumberOfTerms =
+      customizationArgs.numberOfTerms.value;
+    if (!isInt(minimumNumberOfTerms)) {
+      return [
+        {
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'Number of terms must be integral.')
+        }
+      ];
+    } else {
+      return [];
+    }
   }
 
   getAllWarnings(

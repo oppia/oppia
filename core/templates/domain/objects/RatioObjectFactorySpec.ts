@@ -127,11 +127,13 @@ describe('Ratio Object Factory', () => {
     }).toThrowError(errors.INCLUDES_ZERO);
   });
 
-  it('should covert to simplest form', () => {
+  it('should convert to simplest form', () => {
     expect(new Ratio([1, 2, 3]).convertToSimplestForm()).toEqual([1, 2, 3]);
     expect(new Ratio([2, 4, 6]).convertToSimplestForm()).toEqual([1, 2, 3]);
     expect(new Ratio([3, 6, 9]).convertToSimplestForm()).toEqual([1, 2, 3]);
     expect(new Ratio([2, 3, 5]).convertToSimplestForm()).toEqual([2, 3, 5]);
     expect(new Ratio([2, 4, 5]).convertToSimplestForm()).toEqual([2, 4, 5]);
+    expect(new Ratio([2, 0, 4]).convertToSimplestForm()).toEqual([2, 0, 4]);
+    expect(new Ratio([0, 0, 4]).convertToSimplestForm()).toEqual([0, 0, 4]);
   });
 });

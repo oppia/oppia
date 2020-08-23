@@ -48,7 +48,7 @@ class RatioExpressionInput(base.BaseInteraction):
         }
     }, {
         'name': 'numberOfTerms',
-        'description': 'The number of elements that the answer must have.' +
+        'description': 'The number of elements that the answer must have.'
                        ' If set to 0, a ratio of any length will be accepted.',
         'schema': {
             'type': 'int',
