@@ -1,65 +1,77 @@
 <div class="improvements-tab-container">
-  <div class="improvements-tab-header">
-    <div class="improvements-tab-overview">
-      <div class="improvements-tab-overview-header">
-        <h1 class="improvements-tab-header-title">Overview</h1>
-        <a class="improvements-tab-view-resolved-tasks" href="#">
-          <img class="improvements-tab-time-machine" ng-src="<[$ctrl.timeMachineImageUrl]>">
-          <span class="improvements-tab-text">View Resolved Tasks</span>
-          <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
-        </a>
-      </div>
-      <div class="improvements-tab-overview-body">
-        <div class="improvements-tab-summary">
-          <div class="improvements-pending-summary">
-            <strong class="improvements-tab-count"><[$ctrl.getNumTasks()]></strong>
-            <p class="improvements-tab-units" ng-pluralize count="$ctrl.getNumTasks()"
-               when="{'one': 'Improvement pending', 'other': 'Total Improvements pending'}">
-            </p>
-          </div>
-          <div class="improvements-tab-exploration-health-summary" ng-class="['improvements-tab-' + $ctrl.getExplorationHealth()]">
-            <span class="improvements-tab-outer-dot">
-              <span class="improvements-tab-inner-dot">&nbsp;</span>
-            </span>
-            <p class="improvements-tab-exploration-health protractor-test-improvements-tab-health">
-              <[$ctrl.getExplorationHealth()]>
-            </p>
-          </div>
+  <div class="improvements-tab-header-wrapper">
+    <div class="improvements-tab-header">
+      <div class="improvements-tab-overview">
+        <div class="improvements-tab-overview-header">
+          <h1 class="improvements-tab-header-title">Overview</h1>
+          <a class="improvements-tab-view-resolved-tasks" href="#">
+            <img class="improvements-tab-time-machine" ng-src="<[$ctrl.timeMachineImageUrl]>">
+            <span class="improvements-tab-text">View Resolved Tasks</span>
+            <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+          </a>
         </div>
-        <ul class="improvements-tab-navigation" ng-if="$ctrl.getNumTasks() > 0">
-          <li class="improvements-tab-navigation-item" ng-if="$ctrl.getNumExpLevelTasks() > 0">
-            <a class="improvements-tab-task-scope" href="#">
-              <span class="improvements-tab-dot-warning">&nbsp;</span>
-              <strong class="improvements-tab-scope-number"><[$ctrl.getNumExpLevelTasks()]></strong>
-              <span class="improvements-tab-scope-content">exploration-level</span>
-              <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
-            </a>
-          </li>
-          <li class="improvements-tab-navigation-item" ng-if="$ctrl.getNumConceptLevelTasks() > 0">
-            <a class="improvements-tab-task-scope" href="#">
-              <span class="improvements-tab-dot-warning">&nbsp;</span>
-              <strong class="improvements-tab-scope-number"><[$ctrl.getNumConceptLevelTasks()]></strong>
-              <span class="improvements-tab-scope-content">concept-level</span>
-              <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
-            </a>
-          </li>
-          <li class="improvements-tab-navigation-item" ng-if="$ctrl.getNumCardLevelTasks() > 0">
-            <a class="improvements-tab-task-scope" href="#card-level-improvements" target="_self">
-              <span ng-class="'improvements-tab-' + ($ctrl.hasCriticalTasks() ? 'dot-critical' : 'dot-warning')">&nbsp;</span>
-              <strong class="improvements-tab-scope-number"><[$ctrl.getNumCardLevelTasks()]></strong>
-              <span class="improvements-tab-scope-content">card-level</span>
-              <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
-            </a>
-          </li>
-        </ul>
+        <div class="improvements-tab-overview-body">
+          <div class="improvements-tab-summary">
+            <div class="improvements-pending-summary">
+              <strong class="improvements-tab-count"><[$ctrl.getNumTasks()]></strong>
+              <p class="improvements-tab-units"
+                 ng-pluralize count="$ctrl.getNumTasks()"
+                 when="{'one': 'Improvement pending', 'other': 'Total Improvements pending'}">
+              </p>
+            </div>
+            <div class="improvements-tab-exploration-health-summary"
+                 ng-class="['improvements-tab-' + $ctrl.getExplorationHealth()]">
+              <span class="improvements-tab-outer-dot">
+                <span class="improvements-tab-inner-dot">&nbsp;</span>
+              </span>
+              <p class="improvements-tab-exploration-health protractor-test-improvements-tab-health"
+                 ng-bind="$ctrl.getExplorationHealth()">
+              </p>
+            </div>
+          </div>
+          <ul class="improvements-tab-navigation" ng-if="$ctrl.getNumTasks() > 0">
+            <li class="improvements-tab-navigation-item" ng-if="$ctrl.getNumExpLevelTasks() > 0">
+              <a class="improvements-tab-task-scope" href="#">
+                <span class="improvements-tab-dot-warning">&nbsp;</span>
+                <strong class="improvements-tab-scope-number">
+                  <[$ctrl.getNumExpLevelTasks()]>
+                </strong>
+                <span class="improvements-tab-scope-content">exploration-level</span>
+                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+              </a>
+            </li>
+            <li class="improvements-tab-navigation-item"
+                ng-if="$ctrl.getNumConceptLevelTasks() > 0">
+              <a class="improvements-tab-task-scope" href="#">
+                <span class="improvements-tab-dot-warning">&nbsp;</span>
+                <strong class="improvements-tab-scope-number">
+                  <[$ctrl.getNumConceptLevelTasks()]>
+                </strong>
+                <span class="improvements-tab-scope-content">concept-level</span>
+                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+              </a>
+            </li>
+            <li class="improvements-tab-navigation-item" ng-if="$ctrl.getNumCardLevelTasks() > 0">
+              <a class="improvements-tab-task-scope" href="#card-level-improvements" target="_self">
+                <span ng-class="'improvements-tab-dot-' + $ctrl.getExplorationHealth()">
+                  &nbsp;
+                </span>
+                <strong class="improvements-tab-scope-number">
+                  <[$ctrl.getNumCardLevelTasks()]>
+                </strong>
+                <span class="improvements-tab-scope-content">card-level</span>
+                <i class="material-icons improvements-tab-chevron-right-icon">chevron_right</i>
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
-    <div class="improvements-tab-completion-rate">
-      <completion-graph completion-rate="$ctrl.completionRate"></completion-graph>
-      <p class="improvements-tab-value"><[$ctrl.completionRateAsPercent]></p>
-      <p class="improvements-tab-label">Exploration Completion Rate</p>
-    </div>
-  </div>
+      <div class="improvements-tab-completion-rate">
+        <completion-graph completion-rate="$ctrl.completionRate"></completion-graph>
+        <p class="improvements-tab-value"><[$ctrl.completionRateAsPercent]></p>
+        <p class="improvements-tab-label">Exploration Completion Rate</p>
+      </div>
+    </div></div>
   <div class="improvements-tab-body">
     <div class="improvements-tab-level" ng-if="$ctrl.getNumCardLevelTasks() > 0">
       <div class="improvements-tab-level-header" name="card-level-improvements">
@@ -114,19 +126,25 @@
 <style>
   .improvements-tab-container {
     background-color: #EEEEEE;
-    font-family: Roboto, Arial, sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
     margin: 0;
     overflow: scroll;
     padding: 0;
     width: 100%;
   }
 
+  .improvements-tab-header-wrapper {
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    margin: auto;
+    width: 100%;
+  }
+
   .improvements-tab-header {
     align-items: center;
-    border-bottom: 1px solid rgba(0,0,0,0.12);
-    display: inline-flex;
-    justify-content: center;
-    min-width: 100%;
+    display: flex;
+    justify-content: start;
+    margin: auto;
+    max-width: 1238px;
   }
 
   .improvements-tab-completion-rate {
@@ -150,6 +168,7 @@
   .improvements-tab-completion-rate p.improvements-tab-value {
     bottom: 35px;
     color: rgba(0,0,0,0.54);
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 20px;
     font-weight: 500;
     height: 28px;
@@ -167,6 +186,7 @@
   .improvements-tab-completion-rate p.improvements-tab-label {
     color: rgba(0,0,0,0.54);
     flex-grow: 0;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
     font-weight: 500;
     height: 24px;
@@ -192,6 +212,7 @@
   .improvements-tab-overview-header h1.improvements-tab-header-title {
     color: rgba(0,0,0,0.87);
     flex-grow: 1;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 20px;
     font-weight: 500;
     height: 24px;
@@ -205,6 +226,7 @@
   .improvements-tab-overview-header a.improvements-tab-view-resolved-tasks {
     color: #00829B;
     display: inline-flex;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
     font-weight: 500;
     height: 18px;
@@ -228,6 +250,7 @@
   .improvements-tab-overview-header a.improvements-tab-view-resolved-tasks span.improvements-tab-text {
     color: #00829B;
     display: inline-block;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0;
@@ -272,6 +295,7 @@
 
   .improvements-tab-summary div.improvements-pending-summary strong.improvements-tab-count {
     display: inline-block;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 24px;
     font-weight: bold;
     height: 32px;
@@ -284,6 +308,7 @@
   .improvements-tab-summary div.improvements-pending-summary p.improvements-tab-units {
     display: inline-block;
     flex-grow: 1;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 16px;
     letter-spacing: 0.47px;
     line-height: 19px;
@@ -319,6 +344,7 @@
   .improvements-tab-summary div.improvements-tab-exploration-health-summary p.improvements-tab-exploration-health {
     display: inline-block;
     flex-grow: 1;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
     font-weight: bold;
     height: 16px;
@@ -392,6 +418,7 @@
   .improvements-tab-navigation-item a.improvements-tab-task-scope {
     color: #00829B;
     display: inline-flex;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
     letter-spacing: 0.23px;
     line-height: 16px;
@@ -430,6 +457,7 @@
 
   .improvements-tab-navigation-item a.improvements-tab-task-scope strong.improvements-tab-scope-number {
     display: inline-block;
+    font-family: 'Roboto', Arial, sans-serif;
     font-weight: bold;
     width: 25px;
   }
@@ -465,6 +493,7 @@
 
   .improvements-tab-level-header {
     color: rgba(0, 0, 0, 0.87);
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 20px;
     font-style: normal;
     font-weight: 500;
@@ -493,6 +522,7 @@
   }
 
   .improvements-tab-collapse-arrow-button {
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 24px;
     font-weight: bold;
     text-align: center;
@@ -509,6 +539,7 @@
   .improvements-tab-state-link {
     color: #004C76;
     flex-grow: 0;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 18px;
     font-style: normal;
     font-weight: bold;
@@ -525,6 +556,7 @@
   .improvements-tab-state-retention {
     color: #686868;
     flex-grow: 1;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
@@ -536,6 +568,7 @@
   .improvements-tab-state-num-issues {
     color: #686868;
     flex-grow: 1;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 16px;
     font-style: normal;
     font-weight: normal;
@@ -581,6 +614,7 @@
 
   .improvements-tab-task-overview-title {
     color: rgba(0, 0, 0, 0.87);
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 18px;
     font-style: normal;
     font-weight: 500;
@@ -591,6 +625,7 @@
 
   .improvements-tab-task-overview-summary {
     color: rgba(0, 0, 0, 0.541327);
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 16px;
     font-style: normal;
     font-weight: normal;
@@ -615,6 +650,7 @@
 
   .improvements-tab-task-details-header {
     color: #333333;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
@@ -627,6 +663,7 @@
 
   .improvements-tab-task-actions {
     color: #00829B;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 16px;
     font-style: normal;
     font-weight: bold;
@@ -652,6 +689,7 @@
 
   .improvements-tab-suggestions-header {
     color: #303030;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 15px;
     font-style: normal;
     font-weight: 500;
@@ -663,6 +701,7 @@
 
   .improvements-tab-suggestions-content {
     color: rgba(0, 0, 0, 0.541327);
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 15px;
     font-style: normal;
     letter-spacing: 0.234375px;
