@@ -1,7 +1,7 @@
 {
   "ci": {
     "collect": {
-      "numberOfRuns": 1,
+      "numberOfRuns": 2,
       "puppeteerScript": "puppeteer-login-script.js",
       "url": [
         "http://127.0.0.1:8181/signup?return_url=%2F",
@@ -49,7 +49,6 @@
             "efficient-animated-content": ["error",{"minScore": 1}],
             "appcache-manifest": ["error", {"minScore": 1}],
             "errors-in-console": ["error", {"minScore": 1}],
-            "is-on-https": ["error", {"minScore": 1}],
             "uses-passive-event-listeners": ["error", {"minScore": 1}],
             "no-document-write": ["error", {"minScore": 1}],
             "external-anchors-use-rel-noopener": ["error", {"minScore": 1}],
@@ -62,138 +61,102 @@
             "password-inputs-can-be-pasted-into": ["error", {"minScore": 1}],
             "image-aspect-ratio": ["error", {"minScore": 1}],
             "uses-webp-images": ["error", {"minScore": 1}],
+            "offscreen-images": ["error", {"minScore": 1}],
             "is-on-https": ["off", {}],
             "time-to-first-byte": ["off", {}]
           }
         },
         {
+          "matchingUrlPattern": "http://[^/]+/signup?return_url=%2F$",
+          "assertions": {}
+        },
+        {
           "matchingUrlPattern": "http://[^/]+/$",
-          "assertions": {
-            "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
-            "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
-            "uses-http2": ["error", {"minScore": 0}]
-          }
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/admin$",
+          "assertions": {}
         },
         {
           "matchingUrlPattern": "http://[^/]+/about$",
-          "assertions": {
-            "offscreen-images": ["error", {"minScore": 0}],
-            "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
-            "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
-            "uses-http2": ["error", {"minScore": 0}]
-          }
-        },
-        {
-          "matchingUrlPattern": "http://[^/]+/contact$",
-          "assertions": {
-            "offscreen-images": ["error", {"minScore": 0}],
-            "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
-            "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
-            "uses-http2": ["error", {"minScore": 0}],
-            "errors-in-console": ["error", {"minScore": 0}]
-          }
-        },
-        {
-          "matchingUrlPattern": "http://[^/]+/donate$",
-          "assertions": {
-            "offscreen-images": ["error", {"minScore": 1}],
-            "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
-            "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
-            "uses-http2": ["error", {"minScore": 0}],
-            "errors-in-console": ["error", {"minScore": 0}],
-                        "uses-webp-images": ["off", {}]
-          }
-        },
-        {
-          "matchingUrlPattern": "http://[^/]+/get-started$",
-          "assertions": {
-            "offscreen-images": ["error", {"minScore": 0}],
-            "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
-            "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
-            "uses-http2": ["error", {"minScore": 0}],
-            "errors-in-console": ["error", {"minScore": 0}]
-          }
+          "assertions": {}
         },
         {
           "matchingUrlPattern": "http://[^/]+/community-library$",
-          "assertions": {
-            "offscreen-images": ["error", {"minScore": 1}],
-            "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
-            "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
-            "uses-http2": ["error", {"minScore": 0}],
-            "errors-in-console": ["error", {"minScore": 0}],
-            "uses-webp-images": ["off", {}]
-          }
+          "assertions": {}
         },
         {
-          "matchingUrlPattern": "http://[^/]+/privacy$",
-          "assertions": {
-            "offscreen-images": ["error", {"minScore": 1}],
-            "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
-            "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
-            "uses-http2": ["error", {"minScore": 0}],
-            "errors-in-console": ["error", {"minScore": 0}]
-          }
+          "matchingUrlPattern": "http://[^/]+/contact$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/contributor-dashboard$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/creator-dashboard$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/delete-account$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/donate$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/get-started$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/learner-dashboard$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/nonprofits$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/parents$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/partners$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/preferences$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/privacy-policy$",
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/profile/username1$",
+          "assertions": {}
         },
         {
           "matchingUrlPattern": "http://[^/]+/teach$",
-          "assertions": {
-            "offscreen-images": ["error", {"minScore": 0}],
-            "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
-            "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
-            "uses-http2": ["error", {"minScore": 0}],
-            "errors-in-console": ["error", {"minScore": 0}]
-          }
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/teachers$",
+          "assertions": {}
         },
         {
           "matchingUrlPattern": "http://[^/]+/terms$",
-          "assertions": {
-            "offscreen-images": ["error", {"minScore": 1}],
-            "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
-            "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
-            "uses-http2": ["error", {"minScore": 0}],
-            "errors-in-console": ["error", {"minScore": 0}]
-          }
+          "assertions": {}
         },
         {
           "matchingUrlPattern": "http://[^/]+/thanks$",
-          "assertions": {
-            "offscreen-images": ["error", {"minScore": 0}],
-            "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
-            "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
-            "uses-http2": ["error", {"minScore": 0}],
-            "errors-in-console": ["error", {"minScore": 0}]
-          }
+          "assertions": {}
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/volunteers$",
+          "assertions": {}
         }
       ]
     },
