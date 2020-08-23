@@ -138,7 +138,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, response_dict)
 
         # Create exploration A.
-        exploration = self.save_new_valid_exploration(
+        self.save_new_valid_exploration(
             'A', self.admin_id, title='Title A', category='Category A',
             objective='Objective A')
         exp_services.update_exploration(self.admin_id, 'A', [], 'Exploration A')
@@ -148,7 +148,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
         self.assertEqual(response_dict['activity_list'], [])
 
         # Create exploration B.
-        exploration = self.save_new_valid_exploration(
+        self.save_new_valid_exploration(
             'B', self.admin_id, title='Title B', category='Category B',
             objective='Objective B')
         exp_services.update_exploration(self.admin_id, 'B', [], 'Exploration B')
