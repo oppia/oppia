@@ -23,6 +23,7 @@ import datetime
 
 from constants import constants
 import core.storage.base_model.gae_models as base_models
+from core.domain import rights_manager
 import feconf
 import python_utils
 
@@ -510,8 +511,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
-            if commit_cmd['cmd'] == feconf.CMD_CHANGE_ROLE:
-                commit_cmds_user_ids.add(commit_cmd['assignee_id'])
+            user_id_attribute_names = (
+                rights_manager.ExplorationRightsChange
+                .get_user_id_attribute_names(commit_cmd['cmd'])
+            )
+            for user_id_attribute_name in user_id_attribute_names:
+                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 

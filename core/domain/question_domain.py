@@ -87,20 +87,24 @@ class QuestionChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_QUESTION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': QUESTION_PROPERTIES}
     }, {
         'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
         'required_attribute_names': ['question_dict', 'skill_id'],
-        'optional_attribute_names': ['topic_name']
+        'optional_attribute_names': ['topic_name'],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -117,7 +121,8 @@ class QuestionSuggestionChange(change_domain.BaseChange):
             'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'required_attribute_names': [
                 'question_dict', 'skill_id', 'skill_difficulty'],
-            'optional_attribute_names': []
+            'optional_attribute_names': [],
+            'user_id_attribute_names': []
         }
     ]
 

@@ -42,7 +42,7 @@ current_user_services = models.Registry.import_current_user_services()
 # backward-compatibility with previous exploration snapshots in the datastore.
 # Do not modify the definitions of CMD keys that already exist.
 CMD_CREATE_NEW = 'create_new'
-CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
+CMD_CHANGE_ROLE = 'change_role'
 CMD_CHANGE_EXPLORATION_STATUS = 'change_exploration_status'
 CMD_CHANGE_COLLECTION_STATUS = 'change_collection_status'
 CMD_CHANGE_PRIVATE_VIEWABILITY = 'change_private_viewability'
@@ -71,26 +71,31 @@ ALLOWED_STATUS = [ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC]
 COMMON_ALLOWED_COMMANDS = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
-    'optional_attribute_names': []
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
 }, {
     'name': CMD_CHANGE_ROLE,
     'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
     'optional_attribute_names': [],
+    'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
 }, {
     'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
     'required_attribute_names': [
         'old_viewable_if_private', 'new_viewable_if_private'],
-    'optional_attribute_names': []
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
 }, {
     'name': CMD_RELEASE_OWNERSHIP,
     'required_attribute_names': [],
     'optional_attribute_names': [],
+    'user_id_attribute_names': []
 }, {
     'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
     'required_attribute_names': [
         'old_first_published_msec', 'new_first_published_msec'],
     'optional_attribute_names': [],
+    'user_id_attribute_names': []
 }]
 
 
@@ -292,6 +297,7 @@ class ExplorationRightsChange(ActivityRightsChange):
         'name': CMD_CHANGE_EXPLORATION_STATUS,
         'required_attribute_names': ['old_status', 'new_status'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {
             'old_status': ALLOWED_STATUS, 'new_status': ALLOWED_STATUS}
     })
@@ -305,6 +311,7 @@ class CollectionRightsChange(ActivityRightsChange):
         'name': CMD_CHANGE_COLLECTION_STATUS,
         'required_attribute_names': ['old_status', 'new_status'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {
             'old_status': ALLOWED_STATUS, 'new_status': ALLOWED_STATUS}
     })
