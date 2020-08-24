@@ -1159,6 +1159,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             failed = False
 
             for file_path in self.all_filepaths:
+                if file_path in excluded_files:
+                    continue
                 file_content = self.file_cache.read(file_path)
                 for line_number, line in enumerate(file_content.split('\n')):
                     if re.findall(broadcast_pattern, line):
