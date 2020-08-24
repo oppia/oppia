@@ -1148,7 +1148,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'Starting broadcast checks\n'
                 '----------------------------------------')
         summary_messages = []
-        broadcast_ignore_pattern = r'\$broadcast'
+        broadcast_pattern = r'\$broadcast'
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             failed = False
@@ -1156,7 +1156,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             for file_path in self.all_filepaths:
                 file_content = self.file_cache.read(file_path)
                 for line_number, line in enumerate(file_content.split('\n')):
-                    if re.findall(broadcast_ignore_pattern, line):
+                    if re.findall(broadcast_pattern, line):
                         failed = True
                         summary_message = (
                             '%s --> $broadcast found at line %s. '
