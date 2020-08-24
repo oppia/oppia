@@ -36,7 +36,7 @@ import {
   ExplorationImprovementsResponseBackendDict
 } from 'services/exploration-improvements-backend-api.service';
 
-describe('Exploration stats backend api service', () => {
+describe('Exploration stats back-end API service', () => {
   let explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   let httpTestingController: HttpTestingController;
   let explorationImprovementsBackendApiService:
@@ -160,7 +160,7 @@ describe('Exploration stats backend api service', () => {
         false));
   }));
 
-  it('should try to post a task dict to the backend', fakeAsync(async() => {
+  it('should try to post a task dict to the back-end', fakeAsync(async() => {
     const task = explorationTaskObjectFactory.createFromBackendDict({
       entity_type: 'exploration',
       entity_id: 'eid',
@@ -187,6 +187,19 @@ describe('Exploration stats backend api service', () => {
       task_entries: [task.toPayloadDict()]
     });
     req.flush({});
+    flushMicrotasks();
+
+    expect(onSuccess).toHaveBeenCalled();
+    expect(onFailure).not.toHaveBeenCalled();
+  }));
+
+  it('should not make HTTP call when posting empty list', fakeAsync(async() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    const onFailure = jasmine.createSpy('onFailure');
+    explorationImprovementsBackendApiService.postTasksAsync('eid', [])
+      .then(onSuccess, onFailure);
+
+    httpTestingController.expectNone('/improvements/exploration/eid');
     flushMicrotasks();
 
     expect(onSuccess).toHaveBeenCalled();

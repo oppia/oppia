@@ -26,13 +26,15 @@ require(
 
 angular.module('oppia').directive('oppiaVisualizationSortedTiles', () => ({
   restrict: 'E',
-  scope: { data: '<', options: '<' },
+  scope: { data: '<', options: '<', totalFrequency: '<' },
   template: require('./oppia-visualization-sorted-tiles.directive.html'),
   style: require('./oppia-visualization-sorted-tiles.directive.css'),
   controller: ['$scope', '$uibModal', 'UtilsService',
     function($scope, $uibModal, UtilsService) {
       this.$onInit = () => {
         const data = <AnswerStats[]> $scope.data;
+        const totalFrequency = (
+          $scope.totalFrequency || sum(data, a => a.frequency));
 
         $scope.isAnswerTooLong = (index: number) => {
           return UtilsService.isOverflowing(
@@ -57,7 +59,6 @@ angular.module('oppia').directive('oppiaVisualizationSortedTiles', () => ({
         };
 
         if ($scope.options.use_percentages) {
-          const totalFrequency = sum(data, a => a.frequency);
           $scope.percentages = (
             data.map(d => Math.round(100.0 * d.frequency / totalFrequency)));
         }
