@@ -33,11 +33,11 @@
 
     <h4 ng-if="!newQuestionIsBeingCreated" class="oppia-question-editor-container"> <strong> Question Editor </strong> </h4>
     <question-editor question-id="questionId"
-                    misconceptions-by-skill="misconceptionsBySkill"
-                    question-state-data="questionStateData"
-                    question="question"
-                    can-edit-question="canEditQuestion"
-                    question-changed="questionChanged">
+                     misconceptions-by-skill="misconceptionsBySkill"
+                     question-state-data="questionStateData"
+                     question="question"
+                     can-edit-question="canEditQuestion"
+                     question-changed="questionChanged">
     </question-editor>
     <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && question.getValidationErrorMessage()">
       <[question.getValidationErrorMessage()]>
