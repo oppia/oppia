@@ -1946,7 +1946,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             html_validation_service.
-            validate_svg_filename_format_in_math_rich_text(
+            validate_math_content_in_math_rich_text(
                 html_string_with_filename_having_valid_format), [])
 
     def test_validate_svg_filenames_format_when_all_filenames_are_invalid(self):
@@ -1966,21 +1966,35 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '122_vertical_2d123.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
         expected_output = [
-            '<oppia-noninteractive-math math_content-with-value="{&amp;quot;ra'
-            'w_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_fil'
-            'ename&amp;quot;: &amp;quot;mathImg_20201216*331234_r3ir43lmfd_hei'
-            'ght_2d456_width_6d124_vertical_0d231.svg&amp;quot;}"></oppia-noni'
-            'nteractive-math>',
-            '<oppia-noninteractive-math math_content-with-value="{&amp;quot;ra'
-            'w_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_fil'
-            'ename&amp;quot;: &amp;quot;mathImg_20200216_133832_imzlvnf23a_inv'
-            'alid_4d123_width_23d122_vertical_2d123.svg&amp;quot;}"></oppia-no'
-            'ninteractive-math>']
+            {
+                'invalid_tag': (
+                    '<oppia-noninteractive-math math_content-with-value="{&am'
+                    'p;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
+                    '&amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20201'
+                    '216*331234_r3ir43lmfd_height_2d456_width_6d124_vertical_0'
+                    'd231.svg&amp;quot;}"></oppia-noninteractive-math>'),
+                'error': (
+                    'Invalid svg_filename attribute in math component: '
+                    'mathImg_20201216*331234_r3ir43lmfd_height_2d456_width_6d1'
+                    '24_vertical_0d231.svg'
+                )
+            }, {
+                'invalid_tag': (
+                    '<oppia-noninteractive-math math_content-with-value="{&amp;'
+                    'quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &a'
+                    'mp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_2020021'
+                    '6_133832_imzlvnf23a_invalid_4d123_width_23d122_vertical_2'
+                    'd123.svg&amp;quot;}"></oppia-noninteractive-math>'),
+                'error': (
+                    'Invalid svg_filename attribute in math component: '
+                    'mathImg_20200216_133832_imzlvnf23a_inv'
+                    'alid_4d123_width_23d122_vertical_2d123.svg')
+            }]
 
         self.assertEqual(
             sorted(
                 html_validation_service.
-                validate_svg_filename_format_in_math_rich_text(
+                validate_math_content_in_math_rich_text(
                     html_string_with_filename_having_invalid_format)), sorted(
                         expected_output))
 

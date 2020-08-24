@@ -2340,7 +2340,7 @@ class ExplorationMathRichTextInfoModelDeletionOneOffJobTests(
         self.assertEqual(actual_output, expected_output)
 
 
-class ExplorationMathSvgFilenameFormatValidationOneOffJobTests(
+class ExplorationRteMathContentValidationOneOffJobTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -2351,7 +2351,7 @@ class ExplorationMathSvgFilenameFormatValidationOneOffJobTests(
 
     def setUp(self):
         super(
-            ExplorationMathSvgFilenameFormatValidationOneOffJobTests,
+            ExplorationRteMathContentValidationOneOffJobTests,
             self).setUp()
 
         # Setup user who will own the test explorations.
@@ -2511,15 +2511,15 @@ class ExplorationMathSvgFilenameFormatValidationOneOffJobTests(
 
         job_id = (
             exp_jobs_one_off
-            .ExplorationMathSvgFilenameFormatValidationOneOffJob.create_new())
+            .ExplorationRteMathContentValidationOneOffJob.create_new())
         (
             exp_jobs_one_off.
-            ExplorationMathSvgFilenameFormatValidationOneOffJob.enqueue(
+            ExplorationRteMathContentValidationOneOffJob.enqueue(
                 job_id))
         self.process_and_flush_pending_tasks()
         actual_output = (
             exp_jobs_one_off
-            .ExplorationMathSvgFilenameFormatValidationOneOffJob.get_output(
+            .ExplorationRteMathContentValidationOneOffJob.get_output(
                 job_id))
         detailed_info_output = ast.literal_eval(actual_output[1])
 
@@ -2538,8 +2538,9 @@ class ExplorationMathSvgFilenameFormatValidationOneOffJobTests(
         expected_invalid_tags = [invalid_tag1, invalid_tag2]
         exp_error_info = detailed_info_output[1][self.VALID_EXP_ID]
         for state_error_info in exp_error_info:
-            for invalid_tag in state_error_info['error_list']:
-                self.assertTrue(invalid_tag in expected_invalid_tags)
+            for invalid_tag_info in state_error_info['error_list']:
+                self.assertTrue(
+                    invalid_tag_info['invalid_tag'] in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
         self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
@@ -2570,7 +2571,7 @@ class ExplorationMathSvgFilenameFormatValidationOneOffJobTests(
         run_job_for_deleted_exp(
             self,
             exp_jobs_one_off.
-            ExplorationMathSvgFilenameFormatValidationOneOffJob)
+            ExplorationRteMathContentValidationOneOffJob)
 
     def test_explorations_with_valid_math_tags(self):
         """Tests for the case when there are no invalid svg_filenames in the
@@ -2628,16 +2629,16 @@ class ExplorationMathSvgFilenameFormatValidationOneOffJobTests(
 
         job_id = (
             exp_jobs_one_off
-            .ExplorationMathSvgFilenameFormatValidationOneOffJob.create_new())
+            .ExplorationRteMathContentValidationOneOffJob.create_new())
         (
             exp_jobs_one_off.
-            ExplorationMathSvgFilenameFormatValidationOneOffJob.enqueue(
+            ExplorationRteMathContentValidationOneOffJob.enqueue(
                 job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
             exp_jobs_one_off
-            .ExplorationMathSvgFilenameFormatValidationOneOffJob.get_output(
+            .ExplorationRteMathContentValidationOneOffJob.get_output(
                 job_id))
         self.assertEqual(len(actual_output), 0)
 

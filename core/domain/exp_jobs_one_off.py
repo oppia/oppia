@@ -433,10 +433,10 @@ class ExplorationMathRichTextInfoModelDeletionOneOffJob(
             no_of_models_deleted)])
 
 
-class ExplorationMathSvgFilenameFormatValidationOneOffJob(
+class ExplorationRteMathContentValidationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that checks the html content of an exploration and validates the
-    svg_filename format in each math rich-text components.
+    Math content object for each math rich-text components.
     """
 
     @classmethod
@@ -454,7 +454,7 @@ class ExplorationMathSvgFilenameFormatValidationOneOffJob(
             html_string = ''.join(state.get_all_html_content_strings())
             error_list = (
                 html_validation_service.
-                validate_svg_filename_format_in_math_rich_text(html_string))
+                validate_math_content_in_math_rich_text(html_string))
             if len(error_list) > 0:
                 invalid_tags_info_in_state = {
                     'state_name': state_name,
