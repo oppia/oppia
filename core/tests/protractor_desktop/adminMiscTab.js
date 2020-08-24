@@ -105,7 +105,6 @@ describe('Admin misc tab', function() {
     await responseEditor.markAsCorrect();
     await explorationEditorMainTab.expectTickMarkIsDisplayed();
     await explorationEditorPage.saveChanges();
-    debugger;
     await workflow.publishExploration();
 
     await libraryPage.get();
@@ -114,7 +113,7 @@ describe('Admin misc tab', function() {
       null, CORRECT_ANSWER);
     await explorationPlayerPage.clickThroughToNextCard();
     await waitFor.pageToFullyLoad();
-    
+
     await adminPage.get();
     await adminPage.getMiscTab();
   });
