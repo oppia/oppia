@@ -1138,7 +1138,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
         return summary_messages
-    
+
     def _check_broadcast_usage(self):
         """This function ensures that there are no uses of $broadcast in the 
         codebase.
@@ -1165,7 +1165,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         python_utils.PRINT(summary_message)
                         summary_messages.append(summary_message)
                         python_utils.PRINT('')
-            
+
             if failed:
                 summary_message = (
                     '%s broadcast check failed' % (
@@ -1179,7 +1179,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('')
 
         return summary_messages
-
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
