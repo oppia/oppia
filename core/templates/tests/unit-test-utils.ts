@@ -26,7 +26,7 @@ import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 declare var angular: ng.IAngularStatic;
 /**
  * Returns a div containing the compiled html.
- * @param {string} html - The html we want to compile.
+ * @param {string} html - The html to be compiled.
  */
 export const html = (html: string): Element => {
   // Don't return `body` itself, because using it as a `$rootElement` for ng1
@@ -45,8 +45,8 @@ export const html = (html: string): Element => {
 /**
  * Trims the text by removing new lines and extra white space.
  * @param {string | null | undefined} text - The text to be trimmed of spaces.
- * @param {bool} allSpace - A bool to define is we want to replace new line
- *   with a space or just empty string.
+ * @param {bool} allSpace - A bool to define whether to replace new line
+ *   with a space or empty string.
  */
 export const multiTrim = (
     text: string | null | undefined, allSpace = false): string => {
@@ -61,7 +61,7 @@ export const multiTrim = (
 /**
  * And upgraded angularjs module.
  * @param {PlatformRef} platform - The platform reference for bootstraping.
- * @param {Type<{}>} Ng2Module - Angular two module to bootstrap.
+ * @param {Type<{}>} Ng2Module - Angular module to bootstrap.
  * @param {Element} element - An html element.
  * @param {angular.IModule} ng1Module - The angularjs module to be included
  *  in angular zone.
@@ -102,7 +102,7 @@ export const bootstrap = (
  * @param {string} kebabCaseName - Name of the upgraded component in kebab-case.
  * @param {string} camelCaseName - Name of the upgraded component in camelCase.
  * @param {unkownn} upgradedComponentTypes - An array consisting of only
- *   elements which is the type of the upgraded component.
+ *   one element. That element is the type of the upgraded component.
  * @param {boolean} focus - To run this test in fdescribe.
  */
 export const testUpgradeComponent = (
