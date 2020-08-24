@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core.domain.prod_validation_jobs_one_off."""
+"""Unit tests for core.domain.prod_validators."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -71,7 +71,7 @@ USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
-    activity_models, audit_models,
+    audit_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
@@ -80,7 +80,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     story_models, suggestion_models, topic_models,
     user_models,) = (
         models.Registry.import_models([
-            models.NAMES.activity, models.NAMES.audit,
+            models.NAMES.audit,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
@@ -88,132 +88,6 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.statistics, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
-
-
-class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(ActivityReferencesModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            '1exp', title='title', category='category')
-
-        exp_services.save_new_exploration(self.owner_id, exploration)
-
-        collection = collection_domain.Collection.create_default_collection(
-            '1col', title='title', category='category')
-
-        collection_services.save_new_collection(self.owner_id, collection)
-
-        self.model_instance = (
-            activity_models.ActivityReferencesModel.get_or_create('featured'))
-        self.model_instance.activity_references = [{
-            'type': constants.ACTIVITY_TYPE_EXPLORATION,
-            'id': '1exp',
-        }, {
-            'type': constants.ACTIVITY_TYPE_COLLECTION,
-            'id': '1col',
-        }]
-        self.model_instance.put()
-
-        self.job_class = (
-            prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [u'[u\'fully-validated ActivityReferencesModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of ActivityReferencesModel\', '
-            '[u\'Entity id featured: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.created_on, self.model_instance.last_updated
-            )]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ActivityReferencesModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_missing_id_in_activity_references(self):
-        self.model_instance.activity_references = [{
-            'type': 'exploration',
-        }]
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for fetch properties of '
-            'ActivityReferencesModel\', '
-            '[u"Entity id featured: Entity properties cannot be fetched '
-            'completely with the error u\'id\'"]]')]
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_invalid_type_in_activity_references(self):
-        self.model_instance.activity_references = [{
-            'type': 'invalid_type',
-            'id': '0'
-        }]
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for domain object check of '
-            'ActivityReferencesModel\', '
-            '[u\'Entity id featured: Entity fails domain validation with the '
-            'error Invalid activity type: invalid_type\']]')]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_invalid_id_in_activity_references(self):
-        self.model_instance.activity_references = [{
-            'type': 'exploration',
-            'id': '1col'
-        }]
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for exploration_ids field check of '
-            'ActivityReferencesModel\', '
-            '[u"Entity id featured: based on field exploration_ids having '
-            'value 1col, expect model ExplorationModel with id 1col but '
-            'it doesn\'t exist"]]')]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_mock_model_with_invalid_id(self):
-        model_instance_with_invalid_id = (
-            activity_models.ActivityReferencesModel(id='invalid'))
-        model_instance_with_invalid_id.put()
-        expected_output = [(
-            u'[u\'fully-validated ActivityReferencesModel\', 1]'
-        ), (
-            u'[u\'failed validation check for model id check of '
-            'ActivityReferencesModel\', '
-            '[u\'Entity id invalid: Entity id does not match regex pattern\']]'
-        )]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
 
 
 class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):

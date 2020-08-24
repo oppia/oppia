@@ -565,6 +565,7 @@
 
 # Typings.
 /typings @ankita240796 @nishantwrp
+/typings/tests/ @shavavo
 
 
 # User Data Takeout.
