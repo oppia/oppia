@@ -19,10 +19,10 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import 'interactions/codemirrorRequires.ts';
 import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/dnd-lists.import';
+import 'third-party-imports/ui-codemirror.import';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [

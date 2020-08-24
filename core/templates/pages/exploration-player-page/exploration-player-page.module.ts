@@ -21,7 +21,10 @@ import 'zone.js';
 
 import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
+import 'third-party-imports/guppy.import';
+import 'third-party-imports/midi-js.import';
 import 'third-party-imports/ng-audio.import';
+import 'third-party-imports/skulpt.import';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
