@@ -145,10 +145,6 @@ describe('Admin misc tab', function() {
     await adminPage.expectUsernameToBeChanged('mTabChecker');
   });
 
-  it('should generate SVGs for explorations', async function() {
-    await adminPage.generateSVG();
-  });
-
   it('should regenerate contribution opportunities for a topic',
     async function() {
       await adminPage.regenerateContributionsForTopic('0', false);

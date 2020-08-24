@@ -88,10 +88,6 @@ var AdminPage = function() {
     by.css('.protractor-test-regeneration-error-message'));
   var usernameSection = element(
     by.css('.protractor-test-dropdown-username-section'));
-  var generateSVGButton = element(
-    by.css('.protractor-test-fetch-svg-button'));
-  var stopSVGButton = element(
-    by.css('.protractor-test-stop-svg-button'));
   // Adding a new community reviewer.
   var addReviewerName = element(by.css(
     '.protractor-test-add-reviewer-username'));
@@ -434,14 +430,6 @@ var AdminPage = function() {
 
   this.expectUsernameToBeChanged = async function(newUsername) {
     expect(usernameSection.getText()).toEqual(newUsername);
-  };
-
-  this.generateSVG = async function() {
-    await action.click('Generate SVG Button', generateSVGButton);
-    await waitFor.visibilityOf(
-      statusMessage, 'Status message not visible');
-    await waitFor.textToBePresentInElement(
-      statusMessage, 'SVGs generated for all explorations .');
   };
 
   this.extractData = async function(expID, expVersion,
