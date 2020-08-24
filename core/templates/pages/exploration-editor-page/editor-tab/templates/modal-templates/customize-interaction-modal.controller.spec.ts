@@ -146,7 +146,7 @@ describe('Customize Interaction Modal Controller', function() {
         expect($scope.hasCustomizationArgs).toBe(true);
       });
 
-    it('should get complete interaction thumbail icon path corresponding to' +
+    it('should get complete interaction thumbnail icon path corresponding to' +
       ' a given relative path', function() {
       var interactionId = 'i1';
       expect($scope.getInteractionThumbnailImageUrl(interactionId)).toBe(
@@ -206,7 +206,7 @@ describe('Customize Interaction Modal Controller', function() {
       interactionDetailsCacheService.removeDetails('LogicProof');
     });
 
-    it('should save interaction when there is no customization args left',
+    it('should save interaction when there are no customization args left',
       function() {
         spyOn(
           editorFirstTimeEventsService, 'registerFirstSaveInteractionEvent')

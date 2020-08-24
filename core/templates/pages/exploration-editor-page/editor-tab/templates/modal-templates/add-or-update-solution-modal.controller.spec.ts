@@ -107,7 +107,7 @@ describe('Add Or Update Solution Modal Controller', function() {
         expect($scope.answerIsValid).toBe(false);
       });
 
-    it('should update data answer when submitting current interaction',
+    it('should update correct answer when submitting current interaction',
       function() {
         var answer = {};
         currentInteractionService.onSubmit(answer);
@@ -121,7 +121,7 @@ describe('Add Or Update Solution Modal Controller', function() {
       expect(currentInteractionService.submitAnswer).toHaveBeenCalled();
     });
 
-    it('should check whenever additional submit button should be shown',
+    it('should check if additional submit button should be shown',
       function() {
         stateInteractionIdService.init('', 'TextInput');
         expect($scope.shouldAdditionalSubmitButtonBeShown()).toBe(true);

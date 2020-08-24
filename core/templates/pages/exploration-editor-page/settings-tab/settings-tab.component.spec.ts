@@ -511,7 +511,7 @@ describe('Settings Tab Component', function() {
       expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(false);
     });
 
-    it('should check whenever exploration is locked for editing', function() {
+    it('should check if exploration is locked for editing', function() {
       var changeListSpy = spyOn(
         changeListService, 'isExplorationLockedForEditing');
 

@@ -445,7 +445,7 @@ describe('Feedback Tab Component', function() {
         '11/21/14');
     });
 
-  it('should evaluate whenever exploration is editable', function() {
+  it('should evaluate if exploration is editable', function() {
     var isEditableSpy = spyOn(editabilityService, 'isEditable');
 
     isEditableSpy.and.returnValue(true);

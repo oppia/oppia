@@ -636,7 +636,7 @@ describe('Exploration editor tab component', function() {
     expect(routerService.navigateToMainTab).toHaveBeenCalledWith(stateName);
   });
 
-  it('should evaluate whenever parameters are enabled', function() {
+  it('should evaluate if parameters are enabled', function() {
     var areParametersEnabledSpy = spyOn(
       explorationFeaturesService, 'areParametersEnabled');
 

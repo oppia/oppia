@@ -72,7 +72,7 @@ describe('Exploration Graph Component', function() {
     expect(ctrl.getGraphData()).toBe(null);
   });
 
-  it('should evaluate whenever exploration graph is editable', function() {
+  it('should evaluate if exploration graph is editable', function() {
     var isEditableSpy = spyOn(editabilityService, 'isEditable');
     isEditableSpy.and.returnValue(true);
     expect(ctrl.isEditable()).toBe(true);

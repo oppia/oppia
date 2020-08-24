@@ -142,7 +142,7 @@ describe('Add Answer Group Modal Controller', function() {
     expect($scope.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });
 
-  it('should close modal when saving answer group response', function() {
+  it('should save answer group response when closing the modal', function() {
     $scope.saveResponse(null);
 
     expect(saveOutcomeDestDetailsSpy).toHaveBeenCalled();
