@@ -60,7 +60,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/components/forms/forms-templates/' +
-              'mark-audio-as-needing-update-modal.template.html'),
+              'mark-audio-as-needing-update-modal.directive.html'),
             backdrop: true,
             controller: 'ConfirmOrCancelModalController'
           }).result.then(function() {
