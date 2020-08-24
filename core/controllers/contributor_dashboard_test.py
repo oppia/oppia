@@ -71,7 +71,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             '0', 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic('0', self.admin_id)
 
         self.skill_id_0 = 'skill_id_0'
         self.skill_id_1 = 'skill_id_1'
@@ -108,6 +111,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             story_services.save_new_story(self.owner_id, story)
             topic_services.add_canonical_story(
                 self.owner_id, topic.id, story.id)
+            topic_services.publish_story(
+                topic.id, story.id, self.admin_id)
             story_services.update_story(
                 self.owner_id, story.id, [story_domain.StoryChange({
                     'cmd': 'add_story_node',
@@ -329,9 +334,13 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TranslatableTextHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -346,7 +355,10 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             '0', 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -361,6 +373,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             story_services.save_new_story(self.owner_id, story)
             topic_services.add_canonical_story(
                 self.owner_id, topic.id, story.id)
+            topic_services.publish_story(topic.id, story.id, self.admin_id)
             story_services.update_story(
                 self.owner_id, story.id, [story_domain.StoryChange({
                     'cmd': 'add_story_node',

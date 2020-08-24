@@ -1617,7 +1617,7 @@ def can_edit_topic(handler):
             raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1832,7 +1832,7 @@ def can_add_new_story_to_topic(handler):
             raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1884,7 +1884,7 @@ def can_edit_story(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         topic_id = story.corresponding_topic_id
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -2061,7 +2061,7 @@ def can_delete_story(handler):
             raise base.UserFacingExceptions.PageNotFoundException
         topic_id = story.corresponding_topic_id
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -2406,7 +2406,7 @@ def can_access_topic_viewer_page(handler):
             return
 
         topic_id = topic.id
-        topic_rights = topic_services.get_topic_rights(
+        topic_rights = topic_fetchers.get_topic_rights(
             topic_id, strict=False)
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
@@ -2500,7 +2500,7 @@ def can_access_story_viewer_page(handler):
                         url_substring),
                     self.GET_HANDLER_ERROR_RETURN_TYPE)
                 return
-            topic_rights = topic_services.get_topic_rights(topic_id)
+            topic_rights = topic_fetchers.get_topic_rights(topic_id)
             topic_is_published = topic_rights.topic_is_published
             all_story_references = topic.get_all_story_references()
             for reference in all_story_references:
@@ -2567,7 +2567,7 @@ def can_access_subtopic_viewer_page(handler):
             return
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
-        topic_rights = topic_services.get_topic_rights(topic.id)
+        topic_rights = topic_fetchers.get_topic_rights(topic.id)
 
         if (
                 (topic_rights is None or not topic_rights.topic_is_published)

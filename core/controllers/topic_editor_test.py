@@ -24,6 +24,7 @@ from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -938,14 +939,14 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': True}, csrf_token=csrf_token)
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertTrue(topic_rights.topic_is_published)
 
         self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': False}, csrf_token=csrf_token)
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertFalse(topic_rights.topic_is_published)
         self.logout()
 
@@ -978,7 +979,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': True}, csrf_token=csrf_token)
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertTrue(topic_rights.topic_is_published)
 
         response = self.put_json(
@@ -991,7 +992,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_cannot_unpublish_an_unpublished_exploration(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertFalse(topic_rights.topic_is_published)
 
         response = self.put_json(
