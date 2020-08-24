@@ -229,7 +229,7 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.getSkillEditorUrl = function(skillId) {
-            return '/skill_editor/' + skillId;
+            return `/skill_editor/${skillId}`;
           };
 
           ctrl.cancel = function() {
@@ -257,7 +257,6 @@ angular.module('oppia').directive('questionsList', [
             } else {
               ctrl.newQuestionSkillIds = [ctrl.getSelectedSkillId()];
             }
-
             ctrl.linkedSkillsWithDifficulty = [];
             ctrl.newQuestionSkillIds.forEach(function(skillId) {
               ctrl.linkedSkillsWithDifficulty.push(
@@ -558,7 +557,6 @@ angular.module('oppia').directive('questionsList', [
           ctrl.saveQuestion = function() {
             ContextService.resetImageSaveDestination();
             $location.hash(null);
-            var commitMessage = null;
             if (ctrl.questionIsBeingUpdated) {
               $uibModal.open({
                 templateUrl:
@@ -568,8 +566,7 @@ angular.module('oppia').directive('questionsList', [
                           'question-editor-save-modal.template.html'),
                 backdrop: true,
                 controller: 'ConfirmOrCancelModalController'
-              }).result.then(function(commitMsg) {
-                commitMessage = commitMsg;
+              }).result.then(function(commitMessage) {
                 if (ctrl.skillLinkageModificationsArray &&
                     ctrl.skillLinkageModificationsArray.length > 0) {
                   ctrl.updateSkillLinkage(commitMessage);

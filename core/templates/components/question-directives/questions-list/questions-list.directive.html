@@ -5,7 +5,7 @@
       <md-card class="question-skill-id" ng-repeat="skill in $ctrl.associatedSkillSummaries">
         <div class="skill-description-card">
           <span ng-click="$ctrl.removeSkill(skill.getId())" aria-hidden="true">
-            <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+            <i class="material-icons oppia-cross-icon md-18">&#xE14C;</i>
           </span>
           <a ng-href="<[$ctrl.getSkillEditorUrl(skill.getId())]>" target="_blank" rel="noopener">
             <[skill.getDescription()]>
@@ -13,7 +13,6 @@
         </div>
       </md-card>
       <button class="btn btn-success btn-sm" ng-click="$ctrl.addSkill()">Link Another Skill</button>
-      <button class="btn btn-primary btn-sm" ng-click="undo()" ng-if="$ctrl.getSkillLinkageModificationsArray().length > 0">Undo Skill Changes</button>
     </div>
     <question-editor question-id="$ctrl.questionId"
                      misconceptions-by-skill="$ctrl.misconceptionsBySkill"
@@ -71,7 +70,7 @@
           <h3>New Question</h3>
         </div>
         <div class="checklist-item">
-          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': linkedSkillsWithDifficulty.length}"><span>1</span></div>
+          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.linkedSkillsWithDifficulty.length}"><span>1</span></div>
           <div class="checklist-item-text">Difficulty</div>
         </div>
         <div class="checklist-item-separator"></div>
@@ -255,6 +254,9 @@
     justify-content: space-between;
     margin-top: 15px;
     padding-top: 20px;
+  }
+  questions-list .oppia-cross-icon {
+    color: #FF0000;
   }
   @media screen and (max-width: 768px) {
     questions-list .question-editor-container {
