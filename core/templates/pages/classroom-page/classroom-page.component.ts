@@ -31,7 +31,7 @@ require('services/alerts.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('pages/library-page/search-bar/search-bar.directive.ts');
+require('pages/library-page/search-bar/search-bar.component.ts');
 
 angular.module('oppia').component('classroomPage', {
   template: require('./classroom-page.component.html'),

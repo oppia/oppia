@@ -31,13 +31,13 @@ require(
   'translation-language-selector.component.ts');
 require(
   'pages/contributor-dashboard-page/question-opportunities/' +
-  'question-opportunities.directive.ts');
+  'question-opportunities.component.ts');
 require(
   'pages/contributor-dashboard-page/translation-opportunities/' +
   'translation-opportunities.component.ts');
 require(
   'pages/contributor-dashboard-page/voiceover-opportunities/' +
-  'voiceover-opportunities.directive.ts');
+  'voiceover-opportunities.component.ts');
 
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');

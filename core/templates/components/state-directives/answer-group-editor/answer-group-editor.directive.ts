@@ -139,6 +139,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                   getDefaultInputValue('Real')];
               case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
+              case 'SetOfAlgebraicIdentifier':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
                 return [];
@@ -310,7 +311,6 @@ angular.module('oppia').directive('answerGroupEditor', [
                   if (ctrl.isRuleEditorOpen()) {
                     ctrl.saveRules();
                   }
-                  $scope.$broadcast('updateAnswerGroupInteractionId');
                   ctrl.answerChoices = ctrl.getAnswerChoices();
                 }
               )

@@ -118,7 +118,7 @@ export class MathInteractionsService {
   }
 
   validateAlgebraicExpression(
-      expressionString: string, validVariablesList: string[]) {
+      expressionString: string, validVariablesList: string[]): boolean {
     if (!this._validateExpression(expressionString, validVariablesList)) {
       return false;
     }
@@ -144,7 +144,7 @@ export class MathInteractionsService {
     return true;
   }
 
-  validateNumericExpression(expressionString: string) {
+  validateNumericExpression(expressionString: string): boolean {
     if (!this._validateExpression(expressionString, [])) {
       return false;
     }
@@ -410,6 +410,60 @@ export class MathInteractionsService {
     }
 
     return partsList1.length === 0 && partsList2.length === 0;
+  }
+
+  expressionMatchWithPlaceholders(
+      expressionWithPlaceholders: string, inputExpression: string,
+      placeholders: string[]): boolean {
+    // Check if inputExpression contains any placeholders.
+    for (let variable of nerdamer(inputExpression).variables()) {
+      if (placeholders.includes(variable)) {
+        return false;
+      }
+    }
+
+    // The expressions are first split into terms by addition and subtraction.
+    let termsWithPlaceholders = this.getTerms(expressionWithPlaceholders);
+    let inputTerms = this.getTerms(inputExpression);
+
+    // Each term in the expression containing placeholders is compared with
+    // terms in the input expression. Two terms are said to be matched iff
+    // upon subtracting or dividing them, the resultant contains only
+    // placeholders. This would imply that the input term matches with the
+    // general form(the term with placeholders).
+    for (let i = termsWithPlaceholders.length - 1; i >= 0; i--) {
+      for (let j = 0; j < inputTerms.length; j++) {
+        let termWithPlaceholders = termsWithPlaceholders[i];
+        let termWithoutPlaceholders = inputTerms[j];
+
+        let divisionCondition;
+        // Try catch block is meant to catch division by zero errors.
+        try {
+          let variablesAfterDivision = nerdamer(termWithPlaceholders).divide(
+            termWithoutPlaceholders).variables();
+          divisionCondition = variablesAfterDivision.every(
+            variable => placeholders.includes(variable));
+        } catch (e) {
+          divisionCondition = true;
+        }
+
+        let variablesAfterSubtraction = nerdamer(termWithPlaceholders).subtract(
+          termWithoutPlaceholders).variables();
+        let subtractionCondition = variablesAfterSubtraction.every(
+          variable => placeholders.includes(variable));
+
+        // If only placeholders are left in the term after dividing/subtracting
+        // them, then the terms are said to match.
+        if (divisionCondition || subtractionCondition) {
+          termsWithPlaceholders.splice(i, 1);
+          inputTerms.splice(j, 1);
+          break;
+        }
+      }
+    }
+
+    // Checks if all terms have matched.
+    return termsWithPlaceholders.length + inputTerms.length === 0;
   }
 }
 

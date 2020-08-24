@@ -500,7 +500,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "Ismawen n useqdac s 'admin' ttwaḥerren.",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "Wali ma ulac isekkilen ilmawen deg yisem-ik n useqdac.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Urti ilaq",
-	"I18N_SIGNUP_LICENSE_NOTE": "Yessefk ad teẓreḍ d akken ma tqebleḍ tiwtilin-nneɣ n useqdec, ad tqebleḍ dakken akk agbur neɣ ittekkiyen ara txedmeḍ ɣef usmel-nneɣ ad yili ddaw turagt CC-BY-SA v.4.0, udiɣ ad tanfeḍ i tukci n (BY). Ma ulac aɣilif, ɣeṛ <a href=\"/terms\">Tiwtilin n useqdec</a>-nneɣ i wugar n telɣut ɣef umtawa n turagt. Ugar n yisallen ɣef CC-BY-SA, Sit <a ng-click=\"showLicenseExplanationModal()\">da</a>.",
+	"I18N_SIGNUP_LICENSE_NOTE": "Yessefk ad teẓreḍ d akken ma tqebleḍ tiwtilin-nneɣ n useqdec, ad tqebleḍ dakken akk agbur neɣ ittekkiyen ara txedmeḍ ɣef usmel-nneɣ ad yili ddaw turagt CC-BY-SA v.4.0, udiɣ ad tanfeḍ i tukci n (BY). Ma ulac aɣilif, ɣeṛ <a href=\"/terms\">Tiwtilin n useqdec</a>-nneɣ i wugar n telɣut ɣef umtawa n turagt. Ugar n yisallen ɣef CC-BY-SA, Sit <a href=\"#\" ng-click=\"$ctrl.showLicenseExplanationModal()\">da</a>.",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "Aseqdec n turagt <[licenselink]> ad yeǧǧ agbur n usnirem ad yettwanɣel s wudem ilelli, ad yettwaseqdec, ad yettwabeddel diɣ ad yettwazuzer. Tawtilt tagejdant ticki yiwen ibeddel, iselket neɣ yebna ɣef wayen yellan, yessefk daɣen ad zuzren ayen xedmen s turagt tilellit.",
 	"I18N_SIGNUP_LOADING": "Asali",
 	"I18N_SIGNUP_PAGE_TITLE": "Ddu ɣer tmezdagnut - Oppia",

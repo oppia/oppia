@@ -1988,6 +1988,15 @@ pre.oppia-pre-wrapped-text {
   z-index: 50;
 }
 
+.oppia-clear {
+  clear: both;
+}
+
+.oppia-form-error-text {
+  color: #ff0000;
+  font-size: smaller;
+}
+
 .oppia-editor-trash-icon {
   opacity: 0.2;
   -webkit-transition: all 200ms;
@@ -2128,12 +2137,13 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-response-button,
 .oppia-add-fallback-button,
 .oppia-add-hint-button {
-  background-color: rgba(5, 140, 166, 0.9);
+  background-color: #008098;
   border: 0;
-  border-radius: 4px;
-  color: white;
-  opacity: 0.9;
-  padding: 7px;
+  border-radius: 2px;
+  color: #FFF;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+  padding: 7px 15px;
 }
 
 .oppia-add-interaction-button:active,
@@ -2289,7 +2299,7 @@ pre.oppia-pre-wrapped-text {
   cursor: move;
   left: 10px;
   margin-left: 5px;
-  opacity: 0.3;
+  opacity: 1;
   position: absolute;
   top: 6px;
   width: 25px;
@@ -4357,25 +4367,6 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 .oppia-save-exploration-wide-modal .legend-graph {
   right: -25px;
-}
-
-.oppia-mathexpression-input-mobile-overlay {
-  opacity: 0;
-  position: absolute;
-  z-index: 2;
-}
-
-.oppia-mathexpression-input-hidden-text {
-  /* In some versions of Chrome on Android, typing in a 0 input
-  field can cause the previous character to be selected.
-  Set to 1px and 0 opacity instead of 0 to prevent this issue. */
-  border: 0;
-  height: 1px;
-  margin: 0;
-  margin-left: -5px;
-  opacity: 0;
-  padding: 0;
-  width: 1px;
 }
 
 .oppia-rte-component-container {
