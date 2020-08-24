@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core.domain.base_validators."""
+"""Unit tests for core.domain.base_model_validators."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs_registry
-from core.domain import base_validators
+from core.domain import base_model_validators
 from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
@@ -37,12 +37,12 @@ class MockSnapshotModel(base_models.BaseModel):
     commit_cmds = []
 
 
-class MockBaseModelValidator(base_validators.BaseModelValidator):
+class MockBaseModelValidator(base_model_validators.BaseModelValidator):
     pass
 
 
 class MockSummaryModelValidator(
-        base_validators.BaseSummaryModelValidator):
+        base_model_validators.BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -50,7 +50,7 @@ class MockSummaryModelValidator(
 
 
 class MockSnapshotContentModelValidator(
-        base_validators.BaseSnapshotContentModelValidator):
+        base_model_validators.BaseSnapshotContentModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -58,18 +58,18 @@ class MockSnapshotContentModelValidator(
 
 
 class MockSnapshotMetadataModelValidator(
-        base_validators.BaseSnapshotMetadataModelValidator):
+        base_model_validators.BaseSnapshotMetadataModelValidator):
 
     EXTERNAL_MODEL_NAME = 'external model'
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_validators.ExternalModelFetcherDetails(
+            base_model_validators.ExternalModelFetcherDetails(
                 'external_model_ids', MockModel, [])]
 
 
 class MockBaseUserModelValidator(
-        base_validators.BaseUserModelValidator):
+        base_model_validators.BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
