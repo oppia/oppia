@@ -62,7 +62,6 @@ describe('Search service', function() {
       return deferred.promise;
     });
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
     spyOn($translate, 'refresh').and.callThrough();
 
     results = {
@@ -349,7 +348,6 @@ describe('Search service', function() {
     $httpBackend.flush();
 
     expect(SearchService.isSearchInProgress()).toBe(false);
-    expect($rootScope.$broadcast).not.toHaveBeenCalled();
     expect($translate.refresh).toHaveBeenCalled();
     expect(successHandler).toHaveBeenCalled();
   });

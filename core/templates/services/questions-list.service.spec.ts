@@ -55,7 +55,6 @@ describe('Questions List Service', function() {
     next_start_cursor: null
   };
   var CsrfService;
-  var broadcastSpy;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

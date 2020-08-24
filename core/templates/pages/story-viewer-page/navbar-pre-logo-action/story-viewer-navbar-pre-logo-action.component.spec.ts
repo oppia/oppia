@@ -15,7 +15,10 @@
 /**
  * @fileoverview Unit tests for the story viewer pre logo action
  */
+
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+
 import { UrlService } from 'services/contextual/url.service';
 
 require(
@@ -27,7 +30,17 @@ describe('story viewer pre logo action', function() {
   let urlService: UrlService = null;
   let rootScope = null;
 
+  var mockSendStoryDataEventEmitter = null;
+
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    mockSendStoryDataEventEmitter = new EventEmitter();
+    $provide.value('StoryViewerBackendApiService', {
+      onSendStoryData: mockSendStoryDataEventEmitter
+    });
+  }));
+
   beforeEach(() => {
     urlService = TestBed.get(UrlService);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
@@ -44,11 +57,12 @@ describe('story viewer pre logo action', function() {
 
   it('should set the topic name and URL correctly', function() {
     ctrl.$onInit();
-    rootScope.$emit('storyData', {
+    mockSendStoryDataEventEmitter.emit({
       topicName: 'Topic Name'
     });
     rootScope.$digest();
     expect(ctrl.topicName).toEqual('Topic Name');
     expect(ctrl.getTopicUrl()).toEqual('/learn/math/abbrev/story');
+    ctrl.$onDestroy();
   });
 });

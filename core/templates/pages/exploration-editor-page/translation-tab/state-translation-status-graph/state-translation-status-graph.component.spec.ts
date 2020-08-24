@@ -27,6 +27,8 @@ import { StateRecordedVoiceoversService } from
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
 
@@ -53,6 +55,8 @@ describe('State Translation Status Graph Component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AlertsService', TestBed.get(AlertsService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value(
       'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));
@@ -132,7 +136,6 @@ describe('State Translation Status Graph Component', function() {
 
     it('should set new active state name and refresh state when clicking' +
       ' on state in map', function() {
-      var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(stateEditorService, 'setActiveStateName');
       $scope.onClickStateInMap('State2');
 

@@ -48,6 +48,8 @@ import { StateWrittenTranslationsService } from
 
 import * as d3 from 'd3';
 import { of } from 'rxjs';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
@@ -113,6 +115,8 @@ describe('State Graph Visualization directive', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value(
       'StateInteractionIdService', TestBed.get(StateInteractionIdService));
     $provide.value(
@@ -205,10 +209,10 @@ describe('State Graph Visualization directive', function() {
     ctrl.$onDestroy();
   });
 
-  describe('when graph is redrawed after redrawGraph flag is broadcasted',
+  describe('when graph is redrawn',
     function() {
       beforeEach(function() {
-        $rootScope.$broadcast('redrawGraph');
+        angular.element(window).triggerHandler('resize');
         $flushPendingTasks();
       });
 
@@ -236,7 +240,7 @@ describe('State Graph Visualization directive', function() {
         });
 
       it('should check if can navigate to node whenever node id is equal to' +
-        ' current state id', function() {
+      ' current state id', function() {
         expect($scope.canNavigateToNode('state_1')).toBe(false);
         expect($scope.canNavigateToNode('state_3')).toBe(true);
       });
@@ -253,14 +257,14 @@ describe('State Graph Visualization directive', function() {
       });
 
       it('should get node complete title with its secondary label and' +
-        ' warnings', function() {
+      ' warnings', function() {
         expect($scope.getNodeTitle(nodes.state_1)).toBe(
           'This is a label for node 1 Second label for node 1 ' +
-          '(Warning: this state is unreachable.)');
+        '(Warning: this state is unreachable.)');
         expect($scope.getNodeTitle(nodes.state_3)).toBe(
           'This is a label for node 3 This is a secondary label for ' +
-          'state_3 (Warning: there is no path from this state to the ' +
-          'END state.)');
+        'state_3 (Warning: there is no path from this state to the ' +
+        'END state.)');
       });
 
       it('should get truncated label with truncate filter', function() {
@@ -269,7 +273,7 @@ describe('State Graph Visualization directive', function() {
       });
 
       it('should get node error message from node label when' +
-        ' showTranslationWarnings is true', function() {
+      ' showTranslationWarnings is true', function() {
         var nodeErrorMessage = 'Node 1 error message';
         spyOn(translationStatusService, 'getAllStatesNeedUpdatewarning').and
           .returnValue({
@@ -280,7 +284,7 @@ describe('State Graph Visualization directive', function() {
       });
 
       it('should get node error message from node label when' +
-        ' showTranslationWarnings is false', function() {
+      ' showTranslationWarnings is false', function() {
         $scope.showTranslationWarnings = false;
         var nodeErrorMessage = 'Node 1 error message from exploration warnings';
         spyOn(explorationWarningsService, 'getAllStateRelatedWarnings').and
@@ -313,10 +317,7 @@ describe('State Graph Visualization directive', function() {
       top: 10,
       right: 20
     });
-
-    $rootScope.$broadcast('redrawGraph');
     $flushPendingTasks();
-
     // Spies for d3 library.
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({
@@ -349,7 +350,6 @@ describe('State Graph Visualization directive', function() {
       top: 10,
       right: 30
     });
-    $rootScope.$broadcast('redrawGraph');
     $flushPendingTasks();
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({

@@ -29,6 +29,8 @@ import { StateSolutionService } from
   'components/state-editor/state-editor-properties-services/state-solution.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -42,6 +44,8 @@ import { UserExplorationPermissionsService } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+
+import { Subscription } from 'rxjs';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -78,6 +82,9 @@ describe('Settings Tab Component', function() {
   var windowDimensionsService = null;
   var windowRef = null;
   var routerService = null;
+
+  var testSubscriptipns = null;
+  var refreshGraphSpy = null;
 
   var explorationId = 'exp1';
   var userPermissions = {
@@ -118,6 +125,8 @@ describe('Settings Tab Component', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value(
       'StateInteractionIdService', TestBed.get(StateInteractionIdService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
@@ -182,6 +191,18 @@ describe('Settings Tab Component', function() {
     }));
 
 
+    beforeEach(() => {
+      testSubscriptipns = new Subscription();
+      refreshGraphSpy = jasmine.createSpy('refreshGraph');
+      testSubscriptipns.add(
+        explorationStatesService.onRefreshGraph.subscribe(refreshGraphSpy));
+    });
+
+    afterEach(() => {
+      testSubscriptipns.unsubscribe();
+    });
+
+
     it('should evaluate controller properties after its initialization',
       function() {
         expect(ctrl.isRolesFormOpen).toBe(false);
@@ -202,7 +223,7 @@ describe('Settings Tab Component', function() {
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
         'broadcasted', function() {
-      $rootScope.$broadcast('refreshSettingsTab');
+      routerService.onRefreshSettingsTab.emit();
       $scope.$apply();
 
       expect(ctrl.stateNames).toEqual(['Introduction']);
@@ -282,13 +303,12 @@ describe('Settings Tab Component', function() {
         explorationInitStateNameService.init('Introduction');
         spyOn(explorationStatesService, 'getState').and.returnValue(true);
         spyOn(explorationInitStateNameService, 'saveDisplayedValue');
-        spyOn($rootScope, '$broadcast');
 
         ctrl.saveExplorationInitStateName();
 
         expect(explorationInitStateNameService.saveDisplayedValue)
           .toHaveBeenCalled();
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('refreshGraph');
+        expect(refreshGraphSpy).toHaveBeenCalled();
       });
 
     it('should delete exploration when closing delete exploration modal',
@@ -608,6 +628,18 @@ describe('Settings Tab Component', function() {
       ctrl.$onInit();
       $scope.$apply();
     }));
+
+
+    beforeEach(() => {
+      testSubscriptipns = new Subscription();
+      refreshGraphSpy = jasmine.createSpy('refreshGraph');
+      testSubscriptipns.add(
+        explorationStatesService.onRefreshGraph.subscribe(refreshGraphSpy));
+    });
+
+    afterEach(() => {
+      testSubscriptipns.unsubscribe();
+    });
 
 
     it('should not toggle the preview cards', function() {
