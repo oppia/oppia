@@ -109,22 +109,6 @@ VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
     '%s\\.[A-Za-z0-9-_]{1,%s}' % (
         suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
 
-ERROR_CATEGORY_COUNT_CHECK = 'count check'
-ERROR_CATEGORY_DATETIME_CHECK = 'datetime check'
-ERROR_CATEGORY_EMAIL_CHECK = 'email check'
-ERROR_CATEGORY_ERROR_CHECK = 'error check'
-ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK = 'first published msec check'
-ERROR_CATEGORY_LAST_UPDATED_CHECK = 'last updated check'
-ERROR_CATEGORY_LENGTH_CHECK = 'length check'
-ERROR_CATEGORY_NAME_CHECK = 'name check'
-ERROR_CATEGORY_OUTPUT_CHECK = 'output check'
-ERROR_CATEGORY_RATED_ON_CHECK = 'rated on check'
-ERROR_CATEGORY_RATINGS_CHECK = 'ratings check'
-ERROR_CATEGORY_REFERENCE_CHECK = 'reference check'
-ERROR_CATEGORY_REVIEWER_CHECK = 'reviewer check'
-ERROR_CATEGORY_STATE_NAME_CHECK = 'state name check'
-ERROR_CATEGORY_SUMMARY_CHECK = 'summary check'
-
 
 class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating RoleQueryAuditModels."""
@@ -266,7 +250,7 @@ class ClassifierTrainingJobModelValidator(
                 continue
             if item.state_name not in exp_model.states.keys():
                 cls._add_error(
-                    ERROR_CATEGORY_STATE_NAME_CHECK,
+                    base_model_validators.ERROR_CATEGORY_STATE_NAME_CHECK,
                     'Entity id %s: State name %s in entity is not present '
                     'in states of exploration corresponding to '
                     'exp_id %s' % (
@@ -385,7 +369,7 @@ class TrainingJobExplorationMappingModelValidator(
                 continue
             if item.state_name not in exp_model.states.keys():
                 cls._add_error(
-                    ERROR_CATEGORY_STATE_NAME_CHECK,
+                    base_model_validators.ERROR_CATEGORY_STATE_NAME_CHECK,
                     'Entity id %s: State name %s in entity is not present '
                     'in states of exploration corresponding to '
                     'exp_id %s' % (
@@ -518,7 +502,7 @@ class CollectionRightsModelValidator(base_model_validators.BaseModelValidator):
         current_time_msec = utils.get_current_time_in_millisecs()
         if item.first_published_msec > current_time_msec:
             cls._add_error(
-                ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK,
+                base_model_validators.ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK,
                 'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run'
                 % (item.id, item.first_published_msec))
@@ -650,7 +634,8 @@ class CollectionSummaryModelValidator(
         if sorted(item.contributor_ids) != sorted(
                 contributor_ids_from_contributors_summary):
             cls._add_error(
-                'contributors %s' % ERROR_CATEGORY_SUMMARY_CHECK,
+                'contributors %s' % (
+                    base_model_validators.ERROR_CATEGORY_SUMMARY_CHECK),
                 'Entity id %s: Contributor ids: %s do not match the '
                 'contributor ids obtained using contributors summary: %s' % (
                     item.id, sorted(item.contributor_ids),
@@ -695,7 +680,8 @@ class CollectionSummaryModelValidator(
             nodes = collection_model.collection_contents['nodes']
             if item.node_count != len(nodes):
                 cls._add_error(
-                    'node %s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'node %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: Node count: %s does not match the number of '
                     'nodes in collection_contents dict: %s' % (
                         item.id, item.node_count, nodes))
@@ -709,7 +695,7 @@ class CollectionSummaryModelValidator(
         """
         if item.ratings:
             cls._add_error(
-                ERROR_CATEGORY_RATINGS_CHECK,
+                base_model_validators.ERROR_CATEGORY_RATINGS_CHECK,
                 'Entity id %s: Expected ratings for the entity to be '
                 'empty but received %s' % (item.id, item.ratings))
 
@@ -820,7 +806,8 @@ class ExplorationOpportunitySummaryModelValidator(
                 exploration.get_translation_counts())
             if exploration_translation_counts != item.translation_counts:
                 cls._add_error(
-                    'translation %s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'translation %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: Translation counts: %s does not match the '
                     'translation counts of external exploration model: %s' % (
                         item.id, item.translation_counts,
@@ -867,7 +854,8 @@ class ExplorationOpportunitySummaryModelValidator(
             exploration_content_count = exploration.get_content_count()
             if exploration_content_count != item.content_count:
                 cls._add_error(
-                    'content %s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'content %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: Content count: %s does not match the '
                     'content count of external exploration model: %s' % (
                         item.id, item.content_count, exploration_content_count))
@@ -1008,7 +996,8 @@ class SkillOpportunityModelValidator(
             question_count = len(question_skill_links)
             if question_count != item.question_count:
                 cls._add_error(
-                    'question_%s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'question_%s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: question_count: %s does not match the '
                     'question_count of external skill model: %s' % (
                         item.id, item.question_count, question_count))
@@ -1129,7 +1118,7 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
         current_datetime = datetime.datetime.utcnow()
         if item.sent_datetime > current_datetime:
             cls._add_error(
-                'sent %s' % ERROR_CATEGORY_DATETIME_CHECK,
+                'sent %s' % base_model_validators.ERROR_CATEGORY_DATETIME_CHECK,
                 'Entity id %s: The sent_datetime field has a value %s which is '
                 'greater than the time when the job was run' % (
                     item.id, item.sent_datetime))
@@ -1172,7 +1161,8 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
                 continue
             if sender_model.email != item.sender_email:
                 cls._add_error(
-                    'sender %s' % ERROR_CATEGORY_EMAIL_CHECK,
+                    'sender %s' % (
+                        base_model_validators.ERROR_CATEGORY_EMAIL_CHECK),
                     'Entity id %s: Sender email %s in entity does not '
                     'match with email %s of user obtained through '
                     'sender id %s' % (
@@ -1217,7 +1207,8 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
                 continue
             if recipient_model.email != item.recipient_email:
                 cls._add_error(
-                    'recipient %s' % ERROR_CATEGORY_EMAIL_CHECK,
+                    'recipient %s' % (
+                        base_model_validators.ERROR_CATEGORY_EMAIL_CHECK),
                     'Entity id %s: Recipient email %s in entity does '
                     'not match with email %s of user obtained through '
                     'recipient id %s' % (
@@ -1257,7 +1248,7 @@ class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
         current_datetime = datetime.datetime.utcnow()
         if item.sent_datetime > current_datetime:
             cls._add_error(
-                'sent %s' % ERROR_CATEGORY_DATETIME_CHECK,
+                'sent %s' % base_model_validators.ERROR_CATEGORY_DATETIME_CHECK,
                 'Entity id %s: The sent_datetime field has a value %s which is '
                 'greater than the time when the job was run' % (
                     item.id, item.sent_datetime))
@@ -1300,7 +1291,8 @@ class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
                 continue
             if sender_model.email != item.sender_email:
                 cls._add_error(
-                    'sender %s' % ERROR_CATEGORY_EMAIL_CHECK,
+                    'sender %s' % (
+                        base_model_validators.ERROR_CATEGORY_EMAIL_CHECK),
                     'Entity id %s: Sender email %s in entity does not '
                     'match with email %s of user obtained through '
                     'sender id %s' % (
@@ -1355,7 +1347,8 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
         # email_models.REPLY_TO_ID_LENGTH.
         if len(item.reply_to_id) > email_models.REPLY_TO_ID_LENGTH:
             cls._add_error(
-                'reply_to_id %s' % ERROR_CATEGORY_LENGTH_CHECK,
+                'reply_to_id %s' % (
+                    base_model_validators.ERROR_CATEGORY_LENGTH_CHECK),
                 'Entity id %s: reply_to_id %s should have length less than or '
                 'equal to %s but instead has length %s' % (
                     item.id, item.reply_to_id, email_models.REPLY_TO_ID_LENGTH,
@@ -1489,7 +1482,7 @@ class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
         current_time_msec = utils.get_current_time_in_millisecs()
         if item.first_published_msec > current_time_msec:
             cls._add_error(
-                ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK,
+                base_model_validators.ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK,
                 'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run' % (
                     item.id, item.first_published_msec))
@@ -1619,7 +1612,8 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
         if sorted(item.contributor_ids) != sorted(
                 contributor_ids_from_contributors_summary):
             cls._add_error(
-                'contributors %s' % ERROR_CATEGORY_SUMMARY_CHECK,
+                'contributors %s' % (
+                    base_model_validators.ERROR_CATEGORY_SUMMARY_CHECK),
                 'Entity id %s: Contributor ids: %s do not match the '
                 'contributor ids obtained using contributors summary: %s' % (
                     item.id, sorted(item.contributor_ids),
@@ -1639,7 +1633,7 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
         current_time_msec = utils.get_current_time_in_millisecs()
         if item.first_published_msec > current_time_msec:
             cls._add_error(
-                ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK,
+                base_model_validators.ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK,
                 'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run' % (
                     item.id, item.first_published_msec))
@@ -1686,7 +1680,9 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
                 python_utils.divide(last_human_update_ms, 1000.0))
             if item.exploration_model_last_updated != last_human_update_time:
                 cls._add_error(
-                    'exploration model %s' % ERROR_CATEGORY_LAST_UPDATED_CHECK,
+                    'exploration model %s' % (
+                        base_model_validators.ERROR_CATEGORY_LAST_UPDATED_CHECK
+                    ),
                     'Entity id %s: The exploration_model_last_updated '
                     'field: %s does not match the last time a commit was '
                     'made by a human contributor: %s' % (
@@ -1943,7 +1939,8 @@ class UnsentFeedbackEmailModelValidator(
                     reference['thread_id'], reference['message_id']))
             except Exception:
                 cls._add_error(
-                    'feedback message %s' % ERROR_CATEGORY_REFERENCE_CHECK,
+                    'feedback message %s' % (
+                        base_model_validators.ERROR_CATEGORY_REFERENCE_CHECK),
                     'Entity id %s: Invalid feedback reference: %s' % (
                         item.id, reference))
         return [
@@ -1967,12 +1964,15 @@ class UnsentFeedbackEmailModelValidator(
                 if split_thread_id[0] != reference['entity_type'] or (
                         split_thread_id[1] != reference['entity_id']):
                     cls._add_error(
-                        'feedback message %s' % ERROR_CATEGORY_REFERENCE_CHECK,
+                        'feedback message %s' % (
+                            base_model_validators.ERROR_CATEGORY_REFERENCE_CHECK
+                        ),
                         'Entity id %s: Invalid feedback reference: %s' % (
                             item.id, reference))
             except Exception:
                 cls._add_error(
-                    'feedback message %s' % ERROR_CATEGORY_REFERENCE_CHECK,
+                    'feedback message %s' % (
+                        base_model_validators.ERROR_CATEGORY_REFERENCE_CHECK),
                     'Entity id %s: Invalid feedback reference: %s' % (
                         item.id, reference))
 
@@ -2036,14 +2036,14 @@ class JobModelValidator(base_model_validators.BaseModelValidator):
         if item.error and item.status_code not in [
                 job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
             cls._add_error(
-                ERROR_CATEGORY_ERROR_CHECK,
+                base_model_validators.ERROR_CATEGORY_ERROR_CHECK,
                 'Entity id %s: error: %s for job is not empty but '
                 'job status is %s' % (item.id, item.error, item.status_code))
 
         if not item.error and item.status_code in [
                 job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
             cls._add_error(
-                ERROR_CATEGORY_ERROR_CHECK,
+                base_model_validators.ERROR_CATEGORY_ERROR_CHECK,
                 'Entity id %s: error for job is empty but '
                 'job status is %s' % (item.id, item.status_code))
 
@@ -2057,14 +2057,14 @@ class JobModelValidator(base_model_validators.BaseModelValidator):
         """
         if item.output and item.status_code != job_models.STATUS_CODE_COMPLETED:
             cls._add_error(
-                ERROR_CATEGORY_OUTPUT_CHECK,
+                base_model_validators.ERROR_CATEGORY_OUTPUT_CHECK,
                 'Entity id %s: output: %s for job is not empty but '
                 'job status is %s' % (item.id, item.output, item.status_code))
 
         if item.output is None and (
                 item.status_code == job_models.STATUS_CODE_COMPLETED):
             cls._add_error(
-                ERROR_CATEGORY_OUTPUT_CHECK,
+                base_model_validators.ERROR_CATEGORY_OUTPUT_CHECK,
                 'Entity id %s: output for job is empty but '
                 'job status is %s' % (item.id, item.status_code))
 
@@ -2702,7 +2702,8 @@ class SkillSummaryModelValidator(
                 continue
             if item.misconception_count != len(skill_model.misconceptions):
                 cls._add_error(
-                    'misconception %s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'misconception %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: Misconception count: %s does not match '
                     'the number of misconceptions in skill model: %s' % (
                         item.id, item.misconception_count,
@@ -2747,7 +2748,8 @@ class SkillSummaryModelValidator(
             if item.worked_examples_count != len(
                     skill_model.skill_contents['worked_examples']):
                 cls._add_error(
-                    'worked examples %s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'worked examples %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: Worked examples count: %s does not match '
                     'the number of worked examples in skill_contents '
                     'in skill model: %s' % (
@@ -3083,14 +3085,16 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         if item.final_reviewer_id is None and (
                 item.status != suggestion_models.STATUS_IN_REVIEW):
             cls._add_error(
-                'final %s' % ERROR_CATEGORY_REVIEWER_CHECK,
+                'final %s' % (
+                    base_model_validators.ERROR_CATEGORY_REVIEWER_CHECK),
                 'Entity id %s: Final reviewer id is empty but '
                 'suggestion is %s' % (item.id, item.status))
 
         if item.final_reviewer_id and (
                 item.status == suggestion_models.STATUS_IN_REVIEW):
             cls._add_error(
-                'final %s' % ERROR_CATEGORY_REVIEWER_CHECK,
+                'final %s' % (
+                    base_model_validators.ERROR_CATEGORY_REVIEWER_CHECK),
                 'Entity id %s: Final reviewer id %s is not empty but '
                 'suggestion is in review' % (item.id, item.final_reviewer_id))
 
@@ -3276,7 +3280,7 @@ class TopicModelValidator(base_model_validators.BaseModelValidator):
             for topic_model in topic_models_list if topic_model.id != item.id]
         if topic_model_ids:
             cls._add_error(
-                'unique %s' % ERROR_CATEGORY_NAME_CHECK,
+                'unique %s' % base_model_validators.ERROR_CATEGORY_NAME_CHECK,
                 'Entity id %s: canonical name %s matches with canonical '
                 'name of topic models with ids %s' % (
                     item.id, item.canonical_name, topic_model_ids))
@@ -3292,7 +3296,8 @@ class TopicModelValidator(base_model_validators.BaseModelValidator):
         name = item.name
         if name.lower() != item.canonical_name:
             cls._add_error(
-                'canonical %s' % ERROR_CATEGORY_NAME_CHECK,
+                'canonical %s' % (
+                    base_model_validators.ERROR_CATEGORY_NAME_CHECK),
                 'Entity id %s: Entity name %s in lowercase does not match '
                 'canonical name %s' % (item.id, item.name, item.canonical_name))
 
@@ -3514,7 +3519,8 @@ class TopicSummaryModelValidator(
                 if reference['story_is_published']]
             if item.canonical_story_count != len(pubished_canonical_story_ids):
                 cls._add_error(
-                    'canonical story %s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'canonical story %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: Canonical story count: %s does not '
                     'match the number of story ids in canonical_story_ids in '
                     'topic model: %s' % (
@@ -3565,7 +3571,8 @@ class TopicSummaryModelValidator(
                     item.additional_story_count !=
                     len(published_additional_story_ids)):
                 cls._add_error(
-                    'additional story %s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'additional story %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: Additional story count: %s does not '
                     'match the number of story ids in additional_story_ids in '
                     'topic model: %s' % (
@@ -3611,7 +3618,8 @@ class TopicSummaryModelValidator(
             if item.uncategorized_skill_count != len(
                     topic_model.uncategorized_skill_ids):
                 cls._add_error(
-                    'uncategorized skill %s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'uncategorized skill %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: Uncategorized skill count: %s does not '
                     'match the number of skill ids in '
                     'uncategorized_skill_ids in topic model: %s' % (
@@ -3661,7 +3669,8 @@ class TopicSummaryModelValidator(
             if item.total_skill_count != len(
                     topic_model.uncategorized_skill_ids + subtopic_skill_ids):
                 cls._add_error(
-                    'total skill %s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'total skill %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: Total skill count: %s does not '
                     'match the total number of skill ids in '
                     'uncategorized_skill_ids in topic model: %s and skill_ids '
@@ -3708,7 +3717,8 @@ class TopicSummaryModelValidator(
                 continue
             if item.subtopic_count != len(topic_model.subtopics):
                 cls._add_error(
-                    'subtopic %s' % ERROR_CATEGORY_COUNT_CHECK,
+                    'subtopic %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
                     'Entity id %s: Subtopic count: %s does not '
                     'match the total number of subtopics in topic '
                     'model: %s ' % (
@@ -4118,7 +4128,7 @@ class ExpUserLastPlaythroughModelValidator(
             if item.last_played_state_name not in (
                     exploration_model.states.keys()):
                 cls._add_error(
-                    ERROR_CATEGORY_STATE_NAME_CHECK,
+                    base_model_validators.ERROR_CATEGORY_STATE_NAME_CHECK,
                     'Entity id %s: last played state name %s is not present '
                     'in exploration states %s for exploration id %s' % (
                         item.id, item.last_played_state_name,
@@ -4543,7 +4553,7 @@ class ExplorationUserDataModelValidator(
         """
         if item.rating is not None and (item.rating < 1 or item.rating > 5):
             cls._add_error(
-                ERROR_CATEGORY_RATINGS_CHECK,
+                base_model_validators.ERROR_CATEGORY_RATINGS_CHECK,
                 'Entity id %s: Expected rating to be in range [1, 5], '
                 'received %s' % (item.id, item.rating))
 
@@ -4557,13 +4567,13 @@ class ExplorationUserDataModelValidator(
         """
         if item.rating is not None and not item.rated_on:
             cls._add_error(
-                ERROR_CATEGORY_RATED_ON_CHECK,
+                base_model_validators.ERROR_CATEGORY_RATED_ON_CHECK,
                 'Entity id %s: rating %s exists but rated on is None' % (
                     item.id, item.rating))
         current_time = datetime.datetime.utcnow()
         if item.rated_on is not None and item.rated_on > current_time:
             cls._add_error(
-                ERROR_CATEGORY_RATED_ON_CHECK,
+                base_model_validators.ERROR_CATEGORY_RATED_ON_CHECK,
                 'Entity id %s: rated on %s is greater than the time '
                 'when job was run' % (item.id, item.rated_on))
 
@@ -4577,7 +4587,8 @@ class ExplorationUserDataModelValidator(
         """
         if item.draft_change_list and not item.draft_change_list_last_updated:
             cls._add_error(
-                'draft change list %s' % ERROR_CATEGORY_LAST_UPDATED_CHECK,
+                'draft change list %s' % (
+                    base_model_validators.ERROR_CATEGORY_LAST_UPDATED_CHECK),
                 'Entity id %s: draft change list %s exists but '
                 'draft change list last updated is None' % (
                     item.id, item.draft_change_list))
@@ -4585,7 +4596,8 @@ class ExplorationUserDataModelValidator(
         if item.draft_change_list_last_updated is not None and (
                 item.draft_change_list_last_updated > current_time):
             cls._add_error(
-                'draft change list %s' % ERROR_CATEGORY_LAST_UPDATED_CHECK,
+                'draft change list %s' % (
+                    base_model_validators.ERROR_CATEGORY_LAST_UPDATED_CHECK),
                 'Entity id %s: draft change list last updated %s is '
                 'greater than the time when job was run' % (
                     item.id, item.draft_change_list_last_updated))
@@ -5021,7 +5033,8 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
                 if user_bulk_emails_model is None or (
                         user_bulk_emails_model.deleted):
                     cls._add_error(
-                        'user bulk %s' % ERROR_CATEGORY_EMAIL_CHECK,
+                        'user bulk %s' % (
+                            base_model_validators.ERROR_CATEGORY_EMAIL_CHECK),
                         'Entity id %s: UserBulkEmails model is missing for '
                         'recipient with id %s' % (
                             item.id, recipient_user_ids[index]))
@@ -5494,7 +5507,7 @@ class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
 
             if len(issues) == 0:
                 cls._add_error(
-                    '%s' % ERROR_CATEGORY_REFERENCE_CHECK,
+                    base_model_validators.ERROR_CATEGORY_REFERENCE_CHECK,
                     'Entity id %s: not referenced by any issue of the'
                     ' corresponding exploration (id=%s, version=%s).' % (
                         item.id, exp_id, exp_version)
@@ -5502,7 +5515,7 @@ class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
             elif len(issues) > 1:
                 issue_indices = [index for index, _ in issues]
                 cls._add_error(
-                    '%s' % ERROR_CATEGORY_REFERENCE_CHECK,
+                    base_model_validators.ERROR_CATEGORY_REFERENCE_CHECK,
                     'Entity id %s: referenced by more than one issues of the '
                     'corresponding exploration (id=%s, version=%s), '
                     'issue indices: %s.' % (
@@ -5517,7 +5530,7 @@ class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
                         id_indices.append(id_index)
                 if len(id_indices) > 1:
                     cls._add_error(
-                        '%s' % ERROR_CATEGORY_REFERENCE_CHECK,
+                        base_model_validators.ERROR_CATEGORY_REFERENCE_CHECK,
                         'Entity id %s: referenced multiple times in an '
                         'issue (index=%s) of the corresponding exploration '
                         '(id=%s, version=%s), duplicated id indices: %s.' % (

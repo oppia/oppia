@@ -96,7 +96,7 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
             # Module name for models is of the form:
             # 'core.storgae.<model-type>.gae_models'.
             # Module name for validators is of the form:
-            # 'core.domain.<model-type>'.
+            # 'core.domain.<model-type>_validators'.
             # So, we extract the module name for models to obtain the module
             # name for validators. There is no extra test required to verify
             # that models and validators have names defined based on model-type
@@ -105,7 +105,7 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
             model_module_name = model_instance.__module__
             model_type = model_module_name.split('.')[2]
             validator_module_name = '%s_validators' % model_type
-            # TODO(ankita240796): This try catch is required until all
+            # TODO(#10415): This try catch is required until all
             # the validators are refactored. Remove the try catch block
             # once #10415 is fixed.
             try:

@@ -30,6 +30,7 @@ from core.domain import prod_validation_jobs_one_off
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
 
@@ -55,7 +56,8 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
         collection_services.save_new_collection(self.owner_id, collection)
 
         self.model_instance = (
-            activity_models.ActivityReferencesModel.get_or_create('featured'))
+            activity_models.ActivityReferencesModel.get_or_create(
+                feconf.ACTIVITY_REFERENCE_LIST_FEATURED))
         self.model_instance.activity_references = [{
             'type': constants.ACTIVITY_TYPE_EXPLORATION,
             'id': '1exp',
@@ -80,9 +82,10 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ActivityReferencesModel\', '
-            '[u\'Entity id featured: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
+                feconf.ACTIVITY_REFERENCE_LIST_FEATURED,
                 self.model_instance.created_on, self.model_instance.last_updated
             )]
         self.run_job_and_check_output(
@@ -110,8 +113,9 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [(
             u'[u\'failed validation check for fetch properties of '
             'ActivityReferencesModel\', '
-            '[u"Entity id featured: Entity properties cannot be fetched '
-            'completely with the error u\'id\'"]]')]
+            '[u"Entity id %s: Entity properties cannot be fetched '
+            'completely with the error u\'id\'"]]' % (
+                feconf.ACTIVITY_REFERENCE_LIST_FEATURED))]
 
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -125,8 +129,9 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [(
             u'[u\'failed validation check for domain object check of '
             'ActivityReferencesModel\', '
-            '[u\'Entity id featured: Entity fails domain validation with the '
-            'error Invalid activity type: invalid_type\']]')]
+            '[u\'Entity id %s: Entity fails domain validation with the '
+            'error Invalid activity type: invalid_type\']]' % (
+                feconf.ACTIVITY_REFERENCE_LIST_FEATURED))]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -139,9 +144,9 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [(
             u'[u\'failed validation check for exploration_ids field check of '
             'ActivityReferencesModel\', '
-            '[u"Entity id featured: based on field exploration_ids having '
+            '[u"Entity id %s: based on field exploration_ids having '
             'value 1col, expect model ExplorationModel with id 1col but '
-            'it doesn\'t exist"]]')]
+            'it doesn\'t exist"]]' % feconf.ACTIVITY_REFERENCE_LIST_FEATURED)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

@@ -25,12 +25,8 @@ from core.domain import base_model_validators
 from core.platform import models
 import feconf
 
-ERROR_CATEGORY_PROPERTY_FETCH_CHECK = 'fetch properties'
-
-(
-    collection_models, exp_models,) = (
-        models.Registry.import_models([
-            models.NAMES.collection, models.NAMES.exploration]))
+(collection_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.exploration])
 
 
 class ActivityReferencesModelValidator(
@@ -40,7 +36,7 @@ class ActivityReferencesModelValidator(
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         # Valid id: featured.
-        regex_string = '^(%s)$' % '|'.join(
+        regex_string = '^%s$' % '|'.join(
             feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES)
         return regex_string
 
@@ -55,7 +51,7 @@ class ActivityReferencesModelValidator(
                         reference['type'], reference['id']))
         except Exception as e:
             cls._add_error(
-                ERROR_CATEGORY_PROPERTY_FETCH_CHECK,
+                base_model_validators.ERROR_CATEGORY_PROPERTY_FETCH_CHECK,
                 'Entity id %s: Entity properties cannot be fetched completely '
                 'with the error %s' % (item.id, e))
             return None
@@ -75,10 +71,10 @@ class ActivityReferencesModelValidator(
                     collection_ids.append(reference['id'])
         except Exception as e:
             cls._add_error(
-                ERROR_CATEGORY_PROPERTY_FETCH_CHECK,
+                base_model_validators.ERROR_CATEGORY_PROPERTY_FETCH_CHECK,
                 'Entity id %s: Entity properties cannot be fetched completely '
                 'with the error %s' % (item.id, e))
-            return {}
+            return []
 
         return [
             base_model_validators.ExternalModelFetcherDetails(
