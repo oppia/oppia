@@ -1138,6 +1138,48 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
         return summary_messages
+    
+    def _check_broadcast_usage(self):
+        """This function ensures that there are no uses of $broadcast in the 
+        codebase.
+        """
+        if self.verbose_mode_enabled:
+            python_utils.PRINT(
+                'Starting broadcast checks\n'
+                '----------------------------------------')
+        summary_messages = []
+        broadcast_ignore_pattern = r'$broadcast'
+        stdout = sys.stdout
+        with linter_utils.redirect_stdout(stdout):
+            failed = False
+
+            for file_path in self.all_filepaths:
+                file_content = self.file_cache.read(file_path)
+                for line_number, line in enumerate(file_content.split('\n')):
+                    if re.findall(broadcast_ignore_pattern, line):
+                        failed = True
+                        summary_message = (
+                            '%s --> $broadcast found at line %s. '
+                            'Please use EventEmitters and Subscriptions instead.' % (
+                                file_path, line_number))
+                        python_utils.PRINT(summary_message)
+                        summary_messages.append(summary_message)
+                        python_utils.PRINT('')
+            
+            if failed:
+                summary_message = (
+                    '%s broadcast check failed' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+            else:
+                summary_message = (
+                    '%s broadcast check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+            python_utils.PRINT('')
+
+        return summary_messages
+
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -1162,6 +1204,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
+        broadcast_messages = self._check_broadcast_usage()
         ts_ignore_messages = self._check_ts_ignore()
         ts_expect_error_messages = self._check_ts_expect_error()
         extra_js_files_messages = self._check_extra_js_files()
@@ -1179,7 +1222,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
 
         all_messages = (
-            ts_ignore_messages + ts_expect_error_messages +
+            broadcast_messages + ts_ignore_messages + ts_expect_error_messages +
             extra_js_files_messages + http_requests_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
