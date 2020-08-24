@@ -287,7 +287,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "Username yang mengandung 'admin' telah terpakai.",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "Pastikan username anda tidak mengandung spasi.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Isian ini wajib diisi.",
-	"I18N_SIGNUP_LICENSE_NOTE": "Mohon diperhatikan, dengan menyetujui Ketentuan Penggunaan kami, Anda setuju bahwa segala materi atau kontribusi yang anda lakukan dalam Situs kami akan berada di bawah lisensi CC-BY-SA v.4.0, dengan persyaratan pengabaian atribusi. Mohon tinjau <a href=\"/terms\">Ketentuan Penggunaan</a> kami untuk informasi lebih lanjut mengenai pemberian lisensi tersebut. Untuk informasi lebih lanjut mengenai CC-BY-SA, klik <a ng-click=\"showLicenseExplanationModal()\">di sini</a>.",
+	"I18N_SIGNUP_LICENSE_NOTE": "Mohon diperhatikan, dengan menyetujui Ketentuan Penggunaan kami, Anda setuju bahwa segala materi atau kontribusi yang anda lakukan dalam Situs kami akan berada di bawah lisensi CC-BY-SA v.4.0, dengan persyaratan pengabaian atribusi. Mohon tinjau <a href=\"/terms\">Ketentuan Penggunaan</a> kami untuk informasi lebih lanjut mengenai pemberian lisensi tersebut. Untuk informasi lebih lanjut mengenai CC-BY-SA, klik <a href=\"#\" ng-click=\"$ctrl.showLicenseExplanationModal()\">di sini</a>.",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "Menggunakan lisensi <[licenselink]> membebaskan isi eksplorasi untuk disalin, digunakan kembali, didaur ulang, dan didistribusikan kembali. Persyaratan yang utama adalah jika seseorang mendaur ulang, mengubah, atau menambahi material tersebut, ia juga harus mendistribusikan karyanya di bawah lisensi bebas yang sama.",
 	"I18N_SIGNUP_LOADING": "Memuat",
 	"I18N_SIGNUP_PAGE_TITLE": "Bergabung ke komunitas - Oppia",
