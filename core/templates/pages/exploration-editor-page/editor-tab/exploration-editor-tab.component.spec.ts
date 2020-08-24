@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the component of the 'State Editor'.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
@@ -84,9 +85,12 @@ describe('Exploration editor tab component', function() {
   var hintObjectFactory = null;
   var outcomeObjectFactory = null;
   var routerService = null;
+  var stateEditorRefreshService = null;
   var solutionObjectFactory = null;
   var stateEditorService = null;
   var subtitledHtmlObjectFactory = null;
+
+  var mockRefreshStateEditorEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();
@@ -168,6 +172,12 @@ describe('Exploration editor tab component', function() {
     explorationStatesService = $injector.get('ExplorationStatesService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
     routerService = $injector.get('RouterService');
+    stateEditorRefreshService = $injector.get('StateEditorRefreshService');
+
+    mockRefreshStateEditorEventEmitter = new EventEmitter();
+    spyOnProperty(stateEditorRefreshService,
+      'onRefreshStateEditor').and.returnValue(
+      mockRefreshStateEditorEventEmitter);
 
     explorationStatesService.init({
       'First State': {
@@ -314,6 +324,10 @@ describe('Exploration editor tab component', function() {
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should initialize controller properties after its initialization',
     function() {
@@ -640,7 +654,7 @@ describe('Exploration editor tab component', function() {
     stateEditorService.updateStateResponsesInitialised();
     stateEditorService.updateStateEditorDirectiveInitialised();
 
-    $rootScope.$broadcast('refreshStateEditor');
+    mockRefreshStateEditorEventEmitter.emit();
 
     const stateEditorInitializedSpy = jasmine.createSpy(
       'stateEditorInitialized');
