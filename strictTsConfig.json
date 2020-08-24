@@ -34,5 +34,5 @@
     "core/templates/pages/admin-page/services/admin-router.service.ts",
     "core/templates/pages/admin-page/services/admin-router.service.spec.ts"
   ],
-  "include": ["typings"]
+  "include": ["typings/*.ts"]
 }
