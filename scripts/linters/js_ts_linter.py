@@ -1148,7 +1148,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'Starting broadcast checks\n'
                 '----------------------------------------')
         summary_messages = []
-        broadcast_ignore_pattern = r'$broadcast'
+        broadcast_ignore_pattern = r'\$broadcast'
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             failed = False
@@ -1168,11 +1168,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s broadcast check failed' % (
+                    '%s Broadcast check failed' % (
                         linter_utils.FAILED_MESSAGE_PREFIX))
             else:
                 summary_message = (
-                    '%s broadcast check passed' % (
+                    '%s Broadcast check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
