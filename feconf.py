@@ -478,8 +478,8 @@ ENABLE_RECORDING_OF_SCORES = False
 # No. of pretest questions to display.
 NUM_PRETEST_QUESTIONS = 3
 
-# Whether to automatically accept suggestions after a threshold time.
-ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
+# Maximum allowed commit message length for SnapshotMetadata models.
+MAX_COMMIT_MESSAGE_LENGTH = 1000
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
