@@ -377,7 +377,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "Los usuarios que contienen 'admin' están reservados.",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "Por favor asegúrate de que tu usuario no contenga espacios.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Este campo es obligatorio.",
-	"I18N_SIGNUP_LICENSE_NOTE": "Por favor nota que, al aceptar nuestros Términos de Uso, aceptas que cualquier contenido o contribuciones que hagas a nuestro sitio están y estarán bajo la licencia CC-BY-SA v.4.0, con un requisito de renuncia de atribución. Por favor, revisa nuestros <a href=\"/terms\">Términos de Uso</a> para más información acerca de la licencia. Para más información sobre CC-BY-SA, haz click <a ng-click=\"showLicenseExplanationModal()\">aquí</a>.",
+	"I18N_SIGNUP_LICENSE_NOTE": "Por favor nota que, al aceptar nuestros Términos de Uso, aceptas que cualquier contenido o contribuciones que hagas a nuestro sitio están y estarán bajo la licencia CC-BY-SA v.4.0, con un requisito de renuncia de atribución. Por favor, revisa nuestros <a href=\"/terms\">Términos de Uso</a> para más información acerca de la licencia. Para más información sobre CC-BY-SA, haz click <a href=\"#\" ng-click=\"$ctrl.showLicenseExplanationModal()\">aquí</a>.",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "El uso de una licencia <[licenselink]> permite que el contenido de las exploraciones sea libremente copiado, reusado, mezclado y redistribuido. La condición principal es que si alguien mezcla, transforma o construye algo sobre ese material, debe también distribuirlo bajo la misma licencia libre.",
 	"I18N_SIGNUP_LOADING": "Cargando",
 	"I18N_SIGNUP_PAGE_TITLE": "Únete a la comunidad - Oppia",

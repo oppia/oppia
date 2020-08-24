@@ -272,7 +272,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "Gebruikersnamen met 'admin' zijn gereserveerd.",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "Zorg ervoor dat uw gebruikersnaam geen spaties bevat.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Dit is een verplicht veld.",
-	"I18N_SIGNUP_LICENSE_NOTE": "Houd er rekening mee dat u, door akkoord te gaan met onze Algemene voorwaarden, u ermee akkoord gaat dat enige inhoud of bijdragen die u op onze site toevoegt of maakt zal worden vrijgegeven onder CC BY-SA 4.0, met de eis uw naam te vermelden (BY). Lees onze <a href=\"/terms\">Gebruiksvoorwaarden</a> voor meer informatie over de licentie. U kunt ook <a ng-click=\"showLicenseExplanationModal()\">meer lezen over CC BY-SA</a>.",
+	"I18N_SIGNUP_LICENSE_NOTE": "Houd er rekening mee dat u, door akkoord te gaan met onze Algemene voorwaarden, u ermee akkoord gaat dat enige inhoud of bijdragen die u op onze site toevoegt of maakt zal worden vrijgegeven onder CC BY-SA 4.0, met de eis uw naam te vermelden (BY). Lees onze <a href=\"/terms\">Gebruiksvoorwaarden</a> voor meer informatie over de licentie. U kunt ook <a href=\"#\" ng-click=\"$ctrl.showLicenseExplanationModal()\">meer lezen over CC BY-SA</a>.",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "Met behulp van een <[licenselink]>-licentie kan de inhoud van verkenningen vrijelijk worden gekopieerd, hergebruikt, aangepast en verspreid worden. De belangrijkste voorwaarde is dat als iemand aanpast, transformeert of voortbouwt op het materiaal, zij hun werk ook moeten verspreiden onder dezelfde licentie.",
 	"I18N_SIGNUP_LOADING": "Bezig met laden",
 	"I18N_SIGNUP_PAGE_TITLE": "Word lid van de gemeenschap - Oppia",

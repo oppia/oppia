@@ -290,7 +290,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "Az „admin” szót tartalmazó felhasználónevek nem választhatók.",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "Kérjük, győződj meg, hogy a felhasználónévben nincs szóköz.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Ezt a mezőt kötelező kitölteni.",
-	"I18N_SIGNUP_LICENSE_NOTE": "Kérjük, vedd figyelembe, a felhasználási feltételek elfogadásával hozzájárulsz, hogy bármilyen változtatás, amit az oldalon végzel, CC-BY-SA 4.0 licenc alatt lesz publikálva; ezen kívül lemondasz arról, hogy kötelező legyen megnevezni téged. Kérjük, további információkért olvasd el a <a href=\"/terms\">felhasználási feltételeket</a>. A CC-BY-SA-ról <a ng-click=\"showLicenseExplanationModal()\">itt olvashatsz</a>.",
+	"I18N_SIGNUP_LICENSE_NOTE": "Kérjük, vedd figyelembe, a felhasználási feltételek elfogadásával hozzájárulsz, hogy bármilyen változtatás, amit az oldalon végzel, CC-BY-SA 4.0 licenc alatt lesz publikálva; ezen kívül lemondasz arról, hogy kötelező legyen megnevezni téged. Kérjük, további információkért olvasd el a <a href=\"/terms\">felhasználási feltételeket</a>. A CC-BY-SA-ról <a href=\"#\" ng-click=\"$ctrl.showLicenseExplanationModal()\">itt olvashatsz</a>.",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "A <[licenselink]> licenc lehetőséget ad a felfedezések tartalmának szabad másolásához, újrafelhasználásához, módosításához, és megosztásához. Az alap feltétel az, hogyha valaki módosítja, átalakítja vagy ráépít a tartalomra, ugyanezzel a szabad licencszel kell közzétennie.",
 	"I18N_SIGNUP_LOADING": "Betöltés",
 	"I18N_SIGNUP_PAGE_TITLE": "Csatlakozz a közösséghez – Oppia",

@@ -318,7 +318,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "「admin」と付くユーザー名は使えません",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "ユーザー名にスペースを入れることはできません。",
 	"I18N_SIGNUP_FIELD_REQUIRED": "このフィールドは必須です。",
-	"I18N_SIGNUP_LICENSE_NOTE": "利用規約に同意することで、あなたが当サイトで作成するコンテンツまたは行う貢献は、表示（BY）要件を放棄したCC-BY-SA v.4.0でライセンスされることに同意するという点にご注意ください。このライセンス許諾に関する詳細は、当サイトの<a href=\"/terms\">利用規約</a>をお読みください。CC-BY-SAについては<a ng-click=\"showLicenseExplanationModal()\">こちら</a>をクリックしてください。",
+	"I18N_SIGNUP_LICENSE_NOTE": "利用規約に同意することで、あなたが当サイトで作成するコンテンツまたは行う貢献は、表示（BY）要件を放棄したCC-BY-SA v.4.0でライセンスされることに同意するという点にご注意ください。このライセンス許諾に関する詳細は、当サイトの<a href=\"/terms\">利用規約</a>をお読みください。CC-BY-SAについては<a href=\"#\" ng-click=\"$ctrl.showLicenseExplanationModal()\">こちら</a>をクリックしてください。",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "<[licenselink]>ライセンスによって、探検コンテンツは自由に複製、再利用、リミックス、および再配布できます。主な条件は、誰かが当該資料をリミックス、改変、または別の作品のベースにした場合、その人も自分の作品を同じく自由なライセンスで配布しなければならない点です。",
 	"I18N_SIGNUP_LOADING": "読み込み中",
 	"I18N_SIGNUP_PAGE_TITLE": "コミュニティーに参加 - Oppia",
