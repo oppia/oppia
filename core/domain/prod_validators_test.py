@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core.domain.prod_validation_jobs_one_off."""
+"""Unit tests for core.domain.prod_validators."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -27,7 +27,6 @@ import time
 import types
 
 from constants import constants
-from core import jobs_registry
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
@@ -39,6 +38,7 @@ from core.domain import html_validation_service
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
+from core.domain import prod_validators
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rating_services
@@ -64,9 +64,6 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.api import datastore_types
-from google.appengine.ext import db
-
 gae_search_services = models.Registry.import_search_services()
 
 USER_EMAIL = 'useremail@example.com'
@@ -74,7 +71,7 @@ USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
-    activity_models, audit_models, base_models,
+    audit_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
@@ -83,7 +80,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     story_models, suggestion_models, topic_models,
     user_models,) = (
         models.Registry.import_models([
-            models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
+            models.NAMES.audit,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
@@ -92,324 +89,8 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.statistics, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 
-OriginalDatetimeType = datetime.datetime
 
-
-class PatchedDatetimeType(type):
-    """Validates the datetime instances."""
-
-    def __instancecheck__(cls, other):
-        """Validates whether the given instance is a datatime instance.
-
-        Args:
-            other: *. The instance to check.
-
-        Returns:
-            bool. Whether or not the instance is an OriginalDateTimeType.
-        """
-        return isinstance(other, OriginalDatetimeType)
-
-
-class MockDatetime13Hours( # pylint: disable=inherit-non-class
-        python_utils.with_metaclass(PatchedDatetimeType, datetime.datetime)):
-    @classmethod
-    def utcnow(cls):
-        """Returns the current date and time 13 hours behind UTC.
-
-        Returns:
-            datetime. A datetime that is 13 hours behind the current time.
-        """
-        return CURRENT_DATETIME - datetime.timedelta(hours=13)
-
-
-def run_job_and_check_output(
-        self, expected_output, sort=False, literal_eval=False):
-    """Helper function to run job and compare output.
-
-    Args:
-        expected_output: list(*). The expected result of the job.
-        sort: bool. Whether to sort the outputs before comparison.
-        literal_eval: bool. Whether to use ast.literal_eval before comparison.
-    """
-    job_id = self.job_class.create_new()
-    self.assertEqual(
-        self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-    self.job_class.enqueue(job_id)
-    self.assertEqual(
-        self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-    self.process_and_flush_pending_tasks()
-    actual_output = self.job_class.get_output(job_id)
-    if literal_eval:
-        actual_output_dict = {}
-        expected_output_dict = {}
-
-        for item in [ast.literal_eval(value) for value in actual_output]:
-            value = item[1]
-            if isinstance(value, list):
-                value = sorted(value)
-            actual_output_dict[item[0]] = value
-
-        for item in [ast.literal_eval(value) for value in expected_output]:
-            value = item[1]
-            if isinstance(value, list):
-                value = sorted(value)
-            expected_output_dict[item[0]] = value
-        self.assertEqual(
-            sorted(actual_output_dict.keys()),
-            sorted(expected_output_dict.keys()))
-        for key in actual_output_dict:
-            self.assertEqual(actual_output_dict[key], expected_output_dict[key])
-    elif sort:
-        self.assertEqual(sorted(actual_output), sorted(expected_output))
-    else:
-        self.assertEqual(actual_output, expected_output)
-
-
-def update_datastore_types_for_mock_datetime():
-    """Updates datastore types for MockDatetime13Hours to ensure that validation
-    of ndb datetime properties does not fail.
-    """
-
-    datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime13Hours] = (  # pylint: disable=protected-access
-        datastore_types.ValidatePropertyNothing)
-    datastore_types._PACK_PROPERTY_VALUES[MockDatetime13Hours] = (  # pylint: disable=protected-access
-        datastore_types.PackDatetime)
-    datastore_types._PROPERTY_MEANINGS[MockDatetime13Hours] = (  # pylint: disable=protected-access
-        datastore_types.entity_pb.Property.GD_WHEN)
-
-
-class MockModel(base_models.BaseModel):
-    pass
-
-
-class MockSnapshotModel(base_models.BaseModel):
-    commit_type = 'edit'
-    commit_cmds = []
-
-
-class MockBaseModelValidator(prod_validation_jobs_one_off.BaseModelValidator):
-    pass
-
-
-class MockSummaryModelValidator(
-        prod_validation_jobs_one_off.BaseSummaryModelValidator):
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return []
-
-
-class MockSnapshotContentModelValidator(
-        prod_validation_jobs_one_off.BaseSnapshotContentModelValidator):
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return []
-
-
-class MockSnapshotMetadataModelValidator(
-        prod_validation_jobs_one_off.BaseSnapshotMetadataModelValidator):
-
-    EXTERNAL_MODEL_NAME = 'external model'
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            prod_validation_jobs_one_off.ExternalModelFetcherDetails(
-                'external_model_ids', MockModel, [])]
-
-
-class MockBaseUserModelValidator(
-        prod_validation_jobs_one_off.BaseUserModelValidator):
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return []
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_common_properties_do_not_match]
-
-    @classmethod
-    def _get_external_instance_custom_validation_functions(cls):
-        return [
-            cls._validate_explorations_are_public,
-            cls._validate_collections_are_public
-        ]
-
-
-class BaseValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(BaseValidatorTests, self).setUp()
-        self.item = MockModel(id='mockmodel')
-        self.item.put()
-
-    def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            r'The _get_external_id_relationships\(\) method is missing from the'
-            ' derived class. It should be implemented in the derived class.'):
-            MockBaseModelValidator().validate(self.item)
-
-    def test_error_is_get_external_model_properties_is_undefined(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            r'The _get_external_model_properties\(\) method is missing from the'
-            ' derived class. It should be implemented in the derived class.'):
-            MockSummaryModelValidator().validate(self.item)
-
-    def test_error_is_raised_if_external_model_name_is_undefined(self):
-        with self.assertRaisesRegexp(
-            Exception, 'External model name should be specified'):
-            MockSnapshotContentModelValidator().validate(self.item)
-
-    def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            r'The _get_change_domain_class\(\) method is missing from the '
-            'derived class. It should be implemented in the derived class.'):
-            snapshot_model = MockSnapshotModel(id='mockmodel')
-            snapshot_model.put()
-            MockSnapshotMetadataModelValidator().validate(snapshot_model)
-
-    def test_error_is_raised_if_entity_classes_to_map_over_is_undefined(self):
-        job_class = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            r'The entity_classes_to_map_over\(\) method is missing from the '
-            'derived class. It should be implemented in the derived class.'):
-            with self.swap(jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
-                job_id = job_class.create_new()
-                job_class.enqueue(job_id)
-
-    def test_no_error_is_raised_for_base_user_model(self):
-        user = MockModel(id='12345')
-        user.put()
-        MockBaseUserModelValidator().validate(user)
-
-
-class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(ActivityReferencesModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            '1exp', title='title', category='category')
-
-        exp_services.save_new_exploration(self.owner_id, exploration)
-
-        collection = collection_domain.Collection.create_default_collection(
-            '1col', title='title', category='category')
-
-        collection_services.save_new_collection(self.owner_id, collection)
-
-        self.model_instance = (
-            activity_models.ActivityReferencesModel.get_or_create('featured'))
-        self.model_instance.activity_references = [{
-            'type': constants.ACTIVITY_TYPE_EXPLORATION,
-            'id': '1exp',
-        }, {
-            'type': constants.ACTIVITY_TYPE_COLLECTION,
-            'id': '1col',
-        }]
-        self.model_instance.put()
-
-        self.job_class = (
-            prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob)
-
-    def test_standard_model(self):
-        expected_output = [u'[u\'fully-validated ActivityReferencesModel\', 1]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of ActivityReferencesModel\', '
-            '[u\'Entity id featured: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance.created_on, self.model_instance.last_updated
-            )]
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ActivityReferencesModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
-
-    def test_model_with_missing_id_in_activity_references(self):
-        self.model_instance.activity_references = [{
-            'type': 'exploration',
-        }]
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for fetch properties of '
-            'ActivityReferencesModel\', '
-            '[u"Entity id featured: Entity properties cannot be fetched '
-            'completely with the error u\'id\'"]]')]
-
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_type_in_activity_references(self):
-        self.model_instance.activity_references = [{
-            'type': 'invalid_type',
-            'id': '0'
-        }]
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for domain object check of '
-            'ActivityReferencesModel\', '
-            '[u\'Entity id featured: Entity fails domain validation with the '
-            'error Invalid activity type: invalid_type\']]')]
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_invalid_id_in_activity_references(self):
-        self.model_instance.activity_references = [{
-            'type': 'exploration',
-            'id': '1col'
-        }]
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for exploration_ids field check of '
-            'ActivityReferencesModel\', '
-            '[u"Entity id featured: based on field exploration_ids having '
-            'value 1col, expect model ExplorationModel with id 1col but '
-            'it doesn\'t exist"]]')]
-        run_job_and_check_output(self, expected_output)
-
-    def test_mock_model_with_invalid_id(self):
-        model_instance_with_invalid_id = (
-            activity_models.ActivityReferencesModel(id='invalid'))
-        model_instance_with_invalid_id.put()
-        expected_output = [(
-            u'[u\'fully-validated ActivityReferencesModel\', 1]'
-        ), (
-            u'[u\'failed validation check for model id check of '
-            'ActivityReferencesModel\', '
-            '[u\'Entity id invalid: Entity id does not match regex pattern\']]'
-        )]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
+class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(RoleQueryAuditModelValidatorTests, self).setUp()
@@ -436,7 +117,8 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
 
     def test_standard_model(self):
         expected_output = [u'[u\'fully-validated RoleQueryAuditModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -451,7 +133,8 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -461,10 +144,11 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_model_with_non_existent_user_id(self):
         user_models.UserSettingsModel.get(self.admin_id).delete()
@@ -476,7 +160,8 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.admin_id, self.admin_id)]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_invalid_id = '%s.%s.%s.%s' % (
@@ -493,10 +178,11 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
             'RoleQueryAuditModel\', '
             '[u\'Entity id %s: Entity id does not match regex pattern\']]'
         ) % model_invalid_id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
+class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UsernameChangeAuditModelValidatorTests, self).setUp()
@@ -523,7 +209,8 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_model(self):
         expected_output = [
             u'[u\'fully-validated UsernameChangeAuditModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -538,7 +225,8 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -548,10 +236,11 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_model_with_non_existent_user_id(self):
         user_models.UserSettingsModel.get(self.admin_id).delete()
@@ -563,7 +252,8 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.admin_id, self.admin_id)]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_invalid_id = (
@@ -579,10 +269,11 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
             'UsernameChangeAuditModel\', '
             '[u\'Entity id %s: Entity id does not match regex pattern\']]'
         ) % model_invalid_id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
+class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ClassifierTrainingJobModelValidatorTests, self).setUp()
@@ -629,7 +320,8 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ClassifierTrainingJobModel\', 2]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -645,7 +337,8 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -656,10 +349,11 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -672,7 +366,8 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
                 '0, expect model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance_0.id,
             u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_exp_version(self):
         self.model_instance_0.exp_version = 5
@@ -685,7 +380,8 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
                 'version 1 of exploration corresponding to exp_id 0\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_state_name(self):
         self.model_instance_0.state_name = 'invalid'
@@ -698,7 +394,8 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
                 'states of exploration corresponding to exp_id 0\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_schema(self):
         self.model_instance_0.interaction_id = 'invalid'
@@ -711,11 +408,12 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
                 'interaction id: invalid\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class TrainingJobExplorationMappingModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TrainingJobExplorationMappingModelValidatorTests, self).setUp()
@@ -750,7 +448,8 @@ class TrainingJobExplorationMappingModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -766,7 +465,8 @@ class TrainingJobExplorationMappingModelValidatorTests(
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -777,10 +477,11 @@ class TrainingJobExplorationMappingModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -793,7 +494,8 @@ class TrainingJobExplorationMappingModelValidatorTests(
                 '0, expect model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance_0.id,
             u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_exp_version(self):
         model_instance_with_invalid_exp_version = (
@@ -809,7 +511,8 @@ class TrainingJobExplorationMappingModelValidatorTests(
                 'version 1 of exploration corresponding to exp_id 0\']]'
             ) % model_instance_with_invalid_exp_version.id,
             u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_state_name(self):
         model_instance_with_invalid_state_name = (
@@ -825,10 +528,11 @@ class TrainingJobExplorationMappingModelValidatorTests(
                 'states of exploration corresponding to exp_id 0\']]'
             ) % model_instance_with_invalid_state_name.id,
             u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class CollectionModelValidatorTests(test_utils.GenericTestBase):
+class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionModelValidatorTests, self).setUp()
@@ -878,7 +582,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             u'[u\'fully-validated CollectionModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -897,7 +602,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance_0.last_updated
                 ),
             u'[u\'fully-validated CollectionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -909,10 +615,11 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_collection_schema(self):
         expected_output = [
@@ -926,7 +633,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
         with self.swap(
             constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
-            run_job_and_check_output(self, expected_output, sort=True)
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('1').delete(
@@ -940,7 +648,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
                 'with id 1 but it doesn\'t exist"]]'
             ),
             u'[u\'fully-validated CollectionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_commit_log_entry_model_failure(self):
         collection_services.update_collection(
@@ -962,7 +671,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
                 'collection-0-1, expect model CollectionCommitLogEntryModel '
                 'with id collection-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
         collection_models.CollectionSummaryModel.get_by_id('0').delete()
@@ -975,7 +685,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
                 'having value 0, expect model CollectionSummaryModel with '
                 'id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_rights_model_failure(self):
         collection_models.CollectionRightsModel.get_by_id(
@@ -989,7 +700,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model CollectionRightsModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         collection_models.CollectionSnapshotMetadataModel.get_by_id(
@@ -1002,7 +714,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model CollectionSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         collection_models.CollectionSnapshotContentModel.get_by_id(
@@ -1015,11 +728,12 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model CollectionSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class CollectionSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionSnapshotMetadataModelValidatorTests, self).setUp()
@@ -1079,7 +793,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
             }], 'Changes.')
         expected_output = [
             u'[u\'fully-validated CollectionSnapshotMetadataModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -1097,7 +812,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'CollectionSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -1109,10 +825,11 @@ class CollectionSnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('0').delete(
@@ -1129,7 +846,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'CollectionSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -1143,7 +861,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
                 'CollectionSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_collection_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -1161,7 +880,8 @@ class CollectionSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated CollectionSnapshotMetadataModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -1191,10 +911,12 @@ class CollectionSnapshotMetadataModelValidatorTests(
                 'with error: The following required attributes are '
                 'missing: exploration_id"]]'
             ), u'[u\'fully-validated CollectionSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class CollectionSnapshotContentModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionSnapshotContentModelValidatorTests, self).setUp()
@@ -1246,7 +968,8 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             }], 'Changes.')
         expected_output = [
             u'[u\'fully-validated CollectionSnapshotContentModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -1264,7 +987,8 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'CollectionSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -1276,10 +1000,11 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('0').delete(
@@ -1296,7 +1021,8 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'CollectionSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_collection_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -1314,10 +1040,11 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated CollectionSnapshotContentModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
+class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionRightsModelValidatorTests, self).setUp()
@@ -1379,7 +1106,8 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.owner, '0')
         expected_output = [
             u'[u\'fully-validated CollectionRightsModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -1396,7 +1124,8 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated CollectionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -1408,10 +1137,11 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_first_published_datetime_greater_than_current_time(
             self):
@@ -1429,7 +1159,8 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
                 'run\']]'
             ) % (self.model_instance_0.first_published_msec),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('0').delete(
@@ -1442,7 +1173,8 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model CollectionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_collection(
@@ -1456,7 +1188,8 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_editor_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
@@ -1469,7 +1202,8 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_viewer_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
@@ -1482,7 +1216,8 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
@@ -1497,7 +1232,8 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
                 'with id 0-1 but it doesn\'t exist"]]'
             ),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         collection_models.CollectionRightsSnapshotContentModel.get_by_id(
@@ -1510,11 +1246,12 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model CollectionRightsSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class CollectionRightsSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionRightsSnapshotMetadataModelValidatorTests, self).setUp(
@@ -1569,7 +1306,8 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -1587,7 +1325,8 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'CollectionRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -1599,10 +1338,11 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_rights_model_failure(self):
         collection_models.CollectionRightsModel.get_by_id('0').delete(
@@ -1619,7 +1359,8 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'CollectionRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -1633,7 +1374,8 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
                 'CollectionRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_collection_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -1651,7 +1393,8 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'CollectionRightsSnapshotMetadataModel\', 3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -1684,11 +1427,12 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'CollectionRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class CollectionRightsSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionRightsSnapshotContentModelValidatorTests, self).setUp(
@@ -1736,7 +1480,8 @@ class CollectionRightsSnapshotContentModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated CollectionRightsSnapshotContentModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -1754,7 +1499,8 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'CollectionRightsSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -1766,10 +1512,11 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionRightsModel.get_by_id('0').delete(
@@ -1786,7 +1533,8 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'CollectionRightsSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_collection_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -1804,10 +1552,11 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated CollectionRightsSnapshotContentModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class CollectionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionCommitLogEntryModelValidatorTests, self).setUp()
@@ -1873,7 +1622,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             }], 'Changes.')
         expected_output = [
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 5]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -1889,7 +1639,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -1902,10 +1653,11 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('0').delete(
@@ -1920,8 +1672,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'on field collection_ids having value 0, expect model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, literal_eval=True)
 
     def test_missing_collection_rights_model_failure(self):
         collection_models.CollectionRightsModel.get_by_id('1').delete(
@@ -1934,8 +1686,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'collection_rights_ids having value 1, expect model '
                 'CollectionRightsModel with id 1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
-        run_job_and_check_output(
-            self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True)
 
     def test_invalid_collection_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -1953,7 +1705,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
@@ -1978,7 +1731,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'No commit command domain object defined for entity with '
                 'commands: [{}]\']]'),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
@@ -1990,7 +1744,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id collection-0-1: Commit type invalid is '
                 'not allowed\']]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
@@ -2002,7 +1757,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id collection-0-1: Post commit status invalid '
                 'is invalid\']]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_true_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = (
@@ -2018,7 +1774,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '%s but post_commit_is_private is True\']]'
             ) % (self.model_instance_0.id, feconf.POST_COMMIT_STATUS_PUBLIC),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_false_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = (
@@ -2034,7 +1791,8 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '%s but post_commit_is_private is False\']]'
             ) % (self.model_instance_0.id, feconf.POST_COMMIT_STATUS_PRIVATE),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -2063,10 +1821,11 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'failed with error: The following required attributes '
                 'are missing: exploration_id"]]'),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
+class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionSummaryModelValidatorTests, self).setUp()
@@ -2148,7 +1907,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             }], 'Changes.')
         expected_output = [
             u'[u\'fully-validated CollectionSummaryModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -2164,7 +1924,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         collection_services.delete_collection(self.owner_id, '1')
@@ -2176,10 +1937,11 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
         collection_model = collection_models.CollectionModel.get_by_id('0')
@@ -2195,7 +1957,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model CollectionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_collection(
@@ -2209,7 +1972,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_editor_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
@@ -2222,7 +1986,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_viewer_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
@@ -2235,7 +2000,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_contributor_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.contributor_id).delete()
@@ -2248,7 +2014,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]') % (
                     self.contributor_id, self.contributor_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_contributors_summary(self):
         sorted_contributor_ids = sorted(
@@ -2264,7 +2031,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'contributors summary: [u\'invalid\']"]]'
             ) % (sorted_contributor_ids[0], sorted_contributor_ids[1]),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_node_count(self):
         self.model_instance_0.node_count = 10
@@ -2277,7 +2045,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'of nodes in collection_contents dict: [{u\'exploration_id\': '
                 'u\'0\'}, {u\'exploration_id\': u\'1\'}]"]]'
             ), u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_ratings(self):
         self.model_instance_0.ratings = {'1': 0, '2': 1}
@@ -2290,7 +2059,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             '[u"Entity id 0: Expected ratings for the entity to be empty '
             'but received {u\'1\': 0, u\'2\': 1}"]]'
         ), u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_collection_related_property(self):
         self.model_instance_0.title = 'invalid'
@@ -2303,7 +2073,8 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'match corresponding collection title field: New title\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_collection_rights_related_property(self):
         self.model_instance_0.status = 'public'
@@ -2317,11 +2088,12 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'private\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class ExplorationOpportunitySummaryModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationOpportunitySummaryModelValidatorTests, self).setUp()
@@ -2394,7 +2166,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_1.created_on = (
@@ -2410,7 +2183,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 self.model_instance_1.created_on,
                 self.model_instance_1.last_updated
             ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -2427,11 +2201,11 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             self.model_instance_2.id, self.model_instance_2.last_updated,
             self.model_instance_3.id, self.model_instance_3.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(
-                self, expected_output, sort=True, literal_eval=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=True)
 
     def test_missing_story_model_failure(self):
         story_model = story_models.StoryModel.get_by_id(self.STORY_ID)
@@ -2448,8 +2222,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 'u"Entity id 3: based on field story_ids having value story, '
                 'expect model StoryModel with id story but it doesn\'t exist"]]'
             )]
-        run_job_and_check_output(
-            self, expected_output, sort=True, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=True)
 
     def test_missing_topic_model_failure(self):
         topic_model = topic_models.TopicModel.get_by_id(self.TOPIC_ID)
@@ -2466,8 +2240,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 'u"Entity id 3: based on field topic_ids having value topic, '
                 'expect model TopicModel with id topic but it doesn\'t exist"]]'
             )]
-        run_job_and_check_output(
-            self, expected_output, sort=True, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=True)
 
     def test_missing_exp_model_failure(self):
         exp_model = exp_models.ExplorationModel.get_by_id('1')
@@ -2481,7 +2255,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             'doesn\'t exist"]]'), (
                 u'[u\'fully-validated ExplorationOpportunitySummaryModel\','
                 ' 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_content_count(self):
         self.model_instance_1.content_count = 10
@@ -2493,8 +2268,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 '[u"Entity id 1: Content count: 10 does not match the '
                 'content count of external exploration model: 1"]]'
             ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        run_job_and_check_output(
-            self, expected_output, sort=True, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=True)
 
     def test_model_with_invalid_translation_counts(self):
         self.model_instance_1.translation_counts = {'hi': 0}
@@ -2507,8 +2282,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 'match the translation counts of external exploration model: '
                 '{}"]]'
             ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        run_job_and_check_output(
-            self, expected_output, sort=True, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=True)
 
     def test_model_with_invalid_chapter_title(self):
         self.model_instance_1.chapter_title = 'Invalid title'
@@ -2520,8 +2295,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 '[u"Entity id 1: Chapter title: Invalid title does not match '
                 'the chapter title of external story model: Node 1"]]'
             ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        run_job_and_check_output(
-            self, expected_output, sort=True, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=True)
 
     def test_model_with_invalid_topic_related_property(self):
         self.model_instance_1.topic_name = 'invalid'
@@ -2534,7 +2309,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 'not match corresponding topic name field: topic\']]'
             ) % self.model_instance_1.id,
             u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_story_related_property(self):
         self.model_instance_1.story_title = 'invalid'
@@ -2547,10 +2323,11 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 'not match corresponding story title field: A story\']]'
             ) % self.model_instance_1.id,
             u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
+class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillOpportunityModelValidatorTests, self).setUp()
@@ -2590,7 +2367,8 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated SkillOpportunityModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -2607,11 +2385,11 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
             self.model_instance_1.id, self.model_instance_1.last_updated,
             self.model_instance_2.id, self.model_instance_2.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(
-                self, expected_output, sort=True, literal_eval=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=True)
 
     def test_missing_skill_model_failure(self):
         skill_model = skill_models.SkillModel.get_by_id('0')
@@ -2626,7 +2404,8 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
                 'doesn\'t exist"]]'
             ),
             u'[u\'fully-validated SkillOpportunityModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_skill_description(self):
         self.model_instance_0.skill_description = 'invalid'
@@ -2641,7 +2420,8 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
                 'description 0\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated SkillOpportunityModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_question_count(self):
         self.model_instance_0.question_count = 10
@@ -2655,7 +2435,8 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
                 'question_count of external skill model: 1\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated SkillOpportunityModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_question_count_schema(self):
         self.model_instance_0.question_count = -1
@@ -2675,10 +2456,11 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id 0: question_count: -1 does not match the '
                 'question_count of external skill model: 1\']]'
             ), u'[u\'fully-validated SkillOpportunityModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
+class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ConfigPropertyModelValidatorTests, self).setUp()
@@ -2698,7 +2480,8 @@ class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ConfigPropertyModel\', 2]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -2716,7 +2499,8 @@ class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance.last_updated
                 ),
             u'[u\'fully-validated ConfigPropertyModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.csrf_model_instance.delete(self.admin_id, '', [{}])
@@ -2727,10 +2511,11 @@ class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
@@ -2745,7 +2530,8 @@ class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
                 'ConfigPropertySnapshotMetadataModel '
                 'with id config_model-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ConfigPropertyModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         config_models.ConfigPropertySnapshotContentModel.get_by_id(
@@ -2760,11 +2546,12 @@ class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
                 'ConfigPropertySnapshotContentModel '
                 'with id config_model-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ConfigPropertyModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class ConfigPropertySnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ConfigPropertySnapshotMetadataModelValidatorTests, self).setUp()
@@ -2795,7 +2582,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
         self.config_model.commit(self.admin_id, [])
         expected_output = [
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -2812,7 +2600,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                     self.model_instance.created_on,
                     self.model_instance.last_updated),
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.csrf_model_instance.delete()
@@ -2823,10 +2612,11 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_config_property_model_failure(self):
         self.config_model.delete(self.admin_id, '', [])
@@ -2844,7 +2634,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 'exist"]]'
             ),
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
@@ -2857,7 +2648,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 'but it doesn\'t exist"]]'
             ) % (self.admin_id, self.admin_id),
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_config_property_model_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -2876,7 +2668,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 'snapshot metadata model id\']]'
             ),
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance.commit_cmds = [{
@@ -2897,11 +2690,12 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 'new_value, The following extra attributes are present: '
                 'invalid_attribute"]]'
             ), u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class ConfigPropertySnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ConfigPropertySnapshotContentModelValidatorTests, self).setUp()
@@ -2932,7 +2726,8 @@ class ConfigPropertySnapshotContentModelValidatorTests(
         self.config_model.commit(self.admin_id, [])
         expected_output = [
             u'[u\'fully-validated ConfigPropertySnapshotContentModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -2950,7 +2745,8 @@ class ConfigPropertySnapshotContentModelValidatorTests(
                     self.model_instance.last_updated
                 ),
             u'[u\'fully-validated ConfigPropertySnapshotContentModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.csrf_model_instance.delete()
@@ -2961,10 +2757,11 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_config_property_model_failure(self):
         self.config_model.delete(self.admin_id, '', [])
@@ -2982,7 +2779,8 @@ class ConfigPropertySnapshotContentModelValidatorTests(
                 'doesn\'t exist"]]'
             ),
             u'[u\'fully-validated ConfigPropertySnapshotContentModel\', 1]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_invalid_config_property_model_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -3000,10 +2798,11 @@ class ConfigPropertySnapshotContentModelValidatorTests(
                 'content model id\']]'
             ),
             u'[u\'fully-validated ConfigPropertySnapshotContentModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class SentEmailModelValidatorTests(test_utils.GenericTestBase):
+class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SentEmailModelValidatorTests, self).setUp()
@@ -3045,7 +2844,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
 
     def test_standard_model(self):
         expected_output = [u'[u\'fully-validated SentEmailModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -3060,7 +2860,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance.sent_datetime = (
@@ -3073,10 +2874,11 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_model_with_non_existent_sender_id(self):
         self.sender_model.delete()
@@ -3088,7 +2890,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.sender_id, self.sender_id)]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_non_existent_recipient_id(self):
         self.recipient_model.delete()
@@ -3100,7 +2903,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.recipient_id, self.recipient_id)]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_sender_email(self):
         self.sender_model.email = 'invalid@email.com'
@@ -3112,7 +2916,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
             'email %s of user obtained through sender id %s\']]') % (
                 self.model_instance.id, self.model_instance.sender_email,
                 self.sender_model.email, self.model_instance.sender_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_recipient_email(self):
         self.recipient_model.email = 'invalid@email.com'
@@ -3124,7 +2929,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
             'with email %s of user obtained through recipient id %s\']]') % (
                 self.model_instance.id, self.model_instance.recipient_email,
                 self.recipient_model.email, self.model_instance.recipient_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_sent_datetime_greater_than_current_time(self):
         self.model_instance.sent_datetime = (
@@ -3136,7 +2942,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
             '[u\'Entity id %s: The sent_datetime field has a value %s '
             'which is greater than the time when the job was run\']]') % (
                 self.model_instance.id, self.model_instance.sent_datetime)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_instance_with_invalid_id = email_models.SentEmailModel(
@@ -3153,10 +2960,11 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
             'SentEmailModel\', '
             '[u\'Entity id %s: Entity id does not match regex pattern\']]'
         ) % 'invalid']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
+class BulkEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(BulkEmailModelValidatorTests, self).setUp()
@@ -3194,7 +3002,8 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
 
     def test_standard_model(self):
         expected_output = [u'[u\'fully-validated BulkEmailModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -3209,7 +3018,8 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance.sent_datetime = (
@@ -3222,10 +3032,11 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_model_with_non_existent_sender_id(self):
         self.sender_model.delete()
@@ -3237,7 +3048,8 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.sender_id, self.sender_id)]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_non_existent_recipient_id(self):
         self.recipient_model_1.delete()
@@ -3250,7 +3062,8 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.recipient_ids[0],
                 self.recipient_ids[0])]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_sender_email(self):
         self.sender_model.email = 'invalid@email.com'
@@ -3262,7 +3075,8 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
             'email %s of user obtained through sender id %s\']]') % (
                 self.model_instance.id, self.model_instance.sender_email,
                 self.sender_model.email, self.model_instance.sender_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_sent_datetime_greater_than_current_time(self):
         self.model_instance.sent_datetime = (
@@ -3274,7 +3088,8 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
             '[u\'Entity id %s: The sent_datetime field has a value %s '
             'which is greater than the time when the job was run\']]') % (
                 self.model_instance.id, self.model_instance.sent_datetime)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_instance_with_invalid_id = email_models.BulkEmailModel(
@@ -3291,11 +3106,12 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
             'BulkEmailModel\', '
             '[u\'Entity id %s: Entity id does not match regex pattern\']]'
         ) % model_instance_with_invalid_id.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class GeneralFeedbackEmailReplyToIdModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(GeneralFeedbackEmailReplyToIdModelValidatorTests, self).setUp()
@@ -3318,7 +3134,8 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
     def test_standard_model(self):
         expected_output = [(
             u'[u\'fully-validated GeneralFeedbackEmailReplyToIdModel\', 1]')]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -3333,7 +3150,8 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -3343,10 +3161,11 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_model_with_non_existent_user_id(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -3358,7 +3177,8 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.user_id, self.user_id)]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_non_existent_thread_id(self):
         feedback_models.GeneralFeedbackThreadModel.get_by_id(
@@ -3371,7 +3191,8 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.thread_id, self.thread_id)]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_reply_to_id(self):
         while len(
@@ -3389,10 +3210,11 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
             self.model_instance.id, self.model_instance.reply_to_id,
             email_models.REPLY_TO_ID_LENGTH,
             len(self.model_instance.reply_to_id))]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class ExplorationModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationModelValidatorTests, self).setUp()
@@ -3429,7 +3251,8 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             u'[u\'fully-validated ExplorationModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -3446,7 +3269,8 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated ExplorationModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -3458,10 +3282,11 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_exploration_schema(self):
         expected_output = [
@@ -3475,7 +3300,8 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
         with self.swap(
             constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
-            run_job_and_check_output(self, expected_output, sort=True)
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_commit_log_entry_model_failure(self):
         exp_services.update_exploration(
@@ -3497,7 +3323,8 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 'exploration-0-1, expect model ExplorationCommitLogEntryModel '
                 'with id exploration-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
         exp_models.ExpSummaryModel.get_by_id('0').delete()
@@ -3510,7 +3337,8 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model ExpSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_rights_model_failure(self):
         exp_models.ExplorationRightsModel.get_by_id(
@@ -3524,7 +3352,8 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 'having value 0, expect model ExplorationRightsModel '
                 'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         exp_models.ExplorationSnapshotMetadataModel.get_by_id(
@@ -3537,7 +3366,8 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model ExplorationSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         exp_models.ExplorationSnapshotContentModel.get_by_id(
@@ -3550,11 +3380,12 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model ExplorationSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class ExplorationSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationSnapshotMetadataModelValidatorTests, self).setUp()
@@ -3599,7 +3430,8 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -3617,7 +3449,8 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'ExplorationSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -3629,10 +3462,11 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -3649,8 +3483,8 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'ExplorationSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -3664,7 +3498,8 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
                 'ExplorationSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_exploration_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -3682,7 +3517,8 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated ExplorationSnapshotMetadataModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -3712,10 +3548,12 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 'failed with error: The following required attributes '
                 'are missing: state_name"]]'
             ), u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationSnapshotContentModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationSnapshotContentModelValidatorTests, self).setUp()
@@ -3755,7 +3593,8 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated ExplorationSnapshotContentModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -3773,7 +3612,8 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'ExplorationSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -3785,10 +3625,11 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(self.owner_id, '', [])
@@ -3804,7 +3645,8 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'ExplorationSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_exploration_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -3822,10 +3664,11 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated ExplorationSnapshotContentModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationRightsModelValidatorTests, self).setUp()
@@ -3872,7 +3715,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, '0')
         expected_output = [
             u'[u\'fully-validated ExplorationRightsModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -3889,7 +3733,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated ExplorationRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -3901,10 +3746,11 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_first_published_datetime_greater_than_current_time(
             self):
@@ -3922,7 +3768,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 'run\']]'
             ) % (self.model_instance_0.first_published_msec),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -3935,7 +3782,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model ExplorationModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_cloned_from_exploration_model_failure(self):
         self.model_instance_0.cloned_from = 'invalid'
@@ -3949,7 +3797,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 'having value invalid, expect model ExplorationModel with id '
                 'invalid but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
@@ -3963,7 +3812,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_editor_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
@@ -3976,7 +3826,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_viewer_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
@@ -3989,7 +3840,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
@@ -4004,7 +3856,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 'with id 0-1 but it doesn\'t exist"]]'
             ),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
@@ -4017,11 +3870,12 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model ExplorationRightsSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class ExplorationRightsSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationRightsSnapshotMetadataModelValidatorTests, self).setUp(
@@ -4061,7 +3915,8 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ExplorationRightsSnapshotMetadataModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -4079,7 +3934,8 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'ExplorationRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -4091,10 +3947,11 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_rights_model_failure(self):
         exp_models.ExplorationRightsModel.get_by_id('0').delete(
@@ -4111,7 +3968,8 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'ExplorationRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -4125,7 +3983,8 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
                 'ExplorationRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_exploration_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -4143,7 +4002,8 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'ExplorationRightsSnapshotMetadataModel\', 3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -4176,11 +4036,12 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'ExplorationRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class ExplorationRightsSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationRightsSnapshotContentModelValidatorTests, self).setUp(
@@ -4215,7 +4076,8 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ExplorationRightsSnapshotContentModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -4233,7 +4095,8 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'ExplorationRightsSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -4245,10 +4108,11 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationRightsModel.get_by_id('0').delete(
@@ -4265,7 +4129,8 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'ExplorationRightsSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_exploration_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -4283,10 +4148,12 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated ExplorationRightsSnapshotContentModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationCommitLogEntryModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationCommitLogEntryModelValidatorTests, self).setUp()
@@ -4340,7 +4207,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 5]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -4356,7 +4224,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -4369,10 +4238,11 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -4388,7 +4258,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'on field exploration_ids having value 0, expect model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_rights_model_failure(self):
         exp_models.ExplorationRightsModel.get_by_id('1').delete(
@@ -4401,8 +4272,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'exploration_rights_ids having value 1, expect model '
                 'ExplorationRightsModel with id 1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
-        run_job_and_check_output(
-            self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True)
 
     def test_invalid_exploration_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -4420,7 +4291,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
@@ -4445,7 +4317,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'No commit command domain object defined for entity with '
                 'commands: [{}]\']]'),
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
@@ -4457,7 +4330,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id exploration-0-1: Commit type invalid is '
                 'not allowed\']]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
@@ -4469,7 +4343,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id exploration-0-1: Post commit status invalid '
                 'is invalid\']]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_true_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'public'
@@ -4484,7 +4359,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'public but post_commit_is_private is True\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_false_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'private'
@@ -4499,7 +4375,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'private but post_commit_is_private is False\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -4530,10 +4407,11 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'failed with error: The following required attributes '
                 'are missing: state_name"]]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
+class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExpSummaryModelValidatorTests, self).setUp()
@@ -4601,7 +4479,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated ExpSummaryModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -4617,7 +4496,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         exp_models.ExplorationModel.get_by_id('1').delete(
@@ -4633,10 +4513,11 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_first_published_datetime_greater_than_current_time(
             self):
@@ -4659,7 +4540,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'job was run\']]'
             ) % (self.model_instance_0.first_published_msec),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -4672,7 +4554,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model ExplorationModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
@@ -4686,7 +4569,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_editor_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
@@ -4699,7 +4583,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_viewer_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
@@ -4712,7 +4597,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_contributor_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.contributor_id).delete()
@@ -4725,7 +4611,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]') % (
                     self.contributor_id, self.contributor_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_exploration_model_last_updated(self):
         last_human_update_time = (
@@ -4745,7 +4632,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.exploration_model_last_updated,
                 last_human_update_time),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_schema(self):
         self.model_instance_0.ratings = {'10': 4, '5': 15}
@@ -4758,7 +4646,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'the error Expected ratings to have keys: 1, 2, 3, 4, 5, '
                 'received 10, 5\']]'
             ), u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_contributors_summary(self):
         sorted_contributor_ids = sorted(
@@ -4775,7 +4664,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                     sorted_contributor_ids[0], sorted_contributor_ids[1]
                 ),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_exploration_related_property(self):
         self.model_instance_0.title = 'invalid'
@@ -4788,7 +4678,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'match corresponding exploration title field: New title\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_exploration_rights_related_property(self):
         self.model_instance_0.status = 'public'
@@ -4802,10 +4693,11 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'private\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
+class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(GeneralFeedbackThreadModelValidatorTests, self).setUp()
@@ -4856,7 +4748,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralFeedbackThreadModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -4872,7 +4765,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -4881,10 +4775,11 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -4896,7 +4791,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '0, expect model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_suggestion_model_failure(self):
         suggestion_models.GeneralSuggestionModel.get_by_id(
@@ -4909,7 +4805,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
                 'value %s, expect model GeneralSuggestionModel with id %s '
                 'but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_author_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
@@ -4921,7 +4818,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel with id %s but it doesn\'t '
                 'exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_message_model_failure(self):
         feedback_models.GeneralFeedbackMessageModel.get_by_id(
@@ -4934,7 +4832,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
                 '%s.0, expect model GeneralFeedbackMessageModel with '
                 'id %s.0 but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_has_suggestion(self):
         self.model_instance.has_suggestion = False
@@ -4946,7 +4845,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
                 'has suggestion for entity is false but a suggestion exists '
                 'with id same as entity id\']]'
             ) % self.model_instance.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_entity_type(self):
         expected_output = [
@@ -4956,11 +4856,12 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
                 'type exploration is not allowed\']]'
             ) % self.model_instance.id]
         with self.swap(
-            prod_validation_jobs_one_off, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
-            run_job_and_check_output(self, expected_output, sort=True)
+            prod_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
 
-class GeneralFeedbackMessageModelValidatorTests(test_utils.GenericTestBase):
+class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(GeneralFeedbackMessageModelValidatorTests, self).setUp()
@@ -4990,7 +4891,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralFeedbackMessageModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -5006,7 +4908,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -5016,10 +4919,11 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_author_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
@@ -5031,7 +4935,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel with id %s but it doesn\'t '
                 'exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_feedback_thread_model_failure(self):
         feedback_models.GeneralFeedbackThreadModel.get_by_id(
@@ -5044,7 +4949,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.GenericTestBase):
                 'value %s, expect model GeneralFeedbackThreadModel with '
                 'id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_message_id(self):
         self.model_instance.message_id = 2
@@ -5061,10 +4967,12 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.GenericTestBase):
                 'of GeneralFeedbackMessageModel\', [u\'Entity id %s: '
                 'Entity id does not match regex pattern\']]'
             ) % self.model_instance.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class GeneralFeedbackThreadUserModelValidatorTests(test_utils.GenericTestBase):
+class GeneralFeedbackThreadUserModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(GeneralFeedbackThreadUserModelValidatorTests, self).setUp()
@@ -5094,7 +5002,8 @@ class GeneralFeedbackThreadUserModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralFeedbackThreadUserModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -5110,7 +5019,8 @@ class GeneralFeedbackThreadUserModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -5120,10 +5030,11 @@ class GeneralFeedbackThreadUserModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
@@ -5135,7 +5046,8 @@ class GeneralFeedbackThreadUserModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel with id %s but it doesn\'t '
                 'exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_message_model_failure(self):
         feedback_models.GeneralFeedbackMessageModel.get_by_id(
@@ -5148,10 +5060,11 @@ class GeneralFeedbackThreadUserModelValidatorTests(test_utils.GenericTestBase):
                 'value %s.0, expect model GeneralFeedbackMessageModel with '
                 'id %s.0 but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class FeedbackAnalyticsModelValidatorTests(test_utils.GenericTestBase):
+class FeedbackAnalyticsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(FeedbackAnalyticsModelValidatorTests, self).setUp()
@@ -5175,7 +5088,8 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated FeedbackAnalyticsModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -5191,7 +5105,8 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -5201,10 +5116,11 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -5216,10 +5132,11 @@ class FeedbackAnalyticsModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '0, expect model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
+class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UnsentFeedbackEmailModelValidatorTests, self).setUp()
@@ -5256,7 +5173,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UnsentFeedbackEmailModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -5272,7 +5190,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -5282,10 +5201,11 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
@@ -5297,7 +5217,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel with id %s but it doesn\'t '
                 'exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_message_model_failure(self):
         feedback_models.GeneralFeedbackMessageModel.get_by_id(
@@ -5310,7 +5231,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
                 '%s.0, expect model GeneralFeedbackMessageModel with '
                 'id %s.0 but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_message_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('message_id')
@@ -5323,7 +5245,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
                 '{u\'thread_id\': u\'%s\', u\'entity_id\': u\'0\', '
                 'u\'entity_type\': u\'exploration\'}"]]'
             ) % (self.model_instance.id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_thread_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('thread_id')
@@ -5336,7 +5259,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
                 '{u\'entity_id\': u\'0\', u\'message_id\': 0, '
                 'u\'entity_type\': u\'exploration\'}"]]'
             ) % self.model_instance.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_entity_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('entity_id')
@@ -5349,7 +5273,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
                 'u\'%s\', u\'message_id\': 0, u\'entity_type\': '
                 'u\'exploration\'}"]]'
             ) % (self.model_instance.id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_entity_type_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0].pop('entity_type')
@@ -5363,7 +5288,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
                 'u\'message_id\': 0}"]]'
             ) % (self.model_instance.id, self.thread_id)]
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_entity_type_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0]['entity_type'] = (
@@ -5377,7 +5303,8 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
                 'u\'%s\', u\'entity_id\': u\'0\', u\'message_id\': 0, '
                 'u\'entity_type\': u\'invalid\'}"]]'
             ) % (self.model_instance.id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_entity_id_in_feedback_reference(self):
         self.model_instance.feedback_message_references[0]['entity_id'] = (
@@ -5391,10 +5318,11 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
                 'u\'%s\', u\'entity_id\': u\'invalid\', u\'message_id\': 0, '
                 'u\'entity_type\': u\'exploration\'}"]]'
             ) % (self.model_instance.id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class JobModelValidatorTests(test_utils.GenericTestBase):
+class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(JobModelValidatorTests, self).setUp()
@@ -5414,7 +5342,8 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated JobModel\', 2]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -5430,7 +5359,8 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.created_on,
                 self.model_instance.last_updated
             ), u'[u\'fully-validated JobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [
@@ -5443,10 +5373,11 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance.id, self.model_instance.last_updated),
             u'[u\'fully-validated JobModel\', 1]']
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_invalid_empty_error(self):
         self.model_instance.status_code = job_models.STATUS_CODE_FAILED
@@ -5458,7 +5389,8 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
                 'error for job is empty but job status is %s\']]'
             ) % (self.model_instance.id, self.model_instance.status_code),
             u'[u\'fully-validated JobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_non_empty_error(self):
         self.model_instance.error = 'invalid'
@@ -5470,7 +5402,8 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
                 'error: invalid for job is not empty but job status is %s\']]'
             ) % (self.model_instance.id, self.model_instance.status_code),
             u'[u\'fully-validated JobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_empty_output(self):
         self.model_instance.status_code = job_models.STATUS_CODE_COMPLETED
@@ -5482,7 +5415,8 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
                 'output for job is empty but job status is %s\']]'
             ) % (self.model_instance.id, self.model_instance.status_code),
             u'[u\'fully-validated JobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_non_empty_output(self):
         self.model_instance.output = 'invalid'
@@ -5494,7 +5428,8 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
                 'output: invalid for job is not empty but job status is %s\']]'
             ) % (self.model_instance.id, self.model_instance.status_code),
             u'[u\'fully-validated JobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_time_queued_msec(self):
         self.model_instance.time_queued_msec = 15
@@ -5506,7 +5441,8 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
                 'time queued 15.0 is greater than time started 10.0\']]'
             ) % self.model_instance.id,
             u'[u\'fully-validated JobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_time_started_msec(self):
         self.model_instance.time_started_msec = 25
@@ -5518,7 +5454,8 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
                 'time started 25.0 is greater than time finished 20.0\']]'
             ) % self.model_instance.id,
             u'[u\'fully-validated JobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_time_finished_msec(self):
         current_time_msec = utils.get_current_time_in_millisecs()
@@ -5533,10 +5470,11 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id,
                 self.model_instance.time_finished_msec),
             u'[u\'fully-validated JobModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
+class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ContinuousComputationModelValidatorTests, self).setUp()
@@ -5554,7 +5492,8 @@ class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ContinuousComputationModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -5570,7 +5509,8 @@ class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -5580,10 +5520,11 @@ class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_invalid_last_started_msec(self):
         self.model_instance.last_started_msec = 25
@@ -5595,7 +5536,8 @@ class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
                 'last started 25.0 is greater than both last finished 20.0 '
                 'and last stopped 10.0\']]'
             ) % self.model_instance.id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_last_stopped_msec(self):
         current_time_msec = utils.get_current_time_in_millisecs()
@@ -5607,7 +5549,8 @@ class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
                 'of ContinuousComputationModel\', [u\'Entity id %s: '
                 'last stopped %s is greater than the current time\']]'
             ) % (self.model_instance.id, self.model_instance.last_stopped_msec)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_last_finished_msec(self):
         current_time_msec = utils.get_current_time_in_millisecs()
@@ -5621,7 +5564,8 @@ class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
             ) % (
                 self.model_instance.id,
                 self.model_instance.last_finished_msec)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = job_models.ContinuousComputationModel(
@@ -5636,10 +5580,11 @@ class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id invalid: Entity id does not match '
                 'regex pattern\']]'
             ), u'[u\'fully-validated ContinuousComputationModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class QuestionModelValidatorTests(test_utils.GenericTestBase):
+class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionModelValidatorTests, self).setUp()
@@ -5692,7 +5637,8 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             u'[u\'fully-validated QuestionModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -5711,7 +5657,8 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance_0.last_updated
                 ),
             u'[u\'fully-validated QuestionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -5723,10 +5670,11 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_question_schema(self):
         expected_output = [
@@ -5740,7 +5688,8 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
         with self.swap(
             constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
-            run_job_and_check_output(self, expected_output, sort=True)
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_linked_skill_model_failure(self):
         skill_models.SkillModel.get_by_id('1').delete(
@@ -5753,7 +5702,8 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
                 'having value 1, expect model SkillModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_commit_log_entry_model_failure(self):
         question_services.update_question(
@@ -5776,7 +5726,8 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
                 'question-0-1, expect model QuestionCommitLogEntryModel '
                 'with id question-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
         question_models.QuestionSummaryModel.get_by_id('0').delete()
@@ -5789,7 +5740,8 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model QuestionSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         question_models.QuestionSnapshotMetadataModel.get_by_id(
@@ -5802,7 +5754,8 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model QuestionSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         question_models.QuestionSnapshotContentModel.get_by_id(
@@ -5815,10 +5768,11 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model QuestionSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
+class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionSkillLinkModelValidatorTests, self).setUp()
@@ -5872,7 +5826,8 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated QuestionSkillLinkModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -5890,7 +5845,8 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance_0.last_updated
                 ),
             u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -5902,10 +5858,11 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
         skill_models.SkillModel.get_by_id('2').delete(
@@ -5918,7 +5875,8 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
                 'having value 2, expect model SkillModel with id 2 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_model_failure(self):
         question_models.QuestionModel.get_by_id('0').delete(
@@ -5931,7 +5889,8 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
                 'question_ids having value 0, expect model QuestionModel '
                 'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_id_failure(self):
         model_with_invalid_id = question_models.QuestionSkillLinkModel(
@@ -5943,10 +5902,11 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
                 'QuestionSkillLinkModel\', [u\'Entity id 0:1: Entity id '
                 'does not match regex pattern\']]'
             ), u'[u\'fully-validated QuestionSkillLinkModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationContextModelValidatorTests, self).setUp()
@@ -5989,7 +5949,8 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ExplorationContextModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -6007,7 +5968,8 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance_0.last_updated
                 ),
             u'[u\'fully-validated ExplorationContextModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -6019,10 +5981,11 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
         story_models.StoryModel.get_by_id('1').delete(
@@ -6035,7 +5998,8 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
                 'having value 1, expect model StoryModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationContextModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_exp_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
@@ -6048,11 +6012,12 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
                 'exp_ids having value 2, expect model ExplorationModel '
                 'with id 2 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationContextModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class ExplorationMathRichTextInfoModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationMathRichTextInfoModelValidatorTests, self).setUp()
@@ -6112,7 +6077,8 @@ class ExplorationMathRichTextInfoModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_latex_strings_not_matching_exploration(self):
         self.model_instance_2 = (
@@ -6131,7 +6097,8 @@ class ExplorationMathRichTextInfoModelValidatorTests(
                     self.model_instance_2.id,
                 ),
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_estimated_svg_size_not_matching_exploration(self):
         self.model_instance_2.estimated_max_size_of_images_in_bytes = (
@@ -6146,7 +6113,8 @@ class ExplorationMathRichTextInfoModelValidatorTests(
                     self.model_instance_2.id,
                 ),
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_wrong_status_of_image_generation_requirement(self):
         exploration = (
@@ -6191,7 +6159,8 @@ class ExplorationMathRichTextInfoModelValidatorTests(
             html_validation_service,
             'get_latex_strings_without_svg_from_html',
             lambda html: ['+,+,+,+']):
-            run_job_and_check_output(self, expected_output, sort=True)
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -6209,7 +6178,8 @@ class ExplorationMathRichTextInfoModelValidatorTests(
                     self.model_instance_0.last_updated
                 ),
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -6221,10 +6191,11 @@ class ExplorationMathRichTextInfoModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exp_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
@@ -6238,7 +6209,8 @@ class ExplorationMathRichTextInfoModelValidatorTests(
                 'exploration_ids having value 2, expect model ExplorationModel '
                 'with id 2 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_standard_operation_when_latex_strings_have_unicode(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -6268,11 +6240,12 @@ class ExplorationMathRichTextInfoModelValidatorTests(
         model_instance.put()
         expected_output = [
             u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
 class QuestionSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionSnapshotMetadataModelValidatorTests, self).setUp()
@@ -6338,7 +6311,8 @@ class QuestionSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated QuestionSnapshotMetadataModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -6356,7 +6330,8 @@ class QuestionSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'QuestionSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -6368,10 +6343,11 @@ class QuestionSnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_model_failure(self):
         question_models.QuestionModel.get_by_id('0').delete(
@@ -6388,8 +6364,8 @@ class QuestionSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'QuestionSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -6403,7 +6379,8 @@ class QuestionSnapshotMetadataModelValidatorTests(
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
                 'QuestionSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_question_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -6421,7 +6398,8 @@ class QuestionSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated QuestionSnapshotMetadataModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -6452,10 +6430,11 @@ class QuestionSnapshotMetadataModelValidatorTests(
                 'failed with error: The following required attributes '
                 'are missing: new_value, old_value, property_name"]]'
             ), u'[u\'fully-validated QuestionSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class QuestionSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionSnapshotContentModelValidatorTests, self).setUp()
@@ -6514,7 +6493,8 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated QuestionSnapshotContentModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -6532,7 +6512,8 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'QuestionSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -6544,10 +6525,11 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_model_failure(self):
         question_models.QuestionModel.get_by_id('0').delete(
@@ -6564,7 +6546,8 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'QuestionSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_question_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -6582,10 +6565,11 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated QuestionSnapshotContentModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionCommitLogEntryModelValidatorTests, self).setUp()
@@ -6644,7 +6628,8 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated QuestionCommitLogEntryModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -6660,7 +6645,8 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -6672,10 +6658,11 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_model_failure(self):
         question_models.QuestionModel.get_by_id('0').delete(
@@ -6690,7 +6677,8 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'based on field question_ids having value 0, expect '
                 'model QuestionModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_invalid_question_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -6708,7 +6696,8 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated QuestionCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
@@ -6733,7 +6722,8 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'No commit command domain object defined for entity with '
                 'commands: [{}]\']]'),
             u'[u\'fully-validated QuestionCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
@@ -6745,7 +6735,8 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id question-0-1: Commit type invalid is '
                 'not allowed\']]'
             ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
@@ -6757,7 +6748,8 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id question-0-1: Post commit status invalid '
                 'is invalid\']]'
             ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_private_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'private'
@@ -6769,7 +6761,8 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id question-0-1: Post commit status private '
                 'is invalid\']]'
             ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -6801,10 +6794,11 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'are missing: new_value, old_value, property_name"]]'
             ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
+class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(QuestionSummaryModelValidatorTests, self).setUp()
@@ -6862,7 +6856,8 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated QuestionSummaryModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -6878,7 +6873,8 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated QuestionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         question_services.delete_question(self.owner_id, '1')
@@ -6890,10 +6886,11 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_question_model_failure(self):
         question_model = question_models.QuestionModel.get_by_id('0')
@@ -6909,7 +6906,8 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model QuestionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_question_content(self):
         self.model_instance_0.question_content = '<p>invalid</p>'
@@ -6921,7 +6919,8 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'content: <p>invalid</p> does not match content html '
                 'in question state data in question model: <p>Test</p>\']]'
             ), u'[u\'fully-validated QuestionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_question_related_property(self):
         mock_time = datetime.datetime.utcnow() - datetime.timedelta(
@@ -6938,10 +6937,12 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'created_on field: %s\']]'
             ) % (self.model_instance_0.id, mock_time, actual_time),
             u'[u\'fully-validated QuestionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationRecommendationsModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationRecommendationsModelValidatorTests, self).setUp()
@@ -6975,7 +6976,8 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_model(self):
         expected_output = [(
             u'[u\'fully-validated ExplorationRecommendationsModel\', 2]')]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -6991,7 +6993,8 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance_0.id, self.model_instance_0.created_on,
                     self.model_instance_0.last_updated),
             u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -7002,10 +7005,11 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_model_with_missing_recommended_exploration(self):
         exp_models.ExplorationModel.get_by_id('3').delete(
@@ -7020,7 +7024,8 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
             ),
             u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_id_in_recommended_ids(self):
         self.model_instance_0.recommended_exploration_ids = ['0', '4']
@@ -7034,10 +7039,11 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
                 'exploration ids for entity\']]'
             ),
             u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
+class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicSimilaritiesModelValidatorTests, self).setUp()
@@ -7060,7 +7066,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_model(self):
         expected_output = [(
             u'[u\'fully-validated TopicSimilaritiesModel\', 1]')]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -7075,7 +7082,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
                 '%s of last_updated field\']]') % (
                     self.model_instance.id, self.model_instance.created_on,
                     self.model_instance.last_updated)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -7085,10 +7093,11 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = recommendations_models.TopicSimilaritiesModel(
@@ -7104,7 +7113,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             ),
             u'[u\'fully-validated TopicSimilaritiesModel\', 1]']
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_topic_similarities_columns(self):
         content = {
@@ -7123,7 +7133,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             'similarities columns: 1 does not match length of '
             'topic list: 2."]]')]
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_topic(self):
         content = {
@@ -7141,7 +7152,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             'u\'invalid\': {u\'Art\': u\'0.5\', u\'invalid\': u\'1.0\'}} '
             'fails with error: Topic invalid not in list of known topics."]]')]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_topic_similarities_rows(self):
         content = {
@@ -7158,7 +7170,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             'error: Length of topic similarities rows: 2 does not match '
             'length of topic list: 1."]]')]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_similarity_type(self):
         content = {
@@ -7177,7 +7190,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             'fails with error: Expected similarity to be a float, '
             'received one"]]')]
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_similarity_value(self):
         content = {
@@ -7196,7 +7210,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             'fails with error: Expected similarity to be between '
             '0.0 and 1.0, received 10.0"]]')]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_assymetric_content(self):
         content = {
@@ -7214,10 +7229,11 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             'u\'Art\': {u\'Biology\': 0.5, u\'Art\': 1.0}} fails with error: '
             'Expected topic similarities to be symmetric."]]')]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class SkillModelValidatorTests(test_utils.GenericTestBase):
+class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillModelValidatorTests, self).setUp()
@@ -7305,7 +7321,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             u'[u\'fully-validated SkillModel\', 5]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -7324,7 +7341,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance_0.last_updated
                 ),
             u'[u\'fully-validated SkillModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_0.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -7338,10 +7356,11 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_2.id, self.model_instance_2.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_skill_schema(self):
         expected_output = [
@@ -7355,7 +7374,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
         with self.swap(
             constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
-            run_job_and_check_output(self, expected_output, sort=True)
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_all_questions_merged(self):
         question_models.QuestionSkillLinkModel(
@@ -7369,7 +7389,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 'following question ids are still linked to the skill: '
                 '[u\'question1\']"]]'
             ), u'[u\'fully-validated SkillModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_superseding_skill_model_failure(self):
         self.superseding_skill_0.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
@@ -7381,7 +7402,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 'having value 3, expect model SkillModel with id 3 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated SkillModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_commit_log_entry_model_failure(self):
         skill_services.update_skill(
@@ -7404,7 +7426,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 'skill-0-1, expect model SkillCommitLogEntryModel '
                 'with id skill-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SkillModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
         skill_models.SkillSummaryModel.get_by_id('0').delete()
@@ -7417,7 +7440,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model SkillSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated SkillModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         skill_models.SkillSnapshotMetadataModel.get_by_id(
@@ -7430,7 +7454,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model SkillSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SkillModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         skill_models.SkillSnapshotContentModel.get_by_id(
@@ -7443,11 +7468,12 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model SkillSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SkillModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class SkillSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillSnapshotMetadataModelValidatorTests, self).setUp()
@@ -7535,7 +7561,8 @@ class SkillSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotMetadataModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -7553,7 +7580,8 @@ class SkillSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'SkillSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -7565,10 +7593,11 @@ class SkillSnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
         skill_models.SkillModel.get_by_id('0').delete(
@@ -7585,8 +7614,8 @@ class SkillSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'SkillSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -7600,7 +7629,8 @@ class SkillSnapshotMetadataModelValidatorTests(
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
                 'SkillSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_skill_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -7618,7 +7648,8 @@ class SkillSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated SkillSnapshotMetadataModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -7648,10 +7679,11 @@ class SkillSnapshotMetadataModelValidatorTests(
                 'failed with error: The following required attributes '
                 'are missing: new_misconception_dict"]]'
             ), u'[u\'fully-validated SkillSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillSnapshotContentModelValidatorTests, self).setUp()
@@ -7733,7 +7765,8 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotContentModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -7751,7 +7784,8 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'SkillSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -7763,10 +7797,11 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
         skill_models.SkillModel.get_by_id('0').delete(self.owner_id, '', [])
@@ -7782,7 +7817,8 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'SkillSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_skill_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -7800,10 +7836,11 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated SkillSnapshotContentModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillCommitLogEntryModelValidatorTests, self).setUp()
@@ -7884,7 +7921,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -7900,7 +7938,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -7913,10 +7952,11 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
         skill_models.SkillModel.get_by_id('0').delete(
@@ -7931,7 +7971,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'based on field skill_ids having value 0, expect '
                 'model SkillModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_invalid_skill_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -7949,7 +7990,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated SkillCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
@@ -7974,7 +8016,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'No commit command domain object defined for entity with '
                 'commands: [{}]\']]'),
             u'[u\'fully-validated SkillCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
@@ -7986,7 +8029,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id skill-0-1: Commit type invalid is '
                 'not allowed\']]'
             ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
@@ -7998,7 +8042,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id skill-0-1: Post commit status invalid '
                 'is invalid\']]'
             ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_private_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'private'
@@ -8010,7 +8055,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id skill-0-1: Post commit status private '
                 'is invalid\']]'
             ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -8040,10 +8086,11 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'invalid_attribute"]]'
             ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
+class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SkillSummaryModelValidatorTests, self).setUp()
@@ -8118,7 +8165,8 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSummaryModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -8134,7 +8182,8 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated SkillSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         skill_services.delete_skill(self.owner_id, '1')
@@ -8146,10 +8195,11 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
         skill_model = skill_models.SkillModel.get_by_id('0')
@@ -8165,7 +8215,8 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model SkillModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated SkillSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_misconception_count(self):
         self.model_instance_0.misconception_count = 10
@@ -8180,7 +8231,8 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'u\'notes\': u\'<p>notes</p>\', u\'name\': u\'name\', '
                 'u\'feedback\': u\'<p>default_feedback</p>\'}]"]]'
             ), u'[u\'fully-validated SkillSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_worked_examples_count(self):
         self.model_instance_0.worked_examples_count = 10
@@ -8196,7 +8248,8 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 '{u\'content_id\': u\'2\', u\'html\': u\'<p>Example Question '
                 '1</p>\'}}]"]]'
             ), u'[u\'fully-validated SkillSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_skill_related_property(self):
         self.model_instance_0.description = 'invalid'
@@ -8210,10 +8263,11 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'description 0\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated SkillSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class StoryModelValidatorTests(test_utils.GenericTestBase):
+class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StoryModelValidatorTests, self).setUp()
@@ -8297,7 +8351,8 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             u'[u\'fully-validated StoryModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -8316,7 +8371,8 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance_0.last_updated
                 ),
             u'[u\'fully-validated StoryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -8328,10 +8384,11 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_story_schema(self):
         expected_output = [
@@ -8345,7 +8402,8 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         with self.swap(
             constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
-            run_job_and_check_output(self, expected_output, sort=True)
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('1').delete(
@@ -8359,7 +8417,8 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
                 '1, expect model ExplorationModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_commit_log_entry_model_failure(self):
         story_services.update_story(
@@ -8382,7 +8441,8 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
                 'story-0-1, expect model StoryCommitLogEntryModel '
                 'with id story-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
         story_models.StorySummaryModel.get_by_id('0').delete()
@@ -8395,7 +8455,8 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model StorySummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         story_models.StorySnapshotMetadataModel.get_by_id(
@@ -8408,7 +8469,8 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model StorySnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         story_models.StorySnapshotContentModel.get_by_id(
@@ -8421,11 +8483,12 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model StorySnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class StorySnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StorySnapshotMetadataModelValidatorTests, self).setUp()
@@ -8480,7 +8543,8 @@ class StorySnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated StorySnapshotMetadataModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -8498,7 +8562,8 @@ class StorySnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'StorySnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -8510,10 +8575,11 @@ class StorySnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
         story_models.StoryModel.get_by_id('0').delete(
@@ -8530,8 +8596,8 @@ class StorySnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'StorySnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -8545,7 +8611,8 @@ class StorySnapshotMetadataModelValidatorTests(
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
                 'StorySnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_story_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -8563,7 +8630,8 @@ class StorySnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated StorySnapshotMetadataModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -8592,10 +8660,11 @@ class StorySnapshotMetadataModelValidatorTests(
                 'failed with error: The following required attributes '
                 'are missing: node_id, title"]]'
             ), u'[u\'fully-validated StorySnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class StorySnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StorySnapshotContentModelValidatorTests, self).setUp()
@@ -8645,7 +8714,8 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated StorySnapshotContentModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -8663,7 +8733,8 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'StorySnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -8675,10 +8746,11 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
         story_models.StoryModel.get_by_id('0').delete(self.owner_id, '', [])
@@ -8694,7 +8766,8 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'StorySnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_story_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -8712,10 +8785,11 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated StorySnapshotContentModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StoryCommitLogEntryModelValidatorTests, self).setUp()
@@ -8765,7 +8839,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated StoryCommitLogEntryModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -8781,7 +8856,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -8793,10 +8869,11 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
         story_models.StoryModel.get_by_id('0').delete(
@@ -8811,7 +8888,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'on field story_ids having value 0, expect model '
                 'StoryModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_invalid_story_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -8829,7 +8907,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
@@ -8854,7 +8933,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'No commit command domain object defined for entity with '
                 'commands: [{}]\']]'),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
@@ -8866,7 +8946,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id story-0-1: Commit type invalid is '
                 'not allowed\']]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
@@ -8878,7 +8959,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id story-0-1: Post commit status invalid '
                 'is invalid\']]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_true_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'public'
@@ -8893,7 +8975,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'public but post_commit_is_private is True\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_false_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'private'
@@ -8908,7 +8991,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'private but post_commit_is_private is False\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -8938,10 +9022,11 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'are missing: node_id, title"]]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
+class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StorySummaryModelValidatorTests, self).setUp()
@@ -8987,7 +9072,8 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated StorySummaryModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -9003,7 +9089,8 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated StorySummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         story_services.delete_story(self.owner_id, '1')
@@ -9015,10 +9102,11 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
         story_model = story_models.StoryModel.get_by_id('0')
@@ -9034,7 +9122,8 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model StoryModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated StorySummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_node_titles(self):
         self.model_instance_0.node_titles = ['Title 1']
@@ -9046,7 +9135,8 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Title 1\'] does not match the nodes in story_contents '
                 'dict: []"]]'
             ), u'[u\'fully-validated StorySummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_story_related_property(self):
         self.model_instance_0.title = 'invalid'
@@ -9059,10 +9149,11 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
                 'match corresponding story title field: title 0\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated StorySummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
+class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(GeneralSuggestionModelValidatorTests, self).setUp()
 
@@ -9109,7 +9200,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralSuggestionModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -9125,7 +9217,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -9134,10 +9227,11 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -9149,7 +9243,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '0, expect model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_feedback_thread_model_failure(self):
         feedback_models.GeneralFeedbackThreadModel.get_by_id(
@@ -9162,7 +9257,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
                 'value %s, expect model GeneralFeedbackThreadModel with id %s '
                 'but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.thread_id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_author_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
@@ -9174,7 +9270,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel with id %s but it doesn\'t '
                 'exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_reviewer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
@@ -9186,7 +9283,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel with id %s but it doesn\'t '
                 'exist"]]') % (
                     self.model_instance.id, self.admin_id, self.admin_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_target_version(self):
         self.model_instance.target_version_at_submission = 5
@@ -9198,7 +9296,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
                 'target version 5 in entity is greater than the '
                 'version 1 of exploration corresponding to id 0\']]'
             ) % self.model_instance.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_empty_final_reviewer_id(self):
         self.model_instance.final_reviewer_id = None
@@ -9209,7 +9308,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
                 'check of GeneralSuggestionModel\', [u\'Entity id %s: '
                 'Final reviewer id is empty but suggestion is accepted\']]'
             ) % self.model_instance.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_non_empty_final_reviewer_id(self):
         self.model_instance.status = suggestion_models.STATUS_IN_REVIEW
@@ -9221,7 +9321,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
                 'Final reviewer id %s is not empty but '
                 'suggestion is in review\']]'
             ) % (self.model_instance.id, self.admin_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_schema(self):
         self.model_instance.score_category = 'invalid.Art'
@@ -9234,7 +9335,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
                 'part of score_category to be among allowed choices, '
                 'received invalid\']]'
             ) % self.model_instance.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_target_type(self):
         expected_output = [
@@ -9244,8 +9346,9 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
                 'type exploration is not allowed\']]'
             ) % self.model_instance.id]
         with self.swap(
-            prod_validation_jobs_one_off, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
-            run_job_and_check_output(self, expected_output, sort=True)
+            prod_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_validate_score_category_for_content_suggestion(self):
         self.model_instance.score_category = 'content.invalid'
@@ -9255,7 +9358,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
             'GeneralSuggestionModel\', [u\'Entity id %s: score category sub in'
             'valid does not match target exploration category Art\']]') % (
                 self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_validate_score_category_for_transalation_suggestion(self):
         change = {
@@ -9287,7 +9391,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
             'valid does not match target exploration category Art\']]') % (
                 model_instance.id)),
                            u'[u\'fully-validated GeneralSuggestionModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_validate_score_category_for_question_suggestion(self):
         rubrics = [
@@ -9336,11 +9441,12 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
             ' question.invalid_sub_category is invalid\']]') % (
                 model_instance.id),
                            u'[u\'fully-validated GeneralSuggestionModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class GeneralVoiceoverApplicationModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
     def setUp(self):
         super(GeneralVoiceoverApplicationModelValidatorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -9379,7 +9485,8 @@ class GeneralVoiceoverApplicationModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -9395,7 +9502,8 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -9404,10 +9512,11 @@ class GeneralVoiceoverApplicationModelValidatorTests(
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -9419,7 +9528,8 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '0, expect model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_author_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
@@ -9431,7 +9541,8 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 '%s, expect model UserSettingsModel with id %s but it doesn\'t '
                 'exist"]]') % (
                     self.model_instance.id, self.owner_id, self.owner_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_reviewer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
@@ -9443,7 +9554,8 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 'value %s, expect model UserSettingsModel with id %s but it '
                 'doesn\'t exist"]]') % (
                     self.model_instance.id, self.admin_id, self.admin_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_object_validation_failure(self):
         expected_output = [
@@ -9459,10 +9571,11 @@ class GeneralVoiceoverApplicationModelValidatorTests(
         with self.swap(
             constants, 'SUPPORTED_AUDIO_LANGUAGES',
             mock_supported_audio_languages):
-            run_job_and_check_output(self, expected_output, sort=True)
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
 
-class TopicModelValidatorTests(test_utils.GenericTestBase):
+class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicModelValidatorTests, self).setUp()
@@ -9550,7 +9663,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             u'[u\'fully-validated TopicModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -9569,7 +9683,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance_0.last_updated
                 ),
             u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -9581,10 +9696,11 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_topic_schema(self):
         expected_output = [
@@ -9598,7 +9714,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         with self.swap(
             constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
-            run_job_and_check_output(self, expected_output, sort=True)
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
         story_models.StoryModel.get_by_id('1').delete(
@@ -9612,7 +9729,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 '1, expect model StoryModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
         skill_models.SkillModel.get_by_id('1').delete(
@@ -9626,7 +9744,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 '1, expect model SkillModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
         topic_models.SubtopicPageModel.get_by_id('0-1').delete(
@@ -9640,7 +9759,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 '0-1, expect model SubtopicPageModel with id 0-1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_commit_log_entry_model_failure(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -9663,7 +9783,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 'topic-0-1, expect model TopicCommitLogEntryModel '
                 'with id topic-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_summary_model_failure(self):
         topic_models.TopicSummaryModel.get_by_id('0').delete()
@@ -9676,7 +9797,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model TopicSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_rights_model_failure(self):
         topic_models.TopicRightsModel.get_by_id(
@@ -9690,7 +9812,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model TopicRightsModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         topic_models.TopicSnapshotMetadataModel.get_by_id(
@@ -9703,7 +9826,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model TopicSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         topic_models.TopicSnapshotContentModel.get_by_id(
@@ -9716,7 +9840,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model TopicSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_repeated_name(self):
         self.model_instance_0.name = 'Topic1'
@@ -9730,7 +9855,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 '[\'1\']", u"Entity id 1: canonical name topic1 matches '
                 'with canonical name of topic models with ids [\'0\']"]]'
             ), u'[u\'fully-validated TopicModel\', 1]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_model_with_canonical_name_not_matching_name_in_lowercase(self):
         self.model_instance_0.name = 'invalid'
@@ -9742,7 +9868,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id 0: Entity name invalid in lowercase does '
                 'not match canonical name topic0\']]'
             ), u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_uncategorized_skill_id_in_subtopic(self):
         self.model_instance_0.uncategorized_skill_ids = ['0', '6']
@@ -9754,11 +9881,12 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id 0: uncategorized skill id 0 is present '
                 'in subtopic for entity with id 1\']]'
             ), u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class TopicSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicSnapshotMetadataModelValidatorTests, self).setUp()
@@ -9841,7 +9969,8 @@ class TopicSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated TopicSnapshotMetadataModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -9859,7 +9988,8 @@ class TopicSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'TopicSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -9871,10 +10001,11 @@ class TopicSnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
         topic_models.TopicModel.get_by_id('0').delete(
@@ -9891,8 +10022,8 @@ class TopicSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'TopicSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -9906,7 +10037,8 @@ class TopicSnapshotMetadataModelValidatorTests(
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
                 'TopicSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -9924,7 +10056,8 @@ class TopicSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated TopicSnapshotMetadataModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -9953,10 +10086,11 @@ class TopicSnapshotMetadataModelValidatorTests(
                 'failed with error: The following required attributes '
                 'are missing: subtopic_id, title"]]'
             ), u'[u\'fully-validated TopicSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+class TopicSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicSnapshotContentModelValidatorTests, self).setUp()
@@ -10033,7 +10167,8 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated TopicSnapshotContentModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -10051,7 +10186,8 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'TopicSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -10063,10 +10199,11 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
         topic_models.TopicModel.get_by_id('0').delete(self.owner_id, '', [])
@@ -10082,7 +10219,8 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated '
                 'TopicSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -10100,10 +10238,11 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ), (
                 u'[u\'fully-validated TopicSnapshotContentModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
+class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicRightsModelValidatorTests, self).setUp()
@@ -10203,7 +10342,8 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated TopicRightsModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -10220,7 +10360,8 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated TopicRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -10232,10 +10373,11 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
         topic_models.TopicModel.get_by_id('0').delete(
@@ -10248,7 +10390,8 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model TopicModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_manager_user_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.manager1_id).delete()
@@ -10261,7 +10404,8 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
                 'but it doesn\'t exist"]]') % (
                     self.manager1_id, self.manager1_id),
             u'[u\'fully-validated TopicRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
@@ -10276,7 +10420,8 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
                 'with id 0-1 but it doesn\'t exist"]]'
             ),
             u'[u\'fully-validated TopicRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         topic_models.TopicRightsSnapshotContentModel.get_by_id(
@@ -10289,11 +10434,12 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1, expect model TopicRightsSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class TopicRightsSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicRightsSnapshotMetadataModelValidatorTests, self).setUp()
@@ -10386,7 +10532,8 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated TopicRightsSnapshotMetadataModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -10404,7 +10551,8 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'TopicRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -10416,10 +10564,11 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_rights_model_failure(self):
         topic_models.TopicRightsModel.get_by_id('0').delete(
@@ -10436,7 +10585,8 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'TopicRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -10450,7 +10600,8 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
                 'TopicRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -10468,7 +10619,8 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'TopicRightsSnapshotMetadataModel\', 3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -10499,11 +10651,12 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
                 'The following extra attributes are present: '
                 'invalid_attribute"]]'
             ), u'[u\'fully-validated TopicRightsSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class TopicRightsSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicRightsSnapshotContentModelValidatorTests, self).setUp()
@@ -10590,7 +10743,8 @@ class TopicRightsSnapshotContentModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated TopicRightsSnapshotContentModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -10608,7 +10762,8 @@ class TopicRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'TopicRightsSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -10620,10 +10775,11 @@ class TopicRightsSnapshotContentModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
         topic_models.TopicRightsModel.get_by_id('0').delete(
@@ -10640,7 +10796,8 @@ class TopicRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'TopicRightsSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -10658,10 +10815,11 @@ class TopicRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated TopicRightsSnapshotContentModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicCommitLogEntryModelValidatorTests, self).setUp()
@@ -10754,7 +10912,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated TopicCommitLogEntryModel\', 7]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -10770,7 +10929,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 5]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -10785,10 +10945,11 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
         topic_models.TopicModel.get_by_id('0').delete(
@@ -10806,7 +10967,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model TopicModel with id 0 but '
                 'it doesn\'t exist"]]'
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 4]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_missing_topic_rights_model_failure(self):
         topic_models.TopicRightsModel.get_by_id('0').delete(
@@ -10821,7 +10983,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'on field topic_rights_ids having value 0, expect '
                 'model TopicRightsModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 5]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -10839,7 +11002,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated TopicCommitLogEntryModel\', 6]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
@@ -10864,7 +11028,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'No commit command domain object defined for entity with '
                 'commands: [{}]\']]'),
             u'[u\'fully-validated TopicCommitLogEntryModel\', 6]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
@@ -10876,7 +11041,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id topic-0-1: Commit type invalid is '
                 'not allowed\']]'
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 5]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
@@ -10888,7 +11054,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id topic-0-1: Post commit status invalid '
                 'is invalid\']]'
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 5]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_true_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'public'
@@ -10903,7 +11070,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'public but post_commit_is_private is True\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated TopicCommitLogEntryModel\', 5]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_false_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'private'
@@ -10918,7 +11086,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'private but post_commit_is_private is False\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated TopicCommitLogEntryModel\', 5]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -10948,10 +11117,11 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'are missing: subtopic_id, title"]]'
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 5]']
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
+class TopicSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TopicSummaryModelValidatorTests, self).setUp()
@@ -11041,7 +11211,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated TopicSummaryModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -11057,7 +11228,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         topic_services.delete_topic(self.owner_id, '1')
@@ -11069,10 +11241,11 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
         topic_model = topic_models.TopicModel.get_by_id('0')
@@ -11088,7 +11261,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'value 0, expect model TopicModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_canonical_story_count(self):
         self.model_instance_0.canonical_story_count = 10
@@ -11101,7 +11275,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'match the number of story ids in canonical_story_ids '
                 'in topic model: [u\'1\']"]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_additional_story_count(self):
         self.model_instance_0.additional_story_count = 10
@@ -11114,7 +11289,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'match the number of story ids in '
                 'additional_story_ids in topic model: [u\'0\']"]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_uncategorized_skill_count(self):
         self.model_instance_0.uncategorized_skill_count = 10
@@ -11133,7 +11309,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'total_skill_count to be greater than or equal to '
                 'uncategorized_skill_count 10, received \'3\'"]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_total_skill_count(self):
         self.model_instance_0.total_skill_count = 10
@@ -11147,7 +11324,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'in topic model: [u\'2\'] and skill_ids in subtopics '
                 'of topic model: [u\'0\', u\'1\']"]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_subtopic_count(self):
         self.model_instance_0.subtopic_count = 10
@@ -11161,7 +11339,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'u\'1\'], u\'title\': u\'subtopic1\', u\'url_fragment\': u\'\','
                 ' u\'thumbnail_filename\': None, u\'id\': 1}] "]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_topic_related_property(self):
         self.model_instance_0.name = 'invalid'
@@ -11174,10 +11353,11 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'match corresponding topic name field: topic0\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated TopicSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
+class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SubtopicPageModelValidatorTests, self).setUp()
@@ -11267,7 +11447,8 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SubtopicPageModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -11286,7 +11467,8 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
                     self.model_instance_0.last_updated
                 ),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -11298,10 +11480,11 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_subtopic_page_schema(self):
         self.model_instance_0.language_code = 'ar'
@@ -11317,7 +11500,8 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
         with self.swap(
             constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
-            run_job_and_check_output(self, expected_output, sort=True)
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_topic_model_failure(self):
         topic_models.TopicModel.get_by_id('0').delete(
@@ -11331,7 +11515,8 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
                 '0, expect model TopicModel with id 0 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_commit_log_entry_model_failure(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -11359,7 +11544,8 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
                 'SubtopicPageCommitLogEntryModel '
                 'with id subtopicpage-0-1-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
@@ -11372,7 +11558,8 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1-1, expect model SubtopicPageSnapshotMetadataModel '
                 'with id 0-1-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         topic_models.SubtopicPageSnapshotContentModel.get_by_id(
@@ -11385,11 +11572,12 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
                 'value 0-1-1, expect model SubtopicPageSnapshotContentModel '
                 'with id 0-1-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class SubtopicPageSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SubtopicPageSnapshotMetadataModelValidatorTests, self).setUp()
@@ -11492,7 +11680,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -11510,7 +11699,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'SubtopicPageSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -11522,10 +11712,11 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
         topic_models.SubtopicPageModel.get_by_id('0-1').delete(
@@ -11542,8 +11733,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'SubtopicPageSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -11557,7 +11748,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             ) % (self.user_id, self.user_id), (
                 u'[u\'fully-validated '
                 'SubtopicPageSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_subtopic_page_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -11575,7 +11767,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -11594,11 +11787,12 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 'subtopic_id, topic_id, The following extra attributes '
                 'are present: invalid_attribute"]]'
             ), u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class SubtopicPageSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SubtopicPageSnapshotContentModelValidatorTests, self).setUp()
@@ -11697,7 +11891,8 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SubtopicPageSnapshotContentModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -11715,7 +11910,8 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'SubtopicPageSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -11727,10 +11923,11 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
         topic_models.SubtopicPageModel.get_by_id('0-1').delete(
@@ -11747,8 +11944,8 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'SubtopicPageSnapshotContentModel\', 2]')]
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, literal_eval=True)
 
     def test_invalid_subtopic_page_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -11764,10 +11961,12 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated SubtopicPageSnapshotContentModel\', '
                 '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+class SubtopicPageCommitLogEntryModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(SubtopicPageCommitLogEntryModelValidatorTests, self).setUp()
@@ -11871,7 +12070,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 4]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -11887,7 +12087,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -11899,10 +12100,11 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_subtopic_page_model_failure(self):
         topic_models.SubtopicPageModel.get_by_id('0-1').delete(
@@ -11918,7 +12120,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'subtopic_page_ids having value 0-1, expect model '
                 'SubtopicPageModel with id 0-1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -11936,7 +12139,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
@@ -11961,7 +12165,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'invalid-0-1-1: No commit command domain object defined '
                 'for entity with commands: [{}]\']]'),
             u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 3]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_type(self):
         self.model_instance_0.commit_type = 'invalid'
@@ -11973,7 +12178,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id subtopicpage-0-1-1: Commit type invalid is '
                 'not allowed\']]'
             ), u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
@@ -11985,7 +12191,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id subtopicpage-0-1-1: Post commit status invalid '
                 'is invalid\']]'
             ), u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_true_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'public'
@@ -12000,7 +12207,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'public but post_commit_is_private is True\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_false_post_commit_is_private(self):
         self.model_instance_0.post_commit_status = 'private'
@@ -12015,7 +12223,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'private but post_commit_is_private is False\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
@@ -12034,10 +12243,11 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'subtopic_id, topic_id, The following extra attributes '
                 'are present: invalid_attribute"]]'
             ), u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
+class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserSettingsModelValidatorTests, self).setUp()
@@ -12050,7 +12260,7 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
 
         # Note: There will a total of 3 UserSettingsModel even though
         # only two users signup in the test since superadmin signup
-        # is also done in test_utils.GenericTestBase.
+        # is also done in test_utils.AuditJobsTestBase.
         self.model_instance_0 = user_models.UserSettingsModel.get_by_id(
             self.user_id)
         self.model_instance_1 = user_models.UserSettingsModel.get_by_id(
@@ -12061,7 +12271,8 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserSettingsModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -12076,7 +12287,8 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated UserSettingsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -12094,10 +12306,11 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_contributions_model_failure(self):
         user_models.UserContributionsModel.get_by_id(self.user_id).delete()
@@ -12111,7 +12324,8 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id),
             u'[u\'fully-validated UserSettingsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_schema(self):
         self.model_instance_1.email = 'invalid'
@@ -12124,7 +12338,8 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
                 'with the error Invalid email address: invalid\']]'
             ) % self.admin_id,
             u'[u\'fully-validated UserSettingsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_time_field(self):
         self.model_instance_0.last_created_an_exploration = (
@@ -12140,7 +12355,8 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id,
                 self.model_instance_0.last_created_an_exploration),
             u'[u\'fully-validated UserSettingsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_first_contribution_msec(self):
         self.model_instance_0.first_contribution_msec = (
@@ -12156,10 +12372,11 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id,
                 self.model_instance_0.first_contribution_msec),
             u'[u\'fully-validated UserSettingsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class UserNormalizedNameAuditOneOffJobTests(test_utils.GenericTestBase):
+class UserNormalizedNameAuditOneOffJobTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserNormalizedNameAuditOneOffJobTests, self).setUp()
@@ -12172,7 +12389,7 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.GenericTestBase):
 
         # Note: There will a total of 3 UserSettingsModel even though
         # only two users signup in the test since superadmin signup
-        # is also done in test_utils.GenericTestBase.
+        # is also done in test_utils.AuditJobsTestBase.
         self.model_instance_0 = user_models.UserSettingsModel.get_by_id(
             self.user_id)
         self.model_instance_1 = user_models.UserSettingsModel.get_by_id(
@@ -12182,7 +12399,8 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_standard_operation(self):
         expected_output = []
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_repeated_normalized_username(self):
         self.model_instance_1.normalized_username = USER_NAME
@@ -12194,10 +12412,11 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.GenericTestBase):
             'u"Users with ids [\'%s\', \'%s\'] have the same normalized '
             'username username"]') % (
                 sorted_user_ids[0], sorted_user_ids[1])]
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
 
-class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
+class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CompletedActivitiesModelValidatorTests, self).setUp()
@@ -12264,7 +12483,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated CompletedActivitiesModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -12279,7 +12499,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -12289,10 +12510,11 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -12305,7 +12527,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
@@ -12319,7 +12542,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '2, expect model ExplorationModel with id 2 but it '
                 'doesn\'t exist"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('4').delete(
@@ -12333,7 +12557,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field collection_ids having value '
                 '4, expect model CollectionModel with id 4 but it '
                 'doesn\'t exist"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_common_exploration(self):
         self.model_instance.exploration_ids.append('0')
@@ -12344,7 +12569,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
             '[u"Entity id %s: Common values for exploration_ids in entity '
             'and exploration_ids in IncompleteActivitiesModel: [u\'0\']"]]') % (
                 self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_common_collection(self):
         self.model_instance.collection_ids.append('3')
@@ -12355,7 +12581,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
             '[u"Entity id %s: Common values for collection_ids in entity '
             'and collection_ids in IncompleteActivitiesModel: [u\'3\']"]]') % (
                 self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_private_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -12369,7 +12596,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 'of CompletedActivitiesModel\', '
                 '[u"Entity id %s: Explorations with ids [\'exp\'] are '
                 'private"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_private_collection(self):
         col = collection_domain.Collection.create_default_collection(
@@ -12383,10 +12611,11 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 'of CompletedActivitiesModel\', '
                 '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
+class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(IncompleteActivitiesModelValidatorTests, self).setUp()
@@ -12454,7 +12683,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated IncompleteActivitiesModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -12469,7 +12699,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -12479,10 +12710,11 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -12495,7 +12727,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
@@ -12509,7 +12742,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '2, expect model ExplorationModel with id 2 but it '
                 'doesn\'t exist"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('4').delete(
@@ -12523,7 +12757,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field collection_ids having value '
                 '4, expect model CollectionModel with id 4 but it '
                 'doesn\'t exist"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_common_exploration(self):
         self.model_instance.exploration_ids.append('0')
@@ -12534,7 +12769,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             '[u"Entity id %s: Common values for exploration_ids in entity '
             'and exploration_ids in CompletedActivitiesModel: [u\'0\']"]]') % (
                 self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_common_collection(self):
         self.model_instance.collection_ids.append('3')
@@ -12545,7 +12781,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             '[u"Entity id %s: Common values for collection_ids in entity '
             'and collection_ids in CompletedActivitiesModel: [u\'3\']"]]') % (
                 self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_private_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -12559,7 +12796,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 'of IncompleteActivitiesModel\', '
                 '[u"Entity id %s: Explorations with ids [\'exp\'] are '
                 'private"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_private_collection(self):
         col = collection_domain.Collection.create_default_collection(
@@ -12573,11 +12811,12 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
                 'of IncompleteActivitiesModel\', '
                 '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
 class ExpUserLastPlaythroughModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExpUserLastPlaythroughModelValidatorTests, self).setUp()
@@ -12631,7 +12870,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ExpUserLastPlaythroughModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -12646,7 +12886,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -12656,10 +12897,11 @@ class ExpUserLastPlaythroughModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -12672,7 +12914,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
@@ -12686,7 +12929,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 '[u"Entity id %s.0: based on field exploration_ids having '
                 'value 0, expect model ExplorationModel with id 0 but it '
                 'doesn\'t exist"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_complete_exploration_in_exploration_id(self):
         self.model_instance.exploration_id = '1'
@@ -12700,7 +12944,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 u'[u\'failed validation check for model id check of '
                 'ExpUserLastPlaythroughModel\', [u\'Entity id %s.0: Entity id '
                 'does not match regex pattern\']]') % self.user_id]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_private_exploration(self):
         rights_manager.unpublish_exploration(self.owner, '0')
@@ -12710,7 +12955,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 'of ExpUserLastPlaythroughModel\', '
                 '[u"Entity id %s.0: Explorations with ids [\'0\'] are '
                 'private"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_version(self):
         self.model_instance.last_played_exp_version = 10
@@ -12722,7 +12968,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 '[u\'Entity id %s.0: last played exp version 10 is greater '
                 'than current version 1 of exploration with id 0\']]') % (
                     self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_state_name(self):
         self.model_instance.last_played_state_name = 'invalid'
@@ -12734,10 +12981,11 @@ class ExpUserLastPlaythroughModelValidatorTests(
                 '[u"Entity id %s.0: last played state name invalid is not '
                 'present in exploration states [u\'Introduction\', u\'End\'] '
                 'for exploration id 0"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
+class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(LearnerPlaylistModelValidatorTests, self).setUp()
@@ -12808,7 +13056,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated LearnerPlaylistModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -12823,7 +13072,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -12833,10 +13083,11 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -12849,7 +13100,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
@@ -12863,7 +13115,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '2, expect model ExplorationModel with id 2 but it '
                 'doesn\'t exist"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('6').delete(
@@ -12877,7 +13130,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field collection_ids having value '
                 '6, expect model CollectionModel with id 6 but it '
                 'doesn\'t exist"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_common_completed_exploration(self):
         self.model_instance.exploration_ids.append('0')
@@ -12888,7 +13142,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
             '[u"Entity id %s: Common values for exploration_ids in entity '
             'and exploration_ids in CompletedActivitiesModel: [u\'0\']"]]') % (
                 self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_common_incomplete_exploration(self):
         self.model_instance.exploration_ids.append('1')
@@ -12899,7 +13154,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
             '[u"Entity id %s: Common values for exploration_ids in entity '
             'and exploration_ids in IncompleteActivitiesModel: [u\'1\']"]]') % (
                 self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_common_completed_collection(self):
         self.model_instance.collection_ids.append('4')
@@ -12910,7 +13166,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
             '[u"Entity id %s: Common values for collection_ids in entity '
             'and collection_ids in CompletedActivitiesModel: [u\'4\']"]]') % (
                 self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_common_incomplete_collection(self):
         self.model_instance.collection_ids.append('5')
@@ -12921,7 +13178,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
             '[u"Entity id %s: Common values for collection_ids in entity '
             'and collection_ids in IncompleteActivitiesModel: [u\'5\']"]]') % (
                 self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_private_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -12935,7 +13193,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
                 'of LearnerPlaylistModel\', '
                 '[u"Entity id %s: Explorations with ids [\'exp\'] are '
                 'private"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_private_collection(self):
         col = collection_domain.Collection.create_default_collection(
@@ -12949,10 +13208,11 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
                 'of LearnerPlaylistModel\', '
                 '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
+class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserContributionsModelValidatorTests, self).setUp()
@@ -12997,7 +13257,8 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserContributionsModel\', 3]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
@@ -13012,7 +13273,8 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
                 self.owner_id, self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
             ), u'[u\'fully-validated UserContributionsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
@@ -13025,10 +13287,11 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.owner_id, self.model_instance_0.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -13042,7 +13305,8 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id),
             u'[u\'fully-validated UserContributionsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_created_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('exp1').delete(
@@ -13062,7 +13326,8 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
                 'id exp1 but it doesn\'t exist"]]' % self.owner_id
             ), u'[u\'fully-validated UserContributionsModel\', 2]']
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_edited_exploration_model_failure(self):
         self.model_instance_0.delete()
@@ -13076,10 +13341,11 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
                 'having value exp0, expect model ExplorationModel with '
                 'id exp0 but it doesn\'t exist"]]' % self.user_id
             ), u'[u\'fully-validated UserContributionsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class UserAuthDetailsModelValidatorTests(test_utils.GenericTestBase):
+class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     USER_PIN = '123'
 
@@ -13093,7 +13359,7 @@ class UserAuthDetailsModelValidatorTests(test_utils.GenericTestBase):
         # Note: There will be a total of 2 UserSettingsModels (hence 2
         # UserAuthDetailsModels too) even though only one user signs up in the
         # test since superadmin signup is also done in
-        # test_utils.GenericTestBase.
+        # test_utils.AuditJobsTestBase.
         self.model_instance = user_models.UserAuthDetailsModel.get_by_id(
             self.user_id)
         self.job_class = (
@@ -13102,7 +13368,8 @@ class UserAuthDetailsModelValidatorTests(test_utils.GenericTestBase):
     def test_audit_standard_operation_passes(self):
         expected_output = [
             u'[u\'fully-validated UserAuthDetailsModel\', 2]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_audit_with_created_on_greater_than_last_updated_fails(self):
         self.model_instance.created_on = (
@@ -13117,7 +13384,8 @@ class UserAuthDetailsModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             ), u'[u\'fully-validated UserAuthDetailsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_audit_with_last_updated_greater_than_current_time_fails(self):
         user_models.UserAuthDetailsModel.get_by_id(
@@ -13129,10 +13397,11 @@ class UserAuthDetailsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_audit_with_missing_user_settings_model_fails(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -13146,10 +13415,11 @@ class UserAuthDetailsModelValidatorTests(test_utils.GenericTestBase):
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id),
             u'[u\'fully-validated UserAuthDetailsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
+class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserEmailPreferencesModelValidatorTests, self).setUp()
@@ -13168,7 +13438,8 @@ class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserEmailPreferencesModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -13183,7 +13454,8 @@ class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -13193,10 +13465,11 @@ class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -13209,10 +13482,11 @@ class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
+class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserSubscriptionsModelValidatorTests, self).setUp()
@@ -13266,7 +13540,8 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserSubscriptionsModel\', 2]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -13281,7 +13556,8 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             ), u'[u\'fully-validated UserSubscriptionsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         user_models.UserSubscriptionsModel.get_by_id(self.owner_id).delete()
@@ -13292,10 +13568,11 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_invalid_last_checked(self):
         self.model_instance.last_checked = (
@@ -13309,7 +13586,8 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
                 'when job was run\']]' % (
                     self.user_id, self.model_instance.last_checked)
             ), u'[u\'fully-validated UserSubscriptionsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_user_id_in_subscriber_ids(self):
         subscriber_model = user_models.UserSubscribersModel.get_by_id(
@@ -13324,7 +13602,8 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
                 'with id %s to whom the user has subscribed\']]' % (
                     self.user_id, self.owner_id)
             ), u'[u\'fully-validated UserSubscriptionsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_subscriber_model_failure(self):
         user_models.UserSubscribersModel.get_by_id(self.owner_id).delete()
@@ -13338,7 +13617,8 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.owner_id, self.owner_id),
             u'[u\'fully-validated UserSubscriptionsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_get_external_id_relationship_failure(self):
         nonexist_thread_id = 'nonexist_thread_id'
@@ -13355,10 +13635,11 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
                 'with id nonexist_thread_id but it doesn\'t '
                 'exist"]]') % self.user_id,
             u'[u\'fully-validated UserSubscriptionsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class UserSubscribersModelValidatorTests(test_utils.GenericTestBase):
+class UserSubscribersModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserSubscribersModelValidatorTests, self).setUp()
@@ -13383,7 +13664,8 @@ class UserSubscribersModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserSubscribersModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -13398,7 +13680,8 @@ class UserSubscribersModelValidatorTests(test_utils.GenericTestBase):
                 self.owner_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -13408,10 +13691,11 @@ class UserSubscribersModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.owner_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_user_id_in_subscriber_ids(self):
         self.model_instance.subscriber_ids.append(self.owner_id)
@@ -13428,7 +13712,8 @@ class UserSubscribersModelValidatorTests(test_utils.GenericTestBase):
                 'UserSubscriptionsModel with id %s but it doesn\'t exist"]]'
             ) % (self.owner_id, self.owner_id, self.owner_id)]
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_user_id_in_creator_ids(self):
         subscription_model = user_models.UserSubscriptionsModel.get_by_id(
@@ -13440,7 +13725,8 @@ class UserSubscribersModelValidatorTests(test_utils.GenericTestBase):
             'check of UserSubscribersModel\', [u\'Entity id %s: User id '
             'is not present in creator ids to which the subscriber of user '
             'with id %s has subscribed\']]') % (self.owner_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
@@ -13453,7 +13739,8 @@ class UserSubscribersModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.owner_id, self.owner_id, self.owner_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_subscriptions_model_failure(self):
         user_models.UserSubscriptionsModel.get_by_id(self.user_id).delete()
@@ -13466,10 +13753,11 @@ class UserSubscribersModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSubscriptionsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.owner_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class UserRecentChangesBatchModelValidatorTests(test_utils.GenericTestBase):
+class UserRecentChangesBatchModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserRecentChangesBatchModelValidatorTests, self).setUp()
@@ -13487,7 +13775,8 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserRecentChangesBatchModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -13502,7 +13791,8 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -13512,10 +13802,11 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_invalid_job_queued_msec(self):
         self.model_instance.job_queued_msec = (
@@ -13527,7 +13818,8 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.GenericTestBase):
             '[u\'Entity id %s: job queued msec %s is greater than the time '
             'when job was run\']]'
         ) % (self.user_id, self.model_instance.job_queued_msec)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -13540,10 +13832,11 @@ class UserRecentChangesBatchModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class UserStatsModelValidatorTests(test_utils.GenericTestBase):
+class UserStatsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserStatsModelValidatorTests, self).setUp()
@@ -13570,7 +13863,8 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserStatsModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -13585,7 +13879,8 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         time_str = (
@@ -13606,10 +13901,11 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_invalid_schema_version(self):
         self.model_instance.schema_version = (
@@ -13623,7 +13919,8 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
         ) % (
             self.user_id, self.model_instance.schema_version,
             feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_key_type_in_stats(self):
         self.model_instance.weekly_creator_stats_list = [{
@@ -13639,7 +13936,8 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
             'of UserStatsModel\', [u"Entity id %s: Invalid stats dict: '
             '{u\'invalid\': {u\'num_ratings\': 5, u\'average_ratings\': 4, '
             'u\'total_plays\': 5}}"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_key_value_in_stats(self):
         time_str = (
@@ -13659,7 +13957,8 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
             'dict: {u\'%s\': {u\'num_ratings\': 5, '
             'u\'average_ratings\': 4, u\'total_plays\': 5}}"]]') % (
                 self.user_id, time_str)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_value_in_stats(self):
         self.model_instance.weekly_creator_stats_list = [{
@@ -13670,7 +13969,8 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for weekly creator stats list '
             'of UserStatsModel\', [u"Entity id %s: Invalid stats dict: '
             '{u\'%s\': u\'invalid\'}"]]') % (self.user_id, self.datetime_key)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_properties_in_stats(self):
         self.model_instance.weekly_creator_stats_list = [{
@@ -13684,7 +13984,8 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
             'list of UserStatsModel\', [u"Entity id %s: Invalid stats '
             'dict: {u\'%s\': {u\'invalid\': 2}}"]]') % (
                 self.user_id, self.datetime_key)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_property_values_in_stats(self):
         self.model_instance.weekly_creator_stats_list = [{
@@ -13701,7 +14002,8 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
             'dict: {u\'%s\': {u\'num_ratings\': 2, '
             'u\'average_ratings\': u\'invalid\', u\'total_plays\': 4}}"]]'
         ) % (self.user_id, self.datetime_key)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -13714,10 +14016,11 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
+class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(ExplorationUserDataModelValidatorTests, self).setUp()
@@ -13748,7 +14051,8 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ExplorationUserDataModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -13763,7 +14067,8 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         mock_time = datetime.datetime.utcnow() - datetime.timedelta(days=1)
@@ -13777,10 +14082,11 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -13793,7 +14099,8 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('exp0').delete(
@@ -13805,14 +14112,16 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field exploration_ids '
                 'having value exp0, expect model ExplorationModel with id '
                 'exp0 but it doesn\'t exist"]]' % self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_null_draft_change_list(self):
         self.model_instance.draft_change_list = None
         self.model_instance.put()
         expected_output = [
             u'[u\'fully-validated ExplorationUserDataModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_draft_change_list(self):
         self.model_instance.draft_change_list = [{
@@ -13824,7 +14133,8 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
             'of ExplorationUserDataModel\', [u"Entity id %s: Invalid '
             'change dict {u\'cmd\': u\'invalid\'} due to error '
             'Command invalid is not allowed"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_exp_version(self):
         self.model_instance.draft_change_list_exp_version = 2
@@ -13835,7 +14145,8 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
             'draft change list exp version 2 is greater than '
             'version 1 of corresponding exploration with id exp0\']]') % (
                 self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_draft_change_list_last_updated(self):
         self.model_instance.draft_change_list_last_updated = (
@@ -13848,7 +14159,8 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
             'time when job was run\']]') % (
                 self.model_instance.id,
                 self.model_instance.draft_change_list_last_updated)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_draft_change_list_last_updated_as_none(self):
         self.model_instance.draft_change_list_last_updated = None
@@ -13860,7 +14172,8 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
             'u\'cmd\': u\'edit_exploration_property\', '
             'u\'property_name\': u\'objective\'}] exists but draft '
             'change list last updated is None"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_rating(self):
         self.model_instance.rating = -1
@@ -13870,7 +14183,8 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
             'ExplorationUserDataModel\', [u\'Entity id %s: Expected '
             'rating to be in range [1, 5], received -1\']]') % (
                 self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_rated_on(self):
         self.model_instance.rated_on = (
@@ -13881,7 +14195,8 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
             'ExplorationUserDataModel\', [u\'Entity id %s: rated on '
             '%s is greater than the time when job was run\']]') % (
                 self.model_instance.id, self.model_instance.rated_on)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_rated_on_as_none(self):
         self.model_instance.rated_on = None
@@ -13890,10 +14205,11 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for rated on check of '
             'ExplorationUserDataModel\', [u\'Entity id %s: rating 4 '
             'exists but rated on is None\']]') % (self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
+class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(CollectionProgressModelValidatorTests, self).setUp()
@@ -13943,7 +14259,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated CollectionProgressModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -13958,7 +14275,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -13968,10 +14286,11 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -13984,7 +14303,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('1').delete(
@@ -13998,7 +14318,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '1, expect model ExplorationModel with id 1 but it '
                 'doesn\'t exist"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('col').delete(
@@ -14012,7 +14333,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field collection_ids having value '
                 'col, expect model CollectionModel with id col but it '
                 'doesn\'t exist"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_completed_activities_model_failure(self):
         user_models.CompletedActivitiesModel.get_by_id(self.user_id).delete()
@@ -14024,7 +14346,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
                 'having value %s, expect model CompletedActivitiesModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_private_exploration(self):
         rights_manager.unpublish_exploration(self.owner, '0')
@@ -14034,7 +14357,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
                 'of CollectionProgressModel\', '
                 '[u"Entity id %s: Explorations with ids [\'0\'] are '
                 'private"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_private_collection(self):
         rights_manager.unpublish_collection(self.owner, 'col')
@@ -14044,7 +14368,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
                 'of CollectionProgressModel\', '
                 '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_completed_exploration_missing_in_completed_activities(self):
         self.model_instance.completed_explorations.append('2')
@@ -14055,7 +14380,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
             'exploration ids [u\'2\'] are not present in '
             'CompletedActivitiesModel for the user"]]') % (
                 self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_completed_exploration_missing_in_collection(self):
         self.model_instance.completed_explorations.append('3')
@@ -14066,10 +14392,11 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
             'completed exploration ids [u\'3\'] do not belong to the '
             'collection with id col corresponding to the entity"]]') % (
                 self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
+class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(StoryProgressModelValidatorTests, self).setUp()
@@ -14135,7 +14462,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated StoryProgressModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -14150,7 +14478,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -14160,10 +14489,11 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -14176,7 +14506,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_story_model_failure(self):
         story_models.StoryModel.get_by_id('story').delete(
@@ -14188,7 +14519,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: based on field story_ids having value '
                 'story, expect model StoryModel with id story but it '
                 'doesn\'t exist"]]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_private_story(self):
         topic_id = (
@@ -14200,7 +14532,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
                 'of StoryProgressModel\', '
                 '[u\'Entity id %s: Story with id story corresponding '
                 'to entity is private\']]') % self.model_instance.id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_completed_node_missing_in_story_node_ids(self):
         self.model_instance.completed_node_ids.append('invalid')
@@ -14211,7 +14544,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             'node ids [u\'invalid\'] do not belong to the story with '
             'id story corresponding to the entity"]]') % (
                 self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_private_exploration(self):
         rights_manager.unpublish_exploration(self.owner, '1')
@@ -14220,7 +14554,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             'node check of StoryProgressModel\', [u"Entity id %s: '
             'Following exploration ids are private [u\'1\']. "]]') % (
                 self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_exploration(self):
         exp_models.ExplorationModel.get_by_id('1').delete(
@@ -14230,7 +14565,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             'node check of StoryProgressModel\', [u"Entity id %s: '
             'Following exploration ids are missing [u\'1\']. "]]') % (
                 self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_exploration_not_marked_as_completed(self):
         completed_activities_model = (
@@ -14243,10 +14579,11 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             'Following exploration ids are not marked in '
             'CompletedActivitiesModel [u\'1\']."]]') % (
                 self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class UserQueryModelValidatorTests(test_utils.GenericTestBase):
+class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserQueryModelValidatorTests, self).setUp()
@@ -14280,7 +14617,8 @@ class UserQueryModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserQueryModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -14295,7 +14633,8 @@ class UserQueryModelValidatorTests(test_utils.GenericTestBase):
                 self.query_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -14305,10 +14644,11 @@ class UserQueryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.query_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -14321,7 +14661,8 @@ class UserQueryModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.query_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_sent_email_model_failure(self):
         email_models.BulkEmailModel.get_by_id(self.sent_mail_id).delete()
@@ -14334,7 +14675,8 @@ class UserQueryModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model BulkEmailModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.query_id, self.sent_mail_id, self.sent_mail_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_extra_recipients(self):
         bulk_email_model = email_models.BulkEmailModel.get_by_id(
@@ -14347,7 +14689,8 @@ class UserQueryModelValidatorTests(test_utils.GenericTestBase):
             'for query has following extra recipients [u\'invalid\'] '
             'which are not qualified as per the query"]]') % (
                 self.query_id, self.sent_mail_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_sender_id(self):
         bulk_email_model = email_models.BulkEmailModel.get_by_id(
@@ -14360,7 +14703,8 @@ class UserQueryModelValidatorTests(test_utils.GenericTestBase):
             'email model with id %s does not match submitter id '
             '%s of query\']]') % (
                 self.query_id, self.sent_mail_id, self.admin_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_bulk_email_model(self):
         user_models.UserBulkEmailsModel.get_by_id(self.owner_id).delete()
@@ -14369,10 +14713,11 @@ class UserQueryModelValidatorTests(test_utils.GenericTestBase):
             'UserQueryModel\', [u\'Entity id %s: UserBulkEmails model '
             'is missing for recipient with id %s\']]') % (
                 self.query_id, self.owner_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class UserBulkEmailsModelValidatorTests(test_utils.GenericTestBase):
+class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserBulkEmailsModelValidatorTests, self).setUp()
@@ -14408,7 +14753,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserBulkEmailsModel\', 2]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -14423,7 +14769,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             ), u'[u\'fully-validated UserBulkEmailsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         user_models.UserBulkEmailsModel.get_by_id(self.owner_id).delete()
@@ -14434,10 +14781,11 @@ class UserBulkEmailsModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.user_id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -14451,7 +14799,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.GenericTestBase):
                 'with id %s but it doesn\'t exist"]]' % (
                     self.user_id, self.user_id, self.user_id)
             ), u'[u\'fully-validated UserBulkEmailsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_sent_email_model_failure(self):
         email_models.BulkEmailModel.get_by_id(self.sent_mail_id).delete()
@@ -14465,7 +14814,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.GenericTestBase):
             'doesn\'t exist"]]') % (
                 self.user_id, self.sent_mail_id, self.sent_mail_id,
                 self.owner_id, self.sent_mail_id, self.sent_mail_id)]
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_user_id_not_in_recipient_ids(self):
         bulk_email_model = email_models.BulkEmailModel.get_by_id(
@@ -14479,10 +14829,11 @@ class UserBulkEmailsModelValidatorTests(test_utils.GenericTestBase):
                 'not present in recipient ids of BulkEmailModel with id %s\']]'
             ) % (self.user_id, self.sent_mail_id),
             u'[u\'fully-validated UserBulkEmailsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
+class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserSkillMasteryModelValidatorTests, self).setUp()
@@ -14513,7 +14864,8 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserSkillMasteryModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -14528,7 +14880,8 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -14538,10 +14891,11 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -14554,7 +14908,8 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_skill_model_failure(self):
         skill_models.SkillModel.get_by_id('skill').delete(
@@ -14568,7 +14923,8 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
                 'skill, expect model SkillModel '
                 'with id skill but it doesn\'t exist"]]') % (
                     self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_skill_mastery(self):
         self.model_instance.degree_of_mastery = 10
@@ -14578,10 +14934,11 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
             'of UserSkillMasteryModel\', [u\'Entity id %s: Expected degree '
             'of mastery to be in range [0.0, 1.0], received '
             '10.0\']]') % (self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
+class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserContributionScoringModelValidatorTests, self).setUp()
@@ -14602,7 +14959,8 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserContributionScoringModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -14617,7 +14975,8 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -14627,10 +14986,11 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -14643,7 +15003,8 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_score(self):
         self.model_instance.score = -1
@@ -14653,10 +15014,11 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
             'UserContributionScoringModel\', [u\'Entity id %s: '
             'Expected score to be non-negative, received -1.0\']]') % (
                 self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class UserContributionRightsModelValidatorTests(test_utils.GenericTestBase):
+class UserContributionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     TRANSLATOR_EMAIL = 'translator@community.org'
     TRANSLATOR_USERNAME = 'translator'
@@ -14692,7 +15054,8 @@ class UserContributionRightsModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated UserContributionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_get_external_id_relationship_failure(self):
         user_models.UserSettingsModel.get_by_id(self.translator_id).delete()
@@ -14705,7 +15068,8 @@ class UserContributionRightsModelValidatorTests(test_utils.GenericTestBase):
                 'model UserSettingsModel with id %s but it doesn\'t exist"]]'
             ) % (self.translator_id, self.translator_id, self.translator_id),
             u'[u\'fully-validated UserContributionRightsModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_object_validation_failure(self):
         (
@@ -14722,10 +15086,11 @@ class UserContributionRightsModelValidatorTests(test_utils.GenericTestBase):
             ) % self.translator_id,
             u'[u\'fully-validated UserContributionRightsModel\', 1]']
 
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
-class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
+class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(PendingDeletionRequestModelValidatorTests, self).setUp()
@@ -14754,7 +15119,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated PendingDeletionRequestModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -14769,7 +15135,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -14779,10 +15146,11 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_settings_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -14792,7 +15160,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 'user settings of PendingDeletionRequestModel\', '
                 '[u\'Entity id %s: User settings model '
                 'is not marked as deleted\']]') % (self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_user_settings_model_not_marked_deleted_failure(self):
         user_model = user_models.UserSettingsModel.get_by_id(self.user_id)
@@ -14804,7 +15173,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 'user settings of PendingDeletionRequestModel\', '
                 '[u\'Entity id %s: User settings model '
                 'is not marked as deleted\']]') % (self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_exploration_not_marked_deleted_failure(self):
         exp = exp_models.ExplorationModel.get_by_id('exp_id')
@@ -14816,7 +15186,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 'of PendingDeletionRequestModel\', '
                 '[u"Entity id %s: Explorations with ids [u\'exp_id\'] are '
                 'not marked as deleted"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_collection_not_marked_deleted_failure(self):
         col = collection_models.CollectionModel.get_by_id('col_id')
@@ -14828,7 +15199,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 'of PendingDeletionRequestModel\', '
                 '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
                 'not marked as deleted"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_exploration_deleted_failure(self):
         exp = exp_models.ExplorationModel.get_by_id('exp_id')
@@ -14839,7 +15211,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 'of PendingDeletionRequestModel\', '
                 '[u"Entity id %s: Explorations with ids [u\'exp_id\'] are '
                 'not marked as deleted"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_collection_deleted_failure(self):
         col = collection_models.CollectionModel.get_by_id('col_id')
@@ -14850,7 +15223,8 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 'of PendingDeletionRequestModel\', '
                 '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
                 'not marked as deleted"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_incorrect_keys_in_activity_mappings(self):
         self.model_instance.activity_mappings = {'wrong_key': {'some_id': 'id'}}
@@ -14861,10 +15235,11 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 'check of PendingDeletionRequestModel\', '
                 '[u"Entity id %s: activity_mappings contains keys '
                 '[u\'wrong_key\'] that are not allowed"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
+class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(TaskEntryModelValidatorTests, self).setUp()
@@ -15218,7 +15593,7 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             ])
 
 
-class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
+class PlaythroughModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(PlaythroughModelValidatorTests, self).setUp()
         self.exp = self.save_new_valid_exploration('EXP_ID', 'owner_id')
@@ -15264,7 +15639,8 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
         self.create_exp_issues_with_playthroughs([[playthrough.id]])
 
         expected_output = [u'[u\'fully-validated PlaythroughModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_output_for_pre_released_playthrough(self):
         self.set_config_property(
@@ -15285,7 +15661,8 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
                     playthrough.id,)
             )
         ]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_output_for_non_whitelisted_playthrough(self):
         self.set_config_property(
@@ -15302,7 +15679,8 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
                 'recording.\']]' % (playthrough.id,)
             )
         ]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_output_for_bad_schema_playthrough(self):
         self.set_config_property(
@@ -15321,7 +15699,8 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
                 'schema_version\'"]]' % (playthrough.id,)
             )
         ]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_output_for_missing_reference(self):
         self.set_config_property(
@@ -15341,7 +15720,8 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
                 )
             )
         ]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_output_for_multiple_references(self):
         self.set_config_property(
@@ -15359,7 +15739,8 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
                     playthrough.id, self.exp.id, self.exp.version)
             )
         ]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_output_for_duplicate_references_in_one_issue(self):
         self.set_config_property(
@@ -15377,7 +15758,8 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
                     playthrough.id, self.exp.id, self.exp.version)
             )
         ]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_missing_exp_issues_model_failure(self):
         self.set_config_property(
@@ -15401,10 +15783,11 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
                 '%s, expect model ExplorationIssuesModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     playthrough.id, exp_issues_id, exp_issues_id)]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
+class PseudonymizedUserModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(PseudonymizedUserModelValidatorTests, self).setUp()
@@ -15423,7 +15806,8 @@ class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated PseudonymizedUserModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -15438,7 +15822,8 @@ class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -15448,10 +15833,11 @@ class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
 
     def test_model_not_same_id_as_user(self):
         user_models.UserSettingsModel(
@@ -15466,10 +15852,11 @@ class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
             '[u\'Entity id %s: User settings model exists\']]'
         ) % self.model_instance.id]
 
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
-class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
+class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(PlatformParameterModelValidatorTests, self).setUp()
@@ -15491,7 +15878,8 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated PlatformParameterModel\', 1]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.parameter_model.created_on = (
@@ -15509,7 +15897,8 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
                     self.parameter_model.last_updated
                 )
         ]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -15519,10 +15908,11 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.parameter_model.id, self.parameter_model.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_metadata_model_failure(self):
         config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
@@ -15536,7 +15926,8 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
                 'with id %s-1 but it doesn\'t exist"]]' % (
                     (self.parameter_model.id,) * 3))
         ]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_snapshot_content_model_failure(self):
         config_models.PlatformParameterSnapshotContentModel.get_by_id(
@@ -15550,11 +15941,12 @@ class PlatformParameterModelValidatorTests(test_utils.GenericTestBase):
                 'with id %s-1 but it doesn\'t exist"]]' % (
                     (self.parameter_model.id,) * 3))
         ]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
 
 class PlatformParameterSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(
@@ -15588,7 +15980,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
         self.parameter_model.commit(self.admin_id, '', [])
         expected_output = [
             u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -15605,7 +15998,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                     self.model_instance.created_on,
                     self.model_instance.last_updated)
         ]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -15615,10 +16009,11 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_parameter_model_model_failure(self):
         self.parameter_model.delete(self.admin_id, '', [])
@@ -15635,7 +16030,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                 'PlatformParameterModel with id %s but it doesn\'t '
                 'exist"]]' % ((self.parameter_model.id,) * 6)
             )]
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
@@ -15648,7 +16044,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                 'but it doesn\'t exist"]]'
             ) % (self.parameter_model.id, self.admin_id, self.admin_id)
         ]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_invalid_parameter_model_model_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -15667,7 +16064,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                     self.parameter_model.id, self.parameter_model.id)
             ),
             u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance.commit_cmds = [{
@@ -15687,11 +16085,12 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                     self.parameter_model.id)
             )
         ]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
 class PlatformParameterSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(
@@ -15725,7 +16124,8 @@ class PlatformParameterSnapshotContentModelValidatorTests(
         self.parameter_model.commit(self.admin_id, '', [])
         expected_output = [
             u'[u\'fully-validated PlatformParameterSnapshotContentModel\', 2]']
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
@@ -15743,7 +16143,8 @@ class PlatformParameterSnapshotContentModelValidatorTests(
                     self.model_instance.last_updated
                 )
         ]
-        run_job_and_check_output(self, expected_output)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
@@ -15753,10 +16154,11 @@ class PlatformParameterSnapshotContentModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=True, literal_eval=False)
 
     def test_missing_platform_parameter_model_failure(self):
         self.parameter_model.delete(self.admin_id, '', [])
@@ -15772,7 +16174,8 @@ class PlatformParameterSnapshotContentModelValidatorTests(
                     (self.parameter_model.id,) * 6)
             ),
         ]
-        run_job_and_check_output(self, expected_output, literal_eval=True)
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
     def test_invalid_platform_parameter_model_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -15791,4 +16194,5 @@ class PlatformParameterSnapshotContentModelValidatorTests(
             ),
             u'[u\'fully-validated PlatformParameterSnapshotContentModel\', 1]'
         ]
-        run_job_and_check_output(self, expected_output, sort=True)
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
