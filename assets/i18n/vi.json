@@ -266,7 +266,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "Tên Tài Khoản Của Bạn Không Được Chứa Chữ Admin.",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "Tên Tài Khoản Không Được Có Khoảng Trắng.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Bạn phải điền thông tin vào đây.",
-	"I18N_SIGNUP_LICENSE_NOTE": "Xin lưu ý, khi bạn đồng ý với giấy phép sử dụng của chúng tôi, mọi tài liệu bạn tạo ra đều có giấy phép CC-BY-SA v.4.0. Xem lại <a href=\"/terms\">Terms of Use</a> tại đây. Xem lại giấy phép CC-BY-SA, bấm <a ng-click=\"showLicenseExplanationModal()\">vào đây</a>.",
+	"I18N_SIGNUP_LICENSE_NOTE": "Xin lưu ý, khi bạn đồng ý với giấy phép sử dụng của chúng tôi, mọi tài liệu bạn tạo ra đều có giấy phép CC-BY-SA v.4.0. Xem lại <a href=\"/terms\">Terms of Use</a> tại đây. Xem lại giấy phép CC-BY-SA, bấm <a href=\"#\" ng-click=\"$ctrl.showLicenseExplanationModal()\">vào đây</a>.",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "Dùng <[licenselink]> giấy phép này cho phép mọi người sử dụng lại tài liệu với mục đích dạy và học tập.",
 	"I18N_SIGNUP_LOADING": "Đang Tải",
 	"I18N_SIGNUP_PAGE_TITLE": "Gia Nhập Cộng Đồng Oppia",
