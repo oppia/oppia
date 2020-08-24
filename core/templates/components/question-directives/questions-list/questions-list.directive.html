@@ -24,14 +24,14 @@
     <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && $ctrl.question.getValidationErrorMessage()">
       <[$ctrl.question.getValidationErrorMessage()]>
     </div>
-    <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && !$ctrl.question.getValidationErrorMessage() && $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill).length">
-      Remaining misconceptions that need to be addressed:
-      <ul>
-        <li ng-repeat="misconceptionName in $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill)">
+    <md-card class="misconception-parent-card" ng-if="$ctrl.question.getStateData().interaction.id && !$ctrl.question.getValidationErrorMessage() && $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill).length">
+      <div>
+        <h3>Misconceptions:</h3>
+        <div ng-repeat="misconceptionName in $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill)" class="misconception-list-item">
           <[misconceptionName]>
-        </li>
-      </ul>
-    </div>
+        </div>
+      </div>
+    </md-card>
   </div>
   <md-card class="question-data-container" ng-if="!$ctrl.editorIsOpen">
     <div class="question-list-container">
@@ -258,6 +258,15 @@
   questions-list .oppia-cross-icon {
     color: #FF0000;
   }
+  questions-list .misconception-parent-card {
+    padding: 20px;
+  }
+  questions-list .misconception-list-item {
+    border: 1px solid #999999;
+    border-radius: 4px;
+    margin: 10px;
+    padding: 15px;
+  }
   @media screen and (max-width: 768px) {
     questions-list .question-editor-container {
       margin-top: 30px;
@@ -266,8 +275,10 @@
     questions-list .question-data-container {
       margin-left: 0;
       margin-right: 0;
+      margin-top: 30px;
       order: 10;
-      width: 35%;
+      padding: 0;
+      width: 100%;
     }
     questions-list .create-question-container {
       width: 100%;
@@ -280,7 +291,13 @@
       margin: 0;
     }
     questions-list .create-question-container md-card {
-      padding: 0 15px 10px;
+      padding: 25px;
+    }
+    questions-list .create-question-header {
+      padding-bottom: 25px;
+    }
+    questions-tab .questions {
+      margin-bottom: 70px;
     }
   }
 </style>
