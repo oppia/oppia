@@ -509,6 +509,8 @@ import { StateContentService } from
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -874,6 +876,8 @@ export class UpgradedServices {
     upgradedServices['SkillSummaryObjectFactory'] =
       new SkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
+    upgradedServices['StateEditorRefreshService'] =
+      new StateEditorRefreshService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
     upgradedServices['StateStatsObjectFactory'] = new StateStatsObjectFactory();

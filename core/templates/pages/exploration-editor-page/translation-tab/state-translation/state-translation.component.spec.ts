@@ -46,6 +46,8 @@ import { StateRecordedVoiceoversService } from
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
@@ -69,6 +71,7 @@ import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
 import { EventEmitter } from '@angular/core';
 import { ExternalSaveService } from 'services/external-save.service';
+
 
 describe('State translation component', function() {
   var ctrl = null;
@@ -383,6 +386,8 @@ describe('State translation component', function() {
       TestBed.get(StateCustomizationArgsService));
     $provide.value('StateInteractionIdService',
       TestBed.get(StateInteractionIdService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateRecordedVoiceoversService',
       stateRecordedVoiceoversService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
