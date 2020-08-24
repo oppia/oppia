@@ -20,7 +20,11 @@ describe('Select Skill Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var allowSkillsFromOtherTopics = true;
-  var categorizedSkills = {};
+  var categorizedSkills = {
+    'Dummy Topic': {
+      Subtopic1: [{id: '4'}]
+    }
+  };
   var skillsInSameTopicCount = 3;
   var sortedSkillSummaries = [{
     id: '1'
@@ -45,7 +49,8 @@ describe('Select Skill Modal Controller', function() {
       categorizedSkills: categorizedSkills,
       skillsInSameTopicCount: skillsInSameTopicCount,
       sortedSkillSummaries: sortedSkillSummaries,
-      untriagedSkillSummaries: []
+      skillSummaries: [{id: '9'}],
+      untriagedSkillSummaries: [{id: '10'}]
     });
   }));
 

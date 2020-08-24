@@ -38,7 +38,20 @@ angular.module('oppia').controller('SelectSkillModalController', [
     $scope.countOfSkillsToPrioritize =
       skillsInSameTopicCount;
     $scope.save = function() {
-      $scope.confirm($scope.skillSummaries.find(
+      var totalSkills = [];
+      if ($scope.skillSummaries) {
+        totalSkills = [...$scope.skillSummaries];
+      }
+      if ($scope.untriagedSkillSummaries) {
+        totalSkills.push(...$scope.untriagedSkillSummaries);
+      }
+      for (let topic in $scope.categorizedSkills) {
+        for (let subtopic in $scope.categorizedSkills[topic]) {
+          totalSkills.push(...$scope.categorizedSkills[topic][subtopic]);
+        }
+      }
+
+      $scope.confirm(totalSkills.find(
         summary => summary.id === $scope.selectedSkillId));
     };
   }
