@@ -98,7 +98,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
         names are in test files.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Function definition'
@@ -132,7 +132,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
         are registered in jobs_registry.py file.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         def _get_jobs_class_names_in_filepath(filepath, base_class_name):
@@ -311,7 +311,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         """Prints a list of lint errors in the given list of Python files.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
@@ -377,7 +377,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         Python files.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         files_to_lint = self.all_filepaths
@@ -435,7 +435,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         has imports placed in alphabetical order.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Import order'

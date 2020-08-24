@@ -81,7 +81,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         """Prints a list of lint errors in the given list of CSS files.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')

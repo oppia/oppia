@@ -250,7 +250,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         """This function checks the indentation of lines in HTML files.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         html_files_to_lint = self.html_filepaths
@@ -347,7 +347,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         """This function is used to check HTML files for linting errors.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')

@@ -224,7 +224,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         backend-api.service.ts.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         http_client_pattern = r':\n? *HttpClient'
@@ -264,7 +264,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """Checks if ts ignore is used.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Ts ignore'
@@ -338,7 +338,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """Checks if ts expect error is used in non spec file.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Ts expect error'
@@ -397,7 +397,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         build.JS_FILEPATHS_NOT_TO_BUILD.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Extra JS files'
@@ -430,7 +430,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         matches the filename.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         # Select JS files which need to be checked.
@@ -469,7 +469,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         scope: {} and it should not be scope: true.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         # Select JS and TS files which need to be checked.
@@ -589,7 +589,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         imports, and constant imports, all in sorted order.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Sorted dependencies'
@@ -672,7 +672,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         between the arguments of the controller function.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Controller dependency line break'
@@ -719,7 +719,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         AngularJS) and in *.constants.ts (for Angular 8).
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Constants declaration'
@@ -889,7 +889,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         in the comment.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Comments'
@@ -1078,7 +1078,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         """Prints a list of lint errors in the given list of JavaScript files.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')

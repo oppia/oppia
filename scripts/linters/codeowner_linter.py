@@ -186,7 +186,7 @@ class CodeOwnerLintChecksManager(python_utils.OBJECT):
         bottom of the CODEOWNERS file.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'CODEOWNERS'

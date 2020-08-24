@@ -121,7 +121,7 @@ class CustomLintChecksManager(python_utils.OBJECT):
         are up to date.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Third party type defs'
@@ -197,7 +197,7 @@ class CustomLintChecksManager(python_utils.OBJECT):
         webpack.common.config.ts contains all needed keys.
 
         Returns:
-            TaskResult. An TaskResult object to retrieve the status of a
+            TaskResult. A TaskResult object to retrieve the status of a
             lint check.
         """
         name = 'Webpack config file'
