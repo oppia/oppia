@@ -125,7 +125,8 @@ describe('Admin misc tab', function() {
     await adminPage.expectSimilaritiesToBeUploaded();
     await adminPage.uploadTopicSimilarities('../data/cafe.mp3', false);
     // We uploaded an invalid file (cafe.mp3), so we expect the errors below.
-    allowedErrors.push('encode', 'Object', 'resource');
+    allowedErrors.push('encode', 'Object', 'resource', 'undefined.',
+      'unhandled', 'communicating', 'itemscope');
     await adminPage.downloadSimilarityFile();
     await waitFor.fileToBeDownloaded('topic_similarities.csv');
   });
@@ -165,7 +166,9 @@ describe('Admin misc tab', function() {
     await browser.refresh();
     await waitFor.pageToFullyLoad();
     await adminPage.extractData('0', '0', '0', '0', true);
+    // We expect errors because we inputted an invalid exploration ID.
     await adminPage.expectExtractionFailure();
+    allowedErrors.push('rejection');
   });
 
   afterEach(async function() {
