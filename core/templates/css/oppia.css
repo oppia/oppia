@@ -2141,12 +2141,13 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-response-button,
 .oppia-add-fallback-button,
 .oppia-add-hint-button {
-  background-color: rgba(5, 140, 166, 0.9);
+  background-color: #008098;
   border: 0;
-  border-radius: 4px;
-  color: white;
-  opacity: 0.9;
-  padding: 7px;
+  border-radius: 2px;
+  color: #FFF;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+  padding: 7px 15px;
 }
 
 .oppia-add-interaction-button:active,
@@ -2302,7 +2303,7 @@ pre.oppia-pre-wrapped-text {
   cursor: move;
   left: 10px;
   margin-left: 5px;
-  opacity: 0.3;
+  opacity: 1;
   position: absolute;
   top: 6px;
   width: 25px;
