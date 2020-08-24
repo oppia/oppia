@@ -44,6 +44,8 @@ import { StateCustomizationArgsService } from
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
@@ -101,6 +103,8 @@ describe('Exploration save and publish buttons component', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService',
       TestBed.get(StateInteractionIdService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));

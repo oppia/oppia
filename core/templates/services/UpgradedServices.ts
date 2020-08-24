@@ -329,12 +329,6 @@ import { MathEquationInputRulesService } from
 import { MathEquationInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-validation.service';
-import { MathExpressionInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
-import { MathExpressionInputValidationService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
 import { MessengerService } from 'services/messenger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
@@ -516,6 +510,8 @@ import { StateContentService } from
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -669,12 +665,15 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 
+interface UpgradedServicesDict {
+  [service: string]: unknown;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class UpgradedServices {
-  getUpgradedServices() {
+  getUpgradedServices(): UpgradedServicesDict {
     var upgradedServices = {};
     /* eslint-disable dot-notation */
 
@@ -818,8 +817,6 @@ export class UpgradedServices {
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
       new MathEquationInputRulesService();
-    upgradedServices['MathExpressionInputRulesService'] =
-      new MathExpressionInputRulesService();
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
     upgradedServices['MultipleChoiceInputRulesService'] =
@@ -881,6 +878,8 @@ export class UpgradedServices {
     upgradedServices['SkillSummaryObjectFactory'] =
       new SkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
+    upgradedServices['StateEditorRefreshService'] =
+      new StateEditorRefreshService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
     upgradedServices['StateStatsObjectFactory'] = new StateStatsObjectFactory();
@@ -1022,9 +1021,6 @@ export class UpgradedServices {
       upgradedServices['ExplorationDraftObjectFactory']);
     upgradedServices['LogicProofValidationService'] =
       new LogicProofValidationService(
-        upgradedServices['baseInteractionValidationService']);
-    upgradedServices['MathExpressionInputValidationService'] =
-      new MathExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['MathEquationInputValidationService'] =
       new MathEquationInputValidationService(
@@ -1305,7 +1301,6 @@ export class UpgradedServices {
         upgradedServices['ItemSelectionInputRulesService'],
         upgradedServices['LogicProofRulesService'],
         upgradedServices['MathEquationInputRulesService'],
-        upgradedServices['MathExpressionInputRulesService'],
         upgradedServices['MultipleChoiceInputRulesService'],
         upgradedServices['MusicNotesInputRulesService'],
         upgradedServices['NumberWithUnitsRulesService'],

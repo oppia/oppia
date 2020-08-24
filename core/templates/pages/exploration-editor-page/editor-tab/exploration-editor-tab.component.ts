@@ -45,6 +45,8 @@ require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
+require(
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
 require('components/state-editor/state-editor.directive.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -53,6 +55,8 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/exploration-features.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('explorationEditorTab', {
   template: require('./exploration-editor-tab.component.html'),
   controller: [
@@ -60,14 +64,17 @@ angular.module('oppia').component('explorationEditorTab', {
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'GraphDataService', 'RouterService',
-    'StateEditorService', 'UrlInterpolationService',
+    'StateEditorRefreshService', 'StateEditorService',
+    'UrlInterpolationService',
     function(
         $rootScope, $scope, $uibModal, LoaderService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
         ExplorationWarningsService, GraphDataService, RouterService,
-        StateEditorService, UrlInterpolationService) {
+        StateEditorRefreshService, StateEditorService,
+        UrlInterpolationService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.getStateContentPlaceholder = function() {
         if (
           StateEditorService.getActiveStateName() ===
@@ -258,9 +265,11 @@ angular.module('oppia').component('explorationEditorTab', {
         return ExplorationFeaturesService.areParametersEnabled();
       };
       ctrl.$onInit = function() {
-        $scope.$on('refreshStateEditor', function() {
-          ctrl.initStateEditor();
-        });
+        ctrl.directiveSubscriptions.add(
+          StateEditorRefreshService.onRefreshStateEditor.subscribe(() => {
+            ctrl.initStateEditor();
+          })
+        );
 
         $scope.$watch(ExplorationStatesService.getStates, function() {
           if (ExplorationStatesService.getStates()) {
@@ -269,6 +278,9 @@ angular.module('oppia').component('explorationEditorTab', {
           }
         }, true);
         ctrl.interactionIsShown = false;
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
