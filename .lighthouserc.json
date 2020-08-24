@@ -60,6 +60,7 @@
             "deprecations": ["error", {"minScore": 1}],
             "password-inputs-can-be-pasted-into": ["error", {"minScore": 1}],
             "image-aspect-ratio": ["error", {"minScore": 1}],
+            "offscreen-images": ["error", {"minScore": 0.5}],
             "is-on-https": ["off", {}],
             "time-to-first-byte": ["off", {}]
           }
@@ -67,162 +68,139 @@
         {
           "matchingUrlPattern": "http://[^/]+/signup?return_url=%2F$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/admin$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/about$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/community-library$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/contact$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/contributor-dashboard$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/creator-dashboard$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 0.5}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/delete-account$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/donate$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 0.8}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 0.8}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/get-started$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/learner-dashboard$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/nonprofits$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/parents$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/partners$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/preferences$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 0.5}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/privacy-policy$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/profile/username1$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/teach$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/teachers$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/terms$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/thanks$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         },
         {
           "matchingUrlPattern": "http://[^/]+/volunteers$",
           "assertions": {
-            "uses-webp-images": ["error", {"minScore": 1}],
-            "offscreen-images": ["error", {"minScore": 1}]
+            "uses-webp-images": ["error", {"minScore": 1}]
           }
         }
       ]
