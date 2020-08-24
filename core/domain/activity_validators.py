@@ -36,7 +36,7 @@ class ActivityReferencesModelValidator(
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         # Valid id: featured.
-        regex_string = '^%s$' % '|'.join(
+        regex_string = '^(%s)$' % '|'.join(
             feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES)
         return regex_string
 
