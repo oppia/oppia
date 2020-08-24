@@ -1153,7 +1153,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         excluded_files = [
             'core/templates/pages/exploration-editor-page/translation-tab/'
                 'audio-translation-bar/audio-translation-bar.directive.spec.ts',
-            'core/templates/pages/library-page/search-bar/search-bar.component.spec.ts'
+            'core/templates/pages/library-page/search-bar/'
+                'search-bar.component.spec.ts'
         ]
         with linter_utils.redirect_stdout(stdout):
             failed = False
