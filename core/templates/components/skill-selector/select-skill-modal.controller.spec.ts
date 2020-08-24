@@ -49,7 +49,8 @@ describe('Select Skill Modal Controller', function() {
       categorizedSkills: categorizedSkills,
       skillsInSameTopicCount: skillsInSameTopicCount,
       sortedSkillSummaries: sortedSkillSummaries,
-      untriagedSkillSummaries: []
+      skillSummaries: [{id: '9'}],
+      untriagedSkillSummaries: [{id: '10'}]
     });
   }));
 

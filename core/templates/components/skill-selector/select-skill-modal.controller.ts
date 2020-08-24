@@ -38,9 +38,13 @@ angular.module('oppia').controller('SelectSkillModalController', [
     $scope.countOfSkillsToPrioritize =
       skillsInSameTopicCount;
     $scope.save = function() {
-      var totalSkills = [
-        ...$scope.skillSummaries, ...$scope.untriagedSkillSummaries];
-
+      var totalSkills = [];
+      if ($scope.skillSummaries) {
+        totalSkills = [...$scope.skillSummaries];
+      }
+      if ($scope.untriagedSkillSummaries) {
+        totalSkills.push(...$scope.untriagedSkillSummaries);
+      }
       for (let topic in $scope.categorizedSkills) {
         for (let subtopic in $scope.categorizedSkills[topic]) {
           totalSkills.push(...$scope.categorizedSkills[topic][subtopic]);
