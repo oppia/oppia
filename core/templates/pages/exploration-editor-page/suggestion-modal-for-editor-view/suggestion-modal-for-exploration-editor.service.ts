@@ -23,6 +23,8 @@ require(
 require('domain/state/StateObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
@@ -31,12 +33,14 @@ require('services/suggestion-modal.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
-  '$log', '$rootScope', '$uibModal', 'ExplorationDataService',
-  'ExplorationStatesService', 'RouterService', 'StateObjectFactory',
+  '$log', '$uibModal', 'ExplorationDataService',
+  'ExplorationStatesService', 'RouterService',
+  'StateEditorRefreshService', 'StateObjectFactory',
   'SuggestionModalService', 'ThreadDataService', 'UrlInterpolationService',
   function(
-      $log, $rootScope, $uibModal, ExplorationDataService,
-      ExplorationStatesService, RouterService, StateObjectFactory,
+      $log, $uibModal, ExplorationDataService,
+      ExplorationStatesService, RouterService,
+      StateEditorRefreshService, StateObjectFactory,
       SuggestionModalService, ThreadDataService, UrlInterpolationService) {
     let showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
@@ -86,7 +90,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               RouterService.onRefreshVersionHistory.emit({
                 forceRefresh: true
               });
-              $rootScope.$broadcast('refreshStateEditor');
+              StateEditorRefreshService.onRefreshStateEditor.emit();
             }
           },
           () => $log.error('Error resolving suggestion'));

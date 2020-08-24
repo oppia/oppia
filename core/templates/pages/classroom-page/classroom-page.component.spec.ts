@@ -114,7 +114,6 @@ describe('Classroom page', () => {
       spyOn(
         ClassroomBackendApiService,
         'fetchClassroomDataAsync').and.returnValue($q.resolve(classroomData));
-      spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(PageTitleService, 'setPageTitle').and.callThrough();
       spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
         'mock');

@@ -394,10 +394,6 @@ angular.module('oppia').directive('stateGraphVisualization', [
             }
           };
           ctrl.$onInit = function() {
-            $scope.$on('redrawGraph', function() {
-              redrawGraph();
-            });
-
             ctrl.directiveSubscriptions.add(
               RouterService.onCenterGraph.subscribe(() => {
                 centerGraph();

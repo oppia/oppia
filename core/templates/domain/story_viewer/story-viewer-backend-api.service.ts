@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 
 import {
   LearnerExplorationSummaryBackendDict,
@@ -47,6 +47,11 @@ interface StoryChapterCompletionResponse {
   summaries: LearnerExplorationSummary[];
 }
 
+interface StoryDataDict {
+  topicName: string;
+  storyTitle: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -58,6 +63,8 @@ export class StoryViewerBackendApiService {
     private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
+  private _storyDataEventEmitter = new EventEmitter<StoryDataDict>();
 
   _fetchStoryData(
       topicUrlFragment: string,
@@ -133,6 +140,10 @@ export class StoryViewerBackendApiService {
         topicUrlFragment, classroomUrlFragment, storyUrlFragment,
         nodeId, resolve, reject);
     });
+  }
+
+  get onSendStoryData(): EventEmitter<StoryDataDict> {
+    return this._storyDataEventEmitter;
   }
 }
 

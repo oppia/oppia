@@ -450,8 +450,6 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete new subtopic pages without changing already ' +
     'existing subtopic pages from the local cache', function() {
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
@@ -475,8 +473,6 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete already existing subtopic pages without ' +
     'changing newly created subtopic pages from the local cache', function() {
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
@@ -532,8 +528,6 @@ describe('Topic editor state service', function() {
     // Load initial topic.
     TopicEditorStateService.loadTopic(5);
     $rootScope.$apply();
-
-    spyOn($rootScope, '$broadcast').and.callThrough();
 
     // Load a second topic.
     TopicEditorStateService.loadTopic(1);
@@ -663,11 +657,8 @@ describe('Topic editor state service', function() {
     function() {
       TopicEditorStateService.loadTopic(5);
       $rootScope.$apply();
-
-      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(TopicEditorStateService.saveTopic(
         'Commit message')).toBe(false);
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
   );
 

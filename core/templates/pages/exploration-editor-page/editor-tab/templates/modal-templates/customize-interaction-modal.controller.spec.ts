@@ -110,7 +110,6 @@ describe('Customize Interaction Modal Controller', function() {
       stateInteractionIdService.init(stateName, 'ImageClickInput');
 
       $scope = $rootScope.$new();
-      spyOn($scope, '$broadcast').and.callThrough();
 
       $controller('CustomizeInteractionModalController', {
         $injector: $injector,

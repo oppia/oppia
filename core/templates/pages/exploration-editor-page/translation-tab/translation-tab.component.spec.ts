@@ -50,6 +50,8 @@ import { StateWrittenTranslationsService } from
 import { ContextService } from 'services/context.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
 import { ExternalSaveService } from 'services/external-save.service';
 
 import $ from 'jquery';
@@ -103,6 +105,8 @@ describe('Translation tab component', function() {
       TestBed.get(StateCustomizationArgsService));
     $provide.value('StateInteractionIdService',
       TestBed.get(StateInteractionIdService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));

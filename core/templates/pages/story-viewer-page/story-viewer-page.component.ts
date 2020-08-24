@@ -44,12 +44,12 @@ angular.module('oppia').component('storyViewerPage', {
   template: require('./story-viewer-page.component.html'),
   controller: [
     '$rootScope', 'AlertsService', 'AssetsBackendApiService',
-    'PageTitleService', 'LoaderService',
+    'PageTitleService', 'LoaderService', 'StoryViewerBackendApiService',
     'UrlInterpolationService', 'UrlService', 'ENTITY_TYPE',
     'FATAL_ERROR_CODES',
     function(
         $rootScope, AlertsService, AssetsBackendApiService,
-        PageTitleService, LoaderService,
+        PageTitleService, LoaderService, StoryViewerBackendApiService,
         UrlInterpolationService, UrlService, ENTITY_TYPE,
         FATAL_ERROR_CODES) {
       var ctrl = this;
@@ -145,7 +145,7 @@ angular.module('oppia').component('storyViewerPage', {
             ctrl.storyTitle = storyDataDict.title;
             ctrl.storyDescription = storyDataDict.description;
 
-            $rootScope.$broadcast('storyData', {
+            StoryViewerBackendApiService.onSendStoryData.emit({
               topicName: topicName,
               storyTitle: ctrl.storyTitle
             });

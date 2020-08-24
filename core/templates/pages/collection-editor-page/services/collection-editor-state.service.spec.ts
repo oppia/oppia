@@ -441,10 +441,8 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
 
-      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(CollectionEditorStateService.saveCollection(
         'Commit message')).toBe(false);
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
   );
 

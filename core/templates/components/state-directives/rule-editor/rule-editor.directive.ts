@@ -258,10 +258,6 @@ angular.module('oppia').directive('ruleEditor', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on('updateAnswerGroupInteractionId', function(
-                evt, newInteractionId) {
-              ctrl.currentInteractionId = newInteractionId;
-            });
             ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
             ctrl.editRuleForm = {};
             // Select a default rule type, if one isn't already selected.

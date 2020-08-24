@@ -120,6 +120,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           initialSequence :
           scope.getLastAnswer();
 
+        scope.directiveSubscriptions = new Subscription();
+
         scope.directiveSubscriptions.add(
           PlayerPositionService.onNewCardAvailable.subscribe(() => {
             scope.interactionIsActive = false;

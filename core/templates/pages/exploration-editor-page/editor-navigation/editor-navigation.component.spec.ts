@@ -199,17 +199,6 @@ describe('Editor Navigation Component', function() {
       expect(openTranslationTutorialSpy).toHaveBeenCalled();
     });
 
-    it('should not open any tutorial after dismissing user help modal',
-      function() {
-        spyOn($rootScope, '$broadcast');
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
-        $scope.showUserHelpModal();
-        $scope.$apply();
-
-        expect($rootScope.$broadcast).not.toHaveBeenCalled();
-      });
 
     it('should return if exploration is private', function() {
       spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
