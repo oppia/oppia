@@ -215,11 +215,11 @@ angular.module('oppia').directive('stateInteractionEditor', [
 
             $scope.recomputeGraph();
             _updateInteractionPreview();
-            $rootScope.$broadcast(
-              'handleCustomArgsUpdate',
+            StateEditorService.onHandleCustomArgsUpdate.emit(
               StateEditorService.getAnswerChoices(
                 $scope.interactionId,
-                StateCustomizationArgsService.savedMemento));
+                StateCustomizationArgsService.savedMemento)
+            );
           };
 
           $scope.openInteractionCustomizerModal = function() {
@@ -321,8 +321,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.getStaticImageUrl = function(imagePath) {
               return UrlInterpolationService.getStaticImageUrl(imagePath);
             };
-
-            $rootScope.$broadcast('interactionEditorInitialized');
+            StateEditorService.onInteractionEditorInitialized.emit();
             StateEditorService.updateStateInteractionEditorInitialised();
           };
 

@@ -45,6 +45,7 @@ var submitAnswer = async function(conversationInput, answerCode) {
   await browser.executeScript(
     "var elem = $('.protractor-test-preview-tab .CodeMirror')[0].CodeMirror;" +
     "elem.setValue('" + answerCode + "');");
+  await browser.executeScript('window.scrollTo(0,500);');
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
   await waitFor.elementToBeClickable(
