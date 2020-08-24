@@ -1654,6 +1654,40 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         )
     }
 
+    def _check_space_at_beginning_of_comment(self, line, line_num):
+        """Checks if the comment starts with a space at the beginnig of the
+        comment and returns False if there is no space at beginning else
+        returns True.
+
+        Args:
+            line: str. The current line of comment.
+            line_num: int. Line number of the current comment.
+
+        Returns:
+            bool. False if there is no space at the beginning of the comment
+            else returns True.
+        """
+        if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
+            self.add_message(
+                'no-space-at-beginning', line=line_num)
+            return False
+        return True
+
+    def _check_no_capital_letter_at_beginning(self, line, line_num):
+        """Checks if the comment starts with a capital letter.
+
+        Args:
+            line: str. The current line of comment.
+            line_num: int. Line number of the current comment.
+        """
+        # Check if comment contains any excluded phrase.
+        excluded_phrase_is_present_at_beginning = any(
+            word in line.split()[1] for word in EXCLUDED_PHRASES)
+        if (re.search(br'^# [a-z][A-Za-z]*.*$', line) and not
+                excluded_phrase_is_present_at_beginning):
+            self.add_message(
+                'no-capital-letter-at-beginning', line=line_num)
+
     def process_tokens(self, tokens):
         """Custom pylint checker to ensure that comments follow correct style.
 
@@ -1673,27 +1707,18 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                     continue
 
                 # Comments must start with a space.
-                if (re.search(br'^#[^\s].*$', line) and not
-                        line.startswith(b'#!')):
-                    space_at_beginning_of_comment = False
-                    self.add_message(
-                        'no-space-at-beginning', line=line_num)
+                space_at_beginning_of_comment = (
+                    self._check_space_at_beginning_of_comment(line, line_num))
 
                 if line_num - previous_line_num > 1:
-                    split_line = line.split()
-                    split_prev_line = previous_line.split()
-
-                    # Check if comment contains any excluded phrase.
-                    excluded_phrase_is_present_at_beginning = any(
-                        word in split_line[1] for word in
-                        EXCLUDED_PHRASES)
+                    prev_line_list = previous_line.split()
 
                     if len(previous_line) > 1:
                         excluded_phrase_is_present_at_end = any(
-                            word in split_prev_line[-1] for word in
+                            word in prev_line_list[-1] for word in
                             EXCLUDED_PHRASES)
                         excluded_phrase_at_beginning_of_prev_line = any(
-                            word in split_prev_line[1] for word in
+                            word in prev_line_list[1] for word in
                             EXCLUDED_PHRASES)
 
                         # Comments must end with the proper punctuation.
@@ -1730,10 +1755,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                             continue
 
                     # Comments must start with a capital letter.
-                    if (re.search(br'^# [a-z][A-Za-z]*.*$', line) and not
-                            excluded_phrase_is_present_at_beginning):
-                        self.add_message(
-                            'no-capital-letter-at-beginning', line=line_num)
+                    self._check_no_capital_letter_at_beginning(line, line_num)
                 previous_line_num = line_num
                 previous_line = line
 
