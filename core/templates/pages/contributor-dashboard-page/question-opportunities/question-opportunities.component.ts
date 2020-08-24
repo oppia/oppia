@@ -31,10 +31,10 @@ require(
   'question-editor.directive.ts');
 require(
   'pages/contributor-dashboard-page/login-required-message/' +
-  'login-required-message.directive.ts');
+  'login-required-message.component.ts');
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.directive.ts');
+  'opportunities-list.component.ts');
 require(
   'pages/contributor-dashboard-page/modal-templates/' +
   'question-suggestion-editor-modal.controller.ts');
@@ -52,7 +52,7 @@ require('domain/question/QuestionObjectFactory.ts');
 require('interactions/codemirrorRequires.ts');
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.directive.ts');
+  'opportunities-list.component.ts');
 require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
