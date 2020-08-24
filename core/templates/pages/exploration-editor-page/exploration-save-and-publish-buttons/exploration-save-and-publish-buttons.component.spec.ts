@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for explorationSaveAndPublishButtons.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -43,6 +44,8 @@ import { StateCustomizationArgsService } from
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
@@ -59,6 +62,8 @@ describe('Exploration save and publish buttons component', function() {
   var explorationWarningsService = null;
   var editabilityService = null;
   var userExplorationPermissionsService = null;
+
+  var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -84,6 +89,10 @@ describe('Exploration save and publish buttons component', function() {
       TestBed.get(ExplorationImprovementsTaskRegistryService));
     $provide.value('ExplorationStatsService',
       TestBed.get(ExplorationStatsService));
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
@@ -94,6 +103,8 @@ describe('Exploration save and publish buttons component', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService',
       TestBed.get(StateInteractionIdService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));

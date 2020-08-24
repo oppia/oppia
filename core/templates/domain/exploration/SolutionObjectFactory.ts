@@ -36,7 +36,6 @@ import {
   FractionAnswer,
   InteractionAnswer,
   LogicProofAnswer,
-  MathExpressionAnswer,
   NumberWithUnitsAnswer,
   PencilCodeEditorAnswer
 } from 'interactions/answer-defs';
@@ -51,6 +50,11 @@ export interface SolutionBackendDict {
   'answer_is_exclusive': boolean;
   'correct_answer': InteractionAnswer;
   'explanation': ExplanationBackendDict;
+}
+
+interface ShortAnswerResponse {
+  prefix: string;
+  answer: string;
 }
 
 export class Solution {
@@ -85,8 +89,6 @@ export class Solution {
     var correctAnswer = null;
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';
-    } else if (interactionId === 'MathExpressionInput') {
-      correctAnswer = (<MathExpressionAnswer> this.correctAnswer).latex;
     } else if (interactionId === 'CodeRepl' ||
       interactionId === 'PencilCodeEditor') {
       correctAnswer = (<PencilCodeEditorAnswer> this.correctAnswer).code;
@@ -121,7 +123,8 @@ export class Solution {
     this.explanation = explanation;
   }
 
-  getOppiaShortAnswerResponseHtml(interaction: Interaction) {
+  getOppiaShortAnswerResponseHtml(interaction: Interaction):
+  ShortAnswerResponse {
     return {
       prefix: (this.answerIsExclusive ? 'The only' : 'One'),
       answer: this.ehfs.getShortAnswerHtml(
