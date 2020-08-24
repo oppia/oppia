@@ -55,6 +55,7 @@ import threading
 import time
 import unittest
 
+import pkg_resources
 import python_utils
 
 from . import common
@@ -236,8 +237,11 @@ def main(args=None):
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
+    pkg_resources.working_set.add_entry(common.THIRD_PARTY_DIR)
+
     import dev_appserver
     dev_appserver.fix_sys_path()
+
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(

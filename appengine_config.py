@@ -49,8 +49,9 @@ pkg_resources.working_set.add_entry(os.path.join(ROOT_PATH, 'third_party'))
 if not constants.DEV_MODE:
     pass
 else:
-    os.environ['DATASTORE_DATASET'] = 'migration-toy-app'
+    os.environ['CLOUDSDK_CORE_PROJECT'] = 'oppia-dev'
+    os.environ['DATASTORE_DATASET'] = 'oppia-dev'
     os.environ['DATASTORE_EMULATOR_HOST'] = 'localhost:8081'
     os.environ['DATASTORE_EMULATOR_HOST_PATH'] = 'localhost:8081/datastore'
     os.environ['DATASTORE_HOST'] = 'http://localhost:8081'
-    os.environ['DATASTORE_PROJECT_ID']= 'migration-toy-app'
+    os.environ['DATASTORE_PROJECT_ID']= 'oppia-dev'

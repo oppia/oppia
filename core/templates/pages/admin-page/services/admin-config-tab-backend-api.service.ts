@@ -41,3 +41,6 @@ angular.module('oppia').factory('AdminConfigTabBackendApiService', [
     };
   }
 ]);
+
+//You can change your email preferences via the <a href=\\"https://www.example.com\\">Preferences</a> page. \\u00a9\\u00a9\\u00ae\\u00ae
+//You can change your email preferences via the <a href=\\"https://www.example.com\\">Preferences</a> page. \\u00a9\\u00a9\\u00ae\\u00ae

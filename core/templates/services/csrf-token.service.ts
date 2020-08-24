@@ -28,9 +28,9 @@ import $ from 'jquery';
   providedIn: 'root'
 })
 export class CsrfTokenService {
-  tokenPromise = null;
+  tokenPromise: PromiseLike<string> = null;
 
-  initializeToken() {
+  initializeToken(): void {
     if (this.tokenPromise !== null) {
       throw new Error('Token request has already been made');
     }
@@ -52,7 +52,7 @@ export class CsrfTokenService {
     });
   }
 
-  getTokenAsync() {
+  getTokenAsync(): PromiseLike<string> {
     if (this.tokenPromise === null) {
       throw new Error('Token needs to be initialized');
     }

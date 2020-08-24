@@ -1575,7 +1575,7 @@ class Exploration(python_utils.OBJECT):
         """
         content_count = 0
         for state in self.states.values():
-            content_count += state.get_content_count()
+            content_count += state.get_translatable_content_count()
 
         return content_count
 

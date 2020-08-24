@@ -164,7 +164,7 @@ def main(args=None):
     #Start the local Google Cloud Datastore emulator.
     SUBPROCESSES.append(subprocess.Popen(
         '%s beta emulators datastore start --host-port=localhost:8081'
-        ' --no-store-on-disk --quiet' % (
+        ' --no-store-on-disk --project=oppia-dev --quiet' % (
             common.GCLOUD_PATH
         ), shell=True))
 
