@@ -69,6 +69,52 @@ describe('Admin misc tab', function() {
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4].substring(0, 12);
 
+    await workflow.createExploration();
+    url = await browser.getCurrentUrl();
+    explorationId = url.split('/')[4].substring(0, 12);
+
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(EXPLORATION_NAME);
+    await explorationEditorSettingsTab.setCategory('Algorithms');
+    await explorationEditorSettingsTab.setObjective('Test Admin Page Misc Tab');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.navigateToMainTab();
+
+    await explorationEditorMainTab.setStateName('First');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
+      'Select the right option.'));
+
+    await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      await forms.toRichText('Correct!'),
+      await forms.toRichText('Wrong!')
+    ]);
+    await explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', await forms.toRichText('Good!'),
+      'End', true, 'Equals', 'Correct!');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
+    await explorationEditorMainTab.moveToState('End');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.enableCorrectnessFeedback();
+
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.moveToState('First');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await explorationEditorMainTab.expectTickMarkIsDisplayed();
+    await explorationEditorPage.saveChanges();
+    debugger;
+    await workflow.publishExploration();
+
+    await libraryPage.get();
+    await libraryPage.playExploration(EXPLORATION_NAME);
+    await explorationPlayerPage.submitAnswer.apply(
+      null, CORRECT_ANSWER);
+    await explorationPlayerPage.clickThroughToNextCard();
+    await waitFor.pageToFullyLoad();
+    
     await adminPage.get();
     await adminPage.getMiscTab();
   });
@@ -118,40 +164,12 @@ describe('Admin misc tab', function() {
   });
 
   it('should extract data', async function() {
-    await libraryPage.get();
-    await workflow.createExploration();
-    url = await browser.getCurrentUrl();
-    explorationId = url.split('/')[4].substring(0, 12);
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'));
-    await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-      await forms.toRichText('Correct!'),
-      await forms.toRichText('Wrong!')
-    ]);
-    await explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput', await forms.toRichText('Good!'),
-      'End', true, 'Equals', 'Correct!');
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
-    await explorationEditorMainTab.moveToState('End');
-    await explorationEditorMainTab.setInteraction('EndExploration');
-    await explorationEditorPage.saveChanges();
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle(EXPLORATION_NAME);
-    await explorationEditorSettingsTab.setCategory('Algorithms');
-    await explorationEditorSettingsTab.setObjective('Test the admin misc tab');
-    await explorationEditorSettingsTab.setLanguage('English');
-    await explorationEditorPage.navigateToMainTab();
-    await explorationEditorPage.saveChanges();
-    await workflow.publishExploration();
-    await libraryPage.get();
-    await libraryPage.playExploration(EXPLORATION_NAME);
-    await explorationPlayerPage.submitAnswer.apply(null, CORRECT_ANSWER);
+    await adminPage.extractData(explorationId, '2', 'First', '0', false);
+    await adminPage.expectExtractionSuccess();
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
     await adminPage.extractData('0', '0', '0', '0', true);
     await adminPage.expectExtractionFailure();
-    await adminPage.extractData(explorationId, '1', 'Introduction', '0', false);
-    await adminPage.expectExtractionSuccess();
   });
 
   afterEach(async function() {

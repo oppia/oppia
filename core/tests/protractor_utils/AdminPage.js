@@ -459,9 +459,11 @@ var AdminPage = function() {
     await action.click('Extract Data Form Submit Button',
       extractDataFormSubmitButton);
     if (isMeantToFail) {
-      numExtractionHandles = await browser.driver.getAllWindowHandles().length;
+      numExtractionHandles = await browser.driver.getAllWindowHandles();
+      numExtractionHandles = numExtractionHandles.length;
       await action.click('Extract Data Submit Button',
         extractDataFormSubmitButton);
+      await waitFor.pageToFullyLoad();
     } else {
       await waitFor.visibilityOf(extractDataStatusMessage,
         'Data extraction status message not showing up!');
@@ -471,10 +473,10 @@ var AdminPage = function() {
   };
 
   this.expectExtractionFailure = async function() {
-    var newNumExtractionHandles =
-      await browser.driver.getAllWindowHandles().length;
-    expect(newNumExtractionHandles.length).toEqual(
-      numExtractionHandles.length + 1);
+    var newNumExtractionHandles = await browser.driver.getAllWindowHandles();
+    newNumExtractionHandles = newNumExtractionHandles.length;
+    expect(newNumExtractionHandles).toEqual(
+      numExtractionHandles + 1);
     browser.driver.close();
   };
 
