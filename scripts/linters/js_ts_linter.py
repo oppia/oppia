@@ -1140,7 +1140,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return summary_messages
 
     def _check_broadcast_usage(self):
-        """This function ensures that there are no uses of $broadcast in the 
+        """This function ensures that there are no uses of $broadcast in the
         codebase.
         """
         if self.verbose_mode_enabled:
@@ -1160,8 +1160,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         failed = True
                         summary_message = (
                             '%s --> $broadcast found at line %s. '
-                            'Please use EventEmitters and Subscriptions instead.' % (
-                                file_path, line_number))
+                            'Please use EventEmitters and Subscriptions '
+                            'instead.' % (file_path, line_number))
                         python_utils.PRINT(summary_message)
                         summary_messages.append(summary_message)
                         python_utils.PRINT('')
