@@ -337,7 +337,7 @@ def accept_suggestion(
         score_category = suggestion.score_category
 
         # Get user scoring domain object.
-        user_scoring = get_user_scoring(user_id, score_category)
+        user_scoring = _get_user_scoring(user_id, score_category)
 
         # Increment the score of the author due to their suggestion being
         # accepted.
@@ -650,7 +650,7 @@ def can_user_review_category(user_id, score_category):
         bool. Whether the user can review suggestions under category
         score_category.
     """
-    user_scoring = get_user_scoring(user_id, score_category)
+    user_scoring = _get_user_scoring(user_id, score_category)
     return user_scoring.can_user_review_category()
 
 
@@ -671,7 +671,7 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
     ]
 
 
-def get_user_scoring(user_id, score_category):
+def _get_user_scoring(user_id, score_category):
     """Gets the user scoring model from storage and creates the
     corresponding user scoring domain object if the model exists. If the model
     does not exist a user scoring domain object with the given user_id and
