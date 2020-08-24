@@ -147,11 +147,6 @@
       "description": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }
   },
-  "MathExpressionInput": {
-    "IsMathematicallyEquivalentTo": {
-      "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
-    }
-  },
   "MultipleChoiceInput": {
     "Equals": {
       "description": "is equal to {{x|NonnegativeInt}}"
