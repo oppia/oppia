@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for ExplorationGraphModalController.
  */
 
+import { TestBed } from '@angular/core/testing';
+
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
+
 describe('Exploration Graph Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -26,7 +31,10 @@ describe('Exploration Graph Modal Controller', function() {
   var graphData = {};
   var stateName = 'Introduction';
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
+  }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     GraphDataService = $injector.get('GraphDataService');
