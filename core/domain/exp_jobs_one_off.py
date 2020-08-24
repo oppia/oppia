@@ -28,6 +28,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -49,7 +50,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.content['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
+        if item.content['status'] == rights_domain.ACTIVITY_STATUS_PUBLIC:
             yield (
                 item.get_unversioned_instance_id(),
                 utils.get_time_in_millisecs(item.created_on))

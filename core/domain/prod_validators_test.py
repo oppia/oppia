@@ -43,6 +43,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -1213,10 +1214,10 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             collection_services.save_new_collection(self.owner_id, collection)
 
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
 
         rights_manager.assign_role_for_collection(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = (
             collection_models.CollectionRightsModel.get_by_id('0'))
@@ -1304,7 +1305,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -2000,7 +2001,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             collection_services.save_new_collection(self.owner_id, collection)
 
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
         collection_services.update_collection(
             self.contributor_id, '0', [{
                 'cmd': 'edit_collection_property',
@@ -2009,7 +2010,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             }], 'Changes.')
 
         rights_manager.assign_role_for_collection(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = (
             collection_models.CollectionSummaryModel.get_by_id('0'))
@@ -2088,7 +2089,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -3825,10 +3826,10 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = exp_models.ExplorationRightsModel.get_by_id('0')
         self.model_instance_1 = exp_models.ExplorationRightsModel.get_by_id('1')
@@ -3928,7 +3929,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -4574,7 +4575,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
         exp_services.update_exploration(
             self.contributor_id, '0', [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -4583,7 +4584,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         rating_services.assign_rating_to_exploration(self.user_id, '0', 3)
         rating_services.assign_rating_to_exploration(self.viewer_id, '0', 4)
@@ -4685,7 +4686,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (

@@ -27,12 +27,9 @@ from constants import constants
 from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import user_services
-from core.platform import models
 import feconf
 import python_utils
 import utils
-
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 CMD_CREATE_NEW = 'create_new'
 CMD_CHANGE_ROLE = 'change_role'

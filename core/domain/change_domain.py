@@ -109,10 +109,18 @@ class BaseChange(python_utils.OBJECT):
         'user_id_attribute_names': []
     }]
 
-    @staticmethod
-    def get_user_id_attribute_names(cmd_name):
+    @classmethod
+    def get_user_id_attribute_names(cls, cmd_name):
+        """Get the cmd attributes that contain user ID.
+
+        Args:
+            cmd_name: str. Name of the cmd.
+
+        Returns:
+            list(str). The list of the cmd attributes that contain user ID.
+        """
         all_allowed_commands = (
-                BaseChange.ALLOWED_COMMANDS + BaseChange.COMMON_ALLOWED_COMMANDS
+            cls.ALLOWED_COMMANDS + cls.COMMON_ALLOWED_COMMANDS
         )
 
         for cmd in all_allowed_commands:
