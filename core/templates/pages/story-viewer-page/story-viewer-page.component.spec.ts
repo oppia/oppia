@@ -79,7 +79,7 @@ describe('Story Viewer Page component', function() {
     ctrl = $componentController('storyViewerPage', {
       $rootScope: $rootScope,
       AlertsService: alertsService,
-      PageTitleService: pageTitleService
+      PageTitleService: pageTitleService,
     });
 
     // This approach was choosen because spyOn() doesn't work on properties
