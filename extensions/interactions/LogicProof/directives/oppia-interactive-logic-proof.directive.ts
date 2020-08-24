@@ -19,7 +19,7 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require('interactions/codemirrorRequires.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
