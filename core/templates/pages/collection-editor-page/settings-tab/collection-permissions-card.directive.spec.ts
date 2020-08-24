@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for collection permission card directive.
  */
 
-import { testUpgradeComponent } from 'tests/test-helper';
+import { testUpgradeComponent } from 'tests/unit-test-utils';
 import { CollectionPermissionsCard } from
   './collection-permissions-card.directive';
 
