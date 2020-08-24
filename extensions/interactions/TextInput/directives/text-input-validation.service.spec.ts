@@ -24,6 +24,8 @@ import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from
+  'domain/exploration/RuleObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { TextInputValidationService } from
@@ -35,12 +37,13 @@ describe('TextInputValidationService', () => {
 
   var currentState, customizationArguments;
   var goodAnswerGroups, goodDefaultOutcome;
-  var oof, agof;
+  var oof, agof, rof;
 
   beforeEach(() => {
     validatorService = TestBed.get(TextInputValidationService);
     oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     INTERACTION_SPECS = InteractionSpecsConstants.INTERACTION_SPECS;
     customizationArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
@@ -124,6 +127,150 @@ describe('TextInputValidationService', () => {
       message: (
         'Number of rows must be between ' + minRows + ' and ' +
         maxRows + '.')
+    }]);
+  });
+
+  it('should catch redundancy of contains rules with matching inputs', () => {
+    var answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
+    answerGroups[0].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'Contains',
+        inputs: {
+          x: 'xyz'
+        }
+      }),
+      rof.createFromBackendDict({
+        rule_type: 'Contains',
+        inputs: {
+          x: 'xyza'
+        }
+      })]);
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      ' is preceded by a \'Contains\' rule with a matching input.'
+    }]);
+
+    answerGroups[0].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'Contains',
+        inputs: {
+          x: ''
+        }
+      }),
+      rof.createFromBackendDict({
+        rule_type: 'Contains',
+        inputs: {
+          x: 'abc'
+        }
+      })]);
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      ' is preceded by a \'Contains\' rule with a matching input.'
+    }]);
+
+    answerGroups[0].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'Contains',
+        inputs: {
+          x: 'xyz'
+        }
+      }),
+      rof.createFromBackendDict({
+        rule_type: 'Contains',
+        inputs: {
+          x: 'xyz'
+        }
+      })]);
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      ' is preceded by a \'Contains\' rule with a matching input.'
+    }]);
+  });
+
+  it('should catch redundancy of startsWith rules with matching inputs', () => {
+    var answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
+    answerGroups[0].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'StartsWith',
+        inputs: {
+          x: 'xyz'
+        }
+      }),
+      rof.createFromBackendDict({
+        rule_type: 'StartsWith',
+        inputs: {
+          x: 'xyza'
+        }
+      })]);
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      ' is preceded by a \'StartsWith\' rule with a matching prefix.'
+    }]);
+
+    answerGroups[0].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'StartsWith',
+        inputs: {
+          x: ''
+        }
+      }),
+      rof.createFromBackendDict({
+        rule_type: 'StartsWith',
+        inputs: {
+          x: 'abc'
+        }
+      })]);
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      ' is preceded by a \'StartsWith\' rule with a matching prefix.'
+    }]);
+
+    answerGroups[0].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'Contains',
+        inputs: {
+          x: 'xyz'
+        }
+      }),
+      rof.createFromBackendDict({
+        rule_type: 'StartsWith',
+        inputs: {
+          x: 'xyzy'
+        }
+      })]);
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      ' is preceded by a \'StartsWith\' rule with a matching prefix.'
     }]);
   });
 });

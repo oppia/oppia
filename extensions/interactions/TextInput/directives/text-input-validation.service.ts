@@ -95,9 +95,53 @@ export class TextInputValidationService {
       stateName: string,
       customizationArgs: TextInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    return this.getCustomizationArgsWarnings(customizationArgs).concat(
-      this.bivs.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+    var warningsList: Warning[] = [];
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    var seenStringsContains: string[] = [];
+    var seenStringsStartsWith: string[] = [];
+
+    for (var i = 0; i < answerGroups.length; i++) {
+      var rules = answerGroups[i].getRulesAsList();
+      for (var j = 0; j < rules.length; j++) {
+        var currentString = <string> rules[j].inputs.x;
+        if (rules[j].type === 'Contains') {
+          // Check if the current string contains any of the previously seen
+          // strings as a substring.
+          if (seenStringsContains.some(
+            (seenString) => currentString.includes(seenString)) ||
+            seenStringsStartsWith.includes('')) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+                ' will never be matched because it is preceded ' +
+                'by a \'Contains\' rule with a matching input.')
+            });
+          }
+          seenStringsContains.push(currentString);
+        } else if (rules[j].type === 'StartsWith') {
+          // Check if the current string contains any of the previously seen
+          // strings as a prefix.
+          if (seenStringsStartsWith.concat(seenStringsContains).some(
+            (seenString) => currentString.indexOf(seenString) === 0)) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+                ' will never be matched because it is preceded ' +
+                'by a \'StartsWith\' rule with a matching prefix.')
+            });
+          }
+          seenStringsStartsWith.push(currentString);
+        }
+      }
+    }
+
+    return warningsList.concat(this.bivs.getAllOutcomeWarnings(
+      answerGroups, defaultOutcome, stateName));
   }
 }
 
