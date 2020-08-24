@@ -602,7 +602,7 @@ def _update_user_scoring(user_scoring):
         user_scoring.user_id, user_scoring.score_category
     )
 
-    if user_scoring_model:
+    if user_scoring_model is not None:
         user_scoring_model.user_id = user_scoring.user_id
         user_scoring_model.score_category = user_scoring.score_category
         user_scoring_model.score = user_scoring.score
@@ -687,7 +687,7 @@ def get_user_scoring(user_id, score_category):
     user_scoring_model = user_models.UserContributionScoringModel.get(
         user_id, score_category)
 
-    if user_scoring_model:
+    if user_scoring_model is not None:
         return get_user_scoring_from_model(user_scoring_model)
 
     return user_domain.UserContributionScoring(
