@@ -83,6 +83,7 @@ export const bootstrap = (
       $provide.value('$exceptionHandler', (err) => {
         throw err;
       });
+      return '';
     };
 
     // The `bootstrap()` helper is used for convenience in tests, so that we
@@ -132,7 +133,7 @@ export const testUpgradeComponent = (
         ngDoBootstrap() {}
       }
 
-      // Bootstrap
+      // Bootstrap.
       const element = html('<mock-comp></mock-comp>');
       bootstrap(
         platformBrowserDynamic(), Ng2Module, element, ng1Module).then(

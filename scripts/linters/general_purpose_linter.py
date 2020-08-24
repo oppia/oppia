@@ -136,7 +136,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'\b(ddescribe|fdescribe)\('),
         'message': 'In tests, please use \'describe\' instead of \'ddescribe\''
                    'or \'fdescribe\'',
-        'excluded_files': (),
+        'excluded_files': ('test-helper.ts'),
         'excluded_dirs': ()
     },
     {
@@ -219,7 +219,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/Polyfills.ts',
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
-            'ck-editor-copy-content-service.spec.ts'),
+            'ck-editor-copy-content-service.spec.ts',
+            'core/templates/tests/test-helper.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
@@ -241,7 +242,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'Please do not define "any" types. You can refer '
             'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
             'if you\'re having trouble declaring types.'),
-        'excluded_files': (),
+        'excluded_files': ('core/templates/tests/test-helper.ts'),
         'excluded_dirs': ()
     }
 ]
