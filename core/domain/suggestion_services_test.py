@@ -408,7 +408,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Verify that a user scoring model now exists.
         self.assertIsNotNone(user_models.UserContributionScoringModel.get(
             self.author_id, self.score_category))
-  
+
     def test_accept_suggestion_updates_user_scoring_model_if_it_already_exists(
             self):
         self.mock_create_suggestion(self.target_id)
@@ -1402,18 +1402,14 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_user_ids_who_are_allowed_to_review(self):
         user_models.UserContributionScoringModel.create(
-            self.user_1_id, 'category1', 0
-        )
+            self.user_1_id, 'category1', 0)
         user_models.UserContributionScoringModel.create(
             self.user_1_id, 'category2',
-            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
-        )
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
         user_models.UserContributionScoringModel.create(
-            self.user_2_id, 'category1', 0
-        )
+            self.user_2_id, 'category1', 0)
         user_models.UserContributionScoringModel.create(
-            self.user_2_id, 'category2', 0
-        )
+            self.user_2_id, 'category2', 0)
 
         user_ids = (
             suggestion_services.get_all_user_ids_who_are_allowed_to_review(
@@ -1425,28 +1421,21 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_ids, [self.user_1_id])
 
         self.assertFalse(suggestion_services.can_user_review_category(
-            self.user_1_id, 'category1')
-        )
+            self.user_1_id, 'category1'))
         self.assertTrue(suggestion_services.can_user_review_category(
-            self.user_1_id, 'category2')
-        )
+            self.user_1_id, 'category2'))
         self.assertFalse(suggestion_services.can_user_review_category(
-            self.user_2_id, 'category1')
-        )
+            self.user_2_id, 'category1'))
         self.assertFalse(suggestion_services.can_user_review_category(
-            self.user_2_id, 'category1')
-        )
+            self.user_2_id, 'category1'))
 
     def test_get_all_scores_of_the_user_with_multiple_scores(self):
         user_models.UserContributionScoringModel.create(
-            self.user_1_id, 'category1', 1
-        )
+            self.user_1_id, 'category1', 1)
         user_models.UserContributionScoringModel.create(
-            self.user_1_id, 'category2', 2
-        )
+            self.user_1_id, 'category2', 2)
         user_models.UserContributionScoringModel.create(
-            self.user_1_id, 'category3', 3
-        )
+            self.user_1_id, 'category3', 3)
 
         expected_scores_dict = {}
         for index in python_utils.RANGE(1, 4):
