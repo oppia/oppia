@@ -16,7 +16,12 @@
  * @fileoverview Page object for the exploration editor, for use in Protractor
  * tests.
  */
+
+var action = require('./action');
 var waitFor = require('./waitFor.js');
+
+var ExplorationEditorImprovementsTab = require(
+  '../protractor_utils/ExplorationEditorImprovementsTab.js');
 var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
 var ExplorationEditorHistoryTab = require(
@@ -36,6 +41,10 @@ var ExplorationEditorPage = function() {
   /*
    * Components
    */
+  this.getImprovementsTab = function() {
+    return (
+      new ExplorationEditorImprovementsTab.ExplorationEditorImprovementsTab());
+  };
   this.getFeedbackTab = function() {
     return new ExplorationEditorFeedbackTab.ExplorationEditorFeedbackTab();
   };
@@ -79,6 +88,8 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-confirm-discard-changes'));
   var discardChangesButton = element(
     by.css('.protractor-test-discard-changes'));
+  var navigateToImprovementsTabButton = element(
+    by.css('.protractor-test-improvements-tab'));
   var navigateToFeedbackTabButton = element(
     by.css('.protractor-test-feedback-tab'));
   var navigateToHistoryTabButton = element(
@@ -232,54 +243,56 @@ var ExplorationEditorPage = function() {
     expect(await saveChangesButton.isPresent()).toBeFalsy();
   };
 
+  this.expectCanPublishChanges = async function() {
+    expect(await publishExplorationButton.isEnabled()).toBeTrue();
+  };
+
+  this.expectCannotPublishChanges = async function() {
+    expect(await publishExplorationButton.isEnabled()).toBeFalsy();
+  };
+
   // ---- NAVIGATION ----
 
+  this.navigateToImprovementsTab = async function() {
+    await action.click(
+      'Improvements tab button', navigateToImprovementsTabButton);
+    await waitFor.pageToFullyLoad();
+  };
+
   this.navigateToHistoryTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToHistoryTabButton, 'History tab is not clickable');
-    await navigateToHistoryTabButton.click();
+    await action.click('History tab button', navigateToHistoryTabButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToFeedbackTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToFeedbackTabButton, 'Feedback tab is not clickable');
-    await navigateToFeedbackTabButton.click();
+    await action.click('Feedback tab button', navigateToFeedbackTabButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToMainTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToMainTabButton, 'Main tab is not clickable');
-    await navigateToMainTabButton.click();
-    await waitFor.elementToBeClickable(
-      neutralElement, 'Neutral element is not clickable');
-    await neutralElement.click();
+    await action.click('Main tab button', navigateToMainTabButton);
+    await action.click('Neutral element', neutralElement);
+    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToPreviewTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToPreviewTabButton, 'Preview tab is not clickable');
-    await navigateToPreviewTabButton.click();
+    await action.click('Preview tab button', navigateToPreviewTabButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToSettingsTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToSettingsTabButton, 'Settings tab is not clickable');
-    await navigateToSettingsTabButton.click();
+    await action.click('Settings tab button', navigateToSettingsTabButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.navigateToStatsTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToStatsTabButton, 'Stats tab is not clickable');
-    await navigateToStatsTabButton.click();
+    await action.click('Statistics tab button', navigateToStatsTabButton);
+    await waitFor.pageToFullyLoad();
   };
+
   this.navigateToTranslationTab = async function() {
-    await waitFor.elementToBeClickable(
-      navigateToTranslationTabButton, 'Translation tab is not clickable');
-    await navigateToTranslationTabButton.click();
+    await action.click(
+      'Translation tab button', navigateToTranslationTabButton);
     await waitFor.pageToFullyLoad();
   };
 };
