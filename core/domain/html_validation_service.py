@@ -1037,7 +1037,8 @@ def validate_math_content_in_math_rich_text(html_string):
         html_string: str. The HTML string.
 
     Returns:
-        list(str). A list of invalid math tags in the HTML string.
+        list(dict(str, str)). A list of dicts each having the invalid tags in
+        the HTML string and the corresponding exception raised.
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
