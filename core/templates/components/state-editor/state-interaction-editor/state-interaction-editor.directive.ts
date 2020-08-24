@@ -230,6 +230,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                   '/pages/exploration-editor-page/editor-tab/templates/' +
                   'modal-templates/customize-interaction-modal.template.html'),
                 backdrop: true,
+                windowClass: 'customize-interaction-modal',
                 controller: 'CustomizeInteractionModalController'
               }).result.then(
                 $scope.onCustomizationModalSavePostHook, function() {
