@@ -3009,7 +3009,6 @@ class GeneralSuggestionModelValidator(base_validators.BaseModelValidator):
             feedback_models.THREAD_ID_PREFIX_MAX_LEN)
         return regex_string
 
-
     @classmethod
     def _get_model_domain_object_instance(cls, item):
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:

@@ -34,6 +34,7 @@ interface ThreadMessageBackendDict {
 }
 
 export class ThreadMessage {
+  id: string;
   authorUsername: string;
   createdOnMsecs: number;
   entityType: string;

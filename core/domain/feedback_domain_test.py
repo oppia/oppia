@@ -96,10 +96,9 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_message_dict = {
+            'id': self.FULL_MESSAGE_ID,
             'author_username': self.OWNER_USERNAME,
             'created_on_msecs': utils.get_time_in_millisecs(fake_date),
-            'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
-            'entity_id': self.EXP_ID,
             'message_id': self.MESSAGE_ID,
             'text': 'a message text',
             'updated_status': 'open',
