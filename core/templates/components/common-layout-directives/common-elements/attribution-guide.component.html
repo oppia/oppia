@@ -1,10 +1,10 @@
 <div class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
-  <div style="height: 3px; width: 3px;" class="protractor-test-neutral-element"></div>
+  <div class="oppia-neutral-element protractor-test-neutral-element"></div>
 
   <a class="oppia-attribution-image-link" rel="noopener" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
-    <img alt="Creative Commons License" style="border-width: 0; height: 24px;" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png">
+    <img alt="Creative Commons License" class="oppia-creative-commons-image" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png">
   </a><br>
-  <a class="oppia-attribution-link" href="/about#foundation" rel="noopener" target="_blank" style="font-size: 10px;">Attribution Guide</a>
+  <a class="oppia-attribution-link oppia-attribution-guide-text" href="/about#foundation" rel="noopener" target="_blank">Attribution Guide</a>
 </div>
 <style>
   .oppia-cc-icon a.oppia-attribution-image-link,
@@ -29,5 +29,19 @@
   .oppia-cc-icon:hover {
     opacity: 0.7;
     text-decoration: none;
+  }
+
+  .oppia-neutral-element {
+    height: 3px;
+    width: 3px;
+  }
+
+  .oppia-creative-commons-image {
+    border-width: 0;
+    height: 24px;
+  }
+
+  .oppia-attribution-guide-text {
+    font-size: 10px;
   }
 </style>

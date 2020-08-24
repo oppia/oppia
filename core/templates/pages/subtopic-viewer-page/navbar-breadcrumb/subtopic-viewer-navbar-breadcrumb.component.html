@@ -1,27 +1,39 @@
-<div *ngIf="subtopicTitle" class="nav navbar-nav oppia-navbar-breadcrumb oppia-subtopic-viewer-nav-breadcrumb">
-  <div class="oppia-subtopic-viewer-nav-separator"></div>
-  <div class="oppia-subtopic-viewer-nav-labels-container">
-    <p style="margin: 0; font-size: 18px;">{{ subtopicTitle }}</p>
-    <a [href]="getTopicUrl()" style="color: white; font-size: 12px;">{{ topicName }}</a>
+<div class="subtopic-viewer-navbar-breadcrumb">
+  <div *ngIf="subtopicTitle" class="nav navbar-nav oppia-navbar-breadcrumb oppia-subtopic-viewer-nav-breadcrumb">
+    <div class="oppia-subtopic-viewer-nav-separator"></div>
+    <div class="oppia-subtopic-viewer-nav-labels-container">
+      <p class="oppia-subtopic-title-text">{{ subtopicTitle }}</p>
+      <a [href]="getTopicUrl()" class="oppia-topic-name-text">{{ topicName }}</a>
+    </div>
   </div>
 </div>
 
 <style>
-  .oppia-subtopic-viewer-nav-breadcrumb {
+  .subtopic-viewer-navbar-breadcrumb .oppia-subtopic-viewer-nav-breadcrumb {
     align-items: center;
     height: 56px;
     padding-top: 0;
   }
 
-  .oppia-subtopic-viewer-nav-separator {
+  .subtopic-viewer-navbar-breadcrumb .oppia-subtopic-viewer-nav-separator {
     background-color: white;
     height: 80%;
     margin-right: 12px;
     width: 1px;
   }
 
-  .oppia-subtopic-viewer-nav-labels-container {
+  .subtopic-viewer-navbar-breadcrumb .oppia-subtopic-viewer-nav-labels-container {
     display: flex;
     flex-direction: column;
+  }
+
+  .subtopic-viewer-navbar-breadcrumb .oppia-subtopic-title-text {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .subtopic-viewer-navbar-breadcrumb .oppia-topic-name-text {
+    color: white;
+    font-size: 12px;
   }
 </style>

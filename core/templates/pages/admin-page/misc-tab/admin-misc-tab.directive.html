@@ -1,172 +1,174 @@
-<md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
-  <h3>Topic Similarities</h3>
-  <div class="oppia-topic-similarities-container">
-    Upload a csv file:<br>
-    The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
-    <input type="file" id="topicSimilaritiesFile">
-    <button ng-click="$ctrl.uploadTopicSimilaritiesFile()">Upload</button>
-    <button ng-click="$ctrl.downloadTopicSimilaritiesFile()">Download current topic similarities</button>
-  </div>
-</md-card>
+<div class="oppia-admin-misc-tab-container">
+  <md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+    <h3>Topic Similarities</h3>
+    <div class="oppia-topic-similarities-container">
+      Upload a csv file:<br>
+      The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
+      <input type="file" id="topicSimilaritiesFile">
+      <button ng-click="$ctrl.uploadTopicSimilaritiesFile()">Upload</button>
+      <button ng-click="$ctrl.downloadTopicSimilaritiesFile()">Download current topic similarities</button>
+    </div>
+  </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text" style="">
-  <h3>Search Index</h3>
-  <button ng-click="$ctrl.clearSearchIndex()">Clear Search Index</button>
-</md-card>
+  <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+    <h3>Search Index</h3>
+    <button ng-click="$ctrl.clearSearchIndex()">Clear Search Index</button>
+  </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text" style="">
-  <h3>Flush migration bot contributions</h3>
-  <button ng-click="$ctrl.flushMigrationBotContributions()">Flush contributions</button>
-</md-card>
+  <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+    <h3>Flush migration bot contributions</h3>
+    <button ng-click="$ctrl.flushMigrationBotContributions()">Flush contributions</button>
+  </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Extract Data</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.submitQuery()">
-      <div class="form-group row">
-        <label>Exploration ID:</label> <input type="text" ng-model="$ctrl.expId" required="true">
-      </div>
-      <div class="form-group row">
-        <label>Exploration version:</label> <input type="number" min="0" ng-model="$ctrl.expVersion" required="true">
-      </div>
-      <div class="form-group row">
-        <label>State name:</label> <input type="text" ng-model="$ctrl.stateName" required="true">
-      </div>
-      <div class="form-group row">
-        <label>Number of answers:</label> <input type="number" min="0" ng-model="$ctrl.numAnswers" required="true">
-      </div>
-      <div class="form-group row">
-        <input type="submit" value="submit query">
-        <input type="reset" value="reset">
-      </div>
-    </form>
-    <p> (To get all answers set number of answers to 0) </p>
-    <p ng-if="$ctrl.showDataExtractionQueryStatus">Status: <[$ctrl.dataExtractionQueryStatusMessage]></p>
-  </div>
-</md-card>
+  <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+    <h3>Extract Data</h3>
+    <div class="oppia-query-form">
+      <form class="form" ng-submit="$ctrl.submitQuery()">
+        <div class="form-group row">
+          <label>Exploration ID:</label> <input type="text" ng-model="$ctrl.expId" required="true">
+        </div>
+        <div class="form-group row">
+          <label>Exploration version:</label> <input type="number" min="0" ng-model="$ctrl.expVersion" required="true">
+        </div>
+        <div class="form-group row">
+          <label>State name:</label> <input type="text" ng-model="$ctrl.stateName" required="true">
+        </div>
+        <div class="form-group row">
+          <label>Number of answers:</label> <input type="number" min="0" ng-model="$ctrl.numAnswers" required="true">
+        </div>
+        <div class="form-group row">
+          <input type="submit" value="submit query">
+          <input type="reset" value="reset">
+        </div>
+      </form>
+      <p> (To get all answers set number of answers to 0) </p>
+      <p ng-if="$ctrl.showDataExtractionQueryStatus">Status: <[$ctrl.dataExtractionQueryStatusMessage]></p>
+    </div>
+  </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Regenerate contribution opportunities for a topic:</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.regenerateOpportunitiesRelatedToTopic()">
-      <div class="form-group row">
-        <label>Topic ID:</label> <input type="text" ng-model="$ctrl.topicIdForRegeneratingOpportunities" required="true">
-      </div>
-      <div class="form-group row">
-        <input type="submit" value="Regenerate">
-        <input type="reset" value="reset">
-      </div>
-    </form>
-    <p ng-if="$ctrl.regenerationMessage"><[$ctrl.regenerationMessage]></p>
-  </div>
-</md-card>
+  <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+    <h3>Regenerate contribution opportunities for a topic:</h3>
+    <div class="oppia-query-form">
+      <form class="form" ng-submit="$ctrl.regenerateOpportunitiesRelatedToTopic()">
+        <div class="form-group row">
+          <label>Topic ID:</label> <input type="text" ng-model="$ctrl.topicIdForRegeneratingOpportunities" required="true">
+        </div>
+        <div class="form-group row">
+          <input type="submit" value="Regenerate">
+          <input type="reset" value="reset">
+        </div>
+      </form>
+      <p ng-if="$ctrl.regenerationMessage"><[$ctrl.regenerationMessage]></p>
+    </div>
+  </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Send a Test Mail to Admin</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.sendDummyMailToAdmin()">
-      <div class="form-group row">
-        <input type="submit" value="Send">
-      </div>
-    </form>
-  </div>
-</md-card>
+  <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+    <h3>Send a Test Mail to Admin</h3>
+    <div class="oppia-query-form">
+      <form class="form" ng-submit="$ctrl.sendDummyMailToAdmin()">
+        <div class="form-group row">
+          <input type="submit" value="Send">
+        </div>
+      </form>
+    </div>
+  </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Flush the Memory Cache</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.flushMemoryCache()">
-      <div class="form-group row">
-        <input type="submit" value="Flush Cache">
-      </div>
-    </form>
-    <form class="form" ng-submit="$ctrl.getMemoryCacheProfile()">
-      <div class="form-group row">
-        <input type="submit" value="Get Memory Cache Profile">
-      </div>
-    </form>
-  </div>
-  <div ng-show="$ctrl.memoryCacheDataFetched">
-    <table class="table text-center view-results-table">
-      <thead>
-        <tr>
-          <td><strong>Total Memory Allocated in Bytes</strong></td>
-          <td><strong>Peak Memory Allocation in Bytes</strong></td>
-          <td><strong>Number of Keys Allocated</strong></td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><[$ctrl.result.totalAllocatedInBytes]></td>
-          <td><[$ctrl.result.peakAllocatedInBytes]></td>
-          <td><[$ctrl.result.totalKeysStored]></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</md-card>
+  <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+    <h3>Flush the Memory Cache</h3>
+    <div class="oppia-query-form">
+      <form class="form" ng-submit="$ctrl.flushMemoryCache()">
+        <div class="form-group row">
+          <input type="submit" value="Flush Cache">
+        </div>
+      </form>
+      <form class="form" ng-submit="$ctrl.getMemoryCacheProfile()">
+        <div class="form-group row">
+          <input type="submit" value="Get Memory Cache Profile">
+        </div>
+      </form>
+    </div>
+    <div ng-show="$ctrl.memoryCacheDataFetched">
+      <table class="table text-center view-results-table">
+        <thead>
+          <tr>
+            <td><strong>Total Memory Allocated in Bytes</strong></td>
+            <td><strong>Peak Memory Allocation in Bytes</strong></td>
+            <td><strong>Number of Keys Allocated</strong></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><[$ctrl.result.totalAllocatedInBytes]></td>
+            <td><[$ctrl.result.peakAllocatedInBytes]></td>
+            <td><[$ctrl.result.totalKeysStored]></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Generate SVGs for exploration</h3>
-  <h3>Number of explorations left to update: <[$ctrl.numberOfExplorationsLeftToUpdate]></h3>
-  <h3>Generate and save SVGs for exploration</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForExplorations()">
-      <div class="form-group row">
-        <input type="submit" value="Start">
-      </div>
-    </form>
+  <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+    <h3>Generate SVGs for exploration</h3>
+    <h3>Number of explorations left to update: <[$ctrl.numberOfExplorationsLeftToUpdate]></h3>
+    <h3>Generate and save SVGs for exploration</h3>
+    <div class="oppia-query-form">
+      <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForExplorations()">
+        <div class="form-group row">
+          <input type="submit" value="Start">
+        </div>
+      </form>
 
-  </div>
-  <h3>Stop generating SVGs</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.stopGeneration()">
-      <div class="form-group row">
-        <input type="submit" value="Stop">
-      </div>
-    </form>
-  </div>
+    </div>
+    <h3>Stop generating SVGs</h3>
+    <div class="oppia-query-form">
+      <form class="form" ng-submit="$ctrl.stopGeneration()">
+        <div class="form-group row">
+          <input type="submit" value="Stop">
+        </div>
+      </form>
+    </div>
 
-</md-card>
+  </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Generate SVGs for suggestions</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForSuggestions()">
-      <div class="form-group row">
-        <input type="submit" value="Fetch">
-      </div>
-    </form>
+  <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+    <h3>Generate SVGs for suggestions</h3>
+    <div class="oppia-query-form">
+      <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForSuggestions()">
+        <div class="form-group row">
+          <input type="submit" value="Fetch">
+        </div>
+      </form>
 
-  </div>
-  <h3>Save the SVGs for suggestions</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.saveSuggestionSvgsToBackend()">
-      <div class="form-group row">
-        <input type="submit" value="Save">
-      </div>
-    </form>
-  </div>
-</md-card>
+    </div>
+    <h3>Save the SVGs for suggestions</h3>
+    <div class="oppia-query-form">
+      <form class="form" ng-submit="$ctrl.saveSuggestionSvgsToBackend()">
+        <div class="form-group row">
+          <input type="submit" value="Save">
+        </div>
+      </form>
+    </div>
+  </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Update username</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.updateUsername()">
-      <div class="form-group row">
-        <label>Old username:</label>
-        <input type="text" ng-model="$ctrl.oldUsername" required="true">
-      </div>
-      <div class="form-group row">
-        <label>New username:</label>
-        <input type="text" ng-model="$ctrl.newUsername" required="true" maxlength="<[$ctrl.MAX_USERNAME_LENGTH]>">
-      </div>
-      <div class="form-group row">
-        <input type="submit" value="Update">
-      </div>
-    </form>
-  </div>
-</md-card>
+  <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+    <h3>Update username</h3>
+    <div class="oppia-query-form">
+      <form class="form" ng-submit="$ctrl.updateUsername()">
+        <div class="form-group row">
+          <label>Old username:</label>
+          <input type="text" ng-model="$ctrl.oldUsername" required="true">
+        </div>
+        <div class="form-group row">
+          <label>New username:</label>
+          <input type="text" ng-model="$ctrl.newUsername" required="true" maxlength="<[$ctrl.MAX_USERNAME_LENGTH]>">
+        </div>
+        <div class="form-group row">
+          <input type="submit" value="Update">
+        </div>
+      </form>
+    </div>
+  </md-card>
+</div>
 
 <style>
   .oppia-admin-page-card {
@@ -189,5 +191,8 @@
   .oppia-topic-similarities-container > button {
     display: block;
     margin: 5px 0 5px 0;
+  }
+  .oppia-admin-misc-tab-container .oppia-long-text-card {
+    max-width: 700px;
   }
 </style>
