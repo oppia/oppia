@@ -78,7 +78,26 @@ describe('Classroom page functionality', function() {
       await classroomPage.get('math');
       await classroomPage.expectNumberOfTopicsToBe(0);
       await topicsAndSkillsDashboardPage.get();
+      (await
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill 1', 'Concept card explanation', false));
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+      await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+      await topicEditorPage.addSubtopic(
+        'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
+        'Subtopic content');
+      await topicEditorPage.saveTopic('Added subtopic.');
+
+      await topicEditorPage.navigateToTopicEditorTab();
+      await topicEditorPage.navigateToReassignModal();
+
+      await topicEditorPage.dragSkillToSubtopic('Skill 2', 0);
+      await topicEditorPage.saveRearrangedSkills();
+      await topicEditorPage.saveTopic('Added skill to subtopic.');
+
       await topicEditorPage.publishTopic();
       await classroomPage.get('math');
       await classroomPage.expectNumberOfTopicsToBe(1);
