@@ -31,6 +31,7 @@ describe('Topic editor page', function() {
   var ContextService = null;
   var PageTitleService = null;
   var TopicEditorRoutingService = null;
+  var UndoRedoService = null;
   var TopicEditorStateService = null;
   var UrlService = null;
 
@@ -44,6 +45,7 @@ describe('Topic editor page', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
+    UndoRedoService = $injector.get('UndoRedoService');
     PageTitleService = $injector.get('PageTitleService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
@@ -84,6 +86,13 @@ describe('Topic editor page', function() {
     spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'questions');
     expect(ctrl.getActiveTabName()).toBe('questions');
+    expect(ctrl.isInTopicEditorTabs()).toBe(true);
+    expect(ctrl.isInPreviewTab()).toBe(false);
+  });
+
+  it('should get entity type from context service', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
+    expect(ctrl.getChangeListLength()).toBe(10);
   });
 
   it('should get entity type from context service', function() {

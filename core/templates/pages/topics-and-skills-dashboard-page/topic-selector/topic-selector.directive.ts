@@ -30,9 +30,9 @@ angular.module('oppia').directive('selectTopics', [
         '/pages/topics-and-skills-dashboard-page/topic-selector/' +
         'topic-selector.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$rootScope',
+        '$scope',
         function(
-            $scope, $uibModal, $rootScope) {
+            $scope) {
           var ctrl = this;
           $scope.selectOrDeselectTopic = function(topicId, index) {
             if (!$scope.topicSummaries[index].isSelected) {
