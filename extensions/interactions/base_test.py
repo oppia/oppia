@@ -612,7 +612,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     self.assertTrue(getattr(interaction, item))
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
-                
+
             if interaction.is_linear or interaction.is_terminal:
                 self.assertIsNone(interaction.answer_type)
             else:
