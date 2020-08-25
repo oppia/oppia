@@ -248,7 +248,7 @@
           "order": "asc",
           "caseInsensitive": true
         },
-        "newlines-between": "always"
+        "newlines-between": "always-and-inside-groups"
       }
     ],
     // "unused-imports/no-unused-imports-ts": "error",
