@@ -314,7 +314,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "Los nomes d'usuariu que contienen 'admin' tán acutaos.",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "Por favor asegúrate de que'l to usuariu nun contenga espacios.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Esti campu ye obligatoriu.",
-	"I18N_SIGNUP_LICENSE_NOTE": "Por favor nota que, n'aceutando les nueses Condiciones d'Usu, aceutes que cualquier conteníu o contribuciones que faigas nel nuesu sitiu tán y van tar baxo llicencia CC-BY-SA v.4.0, con un requisitu d'arrenunciu d'atribución. Por favor, revisa les <a href=\"/terms\">Condiciones d'Usu</a> pa más información tocante a la llicencia. Pa más información sobro CC-BY-SA, fai click <a ng-click=\"showLicenseExplanationModal()\">equí</a>.",
+	"I18N_SIGNUP_LICENSE_NOTE": "Por favor nota que, n'aceutando les nueses Condiciones d'Usu, aceutes que cualquier conteníu o contribuciones que faigas nel nuesu sitiu tán y van tar baxo llicencia CC-BY-SA v.4.0, con un requisitu d'arrenunciu d'atribución. Por favor, revisa les <a href=\"/terms\">Condiciones d'Usu</a> pa más información tocante a la llicencia. Pa más información sobro CC-BY-SA, fai click <a href=\"#\" ng-click=\"$ctrl.showLicenseExplanationModal()\">equí</a>.",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "L'usu d'una llicencia <[licenselink]> permite que'l conteníu de les esploraciones se copie, reutilice, entemeza y redistribuya de mou llibre. La condición principal ye que si dalguién entemez, tresforma o construi daqué con el material, tamién ta obligáu a distribuir el trabayu baxo la mesma llicencia llibre.",
 	"I18N_SIGNUP_LOADING": "Cargando",
 	"I18N_SIGNUP_PAGE_TITLE": "Xúnite a la comunidá - Oppia",
