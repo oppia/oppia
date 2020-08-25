@@ -355,14 +355,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': False,
             'add_mailgun_api_key_gets_called': False,
-            'add_redishost_gets_called': False,
             'apply_changes_based_on_config_gets_called': False,
             'ask_user_to_confirm_gets_called': False
         }
         expected_check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': True,
             'add_mailgun_api_key_gets_called': True,
-            'add_redishost_gets_called': True,
             'apply_changes_based_on_config_gets_called': True,
             'ask_user_to_confirm_gets_called': True
         }
@@ -371,8 +369,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 'check_updates_to_terms_of_service_gets_called'] = True
         def mock_add_mailgun_api_key():
             check_function_calls['add_mailgun_api_key_gets_called'] = True
-        def mock_add_redishost():
-            check_function_calls['add_redishost_gets_called'] = True
         def mock_apply_changes(
                 unused_local_filepath, unused_config_filepath,
                 unused_expected_config_line_regex):
@@ -386,8 +382,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             mock_check_updates)
         add_mailgun_api_key_swap = self.swap(
             update_configs, 'add_mailgun_api_key', mock_add_mailgun_api_key)
-        add_redishost_swap = self.swap(
-            update_configs, 'add_redishost', mock_add_redishost)
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
         ask_user_swap = self.swap(
@@ -395,6 +389,5 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with self.branch_name_swap, self.release_scripts_exist_swap:
             with self.url_open_swap, check_updates_swap, ask_user_swap:
                 with add_mailgun_api_key_swap, apply_changes_swap:
-                    with add_redishost_swap:
-                        update_configs.main('test-token')
+                    update_configs.main('test-token')
         self.assertEqual(check_function_calls, expected_check_function_calls)

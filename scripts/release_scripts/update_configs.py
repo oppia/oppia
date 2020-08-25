@@ -168,7 +168,7 @@ def add_mailgun_api_key():
 
 
 def add_redishost():
-    """Adds redishot key to feconf.py."""
+    """Adds redishost key to feconf.py."""
     redishost = getpass.getpass(
         prompt=('Enter REDISHOST from the release process doc.'))
 
@@ -206,7 +206,6 @@ def main(personal_access_token):
     try:
         check_updates_to_terms_of_service(personal_access_token)
         add_mailgun_api_key()
-        add_redishost()
 
         apply_changes_based_on_config(
             LOCAL_FECONF_PATH, FECONF_CONFIG_PATH, FECONF_REGEX)

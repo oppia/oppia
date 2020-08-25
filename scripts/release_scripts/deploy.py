@@ -146,21 +146,34 @@ def preprocess_release(app_name, deploy_data_path):
 
     with python_utils.open_file(
         os.path.join(common.CONSTANTS_FILE_PATH), 'r') as assets_file:
-        content = assets_file.read()
+        common_content = assets_file.read()
 
-    assert '"DEV_MODE": true' in content, 'Invalid DEV_MODE'
-    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content, (
+    with python_utils.open_file(
+        os.path.join(APP_DEV_YAML_PATH), 'r') as app_dev_file:
+        app_dev_content = app_dev_file.read()
+
+    assert '"DEV_MODE": true' in common_content, 'Invalid DEV_MODE'
+    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in common_content, (
         'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
             common.CONSTANTS_FILE_PATH))
+
+    assert 'vpc_access_connector:\n  name: projects/PROJECT_ID' in (
+        app_dev_content), 'Missing vpc_access_connector'
+
     bucket_name = app_name + BUCKET_NAME_SUFFIX
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
         r'"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
-    common.inplace_replace_file(
-        APP_DEV_YAML_PATH,
-        r'vpc_access_connector:\n  name: projects/PROJECT_ID',
+
+    updated_app_dev_content = app_dev_content.replace(
+        'vpc_access_connector:\n  name: projects/PROJECT_ID',
         'vpc_access_connector:\n  name: projects/%s' % app_name)
+    with python_utils.open_file(
+        os.path.join(APP_DEV_YAML_PATH), 'w') as app_dev_file:
+        app_dev_file.write(updated_app_dev_content)
+
+    update_configs.add_redishost()
 
 
 def check_errors_in_a_page(url_to_check, msg_to_confirm):
@@ -276,11 +289,11 @@ def flush_memcache(app_name):
     common.open_new_tab_in_browser_if_possible(memcache_url)
     common.ask_user_to_confirm('Please flush the memcache.')
 
-    admin_misc_tab_url = ''
+    admin_misc_tab_url = None
     if app_name == APP_NAME_OPPIASERVER:
         admin_misc_tab_url = 'https://www.oppia.org/admin#/misc'
-    elif app_name == APP_NAME_OPPIATESTSERVER:
-        admin_misc_tab_url = 'https://oppiatestserver.appspot.com/admin#/misc'
+    else:
+        admin_misc_tab_url = 'https://%s.appspot.com/admin#/misc' % app_name
 
     if admin_misc_tab_url:
         common.open_new_tab_in_browser_if_possible(admin_misc_tab_url)
@@ -549,6 +562,7 @@ def execute_deployment():
                         'MAILGUN_API_KEY = None' in feconf_contents):
                     raise Exception(
                         'The mailgun API key must be added before deployment.')
+
         if not os.path.exists(THIRD_PARTY_DIR):
             raise Exception(
                 'Could not find third_party directory at %s. Please run '
