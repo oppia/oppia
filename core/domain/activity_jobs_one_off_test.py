@@ -1594,7 +1594,6 @@ class AddCommitCmdsUserIdsMetadataJobTests(test_utils.GenericTestBase):
                     }
                 ])
 
-
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'rights-%s-2' % self.EXP_1_ID
             ).delete()

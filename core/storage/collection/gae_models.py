@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from constants import constants
-from core.domain import rights_domain
+from core.domain import rights_domain  # pylint: disable=invalid-import
 import core.storage.base_model.gae_models as base_models
 import feconf
 import python_utils

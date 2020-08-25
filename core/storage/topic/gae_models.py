@@ -20,7 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.domain import topic_domain
+from core.domain import topic_domain  # pylint: disable=invalid-import
 from core.platform import models
 
 from google.appengine.ext import ndb

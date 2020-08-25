@@ -362,14 +362,13 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _migrate_user_id(snapshot_model):
-        """
-        Fix the assignee_id in commit_cmds in snapshot metadata and commit log
-        models. This is only run on models that have commit_cmds of length two.
-        This is stuff that was missed in the user ID migration.
+        """Fix the assignee_id in commit_cmds in snapshot metadata and commit
+        log models. This is only run on models that have commit_cmds of length
+        two. This is stuff that was missed in the user ID migration.
 
         Args:
             snapshot_model: BaseSnapshotMetadataModel. Snapshot metadata model
-            to migrate.
+                to migrate.
 
         Returns:
             (str, str). Result info, first part is result message, second is
