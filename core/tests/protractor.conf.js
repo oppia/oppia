@@ -250,8 +250,6 @@ exports.config = {
         '--use-file-for-fake-audio-capture=data/cafe.mp3',
         // These arguments are required to run the tests on GitHub
         // Actions.
-        '--disable-dev-shm-usage',
-        '--no-sandbox',
         '--headless',
       ]
     },
