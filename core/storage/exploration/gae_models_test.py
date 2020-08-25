@@ -25,7 +25,7 @@ import datetime
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -159,7 +159,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_2,
             owner_ids=[self.USER_ID_1],
@@ -172,7 +172,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_3,
             owner_ids=[self.USER_ID_1],
@@ -185,7 +185,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_4,
             owner_ids=[self.USER_ID_4],
@@ -198,7 +198,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.4
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         self.exp_1_dict = (
             exp_models.ExplorationRightsModel.get_by_id(
@@ -240,7 +240,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
         self.assertEqual(saved_model.id, 'id_0')
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
@@ -337,7 +337,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         self.exploration_model.save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}]
+            [{'cmd': rights_domain.CMD_CREATE_NEW}]
         )
         self.excluded_fields = ['created_on', 'last_updated', 'version']
         # Here copy.deepcopy is needed to mitigate
@@ -348,10 +348,10 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         self.exploration_model.save(
             self.USER_ID_COMMITTER, 'Add owner',
             [{
-                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'cmd': rights_domain.CMD_CHANGE_ROLE,
                 'assignee_id': self.USER_ID_3,
-                'old_role': rights_manager.ROLE_NONE,
-                'new_role': rights_manager.ROLE_OWNER
+                'old_role': rights_domain.ROLE_NONE,
+                'new_role': rights_domain.ROLE_OWNER
             }]
         )
         self.allow_revert_swap = self.swap(

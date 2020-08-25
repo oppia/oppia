@@ -29,6 +29,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
@@ -602,7 +603,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
         # private exploration, then it will show up for the next request.
         rights_manager.assign_role_for_exploration(
             self.editor, self.PRIVATE_EXP_ID_EDITOR, self.viewer_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         response_dict = self.get_json(
             feconf.EXPLORATION_SUMMARIES_DATA_URL,

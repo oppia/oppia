@@ -27,16 +27,13 @@ from constants import constants
 from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import user_services
-from core.platform import models
 import feconf
 import python_utils
 import utils
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
-
 CMD_CREATE_NEW = 'create_new'
-CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
-CMD_REMOVE_MANAGER_ROLE = feconf.CMD_REMOVE_MANAGER_ROLE
+CMD_CHANGE_ROLE = 'change_role'
+CMD_REMOVE_MANAGER_ROLE = 'remove_manager_role'
 CMD_PUBLISH_TOPIC = 'publish_topic'
 CMD_UNPUBLISH_TOPIC = 'unpublish_topic'
 
@@ -127,83 +124,102 @@ class TopicChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['name'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_SUBTOPIC,
         'required_attribute_names': ['title', 'subtopic_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_SUBTOPIC,
         'required_attribute_names': ['subtopic_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_CANONICAL_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_CANONICAL_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REARRANGE_CANONICAL_STORY,
         'required_attribute_names': ['from_index', 'to_index'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_ADDITIONAL_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_ADDITIONAL_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_PUBLISH_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UNPUBLISH_STORY,
         'required_attribute_names': ['story_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_UNCATEGORIZED_SKILL_ID,
         'required_attribute_names': ['new_uncategorized_skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
         'required_attribute_names': ['uncategorized_skill_id'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
         'required_attribute_names': [
             'old_subtopic_id', 'new_subtopic_id', 'skill_id'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REARRANGE_SKILL_IN_SUBTOPIC,
         'required_attribute_names': ['subtopic_id', 'from_index', 'to_index'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REARRANGE_SUBTOPIC,
         'required_attribute_names': ['from_index', 'to_index'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
         'required_attribute_names': ['subtopic_id', 'skill_id'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_SUBTOPIC_PROPERTY,
         'required_attribute_names': [
             'subtopic_id', 'property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': SUBTOPIC_PROPERTIES}
     }, {
         'name': CMD_UPDATE_TOPIC_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': TOPIC_PROPERTIES}
     }, {
         'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -223,24 +239,29 @@ class TopicRightsChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_CHANGE_ROLE,
         'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': ['assignee_id'],
         'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
     }, {
         'name': CMD_REMOVE_MANAGER_ROLE,
         'required_attribute_names': ['removed_user_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': ['removed_user_id']
     }, {
         'name': CMD_PUBLISH_TOPIC,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UNPUBLISH_TOPIC,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 

@@ -26,6 +26,7 @@ import os
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -1838,10 +1839,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # Owner makes viewer a viewer and editor an editor.
         rights_manager.assign_role_for_collection(
             self.owner, self.COLLECTION_0_ID, self.viewer_id,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
         rights_manager.assign_role_for_collection(
             self.owner, self.COLLECTION_0_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         # Check that owner and editor may edit, but not viewer.
         collection_summary = collection_services.get_collection_summary_by_id(
@@ -1875,10 +1876,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # Albert adds an owner and an editor.
         rights_manager.assign_role_for_collection(
             albert, self.COLLECTION_0_ID, self.viewer_id,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
         rights_manager.assign_role_for_collection(
             albert, self.COLLECTION_0_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         # Verify that only Albert and Bob are listed as contributors for the
         # collection.
         collection_summary = collection_services.get_collection_summary_by_id(

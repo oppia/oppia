@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
-// Code - third_party/static/guppy-175999/src/guppy.js
-// This guppy version corresponds to the commit on June 15 2020.
+// Code - third_party/static/guppy-7509f3/src/guppy.js
+// This guppy version corresponds to the commit on Aug 19 2020.
 // For reference, visit:
-// https://github.com/daniel3735928559/guppy/tree/1759992a3885cb99d3ead04241f318a074c9f963
+// https://github.com/oppia/guppy/tree/7509f31c3f6e1205763d605ab41098cf6ac9d738
 
 interface GuppyConfig {
   events?: Object;

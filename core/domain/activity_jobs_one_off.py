@@ -25,17 +25,23 @@ from core import jobs
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import rights_domain
 from core.domain import search_services
+from core.domain import topic_domain
+from core.domain import user_services
 from core.platform import models
 import feconf
 
 (
-    collection_models, exp_models,
-    question_models, skill_models,
-    story_models, topic_models) = models.Registry.import_models([
-        models.NAMES.collection, models.NAMES.exploration,
-        models.NAMES.question, models.NAMES.skill,
-        models.NAMES.story, models.NAMES.topic])
+    collection_models, exp_models, question_models,
+    skill_models, story_models, topic_models,
+    user_models
+) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.exploration, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.topic,
+    models.NAMES.user
+])
+transaction_services = models.Registry.import_transaction_services()
 
 
 class ActivityContributorsSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -355,13 +361,70 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
     """
 
     @staticmethod
+    def _migrate_user_id(snapshot_model):
+        """Fix the assignee_id in commit_cmds in snapshot metadata and commit
+        log models. This is only run on models that have commit_cmds of length
+        two. This is stuff that was missed in the user ID migration.
+
+        Args:
+            snapshot_model: BaseSnapshotMetadataModel. Snapshot metadata model
+                to migrate.
+
+        Returns:
+            (str, str). Result info, first part is result message, second is
+            additional info like IDs.
+        """
+        for i, commit_cmd in enumerate(snapshot_model.commit_cmds):
+            if (
+                    commit_cmd['cmd'] == rights_domain.CMD_CHANGE_ROLE and
+                    not user_services.is_user_id_correct(
+                        commit_cmd['assignee_id'])
+            ):
+                old_user_id = commit_cmd['assignee_id']
+                user_settings_model = (
+                    user_models.UserSettingsModel.get_by_gae_id(old_user_id))
+                if user_settings_model is None:
+                    return ('MIGRATION_FAILURE', old_user_id)
+
+                snapshot_model.commit_cmds[i]['assignee_id'] = (
+                    user_settings_model.id)
+
+        commit_log_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'rights-%s-%s' % (
+                    snapshot_model.get_unversioned_instance_id(),
+                    snapshot_model.get_version_string())
+            )
+        )
+        if commit_log_model is None:
+            snapshot_model.put(update_last_updated_time=False)
+            return (
+                'MIGRATION_SUCCESS_MISSING_COMMIT_LOG',
+                snapshot_model.id
+            )
+
+        commit_log_model.commit_cmds = snapshot_model.commit_cmds
+
+        def _put_both_models():
+            """Put both models into the datastore together."""
+            snapshot_model.put(update_last_updated_time=False)
+            commit_log_model.put(update_last_updated_time=False)
+
+        transaction_services.run_in_transaction(_put_both_models)
+        return ('MIGRATION_SUCCESS', snapshot_model.id)
+
+    @staticmethod
     def _add_col_and_exp_user_ids(snapshot_model):
         """Merge the user ids from the commit_cmds and put them in the
         commit_cmds_user_ids field.
+
+        Args:
+            snapshot_model: BaseSnapshotMetadataModel. Snapshot metadata model
+                to add user IDs to.
         """
         commit_cmds_user_ids = set()
         for commit_cmd in snapshot_model.commit_cmds:
-            if commit_cmd['cmd'] == feconf.CMD_CHANGE_ROLE:
+            if commit_cmd['cmd'] == rights_domain.CMD_CHANGE_ROLE:
                 commit_cmds_user_ids.add(commit_cmd['assignee_id'])
         snapshot_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
@@ -371,12 +434,16 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
     def _add_topic_user_ids(snapshot_model):
         """Merge the user ids from the commit_cmds and put them in the
         commit_cmds_user_ids field.
+
+        Args:
+            snapshot_model: BaseSnapshotMetadataModel. Snapshot metadata model
+                to add user IDs to.
         """
         commit_cmds_user_ids = set()
         for commit_cmd in snapshot_model.commit_cmds:
-            if commit_cmd['cmd'] == feconf.CMD_CHANGE_ROLE:
+            if commit_cmd['cmd'] == topic_domain.CMD_CHANGE_ROLE:
                 commit_cmds_user_ids.add(commit_cmd['assignee_id'])
-            elif commit_cmd['cmd'] == feconf.CMD_REMOVE_MANAGER_ROLE:
+            elif commit_cmd['cmd'] == topic_domain.CMD_REMOVE_MANAGER_ROLE:
                 commit_cmds_user_ids.add(commit_cmd['removed_user_id'])
         snapshot_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
@@ -408,6 +475,12 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
         elif isinstance(
                 snapshot_model,
                 exp_models.ExplorationRightsSnapshotMetadataModel):
+            # From audit job and ananlysis of the user ID migration we know that
+            # only commit_cmds of length 2 can have a wrong user ID.
+            if len(snapshot_model.commit_cmds) == 2:
+                result = AddCommitCmdsUserIdsMetadataJob._migrate_user_id(
+                    snapshot_model)
+                yield result
             AddCommitCmdsUserIdsMetadataJob._add_col_and_exp_user_ids(
                 snapshot_model)
         elif isinstance(
@@ -419,7 +492,10 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, ids):
         """Implements the reduce function for this job."""
-        yield (key, len(ids))
+        if key.startswith('SUCCESS') or key == 'MIGRATION_SUCCESS':
+            yield (key, len(ids))
+        else:
+            yield (key, ids)
 
 
 class AuditSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
