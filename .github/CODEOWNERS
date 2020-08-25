@@ -64,9 +64,9 @@
 /core/templates/services/translate.service.ts @bansalnitish @srijanreddy98
 /core/templates/services/translations-backend-api.service.ts @bansalnitish @srijanreddy98
 /core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
-/strictTsConfig.json @nishantwrp @vojtechjelinek
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
+/tsconfig-strict.json @nishantwrp @vojtechjelinek
 
 
 # Answer classification team.

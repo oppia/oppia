@@ -41,7 +41,7 @@ _PARSER.add_argument(
 
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig.json'
-STRICT_TSCONFIG_FILEPATH = 'strictTsConfig.json'
+STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 
 
 def validate_compiled_js_dir():
@@ -94,7 +94,8 @@ def main(args=None):
 
     parsed_args = _PARSER.parse_args(args=args)
     compile_and_check_typescript(
-        STRICT_TSCONFIG_FILEPATH if parsed_args.strict_checks else
+        STRICT_TSCONFIG_FILEPATH
+        if parsed_args.strict_checks else
         TSCONFIG_FILEPATH)
 
 
