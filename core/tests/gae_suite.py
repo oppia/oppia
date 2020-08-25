@@ -77,7 +77,6 @@ def main(args=None):
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
         sys.path.insert(0, directory)
-
     import dev_appserver
     dev_appserver.fix_sys_path()
 

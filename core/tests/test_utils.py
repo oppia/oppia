@@ -65,6 +65,7 @@ from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import datastore_types
 from google.appengine.api import mail
+from google.cloud import ndb
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -2384,7 +2385,8 @@ class AppEngineTestBase(TestBase):
             self.memory_cache_services_stub.delete_multi)
         with swap_flush_cache, swap_get_multi, swap_set_multi:
             with swap_get_memory_cache_stats, swap_delete_multi:
-                super(AppEngineTestBase, self).run(result=result)
+                with ndb.Client().context():
+                    super(AppEngineTestBase, self).run(result=result)
 
     def tearDown(self):
         self.logout()
