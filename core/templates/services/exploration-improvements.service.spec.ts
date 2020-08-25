@@ -24,6 +24,7 @@ import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
 import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { PlaythroughObjectFactory } from
@@ -53,6 +54,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 describe('ExplorationImprovementsService', function() {
   let explorationImprovementsService;
 
+  let $uibModal;
+  let changeListService;
   let explorationStatesService;
   let playthroughIssuesService;
   let explorationRightsService;
@@ -72,63 +75,65 @@ describe('ExplorationImprovementsService', function() {
   const expId = 'eid';
   const expVersion = 1;
   const stateName = 'Introduction';
-  const statesBackendDict: StateObjectsBackendDict = {
-    [stateName]: {
-      classifier_model_id: null,
-      content: {
-        content_id: 'content',
-        html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
-      interaction: {
-        answer_groups: [],
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          placeholder: {
-            value: {
-              content_id: 'ca_placeholder_0',
-              unicode_str: '',
-            },
-          },
-          rows: { value: 1 },
-        },
-        default_outcome: {
-          dest: 'new state',
-          feedback: {
-            content_id: 'default_outcome',
-            html: '',
-          },
-          labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null,
-        },
-        hints: [],
-        solution: {
-          answer_is_exclusive: false,
-          correct_answer: 'answer',
-          explanation: {
-            content_id: 'solution',
-            html: '<p>This is an explanation.</p>',
-          },
-        },
-        id: 'TextInput',
-      },
-      next_content_id_index: 0,
-      param_changes: [],
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-        },
+  const stateBackendDict: StateBackendDict = {
+    classifier_model_id: null,
+    content: {
+      content_id: 'content',
+      html: '',
+    },
+    recorded_voiceovers: {
+      voiceovers_mapping: {
+        content: {},
+        default_outcome: {},
       },
     },
+    interaction: {
+      answer_groups: [],
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: 'ca_placeholder_0',
+            unicode_str: '',
+          },
+        },
+        rows: { value: 1 },
+      },
+      default_outcome: {
+        dest: 'new state',
+        feedback: {
+          content_id: 'default_outcome',
+          html: '',
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
+      },
+      hints: [],
+      solution: {
+        answer_is_exclusive: false,
+        correct_answer: 'answer',
+        explanation: {
+          content_id: 'solution',
+          html: '<p>This is an explanation.</p>',
+        },
+      },
+      id: 'TextInput',
+    },
+    next_content_id_index: 0,
+    param_changes: [],
+    solicit_answer_details: false,
+    written_translations: {
+      translations_mapping: {
+        content: {},
+        default_outcome: {},
+      },
+    },
+  };
+  const statesBackendDict: StateObjectsBackendDict = {
+    [stateName]: stateBackendDict,
+    End: stateBackendDict,
   };
 
   const newExpImprovementsConfig = (improvementsTabIsEnabled: boolean) => {
@@ -150,6 +155,8 @@ describe('ExplorationImprovementsService', function() {
   beforeEach(angular.mock.inject($injector => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
+    $uibModal = $injector.get('$uibModal');
+    changeListService = $injector.get('ChangeListService');
     contextService = $injector.get('ContextService');
     explorationImprovementsBackendApiService = (
       $injector.get('ExplorationImprovementsBackendApiService'));
@@ -195,7 +202,7 @@ describe('ExplorationImprovementsService', function() {
     explorationStatesService.init(statesBackendDict);
   });
 
-  it('should enable improvements tab based on backend response',
+  it('should enable improvements tab based on back-end response',
     fakeAsync(async() => {
       spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
@@ -211,7 +218,7 @@ describe('ExplorationImprovementsService', function() {
       ).toBeTrue();
     }));
 
-  it('should disable improvements tab based on backend response',
+  it('should disable improvements tab based on back-end response',
     fakeAsync(async() => {
       spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
@@ -275,7 +282,7 @@ describe('ExplorationImprovementsService', function() {
       ).toBeFalse();
     }));
 
-  it('should propagate errors from the backend', fakeAsync(async() => {
+  it('should propagate errors from the back-end', fakeAsync(async() => {
     const error = new Error('Whoops!');
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
       .and.throwError(error);
@@ -330,6 +337,7 @@ describe('ExplorationImprovementsService', function() {
       const expStats = new ExplorationStats(
         expId, expVersion, numStarts, numStarts, numCompletions, new Map([
           [stateName, new StateStats(0, 0, numStarts, 0, 0, numCompletions)],
+          ['End', new StateStats(0, 0, numStarts, 0, 0, numCompletions)],
         ]));
       this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
       // -   A state with an early-quit playthrough associated to it.
@@ -342,7 +350,7 @@ describe('ExplorationImprovementsService', function() {
       this.pibasFetchIssuesSpy.and.returnValue(Promise.resolve(
         [eqPlaythrough]));
 
-      // The newly open HBR tasks should be flushed to the backend.
+      // The newly open HBR tasks should be flushed to the back-end.
       this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
         expect(tasks.length).toEqual(1);
         expect(tasks[0].taskType).toEqual('high_bounce_rate');
@@ -377,10 +385,11 @@ describe('ExplorationImprovementsService', function() {
       const expStats = new ExplorationStats(
         expId, expVersion, numStarts, numStarts, numCompletions, new Map([
           [stateName, new StateStats(0, 0, numStarts, 0, 0, numCompletions)],
+          ['End', new StateStats(0, 0, numStarts, 0, 0, numCompletions)],
         ]));
       this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
 
-      // Mock a pre-existing open HBR task provided by the backend.
+      // Mock a preexisting open HBR task provided by the back-end.
       const hbrTask = highBounceRateTaskObjectFactory.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: expId,
@@ -438,6 +447,10 @@ describe('ExplorationImprovementsService', function() {
       const answerStats = new AnswerStats('foo', 'foo', 100, false);
       this.stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(
         Promise.resolve(new Map([[stateName, [answerStats]]])));
+      const expStats = new ExplorationStats(
+        expId, expVersion, 0, 0, 0,
+        new Map([[stateName, new StateStats(0, 0, 0, 0, 0, 0)]]));
+      this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
 
       // Initialize the service, this should generate a new NGR task.
       let p = explorationImprovementsService.initAsync();
@@ -462,7 +475,8 @@ describe('ExplorationImprovementsService', function() {
 
       // Once the NGR task is resolved, however, it should get flushed.
       answerStats.isAddressed = true;
-      explorationImprovementsTaskRegistryService.onChangeInteraction(stateName);
+      explorationImprovementsTaskRegistryService
+        .onStateInteractionSaved(explorationStatesService.getState(stateName));
       expect(ngrTask.isResolved()).toBeTrue();
 
       this.eibasPostTasksAsyncSpy.calls.reset();
@@ -507,7 +521,8 @@ describe('ExplorationImprovementsService', function() {
 
       // After making answer unaddressed, a new NGR task should be generated.
       answerStats.isAddressed = false;
-      explorationImprovementsTaskRegistryService.onChangeInteraction(stateName);
+      explorationImprovementsTaskRegistryService
+        .onStateInteractionSaved(explorationStatesService.getState(stateName));
       const [ngrTask] = (
         explorationImprovementsTaskRegistryService
           .getOpenNeedsGuidingResponsesTasks());
@@ -515,7 +530,8 @@ describe('ExplorationImprovementsService', function() {
 
       // Even after resolving the new task.
       answerStats.isAddressed = true;
-      explorationImprovementsTaskRegistryService.onChangeInteraction(stateName);
+      explorationImprovementsTaskRegistryService
+        .onStateInteractionSaved(explorationStatesService.getState(stateName));
       expect(ngrTask.isResolved()).toBeTrue();
 
       // It should not be flushed because it wasn't created by initAsync().
@@ -528,6 +544,65 @@ describe('ExplorationImprovementsService', function() {
       await p;
 
       expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+    }));
+  });
+
+  describe('Registering callbacks for state changes', () => {
+    beforeEach(fakeAsync(() => {
+      spyOn($uibModal, 'open').and.returnValue({result: Promise.resolve()});
+      spyOn(changeListService, 'addState').and.stub();
+      spyOn(changeListService, 'deleteState').and.stub();
+      spyOn(changeListService, 'editStateProperty').and.stub();
+      spyOn(changeListService, 'renameState').and.stub();
+      spyOn(explorationImprovementsBackendApiService, 'getConfigAsync')
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(true)));
+      spyOn(explorationRightsService, 'isPublic').and.returnValue(true);
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
+        .and.returnValue(Promise.resolve(newExpPermissions(true)));
+
+      explorationImprovementsService.initAsync();
+      flushMicrotasks();
+    }));
+
+    it('should respond to state additions', fakeAsync(() => {
+      let onStateAddedSpy = (
+        spyOn(explorationImprovementsTaskRegistryService, 'onStateAdded'));
+
+      explorationStatesService.addState('Prologue');
+      flushMicrotasks();
+
+      expect(onStateAddedSpy).toHaveBeenCalledWith('Prologue');
+    }));
+
+    it('should respond to state deletions', fakeAsync(() => {
+      let onStateDeletedSpy = (
+        spyOn(explorationImprovementsTaskRegistryService, 'onStateDeleted'));
+
+      explorationStatesService.deleteState('End');
+      flushMicrotasks();
+
+      expect(onStateDeletedSpy).toHaveBeenCalledWith('End');
+    }));
+
+    it('should respond to state renames', fakeAsync(() => {
+      let onStateRenamedSpy = (
+        spyOn(explorationImprovementsTaskRegistryService, 'onStateRenamed'));
+
+      explorationStatesService.renameState('Introduction', 'Start');
+      flushMicrotasks();
+
+      expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
+    }));
+
+    it('should respond to state interaction changes', fakeAsync(() => {
+      let onStateInteractionSavedSpy = spyOn(
+        explorationImprovementsTaskRegistryService, 'onStateInteractionSaved');
+
+      explorationStatesService.saveInteractionAnswerGroups('Introduction', []);
+      flushMicrotasks();
+
+      expect(onStateInteractionSavedSpy).toHaveBeenCalledWith(
+        explorationStatesService.getState('Introduction'));
     }));
   });
 });
