@@ -272,6 +272,12 @@
     "@typescript-eslint/adjacent-overload-signatures": ["error"],
     "@typescript-eslint/no-extra-non-null-assertion": ["error"],
     "@typescript-eslint/no-misused-new": ["error"],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "args": "none"
+      }
+    ],
     "@typescript-eslint/explicit-module-boundary-types": ["error"],
     "wrap-iife": [
       "error",
