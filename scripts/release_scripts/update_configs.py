@@ -168,7 +168,7 @@ def add_mailgun_api_key():
 
 
 def add_redishost():
-    """Adds redishot key to feconf.py."""
+    """Adds redishot to feconf.py."""
     redishost = getpass.getpass(
         prompt=('Enter REDISHOST from the release process doc.'))
 
