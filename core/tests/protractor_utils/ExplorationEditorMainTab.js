@@ -23,6 +23,7 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var ruleTemplates = require(
   '../../../extensions/interactions/rule_templates.json');
 var waitFor = require('../protractor_utils/waitFor.js');
+var action = require('./action.js');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
@@ -87,10 +88,10 @@ var ExplorationEditorMainTab = function() {
   };
   var responseTab = element.all(by.css('.protractor-test-response-tab'));
   var ruleBlock = element.all(by.css('.protractor-test-rule-block'));
-  var stateEditContent = element(
-    by.css('.protractor-test-edit-content'));
   var stateContentDisplay = element(
     by.css('.protractor-test-state-content-display'));
+  var stateEditButton = element(
+    by.css('.protractor-test-edit-content-pencil-button'));
   var stateNameContainer = element(
     by.css('.protractor-test-state-name-container'));
   var stateNameInput = element(
@@ -355,18 +356,20 @@ var ExplorationEditorMainTab = function() {
         // The first rule block's RTE.
         var feedbackRTE = responseBody(responseNum).
           element(by.className('oppia-rte-editor'));
+        await waitFor.visibilityOf(feedbackRTE,
+          'Feedback Rich Text Editor not showing up.');
         expect(await feedbackRTE.getText()).toEqual(
           feedbackInstructionsText);
       },
       setFeedback: async function(richTextInstructions) {
       // Begin editing feedback.
-        await openOutcomeFeedBackEditor.click();
+        await action.click('openOutcomeFeedBackEditor', openOutcomeFeedBackEditor);
 
         // Set feedback contents.
         await _setOutcomeFeedback(richTextInstructions);
 
         // Save feedback.
-        await saveOutcomeFeedbackButton.click();
+        await action.click('saveOutcomeFeedbackButton', saveOutcomeFeedbackButton);
       },
       // This saves the rule after the destination is selected.
       //  - destinationName: The name of the state to move to, or null to stay
@@ -376,19 +379,19 @@ var ExplorationEditorMainTab = function() {
       setDestination: async function(
           destinationName, createNewState, refresherExplorationId) {
       // Begin editing destination.
-        expect(await openOutcomeDestEditor.isDisplayed()).toBe(true);
-        await openOutcomeDestEditor.click();
+        await action.click('Outcome Destination Editor Open Button',
+          openOutcomeDestEditor);
 
         // Set destination contents.
         await _setOutcomeDest(
           destinationName, createNewState, refresherExplorationId);
 
         // Save destination.
-        expect(await saveOutcomeDestButton.isDisplayed()).toBe(true);
-        await saveOutcomeDestButton.click();
+        await action.click('Outcome Destination Editor Save Button',
+          saveOutcomeDestButton);
       },
       markAsCorrect: async function() {
-        await answerCorrectnessToggle.click();
+        await action.click('Answer Correctness Toggle', answerCorrectnessToggle);
       },
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: async function(stateNames) {
@@ -458,7 +461,10 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.expectTickMarkIsDisplayed = async function() {
-    expect(await correctAnswerTickMark.isDisplayed()).toBe(true);
+    // expect(await correctAnswerTickMark.isDisplayed()).toBe(true);
+    await waitFor.visibilityOf(correctAnswerTickMark,
+      'Correct answer tick mark not visible');
+    expect(correctAnswerTickMark.isPresent()).toBeTruthy();
   };
 
   var _setOutcomeDest = async function(
@@ -496,12 +502,10 @@ var ExplorationEditorMainTab = function() {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
-
-    await waitFor.elementToBeClickable(
-      stateEditContent,
-      'stateEditContent taking too long to appear to set content');
-    await stateEditContent.click();
+    await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
+    await waitFor.visibilityOf(
+      stateEditorTag, 'State editor tag not showing up');
     var stateContentEditor = stateEditorTag.element(
       by.css('.protractor-test-state-content-editor'));
     await waitFor.visibilityOf(
@@ -581,15 +585,11 @@ var ExplorationEditorMainTab = function() {
   // ---- INTERACTIONS ----
 
   this.deleteInteraction = async function() {
-    await waitFor.elementToBeClickable(
-      deleteInteractionButton, 'Delete Interaction button is not clickable');
-    await deleteInteractionButton.click();
+    await action.click('Delete interaction button', deleteInteractionButton);
 
     // Click through the "are you sure?" warning.
-    await waitFor.elementToBeClickable(
-      confirmDeleteInteractionButton,
-      'Confirm Delete Interaction button takes too long to be clickable');
-    await confirmDeleteInteractionButton.click();
+    await action.click('Confirm Delete Interaction button',
+      confirmDeleteInteractionButton);
 
     await waitFor.invisibilityOf(
       confirmDeleteInteractionButton,
@@ -845,9 +845,7 @@ var ExplorationEditorMainTab = function() {
     await answerDescription.click();
     var ruleDropdownElement = await element.all(by.cssContainingText(
       '.select2-results__option', ruleDescriptionInDropdown)).first();
-    await waitFor.visibilityOf(
-      ruleDropdownElement, 'Rule dropdown element takes too long to appear');
-    await ruleDropdownElement.click();
+    await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 
   // ---- STATE GRAPH ----
