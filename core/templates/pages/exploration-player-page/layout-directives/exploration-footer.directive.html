@@ -180,7 +180,6 @@
                ng-class="{'hovered-text':hovering}"
                data-toggle="dropdown"
                ng-if="contributorNames.length > 0"
-               role="menuitem"
                aria-haspopup="true"
                aria-expanded="false">
               <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
@@ -189,7 +188,7 @@
               </h4>
             </a>
             <ul uib-dropdown-menu class="author-profile-dropdown-menu uib-dropdown-menu"
-                aria-labelledby="dropdownMenu2" role="menu">
+                aria-labelledby="dropdownMenu2">
               <li ng-repeat="name in contributorNames | limitTo: 5">
                 <a href="/profile/<[name]>" target="_blank" rel="noopener"><[name]></a>
               </li>
