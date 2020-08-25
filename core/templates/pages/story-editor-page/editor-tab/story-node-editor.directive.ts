@@ -120,7 +120,6 @@ angular.module('oppia').directive('storyNodeEditor', [
               $scope.story.getStoryContents().getNodeIdsToTitleMap(
                 $scope.storyNodeIds);
             _recalculateAvailableNodes();
-            $scope.skillIdToSummaryMap = {};
             $scope.allowedBgColors = (
               storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
@@ -284,6 +283,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               size: 'xl'
             }).result.then(function(summary) {
               try {
+                $scope.skillIdToSummaryMap[summary.id] = summary.description;
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
                   $scope.story, $scope.getId(), summary.id);
               } catch (err) {
@@ -418,6 +418,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.mainChapterCardIsShown = true;
             $scope.explorationInputButtonsAreShown = false;
             $scope.chapterOutlineButtonsAreShown = false;
+            $scope.skillIdToSummaryMap = {};
             PageTitleService.setPageTitleForMobileView('Chapter Editor');
             $scope.chapterOutlineIsShown = (
               !WindowDimensionsService.isWindowNarrow());

@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('interactions/codemirrorRequires.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 
 require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
 require(
