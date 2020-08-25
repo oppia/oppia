@@ -37,7 +37,7 @@ describe('RatioExpression', function() {
     expect(RationExpressionCtrl.value).not.toBeNull();
   });
 
-  it('should initialize ctrl.warningText with non integer ratio', function() {
+  it('should initialize ctrl.warningText with non-integer ratio', function() {
     RationExpressionCtrl.isValidRatio('1:1:2.3');
     expect(RationExpressionCtrl.warningText)
       .toBe('For this question, each element in your ratio should be a ' +
@@ -75,7 +75,7 @@ describe('RatioExpression', function() {
       .toBe('Ratio cannot have 0 as a element.');
   });
 
-  it('should return ctrl.value', function() {
+  it('should return true with a valid value of ratio', function() {
     expect(RationExpressionCtrl.isValidRatio('1:2:3')).toBe(true);
   });
 });

@@ -32,8 +32,6 @@ import { RatioExpressionInputRulesService } from
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
-import { min } from 'd3';
-
 
 @Injectable({
   providedIn: 'root'
@@ -72,7 +70,7 @@ export class RatioExpressionInputValidationService {
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            'Number of terms must be a positive integral.')
+            'Number of terms must be a positive integer.')
         }
       ];
     } else {

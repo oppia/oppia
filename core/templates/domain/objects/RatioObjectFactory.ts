@@ -75,7 +75,7 @@ export class RatioObjectFactory {
       throw new Error(
         ObjectsDomainConstants.RATIO_PARSING_ERRORS.NON_INTEGER_ELEMENTS);
     }
-    // Checking for badly fornatted ratio e.g. - :2:3:4 or 2:3:4:
+    // Checking for badly formatted ratio e.g. :2:3:4 or 2:3:4:
     var RATIO_REGEX = /^(\s)*(\d+((\s)*:(\s)*\d+)+)(\s)*$/;
     if (!RATIO_REGEX.test(rawInput)) {
       throw new Error(

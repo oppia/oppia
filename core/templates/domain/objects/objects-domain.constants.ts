@@ -77,7 +77,7 @@ export class ObjectsDomainConstants {
       'For this question, each element in your ratio should be a whole ' +
       'number (not a fraction or a decimal).',
     INCLUDES_ZERO:
-      'Ratio cannot have 0 as a element.',
+      'Ratios cannot have 0 as a element.',
     EMPTY_STRING:
       'Please enter a valid ratio (e.g. 1:2 or 1:2:3).',
   };

@@ -35,7 +35,7 @@ import { RatioExpressionInputCustomizationArgs } from
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
-describe('RatioExpressionInputValidationService', () => {
+fdescribe('RatioExpressionInputValidationService', () => {
   let validatorService: RatioExpressionInputValidationService;
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
@@ -113,7 +113,7 @@ describe('RatioExpressionInputValidationService', () => {
   it('should catch redundancy of rules with matching inputs', () => {
     // The third rule will never get matched.
     answerGroups[0].updateRuleTypesToInputs(
-      [isEquivalent, equals, hasNumberOfTermsEqualTo]);
+      [isEquivalent, equals]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -226,6 +226,17 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: ('Number of terms cannot be empty.')
+    }]);
+  });
+
+  it('should catch negative value for # terms', () => {
+    customizationArgs.numberOfTerms.value = -1;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: ('Number of terms must be a positive integer')
     }]);
   });
 });

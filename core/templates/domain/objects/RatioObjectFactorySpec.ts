@@ -21,7 +21,7 @@ import { ObjectsDomainConstants } from
 import { Ratio, RatioObjectFactory } from
   'domain/objects/RatioObjectFactory';
 
-fdescribe('Ratio Object Factory', () => {
+describe('Ratio Object Factory', () => {
   let errors = null;
   let ratio: RatioObjectFactory = null;
 
