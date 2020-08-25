@@ -158,7 +158,7 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                `Rule ${j + 1} from answer group  ${i + 1} will never` +
+                `Rule ${j + 1} from answer group ${i + 1} will never` +
                 ' be matched because it is preceded by a \'Equals\' rule with' +
                 ' a matching input.')
             });
