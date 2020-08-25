@@ -411,6 +411,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_dir_optional_dirs_and_files_count + 5,
                 len(interaction_dir_contents)
             )
+
             py_file = os.path.join(interaction_dir, '%s.py' % interaction_id)
             ts_file = os.path.join(
                 interaction_dir, '%s.ts' % interaction_id)
@@ -421,6 +422,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that __init__.py file exists.
             init_file = os.path.join(interaction_dir, '__init__.py')
             self.assertTrue(os.path.isfile(init_file))
+
             # Check that the directives subdirectory exists.
             directives_dir = os.path.join(
                 interaction_dir, 'directives')
@@ -524,6 +526,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
                 self.assertEqual(
                     int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
+
             if interaction_id != u'RatioExpressionInput':
                 interaction_ts_file_content = utils.get_file_contents(
                     interaction_ts_file)
@@ -596,11 +599,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertNotIn('<script>', validation_service_ts_file_content)
             self.assertNotIn(
                 '</script>', validation_service_ts_file_content)
+
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
 
-            # Check that the specified interaction id is the same as the
-            # class name.
+            # Check that the specified interaction id is the same as the class
+            # name.
             self.assertTrue(interaction_id, msg=interaction.__class__.__name__)
 
             # Check that the configuration file contains the correct
@@ -648,13 +652,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             if interaction.display_mode == base.DISPLAY_MODE_INLINE:
                 self.assertIsNone(interaction.instructions)
                 self.assertIsNone(interaction.narrow_instructions)
-
             else:
                 self.assertTrue(
                     isinstance(
                         interaction.instructions, python_utils.BASESTRING))
                 self.assertIsNotNone(interaction.instructions)
                 self.assertIsNotNone(interaction.narrow_instructions)
+
             # Check that terminal interactions are not linear.
             if interaction.is_terminal:
                 self.assertFalse(interaction.is_linear)
