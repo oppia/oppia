@@ -1879,7 +1879,9 @@ tags: []
             story_reference_schema_version=(
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             next_subtopic_id=next_subtopic_id,
-            subtopics=[self.VERSION_1_SUBTOPIC_DICT]
+            subtopics=[self.VERSION_1_SUBTOPIC_DICT],
+            meta_tag_content=meta_tag_content,
+            practice_tab_is_displayed=practice_tab_is_displayed
         )
         commit_message = (
             'New topic created with name \'%s\'.' % name)

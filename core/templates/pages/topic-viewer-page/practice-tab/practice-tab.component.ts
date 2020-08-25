@@ -69,7 +69,7 @@ export class PracticeTabComponent implements OnInit {
     return true;
   }
 
-  checkIfQuestionsExist(subtopicIndices): void {
+  checkIfQuestionsExist(subtopicIndices: boolean[]): void {
     const skillIds = [];
     for (let idx in subtopicIndices) {
       if (subtopicIndices[idx]) {
@@ -79,8 +79,8 @@ export class PracticeTabComponent implements OnInit {
     if (skillIds.length > 0) {
       this.questionBackendApiService.fetchTotalQuestionCountForSkillIds(
         skillIds).then(questionCount => {
-          this.questionsAreAvailable = questionCount > 0
-        });
+        this.questionsAreAvailable = questionCount > 0;
+      });
     } else {
       this.questionsAreAvailable = false;
     }

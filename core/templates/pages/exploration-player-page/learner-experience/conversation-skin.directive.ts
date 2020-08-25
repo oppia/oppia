@@ -809,7 +809,7 @@ angular.module('oppia').directive('conversationSkin', [
 
           var showQuestionAreNotAvailable = function() {
             LoaderService.hideLoadingScreen();
-          }
+          };
 
           var _initializeDirectiveComponents = function(
               initialCard, focusLabel) {

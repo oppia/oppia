@@ -88,7 +88,7 @@ describe('Story object factory', () => {
   });
 
   it('should correctly prepublish validate a story', () => {
-    _sampleStory.setMetaTagContent('a'.repeat(200)); 
+    _sampleStory.setMetaTagContent('a'.repeat(200));
     expect(_sampleStory.prepublishValidate()).toEqual([
       'Story should have a thumbnail.',
       'Story meta tag content should not be longer than 160 characters.'

@@ -302,10 +302,11 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
-          $scope.updatePracticeTabIsDisplayed = function(newPracticeTabIsDisplayed) {
+          $scope.updatePracticeTabIsDisplayed = function(
+              newPracticeTabIsDisplayed) {
             if (
-                newPracticeTabIsDisplayed !==
-                $scope.topic.getPracticeTabIsDisplayed()) {
+              newPracticeTabIsDisplayed !==
+              $scope.topic.getPracticeTabIsDisplayed()) {
               TopicUpdateService.setPracticeTabIsDisplayed(
                 $scope.topic, newPracticeTabIsDisplayed);
             }

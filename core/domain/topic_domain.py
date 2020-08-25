@@ -1284,8 +1284,8 @@ class Topic(python_utils.OBJECT):
         """Updates the language code of a topic object.
 
         Args:
-            new_practice_tab_is_displayed: str. The updated practice tab visibility
-                for the topic.
+            new_practice_tab_is_displayed: str. The updated practice tab is
+                displayed property for the topic.
         """
         self.practice_tab_is_displayed = new_practice_tab_is_displayed
 

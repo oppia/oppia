@@ -349,12 +349,12 @@ describe('Topic editor tab directive', function() {
     });
 
   it('should call the TopicUpdateService if topic meta tag content is updated',
-  function() {
-    var topicMetaTagContentSpy = (
-      spyOn(TopicUpdateService, 'setMetaTagContent'));
-    $scope.updateTopicMetaTagContent('new meta tag content');
-    expect(topicMetaTagContentSpy).toHaveBeenCalled();
-  });
+    function() {
+      var topicMetaTagContentSpy = (
+        spyOn(TopicUpdateService, 'setMetaTagContent'));
+      $scope.updateTopicMetaTagContent('new meta tag content');
+      expect(topicMetaTagContentSpy).toHaveBeenCalled();
+    });
 
   it('should not call the TopicUpdateService if topic description is same',
     function() {
