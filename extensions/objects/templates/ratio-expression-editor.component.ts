@@ -30,7 +30,7 @@ angular.module('oppia').component('ratioExpressionEditor', {
 
       ctrl.isValidRatio = function(value) {
         try {
-          ctrl.value = RatioObjectFactory.fromRawInputString(value);
+          ctrl.value = RatioObjectFactory.fromRawInputString(value).components;
           ctrl.warningText = '';
           return true;
         } catch (parsingError) {
@@ -44,7 +44,7 @@ angular.module('oppia').component('ratioExpressionEditor', {
           ctrl.value = [1, 1];
         }
         ctrl.localValue = {
-          label: RatioObjectFactory.fromList(ctrl.value).toString()
+          label: RatioObjectFactory.fromList(ctrl.value).toAnswerString()
         };
       };
     }

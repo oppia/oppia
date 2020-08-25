@@ -61,15 +61,15 @@ describe('Ratio Object Factory', () => {
   describe('.fromRawInputString()', () => {
     it('should parse valid strings', () => {
       expect(ratio.fromRawInputString('1:2')).toEqual(
-        new Ratio([1, 2]).components);
+        new Ratio([1, 2]));
       expect(ratio.fromRawInputString('2:3:5')).toEqual(
-        new Ratio([2, 3, 5]).components);
+        new Ratio([2, 3, 5]));
       expect(ratio.fromRawInputString('2:3:5:7:11')).toEqual(
-        new Ratio([2, 3, 5, 7, 11]).components);
+        new Ratio([2, 3, 5, 7, 11]));
       expect(ratio.fromRawInputString('2 : 3 : 5 : 7 : 11')).toEqual(
-        new Ratio([2, 3, 5, 7, 11]).components);
+        new Ratio([2, 3, 5, 7, 11]));
       expect(ratio.fromRawInputString('  2 :3:   5')).toEqual(
-        new Ratio([2, 3, 5]).components);
+        new Ratio([2, 3, 5]));
     });
 
     it('should throw errors for invalid character', () => {

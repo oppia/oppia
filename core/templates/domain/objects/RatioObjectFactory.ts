@@ -55,7 +55,7 @@ export class Ratio {
   providedIn: 'root'
 })
 export class RatioObjectFactory {
-  fromRawInputString(rawInput: string): number[] {
+  fromRawInputString(rawInput: string): Ratio {
     if (rawInput.length === 0) {
       throw new Error(
         ObjectsDomainConstants.RATIO_PARSING_ERRORS.EMPTY_STRING);
@@ -89,7 +89,7 @@ export class RatioObjectFactory {
       throw new Error(
         ObjectsDomainConstants.RATIO_PARSING_ERRORS.INCLUDES_ZERO);
     }
-    return ratio.components;
+    return ratio;
   }
 
   // Checks the equality of arrays value by value.

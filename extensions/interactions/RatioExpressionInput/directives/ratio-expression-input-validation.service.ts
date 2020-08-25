@@ -120,10 +120,8 @@ export class RatioExpressionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
-                (i + 1) +
-                ' will never be matched because it has ' +
-                'fewer number of terms than required.')
+                  `Rule ${j + 1} from answer group  ${i + 1} will never be` +
+                ' matched because it has fewer number of terms than required.')
               });
             }
           } else {
@@ -132,10 +130,8 @@ export class RatioExpressionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
-                (i + 1) +
-                ' will never be matched because it has ' +
-                'fewer number of terms than required.')
+                  `Rule ${j + 1} from answer group  ${i + 1} will never be` +
+                ' matched because it has fewer number of terms than required.')
               });
             }
           }
@@ -147,9 +143,8 @@ export class RatioExpressionInputValidationService {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (
-              'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-            ' will never be matched because provided input ' +
-            'is not in its simplest form.')
+              `Rule ${j + 1} from answer group  ${i + 1} will never be` +
+              ' matched because provided input is not in its simplest form.')
           });
         }
         for (let seenRule of seenRules) {
@@ -163,9 +158,9 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-                ' will never be matched because it is preceded ' +
-                'by a \'Equals\' rule with a matching input.')
+                `Rule ${j + 1} from answer group  ${i + 1} will never` +
+                ' be matched because it is preceded by a \'Equals\' rule with' +
+                ' a matching input.')
             });
           } else if (seenRuleType === 'IsEquivalent' && (
             ratioRulesService.IsEquivalent(
@@ -175,9 +170,9 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-                ' will never be matched because it is preceded ' +
-                'by a \'IsEquivalent\' rule with a matching input.')
+                `Rule ${j + 1} from answer group  ${i + 1} will never` +
+                ' be matched because it is preceded by a \'IsEquivalent\'' +
+                ' with a matching input.')
             });
           } else if (currentRuleType === 'HasNumberOfTermsEqualTo' &&
           seenRuleType !== 'HasNumberOfTermsEqualTo' && (
@@ -188,9 +183,9 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-                ' will never be matched because it is preceded ' +
-                'by a \'HasNumberOfTermsEqualTo\' rule with a matching input.')
+                `Rule ${j + 1} from answer group  ${i + 1} will never` +
+                ' be matched because it is preceded by a' +
+                ' \'HasNumberOfTermsEqualTo\' rule with a matching input.')
             });
           }
         }
