@@ -161,6 +161,27 @@ export class EditableStoryBackendApiService {
           }
         });
     };
+    private _doesStoryWithUrlFragmentExist = function(
+        storyUrlFragment: string,
+        successCallback: (value?: Object | PromiseLike<Object>) =>void,
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
+      var storyUrlFragmentUrl = this.urlInterpolation.interpolateUrl(
+        StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
+          story_url_fragment: storyUrlFragment
+        });
+      this.http.get('storyUrlFragment',
+        storyUrlFragmentUrl).toPromise().then(
+        (response) => {
+          if (successCallback) {
+            successCallback(response.status);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.error);
+          }
+        });
+    };
+
     /*
     Return { */
     fetchStory(storyId: string): Promise<object> {
@@ -205,6 +226,13 @@ export class EditableStoryBackendApiService {
     deleteStory(storyId: string): Promise<object> {
       return new Promise((resolve, reject) => {
         this._deleteStory(storyId, resolve, reject);
+      });
+    }
+    async doesStoryWithUrlFragmentExistAsync(storyUrlFragment: string):
+    Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._doesStoryWithUrlFragmentExist(
+          storyUrlFragment, resolve, reject);
       });
     }
 }
