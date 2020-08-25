@@ -122,14 +122,6 @@ class TopicPageDataHandler(base.BaseHandler):
             for skill_id in all_skill_ids:
                 degrees_of_mastery[skill_id] = None
 
-        train_tab_should_be_displayed = False
-        if all_skill_ids:
-            question_count = (
-                question_services.get_total_question_count_for_skill_ids(
-                    all_skill_ids))
-            if question_count >= 5:
-                train_tab_should_be_displayed = True
-
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
@@ -140,6 +132,6 @@ class TopicPageDataHandler(base.BaseHandler):
             'subtopics': subtopics,
             'degrees_of_mastery': degrees_of_mastery,
             'skill_descriptions': skill_descriptions,
-            'train_tab_should_be_displayed': train_tab_should_be_displayed
+            'practice_tab_is_displayed': topic.practice_tab_is_displayed
         })
         self.render_json(self.values)

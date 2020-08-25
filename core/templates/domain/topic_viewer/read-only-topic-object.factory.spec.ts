@@ -74,7 +74,7 @@ describe('Read only topic object Factory', () => {
         skill_id_1: 'Skill Description 1',
         skill_id_2: 'Skill Description 2'
       },
-      train_tab_should_be_displayed: false
+      practice_tab_is_displayed: false
     };
 
     _sampleReadOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(
@@ -86,7 +86,7 @@ describe('Read only topic object Factory', () => {
     expect(
       _sampleReadOnlyTopic.getTopicDescription()).toEqual('Topic description');
     expect(_sampleReadOnlyTopic.getTopicId()).toEqual('topic_id');
-    expect(_sampleReadOnlyTopic.getTrainTabShouldBeDisplayed()).toEqual(false);
+    expect(_sampleReadOnlyTopic.getPracticeTabIsDisplayed()).toEqual(false);
   });
 
   it('should return correct value of uncategorized skill summary object',

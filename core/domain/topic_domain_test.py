@@ -74,7 +74,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             'story_reference_schema_version': (
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
-            'version': 0
+            'version': 0,
+            'practice_tab_is_displayed': False,
+            'meta_tag_content': ''
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
@@ -568,6 +570,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics[0].thumbnail_filename = 'test.svg'
         self._assert_validation_error(
             'Subtopic thumbnail background color is not specified.')
+
+    def test_topic_practice_tab_is_displayed_validation(self):
+        self.topic.practice_tab_is_displayed = 0
+        self._assert_validation_error(
+            'Practice tab is displayed property should be a boolean.'
+            'Received 0.')
 
     def test_subtopic_skill_ids_validation(self):
         self.topic.subtopics[0].skill_ids = 'abc'
