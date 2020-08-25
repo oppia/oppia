@@ -63,7 +63,8 @@ export class KeyboardShortcutService {
 
     Mousetrap.bind('c', function() {
       var categoryBar = <HTMLElement>document.querySelector(
-        '.oppia-category-bar-dropdown-toggle');
+        '.oppia-search-bar-dropdown-toggle');
+      console.log(1);
       categoryBar.focus();
     });
 
