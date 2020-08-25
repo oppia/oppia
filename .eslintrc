@@ -10,7 +10,8 @@
     "angular",
     "html",
     "unused-imports",
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "import"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
@@ -240,7 +241,17 @@
         "before": false
       }
     ],
-    "unused-imports/no-unused-imports-ts": "error",
+    "import/order": [
+      "error",
+      {
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
+        "newlines-between": "always"
+      }
+    ],
+    // "unused-imports/no-unused-imports-ts": "error",
     "@typescript-eslint/no-explicit-any": ["error"],
     "@typescript-eslint/semi": ["error"],
     "@typescript-eslint/ban-types": [
