@@ -120,7 +120,7 @@ export class RatioExpressionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${j + 1} from answer group  ${i + 1} will never be` +
+                  `Rule ${j + 1} from answer group ${i + 1} will never be` +
                 ' matched because it has fewer number of terms than required.')
               });
             }
@@ -130,7 +130,7 @@ export class RatioExpressionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${j + 1} from answer group  ${i + 1} will never be` +
+                  `Rule ${j + 1} from answer group ${i + 1} will never be` +
                 ' matched because it has fewer number of terms than required.')
               });
             }
@@ -143,7 +143,7 @@ export class RatioExpressionInputValidationService {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (
-              `Rule ${j + 1} from answer group  ${i + 1} will never be` +
+              `Rule ${j + 1} from answer group ${i + 1} will never be` +
               ' matched because provided input is not in its simplest form.')
           });
         }
@@ -170,7 +170,7 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                `Rule ${j + 1} from answer group  ${i + 1} will never` +
+                `Rule ${j + 1} from answer group ${i + 1} will never` +
                 ' be matched because it is preceded by a \'IsEquivalent\'' +
                 ' with a matching input.')
             });
@@ -183,7 +183,7 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                `Rule ${j + 1} from answer group  ${i + 1} will never` +
+                `Rule ${j + 1} from answer group ${i + 1} will never` +
                 ' be matched because it is preceded by a' +
                 ' \'HasNumberOfTermsEqualTo\' rule with a matching input.')
             });
