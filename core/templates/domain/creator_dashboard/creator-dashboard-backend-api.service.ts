@@ -75,9 +75,7 @@ interface CreatorDashboardDataBackendDict {
   'suggestions_to_review_list': SuggestionBackendDict[];
   'explorations_list': CreatorExplorationSummaryBackendDict[];
   'collections_list': CollectionSummaryBackendDict[];
-  // Here topic summary dicts are optional because they are present in response
-  // only if new structrures are enabled.
-  'topic_summary_dicts'?: TopicSummaryBackendDict[];
+  'topic_summary_dicts': TopicSummaryBackendDict[];
 }
 
 interface CreatorDashboardData {
@@ -93,7 +91,7 @@ interface CreatorDashboardData {
   suggestionThreadsToReviewList: SuggestionThread[];
   explorationsList: CreatorExplorationSummary[];
   collectionsList: CollectionSummary[];
-  topicSummaries?: TopicSummary[];
+  topicSummaries: TopicSummary[];
 }
 
 @Injectable({
@@ -192,6 +190,8 @@ export class CreatorDashboardBackendApiService {
               topicSummaryDict => this.topicSummaryObjectFactory
                 .createFromBackendDict(topicSummaryDict))) : null)
       };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 

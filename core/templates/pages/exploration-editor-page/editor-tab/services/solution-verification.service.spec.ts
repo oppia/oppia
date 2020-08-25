@@ -111,11 +111,24 @@ describe('Solution Verification Service', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {x: 'abc'},
-              rule_type: 'Contains'
-            }]
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Contains: [
+                {
+                  x: 'abc'
+                }
+              ]
+            },
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'First State',
             feedback: {
@@ -165,7 +178,8 @@ describe('Solution Verification Service', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            rule_specs: [],
+            rule_input_translations: {},
+            rule_types_to_inputs: {},
             outcome: {
               dest: 'default',
               feedback: {
@@ -177,6 +191,15 @@ describe('Solution Verification Service', function() {
               refresher_exploration_id: null
             }
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'default',
             feedback: {

@@ -22,10 +22,10 @@ import { HttpClientTestingModule, HttpTestingController }
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { IImageData } from 'domain/skill/skill-creation-backend-api.service';
+import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
-import { TopicCreationBackendApiService, ITopicCreationBackend } from
+import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service.ts';
 
 describe('Topic creation backend api service', () => {
@@ -34,13 +34,14 @@ describe('Topic creation backend api service', () => {
   let topicCreationBackendApiService: TopicCreationBackendApiService = null;
   let newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory = null;
   let topic: NewlyCreatedTopic = null;
-  let imagesData: IImageData[] = null;
+  let imagesData: ImageData[] = null;
   const thumbnailBgColor = '#e3e3e3';
-  let postData: ITopicCreationBackend = {
+  let postData = {
     name: 'topic-name',
     description: 'Description',
     thumbnailBgColor: thumbnailBgColor,
     filename: 'image.svg',
+    url_fragment: 'url-fragment'
   };
 
   beforeEach(() => {
@@ -58,12 +59,19 @@ describe('Topic creation backend api service', () => {
     topic = newlyCreatedTopicObjectFactory.createDefault();
     topic.name = 'topic-name';
     topic.description = 'Description';
+    topic.urlFragment = 'url-fragment';
     let imageBlob = new Blob(
       ['data:image/png;base64,xyz']);
     imagesData = [{
       filename: 'image.svg',
       imageBlob: imageBlob
     }];
+
+    // This throws "Argument of type '() -> Promise<unknown>'
+    // is not assignable to parameter of type 'PromiseLike<string>'.".
+    // We need to suppress this error because we need to mock the
+    // `getTokenAsync` function for testing purposes.
+    // @ts-expect-error
     spyOn(csrfService, 'getTokenAsync').and.returnValue(() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');

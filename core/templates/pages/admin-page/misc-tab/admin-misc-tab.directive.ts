@@ -17,19 +17,20 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
 require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
-  'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
-  'MAX_USERNAME_LENGTH',
+  '$http', '$window',
+  'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $http, $window, AdminTaskManagerService, UrlInterpolationService,
-      ADMIN_HANDLER_URL, ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL,
-      MAX_USERNAME_LENGTH) {
+      $http, $window,
+      AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL,
+      ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
       restrict: 'E',
       scope: {},
@@ -39,14 +40,14 @@ angular.module('oppia').directive('adminMiscTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/misc-tab/admin-misc-tab.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {
+      controller: ['$scope', function($scope) {
         var ctrl = this;
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
           '/senddummymailtoadminhandler');
+        var MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
         var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
-
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
@@ -155,6 +156,32 @@ angular.module('oppia').directive('adminMiscTab', [
           $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
             .then(function(response) {
               ctrl.setStatusMessage('Success! Mail sent to admin.');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            });
+        };
+
+        ctrl.flushMemoryCache = function() {
+          $http.post(MEMORY_CACHE_HANDLER_URL)
+            .then(function(response) {
+              ctrl.setStatusMessage('Success! Memory Cache Flushed.');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            });
+        };
+
+        ctrl.getMemoryCacheProfile = function() {
+          $http.get(MEMORY_CACHE_HANDLER_URL)
+            .then(function(response) {
+              ctrl.result = {
+                totalAllocatedInBytes: response.data.total_allocation,
+                peakAllocatedInBytes: response.data.peak_allocation,
+                totalKeysStored: response.data.total_keys_stored
+              };
+              ctrl.memoryCacheDataFetched = true;
+              ctrl.setStatusMessage('Success!');
             }, function(errorResponse) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse.data.error);

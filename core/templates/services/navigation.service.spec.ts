@@ -38,7 +38,11 @@ describe('Navigation Service', () => {
   beforeEach(angular.mock.inject(function($injector) {
     NavigationService = $injector.get('NavigationService');
 
-    // @ts-ignore
+    // This throws "Argument of type '{ focus: () => void; closest: ()
+    // => void; }' is not assignable to parameter of type 'JQLite'."
+    // This is because 'JQLite' has around 150 more properties.
+    // We have only defined the properties we need in 'element'.
+    // @ts-expect-error
     angularElementSpy = spyOn(angular, 'element').and.returnValue(element);
     focusAngularElementSpy = spyOn(element, 'focus').and.callThrough();
     blurAngularElementSpy = spyOn(findReturn, 'blur').and.callThrough();

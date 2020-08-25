@@ -31,7 +31,7 @@ angular.module('oppia').controller('DeleteSkillModalController', [
     $scope.fetchTopicAssignmentsForSkill = function() {
       TopicsAndSkillsDashboardBackendApiService.fetchTopicAssignmentsForSkill(
         skillId).then((response) => {
-        $scope.topicsAssignments = response.topic_assignment_dicts;
+        $scope.topicsAssignments = response;
         $scope.topicsAssignmentsAreFetched = true;
       });
     };

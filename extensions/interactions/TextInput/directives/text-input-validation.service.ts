@@ -25,12 +25,14 @@ import { AppConstants } from 'app.constants';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
-import { ITextInputCustomizationArgs } from
+import { TextInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
-interface IWarning {
+interface Warning {
   type: string,
   message: string
 }
@@ -41,14 +43,18 @@ interface IWarning {
 export class TextInputValidationService {
   constructor(private bivs: baseInteractionValidationService) {}
   getCustomizationArgsWarnings(
-      customizationArgs: ITextInputCustomizationArgs): IWarning[] {
+      customizationArgs: TextInputCustomizationArgs): Warning[] {
     var warningsList = [];
     this.bivs.requireCustomizationArguments(
       customizationArgs,
       ['placeholder', 'rows']);
 
     var placeholder = customizationArgs.placeholder.value;
-    if (!angular.isString(placeholder)) {
+
+    if (
+      !(placeholder instanceof SubtitledUnicode) ||
+      !angular.isString(placeholder.getUnicode())
+    ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
@@ -87,8 +93,8 @@ export class TextInputValidationService {
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: ITextInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      customizationArgs: TextInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.bivs.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));

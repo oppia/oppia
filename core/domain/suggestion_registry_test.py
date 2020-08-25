@@ -1736,12 +1736,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1774,7 +1772,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': ['option 1']
+                        'value': [{
+                            'html': 'option 1',
+                            'content_id': 'ca_choices_0'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True

@@ -26,7 +26,9 @@ import shutil
 import socket
 import subprocess
 import sys
+import time
 
+import feconf
 import python_utils
 import release_constants
 
@@ -53,15 +55,38 @@ YARN_VERSION = '1.22.4'
 # Versions of libraries used in backend.
 PILLOW_VERSION = '6.2.2'
 
+# We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
+# there is a `make test` bug in redis 6.0.6 where the solution has not been
+# released. This is explained in this issue:
+# https://github.com/redis/redis/issues/7540.
+# IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
+# 1. Download the new version of the redis cli.
+# 2. Extract the cli in the folder that it was downloaded, most likely
+#    Downloads/.
+# 3. Change directories into the folder you extracted, titled
+#    redis-<new version>/ and change into that directory:
+#    cd redis-<new version>/
+# 4. From the top level of the redis-<new version> directory,
+#    run `make test`.
+# 5. All of the tests should pass with an [ok] status with no error codes. The
+#    final output should be 'All tests pass'.
+# 6. Be sure to leave a note in the PR description to confirm that you have read
+#    this message, and that all of the `make test` tests pass before you commit
+#    the upgrade to develop.
+# 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
+REDIS_CLI_VERSION = '6.0.5'
+
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
-GOOGLE_APP_ENGINE_HOME = os.path.join(
-    OPPIA_TOOLS_DIR_ABS_PATH, 'google_appengine_1.9.67', 'google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
+GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
+    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
+GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
+GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
 PYCODESTYLE_PATH = os.path.join(
@@ -74,6 +99,12 @@ YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+REDIS_SERVER_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
+    'src', 'redis-server')
+REDIS_CLI_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
+    'src', 'redis-cli')
 
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
@@ -83,6 +114,11 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+REDIS_CONF_PATH = os.path.join('.', 'redis.conf')
+# Path for the dump file the redis server autogenerates. It contains data
+# used by the Redis server.
+REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
 
 
 def is_windows_os():
@@ -323,7 +359,14 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
                 'git@github.com:oppia/release-scripts.git'])
 
     with CD(release_scripts_dirpath):
+        ask_user_to_confirm(
+            'Please make sure that the ../release-scripts repo is clean and '
+            'you are on master branch in ../release-scripts repo.')
+        python_utils.PRINT('Verifying that ../release-scripts repo is clean...')
         verify_local_repo_is_clean()
+        python_utils.PRINT(
+            'Verifying that user is on master branch in '
+            '../release-scripts repo...')
         verify_current_branch_name('master')
 
         # Update the local repo.
@@ -428,7 +471,7 @@ def get_personal_access_token():
         str. The personal access token for the GitHub id of user.
 
     Raises:
-        Exception: Personal access token is None.
+        Exception. Personal access token is None.
     """
     personal_access_token = getpass.getpass(
         prompt=(
@@ -450,8 +493,8 @@ def check_blocking_bug_issue_count(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: Number of unresolved blocking bugs is not zero.
-        Exception: The blocking bug milestone is closed.
+        Exception. Number of unresolved blocking bugs is not zero.
+        Exception. The blocking bug milestone is closed.
     """
     blocking_bugs_milestone = repo.get_milestone(
         number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
@@ -475,7 +518,7 @@ def check_prs_for_current_release_are_released(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: Some pull requests for current release do not have a
+        Exception. Some pull requests for current release do not have a
             "PR: released" label.
     """
     current_release_label = repo.get_label(
@@ -577,6 +620,66 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         os.remove(filename)
         shutil.move(backup_filename, filename)
         raise
+
+
+def wait_for_port_to_be_open(port_number):
+    """Wait until the port is open and exit if port isn't open after
+    1000 seconds.
+
+    Args:
+        port_number: int. The port number to wait.
+    """
+    waited_seconds = 0
+    while (not is_port_open(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+            and not is_port_open(port_number)):
+        python_utils.PRINT(
+            'Failed to start server on port %s, exiting ...' %
+            port_number)
+        sys.exit(1)
+
+
+def start_redis_server():
+    """Start the redis server with the daemonize argument to prevent
+    the redis-server from exiting on its own.
+    """
+    if is_windows_os():
+        raise Exception(
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. The redis server '
+            'cannot start.')
+
+    # Check if a redis dump file currently exists. This file contains residual
+    # data from a previous run of the redis server. If it exists, removes the
+    # dump file so that the redis server starts with a clean slate.
+    if os.path.exists(REDIS_DUMP_PATH):
+        os.remove(REDIS_DUMP_PATH)
+
+    # Redis-cli is only required in a development environment.
+    python_utils.PRINT('Starting Redis development server.')
+    # Start the redis local development server. Redis doesn't run on
+    # Windows machines.
+    subprocess.call([
+        REDIS_SERVER_PATH, REDIS_CONF_PATH,
+        '--daemonize', 'yes'
+    ])
+    wait_for_port_to_be_open(feconf.REDISPORT)
+
+
+def stop_redis_server():
+    """Stops the redis server by shutting it down."""
+    if is_windows_os():
+        raise Exception(
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. There is no redis '
+            'server to shutdown.')
+
+    python_utils.PRINT('Cleaning up the redis_servers.')
+    # Shutdown the redis server before exiting.
+    subprocess.call([REDIS_CLI_PATH, 'shutdown'])
 
 
 class CD(python_utils.OBJECT):

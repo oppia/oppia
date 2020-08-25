@@ -189,13 +189,15 @@ describe('Translation status service', function() {
               default_outcome: {},
               feedback_2: {
                 hi: {
-                  html: '<p>This is feedback 1.</p>',
+                  data_format: 'html',
+                  translation: '<p>This is feedback 1.</p>',
                   needs_update: false
                 }
               },
               feedback_1: {
                 hi: {
-                  html: '<p>This is first card.</p>',
+                  data_format: 'html',
+                  translation: '<p>This is first card.</p>',
                   needs_update: false
                 }
               }
@@ -230,12 +232,14 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'Second'
               },
-              rule_specs: [{
-                inputs: {
-                  x: 0
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Equals: [
+                  {
+                    x: 0
+                  }
+                ]
+              },
               training_data: []
             },
             {
@@ -251,12 +255,14 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'First'
               },
-              rule_specs: [{
-                inputs: {
-                  x: 1
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Equals: [
+                  {
+                    x: 1
+                  }
+                ]
+              },
               training_data: []
             }],
             solution: null,
@@ -265,7 +271,8 @@ describe('Translation status service', function() {
             customization_args: {
               choices: {
                 value: ['<p>1</p>', '<p>2</p>']
-              }
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             default_outcome: {
               refresher_exploration_id: null,
@@ -317,12 +324,14 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'Third'
               },
-              rule_specs: [{
-                inputs: {
-                  x: 0
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Equals: [
+                  {
+                    x: 0
+                  }
+                ]
+              },
               training_data: []
             }],
             solution: null,
@@ -330,8 +339,9 @@ describe('Translation status service', function() {
             id: 'MultipleChoiceInput',
             customization_args: {
               choices: {
-                value: ['<p>1</p>']
-              }
+                value: ['<p>1</p>'],
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             default_outcome: {
               refresher_exploration_id: null,

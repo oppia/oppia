@@ -17,39 +17,45 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
-export interface IConceptCardBackendDict {
-  'explanation': ISubtitledHtmlBackendDict;
-  'worked_examples': IWorkedExampleBackendDict[];
-  'recorded_voiceovers': IRecordedVoiceOverBackendDict;
-}
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
-  IRecordedVoiceOverBackendDict } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
-  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  RecordedVoiceovers,
+  RecordedVoiceOverBackendDict,
+  RecordedVoiceoversObjectFactory
+} from 'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
-  WorkedExample, WorkedExampleObjectFactory, IWorkedExampleBackendDict } from
-  'domain/skill/WorkedExampleObjectFactory';
+  SubtitledHtml,
+  SubtitledHtmlBackendDict,
+  SubtitledHtmlObjectFactory
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  WorkedExample,
+  WorkedExampleBackendDict,
+  WorkedExampleObjectFactory
+} from 'domain/skill/WorkedExampleObjectFactory';
+
+export interface ConceptCardBackendDict {
+  'explanation': SubtitledHtmlBackendDict;
+  'worked_examples': WorkedExampleBackendDict[];
+  'recorded_voiceovers': RecordedVoiceOverBackendDict;
+}
 
 export class ConceptCard {
   _explanation: SubtitledHtml;
-  _workedExamples: Array<WorkedExample>;
+  _workedExamples: WorkedExample[];
   _recordedVoiceovers: RecordedVoiceovers;
 
   constructor(
-      explanation: SubtitledHtml, workedExamples: Array<WorkedExample>,
+      explanation: SubtitledHtml, workedExamples: WorkedExample[],
       recordedVoiceovers: RecordedVoiceovers) {
     this._explanation = explanation;
     this._workedExamples = workedExamples;
     this._recordedVoiceovers = recordedVoiceovers;
   }
 
-  toBackendDict(): IConceptCardBackendDict {
+  toBackendDict(): ConceptCardBackendDict {
     return {
       explanation: this._explanation.toBackendDict(),
       worked_examples: this._workedExamples.map(
@@ -61,7 +67,7 @@ export class ConceptCard {
   }
 
   _getElementsInFirstSetButNotInSecond(setA: Set<string>,
-      setB: Set<string>): Array<string> {
+      setB: Set<string>): string[] {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
     });
@@ -69,7 +75,7 @@ export class ConceptCard {
   }
 
   _extractAvailableContentIdsFromWorkedExamples(
-      workedExamples: Array<WorkedExample>): Set<string> {
+      workedExamples: WorkedExample[]): Set<string> {
     let contentIds: Set<string> = new Set();
     workedExamples.forEach((workedExample: WorkedExample) => {
       contentIds.add(workedExample.getQuestion().getContentId());
@@ -86,11 +92,11 @@ export class ConceptCard {
     this._explanation = explanation;
   }
 
-  getWorkedExamples(): Array<WorkedExample> {
+  getWorkedExamples(): WorkedExample[] {
     return this._workedExamples.slice();
   }
 
-  setWorkedExamples(workedExamples: Array<WorkedExample>): void {
+  setWorkedExamples(workedExamples: WorkedExample[]): void {
     let oldContentIds = this._extractAvailableContentIdsFromWorkedExamples(
       this._workedExamples);
 
@@ -128,12 +134,11 @@ export class ConceptCardObjectFactory {
       private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
   _generateWorkedExamplesFromBackendDict(
-      workedExampleDicts): Array<WorkedExample> {
-    return workedExampleDicts.map(
-      (workedExampleDict: IWorkedExampleBackendDict) => {
-        return this.workedExampleObjectFactory.createFromBackendDict(
-          workedExampleDict);
-      });
+      workedExampleDicts: WorkedExampleBackendDict[]): WorkedExample[] {
+    return workedExampleDicts.map(workedExampleDict=> {
+      return this.workedExampleObjectFactory.createFromBackendDict(
+        workedExampleDict);
+    });
   }
 
   // Create an interstitial concept card that would be displayed in the
@@ -154,7 +159,7 @@ export class ConceptCardObjectFactory {
   }
 
   createFromBackendDict(
-      conceptCardBackendDict: IConceptCardBackendDict): ConceptCard {
+      conceptCardBackendDict: ConceptCardBackendDict): ConceptCard {
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         conceptCardBackendDict.explanation),

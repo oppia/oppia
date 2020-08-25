@@ -22,18 +22,17 @@
 
 require('domain/utilities/browser-checker.service.ts');
 require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require(
   'interactions/ItemSelectionInput/directives/' +
   'item-selection-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/contextual/url.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
-  'BrowserCheckerService', 'HtmlEscaperService',
+  'BrowserCheckerService', 'InteractionAttributesExtractorService',
   'ItemSelectionInputRulesService', function(
-      BrowserCheckerService, HtmlEscaperService,
+      BrowserCheckerService, InteractionAttributesExtractorService,
       ItemSelectionInputRulesService) {
     return {
       restrict: 'E',
@@ -42,11 +41,11 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
       template: require('./item-selection-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'WindowDimensionsService',
-        'UrlService', 'CurrentInteractionService',
+        '$attrs',
+        'CurrentInteractionService',
         function(
-            $attrs, WindowDimensionsService,
-            UrlService, CurrentInteractionService) {
+            $attrs,
+            CurrentInteractionService) {
           var ctrl = this;
           ctrl.onToggleCheckbox = function() {
             ctrl.newQuestion = false;
@@ -94,12 +93,17 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
             return !ctrl.notEnoughSelections;
           };
           ctrl.$onInit = function() {
-            ctrl.choices = HtmlEscaperService.escapedJsonToObj(
-              $attrs.choicesWithValue);
-            ctrl.maxAllowableSelectionCount = (
-              $attrs.maxAllowableSelectionCountWithValue);
-            ctrl.minAllowableSelectionCount = (
-              $attrs.minAllowableSelectionCountWithValue);
+            const {
+              choices,
+              maxAllowableSelectionCount,
+              minAllowableSelectionCount
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'ItemSelectionInput',
+              $attrs
+            );
+            ctrl.choices = choices.map(choice => choice.getHtml());
+            ctrl.maxAllowableSelectionCount = maxAllowableSelectionCount;
+            ctrl.minAllowableSelectionCount = minAllowableSelectionCount;
 
             // The following is an associative array where the key is a choice
             // (html) and the value is a boolean value indicating whether the

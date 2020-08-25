@@ -26,17 +26,14 @@ from core.domain import activity_jobs_one_off
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
-from core.domain import suggestion_services
 from core.domain import user_jobs_one_off
 from core.domain import wipeout_jobs_one_off
 from core.platform import models
-import feconf
 import utils
 
 from pipeline import pipeline
 
-(job_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.suggestion])
+(job_models,) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
@@ -103,14 +100,16 @@ class CronUserDeletionHandler(base.BaseHandler):
             wipeout_jobs_one_off.UserDeletionOneOffJob.create_new())
 
 
-class CronVerifyUserDeletionHandler(base.BaseHandler):
-    """Handler for running the user deletion verification one off job."""
+class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
+    """Handler for running the fully complete user deletion one off job."""
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
-        wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.enqueue(
-            wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.create_new())
+        wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob.enqueue(
+            wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
+            .create_new()
+        )
 
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):
@@ -214,19 +213,3 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
                     jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
                 })
             logging.warning('Deletion jobs for auxiliary entities kicked off.')
-
-
-class CronAcceptStaleSuggestionsHandler(base.BaseHandler):
-    """Handler to accept suggestions that have no activity on them for
-    THRESHOLD_TIME_BEFORE_ACCEPT time.
-    """
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles get requests."""
-        if feconf.ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS:
-            suggestions = suggestion_services.get_all_stale_suggestions()
-            for suggestion in suggestions:
-                suggestion_services.accept_suggestion(
-                    suggestion, feconf.SUGGESTION_BOT_USER_ID,
-                    suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)

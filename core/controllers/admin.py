@@ -25,6 +25,7 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import caching_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -33,6 +34,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_services
+from core.domain import platform_feature_services as feature_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -119,6 +121,8 @@ class AdminHandler(base.BaseHandler):
                     utils.get_human_readable_time_string(
                         computation['last_finished_msec']))
 
+        feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
+
         self.render_json({
             'config_properties': (
                 config_domain.Registry.get_config_property_schemas()),
@@ -142,7 +146,8 @@ class AdminHandler(base.BaseHandler):
                 for role in role_services.VIEWABLE_ROLES
             },
             'topic_summaries': topic_summary_dicts,
-            'role_graph_data': role_services.get_role_graph_data()
+            'role_graph_data': role_services.get_role_graph_data(),
+            'feature_flags': feature_flag_dicts,
         })
 
     @acl_decorators.can_access_admin_page
@@ -190,14 +195,16 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
-                logging.info('[ADMIN] %s saved config property values: %s' %
-                             (self.user_id, new_config_property_values))
+                logging.info(
+                    '[ADMIN] %s saved config property values: %s' %
+                    (self.user_id, new_config_property_values))
                 for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
-                logging.info('[ADMIN] %s reverted config property: %s' %
-                             (self.user_id, config_property_id))
+                logging.info(
+                    '[ADMIN] %s reverted config property: %s' %
+                    (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
             elif self.payload.get('action') == 'start_new_job':
@@ -241,6 +248,35 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
+            elif self.payload.get('action') == 'update_feature_flag_rules':
+                feature_name = self.payload.get('feature_name')
+                new_rule_dicts = self.payload.get('new_rules')
+                commit_message = self.payload.get('commit_message')
+                if not isinstance(feature_name, python_utils.BASESTRING):
+                    raise self.InvalidInputException(
+                        'feature_name should be string, received \'%s\'.' % (
+                            feature_name))
+                elif not isinstance(commit_message, python_utils.BASESTRING):
+                    raise self.InvalidInputException(
+                        'commit_message should be string, received \'%s\'.' % (
+                            commit_message))
+                elif (not isinstance(new_rule_dicts, list) or not all(
+                        [isinstance(rule_dict, dict)
+                         for rule_dict in new_rule_dicts])):
+                    raise self.InvalidInputException(
+                        'new_rules should be a list of dicts, received'
+                        ' \'%s\'.' % new_rule_dicts)
+                try:
+                    feature_services.update_feature_flag_rules(
+                        feature_name, self.user_id, commit_message,
+                        new_rule_dicts)
+                except (
+                        utils.ValidationError,
+                        feature_services.FeatureFlagNotFoundException) as e:
+                    raise self.InvalidInputException(e)
+                logging.info(
+                    '[ADMIN] %s updated feature %s with new rules: '
+                    '%s.' % (self.user_id, feature_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
             self.render_json({'error': python_utils.UNICODE(e)})
@@ -254,7 +290,7 @@ class AdminHandler(base.BaseHandler):
             exploration_id: str. The exploration id.
 
         Raises:
-            Exception: Cannot reload an exploration in production.
+            Exception. Cannot reload an exploration in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -284,11 +320,24 @@ class AdminHandler(base.BaseHandler):
         state = state_domain.State.create_default_state(
             'ABC', is_initial_state=True)
         state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args({
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1}
+        })
+
+        state.update_next_content_id_index(1)
         state.update_content(state_domain.SubtitledHtml('1', question_content))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
         written_translations = state_domain.WrittenTranslations({})
+        recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
         recorded_voiceovers.add_content_id_for_voiceover('1')
         recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
+        written_translations.add_content_id_for_translation('ca_placeholder_0')
         written_translations.add_content_id_for_translation('1')
         written_translations.add_content_id_for_translation('default_outcome')
 
@@ -305,10 +354,6 @@ class AdminHandler(base.BaseHandler):
 
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
-        state.update_interaction_customization_args({
-            'placeholder': 'Enter text here',
-            'rows': 1
-        })
         state.update_interaction_default_outcome(
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
@@ -351,8 +396,8 @@ class AdminHandler(base.BaseHandler):
         attached to each skill.
 
         Raises:
-            Exception: Cannot load new structures data in production mode.
-            Exception: User does not have enough rights to generate data.
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
             if self.user.role != feconf.ROLE_ID_ADMIN:
@@ -393,9 +438,9 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'abbrev', 'description')
+                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'abbrev', 'description')
+                topic_id_2, 'Empty Topic', 'empty-topic', 'description')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
@@ -415,7 +460,8 @@ class AdminHandler(base.BaseHandler):
             self._reload_exploration('13')
 
             story = story_domain.Story.create_default_story(
-                story_id, 'Help Jaime win the Arcade', topic_id_1)
+                story_id, 'Help Jaime win the Arcade', 'Description',
+                topic_id_1, 'help-jamie-win-arcade')
 
             story_node_dicts = [{
                 'exp_id': '15',
@@ -497,8 +543,8 @@ class AdminHandler(base.BaseHandler):
         linked to the skill.
 
         Raises:
-            Exception: Cannot load new structures data in production mode.
-            Exception: User does not have enough rights to generate data.
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
             if self.user.role != feconf.ROLE_ID_ADMIN:
@@ -533,7 +579,7 @@ class AdminHandler(base.BaseHandler):
             collection_id: str. The collection id.
 
         Raises:
-            Exception: Cannot reload a collection in production.
+            Exception. Cannot reload a collection in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -558,7 +604,7 @@ class AdminHandler(base.BaseHandler):
                 be published.
 
         Raises:
-            Exception: Environment is not DEVMODE.
+            Exception. Environment is not DEVMODE.
         """
 
         if constants.DEV_MODE:
@@ -718,8 +764,8 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class AddCommunityReviewerHandler(base.BaseHandler):
-    """Handles adding reviewer for community dashboard page."""
+class AddContributionReviewerHandler(base.BaseHandler):
+    """Handles adding reviewer for contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -771,13 +817,13 @@ class AddCommunityReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid review_category: %s' % review_category)
 
-        email_manager.send_email_to_new_community_reviewer(
+        email_manager.send_email_to_new_contribution_reviewer(
             new_reviewer_user_id, review_category, language_code=language_code)
         self.render_json({})
 
 
-class RemoveCommunityReviewerHandler(base.BaseHandler):
-    """Handles removing reviewer for community dashboard."""
+class RemoveContributionReviewerHandler(base.BaseHandler):
+    """Handles removing reviewer for contributor dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -800,7 +846,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                 'Invalid language_code: %s' % language_code)
 
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
-            user_services.remove_community_reviewer(user_id)
+            user_services.remove_contribution_reviewer(user_id)
         elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:
             review_category = self.payload.get('review_category')
             if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
@@ -829,7 +875,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Invalid review_category: %s' % review_category)
 
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 user_id, review_category, language_code=language_code)
         else:
             raise self.InvalidInputException(
@@ -838,7 +884,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
         self.render_json({})
 
 
-class CommunityReviewersListHandler(base.BaseHandler):
+class ContributionReviewersListHandler(base.BaseHandler):
     """Handler to show the existing reviewers."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -857,12 +903,12 @@ class CommunityReviewersListHandler(base.BaseHandler):
                 constants.REVIEW_CATEGORY_QUESTION]:
             raise self.InvalidInputException(
                 'Invalid review_category: %s' % review_category)
-        usernames = user_services.get_community_reviewer_usernames(
+        usernames = user_services.get_contribution_reviewer_usernames(
             review_category, language_code=language_code)
         self.render_json({'usernames': usernames})
 
 
-class CommunityReviewerRightsDataHandler(base.BaseHandler):
+class ContributionReviewerRightsDataHandler(base.BaseHandler):
     """Handler to show the review rights of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -877,7 +923,7 @@ class CommunityReviewerRightsDataHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
         user_rights = (
-            user_services.get_user_community_rights(user_id))
+            user_services.get_user_contribution_rights(user_id))
         self.render_json({
             'can_review_translation_for_language_codes': (
                 user_rights.can_review_translation_for_language_codes),
@@ -898,6 +944,26 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             self.render_json({})
         else:
             raise self.InvalidInputException('This app cannot send emails.')
+
+
+class MemoryCacheAdminHandler(base.BaseHandler):
+    """Handler for memory cache functions used in the Misc Page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        cache_stats = caching_services.get_memory_cache_stats()
+        self.render_json({
+            'total_allocation': cache_stats.total_allocated_in_bytes,
+            'peak_allocation': cache_stats.peak_memory_usage_in_bytes,
+            'total_keys_stored': cache_stats.total_number_of_keys_stored
+        })
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        caching_services.flush_memory_cache()
+        self.render_json({})
 
 
 class UpdateUsernameHandler(base.BaseHandler):

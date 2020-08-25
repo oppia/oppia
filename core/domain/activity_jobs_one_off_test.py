@@ -42,8 +42,8 @@ from google.appengine.ext import ndb
 
 gae_search_services = models.Registry.import_search_services()
 
-(collection_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.collection, models.NAMES.exploration])
+(collection_models, exp_models, topic_models) = models.Registry.import_models(
+    [models.NAMES.collection, models.NAMES.exploration, models.NAMES.topic])
 
 
 class ActivityContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
@@ -502,8 +502,9 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
 
         def mock_add_documents_to_index(docs, index):
             indexed_docs.extend(docs)
-            self.assertIn(index, (search_services.SEARCH_INDEX_EXPLORATIONS,
-                                  search_services.SEARCH_INDEX_COLLECTIONS))
+            self.assertIn(index, (
+                search_services.SEARCH_INDEX_EXPLORATIONS,
+                search_services.SEARCH_INDEX_COLLECTIONS))
 
         add_docs_swap = self.swap(
             gae_search_services, 'add_documents_to_index',
@@ -575,10 +576,9 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
             )
             original_commit_model.put()
 
-            # pylint: disable=protected-access
             self.assertIsNotNone(original_commit_model.username)
-            self.assertIn('username', original_commit_model._values)
-            self.assertIn('username', original_commit_model._properties)
+            self.assertIn('username', original_commit_model._values)  # pylint: disable=protected-access
+            self.assertIn('username', original_commit_model._properties)  # pylint: disable=protected-access
 
             output = self._run_one_off_job()
             self.assertItemsEqual(
@@ -588,12 +588,11 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
             migrated_commit_model = (
                 collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
             self.assertIsNone(migrated_commit_model.username)
-            self.assertNotIn('username', migrated_commit_model._values)
-            self.assertNotIn('username', migrated_commit_model._properties)
+            self.assertNotIn('username', migrated_commit_model._values)  # pylint: disable=protected-access
+            self.assertNotIn('username', migrated_commit_model._properties)  # pylint: disable=protected-access
             self.assertEqual(
                 original_commit_model.last_updated,
                 migrated_commit_model.last_updated)
-            # pylint: enable=protected-access
 
     def test_one_commit_model_without_username(self):
         original_commit_model = (
@@ -612,9 +611,8 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
         )
         original_commit_model.put()
 
-        # pylint: disable=protected-access
-        self.assertNotIn('username', original_commit_model._values)
-        self.assertNotIn('username', original_commit_model._properties)
+        self.assertNotIn('username', original_commit_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('username', original_commit_model._properties)  # pylint: disable=protected-access
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
@@ -623,8 +621,8 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
 
         migrated_commit_model = (
             collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
-        self.assertNotIn('username', migrated_commit_model._values)
-        self.assertNotIn('username', migrated_commit_model._properties)
+        self.assertNotIn('username', migrated_commit_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('username', migrated_commit_model._properties)  # pylint: disable=protected-access
         self.assertEqual(
             original_commit_model.last_updated,
             migrated_commit_model.last_updated)
@@ -650,7 +648,7 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
                        stringified_item in stringified_output]
         return eval_output
 
-    def test_one_commit_model_last_updated_before(self):
+    def test_fix_one_commit_when_last_updated_is_before_migration_time(self):
         original_commit_model = (
             collection_models.CollectionCommitLogEntryModel(
                 id='id',
@@ -685,7 +683,7 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
             original_commit_model.last_updated,
             migrated_commit_model.last_updated)
 
-    def test_one_commit_model_last_updated_during(self):
+    def test_fix_one_commit_when_last_updated_is_during_migration_time(self):
         original_commit_model = (
             collection_models.CollectionCommitLogEntryModel(
                 id='id',
@@ -722,7 +720,46 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
             original_commit_model.created_on,
             migrated_commit_model.last_updated)
 
-    def test_one_commit_model_last_updated_after(self):
+    def test_fix_one_commit_when_last_updated_is_during_test_migration_time(
+            self):
+        original_commit_model = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id',
+                user_id='committer_id',
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False,
+                created_on=datetime.datetime.strptime(
+                    '2019-06-09T01:00:00Z', '%Y-%m-%dT%H:%M:%SZ'),
+                last_updated=datetime.datetime.strptime(
+                    '2020-06-13T11:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+            )
+        )
+        original_commit_model.put(update_last_updated_time=False)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_TEST_SERVER_FIXED - CollectionCommitLogEntryModel', 1]],
+            output)
+
+        migrated_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
+        self.assertEqual(
+            original_commit_model.created_on,
+            migrated_commit_model.created_on)
+        self.assertNotEqual(
+            original_commit_model.last_updated,
+            migrated_commit_model.last_updated)
+        self.assertEqual(
+            original_commit_model.created_on,
+            migrated_commit_model.last_updated)
+
+    def test_fix_one_commit_when_last_updated_is_after_migration_time(self):
         original_commit_model = (
             collection_models.CollectionCommitLogEntryModel(
                 id='id',
@@ -757,7 +794,7 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
             original_commit_model.last_updated,
             migrated_commit_model.last_updated)
 
-    def test_multiple_commit_models_admins(self):
+    def test_fix_multiple_commits_when_commits_are_created_by_admins(self):
         original_commit_model_1 = (
             collection_models.CollectionCommitLogEntryModel(
                 id='id1',
@@ -819,7 +856,7 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
             original_commit_model_2.last_updated,
             migrated_commit_model_2.last_updated)
 
-    def test_multiple_commit_models_last_updated_wrong(self):
+    def test_fix_multiple_commits_when_last_updated_is_wrong(self):
         original_commit_model_1 = (
             collection_models.CollectionCommitLogEntryModel(
                 id='id1',
@@ -882,3 +919,206 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_commit_model_2.last_updated,
             migrated_commit_model_2.last_updated)
+
+
+class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
+
+    COL_1_ID = 'col_1_id'
+    EXP_1_ID = 'exp_1_id'
+    TOP_1_ID = 'top_1_id'
+    USER_1_ID = 'user_1_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off.AuditSnapshotMetadataModelsJob.create_new())
+        activity_jobs_one_off.AuditSnapshotMetadataModelsJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            activity_jobs_one_off.AuditSnapshotMetadataModelsJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return [
+            [key, sorted(values) if isinstance(values, list) else values]
+            for key, values in eval_output]
+
+    def test_audit_collection_rights_snapshot(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='%s-1' % self.COL_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }, {
+                    'cmd': 'some_other_command',
+                    'other_field': 'test',
+                    'different_field': 'test'
+                }
+            ]
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['collection-some_command-length-2', 1],
+                ['collection-cmd-some_command', 1],
+                ['collection-cmd-some_other_command', 1],
+                ['collection-some_command-field-other_field', 1],
+                ['collection-some_other_command-field-other_field', 1],
+                ['collection-some_other_command-field-different_field', 1],
+            ]
+        )
+
+    def test_audit_deleted_collection_rights_snapshot(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='%s-1' % self.COL_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }, {
+                    'cmd': 'some_other_command',
+                    'other_field': 'test',
+                    'different_field': 'test'
+                }
+            ],
+            deleted=True
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(output, [['collection-deleted', 1]])
+
+    def test_audit_collection_rights_snapshot_with_missing_cmd(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='%s-1' % self.COL_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'other_field': 'test',
+                    'different_field': 'test'
+                }
+            ]
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['collection-missing_cmd-length-1', 1],
+                ['collection-missing-cmd', 1],
+                ['collection-missing_cmd-field-other_field', 1],
+                ['collection-missing_cmd-field-different_field', 1],
+            ]
+        )
+
+    def test_audit_exploration_rights_snapshot_with_empty_commit_cmds(self):
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[]
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(output, [['exploration-length-0', 1]])
+
+    def test_audit_topic_rights_snapshot(self):
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id='%s-1' % self.TOP_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }, {
+                    'cmd': 'some_other_command',
+                    'other_field': 'test',
+                    'different_field': 'test'
+                }
+            ]
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['topic-some_command-length-2', 1],
+                ['topic-cmd-some_command', 1],
+                ['topic-cmd-some_other_command', 1],
+                ['topic-some_command-field-other_field', 1],
+                ['topic-some_other_command-field-other_field', 1],
+                ['topic-some_other_command-field-different_field', 1],
+            ]
+        )
+
+    def test_audit_multiple_rights_snapshots(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='%s-1' % self.COL_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }, {
+                    'cmd': 'some_other_command',
+                    'other_field': 'test',
+                    'different_field': 'test'
+                }
+            ]
+        ).put()
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }
+            ]
+        ).put()
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-2' % self.EXP_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'some_command',
+                    'other_field': 'test'
+                }
+            ]
+        ).put()
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id='%s-1' % self.TOP_1_ID,
+            committer_id=self.USER_1_ID,
+            commit_type='edit',
+            commit_cmds=[]
+        ).put()
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['collection-some_command-length-2', 1],
+                ['collection-cmd-some_command', 1],
+                ['collection-cmd-some_other_command', 1],
+                ['collection-some_command-field-other_field', 1],
+                ['collection-some_other_command-field-other_field', 1],
+                ['collection-some_other_command-field-different_field', 1],
+                ['exploration-some_command-length-1', 2],
+                ['exploration-cmd-some_command', 2],
+                ['exploration-some_command-field-other_field', 2],
+                ['topic-length-0', 1]
+            ]
+        )

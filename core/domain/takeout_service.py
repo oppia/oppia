@@ -57,7 +57,7 @@ def export_data_for_user(user_id):
         {
             <MODEL_NAME>_data: <dict of data in format as specified by
                                 model export policy>
-        }
+        }.
     """
     exported_data = dict()
     models_to_export = get_models_which_should_be_exported()

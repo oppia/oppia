@@ -26,13 +26,15 @@
  * learner actions and then returns a giant HTML string.
  */
 
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'answer-submit-action.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'multiple-incorrect-submissions-issue.directive.ts');
+  'multiple-incorrect-submissions-issue.component.ts');
 require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
@@ -89,7 +91,11 @@ angular.module('oppia').factory('LearnerActionRenderService', [
       el.attr('interaction-id', interaction.id);
       el.attr(
         'interaction-customization-args',
-        HtmlEscaperService.objToEscapedJson(interaction.customizationArgs));
+        HtmlEscaperService.objToEscapedJson(
+          Interaction.convertCustomizationArgsToBackendDict(
+            interaction.customizationArgs)
+        )
+      );
       return ($('<span>').append(el)).html();
     };
 

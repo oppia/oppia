@@ -29,10 +29,6 @@
 
   <div ng-repeat="vizInfo in visualizationsInfo">
     <div ng-switch="vizInfo.id">
-      <oppia-visualization-bar-chart ng-switch-when="BarChart"
-                                     data="vizInfo.data"
-                                     options="vizInfo.options">
-      </oppia-visualization-bar-chart>
       <oppia-visualization-click-hexbins ng-switch-when="ClickHexbins"
                                          data="vizInfo.data"
                                          interaction-args="interactionArgs">

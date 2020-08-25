@@ -27,12 +27,12 @@ export interface SkillRightsBackendDict {
 
 export class SkillRights {
   _skillId: string;
-  _skillDescriptionIsEditable: boolean;
+  _canEditSkillDescription: boolean;
 
   constructor(
       skillId: string, canEditSkillDescription: boolean) {
     this._skillId = skillId;
-    this._skillDescriptionIsEditable = canEditSkillDescription;
+    this._canEditSkillDescription = canEditSkillDescription;
   }
 
   getSkillId(): string {
@@ -40,12 +40,12 @@ export class SkillRights {
   }
 
   canEditSkillDescription(): boolean {
-    return this._skillDescriptionIsEditable;
+    return this._canEditSkillDescription;
   }
 
   copyFromSkillRights(otherSkillRights: SkillRights):void {
     this._skillId = otherSkillRights.getSkillId();
-    this._skillDescriptionIsEditable =
+    this._canEditSkillDescription =
       otherSkillRights.canEditSkillDescription();
   }
 }

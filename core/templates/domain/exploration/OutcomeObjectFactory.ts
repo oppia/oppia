@@ -21,18 +21,18 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
-  ISubtitledHtmlBackendDict,
+  SubtitledHtmlBackendDict,
   SubtitledHtml,
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { IParamChangeBackendDict } from
+import { ParamChangeBackendDict } from
   'domain/exploration/ParamChangeObjectFactory';
 
-export interface IOutcomeBackendDict {
+export interface OutcomeBackendDict {
   'dest': string;
-  'feedback': ISubtitledHtmlBackendDict;
+  'feedback': SubtitledHtmlBackendDict;
   'labelled_as_correct': boolean;
-  'param_changes': IParamChangeBackendDict[];
+  'param_changes': ParamChangeBackendDict[];
   'refresher_exploration_id': string;
   'missing_prerequisite_skill_id': string;
 }
@@ -41,12 +41,12 @@ export class Outcome {
   dest: string;
   feedback: SubtitledHtml;
   labelledAsCorrect: boolean;
-  paramChanges: IParamChangeBackendDict[];
+  paramChanges: ParamChangeBackendDict[];
   refresherExplorationId: string;
   missingPrerequisiteSkillId: string;
   constructor(
       dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
-      paramChanges: IParamChangeBackendDict[], refresherExplorationId: string,
+      paramChanges: ParamChangeBackendDict[], refresherExplorationId: string,
       missingPrerequisiteSkillId: string) {
     this.dest = dest;
     this.feedback = feedback;
@@ -60,7 +60,7 @@ export class Outcome {
     this.dest = newValue;
   }
 
-  toBackendDict(): IOutcomeBackendDict {
+  toBackendDict(): OutcomeBackendDict {
     return {
       dest: this.dest,
       feedback: this.feedback.toBackendDict(),
@@ -96,7 +96,7 @@ export class OutcomeObjectFactory {
 
   createNew(
       dest: string, feedbackTextId: string, feedbackText: string,
-      paramChanges: IParamChangeBackendDict[]): Outcome {
+      paramChanges: ParamChangeBackendDict[]): Outcome {
     return new Outcome(
       dest,
       this.subtitledHtmlObjectFactory.createDefault(
@@ -107,7 +107,7 @@ export class OutcomeObjectFactory {
       null);
   }
 
-  createFromBackendDict(outcomeDict: IOutcomeBackendDict): Outcome {
+  createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
     return new Outcome(
       outcomeDict.dest,
       this.subtitledHtmlObjectFactory.createFromBackendDict(

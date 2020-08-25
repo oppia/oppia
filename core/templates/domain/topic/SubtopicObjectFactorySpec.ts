@@ -36,7 +36,8 @@ describe('Subtopic object factory', () => {
       thumbnail_filename: 'image.png',
       thumbnail_bg_color: '#a33f40',
       title: 'Title',
-      skill_ids: skillIds
+      skill_ids: skillIds,
+      url_fragment: 'title'
     };
     var sampleSkillIdToDesriptionMap = {
       skill_1: 'Description 1',

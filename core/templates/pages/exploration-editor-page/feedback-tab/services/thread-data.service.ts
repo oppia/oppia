@@ -236,12 +236,15 @@ angular.module('oppia').factory('ThreadDataService', [
           updated_status: updatedStatus,
           updated_subject: null,
           text: newMessage
-        }).then(() => {
+        }).then((response) => {
           if (updatedStatus) {
             openThreadsCount += (newStatus === STATUS_OPEN) ? 1 : -1;
           }
           thread.status = newStatus;
-          return this.getMessagesAsync(thread);
+          let threadMessageBackendDicts = response.data.messages;
+          thread.setMessages(threadMessageBackendDicts.map(
+            m => ThreadMessageObjectFactory.createFromBackendDict(m)));
+          return thread.messages;
         });
       },
 

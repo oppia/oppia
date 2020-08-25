@@ -102,14 +102,16 @@ describe('Skill mastery backend API service', () => {
 
       const req = httpTestingController.expectOne(requestUrl);
       expect(req.request.method).toEqual('GET');
-      req.flush(null, {
+      req.flush({
+        error: 'Error fetching skill mastery.'
+      }, {
         status: 500, statusText: 'Error fetching skill mastery.'
       });
 
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error fetching skill mastery.');
     }));
 
   it('should successfully update the skill mastery degrees in the backend',
@@ -142,13 +144,15 @@ describe('Skill mastery backend API service', () => {
       const req = httpTestingController.expectOne(
         '/skill_mastery_handler/data');
       expect(req.request.method).toEqual('PUT');
-      req.flush(null, {
+      req.flush({
+        error: 'Error updating skill mastery.'
+      }, {
         status: 500, statusText: 'Error updating skill mastery.'
       });
 
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error updating skill mastery.');
     }));
 });

@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -41,11 +42,10 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.topic_id = topic_services.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
-        self.save_new_story(
-            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(self.story_id, self.admin_id, self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name', url_fragment='name',
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -67,9 +67,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -178,9 +176,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
 
         self.get_html_response(
             '%s/%s' % (
@@ -201,9 +197,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
         self.get_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id),
@@ -215,9 +209,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
 
         new_story_id = story_services.get_new_story_id()
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
 
         self.get_json(
             '%s/%s' % (
@@ -226,6 +218,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.save_new_topic(
             'topic_id_new', self.admin_id, name='Name 2',
+            abbreviated_name='name-two', url_fragment='name-two',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -262,9 +255,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -288,9 +279,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
         new_story_id = story_services.get_new_story_id()
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -302,6 +291,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # associated with the new topic.
         self.save_new_topic(
             'topic_id_new', self.admin_id, name='Name 2',
+            abbreviated_name='name-new', url_fragment='name-new',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -332,11 +322,38 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         json_response = self.put_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
-            change_cmd, csrf_token=csrf_token, expected_status_int=500)
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             json_response['error'],
             'Expected a commit message but received none.')
+
+        self.logout()
+
+    def test_put_fails_with_long_commit_message(self):
+        self.login(self.ADMIN_EMAIL)
+
+        change_cmd = {
+            'version': 1,
+            'commit_message': 'a' * 1001,
+            'change_dicts': [{
+                'cmd': 'update_story_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            }]
+        }
+
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Commit messages must be at most 1000 characters long.')
 
         self.logout()
 
@@ -353,9 +370,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
     def test_delete_can_not_access_story_handler_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
         new_story_id = story_services.get_new_story_id()
-        self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            'invalid_topic_id')
+        self.save_new_story(new_story_id, self.admin_id, 'invalid_topic_id')
         self.delete_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX,
@@ -392,13 +407,41 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         # Check that admins can access the editable story data.
         self.login(self.ADMIN_EMAIL)
-
+        self.save_new_valid_exploration(
+            '0', self.admin_id, title='Title 1',
+            category='Mathematics', language_code='en')
+        self.publish_exploration(self.admin_id, '0')
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': 'node_1',
+            'title': 'Title 1'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': 'node_1',
+            'old_value': None,
+            'new_value': '0'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
+            'node_id': 'node_1',
+            'old_value': [],
+            'new_value': ['skill_id_1']
+        })]
+        self.save_new_skill(
+            'skill_id_1', self.admin_id, description='Description 3')
+        story_services.update_story(
+            self.admin_id, self.story_id, change_list, 'Updated story node.')
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id))
         self.assertEqual(self.story_id, json_response['story']['id'])
         self.assertEqual('Name', json_response['topic_name'])
-        self.assertEqual([], json_response['skill_summaries'])
+        self.assertEqual(len(json_response['skill_summaries']), 1)
+        self.assertEqual(
+            json_response['skill_summaries'][0]['description'], 'Description 3')
         self.logout()
 
     def test_editable_story_handler_put(self):

@@ -27,10 +27,11 @@ import { ItemSelectionInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
-import { IItemSelectionInputCustomizationArgs } from
+import { ItemSelectionInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('ItemSelectionInputValidationService', () => {
@@ -40,7 +41,7 @@ describe('ItemSelectionInputValidationService', () => {
   let currentState: string = null;
   let goodAnswerGroups: AnswerGroup[] = null,
     goodDefaultOutcome: Outcome = null;
-  let customizationArguments: IItemSelectionInputCustomizationArgs = null;
+  let customizationArguments: ItemSelectionInputCustomizationArgs = null;
   let IsProperSubsetValidOption: AnswerGroup[] = null;
   let oof: OutcomeObjectFactory = null,
     agof: AnswerGroupObjectFactory = null,
@@ -77,7 +78,11 @@ describe('ItemSelectionInputValidationService', () => {
 
     customizationArguments = {
       choices: {
-        value: ['Selection 1', 'Selection 2', 'Selection 3']
+        value: [
+          new SubtitledHtml('Selection 1', ''),
+          new SubtitledHtml('Selection 2', ''),
+          new SubtitledHtml('Selection 3', '')
+        ]
       },
       maxAllowableSelectionCount: {
         value: 2
@@ -86,61 +91,60 @@ describe('ItemSelectionInputValidationService', () => {
         value: 1
       }
     };
-    goodAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
-        rule_type: 'Equals',
-        inputs: {
-          x: ['Selection 1', 'Selection 2']
-        }
-      })],
-      goodDefaultOutcome,
-      null,
-      null)
-    ];
-    ThreeInputsAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+    const goodAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    goodAnswerGroup.updateRuleTypesToInputs([rof.createFromBackendDict({
+      rule_type: 'Equals',
+      inputs: {
+        x: ['Selection 1', 'Selection 2']
+      }
+    })]);
+    goodAnswerGroups = [goodAnswerGroup];
+
+    const threeInputsAnswerGroup = agof.createNew(
+      goodDefaultOutcome, null, null);
+    threeInputsAnswerGroup.updateRuleTypesToInputs([
+      rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: ['Selection 1', 'Selection 2', 'Selection 3']
         }
-      })],
-      goodDefaultOutcome,
-      null,
-      null)
-    ];
-    OneInputAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      })
+    ]);
+    ThreeInputsAnswerGroups = [threeInputsAnswerGroup];
+
+    const oneInputAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    oneInputAnswerGroup.updateRuleTypesToInputs([
+      rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: ['Selection 1']
         }
-      })],
-      goodDefaultOutcome,
-      null,
-      null)
-    ];
-    NoInputAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      })
+    ]);
+    OneInputAnswerGroups = [oneInputAnswerGroup];
+
+    const noInputAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    noInputAnswerGroup.updateRuleTypesToInputs([
+      rof.createFromBackendDict({
         rule_type: 'ContainsAtLeastOneOf',
         inputs: {
           x: []
         }
-      })],
-      goodDefaultOutcome,
-      null,
-      null)
-    ];
-    IsProperSubsetValidOption = [agof.createNew(
-      [rof.createFromBackendDict({
+      })
+    ]);
+    NoInputAnswerGroups = [noInputAnswerGroup];
+
+    const isProperSubsetValidOptionAnswerGroup = agof.createNew(
+      goodDefaultOutcome, null, null);
+    isProperSubsetValidOptionAnswerGroup.updateRuleTypesToInputs([
+      rof.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
         inputs: {
           x: ['Selection 1']
         }
-      })],
-      goodDefaultOutcome,
-      null,
-      null)
-    ];
+      })
+    ]);
+    IsProperSubsetValidOption = [isProperSubsetValidOptionAnswerGroup];
   });
 
   it('should be able to perform basic validation', () => {
@@ -153,6 +157,11 @@ describe('ItemSelectionInputValidationService', () => {
   it('should expect a choices customization argument', () => {
     expect(() => {
       validatorService.getAllWarnings(
+        // This throws "Argument of type '{}' is not assignable to
+        // parameter of type 'ItemSelectionInputCustomizationArgs'." We are
+        // purposely assigning the wrong type of customization args in order
+        // to test validations.
+        // @ts-expect-error
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have property: choices');
@@ -216,7 +225,8 @@ describe('ItemSelectionInputValidationService', () => {
 
   it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
-    customizationArguments.choices.value[0] = '';
+    customizationArguments.choices.value[0] = (
+      new SubtitledHtml('', ''));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -229,7 +239,8 @@ describe('ItemSelectionInputValidationService', () => {
 
   it('should expect all choices to be unique', () => {
     // Repeat the last choice.
-    customizationArguments.choices.value.push('Selection 3');
+    customizationArguments.choices.value.push(
+      new SubtitledHtml('Selection 3', ''));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,

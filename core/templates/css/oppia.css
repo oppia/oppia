@@ -545,6 +545,11 @@ p:last-child {
   font-size: 1em !important;
 }
 
+.oppia-rte-editor {
+  border: none;
+  outline: none;
+}
+
 .oppia-rte-editor p span {
   font-size: 1em !important;
 }
@@ -1513,7 +1518,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-placeholder {
-  color: #888;
+  color: #707070;
   font-style: italic;
 }
 
@@ -1586,6 +1591,13 @@ md-card.oppia-dashboard-tile {
   margin-bottom: 60px;
 }
 
+@media screen and (max-width: 768px) {
+  .oppia-editor-page-container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
 .oppia-editor-header {
   font-size: 16px;
   margin-top: 35px;
@@ -1655,7 +1667,6 @@ pre.oppia-pre-wrapped-text {
 .oppia-editor-card-section-container {
   background: rgba(5,140,166,0.1);
   padding-bottom: 1px;
-  padding-top: 5px;
 }
 
 .oppia-editor-card-section {
@@ -1940,8 +1951,11 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-interaction-preview {
+  height: 100%;
   opacity: 0.5;
   padding: 4px;
+  position: absolute;
+  width: 100%;
 }
 
 .oppia-editable-section:hover .oppia-interaction-preview {
@@ -1972,6 +1986,15 @@ pre.oppia-pre-wrapped-text {
   position: absolute;
   width: 100%;
   z-index: 50;
+}
+
+.oppia-clear {
+  clear: both;
+}
+
+.oppia-form-error-text {
+  color: #ff0000;
+  font-size: smaller;
 }
 
 .oppia-editor-trash-icon {
@@ -2114,13 +2137,13 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-response-button,
 .oppia-add-fallback-button,
 .oppia-add-hint-button {
-  background-color: rgba(5,140,166,0.9);
+  background-color: #008098;
   border: 0;
-  border-radius: 0;
-  color: white;
-  opacity: 0.9;
-  padding: 7px;
-  width: 100%;
+  border-radius: 2px;
+  color: #FFF;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+  padding: 7px 15px;
 }
 
 .oppia-add-interaction-button:active,
@@ -2187,6 +2210,11 @@ pre.oppia-pre-wrapped-text {
   opacity: 1;
 }
 
+@media screen and (max-width: 768px) {
+  .oppia-delete-interaction-button {
+    top: 60px;
+  }
+}
 .oppia-close-popover-button:focus {
   outline: 1px dotted #212121;
   outline: auto 5px -webkit-focus-ring-color;
@@ -2271,7 +2299,7 @@ pre.oppia-pre-wrapped-text {
   cursor: move;
   left: 10px;
   margin-left: 5px;
-  opacity: 0.3;
+  opacity: 1;
   position: absolute;
   top: 6px;
   width: 25px;
@@ -2509,6 +2537,10 @@ oppia-parameter {
   pointer-events: none;
 }
 
+.oppia-disabled-image-link {
+  pointer-events: none;
+}
+
 /* CSS3 Animations */
 @-ms-keyframes spin {
   from { -ms-transform: rotate(0deg); }
@@ -2737,7 +2769,7 @@ div#ng-curtain {
   width: 0;
 }
 .oppia-editor-warnings-error-color {
-  border-color: transparent transparent rgb(244,244,15) transparent;
+  border-color: transparent transparent #FFCC00 transparent;
   color: #333;
 }
 .oppia-editor-warnings-critical-color {
@@ -2946,14 +2978,7 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-bottom: 5px;
 }
 
-.oppia-feedback-card .form-horizontal label {
-  float: left;
-  height: 73px;
-  padding-right: 0;
-  width: 665px;
-}
 .oppia-settings-container .form-group > label {
-  min-height: 35px;
   padding-left: 0;
   padding-right: 0;
 }
@@ -4251,7 +4276,6 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-settings-container .form-text {
   color: #737373;
   display: inline-block;
-  margin-bottom: 15px;
   margin-top: 5px;
 }
 
@@ -4281,12 +4305,37 @@ md-card.preview-conversation-skin-supplemental-card {
 
 }
 
+.oppia-mobile-back-to-parent {
+  display: none;
+}
 @media only screen and (max-width: 768px) {
   .oppia-static-content, .oppia-static-extra-content {
     width: 90%;
   }
   .oppia-about-otter-speech-bubble {
     padding: 10px;
+  }
+  .oppia-mobile-collapsible-card {
+    margin: 40px 0 0;
+    padding: 0;
+  }
+  .oppia-mobile-collapsible-card-header {
+    padding: 18px 15px;
+  }
+  .oppia-mobile-collapsible-card-content {
+    border-top: 1px solid #999999;
+    padding: 20px 26px 15px;
+  }
+  .oppia-mobile-back-to-parent {
+    color: #007bff;
+    display: block;
+    font-size: 18px;
+    margin-left: 3%;
+  }
+  .oppia-mobile-back-to-parent i {
+    color: #007bff;
+    font-size: 18px;
+    margin-left: 3%;
   }
 }
 
@@ -4318,25 +4367,6 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 .oppia-save-exploration-wide-modal .legend-graph {
   right: -25px;
-}
-
-.oppia-mathexpression-input-mobile-overlay {
-  opacity: 0;
-  position: absolute;
-  z-index: 2;
-}
-
-.oppia-mathexpression-input-hidden-text {
-  /* In some versions of Chrome on Android, typing in a 0 input
-  field can cause the previous character to be selected.
-  Set to 1px and 0 opacity instead of 0 to prevent this issue. */
-  border: 0;
-  height: 1px;
-  margin: 0;
-  margin-left: -5px;
-  opacity: 0;
-  padding: 0;
-  width: 1px;
 }
 
 .oppia-rte-component-container {

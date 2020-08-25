@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import json
 
 from constants import constants
 from core.domain import android_validation_constants
@@ -195,7 +196,7 @@ class Misconception(python_utils.OBJECT):
         """Returns a dict representing this Misconception domain object.
 
         Returns:
-            A dict, mapping all fields of Misconception instance.
+            dict. A dict, mapping all fields of Misconception instance.
         """
         return {
             'id': self.id,
@@ -242,7 +243,7 @@ class Misconception(python_utils.OBJECT):
         """Validates various properties of the Misconception object.
 
         Raises:
-            ValidationError: One or more attributes of the misconception are
+            ValidationError. One or more attributes of the misconception are
                 invalid.
         """
         self.require_valid_misconception_id(self.id)
@@ -293,7 +294,7 @@ class Rubric(python_utils.OBJECT):
         """Returns a dict representing this Rubric domain object.
 
         Returns:
-            A dict, mapping all fields of Rubric instance.
+            dict. A dict, mapping all fields of Rubric instance.
         """
         return {
             'difficulty': self.difficulty,
@@ -319,7 +320,7 @@ class Rubric(python_utils.OBJECT):
         """Validates various properties of the Rubric object.
 
         Raises:
-            ValidationError: One or more attributes of the rubric are
+            ValidationError. One or more attributes of the rubric are
                 invalid.
         """
         if not isinstance(self.difficulty, python_utils.BASESTRING):
@@ -360,7 +361,7 @@ class WorkedExample(python_utils.OBJECT):
         """Validates various properties of the WorkedExample object.
 
         Raises:
-            ValidationError: One or more attributes of the worked example are
+            ValidationError. One or more attributes of the worked example are
                 invalid.
         """
         if not isinstance(self.question, state_domain.SubtitledHtml):
@@ -378,7 +379,7 @@ class WorkedExample(python_utils.OBJECT):
         """Returns a dict representing this WorkedExample domain object.
 
         Returns:
-            A dict, mapping all fields of WorkedExample instance.
+            dict. A dict, mapping all fields of WorkedExample instance.
         """
         return {
             'question': self.question.to_dict(),
@@ -404,6 +405,8 @@ class WorkedExample(python_utils.OBJECT):
                 worked_example_dict['explanation']['content_id'],
                 worked_example_dict['explanation']['html'])
         )
+        worked_example.question.validate()
+        worked_example.explanation.validate()
 
         return worked_example
 
@@ -436,7 +439,7 @@ class SkillContents(python_utils.OBJECT):
         """Validates various properties of the SkillContents object.
 
         Raises:
-            ValidationError: One or more attributes of skill contents are
+            ValidationError. One or more attributes of skill contents are
                 invalid.
         """
         available_content_ids = set([])
@@ -474,7 +477,7 @@ class SkillContents(python_utils.OBJECT):
         """Returns a dict representing this SkillContents domain object.
 
         Returns:
-            A dict, mapping all fields of SkillContents instance.
+            dict. A dict, mapping all fields of SkillContents instance.
         """
         return {
             'explanation': self.explanation.to_dict(),
@@ -506,6 +509,7 @@ class SkillContents(python_utils.OBJECT):
             state_domain.WrittenTranslations.from_dict(skill_contents_dict[
                 'written_translations'])
         )
+        skill_contents.explanation.validate()
 
         return skill_contents
 
@@ -609,7 +613,7 @@ class Skill(python_utils.OBJECT):
         """Validates various properties of the Skill object.
 
         Raises:
-            ValidationError: One or more attributes of skill are invalid.
+            ValidationError. One or more attributes of skill are invalid.
         """
         self.require_valid_description(self.description)
 
@@ -745,7 +749,7 @@ class Skill(python_utils.OBJECT):
         """Returns a dict representing this Skill domain object.
 
         Returns:
-            A dict, mapping all fields of Skill instance.
+            dict. A dict, mapping all fields of Skill instance.
         """
         return {
             'id': self.id,
@@ -766,6 +770,107 @@ class Skill(python_utils.OBJECT):
             'all_questions_merged': self.all_questions_merged,
             'prerequisite_skill_ids': self.prerequisite_skill_ids
         }
+
+    def serialize(self):
+        """Returns the object serialized as a JSON string.
+
+        Returns:
+            str. JSON-encoded utf-8 string encoding all of the information
+            composing the object.
+        """
+        skill_dict = self.to_dict()
+        # The only reason we add the version parameter separately is that our
+        # yaml encoding/decoding of this object does not handle the version
+        # parameter.
+        # NOTE: If this changes in the future (i.e the version parameter is
+        # added as part of the yaml representation of this object), all YAML
+        # files must add a version parameter to their files with the correct
+        # version of this object. The line below must then be moved to
+        # to_dict().
+        skill_dict['version'] = self.version
+
+        if self.created_on:
+            skill_dict['created_on'] = utils.convert_naive_datetime_to_string(
+                self.created_on)
+
+        if self.last_updated:
+            skill_dict['last_updated'] = utils.convert_naive_datetime_to_string(
+                self.last_updated)
+
+        return json.dumps(skill_dict).encode('utf-8')
+
+    @classmethod
+    def deserialize(cls, json_string):
+        """Returns a Skill domain object decoded from a JSON string.
+
+        Args:
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Skill. Only call
+                on strings that were created using serialize().
+
+        Returns:
+            Skill. The corresponding Skill domain object.
+        """
+        skill_dict = json.loads(json_string.decode('utf-8'))
+        created_on = (
+            utils.convert_string_to_naive_datetime_object(
+                skill_dict['created_on'])
+            if 'created_on' in skill_dict else None)
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                skill_dict['last_updated'])
+            if 'last_updated' in skill_dict else None)
+        skill = cls.from_dict(
+            skill_dict,
+            skill_version=skill_dict['version'],
+            skill_created_on=created_on,
+            skill_last_updated=last_updated)
+
+        return skill
+
+    @classmethod
+    def from_dict(
+            cls, skill_dict, skill_version=0, skill_created_on=None,
+            skill_last_updated=None):
+        """Returns a Skill domain object from a dict.
+
+        Args:
+            skill_dict: dict. The dictionary representation of skill
+                object.
+            skill_version: int. The version of the skill.
+            skill_created_on: datetime.datetime. Date and time when the
+                skill is created.
+            skill_last_updated: datetime.datetime. Date and time when the
+                skill was last updated.
+
+        Returns:
+            Skill. The corresponding Skill domain object.
+        """
+        skill = cls(
+            skill_dict['id'], skill_dict['description'],
+            [
+                Misconception.from_dict(misconception_dict)
+                for misconception_dict in skill_dict['misconceptions']
+            ],
+            [
+                Rubric.from_dict(rubric_dict)
+                for rubric_dict in skill_dict['rubrics']
+            ],
+            SkillContents.from_dict(
+                skill_dict['skill_contents']),
+            skill_dict['misconceptions_schema_version'],
+            skill_dict['rubric_schema_version'],
+            skill_dict['skill_contents_schema_version'],
+            skill_dict['language_code'],
+            skill_version,
+            skill_dict['next_misconception_id'],
+            skill_dict['superseding_skill_id'],
+            skill_dict['all_questions_merged'],
+            skill_dict['prerequisite_skill_ids'],
+            skill_created_on,
+            skill_last_updated)
+
+        return skill
 
     @classmethod
     def create_default_skill(cls, skill_id, description, rubrics):
@@ -795,6 +900,7 @@ class Skill(python_utils.OBJECT):
                     explanation_content_id: {}
                 }
             }))
+        skill_contents.explanation.validate()
         return cls(
             skill_id, description, [], rubrics, skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -1150,7 +1256,7 @@ class Skill(python_utils.OBJECT):
             skill_id: str. The skill ID to add.
 
         Raises:
-            ValueError: The skill is already a prerequisite skill.
+            ValueError. The skill is already a prerequisite skill.
         """
         if self._find_prerequisite_skill_id_index(skill_id) is not None:
             raise ValueError('The skill is already a prerequisite skill.')
@@ -1163,7 +1269,7 @@ class Skill(python_utils.OBJECT):
             skill_id: str. The skill ID to remove.
 
         Raises:
-            ValueError: The skill to remove is not a prerequisite skill.
+            ValueError. The skill to remove is not a prerequisite skill.
         """
         index = self._find_prerequisite_skill_id_index(skill_id)
         if index is None:
@@ -1203,7 +1309,7 @@ class Skill(python_utils.OBJECT):
             misconception_id: int. The id of the misconception to be removed.
 
         Raises:
-            ValueError: There is no misconception with the given id.
+            ValueError. There is no misconception with the given id.
         """
         index = self._find_misconception_index(misconception_id)
         if index is None:
@@ -1219,7 +1325,7 @@ class Skill(python_utils.OBJECT):
             name: str. The new name of the misconception.
 
         Raises:
-            ValueError: There is no misconception with the given id.
+            ValueError. There is no misconception with the given id.
         """
         index = self._find_misconception_index(misconception_id)
         if index is None:
@@ -1238,8 +1344,8 @@ class Skill(python_utils.OBJECT):
                 misconception.
 
         Raises:
-            ValueError: There is no misconception with the given id.
-            ValueError: must_be_addressed should be bool.
+            ValueError. There is no misconception with the given id.
+            ValueError. The must_be_addressed should be bool.
         """
         if not isinstance(must_be_addressed, bool):
             raise ValueError('must_be_addressed should be a bool value.')
@@ -1257,7 +1363,7 @@ class Skill(python_utils.OBJECT):
             notes: str. The new notes of the misconception.
 
         Raises:
-            ValueError: There is no misconception with the given id.
+            ValueError. There is no misconception with the given id.
         """
         index = self._find_misconception_index(misconception_id)
         if index is None:
@@ -1274,7 +1380,7 @@ class Skill(python_utils.OBJECT):
                 of the misconception.
 
         Raises:
-            ValueError: There is no misconception with the given id.
+            ValueError. There is no misconception with the given id.
         """
         index = self._find_misconception_index(misconception_id)
         if index is None:
@@ -1319,7 +1425,7 @@ class SkillSummary(python_utils.OBJECT):
         """Validates various properties of the Skill Summary object.
 
         Raises:
-            ValidationError: One or more attributes of skill summary are
+            ValidationError. One or more attributes of skill summary are
                 invalid.
         """
         if not isinstance(self.description, python_utils.BASESTRING):

@@ -55,12 +55,9 @@ describe('Exploration Save Modal Controller', function() {
 
   it('should click on toggle diff button', function() {
     var divMock = $(document.createElement('div'));
-    // @ts-ignore window does not have native $ property.
     var jQuerySpy = spyOn(window, '$');
 
-    // @ts-ignore
     jQuerySpy.withArgs('.oppia-save-exploration-modal').and.returnValue(
-      // @ts-ignore
       divMock);
     jQuerySpy.and.callThrough();
 

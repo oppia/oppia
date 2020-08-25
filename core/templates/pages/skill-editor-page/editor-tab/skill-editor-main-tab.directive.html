@@ -43,11 +43,13 @@
       <md-card class="skill-editor-helper-box">
         <div class="skill-details-container">
           <div class="misconception-count">
-            <div class="count-value"><[skill.getMisconceptions().length]></div>
+            <span class="count-value" ng-if="!hasLoadedSkill()"><loading-dots></loading-dots></span>
+            <div class="count-value" ng-if="hasLoadedSkill()"><[skill.getMisconceptions().length]></div>
             <div class="count-text">Misconceptions</div>
           </div>
           <div class="example-count">
-            <div class="count-value"><[skill.getConceptCard().getWorkedExamples().length]></div>
+            <span class="count-value" ng-if="!hasLoadedSkill()"><loading-dots></loading-dots></span>
+            <div class="count-value" ng-if="hasLoadedSkill()"><[skill.getConceptCard().getWorkedExamples().length]></div>
             <div class="count-text">Worked Examples</div>
           </div>
           <div class="create-question" ng-click="createQuestion()">
@@ -67,12 +69,13 @@
   }
 
   .skill-editor .skill-editor-components-container {
+    margin-right: 2%;
     width: 40%;
   }
 
   .skill-editor .skill-editor-info-container {
     margin-top: 30px;
-    width: 35%;
+    width: 31%;
   }
 
   .skill-editor .status-heading {
@@ -105,9 +108,9 @@
     border-radius: 4px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    padding: 35px 0;
+    justify-content: space-evenly;
     text-align: center;
+    width: 100%;
   }
 
   .skill-editor .misconception-count,
@@ -115,16 +118,16 @@
   .skill-editor .create-question {
     border-right: 2px solid #707070;
     display: inline-block;
-    width: 30%;
+    width: 33%;
   }
 
   .skill-editor .count-value {
-    font-size: 25px;
+    font-size: 24px;
     font-weight: bold;
   }
 
   .skill-editor .count-text {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .skill-editor .create-question {
@@ -140,6 +143,21 @@
   .skill-editor .create-text {
     color: #0b6c63;
   }
+  .skill-editor .skill-editor-helper-box {
+    align-items: center;
+    background-color: #FFF;
+    border: 1px solid #aaaac1;
+    border-radius: 6px;
+    box-shadow: none;
+    height: 110px;
+    justify-content: center;
+    margin: 30px auto 0;
+    width: 97%;
+  }
+  .skill-editor .skill-editor-add-btn {
+    font-weight: bold;
+    margin: 10px 0;
+  }
 
   @media screen and (max-width: 1250px) {
     .skill-editor .skill-editor-components-container {
@@ -149,6 +167,7 @@
 
   @media screen and (max-width: 1000px) {
     .skill-editor .skill-editor-components-container {
+      margin-right: 0;
       width: 55%;
     }
 
@@ -179,6 +198,10 @@
     .skill-editor .create-question {
       height: auto;
     }
+
+    .skill-editor .skill-details-container {
+      display: none;
+    }
   }
 
   @media screen and (max-width: 500px) {
@@ -190,11 +213,16 @@
       width: 100%;
     }
 
+    skill-editor-main-tab .skill-editor {
+      margin-top: 20px;
+    }
+
     .skill-editor .skill-editor-status {
       display: none;
     }
 
     .skill-editor .skill-editor-helper-box {
+      display: none;
       margin: 0;
       width: 100%;
     }

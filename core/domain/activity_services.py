@@ -33,8 +33,8 @@ def get_featured_activity_references():
     """Gets a list of ActivityReference domain models.
 
     Returns:
-        A list of all ActivityReference domain objects that are
-        currently featured.
+        list(ActivityReference). A list of all ActivityReference domain objects
+        that are currently featured.
     """
     featured_model_instance = (
         activity_models.ActivityReferencesModel.get_or_create(
@@ -49,11 +49,12 @@ def update_featured_activity_references(featured_activity_references):
     """Updates the current list of featured activity references.
 
     Args:
-        featured_activity_references: A list of ActivityReference domain
-            objects representing the full list of 'featured' activities.
+        featured_activity_references: list(ActivityReference). A list of
+            ActivityReference domain objects representing the full list of
+            'featured' activities.
 
     Raises:
-        Exception: The input list of ActivityReference domain objects has
+        Exception. The input list of ActivityReference domain objects has
             duplicates.
     """
     for activity_reference in featured_activity_references:
@@ -119,15 +120,16 @@ def split_by_type(activity_references):
     in the input list.
 
     Args:
-        activity_references: A list of ActivityReference domain objects.
+        activity_references: list(ActivityReference). The domain object
+            containing exploration ids and collection ids.
 
     Returns:
-        A 2-tuple whose first element is a list of all exploration
-        ids represented in the input list, and whose second element
-        is a list of all collection ids represented in the input list.
+        tuple(list(str), list(str)). A 2-tuple whose first element is a list of
+        all exploration ids represented in the input list, and whose second
+        element is a list of all collection ids represented in the input list.
 
     Raises:
-        Exception: The activity reference type is invalid.
+        Exception. The activity reference type is invalid.
     """
     exploration_ids, collection_ids = [], []
     for activity_reference in activity_references:

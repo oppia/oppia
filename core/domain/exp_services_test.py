@@ -17,7 +17,6 @@
 """Unit tests for core.domain.exp_services."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
@@ -37,7 +36,6 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
-from core.domain import stats_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -48,7 +46,6 @@ import utils
 
 (exp_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
-memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -115,10 +112,12 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 category='Architecture', language_code='en')
 
         interaction_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 'abc'},
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{
+                    'x': 'abc'
+                }]
+            },
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'feedback': {
@@ -227,9 +226,33 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exp.has_state_name('Introduction'), True)
         self.assertEqual(exp.has_state_name('Fake state name'), False)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
+            self.owner_id,
+            self.EXP_0_ID,
+            _get_change_list(
                 'Introduction', exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'MultipleChoiceInput'), '')
+                'MultipleChoiceInput') +
+            _get_change_list(
+                'Introduction',
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }) +
+            _get_change_list(
+                'Introduction',
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                2
+            ),
+            ''
+        )
         self.assertEqual(exp_services.get_interaction_id_for_state(
             self.EXP_0_ID, 'Introduction'), 'MultipleChoiceInput')
         with self.assertRaisesRegexp(
@@ -527,7 +550,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             count_at_least_editable_exploration_summaries(self.owner_id), 1)
 
         exp_services.delete_exploration(self.owner_id, self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -581,9 +607,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_1_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -651,7 +683,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -672,9 +707,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID], force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_1_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
 
         # The deleted explorations does not show up in any queries.
@@ -701,7 +742,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration summary does not show up in any queries.
@@ -1063,7 +1107,8 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
     HINT_AUDIO_FILE = 'answer_hint.mp3'
     SOLUTION_AUDIO_FILE = 'answer_solution.mp3'
 
-    YAML_WITH_AUDIO_TRANSLATIONS = ("""author_notes: ''
+    YAML_WITH_AUDIO_TRANSLATIONS = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -1269,7 +1314,8 @@ title: Title
         self.assertEqual(solution_voiceovers, {})
 
     def test_cannot_load_yaml_with_no_schema_version(self):
-        yaml_with_no_schema_version = ("""
+        yaml_with_no_schema_version = (
+            """
         author_notes: ''
         auto_tts_enabled: true
         blurb: ''
@@ -1413,9 +1459,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state3.update_content(
             state_domain.SubtitledHtml.from_dict(content3_dict))
 
-        state1.update_interaction_id('ImageClickInput')
-        state2.update_interaction_id('MultipleChoiceInput')
-        state3.update_interaction_id('ItemSelectionInput')
+        self.set_interaction_for_state(state1, 'ImageClickInput')
+        self.set_interaction_for_state(state2, 'MultipleChoiceInput')
+        self.set_interaction_for_state(state3, 'ItemSelectionInput')
 
         customization_args_dict1 = {
             'highlightRegionsOnHover': {'value': True},
@@ -1436,47 +1482,58 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             }
         }
         customization_args_dict2 = {
-            'choices': {'value': [
-                (
+            'choices': {'value': [{
+                'content_id': 'ca_choices_0',
+                'html': (
                     '<p>This is value1 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
-                ),
-                (
+                )
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': (
                     '<p>This is value2 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p></p>')
-            ]}
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
         customization_args_dict3 = {
-            'choices': {'value': [
-                (
+            'choices': {'value': [{
+                'content_id': 'ca_choices_0',
+                'html': (
                     '<p>This is value1 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
-                (
+                    '</p>')
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': (
                     '<p>This is value2 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
-                (
+                    '</p>')
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': (
                     '<p>This is value3 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
-            ]}
+            }]},
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 5}
         }
         state1.update_interaction_customization_args(customization_args_dict1)
         state2.update_interaction_customization_args(customization_args_dict2)
@@ -1510,13 +1567,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}, {'x': 1}]
+            },
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -1537,10 +1591,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'outcome': {
                 'dest': 'state3',
                 'feedback': {
@@ -1556,29 +1610,26 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value1 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice1.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value3 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice3.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{
+                    'x': [
+                        '<p>This is value1 for ItemSelection</p><oppia-noni'
+                        'nteractive-image filepath-with-value="&amp;quot;s3'
+                        'Choice1.png&amp;quot;" caption-with-value="&amp;qu'
+                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
+                        ';"></oppia-noninteractive-image>'
+                    ]
+                }, {
+                    'x': [
+                        '<p>This is value3 for ItemSelection</p><oppia-noni'
+                        'nteractive-image filepath-with-value="&amp;quot;s3'
+                        'Choice3.png&amp;quot;" caption-with-value="&amp;qu'
+                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
+                        ';"></oppia-noninteractive-image>'
+                    ]
+                }]
+            },
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -1607,11 +1658,11 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             self.assertIn(filename, filenames)
 
 
-# pylint: disable=protected-access
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
 
-    SAMPLE_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: A category
@@ -1633,7 +1684,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1648,14 +1701,17 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
   New state:
@@ -1668,7 +1724,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1683,14 +1741,17 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
 states_schema_version: %d
@@ -1703,7 +1764,8 @@ title: A title
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION))
 
-    UPDATED_YAML_CONTENT = ("""author_notes: ''
+    UPDATED_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: A category
@@ -1725,7 +1787,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1740,14 +1804,17 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
   Renamed state:
@@ -1760,7 +1827,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1775,14 +1844,17 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
 states_schema_version: %d
@@ -1820,6 +1892,28 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'New state',
+                    'new_value': 1
                 })], 'Add state name')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
@@ -1866,6 +1960,28 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'New state',
+                    'new_value': 1
                 })], 'Add state name')
 
         with python_utils.open_file(
@@ -1879,7 +1995,7 @@ title: A title
         # Audio files should not be included in asset downloads.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_audio = f.read()
         fs.commit('audio/cafe.mp3', raw_audio)
 
@@ -1916,6 +2032,26 @@ title: A title
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+            'state_name': 'New state',
+            'new_value': 1
         })]
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
@@ -1963,7 +2099,8 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     contents.
     """
 
-    _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
+    _SAMPLE_INIT_STATE_CONTENT = (
+        """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -1972,7 +2109,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -1987,21 +2126,25 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'New state': ("""classifier_model_id: null
+        'New state': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2010,7 +2153,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -2025,14 +2170,17 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """)
@@ -2040,7 +2188,8 @@ written_translations:
 
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'Renamed state': ("""classifier_model_id: null
+        'Renamed state': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2049,7 +2198,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -2064,14 +2215,17 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """)
@@ -2102,6 +2256,28 @@ written_translations:
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'New state',
+                    'new_value': 1
                 })], 'Add state name')
 
         dict_output = exp_services.export_states_to_yaml(
@@ -2111,6 +2287,7 @@ written_translations:
 
     def test_export_by_versions(self):
         """Test export_to_dict() for different versions."""
+        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
         self.assertEqual(exploration.version, 1)
@@ -2132,6 +2309,26 @@ written_translations:
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+            'state_name': 'New state',
+            'new_value': 1
         })]
         exploration.objective = 'The objective'
         with python_utils.open_file(
@@ -2197,10 +2394,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         # List of answer groups to add into an interaction.
         self.interaction_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0},
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'outcome': {
                 'dest': self.init_state_name,
                 'feedback': {
@@ -2306,17 +2503,17 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services._save_exploration(self.owner_id, exploration, '', [])  # pylint: disable=protected-access
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'param_changes', self.param_changes), '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         param_changes = exploration.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')
+        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
+        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
         self.assertEqual(
-            param_changes._customization_args,
+            param_changes._customization_args,  # pylint: disable=protected-access
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
     def test_update_invalid_param_changes(self):
@@ -2352,7 +2549,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services._save_exploration(self.owner_id, exploration, '', [])  # pylint: disable=protected-access
 
         self.param_changes[0]['generator_id'] = 'fake'
         with self.assertRaisesRegexp(
@@ -2367,9 +2564,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_interaction_id(self):
         """Test updating of interaction_id."""
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
+            self.owner_id,
+            self.EXP_0_ID,
+            _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'MultipleChoiceInput'), '')
+                'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }),
+            '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
@@ -2385,13 +2600,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                {'choices': {'value': ['Option A', 'Option B']}}),
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }),
             '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(
-            exploration.init_state.interaction.customization_args[
-                'choices']['value'], ['Option A', 'Option B'])
+        choices = exploration.init_state.interaction.customization_args[
+            'choices'].value
+        self.assertEqual(choices[0].html, '<p>Option A</p>')
+        self.assertEqual(choices[0].content_id, 'ca_choices_0')
+        self.assertEqual(choices[1].html, '<p>Option B</p>')
+        self.assertEqual(choices[1].content_id, 'ca_choices_1')
 
     def test_update_interaction_handlers_fails(self):
         """Test legacy interaction handler updating."""
@@ -2400,10 +2629,23 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 2',
-            })] + _get_change_list(
+            })] +
+            _get_change_list(
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'TextInput'),
+                'TextInput') +
+            _get_change_list(
+                'State 2',
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                }),
             'Add state name')
 
         self.interaction_default_outcome['dest'] = 'State 2'
@@ -2432,10 +2674,23 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 2',
-            })] + _get_change_list(
+            })] +
+            _get_change_list(
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'TextInput'),
+                'TextInput') +
+            _get_change_list(
+                'State 2',
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                }),
             'Add state name')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -2445,6 +2700,21 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }) +
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
@@ -2458,10 +2728,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         init_state = exploration.init_state
         init_interaction = init_state.interaction
-        rule_specs = init_interaction.answer_groups[0].rule_specs
+        rule_types_to_inputs = init_interaction.answer_groups[
+            0].rule_types_to_inputs
         outcome = init_interaction.answer_groups[0].outcome
-        self.assertEqual(rule_specs[0].rule_type, 'Equals')
-        self.assertEqual(rule_specs[0].inputs, {'x': 0})
+        self.assertEqual(rule_types_to_inputs, {
+            'Equals': [{'x': 0}]
+        })
         self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
@@ -2481,25 +2753,19 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'MultipleChoiceInput') +
                 _get_change_list(
                     self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-                    self.interaction_answer_groups) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome),
-                '')
-
-    def test_update_state_missing_keys(self):
-        """Test that missing keys in interaction_answer_groups produce an
-        error.
-        """
-        del self.interaction_answer_groups[0]['rule_specs'][0]['inputs']
-        with self.assertRaisesRegexp(KeyError, 'inputs'):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID,
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_ID, 'NumericInput') +
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Option A</p>'
+                            }, {
+                                'content_id': 'ca_choices_1',
+                                'html': '<p>Option B</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': False}
+                    }) +
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
@@ -2512,8 +2778,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
-        self.interaction_answer_groups[0]['rule_specs'][0][
-            'inputs']['x'] = 'abc'
+        self.interaction_answer_groups[0]['rule_types_to_inputs'][
+            'Equals'][0]['x'] = 'abc'
         with self.assertRaisesRegexp(
             Exception,
             'abc has the wrong type. It should be a NonnegativeInt.'):
@@ -2626,11 +2892,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>Test!</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
                 },
-                'default_outcome': {}
+                'default_outcome': {},
+                'ca_placeholder_0': {}
             }
         }
         exp_services.update_exploration(
@@ -2867,7 +3135,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Using the old version of the exploration should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 second_committer_id, v1_exploration, '', [])
 
         # Another person modifies the exploration.
@@ -2921,7 +3189,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, self.owner_id)
 
         exploration.title = 'First title'
-        exp_services._save_exploration(
+        exp_services._save_exploration(  # pylint: disable=protected-access
             self.owner_id, exploration, 'Changed title.', [])
         commit_dict_2 = {
             'committer_id': self.owner_id,
@@ -2941,6 +3209,20 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
         })]
         exp_services.update_exploration(
             'second_committer_id', exploration.id, change_list,
@@ -3003,7 +3285,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # In version 1, the title was 'A title'.
         # In version 2, the title becomes 'V2 title'.
         exploration.title = 'V2 title'
-        exp_services._save_exploration(
+        exp_services._save_exploration(  # pylint: disable=protected-access
             self.owner_id, exploration, 'Changed title.', [])
 
         # In version 3, a new state is added.
@@ -3016,6 +3298,20 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
         })]
         exp_services.update_exploration(
             'committer_id_v3', exploration.id, change_list, 'Added new state')
@@ -3178,19 +3474,19 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, self.albert_id)
 
             exploration_1.title = 'Exploration 1 title'
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 self.bob_id, exploration_1, 'Changed title.', [])
 
             exploration_2 = self.save_new_valid_exploration(
                 self.EXP_ID_2, self.albert_id)
 
             exploration_1.title = 'Exploration 1 Albert title'
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 self.albert_id, exploration_1,
                 'Changed title to Albert1 title.', [])
 
             exploration_2.title = 'Exploration 2 Albert title'
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 self.albert_id, exploration_2, 'Changed title to Albert2.', [])
 
             exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
@@ -3326,7 +3622,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
                         'new_value': 'cat1'})], 'update category')
             self.assertEqual(actual_docs, [updated_exp_doc])
             self.assertEqual(add_docs_counter.times_called, 3)
-
 
     def test_get_number_of_ratings(self):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
@@ -3484,7 +3779,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             expected: dict(unicode, int). Expected summary.
 
         Raises:
-            AssertionError: Contributors summary of the given exp is not same
+            AssertionError. Contributors summary of the given exp is not same
                 as expected.
         """
         contributors_summary = exp_fetchers.get_exploration_summary_by_id(
@@ -3639,8 +3934,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 )}
 
         # Check actual summaries equal expected summaries.
-        self.assertEqual(list(actual_summaries.keys()),
-                         list(expected_summaries.keys()))
+        self.assertEqual(
+            list(actual_summaries.keys()),
+            list(expected_summaries.keys()))
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings',
                         'scaled_average_rating', 'status',
@@ -3651,8 +3947,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'exploration_model_last_updated']
         for exp_id in actual_summaries:
             for prop in simple_props:
-                self.assertEqual(getattr(actual_summaries[exp_id], prop),
-                                 getattr(expected_summaries[exp_id], prop))
+                self.assertEqual(
+                    getattr(actual_summaries[exp_id], prop),
+                    getattr(expected_summaries[exp_id], prop))
 
     def test_get_all_exploration_summaries(self):
         actual_summaries = exp_services.get_all_exploration_summaries()
@@ -3692,7 +3989,8 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
-    UPGRADED_EXP_YAML = ("""author_notes: ''
+    UPGRADED_EXP_YAML = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -3719,6 +4017,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -3737,7 +4036,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         buttonText:
-          value: Continue
+          value:
+            content_id: ca_buttonText
+            unicode_str: Continue
       default_outcome:
         dest: END
         feedback:
@@ -3750,14 +4051,17 @@ states:
       hints: []
       id: Continue
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_buttonText: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_buttonText: {}
         content: {}
         default_outcome: {}
 states_schema_version: %d
@@ -3883,55 +4187,6 @@ title: Old Title
                     'new_value': 'new title'
                 })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    def test_update_exploration_does_nothing_if_create_stats_model_fails(self):
-        swap_create_stats_model = self.swap(
-            stats_services, 'create_stats_model',
-            lambda *_: python_utils.divide(1, 0))
-        assert_raises_regexp = (
-            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
-
-        self.save_new_valid_exploration('exp_id', 'user_id')
-        with swap_create_stats_model, assert_raises_regexp:
-            exp_services.update_exploration(
-                'user_id', 'exp_id', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'New title'})],
-                'Changed language code.')
-
-        self.assertIsNone(
-            exp_fetchers.get_exploration_by_id(
-                'exp_id', strict=False, version=2))
-
-    def test_memcache_does_not_persist_even_if_create_stats_model_fails(self):
-        self.save_new_valid_exploration('exp_id', 'user_id')
-
-        memcache_key = exp_fetchers.get_exploration_memcache_key('exp_id')
-        memcached_exploration = (
-            memcache_services.get_multi([memcache_key]).get(memcache_key))
-        actual_exploration = exp_fetchers.get_exploration_by_id('exp_id')
-        self.assertEqual(
-            memcached_exploration.to_dict(), actual_exploration.to_dict())
-
-        swap_create_stats_model = self.swap(
-            stats_services, 'create_stats_model',
-            lambda *_: python_utils.divide(1, 0))
-        assert_raises_regexp = (
-            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
-
-        with swap_create_stats_model, assert_raises_regexp:
-            exp_services.update_exploration(
-                'user_id', 'exp_id', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'New title'})],
-                'Changed language code.')
-
-        memcache_key = exp_fetchers.get_exploration_memcache_key('exp_id')
-        memcached_exploration = (
-            memcache_services.get_multi([memcache_key]).get(memcache_key))
-        self.assertIsNone(memcached_exploration)
-
     def test_update_language_code(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.language_code, 'en')
@@ -3990,7 +4245,7 @@ title: Old Title
 
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.albert_id, exploration, '', [])
+        exp_services._save_exploration(self.albert_id, exploration, '', [])  # pylint: disable=protected-access
 
         param_changes = [{
             'customization_args': {
@@ -4132,8 +4387,8 @@ title: Old Title
             }
         }
 
-        with self.assertRaisesRegexp(Exception,
-                                     'Expected hints_list to be a list.*'):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected hints_list to be a list.*'):
             hints_update = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
@@ -4230,26 +4485,6 @@ title: Old Title
             'from version 1. Please reload the page and try again.'):
             exp_services.revert_exploration('user_id', 'exp_id', 1, 0)
 
-    def test_revert_exploration_does_nothing_if_create_stats_model_fails(self):
-        swap_create_stats_model = self.swap(
-            stats_services, 'create_stats_model',
-            lambda *_: python_utils.divide(1, 0))
-        assert_raises_regexp = (
-            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
-
-        self.save_new_valid_exploration('exp_id', 'user_id')
-        exp_services.update_exploration(
-            'user_id', 'exp_id', [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'New title'})], 'Changed interaction_solutions.')
-        with swap_create_stats_model, assert_raises_regexp:
-            exp_services.revert_exploration('user_id', 'exp_id', 2, 1)
-
-        self.assertIsNone(
-            exp_fetchers.get_exploration_by_id(
-                'exp_id', strict=False, version=3))
-
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     """Test editor auto saving functions in exp_services."""
@@ -4282,7 +4517,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.USER_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.USER_ID, exploration, '', [])
+        exp_services._save_exploration(self.USER_ID, exploration, '', [])  # pylint: disable=protected-access
         self.save_new_valid_exploration(self.EXP_ID2, self.USER_ID)
         self.save_new_valid_exploration(self.EXP_ID3, self.USER_ID)
         self.init_state_name = exploration.init_state_name
@@ -4393,10 +4628,10 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.USER_ID)
         self.assertIsNotNone(updated_exp)
         param_changes = updated_exp.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')
+        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
+        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
         self.assertEqual(
-            param_changes._customization_args,
+            param_changes._customization_args,  # pylint: disable=protected-access
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
     def test_get_exp_with_draft_applied_when_draft_does_not_exist(self):
@@ -4456,10 +4691,22 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         state_customization_args_dict = {
             'choices': {
                 'value': [
-                    '<p>state customization arg html 1</p>',
-                    '<p>state customization arg html 2</p>',
-                    '<p>state customization arg html 3</p>',
-                    '<p>state customization arg html 4</p>'
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '<p>state customization arg html 1</p>'
+                    },
+                    {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>state customization arg html 2</p>'
+                    },
+                    {
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>state customization arg html 3</p>'
+                    },
+                    {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>state customization arg html 4</p>'
+                    }
                 ]
             },
             'maxAllowableSelectionCount': {
@@ -4470,6 +4717,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             }
         }
         state.update_interaction_id('ItemSelectionInput')
+        state.update_next_content_id_index(4)
         state.update_interaction_customization_args(
             state_customization_args_dict)
         exp_services.save_new_exploration(self.USER_ID, exploration)
@@ -4480,12 +4728,27 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             'new_value': {
                 'choices': {
                     'value': [
-                        '<p>1</p>',
-                        '<p>2</p>',
-                        ('<oppia-noninteractive-math raw_latex-with-value="&am'
-                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
-                         'uot;"></oppia-noninteractive-math>'),
-                        '<p>4</p>'
+                        {
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>1</p>'
+                        },
+                        {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>2</p>'
+                        },
+                        {
+                            'content_id': 'ca_choices_2',
+                            'html': (
+                                '<oppia-noninteractive-math raw_latex-with'
+                                '-value="&amp;quot;(x - a_1)(x - a_2)(x - a_3).'
+                                '..(x - a_n)&amp;quot;"></oppia-noninteractive-'
+                                'math>'
+                            )
+                        },
+                        {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>4</p>'
+                        }
                     ]
                 },
                 'maxAllowableSelectionCount': {
@@ -4551,21 +4814,21 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             'from_version': '0',
             'to_version': '1'
         })]
-        exp_services._save_exploration(
+        exp_services._save_exploration(  # pylint: disable=protected-access
             self.USER_ID, exploration, 'Migrate state schema.',
             migration_change_list)
 
     def test_get_exp_with_draft_applied_after_draft_upgrade(self):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
         self.assertEqual(exploration.init_state.param_changes, [])
-        draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long
+        draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long, protected-access
             classmethod(lambda cls, changelist: changelist))
         updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID1, self.USER_ID)
         self.assertIsNotNone(updated_exp)
         param_changes = updated_exp.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')
+        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
+        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
         self.assertEqual(
-            param_changes._customization_args,
+            param_changes._customization_args,  # pylint: disable=protected-access
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})

@@ -39,14 +39,10 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(1, path)
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-from pylint import lint  # isort:skip
-from pylint.reporters import text# isort:skip
-import isort  # isort:skip
-import pycodestyle # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+from pylint import lint  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.reporters import text  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+import isort  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+import pycodestyle # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 class StringMessageStream(python_utils.OBJECT):
@@ -187,7 +183,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
             'DashboardStatsOneOffJob',
             'UserDeletionOneOffJob',
             'UserQueryOneOffJob',
-            'VerifyUserDeletionOneOffJob'
+            'FullyCompleteUserDeletionOneOffJob'
         ]
 
         jobs_registry = importlib.import_module('core.jobs_registry')

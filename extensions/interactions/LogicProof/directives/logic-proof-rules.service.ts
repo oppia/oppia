@@ -19,21 +19,21 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ILogicProofAnswer } from 'interactions/answer-defs';
-import { ILogicProofRuleInputs } from 'interactions/rule-input-defs';
+import { LogicProofAnswer } from 'interactions/answer-defs';
+import { LogicProofRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LogicProofRulesService {
-  Correct(answer: ILogicProofAnswer): boolean {
+  Correct(answer: LogicProofAnswer): boolean {
     return answer.correct;
   }
-  NotCorrect(answer: ILogicProofAnswer): boolean {
+  NotCorrect(answer: LogicProofAnswer): boolean {
     return !answer.correct;
   }
   NotCorrectByCategory(
-      answer: ILogicProofAnswer, inputs: ILogicProofRuleInputs): boolean {
+      answer: LogicProofAnswer, inputs: LogicProofRuleInputs): boolean {
     return !answer.correct && answer.error_category === inputs.c;
   }
 }

@@ -579,7 +579,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
             before validating.
 
     Returns:
-        dict: Dictionary of all the error relations and strings.
+        dict. Dictionary of all the error relations and strings.
     """
     # err_dict is a dictionary to store the invalid tags and the
     # invalid parent-child relations that we find.
@@ -721,7 +721,7 @@ def validate_customization_args(html_list):
         html_list: list(str). List of html strings to be validated.
 
     Returns:
-        dict: Dictionary of all the invalid customisation args where
+        dict. Dictionary of all the invalid customisation args where
         key is a Rich Text Component and value is the invalid html string.
     """
     # Dictionary to hold html strings in which customization arguments
@@ -759,7 +759,7 @@ def validate_customization_args_in_tag(tag):
         tag: bs4.element.Tag. The html tag to be validated.
 
     Yields:
-        Error message if the attributes of tag are invalid.
+        str. Error message if the attributes of tag are invalid.
     """
 
     component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long
@@ -878,6 +878,40 @@ def get_filename_with_dimensions(old_filename, exp_id):
     return new_filename
 
 
+def validate_svg_filenames_in_math_rich_text(
+        entity_type, entity_id, html_string):
+    """Validates the SVG filenames for each math rich-text components and
+    returns a list of all invalid math tags in the given HTML.
+
+    Args:
+        entity_type: str. The type of the entity.
+        entity_id: str. The ID of the entity.
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). A list of invalid math tags in the HTML string.
+    """
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    error_list = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(unescape_html(
+                math_tag['math_content-with-value'])))
+        svg_filename = (
+            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
+        if svg_filename == '':
+            error_list.append(python_utils.UNICODE(math_tag))
+        else:
+            file_system_class = fs_services.get_entity_file_system_class()
+            fs = fs_domain.AbstractFileSystem(
+                file_system_class(entity_type, entity_id))
+            filepath = 'image/%s' % svg_filename
+            if not fs.isfile(filepath.encode('utf-8')):
+                error_list.append(python_utils.UNICODE(math_tag))
+    return error_list
+
+
 def get_invalid_svg_tags_and_attrs(svg_string):
     """Returns a set of all invalid tags and attributes for the provided SVG.
 
@@ -893,7 +927,14 @@ def get_invalid_svg_tags_and_attrs(svg_string):
         and <attribute> represents the invalid attribute.
         eg. (['invalid-tag1', 'invalid-tag2'], ['path:invalid-attr'])
     """
-    soup = bs4.BeautifulSoup(svg_string.encode('utf-8'), 'html.parser')
+
+    # We don't need to encode the svg_string here because, beautiful soup can
+    # detect the encoding automatically and process the string.
+    # see https://beautiful-soup-4.readthedocs.io/en/latest/#encodings for info
+    # on auto encoding detection.
+    # Also if we encode the svg_string here manually, then it fails to process
+    # SVGs having non-ascii unicode characters and raises a UnicodeDecodeError.
+    soup = bs4.BeautifulSoup(svg_string, 'html.parser')
     invalid_elements = []
     invalid_attrs = []
     for element in soup.find_all():
@@ -923,6 +964,62 @@ def check_for_math_component_in_html(html_string):
     return bool(math_tags)
 
 
+def get_latex_strings_without_svg_from_html(html_string):
+    """Extract LaTeX strings from math rich-text components whose svg_filename
+    field is empty.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). List of unique LaTeX strings from math-tags without svg
+        filename.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    latex_strings = set()
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(unescape_html(
+                math_tag['math_content-with-value'])))
+        raw_latex = (
+            objects.UnicodeString.normalize(math_content_dict['raw_latex']))
+        svg_filename = (
+            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
+        if svg_filename == '':
+            latex_strings.add(raw_latex.encode('utf-8'))
+
+    unique_latex_strings = list(latex_strings)
+    return unique_latex_strings
+
+
+def extract_svg_filenames_in_math_rte_components(html_string):
+    """Extracts the svg_filenames from all the math-rich text components in
+    an HTML string.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). A list of svg_filenames present in the HTML.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    filenames = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(unescape_html(
+                math_tag['math_content-with-value'])))
+        svg_filename = math_content_dict['svg_filename']
+        if svg_filename != '':
+            normalized_svg_filename = (
+                objects.UnicodeString.normalize(svg_filename))
+            filenames.append(normalized_svg_filename)
+    return filenames
+
+
 def add_math_content_to_math_rte_components(html_string):
     """Replaces the attribute raw_latex-with-value in all Math component tags
     with a new attribute math_content-with-value. The new attribute has an
@@ -950,7 +1047,7 @@ def add_math_content_to_math_rte_components(html_string):
                     objects.UnicodeString.normalize(raw_latex))
             except Exception as e:
                 error_message = (
-                    'Invalid raw_latex value found in the math tag : %s' % (
+                    'Invalid raw_latex string found in the math tag : %s' % (
                         python_utils.UNICODE(e)))
                 raise Exception(error_message)
             math_content_dict = {

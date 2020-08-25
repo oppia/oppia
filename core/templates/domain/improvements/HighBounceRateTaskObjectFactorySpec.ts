@@ -18,10 +18,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ExplorationStatsObjectFactory } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationImprovementsConfig } from
+  'domain/improvements/exploration-improvements-config-object.factory';
 import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
+import { ExplorationStatsObjectFactory, ExplorationStats } from
+  'domain/statistics/ExplorationStatsObjectFactory';
 
 describe('High bounce rate task', function() {
   let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
@@ -34,6 +36,27 @@ describe('High bounce rate task', function() {
   });
 
   beforeEach(() => {
+    this.config = (
+      new ExplorationImprovementsConfig('eid', 1, true, 0.25, 0.20, 100));
+    this.createFromExplorationStats = (
+        expStats: ExplorationStats, stateName: string,
+        numEqPlaythroughs: number) => {
+      const task = highBounceRateTaskObjectFactory.createFromBackendDict({
+        entity_type: 'exploration',
+        entity_id: 'eid',
+        entity_version: 1,
+        task_type: 'high_bounce_rate',
+        target_type: 'state',
+        target_id: stateName,
+        issue_description: null,
+        status: 'obsolete',
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
+        resolved_on_msecs: null,
+      });
+      task.refreshStatus(expStats, numEqPlaythroughs, this.config);
+      return task;
+    };
     this.newExplorationStatsWithBounceRate = (
       (numExpStarts: number, bounceRate: number) => {
         return explorationStatsObjectFactory.createFromBackendDict({
@@ -57,8 +80,8 @@ describe('High bounce rate task', function() {
   });
 
   it('should return new task if any state has a high bounce rate', () => {
-    const [task] = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction'], 1);
+    const task = this.createFromExplorationStats(
+      this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction', 1);
 
     expect(task).not.toBeNull();
     expect(task.taskType).toEqual('high_bounce_rate');
@@ -69,25 +92,22 @@ describe('High bounce rate task', function() {
     expect(task.isOpen()).toBeTrue();
   });
 
-  it('should return null if state has a low bounce rate', () => {
-    expect(
-      highBounceRateTaskObjectFactory.createFromExplorationStats(
-        this.newExplorationStatsWithBounceRate(200, 0.15), ['Introduction'], 1))
-      .toEqual([null]);
+  it('should return obsolete if state has a low bounce rate', () => {
+    const task = this.createFromExplorationStats(
+      this.newExplorationStatsWithBounceRate(200, 0.15), 'Introduction', 1);
+    expect(task.isObsolete()).toBeTrue();
   });
 
-  it('should return null if state has no early quit playthroughs', () => {
-    expect(
-      highBounceRateTaskObjectFactory.createFromExplorationStats(
-        this.newExplorationStatsWithBounceRate(200, 0.15), ['Introduction'], 0))
-      .toEqual([null]);
+  it('should return obsolete if state has no early quit playthroughs', () => {
+    const task = this.createFromExplorationStats(
+      this.newExplorationStatsWithBounceRate(200, 0.15), 'Introduction', 0);
+    expect(task.isObsolete()).toBeTrue();
   });
 
-  it('should return null if exploration starts are too low', () => {
-    expect(
-      highBounceRateTaskObjectFactory.createFromExplorationStats(
-        this.newExplorationStatsWithBounceRate(80, 0.50), ['Introduction'], 1))
-      .toEqual([null]);
+  it('should return obsolete if exploration starts are too low', () => {
+    const task = this.createFromExplorationStats(
+      this.newExplorationStatsWithBounceRate(80, 0.50), 'Introduction', 1);
+    expect(task.isObsolete()).toBeTrue();
   });
 
   it('should create from a high bounce rate backend dict', () => {
@@ -141,6 +161,11 @@ describe('High bounce rate task', function() {
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
+        // This throws "Type '"???"' is not assignable to type
+        // '"high_bounce_rate"'." This is because 'task_type'
+        // should be equal to 'high_bounce_rate' but we set it
+        // to an invalid value in order to test validations.
+        // @ts-expect-error
         task_type: '???',
         target_type: 'state',
         target_id: 'Introduction',
@@ -173,26 +198,28 @@ describe('High bounce rate task', function() {
   });
 
   it('should update status based on changes to exploration stats', () => {
-    const [task] = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction'], 1);
+    const task = this.createFromExplorationStats(
+      this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction', 1);
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
     expect(task.isResolved()).toBeFalse();
 
-    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.10), 1);
+    task.refreshStatus(
+      this.newExplorationStatsWithBounceRate(200, 0.10), 1, this.config);
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeTrue();
     expect(task.isResolved()).toBeFalse();
 
-    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.80), 1);
+    task.refreshStatus(
+      this.newExplorationStatsWithBounceRate(200, 0.80), 1, this.config);
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
     expect(task.isResolved()).toBeFalse();
   });
 
   it('should throw when provided stats from a different exploration', () => {
-    const [task] = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction'], 1);
+    const task = this.createFromExplorationStats(
+      this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction', 1);
 
     const statsWithWrongId = (
       explorationStatsObjectFactory.createFromBackendDict({
@@ -212,9 +239,10 @@ describe('High bounce rate task', function() {
           },
         },
       }));
-    expect(() => task.refreshStatus(statsWithWrongId, 1)).toThrowError(
-      'Expected stats for exploration id="eid" v1 but given stats are for ' +
-      'exploration id="eid2" v1');
+    expect(() => task.refreshStatus(statsWithWrongId, 1, this.config))
+      .toThrowError(
+        'Expected stats for exploration id="eid" v1 but given stats are for ' +
+        'exploration id="eid2" v1');
 
     const statsWithWrongVersion = (
       explorationStatsObjectFactory.createFromBackendDict({
@@ -234,25 +262,27 @@ describe('High bounce rate task', function() {
           },
         },
       }));
-    expect(() => task.refreshStatus(statsWithWrongVersion, 1)).toThrowError(
-      'Expected stats for exploration id="eid" v1 but given stats are for ' +
-      'exploration id="eid" v2');
+    expect(() => task.refreshStatus(statsWithWrongVersion, 1, this.config))
+      .toThrowError(
+        'Expected stats for exploration id="eid" v1 but given stats are for ' +
+        'exploration id="eid" v2');
   });
 
   it('should not update status when number of starts is too low', () => {
-    const [task] = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction'], 1);
+    const task = this.createFromExplorationStats(
+      this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction', 1);
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
 
-    task.refreshStatus(this.newExplorationStatsWithBounceRate(25, 0.05), 1);
+    task.refreshStatus(
+      this.newExplorationStatsWithBounceRate(25, 0.05), 1, this.config);
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
   });
 
   it('should stay resolved regardless of changes in exploration stats', () => {
-    const [task] = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.newExplorationStatsWithBounceRate(200, 0.50), ['Introduction'], 1);
+    const task = this.createFromExplorationStats(
+      this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction', 1);
     expect(task.isResolved()).toBeFalse();
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
@@ -262,12 +292,14 @@ describe('High bounce rate task', function() {
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeFalse();
 
-    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.05), 1);
+    task.refreshStatus(
+      this.newExplorationStatsWithBounceRate(200, 0.05), 1, this.config);
     expect(task.isResolved()).toBeTrue();
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeFalse();
 
-    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.95), 1);
+    task.refreshStatus(
+      this.newExplorationStatsWithBounceRate(200, 0.95), 1, this.config);
     expect(task.isResolved()).toBeTrue();
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeFalse();

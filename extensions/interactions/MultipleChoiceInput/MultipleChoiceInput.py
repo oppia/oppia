@@ -49,17 +49,24 @@ class MultipleChoiceInput(base.BaseInteraction):
                 'min_value': 1,
             }],
             'items': {
-                'type': 'html',
-                'ui_config': {
-                    'hide_complex_extensions': True,
-                    'placeholder': 'Enter an option for the learner to select',
-                },
+                'type': 'custom',
+                'obj_type': 'SubtitledHtml',
+                'replacement_ui_config': {
+                    'html': {
+                        'hide_complex_extensions': True,
+                        'placeholder': (
+                            'Enter an option for the learner to select'),
+                    }
+                }
             },
             'ui_config': {
                 'add_element_text': 'Add multiple choice option',
             }
         },
-        'default_value': [''],
+        'default_value': [{
+            'content_id': None,
+            'html': ''
+        }],
     }, {
         'name': 'showChoicesInShuffledOrder',
         'description': 'Shuffle answer choices',

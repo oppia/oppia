@@ -140,15 +140,25 @@ describe('Question Creation Service', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [{
-                inputs: {
-                  x: 10
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Equals: [
+                  {
+                    x: 10
+                  }
+                ]
+              }
             }],
             confirmed_unclassified_answers: [],
-            customization_args: {},
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: null,
               feedback: {
@@ -329,12 +339,14 @@ describe('Question Creation Service', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [{
-                inputs: {
-                  x: 10
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Equals: [
+                  {
+                    x: 10
+                  }
+                ]
+              }
             }],
             confirmed_unclassified_answers: [],
             customization_args: {},
@@ -500,15 +512,25 @@ describe('Question Creation Service', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [{
-                inputs: {
-                  x: 10
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Equals: [
+                  {
+                    x: 10
+                  }
+                ]
+              }
             }],
             confirmed_unclassified_answers: [],
-            customization_args: {},
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: null,
               feedback: {

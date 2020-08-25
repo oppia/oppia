@@ -18,16 +18,22 @@
 
 require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
+require('domain/exploration/InteractionObjectFactory.ts');
 
 angular.module('oppia').component('answerSubmitAction', {
   template: require('./answer-submit-action.component.html'),
   controller: ['$attrs', 'ExplorationHtmlFormatterService',
-    'HtmlEscaperService',
+    'HtmlEscaperService', 'InteractionObjectFactory',
     function($attrs, ExplorationHtmlFormatterService,
-        HtmlEscaperService) {
+        HtmlEscaperService, InteractionObjectFactory) {
       var ctrl = this;
-      var _customizationArgs = HtmlEscaperService.escapedJsonToObj(
-        $attrs.interactionCustomizationArgs);
+      var _customizationArgs = (
+        InteractionObjectFactory.convertFromCustomizationArgsBackendDict(
+          $attrs.interactionId,
+          HtmlEscaperService.escapedJsonToObj(
+            $attrs.interactionCustomizationArgs)
+        )
+      );
       var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       ctrl.getShortAnswerHtml = function() {
         return ExplorationHtmlFormatterService.getShortAnswerHtml(

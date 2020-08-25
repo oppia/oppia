@@ -28,10 +28,10 @@ This is a list of visualizations, each of which is specified by a dict with keys
 calculation may look like this:
 
     answer_visualizations = [{
-        'id': 'BarChart',
+        'id': 'SortedTiles',
         'options': {
-            'x_axis_label': 'Answer',
-            'y_axis_label': 'Count',
+            'use_percentages': True,
+            'header': 'Pretty Tiles!',
         },
         'calculation_id': 'AnswerFrequencies',
     }]

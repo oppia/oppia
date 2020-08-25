@@ -199,7 +199,6 @@ class GcsFileSystem(GeneralFileSystem):
         except cloudstorage.NotFoundError:
             raise IOError('Image does not exist: %s' % filepath)
 
-
     def listdir(self, dir_name):
         """Lists all files in a directory.
 
@@ -261,7 +260,7 @@ class AbstractFileSystem(python_utils.OBJECT):
                 assets folder.
 
         Raises:
-            IOError: Invalid filepath.
+            IOError. Invalid filepath.
         """
         base_dir = utils.vfs_construct_path(
             '/', self.impl.assets_path, 'assets')
@@ -309,7 +308,7 @@ class AbstractFileSystem(python_utils.OBJECT):
             FileStream. The file stream domain object.
 
         Raises:
-            IOError: The given file stream does not exist.
+            IOError. The given file stream does not exist.
         """
         file_stream = self.open(filepath)
         if file_stream is None:

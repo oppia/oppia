@@ -282,8 +282,9 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
         with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap: # pylint: disable=line-too-long
             with not_fully_covered_files_swap:
-                (check_frontend_coverage
-                 .check_not_fully_covered_filenames_list_is_sorted())
+                (
+                    check_frontend_coverage
+                    .check_not_fully_covered_filenames_list_is_sorted())
                 self.assertEqual(
                     check_function_calls,
                     expected_check_function_calls)
@@ -313,8 +314,9 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     SystemExit,
                     r'The \033\[1mNOT_FULLY_COVERED_FILENAMES\033\[0m list'
                     ' must be kept in alphabetical order.'):
-                    (check_frontend_coverage
-                     .check_not_fully_covered_filenames_list_is_sorted())
+                    (
+                        check_frontend_coverage
+                        .check_not_fully_covered_filenames_list_is_sorted())
 
     def test_function_calls(self):
         self.lcov_items_list = (

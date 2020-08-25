@@ -135,8 +135,8 @@
       <div class="oppia-static-extra-content oppia-about-clearfix">
         <div class="oppia-about-otter-container">
           <picture>
-            <source type="image/webp" [src]="getStaticImageUrl('/general/about_page_mascot.webp')">
-            <source type="image/png" [src]="getStaticImageUrl('/general/about_page_mascot.png')">
+            <source type="image/webp" [srcset]="getStaticImageUrl('/general/about_page_mascot.webp')">
+            <source type="image/png" [srcset]="getStaticImageUrl('/general/about_page_mascot.png')">
             <img [src]="getStaticImageUrl('/general/about_page_mascot.png')" class="oppia-about-otter" alt="Otter">
           </picture>
         </div>

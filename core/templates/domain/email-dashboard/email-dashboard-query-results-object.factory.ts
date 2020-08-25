@@ -21,14 +21,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  IEmailDashboardQuery,
   EmailDashboardQuery,
+  EmailDashboardQueryDict,
   EmailDashboardQueryObjectFactory
 } from 'domain/email-dashboard/email-dashboard-query-object.factory';
 
-export interface IEmailDashboardQueryResultsBackendDict {
+export interface EmailDashboardQueryResultsBackendDict {
   'cursor': string;
-  'recent_queries': IEmailDashboardQuery[];
+  'recent_queries': EmailDashboardQueryDict[];
 }
 
 export class EmailDashboardQueryResults {
@@ -50,7 +50,7 @@ export class EmailDashboardQueryResultsObjectFactory {
     EmailDashboardQueryObjectFactory) {}
 
   createFromBackendDict(
-      backendDict: IEmailDashboardQueryResultsBackendDict):
+      backendDict: EmailDashboardQueryResultsBackendDict):
       EmailDashboardQueryResults {
     let queryObjects: EmailDashboardQuery[] = [];
 

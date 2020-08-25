@@ -332,9 +332,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -459,9 +459,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -577,9 +577,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -761,9 +761,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -1258,10 +1258,10 @@ class PlaythroughModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new PlaythroughModel instance.
+            str. ID of the new PlaythroughModel instance.
 
         Raises:
-            Exception: The id generator for PlaythroughModel is producing too
+            Exception. The id generator for PlaythroughModel is producing too
                 many collisions.
         """
 
@@ -1425,7 +1425,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 instance is being created. For exploration state it will be of
                 the form 'exp_id:state_name', and for question it will be of
                 the form 'question_id'.
-            interaction_id: str.  The ID of the interaction for which the
+            interaction_id: str. The ID of the interaction for which the
                 answer details are received.
             learner_answer_info_list: list(LearnerAnswerInfo). The list of
                 LearnerAnswerInfo objects in dict format, which is defined in
@@ -1609,10 +1609,8 @@ class StateAnswersModel(base_models.BaseModel):
     # submitted_answer_list, minus any overhead of the property itself. This
     # value is found by summing the JSON sizes of all answer dicts stored inside
     # submitted_answer_list.
-    # pylint: disable=invalid-name
     accumulated_answer_json_size_bytes = ndb.IntegerProperty(
         indexed=False, required=False, default=0)
-    # pylint: enable=invalid-name
 
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
@@ -1971,7 +1969,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                 stored as a JSON blob.
 
         Raises:
-            Exception: The calculation_output is too large.
+            Exception. The calculation_output is too large.
         """
         instance_id = cls._get_entity_id(
             exploration_id, exploration_version, state_name, calculation_id)

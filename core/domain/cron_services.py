@@ -75,6 +75,7 @@ class JobCleanupManager(jobs.BaseMapReduceOneOffJobManager):
         Args:
             item: mapreduce_model.MapreduceState or mapreduce_model.ShardState.
                 A shard or job which may still be running.
+
         Yields:
             tuple(str, int). Describes the action taken for the item, and the
             number of items this action was applied to.

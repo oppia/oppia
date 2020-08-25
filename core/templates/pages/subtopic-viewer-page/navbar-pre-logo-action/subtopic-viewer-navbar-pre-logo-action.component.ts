@@ -24,16 +24,22 @@ require('services/contextual/url.service.ts');
 angular.module('oppia').component('subtopicViewerNavbarPreLogoAction', {
   template: require('./subtopic-viewer-navbar-pre-logo-action.component.html'),
   controller: [
-    'UrlInterpolationService', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
-    function(UrlInterpolationService, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
+    'UrlInterpolationService', 'UrlService',
+    'TOPIC_VIEWER_REVISION_URL_TEMPLATE',
+    function(
+        UrlInterpolationService, UrlService,
+        TOPIC_VIEWER_REVISION_URL_TEMPLATE) {
       var ctrl = this;
 
       ctrl.$onInit = function() {
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+        ctrl.topicUrlFragment = (
+          UrlService.getTopicUrlFragmentFromLearnerUrl());
 
         ctrl.topicUrl = UrlInterpolationService.interpolateUrl(
-          TOPIC_VIEWER_URL_TEMPLATE, {
-            topic_name: ctrl.topicName
+          TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
+            topic_url_fragment: ctrl.topicUrlFragment,
+            classroom_url_fragment: (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl())
           });
       };
     }]

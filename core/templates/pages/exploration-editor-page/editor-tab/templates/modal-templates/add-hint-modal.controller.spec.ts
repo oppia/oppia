@@ -72,7 +72,9 @@ describe('Add Hint Modal Controller', function() {
     var contentId = 'cont_1';
     var hintExpected = hintObjectFactory.createNew(contentId, '');
 
-    spyOn(generateContentIdService, 'getNextId').and.returnValue(contentId);
+    spyOn(
+      generateContentIdService, 'getNextStateId'
+    ).and.returnValue(contentId);
     $scope.saveHint();
 
     expect($uibModalInstance.close).toHaveBeenCalledWith({

@@ -49,6 +49,8 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillsList', [
   'AlertsService', 'UrlInterpolationService',
   function(
@@ -61,6 +63,7 @@ angular.module('oppia').directive('skillsList', [
         getItemsPerPage: '&itemsPerPage',
         getEditableTopicSummaries: '&editableTopicSummaries',
         getMergeableSkillSummaries: '&mergeableSkillSummaries',
+        getUntriagedSkillSummaries: '&untriagedSkillSummaries',
         canDeleteSkill: '&userCanDeleteSkill',
         canCreateSkill: '&userCanCreateSkill',
         isUnpublishedSkill: '&unpublishedSkill',
@@ -74,14 +77,12 @@ angular.module('oppia').directive('skillsList', [
         '$scope', '$uibModal', '$rootScope', '$timeout',
         'EditableTopicBackendApiService', 'SkillBackendApiService',
         'TopicsAndSkillsDashboardBackendApiService',
-        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, $rootScope, $timeout,
             EditableTopicBackendApiService, SkillBackendApiService,
-            TopicsAndSkillsDashboardBackendApiService,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            TopicsAndSkillsDashboardBackendApiService) {
           var ctrl = this;
-
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.getSkillEditorUrl = function(skillId) {
             var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
             return UrlInterpolationService.interpolateUrl(
@@ -105,8 +106,8 @@ angular.module('oppia').directive('skillsList', [
               SkillBackendApiService.deleteSkill(skillId).then(
                 function(status) {
                   $timeout(function() {
-                    $rootScope.$broadcast(
-                      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                    TopicsAndSkillsDashboardBackendApiService.
+                      onTopicsAndSkillsDashboardReinitialized.emit();
                     var successToast = 'The skill has been deleted.';
                     AlertsService.addSuccessMessage(successToast, 1000);
                   }, 100);
@@ -133,10 +134,10 @@ angular.module('oppia').directive('skillsList', [
             }).result.then(function(topicsToUnassign) {
               for (let topic in topicsToUnassign) {
                 var changeList = [];
-                if (topicsToUnassign[topic].subtopic_id) {
+                if (topicsToUnassign[topic].subtopicId) {
                   changeList.push({
                     cmd: 'remove_skill_id_from_subtopic',
-                    subtopic_id: topicsToUnassign[topic].subtopic_id,
+                    subtopic_id: topicsToUnassign[topic].subtopicId,
                     skill_id: skillId
                   });
                 }
@@ -145,15 +146,14 @@ angular.module('oppia').directive('skillsList', [
                   uncategorized_skill_id: skillId
                 });
                 EditableTopicBackendApiService.updateTopic(
-                  topicsToUnassign[topic].topic_id,
-                  topicsToUnassign[topic].topic_version,
+                  topicsToUnassign[topic].topicId,
+                  topicsToUnassign[topic].topicVersion,
                   `Unassigned skill with id ${skillId} from the topic.`,
                   changeList
                 ).then(function() {
                   $timeout(function() {
-                    $rootScope.$broadcast(
-                      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-                      true);
+                    TopicsAndSkillsDashboardBackendApiService.
+                      onTopicsAndSkillsDashboardReinitialized.emit(true);
                   }, 100);
                 }).then(function() {
                   var successToast = (
@@ -191,9 +191,8 @@ angular.module('oppia').directive('skillsList', [
                       changeList
                     ).then(function() {
                       $timeout(function() {
-                        $rootScope.$broadcast(
-                          EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-                          true);
+                        TopicsAndSkillsDashboardBackendApiService.
+                          onTopicsAndSkillsDashboardReinitialized.emit(true);
                       }, 100);
                     }).then(function() {
                       var successToast = (
@@ -213,6 +212,7 @@ angular.module('oppia').directive('skillsList', [
           ctrl.mergeSkill = function(skill) {
             var skillSummaries = $scope.getMergeableSkillSummaries();
             var categorizedSkills = $scope.getSkillsCategorizedByTopics();
+            var untriagedSkillSummaries = $scope.getUntriagedSkillSummaries();
             var allowSkillsFromOtherTopics = true;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -222,7 +222,8 @@ angular.module('oppia').directive('skillsList', [
                 skill: () => skill,
                 skillSummaries: () => skillSummaries,
                 categorizedSkills: () => categorizedSkills,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
+                untriagedSkillSummaries: () => untriagedSkillSummaries
               },
               controller: 'MergeSkillModalController',
               windowClass: 'skill-select-modal',
@@ -237,8 +238,8 @@ angular.module('oppia').directive('skillsList', [
                 // Broadcast will update the skills list in the dashboard so
                 // that the merged skills are not shown anymore.
                 $timeout(function() {
-                  $rootScope.$broadcast(
-                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                  TopicsAndSkillsDashboardBackendApiService.
+                    onTopicsAndSkillsDashboardReinitialized.emit();
                 }, 100);
               }, function() {
                 // Note to developers:
@@ -272,6 +273,10 @@ angular.module('oppia').directive('skillsList', [
             ctrl.SKILL_HEADINGS = [
               'index', 'description', 'worked_examples_count',
               'misconception_count', 'status'];
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

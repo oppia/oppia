@@ -23,10 +23,6 @@ export class ExplorationPlayerConstants {
 
   public static CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
 
-  /* Called when a new audio-equippable component is loaded and displayed
-     to the user, allowing for the automatic playing of audio if necessary. */
-  public static EVENT_AUTOPLAY_AUDIO = 'autoPlayAudio';
-
   // The enforced waiting period before the first hint request.
   public static WAIT_FOR_FIRST_HINT_MSEC = 60000;
   // The enforced waiting period before each of the subsequent hint requests.

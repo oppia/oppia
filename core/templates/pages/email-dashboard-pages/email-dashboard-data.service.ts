@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { IQueryData, EmailDashboardBackendApiService } from
+import { QueryData, EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardQuery } from
   'domain/email-dashboard/email-dashboard-query-object.factory';
@@ -33,7 +33,7 @@ export class EmailDashboardDataService {
   // Store latest cursor value for fetching next query page.
   latestCursor: string = null;
   // Array containing all fetched queries.
-  queries: Array<EmailDashboardQuery> = [];
+  queries: EmailDashboardQuery[] = [];
   // Index of currently-shown page of query results.
   currentPageIndex: number = -1;
 
@@ -41,7 +41,7 @@ export class EmailDashboardDataService {
     private emailDashboardBackendApiService: EmailDashboardBackendApiService
   ) {}
 
-  getQueries(): Array<EmailDashboardQuery> {
+  getQueries(): EmailDashboardQuery[] {
     return this.queries;
   }
 
@@ -53,7 +53,7 @@ export class EmailDashboardDataService {
     return this.latestCursor;
   }
 
-  submitQuery(data: IQueryData): Promise<Array<EmailDashboardQuery>> {
+  submitQuery(data: QueryData): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
@@ -65,7 +65,7 @@ export class EmailDashboardDataService {
     });
   }
 
-  getNextQueries(): Promise<Array<EmailDashboardQuery>> {
+  getNextQueries(): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
 
@@ -86,7 +86,7 @@ export class EmailDashboardDataService {
     }
   }
 
-  getPreviousQueries(): Array<EmailDashboardQuery> {
+  getPreviousQueries(): EmailDashboardQuery[] {
     var startQueryIndex = (this.currentPageIndex - 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     this.currentPageIndex = this.currentPageIndex - 1;

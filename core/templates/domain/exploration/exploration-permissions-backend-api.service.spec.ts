@@ -73,4 +73,27 @@ describe('Exploration permissions backend api service', () => {
 
     flushMicrotasks();
   }));
+
+  it('should use the rejection handler if the backend request failed.',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      epbas.getPermissions().then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        '/createhandler/permissions/exp1');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+    })
+  );
 });

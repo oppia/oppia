@@ -17,10 +17,12 @@
  * in the test session.
  */
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('QuestionPlayerStateService', [
   function() {
     var questionPlayerState = {};
-
+    var _quesionSessionCompletedEventEmitter = new EventEmitter();
     var getCurrentTime = function() {
       return new Date().getTime();
     };
@@ -90,6 +92,9 @@ angular.module('oppia').factory('QuestionPlayerStateService', [
       },
       getQuestionPlayerStateData: function() {
         return questionPlayerState;
+      },
+      get onQuestionSessionCompleted() {
+        return _quesionSessionCompletedEventEmitter;
       }
     };
   }]);

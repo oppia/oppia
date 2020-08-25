@@ -22,14 +22,14 @@ require(
   'fraction-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/html-escaper.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/stateful/focus-manager.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 
 require('domain/objects/objects-domain.constants.ajs.ts');
 
 angular.module('oppia').directive('oppiaInteractiveFractionInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'InteractionAttributesExtractorService',
+  function(InteractionAttributesExtractorService) {
     return {
       restrict: 'E',
       scope: {},
@@ -37,21 +37,24 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
       template: require('./fraction-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'FocusManagerService', 'FractionInputRulesService',
+        '$scope', '$attrs', 'FractionInputRulesService',
         'FractionObjectFactory', 'FRACTION_PARSING_ERRORS',
-        'WindowDimensionsService', 'CurrentInteractionService',
+        'CurrentInteractionService',
         function(
-            $scope, $attrs, FocusManagerService, FractionInputRulesService,
+            $scope, $attrs, FractionInputRulesService,
             FractionObjectFactory, FRACTION_PARSING_ERRORS,
-            WindowDimensionsService, CurrentInteractionService) {
+            CurrentInteractionService) {
           var ctrl = this;
           // Label for errors caused whilst parsing a fraction.
           var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
           var errorMessage = '';
-          var requireSimplestForm = (
-            $attrs.requireSimplestFormWithValue === 'true');
-          var allowImproperFraction = (
-            $attrs.allowImproperFractionWithValue === 'true');
+          const {
+            requireSimplestForm,
+            allowImproperFraction
+          } = InteractionAttributesExtractorService.getValuesFromAttributes(
+            'FractionInput',
+            $attrs
+          );
 
           ctrl.getWarningText = function() {
             return errorMessage;
@@ -147,10 +150,15 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
             });
             ctrl.answer = '';
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-            ctrl.allowNonzeroIntegerPart = (
-              $attrs.allowNonzeroIntegerPartWithValue === 'true');
-            ctrl.customPlaceholder = HtmlEscaperService.escapedJsonToObj(
-              $attrs.customPlaceholderWithValue);
+            const {
+              allowNonzeroIntegerPart,
+              customPlaceholder
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'FractionInput',
+              $attrs
+            );
+            ctrl.allowNonzeroIntegerPart = allowNonzeroIntegerPart;
+            ctrl.customPlaceholder = customPlaceholder.getUnicode();
 
             ctrl.FRACTION_INPUT_FORM_SCHEMA = {
               type: 'unicode',

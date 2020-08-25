@@ -22,7 +22,7 @@ import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
-import { ITaskEntryBackendDict } from
+import { TaskEntryBackendDict } from
   'domain/improvements/TaskEntryObjectFactory';
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -40,7 +40,7 @@ describe('Exploration task object factory', () => {
 
   beforeEach(() => {
     this.newTaskEntryBackendDict = (
-      (taskType: string): ITaskEntryBackendDict => ({
+      (taskType: string): TaskEntryBackendDict => ({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -107,6 +107,8 @@ describe('Exploration task object factory', () => {
     expect(
       () => expTaskObjectFactory.createFromBackendDict(
         this.newTaskEntryBackendDict('unknown_task_type'))
-    ).toThrowError('unsupported task type: unknown_task_type');
+    ).toThrowError(new RegExp(
+      'Unsupported task type "unknown_task_type" for backend dict: ' +
+      '{.*"task_type":"unknown_task_type".*}'));
   });
 });

@@ -125,6 +125,13 @@ class ExplorationHandler(EditorHandler):
         _require_valid_version(version, exploration.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if (commit_message is not None and
+                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+
         change_list_dict = self.payload.get('change_list')
         change_list = [
             exp_domain.ExplorationChange(change) for change in change_list_dict]
@@ -264,7 +271,7 @@ class ExplorationStatusHandler(EditorHandler):
             exploration_id: str. Id of the exploration.
 
         Raises:
-            InvalidInputException: Given exploration is invalid.
+            InvalidInputException. Given exploration is invalid.
         """
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         try:
@@ -342,7 +349,7 @@ class UserExplorationEmailsHandler(EditorHandler):
             exploration_id: str. The exploration id.
 
         Raises:
-            InvalidInputException: Invalid message type.
+            InvalidInputException. Invalid message type.
         """
 
         mute = self.payload.get('mute')

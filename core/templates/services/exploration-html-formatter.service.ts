@@ -24,9 +24,10 @@ import { CamelCaseToHyphensPipe } from
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { IInteractionAnswer } from 'interactions/answer-defs';
-import { IInteractionCustomizationArgs } from
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
@@ -35,9 +36,10 @@ import { IInteractionCustomizationArgs } from
 })
 export class ExplorationHtmlFormatterService {
   constructor(
-    private camelCaseToHyphens: CamelCaseToHyphensPipe,
-    private extensionTagAssembler: ExtensionTagAssemblerService,
-    private htmlEscaper: HtmlEscaperService) {}
+      private camelCaseToHyphens: CamelCaseToHyphensPipe,
+      private extensionTagAssembler: ExtensionTagAssemblerService,
+      private htmlEscaper: HtmlEscaperService
+  ) {}
   /**
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgSpecs - The various
@@ -53,7 +55,8 @@ export class ExplorationHtmlFormatterService {
    *   the interaction.
    */
   getInteractionHtml(
-      interactionId: string, interactionCustomizationArgSpecs: object,
+      interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
@@ -61,7 +64,7 @@ export class ExplorationHtmlFormatterService {
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
-        element, interactionCustomizationArgSpecs));
+        element, interactionCustomizationArgs));
     element.attr('last-answer', parentHasLastAnswerProperty ?
       'lastAnswer' : 'null');
     if (labelForFocusTarget) {
@@ -72,11 +75,13 @@ export class ExplorationHtmlFormatterService {
 
   getAnswerHtml(
       answer: string, interactionId: string,
-      interactionCustomizationArgs: IInteractionCustomizationArgs): string {
+      interactionCustomizationArgs: InteractionCustomizationArgs): string {
     // TODO(sll): Get rid of this special case for multiple choice.
     var interactionChoices = null;
+
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
+      interactionChoices = interactionCustomizationArgs.choices.value.map(
+        choice => choice.getHtml());
     }
 
     var el = $(
@@ -91,12 +96,14 @@ export class ExplorationHtmlFormatterService {
   }
 
   getShortAnswerHtml(
-      answer: IInteractionAnswer, interactionId: string,
-      interactionCustomizationArgs: IInteractionCustomizationArgs) : string {
-    // TODO(sll): Get rid of this special case for multiple choice.
+      answer: InteractionAnswer, interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs) : string {
     var interactionChoices = null;
+
+    // TODO(sll): Get rid of this special case for multiple choice.
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
+      interactionChoices = interactionCustomizationArgs.choices.value.map(
+        choice => choice.getHtml());
     }
 
     var el = $(

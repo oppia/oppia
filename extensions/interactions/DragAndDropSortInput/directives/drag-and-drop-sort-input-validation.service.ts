@@ -21,9 +21,9 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IDragAndDropSortInputCustomizationArgs } from
+import { DragAndDropSortInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class DragAndDropSortInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IDragAndDropSortInputCustomizationArgs): IWarning[] {
+      customizationArgs: DragAndDropSortInputCustomizationArgs): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -58,7 +58,7 @@ export class DragAndDropSortInputValidationService {
     }
 
     for (var i = 0; i < numChoices; i++) {
-      var choice = customizationArgs.choices.value[i];
+      var choice = customizationArgs.choices.value[i].getHtml();
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }
@@ -87,8 +87,8 @@ export class DragAndDropSortInputValidationService {
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: IDragAndDropSortInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      customizationArgs: DragAndDropSortInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
     var seenItems = [];
     var ranges = [];
@@ -98,6 +98,12 @@ export class DragAndDropSortInputValidationService {
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 
+    const shouldCheckForRedundancy = function(earlierRule, laterRule) {
+      return (
+        earlierRule.type ===
+        'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
+        laterRule.type === 'IsEqualToOrdering');
+    };
     var checkRedundancy = function(earlierRule, laterRule) {
       var noOfMismatches = 0;
       var inputs = earlierRule.inputs.x;
@@ -120,7 +126,7 @@ export class DragAndDropSortInputValidationService {
     };
 
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         var inputs = rules[j].inputs;
         var rule = rules[j];
@@ -137,16 +143,18 @@ export class DragAndDropSortInputValidationService {
           }
         }
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1
+          answerGroupIndex: i,
+          ruleIndex: j
         };
         seenItems = [];
         areAnyItemsEmpty = false;
         areAnyItemsDuplicated = false;
 
+        let choiceValues = (
+          customizationArgs.choices.value.map(x => x.getHtml()));
         switch (rule.type) {
           case 'HasElementXAtPositionY':
-            if (!customizationArgs.choices.value.includes(<string>inputs.x)) {
+            if (!choiceValues.includes(<string>inputs.x)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -175,8 +183,8 @@ export class DragAndDropSortInputValidationService {
               });
             }
             if (
-              !customizationArgs.choices.value.includes(<string>inputs.x) ||
-              !customizationArgs.choices.value.includes(<string>inputs.y)) {
+              !choiceValues.includes(<string>inputs.x) ||
+              !choiceValues.includes(<string>inputs.y)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -233,8 +241,7 @@ export class DragAndDropSortInputValidationService {
                   'elements cannot occupy the same position.')
               });
             }
-            var sortedCustomArgsChoices = (
-              customizationArgs.choices.value.sort());
+            var sortedCustomArgsChoices = choiceValues.sort();
             var flattenedAndSortedXInputs = (
               xInputs.reduce((acc, val) => acc.concat(val), []).sort());
             if (
@@ -252,21 +259,44 @@ export class DragAndDropSortInputValidationService {
         }
 
         for (var k = 0; k < ranges.length; k++) {
-          var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
-            rules[ranges[k].ruleIndex - 1];
-          if (earlierRule.type ===
-            'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
-            rule.type === 'IsEqualToOrdering') {
-            if (checkRedundancy(earlierRule, rule)) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
-                  'will never be matched because it is made redundant by ' +
-                  `rule ${ranges[k].ruleIndex} from answer group ` +
-                  `${ranges[k].answerGroupIndex}.`)
-              });
-            }
+          var earlierRule = answerGroups[ranges[k].answerGroupIndex].
+            getRulesAsList()[ranges[k].ruleIndex];
+
+          // Rules inside an AnswerGroup do not have a set order. We should
+          // check for redundant rules in both directions if rules are in the
+          // same AnswerGroup.
+          const redundantWithinAnswerGroup = (
+            ranges[k].answerGroupIndex === i &&
+            (
+              (
+                shouldCheckForRedundancy(earlierRule, rule) &&
+                checkRedundancy(earlierRule, rule)
+              ) || (
+                shouldCheckForRedundancy(rule, earlierRule) &&
+                checkRedundancy(rule, earlierRule)
+              )
+            )
+          );
+
+          // AnswerGroups do have a set order. If rules are not in the same
+          // AnswerGroup we only check in one direction.
+          const redundantBetweenAnswerGroups = (
+            ranges[k].answerGroupIndex !== i &&
+            (
+              shouldCheckForRedundancy(earlierRule, rule) &&
+              checkRedundancy(earlierRule, rule)
+            )
+          );
+
+          if (redundantWithinAnswerGroup || redundantBetweenAnswerGroups) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                'will never be matched because it is made redundant by ' +
+                `rule ${ranges[k].ruleIndex + 1} from answer group ` +
+                `${ranges[k].answerGroupIndex + 1}.`)
+            });
           }
         }
         ranges.push(range);

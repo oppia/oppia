@@ -18,6 +18,8 @@
  */
 
 var dragAndDropScript = require('html-dnd').code;
+var action = require('../protractor_utils/action.js');
+var general = require('../protractor_utils/general.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -29,6 +31,8 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-create-story-button'));
   var newStoryTitleField = element(
     by.css('.protractor-test-new-story-title-field'));
+  var newStoryUrlFragmentField = element(
+    by.css('.protractor-test-new-story-url-fragment-field'));
   var confirmStoryCreationButton = element(
     by.css('.protractor-test-confirm-story-creation-button'));
   var storyListItems = element.all(
@@ -57,6 +61,8 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-add-subtopic-button'));
   var newSubtopicTitlefield = element(
     by.css('.protractor-test-new-subtopic-title-field'));
+  var newSubtopicUrlFragmentField = element(
+    by.css('.protractor-test-new-subtopic-url-fragment-field'));
   var confirmSubtopicCreationButton = element(by.css(
     '.protractor-test-confirm-subtopic-creation-button'));
   var subtopics = element.all(by.css('.protractor-test-subtopic'));
@@ -109,6 +115,10 @@ var TopicEditorPage = function() {
     by.css('.thumbnail-editor .protractor-test-photo-button'));
   var thumbnailContainer = element(
     by.css('.protractor-test-thumbnail-container'));
+  var newStoryDescriptionField = element(
+    by.css('.protractor-test-new-story-description-field'));
+  var storyThumbnailButton = element(
+    by.css('.thumbnail-editor .protractor-test-photo-button'));
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
@@ -160,24 +170,20 @@ var TopicEditorPage = function() {
       saveQuestionButton, 'Question modal takes too long to disappear');
   };
 
-  this.createQuestionForSkillWithIndex = async function(index) {
+  this.createQuestionForSkillWithName = async function(skillDescription) {
+    await action.click('Select skill dropdown', selectSkillDropdown);
     await waitFor.elementToBeClickable(
-      createQuestionButton,
-      'Create Question button takes too long to be clickable');
-    await createQuestionButton.click();
-    await waitFor.visibilityOf(
-      skillSelectorModal,
-      'Select skill modal takes too long to appear');
-    var skillItem = await skillItems.get(index);
-    await skillItem.click();
-    await waitFor.elementToBeClickable(
-      confirmSkillButton,
-      'Confirm Skill button takes too long to be clickable');
-    await confirmSkillButton.click();
-    await confirmSkillDifficultyButton.click();
+      selectSkillDropdown, 'Skill select dropdown takes too long to appear.');
+    await selectSkillDropdown.click();
+    await element(by.css('option[label="' + skillDescription + '"]')).click();
+
+    await action.click('Create question button', createQuestionButton);
+    await action.click(
+      'Confirm skill difficulty button', confirmSkillDifficultyButton);
+
     await waitFor.invisibilityOf(
-      skillSelectorModal,
-      'Select skill modal takes too long to disappear');
+      confirmSkillDifficultyButton,
+      'Confirm skill difficulty button takes too long to disappear');
   };
 
   this.moveToQuestionsTab = async function() {
@@ -204,6 +210,7 @@ var TopicEditorPage = function() {
   };
 
   this.changeSubtopicPageContents = async function(content) {
+    await general.scrollToTop();
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-edit-html-content'));
     await waitFor.elementToBeClickable(subtopicPageContentButton,
@@ -240,10 +247,12 @@ var TopicEditorPage = function() {
     expect(await subtopics.count()).toEqual(count);
   };
 
-  this.addSubtopic = async function(title, imgPath, htmlContent) {
+  this.addSubtopic = async function(title, urlFragment, imgPath, htmlContent) {
     await addSubtopicButton.click();
     await newSubtopicTitlefield.sendKeys(title);
 
+    await action.sendKeys(
+      'Create new url fragment', newSubtopicUrlFragmentField, urlFragment);
     await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer, imgPath, false);
     var subtopicPageContentButton = element(by.css(
@@ -389,13 +398,25 @@ var TopicEditorPage = function() {
       storyListTable, 'Story list table too long to disappear.');
   };
 
-  this.createStory = async function(storyTitle) {
+  this.createStory = async function(
+      storyTitle, storyUrlFragment, storyDescription, imgPath) {
     await waitFor.elementToBeClickable(
       createStoryButton,
       'Create Story button takes too long to be clickable');
     await createStoryButton.click();
 
-    await newStoryTitleField.sendKeys(storyTitle);
+    await action.sendKeys(
+      'Create new story title', newStoryTitleField, storyTitle);
+    await action.sendKeys(
+      'Create new story description', newStoryDescriptionField,
+      storyDescription);
+    await action.sendKeys(
+      'Create new story url fragment', newStoryUrlFragmentField,
+      storyUrlFragment);
+
+    await workflow.submitImage(
+      storyThumbnailButton, thumbnailContainer, imgPath, false);
+
     await waitFor.elementToBeClickable(
       confirmStoryCreationButton,
       'Confirm Create Story button takes too long to be clickable');

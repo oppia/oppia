@@ -19,11 +19,13 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+
 angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
 import { NgModule, StaticProvider } from '@angular/core';
@@ -35,6 +37,10 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { SubtopicViewerNavbarBreadcrumbComponent } from
+  // eslint-disable-next-line max-len
+  'pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
+
 
 import { SubtopicViewerDomainConstants } from
   'domain/subtopic_viewer/subtopic-viewer-domain.constants';
@@ -46,10 +52,12 @@ import { SubtopicViewerDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SubtopicViewerNavbarBreadcrumbComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
     SubtopicViewerDomainConstants,

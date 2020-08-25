@@ -19,7 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -63,11 +63,12 @@ export class ReadOnlyCollectionBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
   private _collectionCache: CollectionCache = {};
   private _collectionDetailsCache: CollectionDetailsCache = {};
+  private _collectionLoadedEventEmitter = new EventEmitter<void>();
 
   private _fetchCollection(
       collectionId: string,
-      successCallback: (value?: Collection) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: Collection) => void,
+      errorCallback: (reason: string) => void): void {
     var collectionDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.COLLECTION_DATA_URL_TEMPLATE, {
         collection_id: collectionId
@@ -80,10 +81,11 @@ export class ReadOnlyCollectionBackendApiService {
         response.collection);
       if (successCallback) {
         successCallback(collectionObject);
+        this._collectionLoadedEventEmitter.emit();
       }
     }, errorResponse => {
       if (errorCallback) {
-        errorCallback(errorResponse.error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
@@ -131,6 +133,7 @@ export class ReadOnlyCollectionBackendApiService {
       if (this._isCached(collectionId)) {
         if (resolve) {
           resolve(cloneDeep(this._collectionCache[collectionId]));
+          this._collectionLoadedEventEmitter.emit();
         }
       } else {
         this._fetchCollection(collectionId, collection => {
@@ -174,6 +177,10 @@ export class ReadOnlyCollectionBackendApiService {
    */
   clearCollectionCache(): void {
     this._collectionCache = {};
+  }
+
+  get onCollectionLoad(): EventEmitter<void> {
+    return this._collectionLoadedEventEmitter;
   }
 }
 

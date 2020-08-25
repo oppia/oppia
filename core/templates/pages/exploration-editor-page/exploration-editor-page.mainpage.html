@@ -36,7 +36,7 @@
           <div class="oppia-base-container"
                ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
                ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
-            <div class="oppia-content-container">
+            <div class="oppia-content-container protractor-test-content-container">
               <div id="wrapper">
                 <div class="oppia-main-body">
                   <nav class="navbar navbar-expand navbar-light oppia-navbar oppia-prevent-selection" role="navigation"
@@ -47,7 +47,6 @@
                         <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
 
                         <exploration-save-and-publish-buttons class="ml-auto"></exploration-save-and-publish-buttons>
-                        <editor-navigation></editor-navigation>
                       </div>
                     </div>
                   </nav>
@@ -103,6 +102,7 @@
                 </noscript>
 
                 <side-navigation-bar></side-navigation-bar>
+                <editor-navigation></editor-navigation>
               </div>
             </div>
           </div>
@@ -116,7 +116,7 @@
 
     </oppia-root>
     @load('pages/footer_js_libs.html')
-    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS_SVG"></script>
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=default"></script>
     @loadExtensions('interactions/dependency_html.html')
   </body>
 </html>

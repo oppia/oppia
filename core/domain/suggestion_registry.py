@@ -121,7 +121,7 @@ class BaseSuggestion(python_utils.OBJECT):
         The subclasses must validate the change and score_category fields.
 
         Raises:
-            ValidationError: One or more attributes of the BaseSuggestion object
+            ValidationError. One or more attributes of the BaseSuggestion object
                 are invalid.
         """
         if (
@@ -296,7 +296,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """Validates a suggestion object of type SuggestionEditStateContent.
 
         Raises:
-            ValidationError: One or more attributes of the
+            ValidationError. One or more attributes of the
                 SuggestionEditStateContent object are invalid.
         """
         super(SuggestionEditStateContent, self).validate()
@@ -385,7 +385,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             change: ExplorationChange. The new change.
 
         Raises:
-            ValidationError: Invalid new change.
+            ValidationError. Invalid new change.
         """
         if self.change.cmd != change.cmd:
             raise utils.ValidationError(
@@ -413,7 +413,6 @@ class SuggestionEditStateContent(BaseSuggestion):
         if self.change.old_value is not None:
             html_string_list.append(self.change.old_value['html'])
         return html_string_list
-
 
     def convert_html_in_suggestion_change(self, conversion_fn):
         """Checks for HTML fields in a suggestion change and converts it
@@ -459,7 +458,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         """Validates a suggestion object of type SuggestionTranslateContent.
 
         Raises:
-            ValidationError: One or more attributes of the
+            ValidationError. One or more attributes of the
                 SuggestionTranslateContent object are invalid.
         """
         super(SuggestionTranslateContent, self).validate()
@@ -585,7 +584,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Validates a suggestion object of type SuggestionAddQuestion.
 
         Raises:
-            ValidationError: One or more attributes of the SuggestionAddQuestion
+            ValidationError. One or more attributes of the SuggestionAddQuestion
                 object are invalid.
         """
         super(SuggestionAddQuestion, self).validate()
@@ -696,7 +695,6 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Populates old value of the change."""
         pass
 
-
     def pre_update_validate(self, change):
         """Performs the pre update validation. This functions need to be called
         before updating the suggestion.
@@ -705,7 +703,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             change: QuestionChange. The new change.
 
         Raises:
-            ValidationError: Invalid new change.
+            ValidationError. Invalid new change.
         """
         if self.change.cmd != change.cmd:
             raise utils.ValidationError(
@@ -747,7 +745,12 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.change.question_dict['question_state_data'] = (
             state_domain.State.convert_html_fields_in_state(
                 self.change.question_dict['question_state_data'],
-                conversion_fn))
+                conversion_fn,
+                state_uses_old_interaction_cust_args_schema=(
+                    self.change.question_dict[
+                        'question_state_data_schema_version'] < 37)
+            )
+        )
 
 
 class BaseVoiceoverApplication(python_utils.OBJECT):
@@ -799,7 +802,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
         """Validates the BaseVoiceoverApplication object.
 
         Raises:
-            ValidationError: One or more attributes of the
+            ValidationError. One or more attributes of the
                 BaseVoiceoverApplication object are invalid.
         """
 

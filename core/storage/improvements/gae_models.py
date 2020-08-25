@@ -229,8 +229,8 @@ class TaskEntryModel(base_models.BaseModel):
 
         Raises:
             Exception. A task corresponding to the provided identifier values
-            (entity_type, entity_id, entity_version, task_type, target_type,
-            target_id) already exists in storage.
+                (entity_type, entity_id, entity_version, task_type, target_type,
+                target_id) already exists in storage.
         """
         task_id = cls.generate_task_id(
             entity_type, entity_id, entity_version, task_type, target_type,

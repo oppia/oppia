@@ -119,7 +119,7 @@ def get_learner_collection_dict_by_id(
         collection, and a slightly nicer data structure for frontend work.
 
     Raises:
-        ValidationError: If the collection retrieved using the given
+        ValidationError. If the collection retrieved using the given
             ID references non-existent explorations.
     """
     collection = collection_services.get_collection_by_id(
@@ -581,7 +581,7 @@ def require_activities_to_be_public(activity_references):
             ActivityReference domain objects.
 
     Raises:
-        Exception: Any activity reference in the list does not
+        Exception. Any activity reference in the list does not
             exist, or is not public.
     """
     exploration_ids, collection_ids = activity_services.split_by_type(

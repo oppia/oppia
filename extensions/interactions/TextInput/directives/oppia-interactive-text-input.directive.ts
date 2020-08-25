@@ -23,13 +23,13 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('interactions/TextInput/directives/text-input-rules.service.ts');
 require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/html-escaper.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveTextInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'InteractionAttributesExtractorService',
+  function(InteractionAttributesExtractorService) {
     return {
       restrict: 'E',
       scope: {},
@@ -37,11 +37,9 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
       template: require('./text-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'FocusManagerService', 'TextInputRulesService',
-        'WindowDimensionsService', 'CurrentInteractionService',
+        '$attrs', 'TextInputRulesService', 'CurrentInteractionService',
         function(
-            $attrs, FocusManagerService, TextInputRulesService,
-            WindowDimensionsService, CurrentInteractionService) {
+            $attrs, TextInputRulesService, CurrentInteractionService) {
           var ctrl = this;
           ctrl.submitAnswer = function(answer) {
             if (!answer) {
@@ -59,10 +57,15 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
             return ctrl.answer.length > 0;
           };
           ctrl.$onInit = function() {
-            ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
-              $attrs.placeholderWithValue);
-            ctrl.rows = (
-              HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue));
+            const {
+              placeholder,
+              rows
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'TextInput',
+              $attrs
+            );
+            ctrl.placeholder = placeholder.getUnicode();
+            ctrl.rows = rows;
             ctrl.answer = '';
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 

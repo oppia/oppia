@@ -21,7 +21,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  IPlaythroughIssueBackendDict,
+  PlaythroughIssueBackendDict,
   PlaythroughIssue,
   PlaythroughIssueObjectFactory
 } from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
@@ -44,45 +44,59 @@ export class PlaythroughIssuesBackendApiService {
     if (this.cachedIssues !== null) {
       return Promise.resolve(this.cachedIssues);
     }
-    return this.httpClient.get<IPlaythroughIssueBackendDict[]>(
-      this.getFetchIssuesUrl(explorationId), {
-        params: { exp_version: explorationVersion.toString() }}).toPromise()
-      .then(response => {
-        return this.cachedIssues = response.map(
-          this.playthroughIssueObjectFactory.createFromBackendDict);
-      });
+
+    return new Promise((resolve, reject) => {
+      this.httpClient.get<PlaythroughIssueBackendDict[]>(
+        this.getFetchIssuesUrl(explorationId), {
+          params: { exp_version: explorationVersion.toString() }}).toPromise()
+        .then(response => {
+          resolve(this.cachedIssues = response.map(
+            this.playthroughIssueObjectFactory.createFromBackendDict));
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+    });
   }
 
   fetchPlaythrough(
       explorationId: string,
       playthroughId: string): Promise<PlaythroughIssue> {
-    return this.httpClient.get<IPlaythroughIssueBackendDict>(
-      this.getFetchPlaythroughUrl(explorationId, playthroughId)).toPromise()
-      .then(response => {
-        return this.playthroughIssueObjectFactory.createFromBackendDict(
-          response);
-      });
+    return new Promise((resolve, reject) => {
+      this.httpClient.get<PlaythroughIssueBackendDict>(
+        this.getFetchPlaythroughUrl(explorationId, playthroughId)).toPromise()
+        .then(response => {
+          resolve(this.playthroughIssueObjectFactory.createFromBackendDict(
+            response));
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+    });
   }
 
   resolveIssue(
       issueToResolve: PlaythroughIssue,
       explorationId: string, explorationVersion: number): Promise<void> {
-    return this.httpClient.post(this.getResolveIssueUrl(explorationId), {
-      exp_issue_dict: issueToResolve.toBackendDict(),
-      exp_version: explorationVersion
-    }).toPromise()
-      .then(() => {
-        if (this.cachedIssues !== null) {
-          const issueIndex = this.cachedIssues.findIndex(
-            issue => angular.equals(issue, issueToResolve));
-          if (issueIndex !== -1) {
-            this.cachedIssues.splice(issueIndex, 1);
-            return;
+    return new Promise((resolve, reject) => {
+      this.httpClient.post(this.getResolveIssueUrl(explorationId), {
+        exp_issue_dict: issueToResolve.toBackendDict(),
+        exp_version: explorationVersion
+      }).toPromise()
+        .then(() => {
+          if (this.cachedIssues !== null) {
+            const issueIndex = this.cachedIssues.findIndex(
+              issue => angular.equals(issue, issueToResolve));
+            if (issueIndex !== -1) {
+              this.cachedIssues.splice(issueIndex, 1);
+              resolve();
+            }
           }
-        }
-        throw new Error(
-          'An issue which was not fetched from the backend has been resolved');
-      });
+          reject(
+            'An issue which was not fetched from the backend ' +
+            'has been resolved');
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+    });
   }
 
   private getFetchIssuesUrl(explorationId: string): string {

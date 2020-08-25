@@ -17,7 +17,7 @@
  */
 
 import {
-  IExplorationOpportunitySummaryBackendDict,
+  ExplorationOpportunitySummaryBackendDict,
   ExplorationOpportunitySummaryObjectFactory
 } from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 
@@ -25,7 +25,7 @@ describe('Exploration opportunity summary object factory', () => {
   describe('ExplorationOpportunitySummaryObjectFactory', () => {
     let explorationOpportunitySummaryObjectFactory: (
       ExplorationOpportunitySummaryObjectFactory);
-    let backendDict: IExplorationOpportunitySummaryBackendDict;
+    let backendDict: ExplorationOpportunitySummaryBackendDict;
 
     beforeEach(() => {
       explorationOpportunitySummaryObjectFactory = (

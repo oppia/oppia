@@ -119,7 +119,7 @@ class ActivityRights(python_utils.OBJECT):
         """Validates an ActivityRights object.
 
         Raises:
-            utils.ValidationError: if any of the owners, editors, voice artists
+            utils.ValidationError. If any of the owners, editors, voice artists
                 and viewers lists overlap, or if a community-owned exploration
                 has owners, editors, voice artists or viewers specified.
         """
@@ -317,8 +317,8 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
         activity_rights_model: ActivityRightsModel. Activity rights from the
             datastore.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
 
     Returns:
         ActivityRights. The rights object created from the model.
@@ -351,8 +351,8 @@ def _save_activity_rights(
         activity_rights: ActivityRights. The rights object for the given
             activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
         commit_message: str. Descriptive message for the commit.
         commit_cmds: list(dict). A list of commands describing what kind of
             commit was done.
@@ -417,8 +417,8 @@ def _update_activity_summary(activity_type, activity_rights):
 
     Args:
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
@@ -437,8 +437,8 @@ def update_activity_first_published_msec(
 
     Args:
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
         activity_id: str. ID of the activity.
         first_published_msec: float. First publication time in milliseconds
             since the Epoch.
@@ -666,15 +666,15 @@ def _get_activity_rights(activity_type, activity_id):
 
     Args:
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
         activity_id: str. ID of the activity.
 
     Returns:
         ActivityRights. The rights object associated with the given activity.
 
     Raises:
-        Exception. activity_type provided is unknown.
+        Exception. The activity_type provided is unknown.
     """
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         return get_exploration_rights(activity_id, strict=False)
@@ -740,8 +740,7 @@ def check_can_edit_activity(user, activity_rights):
         return True
 
     if (activity_rights.is_published() and
-            (role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in
-             user.actions)):
+            role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions):
         return True
 
     return False
@@ -771,12 +770,11 @@ def check_can_voiceover_activity(user, activity_rights):
         return True
 
     if (activity_rights.community_owned or
-            (role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions)):
+            role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions):
         return True
 
     if (activity_rights.is_published() and
-            (role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in
-             user.actions)):
+            role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions):
         return True
 
     return False
@@ -942,14 +940,14 @@ def _assign_role(
             who is performing the action.
         assignee_id: str. ID of the user whose role is being changed.
         new_role: str. The name of the new role: One of
-            ROLE_OWNER
-            ROLE_EDITOR
-            ROLE_VOICE_ARTIST
-            ROLE_VIEWER
+            ROLE_OWNER,
+            ROLE_EDITOR,
+            ROLE_VOICE_ARTIST,
+            ROLE_VIEWER.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
         Exception. The committer does not have rights to modify a role.
@@ -1060,8 +1058,8 @@ def _release_ownership_of_activity(committer, activity_id, activity_type):
             is performing the action.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
 
     Raise:
         Exception. The committer does not have release rights.
@@ -1098,8 +1096,8 @@ def _change_activity_status(
         committer_id: str. ID of the user who is performing the update action.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
         new_status: str. The new status of the activity.
         commit_message: str. The human-written commit message for this change.
     """
@@ -1135,8 +1133,8 @@ def _publish_activity(committer, activity_id, activity_type):
         committer: UserActionsInfo. UserActionsInfo object for the committer.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
         Exception. The committer does not have rights to publish the
@@ -1163,8 +1161,8 @@ def _unpublish_activity(committer, activity_id, activity_type):
         committer: UserActionsInfo. UserActionsInfo object for the committer.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
         Exception. The committer does not have rights to unpublish the
@@ -1201,9 +1199,9 @@ def assign_role_for_exploration(
         exploration_id: str. ID of the exploration.
         assignee_id: str. ID of the user whose role is being changed.
         new_role: str. The name of the new role: One of
-            ROLE_OWNER
-            ROLE_EDITOR
-            ROLE_VOICE_ARTIST
+            ROLE_OWNER,
+            ROLE_EDITOR,
+            ROLE_VOICE_ARTIST.
 
     Raises:
         Exception. This could potentially throw an exception from
@@ -1332,8 +1330,8 @@ def assign_role_for_collection(
         collection_id: str. ID of the collection.
         assignee_id: str. ID of the user whose role is being changed.
         new_role: str. The name of the new role: One of
-            ROLE_OWNER
-            ROLE_EDITOR
+            ROLE_OWNER,
+            ROLE_EDITOR.
 
     Raises:
         Exception. This could potentially throw an exception from

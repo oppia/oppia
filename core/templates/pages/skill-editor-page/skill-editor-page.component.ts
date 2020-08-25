@@ -36,6 +36,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
+require('services/page-title.service.ts');
 
 angular.module('oppia').component('skillEditorPage', {
   template: require('./skill-editor-page.component.html'),

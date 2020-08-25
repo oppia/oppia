@@ -19,6 +19,17 @@
 
 require('domain/state/StateObjectFactory.ts');
 
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
+
+export interface QuestionBackendDict {
+  'id': string;
+  'question_state_data': StateBackendDict,
+  'question_state_data_schema_version': number;
+  'language_code': string;
+  'version': number;
+  'linked_skill_ids': string[];
+}
+
 angular.module('oppia').factory('QuestionObjectFactory', [
   'StateObjectFactory', 'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
   function(StateObjectFactory, DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {

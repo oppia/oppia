@@ -73,7 +73,8 @@ describe('Training Modal Controller', function() {
             interaction: {
               id: 'TextInput',
               answer_groups: [{
-                rule_specs: [],
+                rule_input_translations: {},
+                rule_types_to_inputs: {},
                 outcome: {
                   dest: '',
                   feedback: {
@@ -83,7 +84,8 @@ describe('Training Modal Controller', function() {
                 },
                 training_data: ['Not the answer']
               }, {
-                rule_specs: [],
+                rule_input_translations: {},
+                rule_types_to_inputs: {},
                 outcome: {
                   dest: '',
                   feedback: {
@@ -93,6 +95,15 @@ describe('Training Modal Controller', function() {
                 },
                 training_data: ['This is the answer']
               }],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_0',
+                    unicode_str: ''
+                  }
+                },
+                rows: { value: 1 }
+              },
               default_outcome: {
                 dest: '',
                 feedback: {
@@ -120,8 +131,18 @@ describe('Training Modal Controller', function() {
               },
             },
             training_data: ['This is the answer'],
-            rule_specs: [],
+            rule_input_translations: {},
+            rule_types_to_inputs: {},
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'Init',
             feedback: {
@@ -219,7 +240,8 @@ describe('Training Modal Controller', function() {
                 }
               },
               training_data: ['Not the answer'],
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
             }, {
               outcome: {
                 dest: '',
@@ -229,7 +251,8 @@ describe('Training Modal Controller', function() {
                 },
               },
               training_data: ['Answer'],
-              rule_specs: []
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
             }, {
               outcome: {
                 dest: '',
@@ -239,8 +262,18 @@ describe('Training Modal Controller', function() {
                 }
               },
               training_data: ['This is the answer'],
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
             }],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: 'Type your answer here.'
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: '',
               feedback: {
@@ -249,15 +282,7 @@ describe('Training Modal Controller', function() {
               }
             },
             hints: [],
-            id: 'TextInput',
-            customization_args: {
-              rows: {
-                value: 1
-              },
-              placeholder: {
-                value: 'Type your answer here.'
-              }
-            },
+            id: 'TextInput'
           },
           written_translations: {
             translations_mapping: {},
@@ -277,8 +302,18 @@ describe('Training Modal Controller', function() {
             },
           },
           training_data: ['This is the answer'],
-          rule_specs: [],
+          rule_input_translations: {},
+          rule_types_to_inputs: {},
         }],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
         default_outcome: {
           dest: 'Init',
           feedback: {
@@ -346,7 +381,8 @@ describe('Training Modal Controller', function() {
             param_changes: [],
             interaction: {
               answer_groups: [{
-                rule_specs: [],
+                rule_input_translations: {},
+                rule_types_to_inputs: {},
                 outcome: {
                   dest: '',
                   feedback: {
@@ -356,6 +392,15 @@ describe('Training Modal Controller', function() {
                 },
                 training_data: ['']
               }],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_0',
+                    unicode_str: ''
+                  }
+                },
+                rows: { value: 1 }
+              },
               default_outcome: {
                 dest: '',
                 feedback: {
@@ -383,7 +428,8 @@ describe('Training Modal Controller', function() {
                 html: ''
               },
             },
-            rule_specs: [],
+            rule_input_translations: {},
+            rule_types_to_inputs: {},
             training_data: []
           }, {
             outcome: {
@@ -393,7 +439,8 @@ describe('Training Modal Controller', function() {
                 html: ''
               },
             },
-            rule_specs: [],
+            rule_input_translations: {},
+            rule_types_to_inputs: {},
             training_data: []
           }],
           default_outcome: {
@@ -409,7 +456,10 @@ describe('Training Modal Controller', function() {
               value: true
             },
             placeholder: {
-              value: 1
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
             }
           },
           hints: [],

@@ -64,7 +64,9 @@ describe('Admin backend api service', () => {
         description: '',
         id: 'VqgPTpt7JyJy',
         topic_model_last_updated: 1591196558882.2,
-        language_code: 'en'
+        language_code: 'en',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA'
       }
     ],
     one_off_job_status_summaries: [],
@@ -164,4 +166,27 @@ describe('Admin backend api service', () => {
 
     flushMicrotasks();
   }));
+
+  it('should use the rejection handler if the backend request failed.',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      abas.getData().then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+    })
+  );
 });

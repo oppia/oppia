@@ -25,33 +25,41 @@ require(
   'math-equation-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/contextual/device-info.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/guppy-initialization.service.ts');
+require('services/html-escaper.service.ts');
 require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
   template: require('./math-equation-input-interaction.component.html'),
   controller: [
-    '$scope', 'CurrentInteractionService', 'GuppyConfigurationService',
-    'MathEquationInputRulesService', 'MathInteractionsService',
-    'GuppyInitializationService',
+    '$attrs', '$scope', 'MathEquationInputRulesService',
+    'CurrentInteractionService', 'DeviceInfoService',
+    'GuppyConfigurationService', 'GuppyInitializationService',
+    'HtmlEscaperService', 'MathInteractionsService',
+    'MATH_INTERACTION_PLACEHOLDERS',
     function(
-        $scope, CurrentInteractionService, GuppyConfigurationService,
-        MathEquationInputRulesService, MathInteractionsService,
-        GuppyInitializationService) {
+        $attrs, $scope, MathEquationInputRulesService,
+        CurrentInteractionService, DeviceInfoService,
+        GuppyConfigurationService, GuppyInitializationService,
+        HtmlEscaperService, MathInteractionsService,
+        MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
       ctrl.warningText = '';
 
       ctrl.isCurrentAnswerValid = function() {
-        if (ctrl.hasBeenTouched) {
+        let activeGuppyObject = (
+          GuppyInitializationService.findActiveGuppyObject());
+        if (ctrl.hasBeenTouched && activeGuppyObject === undefined) {
           // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
           // is not compatible with nerdamer or with the backend validations.
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
             ctrl.value);
           let answerIsValid = MathInteractionsService.validateEquation(
-            ctrl.value);
+            ctrl.value, GuppyInitializationService.getCustomOskLetters());
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
         }
@@ -67,19 +75,37 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
           ctrl.value, MathEquationInputRulesService);
       };
 
+      ctrl.showOSK = function() {
+        GuppyInitializationService.setShowOSK(true);
+        GuppyInitializationService.interactionType = 'MathEquationInput';
+      };
+
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
-        GuppyInitializationService.init('guppy-div-learner');
-        Guppy.event('change', () => {
-          let activeGuppyObject = (
+        GuppyInitializationService.init(
+          'guppy-div-learner',
+          MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
+        GuppyInitializationService.setCustomOskLetters(
+          HtmlEscaperService.escapedJsonToObj(
+            $attrs.customOskLettersWithValue));
+        let eventType = (
+          DeviceInfoService.isMobileUserAgent() &&
+          DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
+        // We need the 'focus' event while using the on screen keyboard (only
+        // for touch-based devices) to capture input from user and the 'change'
+        // event while using the normal keyboard.
+        Guppy.event(eventType, () => {
+          var activeGuppyObject = (
             GuppyInitializationService.findActiveGuppyObject());
           if (activeGuppyObject !== undefined) {
             ctrl.hasBeenTouched = true;
             ctrl.value = activeGuppyObject.guppyInstance.asciimath();
-            // Need to manually trigger the digest cycle to make any 'watchers'
-            // aware of changes in answer.
-            $scope.$apply();
+            if (eventType === 'change') {
+              // Need to manually trigger the digest cycle to make any
+              // 'watchers' aware of changes in answer.
+              $scope.$apply();
+            }
           }
         });
 

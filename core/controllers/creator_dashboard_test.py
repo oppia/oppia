@@ -61,19 +61,19 @@ class OldNotificationsDashboardRedirectPageTest(test_utils.GenericTestBase):
             'http://localhost/notifications', response.headers['location'])
 
 
-class OldCommunityDashboardRedirectPageTest(test_utils.GenericTestBase):
-    """Test for redirecting the old community dashboard page URL
+class OldContributorDashboardRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old contributor dashboard page URL
     to the new one.
     """
 
-    def test_old_community_dashboard_page_url(self):
-        """Test to validate that the old community dashboard page url
+    def test_old_contributor_dashboard_page_url(self):
+        """Test to validate that the old contributor dashboard page url
         redirects to the new one.
         """
         response = self.get_html_response(
-            '/community_dashboard', expected_status_int=301)
+            '/contributor_dashboard', expected_status_int=301)
         self.assertEqual(
-            'http://localhost/community-dashboard',
+            'http://localhost/contributor-dashboard',
             response.headers['location'])
 
 
@@ -776,7 +776,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-            self.assertIsNone(response.get('topic_summary_dicts'))
+            self.assertEqual(response.get('topic_summary_dicts'), [])
         self.logout()
 
     def test_can_update_display_preference(self):

@@ -25,10 +25,10 @@ angular.module('oppia').factory('UserService', [
   function($http, $q, $window, UrlInterpolationService, UrlService,
       UserInfoObjectFactory, DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
-    var USER_COMMUNITY_RIGHTS_DATA_URL = '/usercommunityrightsdatahandler';
+    var USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len
 
     var userInfo = null;
-    var userCommunityRightsInfo = null;
+    var userContributionRightsInfo = null;
 
     var getUserInfoAsync = function() {
       if (UrlService.getPathname() === '/signup') {
@@ -85,14 +85,14 @@ angular.module('oppia').factory('UserService', [
           }
         );
       },
-      getUserCommunityRightsData: function() {
-        if (userCommunityRightsInfo) {
-          return $q.resolve(userCommunityRightsInfo);
+      getUserContributionRightsData: function() {
+        if (userContributionRightsInfo) {
+          return $q.resolve(userContributionRightsInfo);
         } else {
-          return $http.get(USER_COMMUNITY_RIGHTS_DATA_URL).then(
+          return $http.get(USER_CONTRIBUTION_RIGHTS_DATA_URL).then(
             function(response) {
-              userCommunityRightsInfo = response.data;
-              return $q.resolve(userCommunityRightsInfo);
+              userContributionRightsInfo = response.data;
+              return $q.resolve(userContributionRightsInfo);
             }
           );
         }

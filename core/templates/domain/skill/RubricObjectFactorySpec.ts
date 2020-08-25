@@ -21,7 +21,7 @@ import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
 describe('Rubric object factory', () => {
   let rubricObjectFactory: RubricObjectFactory;
   let rubricDict: {
-    difficulty: string; explanations: Array<string>;
+    difficulty: string; explanations: string[];
   };
 
   beforeEach(() => {

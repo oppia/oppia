@@ -81,7 +81,7 @@ def parse_string(string, params, autoescape=True):
         in case of error in parsing.
 
     Raises:
-        Exception: Unable to parse string with Jinja.
+        Exception. Unable to parse string with Jinja.
     """
     env = jinja2.Environment(autoescape=autoescape)
 

@@ -47,6 +47,8 @@ DEFAULT_IDENTICON_DATA_URL = (
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMCAYAAADHl1ErAAAAAXNSR0IArs4c6QAADhtJREFUeAHtXHlwVdUZ/859jyxmIQESyCaglC0iAgkJIntrIpvKphSwY2ttxbFOp9R/cGGqdhykLaMVO2OtoyRSCEKNEpYKyBIVQ1iNkBhNMCtb8shiQpJ3b7/fTW7m5uUlecu9L4nTM5Pce8895zvf93vnnPud833fEdQLKXb5jsC6%2BuZERZbHKaSMYRbGKERxgpQQUkSIIigEbAmFavlfrUKiVhCVcFa%2BIJEvJOlCcNCAnNKMFQ0o58vEfPgmhS5Mn0ot8n2KIs8lIZJJUfy8almIJqbxhRDSIbJKe2s%2BXvWlV/RcrGwqYGGp20bI1LyaeVmjKMrodp4EycGBAy6MjgsrSxozqG7O5GgxcVREeEigNDAwwBpmsUiRKGu3y1caGltstQ3yjbOFV6sPnypXTuRXBReU2GLqGprHkUKSRlMIUcD3WyUakGbbt7JYyzf6agpgYfe9O8kui/U8nB7UhJIkUTljwrBTTz449mZKUlyCEBTnjTCKQiX7T5ScfGP3Rf9j5ysny7IyTKXHPwYP690WSXnZtvcXp71pw1ldQwELm59%2BlyzbX%2BbeNL%2Btscb4EYOyNz2ZWD99wtAFnGdxxoQBefbs85f3rHsjJyivuGo60wsATe51WZJkWW/LWnXGgDZUEoYAFr58x0B7beOLPHGv5XnFIpGoS0mKOfze%2Bpmj/f2smNR9lm42teQ/8vLRgv0nyuZwVwtm1Ows5BZLSMBz1RkrbnjLiNeAhaWmPWgn%2BxYeejwkRMu9idH7tm%2BYE8/z0EhvmfOmPs9/RQ9tOJx3IKc8lUixkqBKC1nW2vat3u0NXY8Bi1%2B%2Bw6%2BktnETD7%2BnwEB4iP/pL/5xf03U4IBZ3jBkdN2K641Hkn/7YWh17c1JoM3D9PW4kIB1eRkrmjxpyyPAeK4aLttbPuAhOIU5aHpm1cTMZ1ffuRT8eMKED%2BooL6Wd%2B2Bj%2BtnFUGeYyVzJYl3Kc9sld9t2W8Dw%2BWkTWuz2fdxQ9ACr9P3Jfy7%2BZuSw0HnuNtwb5Ysqaw4mPJb5k%2BYW%2BVZuv9xqsaRWZ60%2B7w4vbgEWnrJ1hp3kTO5ZYUPCAnK%2B3bYiitWDWHca7O2yrI6U3r5yR8U1W2MiC2%2BzkLS4ev%2BaY67y1a749VQBYLUIZT/AGhUTduS7f68Y39/AgozgGbxDBsgCmSBbT/Jr710CDMMQPYvHf2DC2Mj9p95efA8TCNKI9MNrEGSALJAJskFGV%2BTocUhigrfbWz5jYtH4VdrAMksBdYVnI8vYJ/8q83hhmW0WEy23WKx39/Qh6LaHQXXA1xBgYc5isBL4/scCFoC3QCbIBhkhK2TGi65St4CpeharDvgaYoJnIv15GHaFQRBkg4w8p02BzF0VRH6XgEGDV5VS1rOgOvTHCb47wfXvIBtkhE4JmSG7/r3%2B3ilg6toQyx1OUEr7i56lF8zde8gIWVEPSz1g4IyGU8CwkMbaEMudNg3eWd0fXR5khcyQXcXAiYSdAMMWDY/ltVhIY23IdXr8kjqh21%2BzRKvMogUYAAtHQToBhv0sbNFg16GvLaQdmTfjGTJDdmCgYuHQSIfe07pTSqewn3V9z6qrvb1F48Crzx6xNTR4QXoE9tN4c2%2ByfufWqudC3VbmAYzNPwZrkf6dL%2B4LSm5Q9vkrVH79B6qs%2BoH8B1goatAtNCIqmOZOiabw4G5VJMNYREdhDD7ae6J0USsmtEwj3t7DYLCwK83f8WbbzauZP7/kq53SxiY7vfmfC5R24Fv6prTrDVEWgqbfEUlPLY2nlKkxGv%2BmXbFzG7H4/eE8g/tZyO92zbDSPoe1WncUgT14X4G189NimvjobnrhX6e6BQuo8DCho2crafnzB2n%2BMwe4PL5H5iVgACx4wEltli%2B1sXbA%2BGkNcmCwUN%2BY%2BI%2B3WOjZt3Lpl68cpQoefu6m4%2Bcqae7TWfTfk%2BXuVnWrvA4LFRtUVockjKxKc8sJmMJsWWsiON/U9eJvNmXTtk%2B%2BdYt5Z4WZX0p/bjYtmBbn7LURefaw%2BVuvwoQnBliTYCxu7WFskQb1WROjcvliKlibM/IMAQv8siD0643H6etiGx7NSBbYUlXCbRipgKnme859Ysl4jwwDrnKaV2SjDe%2B0tu9qnZ7KsQWch/YxVpt6KunZexieUVPDSIJjCC86k3lwyikJ0di%2BMS09/3au2iuMbuDr4mpKN2CIO%2BMLVnpgA4yAlVRX1ziV4fODrwOv2k2bDM4UVvEkXeaMJ0PyXn3/nCF0HIkAE2ADjICVpChiLArBMcSxsJHPmdmXjCTXiVZRRS19VVTdKd%2BIDA0bYCW1%2BWcRvGiMIN4Vjb1flHb1yrD8rM9LDKOlJ6RhA6ww6au%2BD3A50hcy%2Bt5sRRP8FpSYo8zqsBnDPax13oJ/ltEgafSqam5SU7NdezTtWsHrTzOShg2wYtWP3SQ5wZnNjMZA80Z9s1mkO9CtMakdDRtgJcGnFK3C869D6wY%2BRISp7loGUnROKtKkdtqxYawkzQGXdwNUN0nnrHiXGxxoJf40e0fEhdpRg29xoZT7RTRsgJV%2B8e0%2BJTdqJIwd4kZpz4pOGWN%2BG5Lq2s38wQHXMzZdq2XiAlllgP2%2BaH6yOX4xGjbAinejlVq0CG9l10T3rNT99wwnf96KMyvNuHMoDR0UaAr5dmwYK1YrhAoYXLtNaa2N6DAW5vFF6qLClGZeeHSyKXRBVMMGWLFaoUZYEPzgTWuxjfC6lROI/RgMb2bZ7JGUaOIcqWEDrDDp50MCBA0YLokDQRgx0p%2BdTezH4PDG88dxI8LotaeneU7AhZo6bPK5hwkVMERYuFDX6yLT2JDx99/fTVY2anibYiOCaPuGuayydDB%2BeUu2U30NG2AlCaFcRAmEo3QqaVLGynm30a6X5sHz2uMWksZH0pHXF9CIYeb/zho2CAqTgoMDvoTXCmJ3EI7isQRuVpw9KYqytyykhxk8qASuJoD84mNTKGvjveSLFQQwUeOaGCNE0Flqvs5o8b/9gZ8xwyMmj404NComZJyrzHtbLjTIjxZNv1X9C/S30pXqRrLVdd4lh7EjOX4oPfHAOHrzD9Np9l1RZMHnygeJ45kOZXxaPJ6byr6WueotdfAjhI73rGdu2ZXnn5oY7QM2OjZxx8hw%2BvPjCepf2bUfqJz/Llc1qHpb1OBAiosMpoFB5i%2BtOnLV%2BoTgL9ypYYZ8bZ0tOd6QmuUNbCiFMoN9GPM0TCbeXYoZcgvhr48kOyLlVF6AESf1UwV7G88jBbC/ISqsjzDb62wAC9UmydhoAaz6b/tWcIgQul7ntI8woMNCxQZstQOGSFYeqQriDeGI0Ud47jU2gIEae8kmtlZsWllpB6zNO2UXZwcg3rDXOO0jDbdhEIDoXs1zB6y1A4YHhP3iiuBMOJXh3tfJzuZ/qBbfX65nR5UGqmto8TUL2OoqAgZoWMNEY6KTMhOa%2Bt4ehCDfmxjz8c4X5y3UChp5hVk/j63Vpwuu0zdlNVTIrkuFfC1hkOobO%2B//Qw8LD/an26JDaFRsKI2KCWU76kCaOi6CoHYYnZY9d/DjAzllC/lDmFWz75EFevqdFmGIkbbL9hREsiI40yg/11wGhxex9PlXV%2BjEhatUU99ZQdUzpr%2BH08n1mkb1L%2BfiVf0rGs5Lo2nxkXT3HUPZ0S7WawAhsxrFy6HPwKJDY/zQqYehAPey1%2BDgDxfsSxkPwZPYaTmU7S7BPWDXkWLafayYLlWaaidW2cASK5nBWzJzOD3AG5YebCgqw5dvP4PoXab1Oveu3znK5xQIOPW31DZchL/6M6vv2sn%2B68scK3b1jDlo%2B6Hv6G878ij/e1M3cbtiQc3HML4vKZbWrbyTpowe3G1Z7SVH7e7cmHZmGXePSmtI4FhnQfVOAQMBNfhdse/CwvzsO/cf6ykapKlZpq0HCmlzxlc%2B6U2akK5c2XJNf3x4At3D29hdJUTrTnz0wxlwOrEIy5Kugum7BAyEtaGJwKVrH63mrSDn0besEdNTmz9XJ%2B6uGOoL%2BbAr/OXJJIoM77jryx%2Bh0iGL0mSENnc1FDX%2BO6gVWqZ2RfQ9I5oLQgj75fxO/q%2BvpJ9TnXTxlevr6cPjlyj5iUx2bb%2BsZ7UesqlgsayQWf/S8b7bHobC3QWYrv3rZ%2BwuXuhIs88/Y4v8vfWz4BvrdoBpj4BBejWE2W4/yupTGMJ%2BD21O/emf3j1t2bTNrYD8PgWkv7/FflvUwE8uFFelMAg2i8Uy05UTBlwCTAWtLUieJ8XA2MiQIxXX6xNYI%2B6XC3Wep%2Br5xz/Jsszij1qDVREprp4s4DJgGmjaMQzcUA5bgaNkRTbH3GxSf5SEVMoxRBUMlrnHMIB//ArounxbjgZZuWWtSzlokmyGkwWv4Bm8QwZ1GLpxZgUYcquHaRLgQ6A/SobJ4IiGpeyc7RE9ja55V/aKEOID5s/3R8loQjkeVsTzwmmeF2oYuFlamT5xFeII/4qh3LMmgR/oWT4/rEgPhONxWEKifUJW4mWikfpyvr5nBbNIkUQeD8BU7lm9fxyWHgDHA9fYQlzHg/0w/6qjuZzqdKwvb/J9PveiAl4Hz%2BE5q%2B8duKYXHjHSjkf6sXkqWyEZK4QFLIQ51iihWrr2CJKCeE6fzm2pax8Grm8e6acHDffth0YSLdF9CCoZvFye55okRU7gIetV1AkPuRJZSCfZUdefezJMYf3v0MhOwHVzLKlQxAWSRJlQlDr%2BzrPcUjjbGwbyBB2mCKH62/K7KwywjWM8b5CQq%2BH9x%2B%2BCSVZiFKH8eI4ldQQOz4jJ/P/Bt86QcSFPPVqZA50Qu4NwFK7i3tHK7HEEJ5reOFr5fwkK97jkk8ywAAAAAElFTkSuQmCC')  # pylint: disable=line-too-long
 
 
+# TODO(#10178): Deprecate gae_id for UserSettings once we have verified that
+# UserAuthDetailsModels exists for every user.
 class UserSettings(python_utils.OBJECT):
     """Value object representing a user's settings.
 
@@ -164,18 +166,20 @@ class UserSettings(python_utils.OBJECT):
         object are valid.
 
         Raises:
-            ValidationError: user_id is not str.
-            ValidationError: gae_id is not str.
-            ValidationError: email is not str.
-            ValidationError: email is invalid.
-            ValidationError: role is not str.
-            ValidationError: Given role does not exist.
+            ValidationError. The user_id is not str.
+            ValidationError. The gae_id is not str.
+            ValidationError. The email is not str.
+            ValidationError. The email is invalid.
+            ValidationError. The role is not str.
+            ValidationError. Given role does not exist.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
+        if not is_user_id_correct(self.user_id):
+            raise utils.ValidationError('The user ID is in a wrong format.')
 
         if (self.gae_id is not None and
                 not isinstance(self.gae_id, python_utils.BASESTRING)):
@@ -266,12 +270,12 @@ class UserSettings(python_utils.OBJECT):
             username: str. The username to validate.
 
         Raises:
-            ValidationError: An empty username is supplied.
-            ValidationError: The given username exceeds the maximum allowed
+            ValidationError. An empty username is supplied.
+            ValidationError. The given username exceeds the maximum allowed
                 number of characters.
-            ValidationError: The given username contains non-alphanumeric
+            ValidationError. The given username contains non-alphanumeric
                 characters.
-            ValidationError: The given username contains reserved substrings.
+            ValidationError. The given username contains reserved substrings.
         """
         if not username:
             raise utils.ValidationError('Empty username supplied.')
@@ -293,15 +297,99 @@ class UserSettings(python_utils.OBJECT):
                         'This username is not available.')
 
 
+class UserAuthDetails(python_utils.OBJECT):
+    """Value object representing a user's authentication details information.
+
+    Attributes:
+        user_id: str. The unique ID of the user.
+        gae_id: str. The ID of the user retrieved from GAE.
+        pin: str or None. The PIN of the user's profile for android.
+        parent_user_id: str or None. For profile users, the user ID of the full
+            user associated with that profile. None for full users.
+    """
+
+    def __init__(
+            self, user_id, gae_id, pin=None, parent_user_id=None,
+            deleted=False):
+        """Constructs a UserAuthDetails domain object.
+
+        Args:
+            user_id: str. The unique ID of the user.
+            gae_id: str. The ID of the user retrieved from GAE.
+            pin: str or None. The PIN of the user's profile for android.
+            parent_user_id: str or None. For profile users, the user ID of the
+                full user associated with that profile. None for full users.
+            deleted: bool. Whether the user has requested removal of their
+                account.
+        """
+        self.user_id = user_id
+        self.gae_id = gae_id
+        self.pin = pin
+        self.parent_user_id = parent_user_id
+        self.deleted = deleted
+
+    def validate(self):
+        """Checks that user_id, gae_id and email fields of this UserAuthDetails
+        domain object are valid.
+
+        Raises:
+            ValidationError. The user_id is not str.
+            ValidationError. The gae_id is not str.
+            ValidationError. The pin is not str.
+            ValidationError. The parent_user_id is not str.
+        """
+        if not isinstance(self.user_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % self.user_id)
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+        if not is_user_id_correct(self.user_id):
+            raise utils.ValidationError('The user ID is in a wrong format.')
+
+        if (self.gae_id is not None and
+                not isinstance(self.gae_id, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected gae_id to be a string, received %s' %
+                self.gae_id
+            )
+
+        if (self.pin is not None and
+                not isinstance(self.pin, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected PIN to be a string, received %s' %
+                self.pin
+            )
+
+        if (self.parent_user_id is not None and
+                not is_user_id_correct(self.parent_user_id)):
+            raise utils.ValidationError(
+                'The parent user ID is in a wrong format.')
+
+        if self.parent_user_id and self.gae_id:
+            raise utils.ValidationError(
+                'The parent user ID and gae_id cannot be present together '
+                'for a user.')
+
+        if not self.parent_user_id and not self.gae_id:
+            raise utils.ValidationError(
+                'The parent user ID and gae_id cannot be None together '
+                'for a user.')
+
+
 def is_user_id_correct(user_id):
-    """Verify that the user ID is in a correct format.
+    """Verify that the user ID is in a correct format or that it belongs to
+    a system user.
 
     Args:
         user_id: str. The user ID to be checked.
 
     Returns:
-        bool. True when the ID is in a correct format, False otherwise.
+        bool. True when the ID is in a correct format or if the ID belongs to
+        a system user, False otherwise.
     """
+    if user_id in feconf.SYSTEM_USERS.keys():
+        return True
+
     return all((
         user_id.islower(),
         user_id.startswith('uid_'),
@@ -328,10 +416,10 @@ def get_email_from_user_id(user_id):
         user_id: str. The unique ID of the user.
 
     Returns:
-        str. user_email corresponding to the given user_id.
+        str. The user_email corresponding to the given user_id.
 
     Raises:
-        Exception: The user is not found.
+        Exception. The user is not found.
     """
     user_settings = get_user_settings(user_id)
     return user_settings.email
@@ -416,7 +504,8 @@ def get_users_settings(user_ids):
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
-            result.append(_transform_user_settings(model))
+            result.append(
+                _transform_user_settings(model) if model is not None else None)
     return result
 
 
@@ -492,7 +581,7 @@ def get_user_settings(user_id, strict=False):
         UserSettings domain object.
 
     Raises:
-        Exception: strict is True and given user_id does not exist.
+        Exception. The value of strict is True and given user_id does not exist.
     """
 
     user_settings = get_users_settings([user_id])[0]
@@ -516,14 +605,17 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
         UserSettings domain object.
 
     Raises:
-        Exception: strict is True and given gae_id does not exist.
+        Exception. The value of strict is True and given gae_id does not exist.
     """
-    user_settings = _transform_user_settings(
-        user_models.UserSettingsModel.get_by_gae_id(gae_id))
-    if strict and user_settings is None:
+    user_settings_model = user_models.UserSettingsModel.get_by_gae_id(gae_id)
+    if user_settings_model is not None:
+        user_settings = _transform_user_settings(user_settings_model)
+        return user_settings
+    elif strict:
         logging.error('Could not find user with id %s' % gae_id)
         raise Exception('User not found.')
-    return user_settings
+    else:
+        return None
 
 
 def get_user_role_from_id(user_id):
@@ -541,73 +633,74 @@ def get_user_role_from_id(user_id):
     return user_settings.role
 
 
-def get_user_community_rights(user_id):
-    """Returns the UserCommunityRights domain object for the given user_id.
+def get_user_contribution_rights(user_id):
+    """Returns the UserContributionRights domain object for the given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
 
     Returns:
-        UserCommunityRights. The UserCommunityRights domain object for the
+        UserContributionRights. The UserContributionRights domain object for the
         corresponding user.
     """
     user_model = (
-        user_models.UserCommunityRightsModel.get_by_id(user_id))
+        user_models.UserContributionRightsModel.get_by_id(user_id))
     if user_model is not None:
-        return user_domain.UserCommunityRights(
+        return user_domain.UserContributionRights(
             user_id,
             user_model.can_review_translation_for_language_codes,
             user_model.can_review_voiceover_for_language_codes,
             user_model.can_review_questions)
     else:
-        return user_domain.UserCommunityRights(user_id, [], [], False)
+        return user_domain.UserContributionRights(user_id, [], [], False)
 
 
-def get_all_community_reviewers():
-    """Returns a list of UserCommunityRights objects corresponding to each
-    UserCommunityRightsModel.
+def get_all_contribution_reviewers():
+    """Returns a list of UserContributionRights objects corresponding to each
+    UserContributionRightsModel.
 
     Returns:
-        list(UserCommunityRights). A list of UserCommunityRights objects.
+        list(UserContributionRights). A list of UserContributionRights objects.
     """
-    reviewer_models = user_models.UserCommunityRightsModel.get_all()
-    return [user_domain.UserCommunityRights(
+    reviewer_models = user_models.UserContributionRightsModel.get_all()
+    return [user_domain.UserContributionRights(
         model.id, model.can_review_translation_for_language_codes,
         model.can_review_voiceover_for_language_codes,
         model.can_review_questions) for model in reviewer_models]
 
 
-def _save_user_community_rights(user_community_rights):
-    """Saves the UserCommunityRights object into the datastore.
+def _save_user_contribution_rights(user_contribution_rights):
+    """Saves the UserContributionRights object into the datastore.
 
     Args:
-        user_community_rights: UserCommunityRights. The UserCommunityRights
-            object of the user.
+        user_contribution_rights: UserContributionRights. The
+            UserContributionRights object of the user.
     """
     # TODO(#8794): Add limitation on number of reviewers allowed in any
     # category.
-    user_community_rights.validate()
-    user_models.UserCommunityRightsModel(
-        id=user_community_rights.id,
+    user_contribution_rights.validate()
+    user_models.UserContributionRightsModel(
+        id=user_contribution_rights.id,
         can_review_translation_for_language_codes=(
-            user_community_rights.can_review_translation_for_language_codes),
+            user_contribution_rights.can_review_translation_for_language_codes),
         can_review_voiceover_for_language_codes=(
-            user_community_rights.can_review_voiceover_for_language_codes),
-        can_review_questions=user_community_rights.can_review_questions).put()
+            user_contribution_rights.can_review_voiceover_for_language_codes),
+        can_review_questions=(
+            user_contribution_rights.can_review_questions)).put()
 
 
-def _update_user_community_rights(user_community_rights):
+def _update_user_contribution_rights(user_contribution_rights):
     """Updates the users rights model if the updated object has review rights in
     at least one item else delete the existing model.
 
     Args:
-        user_community_rights: UserCommunityRights. The updated
-            UserCommunityRights object of the user.
+        user_contribution_rights: UserContributionRights. The updated
+            UserContributionRights object of the user.
     """
-    if user_community_rights.can_review_at_least_one_item():
-        _save_user_community_rights(user_community_rights)
+    if user_contribution_rights.can_review_at_least_one_item():
+        _save_user_contribution_rights(user_contribution_rights)
     else:
-        remove_community_reviewer(user_community_rights.id)
+        remove_contribution_reviewer(user_contribution_rights.id)
 
 
 def get_usernames_by_role(role):
@@ -682,7 +775,7 @@ def get_system_user():
     """Returns user object with system committer user id.
 
     Returns:
-        system_user: user object with system committer user id.
+        UserActionsInfo. User object with system committer user id.
     """
     system_user = UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
     return system_user
@@ -692,7 +785,7 @@ def _save_user_settings(user_settings):
     """Commits a user settings object to the datastore.
 
     Args:
-        user_settings: UserSettings domain object.
+        user_settings: UserSettings. The user setting domain object to be saved.
     """
     user_settings.validate()
 
@@ -741,47 +834,44 @@ def _transform_user_settings(user_settings_model):
     """Transform user settings storage model to domain object.
 
     Args:
-        user_settings_model: UserSettingsModel.
+        user_settings_model: UserSettingsModel. The model to be converted.
 
     Returns:
         UserSettings. Domain object for user settings.
     """
-    if user_settings_model:
-        return UserSettings(
-            user_id=user_settings_model.id,
-            gae_id=user_settings_model.gae_id,
-            email=user_settings_model.email,
-            role=user_settings_model.role,
-            username=user_settings_model.username,
-            last_agreed_to_terms=user_settings_model.last_agreed_to_terms,
-            last_started_state_editor_tutorial=(
-                user_settings_model.last_started_state_editor_tutorial),
-            last_started_state_translation_tutorial=(
-                user_settings_model.last_started_state_translation_tutorial),
-            last_logged_in=user_settings_model.last_logged_in,
-            last_edited_an_exploration=(
-                user_settings_model.last_edited_an_exploration),
-            last_created_an_exploration=(
-                user_settings_model.last_created_an_exploration),
-            profile_picture_data_url=(
-                user_settings_model.profile_picture_data_url),
-            default_dashboard=user_settings_model.default_dashboard,
-            creator_dashboard_display_pref=(
-                user_settings_model.creator_dashboard_display_pref),
-            user_bio=user_settings_model.user_bio,
-            subject_interests=user_settings_model.subject_interests,
-            first_contribution_msec=(
-                user_settings_model.first_contribution_msec),
-            preferred_language_codes=(
-                user_settings_model.preferred_language_codes),
-            preferred_site_language_code=(
-                user_settings_model.preferred_site_language_code),
-            preferred_audio_language_code=(
-                user_settings_model.preferred_audio_language_code),
-            deleted=user_settings_model.deleted
-        )
-    else:
-        return None
+    return UserSettings(
+        user_id=user_settings_model.id,
+        gae_id=user_settings_model.gae_id,
+        email=user_settings_model.email,
+        role=user_settings_model.role,
+        username=user_settings_model.username,
+        last_agreed_to_terms=user_settings_model.last_agreed_to_terms,
+        last_started_state_editor_tutorial=(
+            user_settings_model.last_started_state_editor_tutorial),
+        last_started_state_translation_tutorial=(
+            user_settings_model.last_started_state_translation_tutorial),
+        last_logged_in=user_settings_model.last_logged_in,
+        last_edited_an_exploration=(
+            user_settings_model.last_edited_an_exploration),
+        last_created_an_exploration=(
+            user_settings_model.last_created_an_exploration),
+        profile_picture_data_url=(
+            user_settings_model.profile_picture_data_url),
+        default_dashboard=user_settings_model.default_dashboard,
+        creator_dashboard_display_pref=(
+            user_settings_model.creator_dashboard_display_pref),
+        user_bio=user_settings_model.user_bio,
+        subject_interests=user_settings_model.subject_interests,
+        first_contribution_msec=(
+            user_settings_model.first_contribution_msec),
+        preferred_language_codes=(
+            user_settings_model.preferred_language_codes),
+        preferred_site_language_code=(
+            user_settings_model.preferred_site_language_code),
+        preferred_audio_language_code=(
+            user_settings_model.preferred_audio_language_code),
+        deleted=user_settings_model.deleted
+    )
 
 
 def is_user_registered(user_id):
@@ -812,7 +902,7 @@ def has_ever_registered(user_id):
     return bool(user_settings.username and user_settings.last_agreed_to_terms)
 
 
-def has_fully_registered(user_id):
+def has_fully_registered_account(user_id):
     """Checks if a user has fully registered.
 
     Args:
@@ -841,19 +931,69 @@ def create_new_user(gae_id, email):
         UserSettings. The newly-created user settings domain object.
 
     Raises:
-        Exception: If a user with the given gae_id already exists.
+        Exception. If a user with the given gae_id already exists.
     """
-    user_settings = get_user_settings(gae_id, strict=False)
+    user_settings = get_user_settings_by_gae_id(gae_id, strict=False)
     if user_settings is not None:
-        raise Exception('User %s already exists.' % gae_id)
+        raise Exception(
+            'User %s already exists for gae_id %s.'
+            % (user_settings.user_id, gae_id))
 
     user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
+    _save_user_auth_details(UserAuthDetails(user_id, gae_id))
     _save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
     return user_settings
+
+
+def _save_user_auth_details(user_auth_details):
+    """Commits a user auth details object to the datastore.
+
+    Args:
+        user_auth_details: UserAuthDetails. The user auth details domain
+            object to be saved.
+    """
+    user_auth_details.validate()
+
+    user_auth_details_dict = {
+        'gae_id': user_auth_details.gae_id,
+        'pin': user_auth_details.pin,
+        'parent_user_id': user_auth_details.parent_user_id,
+        'deleted': user_auth_details.deleted
+    }
+
+    # If user auth details entry with the given user_id does not exist, create
+    # a new one.
+    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_id(
+        user_auth_details.user_id)
+    if user_auth_details_model is not None:
+        user_auth_details_model.populate(**user_auth_details_dict)
+        user_auth_details_model.put()
+    else:
+        user_auth_details_dict['id'] = user_auth_details.user_id
+        user_models.UserAuthDetailsModel(**user_auth_details_dict).put()
+
+
+def _get_user_auth_details_from_model(user_auth_details_model):
+    """Transform user auth details storage model to domain object.
+
+    Args:
+        user_auth_details_model: UserAuthDetailsModel. The model to be
+            converted.
+
+    Returns:
+        UserAuthDetails. Domain object for user auth details.
+    """
+    return UserAuthDetails(
+        user_id=user_auth_details_model.id,
+        gae_id=user_auth_details_model.gae_id,
+        pin=user_auth_details_model.pin,
+        parent_user_id=user_auth_details_model.parent_user_id,
+        deleted=user_auth_details_model.deleted
+    )
 
 
 def get_username(user_id):
@@ -909,7 +1049,7 @@ def set_username(user_id, new_username):
         new_username: str. The new username to set.
 
     Raises:
-        ValidationError: The new_username supplied is already taken.
+        ValidationError. The new_username supplied is already taken.
     """
     user_settings = get_user_settings(user_id, strict=True)
 
@@ -1093,7 +1233,7 @@ def update_user_role(user_id, role):
         role: str. The role to be assigned to user with given id.
 
     Raises:
-        Exception: The given role does not exist.
+        Exception. The given role does not exist.
     """
     if role not in role_services.PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)
@@ -1102,28 +1242,25 @@ def update_user_role(user_id, role):
     _save_user_settings(user_settings)
 
 
-def mark_user_for_deletion(
-        user_id, exploration_ids, collection_ids):
-    """Set deleted of the user with given user_id to True and create
-    PendingDeletionRequestModel for that user.
+def mark_user_for_deletion(user_id):
+    """Set the 'deleted' property of the user with given user_id to True.
 
     Args:
         user_id: str. The unique ID of the user who should be deleted.
-        exploration_ids: list(str). List of exploration ids that were soft
-            deleted and should be hard deleted later.
-        collection_ids: list(str). List of collection ids that were soft
-            deleted and should be hard deleted later.
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
+    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_id(
+        user_id)
 
-    user_models.PendingDeletionRequestModel(
-        id=user_id,
-        email=user_settings.email,
-        exploration_ids=exploration_ids,
-        collection_ids=collection_ids,
-    ).put()
+    # TODO(#10178): Remove the if condition below once UserAuthDetailsModel is
+    # present for every existing user.
+    if user_auth_details_model is not None:
+        user_auth_details = _get_user_auth_details_from_model(
+            user_auth_details_model)
+        user_auth_details.deleted = True
+        _save_user_auth_details(user_auth_details)
 
 
 def get_human_readable_user_ids(user_ids):
@@ -1140,7 +1277,7 @@ def get_human_readable_user_ids(user_ids):
         list is the user's truncated email address.
 
     Raises:
-        Exception: At least one of the user_ids does not correspond to a valid
+        Exception. At least one of the user_ids does not correspond to a valid
             UserSettingsModel.
     """
     users_settings = get_users_settings(user_ids)
@@ -1453,12 +1590,12 @@ class UserContributions(python_utils.OBJECT):
         domain object are valid.
 
         Raises:
-            ValidationError: user_id is not str.
-            ValidationError: created_exploration_ids is not a list.
-            ValidationError: exploration_id in created_exploration_ids
+            ValidationError. The user_id is not str.
+            ValidationError. The created_exploration_ids is not a list.
+            ValidationError. The exploration_id in created_exploration_ids
                 is not str.
-            ValidationError: edited_exploration_ids is not a list.
-            ValidationError: exploration_id in edited_exploration_ids
+            ValidationError. The edited_exploration_ids is not a list.
+            ValidationError. The exploration_id in edited_exploration_ids
                 is not str.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
@@ -1529,7 +1666,7 @@ def create_user_contributions(
         UserContributionsModel.
 
     Raises:
-        Exception: The UserContributionsModel for the given user_id already
+        Exception. The UserContributionsModel for the given user_id already
             exists.
     """
     user_contributions = get_user_contributions(user_id, strict=False)
@@ -1556,7 +1693,7 @@ def update_user_contributions(
             user has edited.
 
     Raises:
-        Exception: The UserContributionsModel for the given user_id does not
+        Exception. The UserContributionsModel for the given user_id does not
             exist.
     """
     user_contributions = get_user_contributions(user_id, strict=False)
@@ -1630,7 +1767,7 @@ def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
             user-specific statistics.
 
     Raises:
-        Exception: If schema_version > CURRENT_DASHBOARD_STATS_SCHEMA_VERSION.
+        Exception. If schema_version > CURRENT_DASHBOARD_STATS_SCHEMA_VERSION.
     """
     stats_schema_version = versioned_dashboard_stats.schema_version
     if not (1 <= stats_schema_version
@@ -1838,9 +1975,9 @@ def can_review_translation_suggestions(user_id, language_code=None):
         bool. Whether the user can review translation suggestions in any
         language or in the given language.
     """
-    user_community_rights = get_user_community_rights(user_id)
+    user_contribution_rights = get_user_contribution_rights(user_id)
     reviewable_language_codes = (
-        user_community_rights.can_review_translation_for_language_codes)
+        user_contribution_rights.can_review_translation_for_language_codes)
     if language_code is not None:
         return language_code in reviewable_language_codes
     else:
@@ -1863,9 +2000,9 @@ def can_review_voiceover_applications(user_id, language_code=None):
         bool. Whether the user can review voiceover applications in any language
         or in the given language.
     """
-    user_community_rights = get_user_community_rights(user_id)
+    user_contribution_rights = get_user_contribution_rights(user_id)
     reviewable_language_codes = (
-        user_community_rights.can_review_voiceover_for_language_codes)
+        user_contribution_rights.can_review_voiceover_for_language_codes)
     if language_code is not None:
         return language_code in reviewable_language_codes
     else:
@@ -1881,8 +2018,8 @@ def can_review_question_suggestions(user_id):
     Returns:
         bool. Whether the user can review question suggestions.
     """
-    user_community_rights = get_user_community_rights(user_id)
-    return user_community_rights.can_review_questions
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    return user_contribution_rights.can_review_questions
 
 
 def allow_user_to_review_translation_in_language(user_id, language_code):
@@ -1895,13 +2032,13 @@ def allow_user_to_review_translation_in_language(user_id, language_code):
             the user does not have rights to review translations in the given
             language code.
     """
-    user_community_rights = get_user_community_rights(user_id)
+    user_contribution_rights = get_user_contribution_rights(user_id)
     allowed_language_codes = set(
-        user_community_rights.can_review_translation_for_language_codes)
+        user_contribution_rights.can_review_translation_for_language_codes)
     allowed_language_codes.add(language_code)
-    user_community_rights.can_review_translation_for_language_codes = (
+    user_contribution_rights.can_review_translation_for_language_codes = (
         sorted(list(allowed_language_codes)))
-    _save_user_community_rights(user_community_rights)
+    _save_user_contribution_rights(user_contribution_rights)
 
 
 def remove_translation_review_rights_in_language(user_id, language_code):
@@ -1914,10 +2051,10 @@ def remove_translation_review_rights_in_language(user_id, language_code):
             the user already has rights to review translations in the given
             language code.
     """
-    user_community_rights = get_user_community_rights(user_id)
-    user_community_rights.can_review_translation_for_language_codes.remove(
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_review_translation_for_language_codes.remove(
         language_code)
-    _update_user_community_rights(user_community_rights)
+    _update_user_contribution_rights(user_contribution_rights)
 
 
 def allow_user_to_review_voiceover_in_language(user_id, language_code):
@@ -1930,13 +2067,13 @@ def allow_user_to_review_voiceover_in_language(user_id, language_code):
             the user does not have rights to review voiceovers in the given
             language code.
     """
-    user_community_rights = get_user_community_rights(user_id)
+    user_contribution_rights = get_user_contribution_rights(user_id)
     allowed_language_codes = set(
-        user_community_rights.can_review_voiceover_for_language_codes)
+        user_contribution_rights.can_review_voiceover_for_language_codes)
     allowed_language_codes.add(language_code)
-    user_community_rights.can_review_voiceover_for_language_codes = (
+    user_contribution_rights.can_review_voiceover_for_language_codes = (
         sorted(list(allowed_language_codes)))
-    _save_user_community_rights(user_community_rights)
+    _save_user_contribution_rights(user_contribution_rights)
 
 
 def remove_voiceover_review_rights_in_language(user_id, language_code):
@@ -1949,10 +2086,10 @@ def remove_voiceover_review_rights_in_language(user_id, language_code):
             the user already has rights to review voiceovers in the given
             language code.
     """
-    user_community_rights = get_user_community_rights(user_id)
-    user_community_rights.can_review_voiceover_for_language_codes.remove(
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_review_voiceover_for_language_codes.remove(
         language_code)
-    _update_user_community_rights(user_community_rights)
+    _update_user_contribution_rights(user_contribution_rights)
 
 
 def allow_user_to_review_question(user_id):
@@ -1962,9 +2099,9 @@ def allow_user_to_review_question(user_id):
         user_id: str. The unique ID of the user. Callers should ensure that
             the given user does not have rights to review questions.
     """
-    user_community_rights = get_user_community_rights(user_id)
-    user_community_rights.can_review_questions = True
-    _save_user_community_rights(user_community_rights)
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_review_questions = True
+    _save_user_contribution_rights(user_contribution_rights)
 
 
 def remove_question_review_rights(user_id):
@@ -1974,24 +2111,25 @@ def remove_question_review_rights(user_id):
         user_id: str. The unique ID of the user. Callers should ensure that
             the given user already has rights to review questions.
     """
-    user_community_rights = get_user_community_rights(user_id)
-    user_community_rights.can_review_questions = False
-    _update_user_community_rights(user_community_rights)
+    user_contribution_rights = get_user_contribution_rights(user_id)
+    user_contribution_rights.can_review_questions = False
+    _update_user_contribution_rights(user_contribution_rights)
 
 
-def remove_community_reviewer(user_id):
-    """Deletes the UserCommunityRightsModel corresponding to the given user_id.
+def remove_contribution_reviewer(user_id):
+    """Deletes the UserContributionRightsModel corresponding to the given
+    user_id.
 
     Args:
         user_id: str. The unique ID of the user.
     """
-    user_community_rights_model = (
-        user_models.UserCommunityRightsModel.get_by_id(user_id))
-    if user_community_rights_model is not None:
-        user_community_rights_model.delete()
+    user_contribution_rights_model = (
+        user_models.UserContributionRightsModel.get_by_id(user_id))
+    if user_contribution_rights_model is not None:
+        user_contribution_rights_model.delete()
 
 
-def get_community_reviewer_usernames(review_category, language_code=None):
+def get_contribution_reviewer_usernames(review_category, language_code=None):
     """Returns a list of usernames of users who has rights to review item of
     given review category.
 
@@ -2002,23 +2140,23 @@ def get_community_reviewer_usernames(review_category, language_code=None):
             review category.
 
     Returns:
-        list(str.) A list of usernames.
+        list(str). A list of usernames.
     """
     reviewer_ids = []
     if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
         reviewer_ids = (
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids(language_code))
     elif review_category == constants.REVIEW_CATEGORY_VOICEOVER:
         reviewer_ids = (
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .get_voiceover_reviewer_user_ids(language_code))
     elif review_category == constants.REVIEW_CATEGORY_QUESTION:
         if language_code is not None:
             raise Exception('Expected language_code to be None, found: %s' % (
                 language_code))
         reviewer_ids = (
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
     else:
         raise Exception('Invalid review category: %s' % review_category)

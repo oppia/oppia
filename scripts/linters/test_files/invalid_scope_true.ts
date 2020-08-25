@@ -25,9 +25,3 @@ angular.module('oppia').directive('baseContent', {}, [{},
     browser.wait()
   }
 ]);
-
-angular.module('oppia').directive('baseContent', {}, [{},
-  function() {
-    return browser.wait()
-  }
-]);

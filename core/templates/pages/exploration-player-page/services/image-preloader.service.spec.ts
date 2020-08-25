@@ -201,7 +201,10 @@ describe('Image preloader service', function() {
             confirmed_unclassified_answers: [],
             customization_args: {
               buttonText: {
-                value: 'Continue'
+                value: {
+                  unicode_str: 'Continue',
+                  content_id: ''
+                }
               }
             },
             solution: null,
@@ -276,17 +279,21 @@ describe('Image preloader service', function() {
             confirmed_unclassified_answers: [],
             customization_args: {
               choices: {
-                value: [
-                  '<p> Go to ItemSelection <oppia-noninteractive-image' +
-                  ' filepath-with-value="&amp;quot;' +
-                  'sIMChoice1_height_32_width_42.png&amp;' +
-                  'quot;"></oppia-noninteractive-image></p>',
-                  '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
+                value: [{
+                  html: '<p> Go to ItemSelection <oppia-noninteractive-image' +
+                    ' filepath-with-value="&amp;quot;' +
+                    'sIMChoice1_height_32_width_42.png&amp;' +
+                    'quot;"></oppia-noninteractive-image></p>',
+                  content_id: ''
+                }, {
+                  html: '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
                   ' filepath-with-value="&amp;quot;' +
                   'sIMChoice2_height_30_width_40.png&amp;' +
-                  'quot;"></oppia-noninteractive-image></p>'
-                ]
-              }
+                  'quot;"></oppia-noninteractive-image></p>',
+                  content_id: ''
+                }]
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             answer_groups: [
               {
@@ -304,14 +311,14 @@ describe('Image preloader service', function() {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null
                 },
-                rule_specs: [
-                  {
-                    inputs: {
+                rule_input_translations: {},
+                rule_types_to_inputs: {
+                  Equals: [
+                    {
                       x: 0
-                    },
-                    rule_type: 'Equals'
-                  }
-                ]
+                    }
+                  ]
+                }
               },
               {
                 labelled_as_correct: false,
@@ -325,14 +332,14 @@ describe('Image preloader service', function() {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null
                 },
-                rule_specs: [
-                  {
-                    inputs: {
+                rule_input_translations: {},
+                rule_types_to_inputs: {
+                  Equals: [
+                    {
                       x: 1
-                    },
-                    rule_type: 'Equals'
-                  }
-                ]
+                    }
+                  ]
+                }
               }
             ],
             hints: [],
@@ -382,16 +389,21 @@ describe('Image preloader service', function() {
                 value: 1
               },
               placeholder: {
-                value: ''
+                value: {
+                  unicode_str: '',
+                  content_id: ''
+                }
               }
             },
             answer_groups: [{
-              rule_specs: [{
-                inputs: {
-                  x: '1'
-                },
-                rule_type: 'Contains'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Contains: [
+                  {
+                    x: '1'
+                  }
+                ]
+              },
               outcome: {
                 dest: 'State 1',
                 feedback: {
@@ -404,12 +416,14 @@ describe('Image preloader service', function() {
                 missing_prerequisite_skill_id: null
               }
             }, {
-              rule_specs: [{
-                inputs: {
-                  x: '2'
-                },
-                rule_type: 'Contains'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Contains: [
+                  {
+                    x: '2'
+                  }
+                ]
+              },
               outcome: {
                 dest: 'State 1',
                 feedback: {
@@ -639,6 +653,12 @@ describe('Image preloader service', function() {
         'sol_height_ds_width_60.png');
     }).toThrowError(
       /it does not contain dimensions/);
+    var mathSvgDimensions = ips.getDimensionsOfMathSvg(
+      'mathImg_20207261338r3ir43lmfd_height_2d456_width_6d124_vertical_0' +
+      'd231.svg');
+    expect(mathSvgDimensions.height).toBe('2.456');
+    expect(mathSvgDimensions.width).toBe('6.124');
+    expect(mathSvgDimensions.verticalPadding).toBe('0.231');
   });
 
   it('should get image url', function() {
