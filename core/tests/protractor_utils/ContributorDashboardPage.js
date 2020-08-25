@@ -121,7 +121,7 @@ var ContributorDashboardPage = function() {
   };
 
   this.expectNumberOfOpportunitiesToBe = async function(number) {
-    var opportunityCount = await opportunityListItems.count();
+    var opportunityCount = (await _getOpportunityElements()).length;
     expect(opportunityCount).toBe(number);
   };
 
@@ -131,11 +131,25 @@ var ContributorDashboardPage = function() {
       'Opportunity list is not empty');
   };
 
+  var _getOpportunityElements = async function() {
+    var opportunityCount = await opportunityListItems.count();
+
+    var opportunityElements = [];
+    for (var i = 0; i < opportunityCount; i++) {
+      var opportunityElement = await opportunityListItems.get(i);
+      if (await opportunityElement.isDisplayed()) {
+        opportunityElements.push(opportunityElement);
+      }
+    }
+    return opportunityElements;
+  };
+
   var _getOpportunityWithHeadingAndSubheading = async function(
       expectedHeading, expectedSubheading) {
-    var opportunityCount = await opportunityListItems.count();
-    for (var i = 0; i < opportunityCount; i++) {
-      var opportunity = await opportunityListItems.get(i);
+    var opportunityElements = await _getOpportunityElements();
+
+    for (var i = 0; i < opportunityElements.length; i++) {
+      var opportunity = opportunityElements[i];
 
       var headingElement = opportunity.element(opportunityHeadingCss);
       await waitFor.visibilityOf(

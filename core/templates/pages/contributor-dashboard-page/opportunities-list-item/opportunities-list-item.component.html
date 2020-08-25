@@ -38,7 +38,7 @@
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
     <button class="oppia-opportunities-button protractor-test-opportunity-list-item-button"
             ng-show="!$ctrl.opportunityDataIsLoading"
-            ng-click="onClickActionButton($ctrl.opportunity.id)">
+            ng-click="$ctrl.onClickActionButton($ctrl.opportunity.id)">
       <[$ctrl.opportunity.actionButtonTitle]>
     </button>
   </div>
