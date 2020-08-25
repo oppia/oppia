@@ -90,7 +90,7 @@ commands:
               fi
             fi
 
-  check_release_chaneglog_update_branch:
+  check_release_changelog_update_branch:
     description: "Skip job for release changelog update PRs"
     steps:
       - run:
@@ -139,7 +139,7 @@ jobs:
           name: Run e2e navigation test
           command: |
             python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
-      - check_release_chaneglog_update_branch
+      - check_release_changelog_update_branch
       - run:
           name: Run e2e admin page test
           command: |
@@ -158,7 +158,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_chaneglog_update_branch
+      - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
@@ -188,7 +188,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_chaneglog_update_branch
+      - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
@@ -221,7 +221,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_chaneglog_update_branch
+      - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
@@ -243,7 +243,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_chaneglog_update_branch
+      - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
