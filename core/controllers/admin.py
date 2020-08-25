@@ -33,7 +33,6 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import html_domain
 from core.domain import opportunity_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import question_domain
@@ -50,7 +49,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -634,138 +632,6 @@ class AdminHandler(base.BaseHandler):
                 exploration_ids_to_publish)
         else:
             raise Exception('Cannot generate dummy explorations in production.')
-
-
-class ExplorationsLatexSvgHandler(base.BaseHandler):
-    """Handler updating explorations having math rich-text components with
-    math SVGs.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    explorations have a valid math SVG stored in the datastore.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        item_to_fetch = self.request.get('item_to_fetch')
-        if item_to_fetch == 'exp_id_to_latex_mapping':
-            latex_strings_to_exp_id_mapping = (
-                exp_services.get_batch_of_exps_for_latex_svg_generation())
-            self.render_json({
-                'latex_strings_to_exp_id_mapping': (
-                    latex_strings_to_exp_id_mapping)
-            })
-        elif item_to_fetch == 'number_of_explorations_left_to_update':
-            number_of_explorations_left_to_update = (
-                exp_services.
-                get_number_explorations_having_latex_strings_without_svgs())
-            self.render_json({
-                'number_of_explorations_left_to_update': '%d' % (
-                    number_of_explorations_left_to_update)
-            })
-        else:
-            raise self.InvalidInputException(
-                'Please specify a valid type of item to fetch.')
-
-    @acl_decorators.can_access_admin_page
-    def post(self):
-        latex_to_svg_mappings = self.payload.get('latexMapping')
-        for exp_id, latex_to_svg_mapping_dict in latex_to_svg_mappings.items():
-            for latex_string in latex_to_svg_mapping_dict.keys():
-                svg_image = self.request.get(
-                    latex_to_svg_mappings[exp_id][latex_string]['latexId'])
-                if not svg_image:
-                    raise self.InvalidInputException(
-                        'SVG for LaTeX string %s in exploration %s is not '
-                        'supplied.' % (latex_string, exp_id))
-
-                dimensions = (
-                    latex_to_svg_mappings[exp_id][latex_string]['dimensions'])
-                latex_string_svg_image_dimensions = (
-                    html_domain.LatexStringSvgImageDimensions(
-                        dimensions['encoded_height_string'],
-                        dimensions['encoded_width_string'],
-                        dimensions['encoded_vertical_padding_string']))
-                latex_string_svg_image_data = (
-                    html_domain.LatexStringSvgImageData(
-                        svg_image, latex_string_svg_image_dimensions))
-                latex_to_svg_mappings[exp_id][latex_string] = (
-                    latex_string_svg_image_data)
-
-        for exp_id in latex_to_svg_mappings.keys():
-            exp_services.update_exploration_with_math_svgs(
-                exp_id, latex_to_svg_mappings[exp_id])
-            logging.info('Successfully updated exploration %s' % (exp_id))
-        number_of_explorations_left_to_update = (
-            exp_services.
-            get_number_explorations_having_latex_strings_without_svgs())
-        self.render_json({
-            'number_of_explorations_updated': '%d' % (
-                len(latex_to_svg_mappings.keys())),
-            'number_of_explorations_left_to_update': '%d' % (
-                number_of_explorations_left_to_update)
-        })
-
-
-class SuggestionsLatexSvgHandler(base.BaseHandler):
-    """Handler updating suggestions having math rich-text components with
-    math SVGs.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    suggestions have a valid math SVG stored in the datastore.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        latex_strings_to_suggestion_ids_mapping = (
-            suggestion_services.
-            get_latex_strings_to_suggestion_ids_mapping())
-        self.render_json({
-            'latex_strings_to_suggestion_ids_mapping': (
-                latex_strings_to_suggestion_ids_mapping)
-        })
-
-    @acl_decorators.can_access_admin_page
-    def post(self):
-        latex_to_svg_mappings = self.payload.get('latexMapping')
-        if not isinstance(latex_to_svg_mappings, dict):
-            raise self.InvalidInputException(
-                'Expected latex_to_svg_mappings to be a dict.')
-
-        for suggestion_id, latex_to_svg_mapping_dict in (
-                latex_to_svg_mappings.items()):
-            for latex_string in latex_to_svg_mapping_dict.keys():
-                svg_image = self.request.get(
-                    latex_to_svg_mappings[suggestion_id][latex_string][
-                        'latexId'])
-                if not svg_image:
-                    raise self.InvalidInputException(
-                        'SVG for LaTeX string %s in suggestion %s is not '
-                        'supplied.' % (latex_string, suggestion_id))
-
-                dimensions = (
-                    latex_to_svg_mappings[suggestion_id][latex_string][
-                        'dimensions'])
-                latex_string_svg_image_dimensions = (
-                    html_domain.LatexStringSvgImageDimensions(
-                        dimensions['encoded_height_string'],
-                        dimensions['encoded_width_string'],
-                        dimensions['encoded_vertical_padding_string']))
-                latex_string_svg_image_data = (
-                    html_domain.LatexStringSvgImageData(
-                        svg_image, latex_string_svg_image_dimensions))
-                latex_to_svg_mappings[suggestion_id][latex_string] = (
-                    latex_string_svg_image_data)
-
-        suggestion_services.update_suggestions_with_math_svgs(
-            latex_to_svg_mappings)
-        self.render_json({
-            'number_of_suggestions_updated': '%d' % (
-                len(latex_to_svg_mappings.keys()))
-        })
 
 
 class AdminRoleHandler(base.BaseHandler):

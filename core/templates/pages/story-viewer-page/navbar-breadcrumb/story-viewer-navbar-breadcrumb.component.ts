@@ -19,16 +19,20 @@
 require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/url.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('storyViewerNavbarBreadcrumb', {
   template: require('./story-viewer-navbar-breadcrumb.component.html'),
   controller: [
-    '$rootScope', 'UrlInterpolationService', 'UrlService',
-    'TOPIC_VIEWER_STORY_URL_TEMPLATE',
+    'StoryViewerBackendApiService', 'UrlInterpolationService',
+    'UrlService', 'TOPIC_VIEWER_STORY_URL_TEMPLATE',
     function(
-        $rootScope, UrlInterpolationService, UrlService,
-        TOPIC_VIEWER_STORY_URL_TEMPLATE) {
+        StoryViewerBackendApiService, UrlInterpolationService,
+        UrlService, TOPIC_VIEWER_STORY_URL_TEMPLATE) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.getTopicUrl = function() {
         return UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_STORY_URL_TEMPLATE, {
@@ -40,10 +44,15 @@ angular.module('oppia').component('storyViewerNavbarBreadcrumb', {
       };
 
       ctrl.$onInit = function() {
-        $rootScope.$on('storyData', function(evt, data) {
-          ctrl.topicName = data.topicName;
-          ctrl.storyTitle = data.storyTitle;
-        });
+        ctrl.directiveSubscriptions.add(
+          StoryViewerBackendApiService.onSendStoryData.subscribe((data) => {
+            ctrl.topicName = data.topicName;
+            ctrl.storyTitle = data.storyTitle;
+          })
+        );
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
