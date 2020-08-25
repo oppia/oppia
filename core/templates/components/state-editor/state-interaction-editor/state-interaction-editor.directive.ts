@@ -80,7 +80,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
         onSaveNextContentIdIndex: '=',
         onSaveSolution: '=',
         onSaveStateContent: '=',
-        recomputeGraph: '='
+        recomputeGraph: '=',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '<'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-interaction-editor/' +
@@ -214,11 +215,11 @@ angular.module('oppia').directive('stateInteractionEditor', [
 
             $scope.recomputeGraph();
             _updateInteractionPreview();
-            $rootScope.$broadcast(
-              'handleCustomArgsUpdate',
+            StateEditorService.onHandleCustomArgsUpdate.emit(
               StateEditorService.getAnswerChoices(
                 $scope.interactionId,
-                StateCustomizationArgsService.savedMemento));
+                StateCustomizationArgsService.savedMemento)
+            );
           };
 
           $scope.openInteractionCustomizerModal = function() {
@@ -229,6 +230,10 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/editor-tab/templates/' +
                   'modal-templates/customize-interaction-modal.template.html'),
+                resolve: {
+                  showMarkAllAudioAsNeedingUpdateModalIfRequired: () =>
+                    $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired
+                },
                 backdrop: true,
                 controller: 'CustomizeInteractionModalController'
               }).result.then(
@@ -316,8 +321,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.getStaticImageUrl = function(imagePath) {
               return UrlInterpolationService.getStaticImageUrl(imagePath);
             };
-
-            $rootScope.$broadcast('interactionEditorInitialized');
+            StateEditorService.onInteractionEditorInitialized.emit();
             StateEditorService.updateStateInteractionEditorInitialised();
           };
 
