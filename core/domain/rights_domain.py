@@ -33,6 +33,7 @@ import utils
 # Do not modify the definitions of CMD keys that already exist.
 CMD_CREATE_NEW = 'create_new'
 CMD_CHANGE_ROLE = 'change_role'
+CMD_REMOVE_ROLE = 'remove_role'
 CMD_CHANGE_EXPLORATION_STATUS = 'change_exploration_status'
 CMD_CHANGE_COLLECTION_STATUS = 'change_collection_status'
 CMD_CHANGE_PRIVATE_VIEWABILITY = 'change_private_viewability'
@@ -69,6 +70,12 @@ COMMON_ALLOWED_COMMANDS = [{
     'optional_attribute_names': [],
     'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
+}, {
+    'name': CMD_REMOVE_ROLE,
+    'required_attribute_names': ['removed_user_id', 'old_role'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': ['removed_user_id'],
+    'allowed_values': {'old_role': ALLOWED_ROLES}
 }, {
     'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
     'required_attribute_names': [
