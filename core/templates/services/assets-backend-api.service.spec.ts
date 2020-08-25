@@ -491,6 +491,8 @@ describe('Assets Backend API Service', function() {
       ' Service bucket name is not set', angular.mock.inject(
       function($injector) {
         expect(function() {
+          $injector.get(
+            'AssetsBackendApiService');
         }).toThrowError('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
       }));
   });
