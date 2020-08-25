@@ -53,8 +53,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
   'PlaythroughService', 'PretestQuestionBackendApiService',
   'QuestionBackendApiService', 'QuestionPlayerEngineService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService', 'UrlService',
-  'EXPLORATION_MODE',
+  'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
   function(
       $q, ContextService, EditableExplorationBackendApiService,
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
@@ -63,8 +62,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       PlaythroughService, PretestQuestionBackendApiService,
       QuestionBackendApiService, QuestionPlayerEngineService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService, UrlService,
-      EXPLORATION_MODE) {
+      StatsReportingService, UrlService, EXPLORATION_MODE) {
     StatsReportingService = (
       OppiaAngularRootComponent.statsReportingService);
     var _totalQuestionsReceivedEventEmitter = new EventEmitter();
@@ -75,8 +73,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
     var version = UrlService.getExplorationVersionFromUrl();
-    var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
-      '/overrides/guppy/oppia_symbols.json');
     if (!questionPlayerMode) {
       ReadOnlyExplorationBackendApiService
         .loadExploration(explorationId, version)

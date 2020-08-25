@@ -66,10 +66,8 @@ describe('Image preloader service', function() {
   var ips = null;
   var eof = null;
   var ecs = null;
-  var ifof = null;
   var $httpBackend = null;
   var UrlInterpolationService = null;
-  var $rootScope = null;
   var explorationDict = null;
   var exploration = null;
   var requestUrl1 = null;
@@ -164,7 +162,6 @@ describe('Image preloader service', function() {
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
     spyOn(ecs, 'getEntityType').and.returnValue('exploration');
     spyOn(ecs, 'getEntityId').and.returnValue('1');
-    $rootScope = $injector.get('$rootScope');
     explorationDict = {
       id: 1,
       title: 'My Title',

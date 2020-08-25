@@ -59,7 +59,6 @@ angular.module('oppia').directive('explorationFooter', [
                 .loadPublicAndPrivateExplorationSummaries([
                   $scope.explorationId])
                 .then(function(summaries) {
-                  var summaryBackendObject = null;
                   if (summaries.length > 0) {
                     var contributorSummary = (
                       summaries[0].human_readable_contributors_summary);
