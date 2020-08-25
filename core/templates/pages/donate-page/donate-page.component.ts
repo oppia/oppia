@@ -27,8 +27,6 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-require('base-components/base-content.directive.ts');
-
 @Component({
   selector: 'donate-page',
   templateUrl: './donate-page.component.html',
