@@ -251,6 +251,7 @@ exports.config = {
         // These arguments are required to run the tests on GitHub
         // Actions.
         '--headless',
+        '--no-sandbox',
       ]
     },
     prefs: {
