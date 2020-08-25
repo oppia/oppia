@@ -88,7 +88,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
             '%s/bad_exp_id' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
             expected_status_int=404)
 
-    def test_invalid_thread_ids_return_400_response(self):
+    def test_invalid_thread_ids_return_401_response(self):
         self.get_json(
             '%s/invalid_thread_id' % feconf.FEEDBACK_THREAD_URL_PREFIX,
             expected_status_int=401)
