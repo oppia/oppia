@@ -26,30 +26,28 @@ import { RatioInputAnswer } from
   'interactions/answer-defs';
 
 export class Ratio {
-  numbers: number[];
+  components: number[];
   constructor(numbersList: number[]) {
-    this.numbers = numbersList;
+    this.components = numbersList;
   }
 
-  toString(): string {
-    return this.numbers.join(':');
+  toAnswerString(): string {
+    return this.components.join(':');
   }
 
   getNumberOfTerms(): number {
-    return this.numbers.length;
+    return this.components.length;
   }
+
+  /**
+   * Returns this Ratio in its most simplified form.
+   */
   convertToSimplestForm(): number[] {
     var gcd = (x: number, y: number) => {
       return y === 0 ? x : gcd(y, x % y);
     };
-    var gcdResult = this.numbers.reduce(gcd);
-    return this.numbers.map(currentValue => {
-      if (currentValue === 0) {
-        return currentValue;
-      } else {
-        return currentValue / gcdResult;
-      }
-    });
+    var gcdResult = this.components.reduce(gcd);
+    return this.components.map(currentValue => currentValue / gcdResult);
   }
 }
 
@@ -77,6 +75,7 @@ export class RatioObjectFactory {
       throw new Error(
         ObjectsDomainConstants.RATIO_PARSING_ERRORS.NON_INTEGER_ELEMENTS);
     }
+    // Checking for badly fornatted ratio e.g. - :2:3:4 or 2:3:4:
     var RATIO_REGEX = /^(\s)*(\d+((\s)*:(\s)*\d+)+)(\s)*$/;
     if (!RATIO_REGEX.test(rawInput)) {
       throw new Error(
@@ -86,11 +85,11 @@ export class RatioObjectFactory {
     rawInput = rawInput.trim();
     numbersList = rawInput.split(':').map(Number);
     var ratio = new Ratio(numbersList);
-    if (ratio.numbers.some(element => element === 0)) {
+    if (ratio.components.some(element => element === 0)) {
       throw new Error(
         ObjectsDomainConstants.RATIO_PARSING_ERRORS.INCLUDES_ZERO);
     }
-    return ratio.numbers;
+    return ratio.components;
   }
 
   // Checks the equality of arrays value by value.

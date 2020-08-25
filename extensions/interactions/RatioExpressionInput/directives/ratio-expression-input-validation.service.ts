@@ -32,6 +32,7 @@ import { RatioExpressionInputRulesService } from
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
+import { min } from 'd3';
 
 
 @Injectable({
@@ -66,6 +67,14 @@ export class RatioExpressionInputValidationService {
             'Number of terms must be integral.')
         }
       ];
+    } else if (minimumNumberOfTerms < 0) {
+      return [
+        {
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'Number of terms must be a positive integral.')
+        }
+      ];
     } else {
       return [];
     }
@@ -74,7 +83,8 @@ export class RatioExpressionInputValidationService {
   getAllWarnings(
       stateName: string,
       customizationArgs: RatioExpressionInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+      answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): Warning[] {
     let warningsList = [];
     let ratioRulesService = (
       new RatioExpressionInputRulesService(this.rof));
@@ -87,12 +97,11 @@ export class RatioExpressionInputValidationService {
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
-    // This validations ensures that there are no redundant rules present in the
-    // answer groups.
-    // An Equals rule will make all of the following rules with a
-    // matching input, invalid.
-    // A HasNumberOfTermsEqualTo rule will make the following rules of the
-    // same rule type and a matching input, invalid.
+    // The following validations ensure that there are no redundant rules
+    // present in the answer groups. In particular, an Equals rule will make
+    // all of the following rules with a matching input invalid. A
+    // HasNumberOfTermsEqualTo rule will make the following rules of the same
+    // rule type and a matching input invalid.
     let seenRules = [];
 
     for (let i = 0; i < answerGroups.length; i++) {

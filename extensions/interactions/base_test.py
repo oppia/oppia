@@ -355,7 +355,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
         for interaction_id in all_interaction_ids:
-            # TODO(#10212):Ignoring the RatioExpressionInput for now as
+            # TODO(#10212): Ignoring the RatioExpressionInput for now as
             # there's no learner's flow for the interaction yet.
             # Once added this needs to be removed.
 
@@ -719,7 +719,7 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
         if list(missing_interaction_ids) != ['RatioExpressionInput']:
-            # TODO(#10212):Ignoring the RatioExpressionInput for now as
+            # TODO(#10212): Ignoring the RatioExpressionInput for now as
             # there's no learner's flow for the interaction yet.
             # Once added this needs to be removed.
             # Ignoring the lack of the MathExpressionInput since it is going

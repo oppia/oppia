@@ -279,7 +279,7 @@
   },
   "RatioExpressionInput": {
     "Equals": {
-      "description": "is equals to {{x|RatioExpression}}"
+      "description": "is equal to {{x|RatioExpression}}"
     },
     "IsEquivalent": {
       "description": "is equivalent to {{x|RatioExpression}}"

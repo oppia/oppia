@@ -184,7 +184,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           replacementText += ']';
         } else if (varType === 'RatioExpression') {
           replacementText = RatioObjectFactory
-            .fromList(inputs[varName]).toString();
+            .fromList(inputs[varName]).toAnswerString();
         } else {
           throw new Error('Unknown variable type in rule description');
         }

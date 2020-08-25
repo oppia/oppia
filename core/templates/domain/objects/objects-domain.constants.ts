@@ -64,6 +64,7 @@ export class ObjectsDomainConstants {
       base_unit: '0.01 rupee'
     }
   };
+
   public static RATIO_PARSING_ERRORS = {
     INVALID_COLONS:
       'Your answer has two colons (:) next to each other.',
