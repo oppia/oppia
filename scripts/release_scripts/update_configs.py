@@ -167,6 +167,24 @@ def add_mailgun_api_key():
             f.write(line)
 
 
+def add_redishost():
+    """Adds redishot key to feconf.py."""
+    redishost = getpass.getpass(
+        prompt=('Enter REDISHOST from the release process doc.'))
+
+    feconf_lines = []
+    with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
+        feconf_lines = f.readlines()
+
+    assert 'REDISHOST = \'localhost\'\n' in feconf_lines, 'Missing REDISHOST'
+
+    with python_utils.open_file(LOCAL_FECONF_PATH, 'w') as f:
+        for line in feconf_lines:
+            if line == 'REDISHOST = \'localhost\'\n':
+                line = line.replace('localhost', redishost)
+            f.write(line)
+
+
 def main(personal_access_token):
     """Updates the files corresponding to LOCAL_FECONF_PATH and
     LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
@@ -188,6 +206,7 @@ def main(personal_access_token):
     try:
         check_updates_to_terms_of_service(personal_access_token)
         add_mailgun_api_key()
+        add_redishost()
 
         apply_changes_based_on_config(
             LOCAL_FECONF_PATH, FECONF_CONFIG_PATH, FECONF_REGEX)
@@ -201,6 +220,6 @@ def main(personal_access_token):
     common.ask_user_to_confirm(
         'Done! Please check feconf.py and assets/constants.ts to ensure that '
         'the changes made are correct. Specifically verify that the '
-        'MAILGUN_API_KEY is updated correctly and other config changes '
-        'are corresponding to %s and %s.\n' % (
+        'MAILGUN_API_KEY and REDISHOST are updated correctly and '
+        'other config changes are corresponding to %s and %s.\n' % (
             FECONF_CONFIG_PATH, CONSTANTS_CONFIG_PATH))

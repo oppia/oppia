@@ -76,6 +76,7 @@ BUCKET_NAME_SUFFIX = '-resources'
 
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
+APP_DEV_YAML_PATH = os.path.join('.', 'app_dev.yaml')
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 INDEX_YAML_PATH = os.path.join('.', 'index.yaml')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -156,6 +157,10 @@ def preprocess_release(app_name, deploy_data_path):
         common.CONSTANTS_FILE_PATH,
         r'"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
+    common.inplace_replace_file(
+        APP_DEV_YAML_PATH,
+        r'vpc_access_connector:\n  name: projects/PROJECT_ID',
+        'vpc_access_connector:\n  name: projects/%s' % app_name)
 
 
 def check_errors_in_a_page(url_to_check, msg_to_confirm):
@@ -270,6 +275,16 @@ def flush_memcache(app_name):
         'src=ac&project=%s') % app_name
     common.open_new_tab_in_browser_if_possible(memcache_url)
     common.ask_user_to_confirm('Please flush the memcache.')
+
+    admin_misc_tab_url = ''
+    if app_name == APP_NAME_OPPIASERVER:
+        admin_misc_tab_url = 'https://www.oppia.org/admin#/misc'
+    elif app_name == APP_NAME_OPPIATESTSERVER:
+        admin_misc_tab_url = 'https://oppiatestserver.appspot.com/admin#/misc'
+
+    if admin_misc_tab_url:
+        common.open_new_tab_in_browser_if_possible(admin_misc_tab_url)
+        common.ask_user_to_confirm('Please flush the cache on Oppia website.')
 
 
 def switch_version(app_name, current_release_version):
@@ -582,7 +597,8 @@ def execute_deployment():
         common.run_cmd([
             'git', 'checkout', '--',
             update_configs.LOCAL_FECONF_PATH,
-            update_configs.LOCAL_CONSTANTS_PATH])
+            update_configs.LOCAL_CONSTANTS_PATH,
+            APP_DEV_YAML_PATH])
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

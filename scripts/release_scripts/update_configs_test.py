@@ -225,6 +225,64 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with python_utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
+    def test_missing_redishost_line(self):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
+            return 'test-host'
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
+        with python_utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+        feconf_swap = self.swap(
+            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
+        with getpass_swap, feconf_swap, self.assertRaisesRegexp(
+            AssertionError, 'Missing REDISHOST'):
+            update_configs.add_redishost()
+
+    def test_addition_of_redishost(self):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
+            return 'test-host'
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'REDISHOST = \'localhost\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+        expected_feconf_text = (
+            'REDISHOST = \'test-host\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+        with python_utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+        feconf_swap = self.swap(
+            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
+        with getpass_swap, feconf_swap:
+            update_configs.add_redishost()
+        with python_utils.open_file(temp_feconf_path, 'r') as f:
+            self.assertEqual(f.read(), expected_feconf_text)
+
     def test_invalid_config(self):
         config_swap = self.swap(
             update_configs, 'FECONF_CONFIG_PATH', INVALID_FECONF_CONFIG_PATH)
@@ -297,12 +355,14 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': False,
             'add_mailgun_api_key_gets_called': False,
+            'add_redishost_gets_called': False,
             'apply_changes_based_on_config_gets_called': False,
             'ask_user_to_confirm_gets_called': False
         }
         expected_check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': True,
             'add_mailgun_api_key_gets_called': True,
+            'add_redishost_gets_called': True,
             'apply_changes_based_on_config_gets_called': True,
             'ask_user_to_confirm_gets_called': True
         }
@@ -311,6 +371,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 'check_updates_to_terms_of_service_gets_called'] = True
         def mock_add_mailgun_api_key():
             check_function_calls['add_mailgun_api_key_gets_called'] = True
+        def mock_add_redishost():
+            check_function_calls['add_redishost_gets_called'] = True
         def mock_apply_changes(
                 unused_local_filepath, unused_config_filepath,
                 unused_expected_config_line_regex):
@@ -324,6 +386,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             mock_check_updates)
         add_mailgun_api_key_swap = self.swap(
             update_configs, 'add_mailgun_api_key', mock_add_mailgun_api_key)
+        add_redishost_swap = self.swap(
+            update_configs, 'add_redishost', mock_add_redishost)
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
         ask_user_swap = self.swap(
@@ -331,5 +395,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with self.branch_name_swap, self.release_scripts_exist_swap:
             with self.url_open_swap, check_updates_swap, ask_user_swap:
                 with add_mailgun_api_key_swap, apply_changes_swap:
-                    update_configs.main('test-token')
+                    with add_redishost_swap:
+                        update_configs.main('test-token')
         self.assertEqual(check_function_calls, expected_check_function_calls)

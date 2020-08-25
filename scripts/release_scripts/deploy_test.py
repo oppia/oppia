@@ -644,7 +644,7 @@ class DeployTests(test_utils.GenericTestBase):
                     deploy.CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
                 ))
 
-    def test_flush_memcache(self):
+    def test_flush_memcache_with_oppiaserver(self):
         check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': False,
             'ask_user_to_confirm_is_called': False
@@ -653,9 +653,20 @@ class DeployTests(test_utils.GenericTestBase):
             'open_new_tab_in_browser_if_possible_is_called': True,
             'ask_user_to_confirm_is_called': True
         }
-        def mock_open_tab(unused_url):
+        check_url_list = {
+            'https://console.cloud.google.com/appengine/'
+            'memcache?src=ac&project=oppiaserver': False,
+            'https://www.oppia.org/admin#/misc': False
+        }
+        expected_check_url_list = {
+            'https://console.cloud.google.com/appengine/'
+            'memcache?src=ac&project=oppiaserver': True,
+            'https://www.oppia.org/admin#/misc': True
+        }
+        def mock_open_tab(url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_is_called'] = True
+            check_url_list[url] = True
         def mock_ask_user_to_confirm(unused_msg):
             check_function_calls['ask_user_to_confirm_is_called'] = True
 
@@ -666,6 +677,42 @@ class DeployTests(test_utils.GenericTestBase):
         with open_tab_swap, ask_user_swap:
             deploy.flush_memcache('oppiaserver')
         self.assertEqual(check_function_calls, expected_check_function_calls)
+        self.assertEqual(check_url_list, expected_check_url_list)
+
+    def test_flush_memcache_with_oppiatestserver(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'ask_user_to_confirm_is_called': False
+        }
+        expected_check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'ask_user_to_confirm_is_called': True
+        }
+        check_url_list = {
+            'https://console.cloud.google.com/appengine/'
+            'memcache?src=ac&project=oppiatestserver': False,
+            'https://oppiatestserver.appspot.com/admin#/misc': False
+        }
+        expected_check_url_list = {
+            'https://console.cloud.google.com/appengine/'
+            'memcache?src=ac&project=oppiatestserver': True,
+            'https://oppiatestserver.appspot.com/admin#/misc': True
+        }
+        def mock_open_tab(url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+            check_url_list[url] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_is_called'] = True
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with open_tab_swap, ask_user_swap:
+            deploy.flush_memcache('oppiatestserver')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+        self.assertEqual(check_url_list, expected_check_url_list)
 
     def test_version_switch_with_release_branch(self):
         check_function_calls = {
