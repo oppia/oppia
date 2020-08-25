@@ -121,6 +121,8 @@ require(
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require(
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
+require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -172,10 +174,11 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
-    'StateEditorService', 'StateTopAnswersStatsService',
-    'StateTutorialFirstTimeService', 'ThreadDataService',
-    'UrlInterpolationService', 'UserEmailPreferencesService',
-    'UserExplorationPermissionsService', 'WindowDimensionsService',
+    'StateEditorRefreshService', 'StateEditorService',
+    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
+    'ThreadDataService', 'UrlInterpolationService',
+    'UserEmailPreferencesService', 'UserExplorationPermissionsService',
+    'WindowDimensionsService',
     function(
         $q, $scope, $rootScope, $templateCache, $timeout, $uibModal,
         AutosaveInfoModalsService, BottomNavbarStatusService,
@@ -192,10 +195,11 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         PageTitleService, LoaderService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
-        StateEditorService, StateTopAnswersStatsService,
-        StateTutorialFirstTimeService, ThreadDataService,
-        UrlInterpolationService, UserEmailPreferencesService,
-        UserExplorationPermissionsService, WindowDimensionsService) {
+        StateEditorRefreshService, StateEditorService,
+        StateTopAnswersStatsService, StateTutorialFirstTimeService,
+        ThreadDataService, UrlInterpolationService,
+        UserEmailPreferencesService, UserExplorationPermissionsService,
+        WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
@@ -358,7 +362,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
           if (ExplorationStatesService.getState(
             StateEditorService.getActiveStateName())) {
-            $scope.$broadcast('refreshStateEditor');
+            StateEditorRefreshService.onRefreshStateEditor.emit();
           }
 
           StateTutorialFirstTimeService.initEditor(
@@ -399,7 +403,7 @@ angular.module('oppia').component('explorationEditorPage', {
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
 
           ExplorationWarningsService.updateWarnings();
-          $scope.$broadcast('refreshStateEditor');
+          StateEditorRefreshService.onRefreshStateEditor.emit();
         });
       };
 
@@ -523,9 +527,6 @@ angular.module('oppia').component('explorationEditorPage', {
             GraphDataService.recompute();
             ExplorationWarningsService.updateWarnings();
           }));
-        $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
-          ctrl.initExplorationPage().then(successCallback);
-        });
         ctrl.directiveSubscriptions.add(
           // eslint-disable-next-line max-len
           StateTutorialFirstTimeService.onEnterEditorForTheFirstTime.subscribe(() => {

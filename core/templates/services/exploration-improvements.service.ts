@@ -25,6 +25,7 @@ import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { NeedsGuidingResponsesTask } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+import { State } from 'domain/state/StateObjectFactory';
 
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -111,6 +112,25 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
       ngrTasksOpenSinceInit = (
         ExplorationImprovementsTaskRegistryService
           .getOpenNeedsGuidingResponsesTasks());
+
+      ExplorationStatesService.registerOnStateAddedCallback(
+        (stateName: string) => {
+          ExplorationImprovementsTaskRegistryService.onStateAdded(stateName);
+        });
+      ExplorationStatesService.registerOnStateDeletedCallback(
+        (stateName: string) => {
+          ExplorationImprovementsTaskRegistryService.onStateDeleted(stateName);
+        });
+      ExplorationStatesService.registerOnStateRenamedCallback(
+        (oldName: string, newName: string) => {
+          ExplorationImprovementsTaskRegistryService.onStateRenamed(
+            oldName, newName);
+        });
+      ExplorationStatesService.registerOnStateInteractionSavedCallback(
+        (state: State) => {
+          ExplorationImprovementsTaskRegistryService.onStateInteractionSaved(
+            state);
+        });
     };
 
     return {

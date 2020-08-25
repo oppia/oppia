@@ -490,9 +490,6 @@ NUM_PRETEST_QUESTIONS = 3
 # Maximum allowed commit message length for SnapshotMetadata models.
 MAX_COMMIT_MESSAGE_LENGTH = 1000
 
-# Whether to automatically accept suggestions after a threshold time.
-ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
-
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
@@ -694,8 +691,6 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
-EXPLORATIONS_LATEX_SVG_HANDLER = '/explorationslatexsvghandler'
-SUGGESTIONS_LATEX_SVG_HANDLER = '/suggestionslatexsvghandler'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'

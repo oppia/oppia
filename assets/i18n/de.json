@@ -461,7 +461,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "Benutzernamen, die das Wort „admin“ enthalten, sind reserviert.",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "Bitte stelle sicher, dass dein Benutzername keine Leerzeichen enthält.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Dieses Feld ist erforderlich.",
-	"I18N_SIGNUP_LICENSE_NOTE": "Bitte beachte, dass durch das Akzeptieren unserer Nutzungsbedingungen jeder Inhalt oder Beitrag, den du auf unserer Website erstellst, unter die Lizenz CC-BY-SA v.4.0 gestellt wird, mit einem Verzicht auf die Namensnennungs-Bedingung (BY). Bitte überprüfe unsere <a href=\"/terms\">Nutzungsbedingungen</a> für weitere Informationen über die Lizenzgewährung. Für weitere Informationen über CC-BY-SA, klicke <a ng-click=\"showLicenseExplanationModal()\">hier</a>.",
+	"I18N_SIGNUP_LICENSE_NOTE": "Bitte beachte, dass durch das Akzeptieren unserer Nutzungsbedingungen jeder Inhalt oder Beitrag, den du auf unserer Website erstellst, unter die Lizenz CC-BY-SA v.4.0 gestellt wird, mit einem Verzicht auf die Namensnennungs-Bedingung (BY). Bitte überprüfe unsere <a href=\"/terms\">Nutzungsbedingungen</a> für weitere Informationen über die Lizenzgewährung. Für weitere Informationen über CC-BY-SA, klicke <a href=\"#\" ng-click=\"$ctrl.showLicenseExplanationModal()\">hier</a>.",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "Die Verwendung der Lizenz <[licenselink]> erlaubt das freie Kopieren, Weiterverwenden, Neumischen und Weiterverteilen des Erforschungsinhalts. Die Hauptbedingung dafür ist, dass jemand, falls er das Material neu mischt, verändert oder erstellt, auch sein Werk unter der gleichen freien Lizenz weiterverteilt.",
 	"I18N_SIGNUP_LOADING": "Lade",
 	"I18N_SIGNUP_PAGE_TITLE": "Der Gemeinschaft beitreten – Oppia",
