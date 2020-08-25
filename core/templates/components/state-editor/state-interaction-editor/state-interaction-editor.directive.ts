@@ -235,6 +235,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                     $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired
                 },
                 backdrop: true,
+                windowClass: 'customize-interaction-modal',
                 controller: 'CustomizeInteractionModalController'
               }).result.then(
                 $scope.onCustomizationModalSavePostHook, function() {
