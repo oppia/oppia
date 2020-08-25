@@ -72,7 +72,7 @@ describe('RatioExpression', function() {
   it('should initialize ctrl.warningText with invalid zero ratio', function() {
     RationExpressionCtrl.isValidRatio('1:0');
     expect(RationExpressionCtrl.warningText)
-      .toBe('Ratio cannot have 0 as a element.');
+      .toBe('Ratios cannot have 0 as a element.');
   });
 
   it('should return true with a valid value of ratio', function() {

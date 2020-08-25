@@ -120,11 +120,6 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
-      ' input.'
-    }, {
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 3 from answer group 1 will never be matched because' +
       ' it is preceded by a \'Equals\' rule with a matching' +
       ' input.'
     }]);
@@ -236,7 +231,7 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('Number of terms must be a positive integer')
+      message: ('Number of terms must be a positive integer.')
     }]);
   });
 });
