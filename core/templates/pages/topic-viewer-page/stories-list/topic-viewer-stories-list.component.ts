@@ -30,6 +30,8 @@ export class StoriesListComponent {
   @Input() canonicalStorySummaries: StorySummary[];
   @Input() classroomUrlFragment: string;
   @Input() topicUrlFragment: string;
+  @Input() topicName: string;
+  @Input() topicDescription: string;
   constructor() {}
 }
 angular.module('oppia').directive(

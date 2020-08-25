@@ -2,7 +2,7 @@
   <div class="oppia-subtopic-viewer-nav-separator"></div>
   <div class="oppia-subtopic-viewer-nav-labels-container">
     <p style="margin: 0; font-size: 18px;">{{ subtopicTitle }}</p>
-    <a [href]="getTopicUrl()" style="color: white; font-size: 12px;">{{ topicName }}</a>
+    <a class="topic-name" [href]="getTopicUrl()" style="color: white; font-size: 12px;">{{ topicName }}</a>
   </div>
 </div>
 
@@ -11,6 +11,10 @@
     align-items: center;
     height: 56px;
     padding-top: 0;
+  }
+
+  .oppia-subtopic-viewer-nav-labels-container .topic-name {
+    font-family: 'Roboto', Arial, sans-serif;
   }
 
   .oppia-subtopic-viewer-nav-separator {

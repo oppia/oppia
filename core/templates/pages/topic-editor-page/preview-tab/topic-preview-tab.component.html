@@ -5,14 +5,6 @@
   <div class="topic-preview-container">
     <div class="topic-preview-nav">
       <div class="topic-preview-navbar-tabs">
-        <div class="topic-preview-navbar-tab" ng-class="{'topic-preview-nav-active': $ctrl.activeTab === 'info'}" ng-click="$ctrl.changePreviewTab('info')">
-          <div class="topic-preview-icon">
-            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
-          </div>
-          <div class="topic-preview-text">
-            Info
-          </div>
-        </div>
         <div class="topic-preview-navbar-tab" ng-class="{'topic-preview-nav-active': $ctrl.activeTab === 'story'}" ng-click="$ctrl.changePreviewTab('story')">
           <div class="topic-preview-icon">
             <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
@@ -39,16 +31,10 @@
         </div>
       </div>
     </div>
-    <div ng-if="$ctrl.activeTab === 'info'">
-      <topic-info-tab topic-name="$ctrl.topic.getName()"
-                      topic-description="$ctrl.topic.getDescription()"
-                      story-count="$ctrl.canonicalStorySummaries.length"
-                      subtopic-count="$ctrl.subtopics.length"
-                      chapter-count="$ctrl.chapterCount">
-      </topic-info-tab>
-    </div>
     <div ng-if="$ctrl.activeTab === 'story'">
-      <stories-list [canonical-story-summaries]="$ctrl.canonicalStorySummaries"
+      <stories-list [topic-name]="$ctrl.topic.getName()"
+                    [topic-description]="$ctrl.topic.getDescription()"
+                    [canonical-story-summaries]="$ctrl.canonicalStorySummaries"
                     [classroom-url-fragment]="''"
                     [topic-url-fragment]="''">
       </stories-list>
