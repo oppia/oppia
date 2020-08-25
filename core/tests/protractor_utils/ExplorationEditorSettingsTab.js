@@ -24,8 +24,6 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
    */
-  var editParamChanges = element(
-    by.css('.protractor-test-exploration-edit-param-changes'));
   var explorationCategoryInput = element(
     by.css('.protractor-test-exploration-category-input'));
   var explorationLanguageInput = element(
@@ -48,15 +46,10 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Buttons
    */
-  var addParamButton = element(by.css('.protractor-test-add-param-button'));
   var closePreviewSummaryButton = element(
     by.css('.protractor-test-close-preview-summary-modal'));
-  var enableParametersSwitch = element(
-    by.css('.protractor-test-enable-parameters'));
   var openPreviewSummaryButton = element(
     by.css('.protractor-test-open-preview-summary-modal'));
-  var saveParamChangesButton = element(
-    by.css('.protractor-test-save-param-changes-button'));
   var deleteExplorationButton = element(
     by.css('.protractor-test-delete-exploration-button'));
   var confirmDeleteExplorationButton = element(

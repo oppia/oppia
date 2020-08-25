@@ -21,7 +21,6 @@ import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
 
 describe('UnitsObjectFactory', () => {
-  let errors = null;
   let units: UnitsObjectFactory = null;
 
   beforeEach(() => {

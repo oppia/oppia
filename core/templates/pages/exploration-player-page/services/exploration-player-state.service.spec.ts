@@ -30,7 +30,6 @@ describe('Exploration Player State Service', () => {
   let PlaythroughIssuesService = null;
   let PlaythroughService = null;
   let StatsReportingService = null;
-  let ReadOnlyExplorationBackendApiService = null;
   let $rootScope = null;
   let $q = null;
 
@@ -134,8 +133,6 @@ describe('Exploration Player State Service', () => {
     StatsReportingService = _StatsReportingService_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
     PlaythroughService = _PlaythroughService_;
-    ReadOnlyExplorationBackendApiService = (
-      _ReadOnlyExplorationBackendApiService_);
     ExplorationPlayerStateService = _ExplorationPlayerStateService_;
   }));
 

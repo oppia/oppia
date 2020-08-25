@@ -152,14 +152,6 @@ angular.module('oppia').directive('learnerDashboardIcons', [
               $scope.disablePlaylistTooltip();
             }
           };
-
-          $scope.removeFromLearnerPlaylist = function(
-              activityId, activityTitle, activityType) {
-            var isSuccessfullyRemoved = (
-              LearnerPlaylistService.removeFromLearnerPlaylist(
-                activityId, activityTitle, activityType,
-                $scope.learnerDashboardActivityIds));
-          };
         }
       ]
     };

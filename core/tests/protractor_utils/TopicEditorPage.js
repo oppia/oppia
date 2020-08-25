@@ -20,10 +20,8 @@
 var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
-var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
-var path = require('path');
 
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
@@ -55,8 +53,6 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-commit-message-input'));
   var closeSaveModalButton = element(
     by.css('.protractor-test-close-save-modal-button'));
-  var subtopicsTabButton = element(
-    by.css('.protractor-test-subtopics-tab-button'));
   var addSubtopicButton = element(
     by.css('.protractor-test-add-subtopic-button'));
   var newSubtopicTitlefield = element(
@@ -74,35 +70,24 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-delete-subtopic-button'));
   var reassignSkillButton = element(
     by.css('.protractor-test-reassign-skill-button'));
-  var skillCards = element.all(
-    by.css('.protractor-test-skill-card'));
   var uncategorizedSkills = element.all(
     by.css('.protractor-test-uncategorized-skill-card'));
-  var skillSelectorModal = element(
-    by.css('.protractor-test-skill-select-modal'));
   var uncategorizedSkillItems = element.all(
     by.css('.protractor-test-skill-item'));
   var uncategorizedSkillsContainer = element(
     by.css('.protractor-test-uncategorized-skills-container'));
-  var editSubtopicButtons = element.all(
-    by.css('.protractor-test-edit-subtopic-button'));
   var subtopicTitleField = element(
     by.css('.protractor-test-subtopic-title-field'));
-  var subtopicTitles = element.all(by.css('.protractor-test-subtopic-title'));
   var questionsTabButton = element(
     by.css('.protractor-test-questions-tab-button'));
   var createQuestionButton = element(
     by.css('.protractor-test-create-question-button'));
-  var skillItems = element.all(by.css('.protractor-test-skill-item'));
-  var confirmSkillButton = element(
-    by.css('.protractor-test-confirm-skill-button'));
   var confirmSkillDifficultyButton = element(
     by.css('.protractor-test-confirm-skill-difficulty-button'));
   var saveQuestionButton = element(
     by.css('.protractor-test-save-question-button'));
   var questionItems = element.all(
     by.css('.protractor-test-question-list-item'));
-  var questionItem = element(by.css('.protractor-test-question-list-item'));
   var selectSkillDropdown = element(
     by.css('.protractor-test-select-skill-dropdown'));
   var subtopicThumbnailImageElement = element(

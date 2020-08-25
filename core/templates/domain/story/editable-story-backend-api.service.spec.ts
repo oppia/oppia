@@ -30,10 +30,7 @@ require('services/csrf-token.service.ts');
 describe('Editable story backend API service', function() {
   var EditableStoryBackendApiService = null;
   var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
   var $httpBackend = null;
-  var UndoRedoService = null;
   var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -49,9 +46,6 @@ describe('Editable story backend API service', function() {
   beforeEach(angular.mock.inject(function($injector, $q) {
     EditableStoryBackendApiService = $injector.get(
       'EditableStoryBackendApiService');
-    UndoRedoService = $injector.get('UndoRedoService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 

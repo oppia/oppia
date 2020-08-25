@@ -19,13 +19,10 @@
 
 var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
-var SkillEditorPage = require('./SkillEditorPage.js');
 var workflow = require('./workflow.js');
 var general = require('../protractor_utils/general.js');
 
 var TopicsAndSkillsDashboardPage = function() {
-  var DASHBOARD_URL = '/topics-and-skills-dashboard';
-  var skillEditorPage = new SkillEditorPage.SkillEditorPage();
   var topicNames = element.all(by.css('.protractor-test-topic-name'));
   var skillDescriptions = element.all(
     by.css('.protractor-test-skill-description'));
@@ -93,12 +90,8 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-confirm-skill-selection-button'));
   var openConceptCardExplanationButton = element(
     by.css('.protractor-test-open-concept-card'));
-  var saveConceptCardExplanationButton = element(
-    by.css('.protractor-test-save-concept-card'));
   var topicNamesInTopicSelectModal = element.all(
     by.css('.protractor-test-topic-name-in-topic-select-modal'));
-  var topicsTabButton = element(
-    by.css('.protractor-test-topics-tab'));
   var topicThumbnailButton = element(
     by.css('.protractor-test-photo-button'));
   var thumbnailContainer = element(
@@ -114,6 +107,7 @@ var TopicsAndSkillsDashboardPage = function() {
 
 
   // Returns a promise of all topics with the given name.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   var _getTopicElements = async function(topicName) {
     var topicsListElems = [];
     var topicsListItemsCount = await topicsListItems.count();

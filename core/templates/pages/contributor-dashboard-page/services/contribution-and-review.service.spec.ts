@@ -28,7 +28,7 @@ require(
   'contribution-and-review.service.ts');
 
 describe('ContributionAndReviewService', function() {
-  var ContributionAndReviewService, $httpBackend, $q, UrlInterpolationService;
+  var ContributionAndReviewService, $httpBackend;
   var suggestion1;
   var opportunityDict1;
   var mockSuggestionsBackendObject;
@@ -47,10 +47,7 @@ describe('ContributionAndReviewService', function() {
   beforeEach(angular.mock.inject(function($injector) {
     ContributionAndReviewService = $injector.get(
       'ContributionAndReviewService');
-    UrlInterpolationService = $injector.get(
-      'UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
-    $q = $injector.get('$q');
 
     suggestion1 = {
       suggestion_id: 'suggestion_id_1',

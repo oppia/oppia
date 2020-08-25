@@ -25,7 +25,6 @@ describe('Skill preview tab', function() {
   var $scope = null;
   var ctrl = null;
   var UrlService = null;
-  var QuestionBackendApiService = null;
   var questionDict1 = {
     question_state_data: {
       content: {
@@ -146,7 +145,6 @@ describe('Skill preview tab', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     UrlService = $injector.get('UrlService');
-    QuestionBackendApiService = $injector.get('QuestionBackendApiService');
     var skillId = 'df432fe';
     $scope = $rootScope.$new();
     var MockQuestionBackendApiService = {

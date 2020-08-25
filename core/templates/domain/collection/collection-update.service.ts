@@ -75,6 +75,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
 
     // Applies a property change to a collection node. See _applyChanges() for
     // details on the other behavior of this function.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     var _applyNodePropertyChange = function(
         collection, propertyName, explorationId, newValue, oldValue, apply,
         reverse) {

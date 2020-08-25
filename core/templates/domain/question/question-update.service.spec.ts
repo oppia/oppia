@@ -61,7 +61,6 @@ describe('Question update service', function() {
   var StateObjectFactory = null;
   var subtitledHtmlObjectFactory = null;
   var sampleQuestion = null;
-  var sampleStateTwo = null;
   var sampleStateDict = null;
   var expectedOutputStateDict = null;
   var expectedOutputState = null;

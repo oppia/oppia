@@ -27,7 +27,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Skill backend API service', function() {
   var SkillBackendApiService = null;
-  var UndoRedoService = null;
   var $httpBackend = null;
   var sampleResponse = null;
   var CsrfService = null;
@@ -44,7 +43,6 @@ describe('Skill backend API service', function() {
   beforeEach(angular.mock.inject(function($injector, $q) {
     SkillBackendApiService = $injector.get(
       'SkillBackendApiService');
-    UndoRedoService = $injector.get('UndoRedoService');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 
