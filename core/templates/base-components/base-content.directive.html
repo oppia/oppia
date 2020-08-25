@@ -47,7 +47,7 @@
             <div class="oppia-top-of-page-padding">
             </div>
             <div class="navbar-mobile-container" ng-if="$ctrl.isBottomNavbarShown()">
-              <i class="fa fa-book show-mobile-navbar-icon" ng-click="$ctrl.toggleMobileNavOptions()"></i>
+              <i class="fa fa-book show-mobile-navbar-icon" ng-click="$ctrl.toggleMobileNavOptions()" aria-label="Mobile navbar options"></i>
               <div class="navbar-mobile-options" ng-if="$ctrl.mobileNavOptionsAreShown">
                 <div>
                   <div ng-transclude="mobileNavOptions"></div>
