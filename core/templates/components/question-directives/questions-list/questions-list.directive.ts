@@ -65,6 +65,7 @@ require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -101,6 +102,7 @@ angular.module('oppia').directive('questionsList', [
         'SkillBackendApiService',
         'SkillDifficultyObjectFactory', 'ShortSkillSummaryObjectFactory',
         'StateEditorService', 'UndoRedoService',
+        'WindowDimensionsService',
         'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
         'MODE_SELECT_DIFFICULTY',
         'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
@@ -114,6 +116,7 @@ angular.module('oppia').directive('questionsList', [
             SkillBackendApiService,
             SkillDifficultyObjectFactory, ShortSkillSummaryObjectFactory,
             StateEditorService, UndoRedoService,
+            WindowDimensionsService,
             UrlService, DEFAULT_SKILL_DIFFICULTY,
             MODE_SELECT_DIFFICULTY,
             MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
@@ -264,19 +267,33 @@ angular.module('oppia').directive('questionsList', [
                   skillId, '', DEFAULT_SKILL_DIFFICULTY));
             });
             ctrl.showDifficultyChoices = true;
+            ctrl.editorIsOpen = true;
+            ctrl.initiateQuestionCreation();
           };
-
-          ctrl.initiateQuestionCreation = function(linkedSkillsWithDifficulty) {
-            ctrl.showDifficultyChoices = false;
+          ctrl.changeLinkedSkillDifficulty = function() {
+            ctrl.linkedSkillsWithDifficulty.forEach(
+              (linkedSkillWithDifficulty) => {
+                if (!ctrl.newQuestionSkillIds.includes(
+                  linkedSkillWithDifficulty.getId())) {
+                  ctrl.newQuestionSkillIds.push(
+                    linkedSkillWithDifficulty.getId());
+                  ctrl.newQuestionSkillDifficulties.push(
+                    linkedSkillWithDifficulty.getDifficulty());
+                }
+              });
+          };
+          ctrl.initiateQuestionCreation = function() {
+            ctrl.showDifficultyChoices = true;
             ctrl.newQuestionSkillIds = [];
             ctrl.associatedSkillSummaries = [];
             ctrl.newQuestionSkillDifficulties = [];
-            linkedSkillsWithDifficulty.forEach((linkedSkillWithDifficulty) => {
-              ctrl.newQuestionSkillIds.push(
-                linkedSkillWithDifficulty.getId());
-              ctrl.newQuestionSkillDifficulties.push(
-                linkedSkillWithDifficulty.getDifficulty());
-            });
+            ctrl.linkedSkillsWithDifficulty.forEach(
+              (linkedSkillWithDifficulty) => {
+                ctrl.newQuestionSkillIds.push(
+                  linkedSkillWithDifficulty.getId());
+                ctrl.newQuestionSkillDifficulties.push(
+                  linkedSkillWithDifficulty.getDifficulty());
+              });
             ctrl.populateMisconceptions(ctrl.newQuestionSkillIds);
             if (AlertsService.warnings.length === 0) {
               ctrl.initializeNewQuestionCreation(
@@ -304,7 +321,8 @@ angular.module('oppia').directive('questionsList', [
               });
           };
 
-          ctrl.editQuestion = function(questionSummaryForOneSkill, difficulty) {
+          ctrl.editQuestion = function(
+              questionSummaryForOneSkill, skillDescription, difficulty) {
             if (ctrl.editorIsOpen) {
               return;
             }
@@ -313,6 +331,21 @@ angular.module('oppia').directive('questionsList', [
                 'User does not have enough rights to delete the question');
               return;
             }
+            ctrl.newQuestionSkillIds = [];
+            var currentMode = MODE_SELECT_SKILL;
+            ctrl.skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
+            if (!ctrl.selectSkillModalIsShown()) {
+              ctrl.newQuestionSkillIds = ctrl.skillIds;
+              currentMode = MODE_SELECT_DIFFICULTY;
+            } else {
+              ctrl.newQuestionSkillIds = [ctrl.getSelectedSkillId()];
+            }
+            ctrl.linkedSkillsWithDifficulty = [];
+            ctrl.newQuestionSkillIds.forEach(function(skillId) {
+              ctrl.linkedSkillsWithDifficulty.push(
+                SkillDifficultyObjectFactory.create(
+                  skillId, skillDescription, difficulty));
+            });
             ctrl.difficulty = difficulty;
             ctrl.misconceptionsBySkill = {};
             ctrl.associatedSkillSummaries = [];
@@ -592,11 +625,20 @@ angular.module('oppia').directive('questionsList', [
             return QuestionsListService.getCurrentPageNumber();
           };
 
+          ctrl.toggleDifficultyCard = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            ctrl.difficultyCardIsShown = !ctrl.difficultyCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
               QuestionsListService.onQuestionSummariesInitialized.subscribe(
                 () => _initTab(false)));
             ctrl.showDifficultyChoices = false;
+            ctrl.difficultyCardIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             ctrl.skillIds = [];
             ctrl.selectedSkillIds = [];
             ctrl.associatedSkillSummaries = [];
