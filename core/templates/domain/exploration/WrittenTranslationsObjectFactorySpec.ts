@@ -94,11 +94,11 @@ describe('Written Translations Object Factory', () => {
   it('should add translation in a written translations object', () => {
     expect(() => {
       writtenTranslationsBackendDict.addWrittenTranslation(
-        'content_1', 'hi-en', 'This is a HTML text');
+        'content_1', 'hi-en', 'html', 'This is a HTML text');
     }).toThrowError('Trying to add duplicate language code.');
 
     writtenTranslationsBackendDict.addWrittenTranslation(
-      'content_1', 'en', 'English HTML');
+      'content_1', 'en', 'html', 'English HTML');
     expect(
       writtenTranslationsBackendDict
         .getTranslationsLanguageCodes('content_1')).toEqual(['hi-en', 'en']);
@@ -121,7 +121,7 @@ describe('Written Translations Object Factory', () => {
 
       expect(writtenTranslationsBackendDict.hasWrittenTranslation(
         'content_1', 'hi-en')).toBe(true);
-      writtenTranslationsBackendDict.updateWrittenTranslationHtml(
+      writtenTranslationsBackendDict.updateWrittenTranslation(
         'content_1', 'hi-en', '<p>This is the new HTML</p>');
       expect(writtenTranslationsBackendDict.getWrittenTranslation(
         'content_1', 'hi-en')).toEqual(
@@ -132,7 +132,7 @@ describe('Written Translations Object Factory', () => {
         }));
 
       expect(() => {
-        writtenTranslationsBackendDict.updateWrittenTranslationHtml(
+        writtenTranslationsBackendDict.updateWrittenTranslation(
           'content_1', 'en', 'This is the new HTML');
       }).toThrowError('Unable to find the given language code.');
       expect(writtenTranslationsBackendDict.hasWrittenTranslation('en'))

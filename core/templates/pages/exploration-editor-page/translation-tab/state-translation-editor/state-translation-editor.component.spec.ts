@@ -185,7 +185,7 @@ describe('State Translation Editor Component', function() {
             needs_update: true
           })
         ),
-        updateWrittenTranslationHtml: () => {}
+        updateWrittenTranslation: () => {}
       });
 
       $scope = $rootScope.$new();
@@ -311,11 +311,11 @@ describe('State Translation Editor Component', function() {
       ' translation button', function() {
       spyOn(
         stateWrittenTranslationsService.displayed,
-        'updateWrittenTranslationHtml').and.callThrough();
+        'updateWrittenTranslation').and.callThrough();
       $scope.onSaveTranslationButtonClicked();
 
       expect(
-        stateWrittenTranslationsService.displayed.updateWrittenTranslationHtml)
+        stateWrittenTranslationsService.displayed.updateWrittenTranslation)
         .toHaveBeenCalled();
     });
 
@@ -340,7 +340,7 @@ describe('State Translation Editor Component', function() {
 
     it('should init editor when changing active content id language',
       function() {
-        mockActiveContentIdChangedEventEmitter.emit();
+        mockActiveContentIdChangedEventEmitter.emit('html');
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
           writtenTranslationObjectFactory.createFromBackendDict({
@@ -380,6 +380,9 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'getState').and.returnValue(stateObj);
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
+      spyOn(
+        translationTabActiveContentIdService, 'getActiveDataFormat'
+      ).and.returnValue('html');
 
       stateWrittenTranslationsService.init(stateName, {
         hasWrittenTranslation: () => false,
