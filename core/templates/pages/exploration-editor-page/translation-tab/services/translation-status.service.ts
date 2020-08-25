@@ -84,7 +84,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       if (availableLanguages.indexOf(langCode) !== -1) {
         var writtenTranslation = (
           writtenTranslations.getWrittenTranslation(contentId, langCode));
-        if (writtenTranslation.getHtml() !== '') {
+        if (writtenTranslation.translation !== '') {
           availabilityStatus.available = true;
           availabilityStatus.needsUpdate = writtenTranslation.needsUpdate;
         }

@@ -151,8 +151,7 @@ export class ConceptCardObjectFactory {
     };
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createDefault(
-        'Loading review material',
-        AppConstants.COMPONENT_NAME_EXPLANATION), [],
+        'Loading review material', AppConstants.COMPONENT_NAME_EXPLANATION), [],
       this.recordedVoiceoversObjectFactory.createFromBackendDict(
         recordedVoiceoversDict)
     );

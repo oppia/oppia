@@ -33,13 +33,13 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
   '$controller', '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
   'GenerateContentIdService', 'OutcomeObjectFactory', 'RuleObjectFactory',
   'StateEditorService', 'addState', 'currentInteractionId',
-  'stateName', 'CONTENT_ID_PREFIX_FEEDBACK',
+  'stateName', 'COMPONENT_NAME_FEEDBACK',
   'INTERACTION_SPECS',
   function(
       $controller, $scope, $uibModalInstance, EditorFirstTimeEventsService,
       GenerateContentIdService, OutcomeObjectFactory, RuleObjectFactory,
       StateEditorService, addState, currentInteractionId,
-      stateName, CONTENT_ID_PREFIX_FEEDBACK,
+      stateName, COMPONENT_NAME_FEEDBACK,
       INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -72,7 +72,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     };
     $scope.tmpRule = RuleObjectFactory.createNew(null, {});
     var feedbackContentId = GenerateContentIdService.getNextStateId(
-      CONTENT_ID_PREFIX_FEEDBACK);
+      COMPONENT_NAME_FEEDBACK);
     $scope.tmpOutcome = OutcomeObjectFactory.createNew(
       $scope.questionModeEnabled ? null : stateName,
       feedbackContentId, '', []);
