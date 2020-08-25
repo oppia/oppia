@@ -172,7 +172,7 @@ export class RatioExpressionInputValidationService {
               message: (
                 `Rule ${j + 1} from answer group ${i + 1} will never` +
                 ' be matched because it is preceded by a \'IsEquivalent\'' +
-                ' with a matching input.')
+                ' rule with a matching input.')
             });
           } else if (currentRuleType === 'HasNumberOfTermsEqualTo' &&
           seenRuleType !== 'HasNumberOfTermsEqualTo' && (
