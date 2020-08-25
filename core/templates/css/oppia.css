@@ -756,7 +756,9 @@ textarea {
   color: #009688;
 }
 .modal-body .nav-link {
+  color: #00609C;
   font-size: 16px;
+  font-weight: bold;
 }
 .oppia-navbar-dropdown .nav-link:hover {
   color: #888;
@@ -2172,17 +2174,24 @@ pre.oppia-pre-wrapped-text {
 .oppia-interaction-tile {
   cursor: pointer;
   display: inline-block;
-  margin: 5px;
-  outline: 1px solid #aaa;
+  margin: 10px;
   vertical-align: top;
-  width: 30%;
+  width: 20%;
+}
+@media screen and (max-width: 768px) {
+  .oppia-interaction-tile {
+    width: 42%;
+  }
 }
 .oppia-interaction-tile:hover {
   outline: 2px solid #009688;
 }
 .oppia-interaction-tile-name {
-  border-top: 1px solid #ccc;
-  padding: 3px 0;
+  background-color: #E0F2F1;
+  border: 1px solid #aaa;
+  border-radius: 0 0 5px 5px;
+  font-size: 15px;
+  padding: 6px;
   position: relative;
   text-align: center;
 }
