@@ -74,7 +74,10 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
@@ -82,6 +85,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
