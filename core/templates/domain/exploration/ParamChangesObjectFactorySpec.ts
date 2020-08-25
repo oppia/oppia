@@ -16,12 +16,13 @@
  * @fileoverview unit tests for ParamChangesObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { ParamChange } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('ParamChanges Object Factory', () => {
   let pcsof: ParamChangesObjectFactory;

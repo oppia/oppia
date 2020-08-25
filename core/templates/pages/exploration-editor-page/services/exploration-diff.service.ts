@@ -16,21 +16,23 @@
  * @fileoverview Service for computing diffs of explorations.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import cloneDeep from 'lodash/cloneDeep';
-import isEqual from 'lodash/isEqual';
-
-import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
-
 import {
   AddStateNameChangeList,
   ExplorationChangeList,
   RenameStateChangeList,
   EditStatePropertyChangeList
 } from 'domain/exploration/ExplorationDraftObjectFactory';
+
 import { StateObjectsDict } from 'domain/exploration/StatesObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
+
+import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
+
 
 interface ExplorationGraphChangeList {
   changeList: ExplorationChangeList[];

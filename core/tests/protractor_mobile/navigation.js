@@ -18,9 +18,9 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Navigation features on mobile', function() {
   var libraryPage = null;

@@ -17,14 +17,15 @@
  * results.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   EmailDashboardQuery,
   EmailDashboardQueryDict,
   EmailDashboardQueryObjectFactory
 } from 'domain/email-dashboard/email-dashboard-query-object.factory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export interface EmailDashboardQueryResultsBackendDict {
   'cursor': string;

@@ -16,12 +16,13 @@
  * @fileoverview Tests for ReadOnlyStoryNodeObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { LearnerExplorationSummaryObjectFactory } from
   'domain/summary/learner-exploration-summary-object.factory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Read only story node object factory', () => {
   let readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory = null;

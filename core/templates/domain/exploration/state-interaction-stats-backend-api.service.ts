@@ -16,17 +16,20 @@
  * @fileoverview Backend api service for state interaction stats.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
 import {
   VisualizationInfoBackendDict,
   VisualizationInfo,
   VisualizationInfoObjectFactory
 } from 'domain/exploration/visualization-info-object.factory';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface StateInteractionStatsBackendDict {
   'visualizations_info': VisualizationInfoBackendDict[];

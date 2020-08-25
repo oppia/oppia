@@ -20,6 +20,18 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import 'angular-ui-sortable';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
+
+import { TopicViewerDomainConstants } from
+  'domain/topic_viewer/topic-viewer-domain.constants';
+
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
+import { NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent } from '@angular/upgrade/static';
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
@@ -28,20 +40,13 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { TopicViewerDomainConstants } from
-  'domain/topic_viewer/topic-viewer-domain.constants';
+
+
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { TopicViewerNavbarBreadcrumbComponent } from
@@ -92,7 +97,6 @@ class TopicViewerPageModule {
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {

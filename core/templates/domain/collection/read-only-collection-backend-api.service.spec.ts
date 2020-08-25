@@ -16,16 +16,17 @@
  * @fileoverview Unit tests for ReadOnlyCollectionBackendApiService.
  */
 
+import { CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
+import { ReadOnlyCollectionBackendApiService } from
+  'domain/collection/read-only-collection-backend-api.service';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { Subscription } from 'rxjs';
 
-import { ReadOnlyCollectionBackendApiService } from
-  'domain/collection/read-only-collection-backend-api.service';
-import { CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
 
 describe('Read only collection backend API service', () => {
   let readOnlyCollectionBackendApiService:

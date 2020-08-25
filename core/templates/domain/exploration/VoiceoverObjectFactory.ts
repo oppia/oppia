@@ -23,8 +23,8 @@ export interface VoiceoverBackendDict {
   'needs_update': boolean;
 }
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class Voiceover {
   filename: string;

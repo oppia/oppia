@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for LearnerDashboardBackendApiService.
  */
 
+import { LearnerDashboardBackendApiService } from
+  'domain/learner_dashboard/learner-dashboard-backend-api.service';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { LearnerDashboardBackendApiService } from
-  'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 describe('Learner Dashboard Backend API Service', () => {
   let learnerDashboardBackendApiService:

@@ -16,13 +16,9 @@
  * @fileoverview Domain object for exploration improvement tasks.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { HighBounceRateTask, HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
-import { TaskEntryBackendDict } from
-  'domain/improvements/TaskEntryObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import {
@@ -37,6 +33,11 @@ import {
   SuccessiveIncorrectAnswersTask,
   SuccessiveIncorrectAnswersTaskObjectFactory
 } from 'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+import { TaskEntryBackendDict } from
+  'domain/improvements/TaskEntryObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export type ExplorationTaskType = (
   'high_bounce_rate' |

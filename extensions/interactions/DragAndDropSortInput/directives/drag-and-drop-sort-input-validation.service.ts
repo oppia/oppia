@@ -16,19 +16,21 @@
  * @fileoverview Validator service for the drag and drop sorting interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { DragAndDropSortInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
+
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 import { AppConstants } from 'app.constants';
+import { DragAndDropSortInputCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
+import { Warning, baseInteractionValidationService } from
+  'interactions/base-interaction-validation.service';
 
 @Injectable({
   providedIn: 'root'

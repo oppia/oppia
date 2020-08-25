@@ -16,18 +16,22 @@
  * @fileoverview Service for fetching issues and playthroughs from the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
 import {
   PlaythroughIssueBackendDict,
   PlaythroughIssue,
   PlaythroughIssueObjectFactory
 } from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+
+import { ServicesConstants } from 'services/services.constants.ts';
+
 
 @Injectable({ providedIn: 'root' })
 export class PlaythroughIssuesBackendApiService {

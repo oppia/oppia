@@ -16,10 +16,11 @@
  * @fileoverview Tests for SubtopicPageObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Subtopic page object factory', () => {
   let subtopicPageObjectFactory: SubtopicPageObjectFactory = null;

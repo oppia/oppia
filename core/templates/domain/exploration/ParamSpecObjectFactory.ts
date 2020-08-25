@@ -17,11 +17,12 @@
  * domain objects.
  */
 
+import { ParamType, ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory';
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ParamType, ParamTypeObjectFactory } from
-  'domain/exploration/ParamTypeObjectFactory';
 
 export interface ParamSpecBackendDict {
   'obj_type': string;

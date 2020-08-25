@@ -16,8 +16,6 @@
  * @fileoverview Factory for creating new frontend instances of State
  * domain objects.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { InteractionBackendDict, Interaction, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
@@ -40,6 +38,9 @@ import {
   WrittenTranslations,
   WrittenTranslationsObjectFactory
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 const constants = require('constants.ts');
 

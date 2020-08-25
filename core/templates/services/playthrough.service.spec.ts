@@ -16,19 +16,24 @@
  * @fileoverview Unit tests for the playthrough service.
  */
 
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
+
+import { PlaythroughBackendApiService } from
+  'domain/statistics/playthrough-backend-api.service';
+import { Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
+
+import { StopwatchObjectFactory } from
+  'domain/utilities/StopwatchObjectFactory';
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
-import { Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
+
 import { PlaythroughService } from 'services/playthrough.service';
-import { PlaythroughBackendApiService } from
-  'domain/statistics/playthrough-backend-api.service';
-import { StopwatchObjectFactory } from
-  'domain/utilities/StopwatchObjectFactory';
+
 
 describe('PlaythroughService', () => {
   let explorationFeaturesService: ExplorationFeaturesService = null;

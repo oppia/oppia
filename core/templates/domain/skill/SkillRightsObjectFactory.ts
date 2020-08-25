@@ -17,8 +17,8 @@
  * skill rights domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface SkillRightsBackendDict {
   'can_edit_skill_description': boolean,

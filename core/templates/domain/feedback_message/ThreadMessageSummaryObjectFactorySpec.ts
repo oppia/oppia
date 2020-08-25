@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for ThreadMessageSummaryObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Thread message summary object factory', () => {
   beforeEach(() => {

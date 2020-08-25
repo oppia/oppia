@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for loader service.
  */
 
-import { LoaderService } from 'services/loader.service';
 import { Subscription } from 'rxjs';
+import { LoaderService } from 'services/loader.service';
 
 describe('Loader Service', () => {
   const loaderService = new LoaderService();

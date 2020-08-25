@@ -17,22 +17,24 @@
  * and check for any console errors
  */
 
-var general = require('../protractor_utils/general.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+const { browser } = require('protractor');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
+
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
+var general = require('../protractor_utils/general.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-const { browser } = require('protractor');
+var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
+var workflow = require('../protractor_utils/workflow.js');
+
 
 var backButton = element(by.css('#backButtonId'));
 var categoryBar = element(by.css(

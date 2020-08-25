@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for BrowserCheckerService.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
+
+import { TestBed } from '@angular/core/testing';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Browser Checker Service', function() {

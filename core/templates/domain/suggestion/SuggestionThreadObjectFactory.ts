@@ -17,17 +17,18 @@
    thread domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
-import { SuggestionBackendDict, Suggestion, SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { FeedbackThreadBackendDict } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { SuggestionBackendDict, Suggestion, SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class SuggestionThread {
   status: string;

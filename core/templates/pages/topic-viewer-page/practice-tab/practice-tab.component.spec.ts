@@ -16,14 +16,17 @@
  * @fileoverview Unit tests for practiceTab.
  */
 
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
-import { PracticeTabComponent } from './practice-tab.component';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+
+import { PracticeTabComponent } from './practice-tab.component';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {

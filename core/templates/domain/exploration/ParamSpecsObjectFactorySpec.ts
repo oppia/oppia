@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for the Param Specs object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('ParamSpecs', () => {
   let paramSpecsObjectFactory: ParamSpecsObjectFactory = null;

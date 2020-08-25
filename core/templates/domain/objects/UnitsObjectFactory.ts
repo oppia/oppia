@@ -16,14 +16,15 @@
  * @fileoverview Factory for creating instances of Units domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { createUnit, unit } from 'mathjs';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 import { Unit } from
   'interactions/answer-defs';
+import { createUnit, unit } from 'mathjs';
 
 interface UnitsBackendDict {
   units: Unit[];

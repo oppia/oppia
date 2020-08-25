@@ -16,14 +16,15 @@
  * @fileoverview Domain object for a needs guiding responses improvements task.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
-import { TaskEntryBackendDict, TaskEntry } from
-  'domain/improvements/TaskEntryObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
+import { TaskEntryBackendDict, TaskEntry } from
+  'domain/improvements/TaskEntryObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class NeedsGuidingResponsesTask extends TaskEntry<
     'needs_guiding_responses'> {

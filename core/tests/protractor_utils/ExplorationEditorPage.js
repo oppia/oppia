@@ -17,15 +17,13 @@
  * tests.
  */
 
-var action = require('./action');
-var waitFor = require('./waitFor.js');
 
-var ExplorationEditorImprovementsTab = require(
-  '../protractor_utils/ExplorationEditorImprovementsTab.js');
 var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
 var ExplorationEditorHistoryTab = require(
   '../protractor_utils/ExplorationEditorHistoryTab.js');
+var ExplorationEditorImprovementsTab = require(
+  '../protractor_utils/ExplorationEditorImprovementsTab.js');
 var ExplorationEditorMainTab = require(
   '../protractor_utils/ExplorationEditorMainTab.js');
 var ExplorationEditorSettingsTab = require(
@@ -36,6 +34,9 @@ var ExplorationEditorTranslationTab = require(
   '../protractor_utils/ExplorationEditorTranslationTab.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
+
+var action = require('./action');
+var waitFor = require('./waitFor.js');
 
 var ExplorationEditorPage = function() {
   /*

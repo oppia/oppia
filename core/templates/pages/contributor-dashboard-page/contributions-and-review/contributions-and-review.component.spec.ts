@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for contributionsAndReview.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ContextService } from 'services/context.service';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { ContextService } from 'services/context.service';
 
 describe('Contributions and review component', function() {
   var ctrl = null;

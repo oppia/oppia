@@ -16,17 +16,21 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService, Warning } from
-  'interactions/base-interaction-validation.service';
-import { PencilCodeEditorCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
+
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+
+import { PencilCodeEditorCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
+import { baseInteractionValidationService, Warning } from
+  'interactions/base-interaction-validation.service';
+
 
 @Injectable({
   providedIn: 'root'

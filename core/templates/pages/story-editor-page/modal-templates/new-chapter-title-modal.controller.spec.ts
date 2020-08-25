@@ -17,14 +17,16 @@
  */
 
 
-import { AlertsService } from 'services/alerts.service';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
-import { LoggerService } from 'services/contextual/logger.service';
+
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+
+import { AlertsService } from 'services/alerts.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;

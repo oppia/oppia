@@ -16,16 +16,19 @@
  * @fileoverview Service to send changes to skill mastery to the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+
 import {
   SkillMasteryObjectFactory,
   SkillMastery,
   SkillMasteryBackendDict
 } from 'domain/skill/SkillMasteryObjectFactory';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface SkillMasteryBackendResponse {
   'degrees_of_mastery': SkillMasteryBackendDict;

@@ -16,10 +16,11 @@
  * @fileoverview Tests for StorySummaryObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { StorySummary, StorySummaryObjectFactory } from
   'domain/story/StorySummaryObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Story summary object factory', () => {
   let factory: StorySummaryObjectFactory;

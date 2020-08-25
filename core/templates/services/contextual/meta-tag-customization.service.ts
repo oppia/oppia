@@ -16,8 +16,8 @@
  * @fileoverview Service to add custom meta tags.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { WindowRef } from './window-ref.service';
 

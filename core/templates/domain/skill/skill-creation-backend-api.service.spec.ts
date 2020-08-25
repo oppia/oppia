@@ -16,16 +16,17 @@
  * @fileoverview Unit test for SkillCreationBackendApiService.
  */
 
-import { HttpErrorResponse } from '@angular/common/http';
-import { HttpClientTestingModule, HttpTestingController }
-  from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-
 import {
   RubricBackendDict,
   SkillCreationBackendApiService,
   SkillCreationBackendDict
 } from 'domain/skill/skill-creation-backend-api.service';
+
+import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController }
+  from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
 
 describe('Skill creation backend api service', () => {
   let httpTestingController: HttpTestingController = null;

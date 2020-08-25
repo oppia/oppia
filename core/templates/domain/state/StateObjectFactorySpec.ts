@@ -15,20 +15,21 @@
 /**
  * @fileoverview Unit tests for StateObjectFactory.
  */
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { TestBed } from '@angular/core/testing';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 const constants = require('constants.ts');
 

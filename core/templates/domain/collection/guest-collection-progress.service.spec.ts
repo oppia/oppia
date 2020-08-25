@@ -16,7 +16,6 @@
  * @fileoverview Tests for GuestCollectionProgressService.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { CollectionNodeObjectFactory } from
   'domain/collection/collection-node-object.factory';
@@ -24,6 +23,8 @@ import { Collection, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Guest collection progress service', () => {
   let guestCollectionProgressService = null;

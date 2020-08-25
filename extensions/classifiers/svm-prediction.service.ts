@@ -26,11 +26,12 @@
  * https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L2481
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { PredictionResult, PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 @Injectable({
   providedIn: 'root'

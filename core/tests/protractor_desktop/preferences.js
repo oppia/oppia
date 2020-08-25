@@ -15,8 +15,8 @@
 /**
  * @fileoverview End-to-end tests for user preferences.
  */
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var general = require('../protractor_utils/general.js');
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 

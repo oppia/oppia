@@ -19,7 +19,6 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import nerdamer from 'nerdamer';
 
 import { AlgebraicExpressionInputRulesService } from
   // eslint-disable-next-line max-len
@@ -30,6 +29,7 @@ import {
   MathEquationRuleInputsWithoutSide,
   MathEquationRuleInputsWithPlaceholder
 } from 'interactions/rule-input-defs';
+import nerdamer from 'nerdamer';
 
 @Injectable({
   providedIn: 'root'

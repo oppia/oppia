@@ -25,22 +25,29 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap'
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
+
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-import { ThanksPageComponent } from './thanks-page.component';
+import { downgradeModule } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+
+
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+
+import { ThanksPageComponent } from './thanks-page.component';
 
 @NgModule({
   imports: [
@@ -72,8 +79,6 @@ class ThanksPageModule {
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -28,13 +28,15 @@
 // interaction validators is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
+
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { baseInteractionValidationService } from
+  'interactions/base-interaction-validation.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 

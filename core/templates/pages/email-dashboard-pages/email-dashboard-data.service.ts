@@ -16,13 +16,14 @@
  * @fileoverview Services for oppia email dashboard page.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { QueryData, EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardQuery } from
   'domain/email-dashboard/email-dashboard-query-object.factory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root'

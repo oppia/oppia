@@ -16,9 +16,9 @@
  * @fileoverview End-to-end tests for general site navigation.
  */
 var general = require('../protractor_utils/general.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var ThanksPage = require('../protractor_utils/ThanksPage.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
+var ThanksPage = require('../protractor_utils/ThanksPage.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 describe('Oppia landing pages tour', function() {
   it('visits the Fractions landing page', async function() {

@@ -29,10 +29,10 @@ import { StateWrittenTranslationsService } from
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
 
-import { Subscription } from 'rxjs';
 
 describe('State Translation Status Graph Component', function() {
   var $rootScope = null;

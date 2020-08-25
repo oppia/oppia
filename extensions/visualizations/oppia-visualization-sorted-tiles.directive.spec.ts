@@ -19,10 +19,11 @@
 
 require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
-import { TestBed } from '@angular/core/testing';
-
 import { AnswerStatsBackendDict, AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 import { UtilsService } from 'services/utils.service';
 
 describe('Oppia sorted tiles visualization', function() {

@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for stewardsLandingPage.
  */
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
+import { of } from 'rxjs';
 import { UrlService } from
   'services/contextual/url.service';
-import { of } from 'rxjs';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 require(
   'pages/landing-pages/stewards-landing-page/' +

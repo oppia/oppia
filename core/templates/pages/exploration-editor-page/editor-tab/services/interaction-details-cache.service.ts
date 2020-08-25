@@ -20,13 +20,13 @@
  * editor is initialized.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+import cloneDeep from 'lodash/cloneDeep';
 
 interface InteractionDetailsCache {
   [interactionId: string]: InteractionCustomizationArgs;

@@ -21,18 +21,18 @@
  * function on Oppia-ml.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants.ts';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants.ts';
+import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
 
 @Injectable({
   providedIn: 'root'

@@ -24,10 +24,12 @@ import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from
   'domain/collection/CollectionPlaythroughObjectFactory';
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory';
+
+import { Subscription } from 'rxjs';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -38,7 +40,6 @@ require('domain/collection/collection-update.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 
-import { Subscription } from 'rxjs';
 
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;

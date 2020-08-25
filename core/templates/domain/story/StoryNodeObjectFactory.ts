@@ -17,8 +17,8 @@
  * story node domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';

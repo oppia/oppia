@@ -16,16 +16,17 @@
  * @fileoverview Unit tests for the email dashboard page.
  */
 
+import { EmailDashboardQueryObjectFactory } from
+  'domain/email-dashboard/email-dashboard-query-object.factory';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { CsrfTokenService } from
-  'services/csrf-token.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
-import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-object.factory';
+import { CsrfTokenService } from
+  'services/csrf-token.service';
 
 describe('Email Dashboard Services', () => {
   describe('Email Dashboard Services', () => {

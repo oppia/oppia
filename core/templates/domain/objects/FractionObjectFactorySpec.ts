@@ -16,10 +16,10 @@
  * @fileoverview unit tests for the fraction object type factory service.
  */
 
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
 import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
 
 describe('Fraction Object Factory', () => {
   let errors = null;

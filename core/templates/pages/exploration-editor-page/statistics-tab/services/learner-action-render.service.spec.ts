@@ -21,15 +21,16 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-action-render.service.ts is upgraded to Angular 8.
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 
 require('pages/exploration-editor-page/services/exploration-states.service');
 require(

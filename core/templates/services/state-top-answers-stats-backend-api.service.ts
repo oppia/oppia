@@ -16,18 +16,21 @@
  * @fileoverview Service to fetch statistics about an exploration's states.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
-import { ServicesConstants } from 'services/services.constants';
 import {
   StateTopAnswersStats,
   StateTopAnswersStatsBackendDict,
   StateTopAnswersStatsObjectFactory
 } from 'domain/statistics/state-top-answers-stats-object.factory';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { ServicesConstants } from 'services/services.constants';
+
 
 @Injectable({providedIn: 'root'})
 export class StateTopAnswersStatsBackendApiService {

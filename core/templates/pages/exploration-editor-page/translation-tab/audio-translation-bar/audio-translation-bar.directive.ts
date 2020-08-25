@@ -60,9 +60,9 @@ require('services/id-generation.service.ts');
 require('services/user.service.ts');
 require('services/external-save.service.ts');
 
+import { Subscription } from 'rxjs';
 import WaveSurfer from 'wavesurfer.js';
 
-import { Subscription } from 'rxjs';
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

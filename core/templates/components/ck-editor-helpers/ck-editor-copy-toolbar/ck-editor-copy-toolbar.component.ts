@@ -16,8 +16,8 @@
  * @fileoverview Ck editor copy toolbar component.
  */
 
-import { Component, Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { Component, Inject } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { CkEditorCopyContentService } from

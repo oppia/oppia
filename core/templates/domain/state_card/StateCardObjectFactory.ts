@@ -17,21 +17,27 @@
  * card domain objects used in the exploration player.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import cloneDeep from 'lodash/cloneDeep';
-
-import { AppConstants } from 'app.constants';
-import { AudioTranslationLanguageService } from
-  'pages/exploration-player-page/services/audio-translation-language.service';
+import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+
 import { BindableVoiceovers, RecordedVoiceovers } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { AppConstants } from 'app.constants';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Hint } from 'domain/exploration/HintObjectFactory';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import cloneDeep from 'lodash/cloneDeep';
+
+import { AudioTranslationLanguageService } from
+  'pages/exploration-player-page/services/audio-translation-language.service';
+
+
+
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 

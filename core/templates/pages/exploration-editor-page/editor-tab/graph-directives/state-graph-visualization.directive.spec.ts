@@ -16,40 +16,41 @@
  * @fileoverview Unit tests for State Graph Visualization directive.
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
 
-import { StateGraphLayoutService } from
-  'components/graph-services/graph-layout.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
+
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { StateGraphLayoutService } from
+  'components/graph-services/graph-layout.service';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { StateSolutionService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solution.service';
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 
 import * as d3 from 'd3';
-import { of } from 'rxjs';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { of } from 'rxjs';
 
 require('pages/exploration-editor-page/editor-tab/graph-directives/' +
   'state-graph-visualization.directive.ts');

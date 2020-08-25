@@ -19,11 +19,11 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { NumericExpressionAnswer } from 'interactions/answer-defs';
+import { NumericExpressionRuleInputs } from 'interactions/rule-input-defs';
 import nerdamer from 'nerdamer';
 
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
-import { NumericExpressionAnswer } from 'interactions/answer-defs';
-import { NumericExpressionRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'

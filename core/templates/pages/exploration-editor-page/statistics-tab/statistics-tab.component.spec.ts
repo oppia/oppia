@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for statisticsTab.
  */
 
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { AlertsService } from 'services/alerts.service';
+import { ComputeGraphService } from 'services/compute-graph.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { StateInteractionStatsService } from
   'services/state-interaction-stats.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { AlertsService } from 'services/alerts.service';
-import { ComputeGraphService } from 'services/compute-graph.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
 
 class MockRouterService {
   private refreshStatisticsTabEventEmitter: EventEmitter<void>;

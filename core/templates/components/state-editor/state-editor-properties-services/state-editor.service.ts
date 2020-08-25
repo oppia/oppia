@@ -17,14 +17,20 @@
  * a state.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
+
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
+
+import { State } from 'domain/state/StateObjectFactory';
+
+import { EventEmitter, Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import {
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
@@ -32,12 +38,9 @@ import {
   ItemSelectionInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs
 } from 'extensions/interactions/customization-args-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import cloneDeep from 'lodash/cloneDeep';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { State } from 'domain/state/StateObjectFactory';
 
 interface AnswerChoice {
   val: string | number;

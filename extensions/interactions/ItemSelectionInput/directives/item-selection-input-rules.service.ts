@@ -16,10 +16,10 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { RemoveDuplicatesInArrayPipe } from
-  'filters/remove-duplicates-in-array.pipe';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { RemoveDuplicatesInArrayPipe } from
+  'filters/remove-duplicates-in-array.pipe';
 
 import { ItemSelectionAnswer } from 'interactions/answer-defs';
 import { ItemSelectionRuleInputs } from 'interactions/rule-input-defs';

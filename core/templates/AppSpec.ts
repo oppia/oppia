@@ -27,6 +27,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 

@@ -16,20 +16,22 @@
  * @fileoverview Unit tests for interactive map validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { InteractiveMapValidationService } from
-  'interactions/InteractiveMap/directives/interactive-map-validation.service';
+
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import { TestBed } from '@angular/core/testing';
+
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { AppConstants } from 'app.constants';
 import { InteractiveMapCustomizationArgs } from
   'interactions/customization-args-defs';
+import { InteractiveMapValidationService } from
+  'interactions/InteractiveMap/directives/interactive-map-validation.service';
 import { InteractiveMapRuleInputs } from 'interactions/rule-input-defs';
 
 describe('InteractiveMapValidationService', () => {

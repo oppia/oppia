@@ -16,15 +16,17 @@
  * @fileoverview Unit tests for SearchExplorationsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-
 import { SearchExplorationsBackendApiService } from
   'domain/collection/search-explorations-backend-api.service';
 
 import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
+
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+
 
 describe('Exploration search backend API service', () => {
   let SearchExplorationsService: SearchExplorationsBackendApiService = null;

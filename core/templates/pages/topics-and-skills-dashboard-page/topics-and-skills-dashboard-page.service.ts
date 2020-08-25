@@ -16,8 +16,6 @@
  * @fileoverview Service for topics and skills dashboard page.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { TopicSummary } from
   'domain/topic/TopicSummaryObjectFactory';
@@ -25,6 +23,9 @@ import { TopicSummary } from
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { TopicsAndSkillsDashboardPageConstants } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';

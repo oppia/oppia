@@ -16,8 +16,8 @@
  * @fileoverview Domain object holding the statistics of a state.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface StateStatsBackendDict {
   'total_answers_count': number;

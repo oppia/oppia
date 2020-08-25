@@ -16,8 +16,8 @@
  * @fileoverview Service to add custom attributes to the <html> element.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 

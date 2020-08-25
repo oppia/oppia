@@ -16,18 +16,20 @@
  * @fileoverview Service to send changes to a collection to the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 
 import { Collection, CollectionBackendDict, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
+
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { CollectionEditorPageConstants } from
+  'pages/collection-editor-page/collection-editor-page.constants';
 
 interface EditableCollectionBackendResponse {
   collection: CollectionBackendDict;

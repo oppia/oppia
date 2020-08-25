@@ -16,11 +16,12 @@
  * @fileoverview Domain object for holding details about an improvements task.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 /**
  * Encodes the back-end response of a task entry. This interface is intended to

@@ -25,11 +25,12 @@ import { StoryContentsObjectFactory } from
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+
+import { Subscription } from 'rxjs';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
-import { Subscription } from 'rxjs';
 
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');

@@ -16,8 +16,8 @@
  * @fileoverview Service for querying the shared constants of the Oppia module.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 

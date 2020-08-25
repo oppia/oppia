@@ -16,9 +16,10 @@
  * @fileoverview Tests for TopicObjectFactory.
  */
 
+import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
 
-import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 
 describe('Topic object factory', () => {
   let topicObjectFactory: TopicObjectFactory;

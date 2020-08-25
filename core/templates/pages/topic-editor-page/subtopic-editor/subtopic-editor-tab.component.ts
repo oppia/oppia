@@ -23,6 +23,8 @@ require('domain/utilities/url-interpolation.service.ts');
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
+import { Subscription } from 'rxjs';
+
 const subtopicConstants2 = require('constants.ts');
 
 require('domain/question/question-backend-api.service.ts');
@@ -34,7 +36,6 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
 
-import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),

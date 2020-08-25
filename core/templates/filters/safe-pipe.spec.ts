@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for Sanitization filter for Oppia.
  */
 
-import { async, TestBed } from '@angular/core/testing';
-import { SafePipe } from 'filters/safe-pipe';
-import { DomSanitizer } from '@angular/platform-browser';
 import { SecurityContext } from '@angular/core';
+import { async, TestBed } from '@angular/core/testing';
+import { DomSanitizer } from '@angular/platform-browser';
+import { SafePipe } from 'filters/safe-pipe';
 
 describe('Safe pipe', () => {
   let pipe: SafePipe;

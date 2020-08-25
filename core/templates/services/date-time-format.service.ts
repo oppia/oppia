@@ -17,8 +17,8 @@
  * since the Epoch to human-readable dates.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import moment from 'moment';
 
 @Injectable({

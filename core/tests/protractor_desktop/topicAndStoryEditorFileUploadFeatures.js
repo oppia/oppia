@@ -17,18 +17,18 @@
  * page.
  */
 
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
+var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
+var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
+var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+var TopicsAndSkillsDashboardPage =
+  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var TopicsAndSkillsDashboardPage =
-  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
-var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
-var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
 
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;

@@ -16,20 +16,21 @@
  * @fileoverview Unit tests for the ExplorationTaskObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
-import { TaskEntryBackendDict } from
-  'domain/improvements/TaskEntryObjectFactory';
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { NeedsGuidingResponsesTask } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+import { TaskEntryBackendDict } from
+  'domain/improvements/TaskEntryObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Exploration task object factory', () => {
   let expTaskObjectFactory: ExplorationTaskObjectFactory;

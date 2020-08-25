@@ -16,15 +16,16 @@
  * @fileoverview Backend api service for exploration-recommendations.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
 import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,
   LearnerExplorationSummaryObjectFactory
 } from 'domain/summary/learner-exploration-summary-object.factory';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 // This is the type used for params that are sent to the backend.
 // This type has optional properties because they may not be present in the URL.

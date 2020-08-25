@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for SuggestionObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('SuggestionObjectFactory', () => {
   beforeEach(() => {

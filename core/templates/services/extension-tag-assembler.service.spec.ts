@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for ExtensionTagAssemblerService.
  */
 
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
-import { ExtensionTagAssemblerService } from
-  './extension-tag-assembler.service';
+
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { ExtensionTagAssemblerService } from
+  './extension-tag-assembler.service';
 
 describe('Extension Tag Assembler Service', () => {
   let etas;

@@ -19,9 +19,9 @@
 
 import { EventEmitter } from '@angular/core';
 
+import { Subscription } from 'rxjs';
 import { UpgradedServices } from 'services/UpgradedServices';
 
-import { Subscription } from 'rxjs';
 
 describe('Skills List Directive', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -21,8 +21,8 @@ var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var general = require('../protractor_utils/general.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');

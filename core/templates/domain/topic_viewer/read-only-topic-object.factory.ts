@@ -17,8 +17,6 @@
  * topic data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
@@ -30,6 +28,9 @@ import {
   Subtopic,
   SubtopicObjectFactory
 } from 'domain/topic/SubtopicObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface DegreesOfMastery {
   [skillId: string]: number | null;

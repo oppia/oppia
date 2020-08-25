@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for searchBar.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';

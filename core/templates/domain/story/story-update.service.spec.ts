@@ -25,6 +25,7 @@ import { StoryContentsObjectFactory } from
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 

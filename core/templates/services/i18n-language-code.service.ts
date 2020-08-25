@@ -16,8 +16,8 @@
  * @fileoverview Service for informing of the i18n language code changes.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root'

@@ -16,17 +16,23 @@
  * @fileoverview Unit tests for the subtopic viewer navbar breadcrumb.
  */
 
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SubtopicViewerNavbarBreadcrumbComponent } from
-  './subtopic-viewer-navbar-breadcrumb.component';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { SubtopicViewerBackendApiService } from
-  'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
 import { ReadOnlySubtopicPageObjectFactory } from
   'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
+import { SubtopicViewerBackendApiService } from
+  'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+
+import { UrlService } from 'services/contextual/url.service';
+
+import { SubtopicViewerNavbarBreadcrumbComponent } from
+  './subtopic-viewer-navbar-breadcrumb.component';
+
+
+
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {

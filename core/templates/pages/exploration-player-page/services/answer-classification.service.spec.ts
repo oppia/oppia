@@ -16,25 +16,29 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerClassificationService } from
-  'pages/exploration-player-page/services/answer-classification.service';
-import { AppService } from 'services/app.service';
+
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
-import { InteractionSpecsService } from 'services/interaction-specs.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { AppService } from 'services/app.service';
+import { InteractionSpecsService } from 'services/interaction-specs.service';
+
 
 describe('Answer Classification Service', () => {
   beforeEach(() => {

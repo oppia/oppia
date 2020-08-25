@@ -16,8 +16,8 @@
  * @fileoverview Frontend domain object factory for email dashboard query.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface EmailDashboardQueryDict {
   'id': string;

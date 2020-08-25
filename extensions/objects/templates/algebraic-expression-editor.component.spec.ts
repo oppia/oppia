@@ -17,12 +17,12 @@
  */
 
 import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service.ts';
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 describe('AlgebraicExpressionEditor', function() {
   let ctrl = null, $window = null;

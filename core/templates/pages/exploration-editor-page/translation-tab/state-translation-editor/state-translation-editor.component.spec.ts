@@ -16,21 +16,24 @@
  * @fileoverview Unit tests for stateTranslationEditor.
  */
 
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateWrittenTranslationsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StateWrittenTranslationsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-written-translations.service';
+
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 

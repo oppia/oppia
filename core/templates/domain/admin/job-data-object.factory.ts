@@ -16,8 +16,8 @@
  * @fileoverview Frontend domain object factory for job data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface JobDataBackendDict {
   'human_readable_time_finished': string;

@@ -16,17 +16,20 @@
  * @fileoverview Services for stats reporting.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { AggregatedStats, StatsReportingBackendApiService } from
+  'domain/exploration/stats-reporting-backend-api.service';
+
+import { Stopwatch, StopwatchObjectFactory } from
+  'domain/utilities/StopwatchObjectFactory';
+
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ContextService } from 'services/context.service';
 import { MessengerService } from 'services/messenger.service';
 import { PlaythroughService } from 'services/playthrough.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { AggregatedStats, StatsReportingBackendApiService } from
-  'domain/exploration/stats-reporting-backend-api.service';
-import { Stopwatch, StopwatchObjectFactory } from
-  'domain/utilities/StopwatchObjectFactory';
+
 
 @Injectable({
   providedIn: 'root'

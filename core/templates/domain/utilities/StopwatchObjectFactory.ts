@@ -19,8 +19,8 @@
 // A simple service that provides stopwatch instances. Each stopwatch can be
 // independently reset and queried for the current time.
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { LoggerService } from 'services/contextual/logger.service';
 

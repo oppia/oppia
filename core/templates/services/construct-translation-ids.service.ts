@@ -16,8 +16,8 @@
  * @fileoverview Service to dynamically construct translation ids for i18n.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root'

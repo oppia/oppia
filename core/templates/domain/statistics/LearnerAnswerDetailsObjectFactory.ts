@@ -17,11 +17,12 @@
  * domain objects.
  */
 
+import { LearnerAnswerInfo } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { LearnerAnswerInfo } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 

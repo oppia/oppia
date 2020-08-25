@@ -17,12 +17,12 @@
  */
 
 
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { MusicNotesAnswer } from 'interactions/answer-defs';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
 import { UtilsService } from 'services/utils.service';
 
 @Injectable({

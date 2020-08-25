@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for chapter editor tab controller.
  */
 
+import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
 describe('Chapter Editor tab', function() {
   var $scope = null;

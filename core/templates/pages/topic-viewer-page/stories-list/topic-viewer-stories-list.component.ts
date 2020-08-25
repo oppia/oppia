@@ -16,10 +16,11 @@
  * @fileoverview Component for the topic viewer stories list.
  */
 
+import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
+
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
 
 @Component({
   selector: 'stories-list',

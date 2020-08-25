@@ -16,14 +16,16 @@
  * @fileoverview Unit tests for donate page.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { DonatePageComponent } from './donate-page.component';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { TestBed } from '@angular/core/testing';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+
+import { DonatePageComponent } from './donate-page.component';
 
 describe('Donate page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(

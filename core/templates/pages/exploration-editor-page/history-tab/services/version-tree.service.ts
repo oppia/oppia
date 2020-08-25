@@ -17,13 +17,14 @@
  * tree.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
+import { RevertChangeList, ExplorationChangeList } from
+  'domain/exploration/ExplorationDraftObjectFactory';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
 
-import { RevertChangeList, ExplorationChangeList } from
-  'domain/exploration/ExplorationDraftObjectFactory';
+
 
 export interface ExplorationSnapshot {
   'commit_message': string;

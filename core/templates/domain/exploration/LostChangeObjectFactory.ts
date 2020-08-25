@@ -17,15 +17,17 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { UtilsService } from 'services/utils.service';
-import isEqual from 'lodash/isEqual';
-
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+
 import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import isEqual from 'lodash/isEqual';
+import { UtilsService } from 'services/utils.service';
+
 
 interface LostChangeValues {
   'outcome'?: Outcome;

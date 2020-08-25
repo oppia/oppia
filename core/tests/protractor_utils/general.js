@@ -19,8 +19,11 @@
 
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
+
 var waitFor = require('./waitFor.js');
+
 var dragAndDropScript = require('html-dnd').code;
+
 var action = require('../protractor_utils/action.js');
 
 var dragAndDrop = async function(fromElement, toElement) {

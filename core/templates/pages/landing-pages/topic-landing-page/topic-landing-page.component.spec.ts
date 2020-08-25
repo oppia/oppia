@@ -16,17 +16,18 @@
  * @fileoverview Unit tests for topicLandingPage.
  */
 
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, async, tick, fakeAsync }
   from '@angular/core/testing';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { TopicLandingPageComponent } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockWindowRef {
   _window = {

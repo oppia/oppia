@@ -17,14 +17,15 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import {
   ParamChangeBackendDict,
   ParamChange,
   ParamChangeObjectFactory
 } from 'domain/exploration/ParamChangeObjectFactory.ts';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 @Injectable({
   providedIn: 'root'

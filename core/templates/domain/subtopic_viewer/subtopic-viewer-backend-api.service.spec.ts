@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for SubtopicViewerBackendApiService.
  */
 
+import { SubtopicViewerBackendApiService } from
+  'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { SubtopicViewerBackendApiService } from
-  'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 
 describe('Subtopic viewer backend API service', () => {
   let subtopicViewerBackendApiService: SubtopicViewerBackendApiService = null;

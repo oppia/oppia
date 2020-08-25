@@ -16,8 +16,8 @@
  * @fileoverview Frontend domain object factory for job specs.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface JobStatusSummaryBackendDict {
   'job_type': string;

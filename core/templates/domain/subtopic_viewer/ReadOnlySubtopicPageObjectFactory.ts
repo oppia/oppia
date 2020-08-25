@@ -17,16 +17,17 @@
  * subtopic data domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
+import { SubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
+  'domain/topic/SubtopicObjectFactory';
 import {
   SubtopicPageContentsBackendDict,
   SubtopicPageContents,
   SubtopicPageContentsObjectFactory
 } from 'domain/topic/SubtopicPageContentsObjectFactory';
-import { SubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
-  'domain/topic/SubtopicObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export interface SubtopicDataBackendDict {
   'subtopic_title': string;

@@ -15,12 +15,13 @@
 /**
  * @fileoverview Unit tests for WrittenTranslationsObjectFactory.ts
  */
-import { TestBed } from '@angular/core/testing';
-
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Written Translations Object Factory', () => {
   let writtenTranslationsObjectFactory;

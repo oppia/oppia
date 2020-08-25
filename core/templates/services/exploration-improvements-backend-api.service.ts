@@ -16,9 +16,6 @@
  * @fileoverview Service for fetching improvement tasks from the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 
 import {
   ExplorationImprovementsConfig,
@@ -34,6 +31,10 @@ import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface ExplorationImprovementsResponseBackendDict {
   'open_tasks': ExplorationTaskBackendDict[];

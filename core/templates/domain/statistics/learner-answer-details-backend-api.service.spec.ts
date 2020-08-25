@@ -15,12 +15,13 @@
 /**
  * @fileoverview Unit tests for LearnerAnswerDetailsBackendApiService
  */
+import { LearnerAnswerDetailsBackendApiService } from
+  'domain/statistics/learner-answer-details-backend-api.service.ts';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
-import { LearnerAnswerDetailsBackendApiService } from
-  'domain/statistics/learner-answer-details-backend-api.service.ts';
 
 describe('Learner answer info backend Api service', () => {
   let httpTestingController: HttpTestingController;

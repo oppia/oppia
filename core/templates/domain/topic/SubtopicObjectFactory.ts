@@ -17,11 +17,12 @@
  * subtopic domain objects.
  */
 
+import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
 
 const constants = require('constants.ts');
 

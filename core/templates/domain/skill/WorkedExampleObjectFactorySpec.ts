@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for WorkedExampleObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { SubtitledHtmlObjectFactory} from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { WorkedExampleObjectFactory} from
   'domain/skill/WorkedExampleObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Worked example object factory', () => {
   let workedExampleDict;

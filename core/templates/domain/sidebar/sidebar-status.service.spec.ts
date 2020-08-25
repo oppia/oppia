@@ -16,9 +16,10 @@
  * @fileoverview Tests for SidebarStatusService.
  */
 
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
+
 import { TestBed } from '@angular/core/testing';
 
-import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('SidebarStatusService', () => {

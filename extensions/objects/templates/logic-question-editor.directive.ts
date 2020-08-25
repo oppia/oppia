@@ -19,13 +19,13 @@
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
 import logicProofConversion from
   'interactions/LogicProof/static/js/conversion.ts';
+import logicProofData from 'interactions/LogicProof/static/js/data.ts';
 import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
   'interactions/LogicProof/static/js/generatedDefaultData.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
+import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
 
 
 angular.module('oppia').directive('logicQuestionEditor', [

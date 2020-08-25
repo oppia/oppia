@@ -16,10 +16,12 @@
  * @fileoverview Unit tests for the ExplorationImprovementsTaskRegistryService.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerStatsObjectFactory, AnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { ExplorationImprovementsConfig } from
+  'domain/improvements/exploration-improvements-config-object.factory';
 import {
   ExplorationTask,
   ExplorationTaskType,
@@ -28,16 +30,12 @@ import {
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
-import { StateStatsBackendDict } from
-  'domain/statistics/StateStatsObjectFactory';
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { NeedsGuidingResponsesTask } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
-import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from
   'domain/statistics/ExplorationStatsObjectFactory';
@@ -50,7 +48,10 @@ import {
   MultipleIncorrectSubmissionsPlaythroughIssue,
   PlaythroughIssueObjectFactory,
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { StateStatsBackendDict } from
+  'domain/statistics/StateStatsObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 

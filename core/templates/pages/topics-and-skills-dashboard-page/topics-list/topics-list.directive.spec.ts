@@ -18,8 +18,8 @@
 
 
 
-import { Subscription } from 'rxjs';
 import { EventEmitter } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 
 describe('Topics List Directive', function() {

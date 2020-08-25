@@ -16,16 +16,18 @@
  * @fileoverview Unit tests for the Solution object factory.
  */
 
+import { SolutionObjectFactory } from
+  'domain/exploration/SolutionObjectFactory';
+
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
-import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {

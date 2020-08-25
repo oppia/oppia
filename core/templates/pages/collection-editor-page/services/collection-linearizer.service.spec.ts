@@ -18,14 +18,15 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // collection-linearizer.service.ts is upgraded to Angular 8.
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionNodeObjectFactory } from
   'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from
   'domain/collection/CollectionPlaythroughObjectFactory';
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 

@@ -16,9 +16,10 @@
  * @fileoverview Tests for StoryObjectFactory.
  */
 
+import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
 
-import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
 describe('Story object factory', () => {
   let storyObjectFactory: StoryObjectFactory = null;

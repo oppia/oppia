@@ -16,23 +16,25 @@
  * @fileoverview Unit tests for item selection input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
+
 /* eslint-disable max-len */
-import { ItemSelectionInputValidationService } from
-  'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 /* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import { TestBed } from '@angular/core/testing';
+
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { AppConstants } from 'app.constants';
 import { ItemSelectionInputCustomizationArgs } from
   'interactions/customization-args-defs';
+import { ItemSelectionInputValidationService } from
+  'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 
 describe('ItemSelectionInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;

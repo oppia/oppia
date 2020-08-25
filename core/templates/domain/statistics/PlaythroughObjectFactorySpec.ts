@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for the PlaythroughObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Playthrough Object Factory', () => {
   let laof: LearnerActionObjectFactory;

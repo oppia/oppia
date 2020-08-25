@@ -18,6 +18,7 @@
 
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
 import { UtilsService } from 'services/utils.service';
 

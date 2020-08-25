@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
 import { FeatureStatusSummaryObjectFactory } from
   './feature-status-summary-object.factory';
 

@@ -16,23 +16,25 @@
  * @fileoverview Unit tests for graph input validation service.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { GraphInputValidationService } from
-  'interactions/GraphInput/directives/graph-input-validation.service';
+
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import { TestBed } from '@angular/core/testing';
+
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { AppConstants } from 'app.constants';
 import { GraphInputCustomizationArgs } from
   'interactions/customization-args-defs';
+import { GraphInputValidationService } from
+  'interactions/GraphInput/directives/graph-input-validation.service';
 import { GraphIsomorphicRuleInputs } from 'interactions/rule-input-defs';
+import cloneDeep from 'lodash/cloneDeep';
 
 describe('GraphInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;

@@ -16,8 +16,8 @@
  * @fileoverview Frontend domain object factory for creator exploration summary.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface ExplorationRatings {
   '1': number;

@@ -16,16 +16,18 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+
 import { FractionAnswer } from 'interactions/answer-defs';
-import { UtilsService } from 'services/utils.service';
 import {
   FractionEquivalentRuleInputs,
   FractionIntegerPartRuleInputs
 } from 'interactions/rule-input-defs';
+import { UtilsService } from 'services/utils.service';
 
 @Injectable({
   providedIn: 'root'

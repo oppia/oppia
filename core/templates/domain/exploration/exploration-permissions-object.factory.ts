@@ -17,8 +17,8 @@
  * permissions.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface ExplorationPermissionsBackendDict {
   'can_unpublish': boolean;

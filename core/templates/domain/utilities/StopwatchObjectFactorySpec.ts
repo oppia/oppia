@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for StopwatchObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Stopwatch object factory', () => {
   let stopwatchObjectFactory: StopwatchObjectFactory = null;

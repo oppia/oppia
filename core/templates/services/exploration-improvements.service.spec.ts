@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
-import { StateObjectsBackendDict } from
-  'domain/exploration/StatesObjectFactory';
 import { ExplorationPermissions } from
   'domain/exploration/exploration-permissions-object.factory';
+import { StateObjectsBackendDict } from
+  'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
 import { HighBounceRateTaskObjectFactory } from
@@ -30,6 +28,9 @@ import { ExplorationStats } from
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { ContextService } from 'services/context.service';

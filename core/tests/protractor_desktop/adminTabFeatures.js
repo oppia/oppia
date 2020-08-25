@@ -16,9 +16,9 @@
  * @fileoverview End-to-end tests for admin page functionality.
  */
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
 
 describe('Admin Page', function() {
   var adminPage = null;

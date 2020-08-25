@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for the NeedsGuidingResponsesTask domain object.
  */
 
-import { TestBed } from '@angular/core/testing';
-
+import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { NeedsGuidingResponsesTaskObjectFactory } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Needs guiding responses task', function() {
   let needsGuidingResponsesTaskObjectFactory:

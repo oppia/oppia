@@ -16,10 +16,11 @@
  * @fileoverview unit tests for outcome object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Outcome object factory', () => {
   let oof: OutcomeObjectFactory;

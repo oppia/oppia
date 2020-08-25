@@ -21,14 +21,14 @@
  * function on Oppia-ml.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
 
 @Injectable({
   providedIn: 'root'

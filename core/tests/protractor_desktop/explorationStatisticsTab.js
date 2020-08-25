@@ -17,10 +17,6 @@
  * in the exploration editor.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
 
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -30,7 +26,11 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var forms = require('../protractor_utils/forms.js');
+var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var users = require('../protractor_utils/users.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 describe('Statistics tab', function() {
   var explorationEditorPage = null;

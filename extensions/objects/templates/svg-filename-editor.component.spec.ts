@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for the svg filename editor.
  */
 
-import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
+import { fabric } from 'fabric';
 
 var initializeMockDocument = function(svgFilenameCtrl) {
   var mockDocument = document.createElement('div');

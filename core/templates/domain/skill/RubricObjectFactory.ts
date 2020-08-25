@@ -22,10 +22,10 @@ export interface RubricBackendDict {
   explanations: string[]
 }
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export class Rubric {
   _difficulty: string;

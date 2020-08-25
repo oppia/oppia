@@ -17,17 +17,19 @@
  * exploration.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { ContextService } from 'services/context.service';
-import { ServicesConstants } from 'services/services.constants';
-import { UrlService } from 'services/contextual/url.service';
-
 import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
+
 import { LearnerExplorationSummary } from
   'domain/summary/learner-exploration-summary-object.factory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { ContextService } from 'services/context.service';
+import { UrlService } from 'services/contextual/url.service';
+import { ServicesConstants } from 'services/services.constants';
+
 
 @Injectable({
   providedIn: 'root'

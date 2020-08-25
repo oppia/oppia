@@ -16,16 +16,17 @@
  * @fileoverview Unit tests for the translation language selector component.
  */
 
+import { FeaturedTranslationLanguageObjectFactory } from
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TranslationLanguageSelectorComponent } from
-  // eslint-disable-next-line max-len
-  'pages/contributor-dashboard-page/translation-language-selector/translation-language-selector.component.ts';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.ts';
-import { FeaturedTranslationLanguageObjectFactory } from
-  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+import { TranslationLanguageSelectorComponent } from
+  // eslint-disable-next-line max-len
+  'pages/contributor-dashboard-page/translation-language-selector/translation-language-selector.component.ts';
 
 describe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;

@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for PlatformParameterRuleObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import {
   PlatformParameterBackendDict,
   PlatformParameterObjectFactory
 } from 'domain/platform_feature/platform-parameter-object.factory';
+
+import { TestBed } from '@angular/core/testing';
+
 import {
   PlatformParameterFilterType,
   ServerMode

@@ -16,28 +16,32 @@
  * @fileoverview Classification service for answer groups.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
 import {
   AnswerClassificationResult, AnswerClassificationResultObjectFactory
 } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { AppService } from 'services/app.service';
+
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+
+import { State } from 'domain/state/StateObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { InteractionSpecsService } from 'services/interaction-specs.service';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService }
   // eslint-disable-next-line max-len
   from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import { AlertsService } from 'services/alerts.service';
+import { AppService } from 'services/app.service';
+import { InteractionSpecsService } from 'services/interaction-specs.service';
 
 interface InteractionRulesService {
   [ruleName: string]: (

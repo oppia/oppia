@@ -27,9 +27,9 @@
  * https://cran.r-project.org/web/packages/hexbin/vignettes/hexagon_binning.pdf
  */
 
-import { hexbin, HexbinBin } from 'd3-hexbin';
 import { max, sum } from 'd3-array';
 import { RGBColor, rgb } from 'd3-color';
+import { hexbin, HexbinBin } from 'd3-hexbin';
 import { scaleLinear } from 'd3-scale';
 
 interface ClickOnImageAnswer {

@@ -16,11 +16,12 @@
  * @fileoverview Domain object for state top answers stats.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { AnswerStatsObjectFactory, AnswerStats, AnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 interface StateInteractionIds {
   [stateName: string]: string;

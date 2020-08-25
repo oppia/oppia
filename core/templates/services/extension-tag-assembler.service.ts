@@ -17,20 +17,21 @@
  * the learner and editor views.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { HtmlEscaperService } from 'services/html-escaper.service';
 import {
   InteractionCustomizationArgs,
   InteractionCustomizationArgsBackendDict
 } from
   'interactions/customization-args-defs';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 // Service for assembling extension tags (for interactions).
 @Injectable({

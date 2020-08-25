@@ -18,8 +18,8 @@
  * is opened for the first time for an exploration.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 

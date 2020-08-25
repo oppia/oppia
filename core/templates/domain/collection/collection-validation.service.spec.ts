@@ -16,14 +16,15 @@
  * @fileoverview Tests for CollectionValidationService.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { CollectionNodeObjectFactory } from
   'domain/collection/collection-node-object.factory';
-import { CollectionBackendDict, Collection, CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
+import { CollectionBackendDict, Collection, CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Collection validation service', function() {
   let collectionValidationService: CollectionValidationService = null;

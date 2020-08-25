@@ -16,15 +16,16 @@
  * @fileoverview Factory for creating PlatformParameterRule domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import {
   PlatformParameterFilter,
   PlatformParameterFilterBackendDict,
   PlatformParameterFilterObjectFactory,
   PlatformParameterFilterType
 } from 'domain/platform_feature/platform-parameter-filter-object.factory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 
 export type PlatformParameterValue = boolean | number | string;

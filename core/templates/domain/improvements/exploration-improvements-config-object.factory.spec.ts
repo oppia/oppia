@@ -17,6 +17,7 @@ import {
   ExplorationImprovementsConfigBackendDict,
   ExplorationImprovementsConfigObjectFactory,
 } from 'domain/improvements/exploration-improvements-config-object.factory';
+
 import { TestBed } from '@angular/core/testing';
 
 /**

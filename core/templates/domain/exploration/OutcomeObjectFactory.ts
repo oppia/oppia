@@ -17,16 +17,17 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
+import { ParamChangeBackendDict } from
+  'domain/exploration/ParamChangeObjectFactory';
 import {
   SubtitledHtmlBackendDict,
   SubtitledHtml,
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { ParamChangeBackendDict } from
-  'domain/exploration/ParamChangeObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export interface OutcomeBackendDict {
   'dest': string;

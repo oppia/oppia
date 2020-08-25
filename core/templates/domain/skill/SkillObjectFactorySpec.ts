@@ -16,19 +16,24 @@
  * @fileoverview Unit tests for SkillObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
+
+
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
+
+
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory.ts';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
+
 const constants = require('constants.ts');
 
 describe('Skill object factory', () => {

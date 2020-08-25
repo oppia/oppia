@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for ClassroomDataObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { ClassroomDataObjectFactory } from
   'domain/classroom/ClassroomDataObjectFactory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Classroom data object factory', () => {
   let topicSummaryDicts;

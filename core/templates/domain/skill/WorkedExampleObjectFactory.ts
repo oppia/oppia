@@ -17,11 +17,12 @@
  * worked examples.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import {
   SubtitledHtml, SubtitledHtmlObjectFactory, SubtitledHtmlBackendDict
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface WorkedExampleBackendDict {
   question: SubtitledHtmlBackendDict,

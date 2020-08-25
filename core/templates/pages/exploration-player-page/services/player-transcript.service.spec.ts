@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for the player transcript service.
  */
 
+import { StateCardObjectFactory } from
+  'domain/state_card/StateCardObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
 
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
 
 describe('Player transcript service', () => {
   let pts;

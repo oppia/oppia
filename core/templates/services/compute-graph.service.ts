@@ -17,10 +17,11 @@
  * exploration.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { States } from 'domain/exploration/StatesObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export interface GraphLink {
   source: string;

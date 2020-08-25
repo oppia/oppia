@@ -18,11 +18,11 @@
     used in an instance of the LogicProof interaction.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
 import logicProofData from 'interactions/LogicProof/static/js/data.ts';
 import logicProofParser from
   'interactions/LogicProof/static/js/generatedParser.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
+import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
 
 var logicProofTeacher2 = (function() {
   // ---- LINE TEMPLATES ----

@@ -16,14 +16,17 @@
  * @fileoverview Unit tests for logic proof validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { LogicProofValidationService } from
-  'interactions/LogicProof/directives/logic-proof-validation.service';
+
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
+import { LogicProofValidationService } from
+  'interactions/LogicProof/directives/logic-proof-validation.service';
+
 
 describe('LogicProofValidationService', () => {
   let validatorService: LogicProofValidationService;

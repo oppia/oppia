@@ -16,19 +16,19 @@
  * @fileoverview End-to-end tests for the skill editor page.
  */
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
+var SkillEditorPage =
+  require('../protractor_utils/SkillEditorPage.js');
+var TopicsAndSkillsDashboardPage =
+  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
-var TopicsAndSkillsDashboardPage =
-  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var SkillEditorPage =
-  require('../protractor_utils/SkillEditorPage.js');
 
 describe('Skill Editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;

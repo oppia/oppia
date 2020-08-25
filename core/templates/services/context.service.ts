@@ -17,14 +17,17 @@
  * context.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { AppConstants } from 'app.constants';
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory.ts';
-import { ServicesConstants } from 'services/services.constants';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { AppConstants } from 'app.constants';
+
+
 import { UrlService } from 'services/contextual/url.service';
+import { ServicesConstants } from 'services/services.constants';
 
 @Injectable({
   providedIn: 'root'

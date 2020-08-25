@@ -16,21 +16,26 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
+
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
+
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+
 import { AppConstants } from 'app.constants';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { TextInputCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+
 
 interface Warning {
   type: string,

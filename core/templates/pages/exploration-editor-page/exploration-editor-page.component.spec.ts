@@ -16,18 +16,22 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { StateClassifierMappingService } from

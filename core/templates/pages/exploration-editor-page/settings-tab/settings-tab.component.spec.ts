@@ -16,36 +16,37 @@
  * @fileoverview Unit tests for settingsTab.
  */
 
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { AlertsService } from 'services/alerts.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import { StateSolutionService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solution.service';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-import { Subscription } from 'rxjs';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;

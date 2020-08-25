@@ -16,9 +16,9 @@
  * collection_id.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface CollectionCreationBackendDict {
   'collection_id': string

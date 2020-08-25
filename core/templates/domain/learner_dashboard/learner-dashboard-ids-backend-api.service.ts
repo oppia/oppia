@@ -17,15 +17,16 @@
  * activities present in the learner dashboard.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
 import {
   LearnerDashboardActivityIds,
   LearnerDashboardActivityIdsDict,
   LearnerDashboardActivityIdsObjectFactory
 } from 'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 interface LearnerDashboardIdsBackendResponse {
   'learner_dashboard_activity_ids': LearnerDashboardActivityIdsDict;

@@ -15,14 +15,15 @@
 /**
  * @fileoverview A data service that stores the current interaction solution.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { AlertsService } from 'services/alerts.service';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
+import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
 
 @Injectable({

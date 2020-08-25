@@ -19,13 +19,14 @@
  * This cache should be reset each time the state editor is initialized.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
+import { AnswerGroupBackendDict } from
+  'domain/exploration/AnswerGroupObjectFactory';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
 
-import { AnswerGroupBackendDict } from
-  'domain/exploration/AnswerGroupObjectFactory';
+
 
 @Injectable({
   providedIn: 'root'

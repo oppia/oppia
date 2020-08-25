@@ -17,12 +17,13 @@
  */
 
 
+import { ReviewTestBackendApiService } from
+  'domain/review_test/review-test-backend-api.service';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ReviewTestBackendApiService } from
-  'domain/review_test/review-test-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 
 describe('Review test backend API service', () => {

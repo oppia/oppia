@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardFilterObjectFactory.
  */
 
-import { ETopicPublishedOptions, ETopicSortOptions } from
-  // eslint-disable-next-line max-len
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
-
 import {
   TopicsAndSkillsDashboardFilter,
   TopicsAndSkillsDashboardFilterObjectFactory } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+
+import { ETopicPublishedOptions, ETopicSortOptions } from
+  // eslint-disable-next-line max-len
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+
 
 describe('Topics And Skills Dashboard Filter Object', () => {
   let topicsAndSkillsDashboardFilterObjectFactory:

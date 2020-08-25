@@ -18,11 +18,12 @@
  * which defines them (represented as ParamSpec objects).
  */
 
+import { ParamSpecBackendDict, ParamSpec, ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory';
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ParamSpecBackendDict, ParamSpec, ParamSpecObjectFactory } from
-  'domain/exploration/ParamSpecObjectFactory';
 
 export interface ParamSpecsBackendDict {
   [paramName: string]: ParamSpecBackendDict;

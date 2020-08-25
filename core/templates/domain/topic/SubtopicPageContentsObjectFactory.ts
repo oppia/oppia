@@ -17,10 +17,6 @@
  * subtopic page data domain objects.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
-
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
   RecordedVoiceOverBackendDict,
@@ -33,6 +29,13 @@ import {
   SubtitledHtml,
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+
+
+import cloneDeep from 'lodash/cloneDeep';
 
 export interface SubtopicPageContentsBackendDict {
   'subtitled_html': SubtitledHtmlBackendDict;

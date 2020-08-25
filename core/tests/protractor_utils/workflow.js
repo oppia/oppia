@@ -17,14 +17,15 @@
  * carrrying out end-to-end testing with protractor.
  */
 
-var forms = require('./forms.js');
 var path = require('path');
-var users = require('./users.js');
-var waitFor = require('./waitFor.js');
+
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
+var forms = require('./forms.js');
 var LibraryPage = require('./LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+var users = require('./users.js');
+var waitFor = require('./waitFor.js');
 
 var imageUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));

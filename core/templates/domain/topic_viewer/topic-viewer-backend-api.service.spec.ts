@@ -16,17 +16,18 @@
  * @fileoverview Unit tests for TopicViewerBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ReadOnlyTopicObjectFactory } from
-  'domain/topic_viewer/read-only-topic-object.factory';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
+
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Topic viewer backend API service', () => {

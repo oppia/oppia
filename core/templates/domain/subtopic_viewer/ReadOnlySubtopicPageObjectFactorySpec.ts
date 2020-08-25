@@ -16,13 +16,14 @@
  * @fileoverview Tests for SubtopicDataObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
+import { ReadOnlySubtopicPageObjectFactory } from
+  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
 
-import { ReadOnlySubtopicPageObjectFactory } from
-  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
+import { TestBed } from '@angular/core/testing';
+
+
 
 describe('Subtopic data object factory', () => {
   describe('subtopic data object factory', () => {

@@ -16,23 +16,28 @@
  * @fileoverview Validator service for the MathEquationInput interaction.
  */
 
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import nerdamer from 'nerdamer';
-
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
+import { AppConstants } from 'app.constants';
 import { MathEquationInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
+import { Warning, baseInteractionValidationService } from
+  'interactions/base-interaction-validation.service';
+import nerdamer from 'nerdamer';
+
+
+import { MathInteractionsService } from 'services/math-interactions.service';
+
 import { MathEquationInputRulesService } from
   './math-equation-input-rules.service';
-import { MathInteractionsService } from 'services/math-interactions.service';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
-import { AppConstants } from 'app.constants';
+
 
 @Injectable({
   providedIn: 'root'

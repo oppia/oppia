@@ -16,15 +16,11 @@
  * @fileoverview Unit tests for multiple choice input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { MultipleChoiceInputCustomizationArgs } from
-  'interactions/customization-args-defs';
+
 /* eslint-disable max-len */
-import { MultipleChoiceInputValidationService } from
-  'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 /* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -32,8 +28,14 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import { TestBed } from '@angular/core/testing';
+
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { AppConstants } from 'app.constants';
+import { MultipleChoiceInputCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { MultipleChoiceInputValidationService } from
+  'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import { MultipleChoiceRuleInputs } from 'interactions/rule-input-defs';
 
 describe('MultipleChoiceInputValidationService', () => {

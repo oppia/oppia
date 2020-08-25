@@ -20,7 +20,6 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate',
@@ -28,32 +27,38 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
+import { CollectionDomainConstants } from
+  'domain/collection/collection-domain.constants';
+
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
+
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-
-import { AppConstants } from 'app.constants';
-import { CollectionDomainConstants } from
-  'domain/collection/collection-domain.constants';
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
+import { SharedComponentsModule } from 'components/shared-component.module';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-
+import { CollectionEditorPageConstants } from
+  'pages/collection-editor-page/collection-editor-page.constants';
 import { CollectionHistoryTabComponent } from
   'pages/collection-editor-page/history-tab/collection-history-tab.component';
 import { CollectionDetailsEditor } from
   // eslint-disable-next-line max-len
   'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+
+
+
+
+
+import { ServicesConstants } from 'services/services.constants';
+
 import { CollectionPermissionsCard } from
   // eslint-disable-next-line max-len
   'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
@@ -104,6 +109,7 @@ class CollectionEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import uiValidate from 'angular-ui-validate';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

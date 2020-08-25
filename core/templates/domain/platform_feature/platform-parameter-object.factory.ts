@@ -16,15 +16,16 @@
  * @fileoverview Factory for creating PlatformParameter domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import {
   PlatformParameterRule,
   PlatformParameterRuleBackendDict,
   PlatformParameterRuleObjectFactory,
   PlatformParameterValue
 } from 'domain/platform_feature/platform-parameter-rule-object.factory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export enum FeatureStage {
   DEV = 'dev',

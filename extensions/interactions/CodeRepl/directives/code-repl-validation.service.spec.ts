@@ -16,17 +16,19 @@
  * @fileoverview Unit tests for code repl input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { CodeReplValidationService } from
-  'interactions/CodeRepl/directives/code-repl-validation.service';
+
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import { TestBed } from '@angular/core/testing';
+
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { AppConstants } from 'app.constants';
+import { CodeReplValidationService } from
+  'interactions/CodeRepl/directives/code-repl-validation.service';
 import { CodeReplCustomizationArgs } from
   'interactions/customization-args-defs';
 

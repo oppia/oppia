@@ -15,12 +15,13 @@
  * @fileoverview Unit tests for QuestionBackendApiService.
  */
 
+import { QuestionBackendApiService } from
+  'domain/question/question-backend-api.service.ts';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { QuestionBackendApiService } from
-  'domain/question/question-backend-api.service.ts';
 
 describe('Question backend Api service', () => {
   let questionBackendApiService = null;

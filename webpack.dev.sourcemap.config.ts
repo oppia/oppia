@@ -18,6 +18,7 @@
  */
 
 const { merge } = require('webpack-merge');
+
 const dev = require('./webpack.dev.config.ts');
 
 module.exports = merge(dev, {

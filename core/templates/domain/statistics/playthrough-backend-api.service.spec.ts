@@ -16,14 +16,16 @@
  * @fileoverview Unit tests for PlaythroughBackendApiService.
  */
 
+import { PlaythroughBackendApiService } from
+  'domain/statistics/playthrough-backend-api.service';
+
+import { PlaythroughObjectFactory, PlaythroughBackendDict } from
+  'domain/statistics/PlaythroughObjectFactory';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { PlaythroughBackendApiService } from
-  'domain/statistics/playthrough-backend-api.service';
-import { PlaythroughObjectFactory, PlaythroughBackendDict } from
-  'domain/statistics/PlaythroughObjectFactory';
 
 describe('Playthrough backend api service', () => {
   let pbas: PlaythroughBackendApiService;

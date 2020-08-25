@@ -16,9 +16,9 @@
  * @fileoverview Service for computing the window dimensions.
  */
 
+import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { fromEvent, Observable } from 'rxjs';
-import { Injectable } from '@angular/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({

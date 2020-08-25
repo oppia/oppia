@@ -17,11 +17,11 @@
  */
 import { TestBed } from '@angular/core/testing';
 
+import { NormalizeWhitespacePunctuationAndCasePipe } from
+  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 /* eslint-disable max-len */
-import { NormalizeWhitespacePunctuationAndCasePipe } from
-  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 /* eslint-enable max-len */
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';

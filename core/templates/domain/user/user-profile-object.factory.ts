@@ -16,14 +16,15 @@
  * @fileoverview Frontend domain object factory for users.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,
   LearnerExplorationSummaryObjectFactory
 } from 'domain/summary/learner-exploration-summary-object.factory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export interface UserProfileBackendDict {
   'username': string;

@@ -18,14 +18,14 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CodeReplPredictionService } from
-  'interactions/CodeRepl/code-repl-prediction.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
-import { LoggerService } from 'services/contextual/logger.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
+import { CodeReplPredictionService } from
+  'interactions/CodeRepl/code-repl-prediction.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
 describe('CodeRepl prediction service', () => {
   describe('CodeRepl prediction service test', () => {

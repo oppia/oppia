@@ -17,8 +17,8 @@
  *               the exploration editor.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ExplorationFeatures } from
   'services/exploration-features-backend-api.service';

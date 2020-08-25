@@ -16,8 +16,9 @@
  * @fileoverview Unit test for the State Hints service.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 /* eslint-disable max-len */
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 /* eslint-disable max-len */

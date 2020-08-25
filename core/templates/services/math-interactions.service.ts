@@ -19,9 +19,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { AppConstants } from 'app.constants';
 import nerdamer from 'nerdamer';
 
-import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'

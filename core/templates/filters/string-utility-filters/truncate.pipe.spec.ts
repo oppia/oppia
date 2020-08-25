@@ -16,9 +16,9 @@
  * @fileoverview Tests for Truncate pipe for Oppia.
  */
 
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 
 describe('Testing filters', function() {
   let truncatePipe: TruncatePipe = null;

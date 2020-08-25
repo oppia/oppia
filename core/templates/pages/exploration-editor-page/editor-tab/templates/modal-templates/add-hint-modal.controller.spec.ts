@@ -16,8 +16,9 @@
  * @fileoverview Unit tests for AddHintModalController.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';

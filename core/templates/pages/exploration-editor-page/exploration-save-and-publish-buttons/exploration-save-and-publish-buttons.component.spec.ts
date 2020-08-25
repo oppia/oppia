@@ -16,40 +16,46 @@
  * @fileoverview Unit tests for explorationSaveAndPublishButtons.
  */
 
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { ContextService } from 'services/context.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { EditabilityService } from 'services/editability.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+
+
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { ContextService } from 'services/context.service';
+import { EditabilityService } from 'services/editability.service';
+
+
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 describe('Exploration save and publish buttons component', function() {
   var ctrl = null;

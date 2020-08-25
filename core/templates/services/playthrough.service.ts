@@ -16,26 +16,32 @@
  * @fileoverview Service for recording and scrutinizing playthroughs.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { AppConstants } from 'app.constants';
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
+import { LearnerAction, LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
+import { PlaythroughBackendApiService } from
+  'domain/statistics/playthrough-backend-api.service';
 import {
   CyclicStateTransitionsCustomizationArgs,
   EarlyQuitCustomizationArgs,
   MultipleIncorrectSubmissionsCustomizationArgs
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
-import { LearnerAction, LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+
 import { Playthrough, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
-import { PlaythroughBackendApiService } from
-  'domain/statistics/playthrough-backend-api.service';
-import { ServicesConstants } from 'services/services.constants';
+
 import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { AppConstants } from 'app.constants';
+import { ExplorationFeaturesService } from
+  'services/exploration-features.service';
+
+
+import { ServicesConstants } from 'services/services.constants';
+
 
 class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */

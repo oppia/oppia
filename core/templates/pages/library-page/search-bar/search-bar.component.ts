@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Subscription } from 'rxjs';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { Subscription } from 'rxjs';
 
 /**
  * @fileoverview Component for the Search Bar.

@@ -17,35 +17,36 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
-import cloneDeep from 'lodash/cloneDeep';
 
-import { AppConstants } from 'app.constants';
-import { LoggerService } from 'services/contextual/logger.service';
+import { Interaction } from
+  'domain/exploration/InteractionObjectFactory';
 import { ParamChangeBackendDict, ParamChange } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { ParamSpecsBackendDict, ParamSpecs, ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
-import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { Interaction } from
-  'domain/exploration/InteractionObjectFactory';
 import { BindableVoiceovers } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { State } from 'domain/state/StateObjectFactory';
 import {
   StateObjectsBackendDict,
   States,
   StatesObjectFactory,
   VoiceoverObjectsDict
 } from 'domain/exploration/StatesObjectFactory';
+import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+import { State } from 'domain/state/StateObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
+import cloneDeep from 'lodash/cloneDeep';
+import { LoggerService } from 'services/contextual/logger.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 

@@ -16,17 +16,17 @@
  * @fileoverview End-to-end tests for the topics and skills dashboard page.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-
-var Constants = require('../protractor_utils/ProtractorConstants.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
-var TopicsAndSkillsDashboardPage = require(
-  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
+var forms = require('../protractor_utils/forms.js');
+var general = require('../protractor_utils/general.js');
+
+var Constants = require('../protractor_utils/ProtractorConstants.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+var TopicsAndSkillsDashboardPage = require(
+  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
+var users = require('../protractor_utils/users.js');
 
 
 describe('Topics and skills dashboard functionality', function() {

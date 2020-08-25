@@ -16,15 +16,16 @@
  * @fileoverview Backend api service for stats reporting.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
-import { ContextService } from 'services/context.service';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { ExplorationPlayerConstants } from
+  'pages/exploration-player-page/exploration-player-page.constants';
+import { ContextService } from 'services/context.service';
 
 interface StateStats {
   'total_answers_count': number;

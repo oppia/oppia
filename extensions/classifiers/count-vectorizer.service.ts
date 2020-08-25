@@ -23,8 +23,8 @@
  * propagated here.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface Vocabulary {
   [char: string]: number;

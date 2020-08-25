@@ -16,11 +16,12 @@
  * @fileoverview Component for the attribution guide.
  */
 
+import { BrowserCheckerService } from
+  'domain/utilities/browser-checker.service';
+
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { BrowserCheckerService } from
-  'domain/utilities/browser-checker.service';
 import { UrlService } from 'services/contextual/url.service';
 
 @Component({

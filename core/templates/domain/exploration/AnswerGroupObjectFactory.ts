@@ -17,14 +17,19 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { InteractionAnswer } from 'interactions/answer-defs';
 import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+
 import { RuleObjectFactory, Rule } from 'domain/exploration/RuleObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { InteractionAnswer } from 'interactions/answer-defs';
+
+
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+
 
 export interface RuleInputs {
   [ruleType: string]: InteractionRuleInputs[];

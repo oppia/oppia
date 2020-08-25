@@ -16,17 +16,20 @@
  * @fileoverview Modal and functionality for the create collection button.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { AlertsService } from 'services/alerts.service';
-import { CollectionCreationBackendService } from
-  'components/entity-creation-services/collection-creation-backend-api.service';
-import { LoaderService } from 'services/loader.service.ts';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { CollectionCreationBackendService } from
+  'components/entity-creation-services/collection-creation-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoaderService } from 'services/loader.service.ts';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+
+
 
 @Injectable({
   providedIn: 'root'

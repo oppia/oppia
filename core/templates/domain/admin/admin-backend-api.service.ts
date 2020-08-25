@@ -16,17 +16,7 @@
  * @fileoverview Backend api service for fetching the admin data;
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 
-import { AdminPageConstants } from
-  'pages/admin-page/admin-page.constants';
-import {
-  TopicSummaryBackendDict,
-  TopicSummary,
-  TopicSummaryObjectFactory
-} from 'domain/topic/TopicSummaryObjectFactory';
 import {
   ComputationData,
   ComputationDataBackendDict,
@@ -42,6 +32,17 @@ import {
   JobStatusSummaryBackendDict,
   JobStatusSummaryObjectFactory
 } from 'domain/admin/job-status-summary-object.factory';
+import {
+  TopicSummaryBackendDict,
+  TopicSummary,
+  TopicSummaryObjectFactory
+} from 'domain/topic/TopicSummaryObjectFactory';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { AdminPageConstants } from
+  'pages/admin-page/admin-page.constants';
 
 
 interface UserRoles {

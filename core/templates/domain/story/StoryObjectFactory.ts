@@ -17,16 +17,17 @@
  * story domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-const constants = require('constants.ts');
-
 import {
   StoryContentsBackendDict,
   StoryContents,
   StoryContentsObjectFactory
 } from 'domain/story/StoryContentsObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+const constants = require('constants.ts');
+
 
 interface StoryBackendDict {
   'id': string;

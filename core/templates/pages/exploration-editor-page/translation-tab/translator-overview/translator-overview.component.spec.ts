@@ -16,17 +16,19 @@
  * @fileoverview Unit tests for translatorOverview.
  */
 
-import { EventEmitter } from '@angular/core';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { StateWrittenTranslationsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-written-translations.service';
+
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { StateWrittenTranslationsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 

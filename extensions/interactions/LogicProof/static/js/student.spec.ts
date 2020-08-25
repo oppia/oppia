@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for LogicProof interaction student components.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared';
-import logicProofStudent from 'interactions/LogicProof/static/js/student';
 import logicProofData from 'interactions/LogicProof/static/js/data';
 import logicProofParser from
   'interactions/LogicProof/static/js/generatedParser';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
+import logicProofStudent from 'interactions/LogicProof/static/js/student';
 
 describe('Match expression to expression template', function() {
   var expressionR = {

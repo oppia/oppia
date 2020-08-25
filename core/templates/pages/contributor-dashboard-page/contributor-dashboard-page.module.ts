@@ -20,6 +20,13 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import 'angular-ui-sortable';
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeModule } from '@angular/upgrade/static';
 import uiValidate from 'angular-ui-validate';
 import ngInfiniteScroll from 'ng-infinite-scroll';
 import 'third-party-imports/ui-tree.import';
@@ -30,19 +37,15 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ContributorDashboardConstants } from
+  'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 import { AppConstants } from 'app.constants';
-import { ContributorDashboardConstants } from
-  'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
 
@@ -75,8 +78,6 @@ class ContributorDashboardPageModule {
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

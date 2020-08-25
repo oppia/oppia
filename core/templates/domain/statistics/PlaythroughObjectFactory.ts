@@ -17,8 +17,6 @@
  *     domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import {
   LearnerActionBackendDict,
@@ -30,6 +28,9 @@ import {
   CyclicStateTransitionsCustomizationArgs,
   MultipleIncorrectSubmissionsCustomizationArgs
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This type takes one of the values of the customization args based

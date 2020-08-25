@@ -17,9 +17,6 @@
  * backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 
 import {
   CollectionSummary,
@@ -32,20 +29,24 @@ import {
   FeedbackThreadSummaryBackendDict
 } from 'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import {
-  LearnerExplorationSummary,
-  LearnerExplorationSummaryBackendDict,
-  LearnerExplorationSummaryObjectFactory
-} from 'domain/summary/learner-exploration-summary-object.factory';
-import {
   NonExistentActivities,
   NonExistentActivitiesBackendDict,
   NonExistentActivitiesObjectFactory
 } from 'domain/learner_dashboard/non-existent-activities-object.factory';
 import {
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryBackendDict,
+  LearnerExplorationSummaryObjectFactory
+} from 'domain/summary/learner-exploration-summary-object.factory';
+import {
   CreatorSummaryBackendDict,
   ProfileSummary,
   ProfileSummaryObjectFactory
 } from 'domain/user/profile-summary-object.factory';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface LearnerDashboardDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];

@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for ClientContextObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { ClientContextObjectFactory } from
   'domain/platform_feature/client-context-object.factory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('PlatformParameterMetadataObjectFactory', () => {
   let factory: ClientContextObjectFactory;

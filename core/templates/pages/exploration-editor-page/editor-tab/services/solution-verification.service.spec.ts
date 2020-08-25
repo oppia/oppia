@@ -18,11 +18,11 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
 
 require('App.ts');
 require('domain/exploration/SolutionObjectFactory.ts');

@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for the component of the library page.
  */
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TestBed } from '@angular/core/testing';
-import { PageTitleService } from 'services/page-title.service';
-import { of } from 'rxjs';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PageTitleService } from 'services/page-title.service';
+
+
 
 import 'mousetrap';
 

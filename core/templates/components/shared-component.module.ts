@@ -18,40 +18,45 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { BackgroundBannerComponent } from
-  './common-layout-directives/common-elements/background-banner.component';
-import { AttributionGuideComponent } from
-  './common-layout-directives/common-elements/attribution-guide.component';
-import { LazyLoadingComponent } from
-  './common-layout-directives/common-elements/lazy-loading.component';
-import { LoadingDotsComponent } from
-  './common-layout-directives/common-elements/loading-dots.component';
-import { MaterialModule } from './material.module';
-import { TranslatePipe } from 'filters/translate.pipe';
-import { SafePipe } from 'filters/safe-pipe';
-import { SkillMasteryViewerComponent } from
-  './skill-mastery/skill-mastery.component';
-import { ExplorationEmbedButtonModalComponent } from
-  './button-directives/exploration-embed-button-modal.component';
-import { SharingLinksComponent } from
-  './common-layout-directives/common-elements/sharing-links.component';
-import { StorySummaryTileDirective } from
-  './summary-tile/story-summary-tile.directive';
-import { SubtopicSummaryTileDirective } from
-  './summary-tile/subtopic-summary-tile.directive';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SocialButtonsComponent } from
   'components/button-directives/social-buttons.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationSummaryTileDirective } from
-  './summary-tile/exploration-summary-tile.directive';
 import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
+import { SafePipe } from 'filters/safe-pipe';
+import { TranslatePipe } from 'filters/translate.pipe';
+
+import { ExplorationEmbedButtonModalComponent } from
+  './button-directives/exploration-embed-button-modal.component';
+import { AttributionGuideComponent } from
+  './common-layout-directives/common-elements/attribution-guide.component';
+import { BackgroundBannerComponent } from
+  './common-layout-directives/common-elements/background-banner.component';
+import { LazyLoadingComponent } from
+  './common-layout-directives/common-elements/lazy-loading.component';
+import { LoadingDotsComponent } from
+  './common-layout-directives/common-elements/loading-dots.component';
+import { SharingLinksComponent } from
+  './common-layout-directives/common-elements/sharing-links.component';
+import { MaterialModule } from './material.module';
+
+import { SkillMasteryViewerComponent } from
+  './skill-mastery/skill-mastery.component';
+import { ExplorationSummaryTileDirective } from
+  './summary-tile/exploration-summary-tile.directive';
+import { StorySummaryTileDirective } from
+  './summary-tile/story-summary-tile.directive';
+import { SubtopicSummaryTileDirective } from
+  './summary-tile/subtopic-summary-tile.directive';
+
+
+
 
 
 @NgModule({

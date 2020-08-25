@@ -16,17 +16,18 @@
  * @fileoverview Domain object for a high bounce-rate improvements task.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
-import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
 import { TaskEntryBackendDict, TaskEntry } from
   'domain/improvements/TaskEntryObjectFactory';
+import { ExplorationStats } from
+  'domain/statistics/ExplorationStatsObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
   constructor(backendDict: TaskEntryBackendDict<'high_bounce_rate'>) {

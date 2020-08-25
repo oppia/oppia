@@ -16,9 +16,10 @@
  * @fileoverview unit tests for the units object factory service.
  */
 
-import {TestBed} from '@angular/core/testing';
 import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
+
+import {TestBed} from '@angular/core/testing';
 
 describe('UnitsObjectFactory', () => {
   let errors = null;

@@ -16,13 +16,14 @@
  * @fileoverview Unit tests for story preview tab component.
  */
 
+import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
 describe('Story Preview tab', function() {
   var $scope = null;

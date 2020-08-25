@@ -16,13 +16,14 @@
  * @fileoverview Component for the skill mastery viewer.
  */
 
+import { SkillMasteryBackendApiService } from
+  'domain/skill/skill-mastery-backend-api.service';
+
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { SkillMasteryListConstants } from
   'components/skills-mastery-list/skills-mastery-list.constants';
-import { SkillMasteryBackendApiService } from
-  'domain/skill/skill-mastery-backend-api.service';
 
 @Component({
   selector: 'skill-mastery-viewer',

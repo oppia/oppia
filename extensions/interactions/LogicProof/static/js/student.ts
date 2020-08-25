@@ -16,8 +16,8 @@
  * @fileoverview Components used by the LogicProof interaction reader.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
 import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
 
 var logicProofStudent = (function() {
   // ---- BUILD INSTANCE ----

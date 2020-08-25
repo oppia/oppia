@@ -29,7 +29,6 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('services/alerts.service.ts');
 
-import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('collectionDetailsEditor', [
   function() {
@@ -152,6 +151,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
 
 import { Directive, ElementRef, Injector } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
 @Directive({
   selector: 'collection-details-editor'
 })

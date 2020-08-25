@@ -17,11 +17,12 @@
  * being played or paused.
  */
 
+import { Voiceover } from
+  'domain/exploration/VoiceoverObjectFactory';
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { Voiceover } from
-  'domain/exploration/VoiceoverObjectFactory';
 
 export interface AudioTranslations {
   [languageCode: string]: Voiceover

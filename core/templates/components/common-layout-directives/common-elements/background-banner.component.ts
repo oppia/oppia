@@ -16,9 +16,10 @@
  * @fileoverview Component for the background banner.
  */
 
-import { Component, OnInit } from '@angular/core';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({

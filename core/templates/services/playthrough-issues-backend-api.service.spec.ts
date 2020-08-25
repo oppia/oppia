@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for the issues backend api service.
  */
 
+import { PlaythroughIssueBackendDict, PlaythroughIssueObjectFactory } from
+  'domain/statistics/PlaythroughIssueObjectFactory';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
-import { PlaythroughIssueBackendDict, PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
 
 describe('PlaythroughIssuesBackendApiService', () => {
   let httpTestingController: HttpTestingController = null;

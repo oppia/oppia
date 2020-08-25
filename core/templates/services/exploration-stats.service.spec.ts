@@ -16,13 +16,14 @@
  * @fileoverview Unit tests for the ExplorationStatsService.
  */
 
+import { ExplorationStatsObjectFactory } from
+  'domain/statistics/ExplorationStatsObjectFactory';
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
-import { ExplorationStatsObjectFactory } from
-  'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 
 describe('Exploration stats service', function() {

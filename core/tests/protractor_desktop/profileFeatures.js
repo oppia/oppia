@@ -19,19 +19,19 @@
 var DEFAULT_BIO = 'This user has not supplied a bio yet.';
 var PLACEHOLDER_INTEREST_TEXT = 'none specified';
 
-var forms = require('../protractor_utils/forms.js');
-var users = require('../protractor_utils/users.js');
-var general = require('../protractor_utils/general.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var forms = require('../protractor_utils/forms.js');
+var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var ProfilePage = require('../protractor_utils/ProfilePage.js');
+var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 describe('Un-customized profile page', function() {
   var TEST_USERNAME = 'defaultProfileFeatures';

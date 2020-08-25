@@ -16,27 +16,27 @@
  * @fileoverview End-to-end tests for the learner dashboard page.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
-var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var forms = require('../protractor_utils/forms.js');
+var general = require('../protractor_utils/general.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
+var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;

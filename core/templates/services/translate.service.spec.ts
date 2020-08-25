@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for Translate service.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { HttpTestingController, HttpClientTestingModule } from
   '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
 import { TranslateService } from './translate.service';
 
 describe('Translate service', () => {

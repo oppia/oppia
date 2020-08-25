@@ -16,11 +16,12 @@
  * @fileoverview Domain object for holding the stats of an exploration.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { StateStatsBackendDict, StateStats, StateStatsObjectFactory } from
   'domain/statistics/StateStatsObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export interface ExplorationStatsBackendDict {
   'exp_id': string;

@@ -16,15 +16,17 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { SuggestionModalService } from 'services/suggestion-modal.service';
-import { AlertsService } from 'services/alerts.service';
+
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { AlertsService } from 'services/alerts.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;

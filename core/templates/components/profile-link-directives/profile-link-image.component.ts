@@ -16,10 +16,11 @@
  * @fileoverview Directive for creating image links to a user's profile page.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { Component, OnInit, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { ProfileLinkImageBackendApiService } from
   'components/profile-link-directives/profile-link-image-backend-api.service';
 

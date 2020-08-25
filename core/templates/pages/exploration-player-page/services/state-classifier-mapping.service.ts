@@ -16,11 +16,12 @@
  * @fileoverview Services for mapping state names to classifier details.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { Classifier, ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 interface StateClassifierMappingBackendDict {
   [state: string]: {

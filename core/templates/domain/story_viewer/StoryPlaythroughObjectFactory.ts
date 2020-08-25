@@ -17,14 +17,15 @@
  * story playthrough domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   StoryNodeBackendDict,
   ReadOnlyStoryNodeObjectFactory,
   ReadOnlyStoryNode
 } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export interface StoryPlaythroughBackendDict {
   'story_id': string,

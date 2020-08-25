@@ -17,12 +17,13 @@
  */
 
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Unassign Skill from Topics Modal', function() {
   var $scope = null;

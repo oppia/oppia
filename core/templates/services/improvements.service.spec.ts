@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for improvements service.
  */
 
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ImprovementsService } from 'services/improvements.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 
 describe('ImprovementsService', () => {

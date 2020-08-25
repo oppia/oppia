@@ -16,12 +16,13 @@
  * @fileoverview Type definiitions for Customization Args.
  */
 
-import { GraphAnswer } from 'interactions/answer-defs';
 
 import { SubtitledHtmlBackendDict, SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+
+import { GraphAnswer } from 'interactions/answer-defs';
 
 
 interface LabeledRegion {

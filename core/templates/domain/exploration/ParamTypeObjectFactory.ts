@@ -17,10 +17,10 @@
  * domain objects.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
 
 interface TypeDefinitionObject {
   'validate': (arg0: Object) => boolean;

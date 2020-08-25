@@ -16,8 +16,8 @@
  * @fileoverview Service for mapping algorithmId to PredictionAlgorithmService.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';

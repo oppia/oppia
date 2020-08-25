@@ -17,10 +17,7 @@
  * collection domain objects.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import {
   CollectionNode,
@@ -32,6 +29,10 @@ import {
   CollectionPlaythroughBackendDict,
   CollectionPlaythroughObjectFactory
 } from 'domain/collection/CollectionPlaythroughObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
 
 interface ExplorationIdToNodeIndexMap {
   [explorationId: string]: number;

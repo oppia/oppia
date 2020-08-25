@@ -25,27 +25,29 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap'
 ]);
 
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
+
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { TopicLandingPageComponent } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-
-import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
+import { TopicLandingPageComponent } from
+  'pages/landing-pages/topic-landing-page/topic-landing-page.component';
 import { TopicLandingPageConstants } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+
+import { ServicesConstants } from 'services/services.constants';
 
 
 @NgModule({
@@ -80,7 +82,6 @@ class TopicLandingPageModule {
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {

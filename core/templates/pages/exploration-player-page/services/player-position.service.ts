@@ -16,13 +16,14 @@
  * @fileoverview Service for keeping track of the learner's position.
  */
 
+import { StateCard } from
+  'domain/state_card/StateCardObjectFactory';
+
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCard } from
-  'domain/state_card/StateCardObjectFactory';
 
 interface HelpCardEventResponse {
   helpCardHtml: string;

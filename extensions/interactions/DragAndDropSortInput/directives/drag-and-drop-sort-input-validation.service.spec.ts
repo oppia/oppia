@@ -16,13 +16,11 @@
  * @fileoverview Unit tests for drag and drop sort input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
+
 /* eslint-disable max-len */
-import { DragAndDropSortInputValidationService } from
-  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
 /* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -31,10 +29,14 @@ import { Rule, RuleObjectFactory } from
 import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import { TestBed } from '@angular/core/testing';
+
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { AppConstants } from 'app.constants';
 import { DragAndDropSortInputCustomizationArgs } from
   'interactions/customization-args-defs';
+import { DragAndDropSortInputValidationService } from
+  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
 
 describe('DragAndDropSortInputValidationService', () => {
   let validatorService: DragAndDropSortInputValidationService;

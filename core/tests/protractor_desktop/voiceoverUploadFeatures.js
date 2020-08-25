@@ -16,15 +16,15 @@
  * @fileoverview End-to-end tests for the functionality of voiceover upload.
  */
 
+var CreatorDashboardPage =
+    require('../protractor_utils/CreatorDashboardPage.js');
+var ExplorationEditorPage =
+    require('../protractor_utils/ExplorationEditorPage.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var ExplorationEditorPage =
-    require('../protractor_utils/ExplorationEditorPage.js');
-var CreatorDashboardPage =
-    require('../protractor_utils/CreatorDashboardPage.js');
 
 describe('Voiceover upload features', function() {
   var TEST_USERNAME = 'uploadUser';

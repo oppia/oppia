@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for SuggestionThreadObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { SuggestionThreadObjectFactory } from
-  'domain/suggestion/SuggestionThreadObjectFactory';
 import { ThreadMessageObjectFactory } from
   'domain/feedback_message/ThreadMessageObjectFactory';
+import { SuggestionThreadObjectFactory } from
+  'domain/suggestion/SuggestionThreadObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('SuggestionThreadObjectFactory', () => {
   beforeEach(() => {

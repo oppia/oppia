@@ -18,13 +18,14 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // text-input-prediction.service.ts is upgraded to Angular 8.
-import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
+
+import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
+import { SVMPredictionService } from 'classifiers/svm-prediction.service';
+import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
-import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
-import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 // ^^^ This block is to be removed.
 
 describe('Text Input Prediction Service', () => {

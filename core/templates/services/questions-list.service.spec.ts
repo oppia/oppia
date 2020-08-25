@@ -16,9 +16,6 @@
  * @fileoverview Unit tests for QuestionsListService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
@@ -26,9 +23,13 @@ import { QuestionSummaryForOneSkillObjectFactory } from
   'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
+
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { Subscription } from 'rxjs';
 import { UpgradedServices } from 'services/UpgradedServices';
 
-import { Subscription } from 'rxjs';
 
 require('services/csrf-token.service.ts');
 

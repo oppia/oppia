@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for multipleIncorrectIssue.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { AlertsService } from 'services/alerts.service';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { AlertsService } from 'services/alerts.service';
 
 describe('Multiple Incorrect Issue Component', function() {
   var ctrl = null;

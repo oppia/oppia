@@ -20,6 +20,7 @@
 // undo-redo.service.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 

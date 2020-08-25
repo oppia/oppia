@@ -16,13 +16,13 @@
  * @fileoverview End-to-end tests for the contributor dashboard page.
  */
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
+var ContributorDashboardPage = require(
+  '../protractor_utils/ContributorDashboardPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var ContributorDashboardPage = require(
-  '../protractor_utils/ContributorDashboardPage.js');
 
 describe('Contributor Dashboard page', function() {
   var contributorDashboardPage = null;

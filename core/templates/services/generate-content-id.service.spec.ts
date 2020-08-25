@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for GenerateContentIdService.
  */
 
-import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateNextContentIdIndexService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 describe('GenerateContentIdService', () => {
   let gcis: GenerateContentIdService;

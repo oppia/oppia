@@ -17,13 +17,16 @@
  * topic_id.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
+
+import { NewlyCreatedTopic } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
-import { NewlyCreatedTopic } from
-  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
+
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface TopicCreationResponse {
   topicId: string;

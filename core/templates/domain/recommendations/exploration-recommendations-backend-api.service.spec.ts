@@ -16,14 +16,16 @@
  * @fileoverview Unit tests for ExplorationRecommendationsBackendApiService.
  */
 
+import { ExplorationRecommendationsBackendApiService } from
+  'domain/recommendations/exploration-recommendations-backend-api.service';
+
+import { LearnerExplorationSummaryObjectFactory } from
+  'domain/summary/learner-exploration-summary-object.factory';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ExplorationRecommendationsBackendApiService } from
-  'domain/recommendations/exploration-recommendations-backend-api.service';
-import { LearnerExplorationSummaryObjectFactory } from
-  'domain/summary/learner-exploration-summary-object.factory';
 
 describe('Exploration recommendations backend api service', () => {
   let httpTestingController: HttpTestingController;

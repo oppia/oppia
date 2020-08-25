@@ -17,10 +17,10 @@
  * interaction.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared';
 import logicProofData from 'interactions/LogicProof/static/js/data';
 import logicProofParser from
   'interactions/LogicProof/static/js/generatedParser';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
 
 describe('Parse then display expressions', function() {
   var parseThenDisplay = function(expressionString) {

@@ -16,35 +16,41 @@
  * @fileoverview Unit tests for paramChangesEditor.
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { StateParamChangesService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-param-changes.service';
-import { AlertsService } from 'services/alerts.service';
+
 import { ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
+
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateParamChangesService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-param-changes.service';
+import { StateSolutionService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solution.service';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
+
+
+import { AlertsService } from 'services/alerts.service';
+
+
 
 describe('Param Changes Editor Component', function() {
   var ctrl = null;

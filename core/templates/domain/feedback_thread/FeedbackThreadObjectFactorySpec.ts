@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for FeedbackThreadObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { FeedbackThreadObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { ThreadMessageObjectFactory } from
   'domain/feedback_message/ThreadMessageObjectFactory';
+import { FeedbackThreadObjectFactory } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('FeedbackThreadObjectFactory', () => {
   beforeEach(() => {

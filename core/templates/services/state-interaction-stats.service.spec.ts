@@ -16,22 +16,25 @@
  * @fileoverview Unit tests for state interaction stats service.
  */
 
-import { TestBed, flushMicrotasks, fakeAsync } from '@angular/core/testing';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { VisualizationInfoObjectFactory } from
+  'domain/exploration/visualization-info-object.factory';
+
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
+import { TestBed, flushMicrotasks, fakeAsync } from '@angular/core/testing';
 
-import { ContextService } from 'services/context.service';
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   // eslint-disable-next-line max-len
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
+import { ContextService } from 'services/context.service';
 import { StateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
-import { VisualizationInfoObjectFactory } from
-  'domain/exploration/visualization-info-object.factory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
 
 describe('State Interaction Stats Service', () => {
   beforeEach(() => {

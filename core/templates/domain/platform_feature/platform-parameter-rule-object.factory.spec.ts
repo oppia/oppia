@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for PlatformParameterRuleObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { PlatformParameterFilterType, ServerMode } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
@@ -24,6 +23,8 @@ import {
   PlatformParameterRuleBackendDict,
   PlatformParameterRuleObjectFactory,
 } from 'domain/platform_feature/platform-parameter-rule-object.factory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('PlatformParameterRuleObjectFactory', () => {
   let factory: PlatformParameterRuleObjectFactory;

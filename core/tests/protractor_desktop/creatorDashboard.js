@@ -16,18 +16,18 @@
  * @fileoverview End-to-end tests for the creator dashboard page.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
+var users = require('../protractor_utils/users.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 describe('Creator dashboard functionality', function() {
   var EXPLORATION_TITLE_1 = 'Exploration 1';

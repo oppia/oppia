@@ -16,17 +16,19 @@
  * @fileoverview Unit tests for AddAnswerGroupModalController.
  */
 
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
-import { EditorFirstTimeEventsService } from
-  'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-
+import { EditorFirstTimeEventsService } from
+  'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { Subscription } from 'rxjs';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
+
 
 describe('Add Answer Group Modal Controller', function() {
   var $scope = null;

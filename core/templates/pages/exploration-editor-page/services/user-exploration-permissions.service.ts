@@ -17,13 +17,14 @@
  * of a user for a particular exploration.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissions } from
   'domain/exploration/exploration-permissions-object.factory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root'

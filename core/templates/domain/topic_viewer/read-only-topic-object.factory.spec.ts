@@ -16,11 +16,11 @@
  * @fileoverview Tests for ReadOnlyTopicObjectFactory.
  */
 
-import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
-  'domain/topic_viewer/read-only-topic-object.factory';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/read-only-topic-object.factory';
 
 describe('Read only topic object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;

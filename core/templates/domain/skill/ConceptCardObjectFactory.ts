@@ -17,9 +17,6 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-import { AppConstants } from 'app.constants';
 import {
   RecordedVoiceovers,
   RecordedVoiceOverBackendDict,
@@ -35,6 +32,10 @@ import {
   WorkedExampleBackendDict,
   WorkedExampleObjectFactory
 } from 'domain/skill/WorkedExampleObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
 export interface ConceptCardBackendDict {
   'explanation': SubtitledHtmlBackendDict;

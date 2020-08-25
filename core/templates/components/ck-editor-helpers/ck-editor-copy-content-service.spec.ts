@@ -18,8 +18,8 @@
 
 import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content-service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 /**
  * Returns a HTMLElement containing the element to copy.

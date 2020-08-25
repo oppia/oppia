@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the ExplorationStats domain object.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import {
   ExplorationStats,
@@ -24,6 +23,8 @@ import {
   ExplorationStatsBackendDict
 } from 'domain/statistics/ExplorationStatsObjectFactory';
 import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Exploration stats', function() {
   let explorationStatsObjectFactory: ExplorationStatsObjectFactory;

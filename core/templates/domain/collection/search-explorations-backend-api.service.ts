@@ -16,21 +16,23 @@
  * @fileoverview Service to search explorations metadata.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
-import cloneDeep from 'lodash/cloneDeep';
-
-import { LibraryPageConstants } from
-  'pages/library-page/library-page.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import {
   ExplorationMetaDataBackendDict,
   ExplorationMetadata,
   ExplorationMetadataObjectFactory
 } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import cloneDeep from 'lodash/cloneDeep';
+
+import { LibraryPageConstants } from
+  'pages/library-page/library-page.constants';
+
 
 interface SearchExplorationBackendResponse {
   'collection_node_metadata_list': ExplorationMetaDataBackendDict[];

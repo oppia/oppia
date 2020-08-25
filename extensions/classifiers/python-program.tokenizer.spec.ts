@@ -18,8 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { LoggerService } from 'services/contextual/logger.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+import { LoggerService } from 'services/contextual/logger.service';
 
 describe('Python program tokenizer', () => {
   describe('Test python program tokenizer', () => {

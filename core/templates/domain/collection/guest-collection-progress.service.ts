@@ -25,13 +25,16 @@
 // TODO(bhenning): This should be reset upon login, otherwise the progress will
 // be different depending on the user's logged in/logged out state.
 
+import { Collection } from
+  'domain/collection/CollectionObjectFactory';
+
+import { GuestCollectionProgress, GuestCollectionProgressObjectFactory } from
+  'domain/collection/GuestCollectionProgressObjectFactory';
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { Collection } from
-  'domain/collection/CollectionObjectFactory';
-import { GuestCollectionProgress, GuestCollectionProgressObjectFactory } from
-  'domain/collection/GuestCollectionProgressObjectFactory';
+
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({

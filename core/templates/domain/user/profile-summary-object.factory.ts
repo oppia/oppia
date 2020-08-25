@@ -16,8 +16,8 @@
  * @fileoverview Frontend domain object factory for subscriber summary.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface SubscriberSummaryBackendDict {
   'subscriber_picture_data_url': string;

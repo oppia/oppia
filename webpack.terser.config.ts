@@ -16,9 +16,10 @@
  * @fileoverview Disable parallelism on terser webpack plugin.
  */
 
-const { merge } = require('webpack-merge');
-const prod = require('./webpack.prod.config.ts');
 const TerserPlugin = require('terser-webpack-plugin');
+const { merge } = require('webpack-merge');
+
+const prod = require('./webpack.prod.config.ts');
 
 module.exports = merge(prod, {
   optimization: {

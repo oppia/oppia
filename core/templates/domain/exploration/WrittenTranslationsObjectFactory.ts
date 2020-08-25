@@ -17,15 +17,16 @@
  * WrittenTranslations domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   TranslationBackendDict,
   WrittenTranslation,
   WrittenTranslationObjectFactory,
   WRITTEN_TRANSLATION_TYPE_HTML
 } from 'domain/exploration/WrittenTranslationObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export interface WrittenTranslationsBackendDict {
   'translations_mapping': {

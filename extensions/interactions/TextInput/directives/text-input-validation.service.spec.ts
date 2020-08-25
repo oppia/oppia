@@ -16,18 +16,20 @@
  * @fileoverview Unit tests for text input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AppConstants } from 'app.constants';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 describe('TextInputValidationService', () => {
   var validatorService, WARNING_TYPES;

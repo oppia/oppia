@@ -16,20 +16,25 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
+
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
+
+import { Rule } from
+  'domain/exploration/RuleObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+
 import { AppConstants } from 'app.constants';
 import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { SetInputCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule } from
-  'domain/exploration/RuleObjectFactory';
+
 
 interface PreviousRule {
   answerGroupIndex: number;

@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for SkillMasteryBackendApiService.
  */
 
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
+
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+
+import { CsrfTokenService } from 'services/csrf-token.service';
+
+
 import { SkillMasteryObjectFactory, SkillMastery } from
   './SkillMasteryObjectFactory';
 

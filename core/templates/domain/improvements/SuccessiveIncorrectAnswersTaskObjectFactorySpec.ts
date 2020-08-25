@@ -17,10 +17,11 @@
  *    object.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { SuccessiveIncorrectAnswersTaskObjectFactory } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Successive incorrect answers task', function() {
   let successiveIncorrectAnswersTaskObjectFactory:

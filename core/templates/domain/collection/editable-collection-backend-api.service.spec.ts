@@ -15,14 +15,15 @@
 /**
  * @fileoverview Unit tests for EditableCollectionBackendApiService.
  */
+import { Collection, CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
+import { EditableCollectionBackendApiService } from
+  'domain/collection/editable-collection-backend-api.service';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { EditableCollectionBackendApiService } from
-  'domain/collection/editable-collection-backend-api.service';
-import { Collection, CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
 
 describe('Editable collection backend API service', () => {
   let editableCollectionBackendApiService:

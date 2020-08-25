@@ -16,14 +16,15 @@
  * @fileoverview Tests for FeaturedTranslationLanguageObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import {
   FeaturedTranslationLanguageObjectFactory,
   FeaturedTranslationLanguage,
   FeaturedTranslationLanguageBackendDict
 } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Featured Translation Language object factory', () => {
   let featuredTranslationLanguageObjectFactory:

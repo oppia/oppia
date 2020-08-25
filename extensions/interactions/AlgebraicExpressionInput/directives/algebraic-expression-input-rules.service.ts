@@ -19,14 +19,14 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import nerdamer from 'nerdamer';
-
-import { MathInteractionsService } from 'services/math-interactions.service.ts';
 import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
 import {
   AlgebraicExpressionRuleInputsWithPlaceholder,
   AlgebraicExpressionRuleInputsWithoutPlaceholder
 } from 'interactions/rule-input-defs';
+import nerdamer from 'nerdamer';
+
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
 
 @Injectable({
   providedIn: 'root'

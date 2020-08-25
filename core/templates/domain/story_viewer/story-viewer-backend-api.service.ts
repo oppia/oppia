@@ -16,24 +16,27 @@
  * @fileoverview Service to get story data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable, EventEmitter } from '@angular/core';
-
-import {
-  LearnerExplorationSummaryBackendDict,
-  LearnerExplorationSummary,
-  LearnerExplorationSummaryObjectFactory
-} from 'domain/summary/learner-exploration-summary-object.factory';
+import { StoryViewerDomainConstants } from
+  'domain/story_viewer/story-viewer-domain.constants';
 import {
   StoryPlaythroughBackendDict,
   StoryPlaythrough,
   StoryPlaythroughObjectFactory
 } from 'domain/story_viewer/StoryPlaythroughObjectFactory';
-import { StoryViewerDomainConstants } from
-  'domain/story_viewer/story-viewer-domain.constants';
+import {
+  LearnerExplorationSummaryBackendDict,
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryObjectFactory
+} from 'domain/summary/learner-exploration-summary-object.factory';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable, EventEmitter } from '@angular/core';
+
+
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface StoryChapterCompletionBackendResponse {
   'next_node_id': string;

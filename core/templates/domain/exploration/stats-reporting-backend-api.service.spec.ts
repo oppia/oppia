@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for StatsReportingBackendApiService.
  */
 
+import { StatsReportingBackendApiService } from
+  'domain/exploration/stats-reporting-backend-api.service';
+import { InterpolationValuesType, UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ContextService } from 'services/context.service';
-import { InterpolationValuesType, UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { StatsReportingBackendApiService } from
-  'domain/exploration/stats-reporting-backend-api.service';
 
 describe('Stats reporting backend API Service', () => {
   let contextService: ContextService;

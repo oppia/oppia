@@ -17,17 +17,21 @@
  * backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { UserProfile, UserProfileBackendDict, UserProfileObjectFactory } from
+  'domain/user/user-profile-object.factory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ProfilePageDomainConstants } from
   'pages/profile-page/profile-page-domain.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+
+
 import { UrlService } from 'services/contextual/url.service.ts';
-import { UserProfile, UserProfileBackendDict, UserProfileObjectFactory } from
-  'domain/user/user-profile-object.factory';
+
 
 @Injectable({
   providedIn: 'root'

@@ -20,7 +20,6 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
 import 'third-party-imports/ng-audio.import';
@@ -35,17 +34,7 @@ angular.module('oppia', [
   'ui.sortable', 'ui.tree', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants';
 import { CollectionSummaryTileConstants } from
@@ -58,6 +47,10 @@ import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
 import { ServicesConstants } from 'services/services.constants';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
+import { NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
 
@@ -96,7 +89,14 @@ class ExplorationPlayerPageModule {
 }
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { downgradeModule } from '@angular/upgrade/static';
+import uiValidate from 'angular-ui-validate';
+import { AppConstants } from 'app.constants';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -19,16 +19,16 @@
  * answer submission process.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ContextService } from 'services/context.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import { ContextService } from 'services/context.service';
 
 interface InteractionRulesService {
   [ruleName: string]: (

@@ -17,16 +17,17 @@
  * @fileoverview Unit tests for the extracting image files in state service.
  */
 
+import { ExplorationObjectFactory } from
+  'domain/exploration/ExplorationObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ContextService } from 'services/context.service';
-import { ExplorationObjectFactory } from
-  'domain/exploration/ExplorationObjectFactory';
 import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { ContextService } from 'services/context.service';
 
 
 describe('Extracting Image file names in the state service', () => {

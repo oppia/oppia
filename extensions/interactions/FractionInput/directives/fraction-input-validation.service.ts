@@ -16,20 +16,21 @@
  * @fileoverview Validator service for the fraction interaction.
  */
 
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Fraction, FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory';
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { AppConstants } from 'app.constants';
 import { FractionAnswer } from 'interactions/answer-defs';
-import { Fraction, FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { AppConstants } from 'app.constants';
-import { Warning } from 'services/alerts.service';
 import { FractionInputCustomizationArgs } from
   'interactions/customization-args-defs';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Warning } from 'services/alerts.service';
 
 interface FractionWarning {
   type: string;

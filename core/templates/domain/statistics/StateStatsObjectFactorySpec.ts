@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for the StateStats domain object.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { StateStatsObjectFactory } from
   'domain/statistics/StateStatsObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('State stats', function() {
   let stateStatsObjectFactory: StateStatsObjectFactory;

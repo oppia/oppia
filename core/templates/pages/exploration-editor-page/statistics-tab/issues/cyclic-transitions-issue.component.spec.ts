@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TestBed } from '@angular/core/testing';
-import { AlertsService } from 'services/alerts.service';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { AlertsService } from 'services/alerts.service';
 
 /**
  * @fileoverview Unit tests for cyclicTransitionsIssue.

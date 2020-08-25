@@ -16,19 +16,22 @@
  * @fileoverview Unit tests for the ExplorationStatsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-
 import {
   ExplorationStats,
   ExplorationStatsObjectFactory,
   ExplorationStatsBackendDict
 } from 'domain/statistics/ExplorationStatsObjectFactory';
-import { ExplorationStatsBackendApiService } from
-  'services/exploration-stats-backend-api.service';
+
 import { StateStatsBackendDict } from
   'domain/statistics/StateStatsObjectFactory';
+
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+import { ExplorationStatsBackendApiService } from
+  'services/exploration-stats-backend-api.service';
+
 
 describe('Exploration stats backend api service', () => {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;

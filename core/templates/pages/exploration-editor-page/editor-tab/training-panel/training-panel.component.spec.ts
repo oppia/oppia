@@ -16,28 +16,31 @@
  * @fileoverview Unit tests for trainingPanel.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
+
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateSolutionService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solution.service';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
 
 describe('Training Panel Component', function() {
   var ctrl = null;

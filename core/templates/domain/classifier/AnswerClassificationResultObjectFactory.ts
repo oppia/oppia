@@ -17,10 +17,11 @@
  *     Classification Result domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export class AnswerClassificationResult {
   outcome: Outcome;

@@ -16,17 +16,19 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardPageService.
  */
 
-import { ETopicPublishedOptions, ETopicSortOptions } from
-// eslint-disable-next-line max-len
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+import { TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
 import { TopicsAndSkillsDashboardFilterObjectFactory } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+
+import { ETopicPublishedOptions, ETopicSortOptions } from
+// eslint-disable-next-line max-len
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
+
 
 describe('Topic and Skill dashboard page service', () => {
   let tsds: TopicsAndSkillsDashboardPageService = null;

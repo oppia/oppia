@@ -16,14 +16,17 @@
  * @fileoverview Service to record learner answer info.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { StatisticsDomainConstants } from
+  'domain/statistics/statistics-domain.constants.ts';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants.ts';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
+
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root'

@@ -17,15 +17,18 @@
  * SchemaBasedList item.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { LoggerService } from 'services/contextual/logger.service';
 import { SubtitledHtmlObjectFactory, SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+
 import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema-constants';
+import { LoggerService } from 'services/contextual/logger.service';
+
 
 
 interface BoolSchema {

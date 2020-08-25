@@ -16,20 +16,21 @@
  * @fileoverview Backend api service for email dashboard pages.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
-import {
-  EmailDashboardQueryResults,
-  EmailDashboardQueryResultsBackendDict,
-  EmailDashboardQueryResultsObjectFactory
-} from 'domain/email-dashboard/email-dashboard-query-results-object.factory';
 import {
   EmailDashboardQuery,
   EmailDashboardQueryBackendDict,
   EmailDashboardQueryObjectFactory
 } from 'domain/email-dashboard/email-dashboard-query-object.factory';
+import {
+  EmailDashboardQueryResults,
+  EmailDashboardQueryResultsBackendDict,
+  EmailDashboardQueryResultsObjectFactory
+} from 'domain/email-dashboard/email-dashboard-query-results-object.factory';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export interface QueryData {
   hasNotLoggedInForNDays: string;

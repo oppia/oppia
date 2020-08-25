@@ -16,20 +16,22 @@
  * @fileoverview Unit tests for numeric input validation service.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { NumericInputValidationService } from
-  'interactions/NumericInput/directives/numeric-input-validation.service';
+
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import { TestBed } from '@angular/core/testing';
+
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { AppConstants } from 'app.constants';
+import { NumericInputValidationService } from
+  'interactions/NumericInput/directives/numeric-input-validation.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 describe('NumericInputValidationService', () => {
   let validatorService: NumericInputValidationService;

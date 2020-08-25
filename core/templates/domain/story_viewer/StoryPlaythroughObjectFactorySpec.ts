@@ -16,10 +16,11 @@
  * @fileoverview Tests for StoryPlaythroughObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Story playthrough object factory', () => {
   let storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory = null;

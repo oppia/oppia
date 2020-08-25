@@ -17,15 +17,15 @@
  * page.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
+var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+var users = require('../protractor_utils/users.js');
 
 describe('Classroom page functionality', function() {
   var adminPage = null;

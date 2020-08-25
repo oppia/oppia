@@ -16,9 +16,6 @@
  * @fileoverview Service to get classroom data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
 
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
@@ -30,6 +27,10 @@ import { TopicSummaryBackendDict } from
   'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { EventEmitter, Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface ClassroomStatusBackendDict {
   'classroom_page_is_shown': boolean;

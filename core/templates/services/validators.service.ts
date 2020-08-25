@@ -17,13 +17,13 @@
  * warning messages if the validation fails.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
+import { AlertsService } from 'services/alerts.service';
 
 @Injectable({
   providedIn: 'root'

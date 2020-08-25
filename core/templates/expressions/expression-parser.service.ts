@@ -17,8 +17,8 @@
  * oppia/core/templates/expressions/README.txt for further details.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import parser from 'expressions/parser';
 

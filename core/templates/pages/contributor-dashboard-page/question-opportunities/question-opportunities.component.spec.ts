@@ -16,16 +16,21 @@
  * @fileoverview Unit tests for questionOpportunities.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { SkillOpportunityObjectFactory } from
+  'domain/opportunity/SkillOpportunityObjectFactory';
+
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { SkillOpportunityObjectFactory } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
+
+
 import { AlertsService } from 'services/alerts.service';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+
 
 describe('Question opportunities component', function() {
   var ctrl = null;

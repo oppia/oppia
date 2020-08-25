@@ -20,6 +20,15 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import 'angular-ui-sortable';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
+
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
+import { NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent } from '@angular/upgrade/static';
 import uiValidate from 'angular-ui-validate';
 import ngInfiniteScroll from 'ng-infinite-scroll';
 
@@ -29,11 +38,8 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { LibraryPageConstants } from
+  'pages/library-page/library-page.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -44,11 +50,9 @@ import { CollectionSummaryTileConstants } from
   'components/summary-tile/collection-summary-tile.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+
+
 import { ServicesConstants } from 'services/services.constants';
-import { LibraryPageConstants } from
-  'pages/library-page/library-page.constants';
 
 @NgModule({
   imports: [
@@ -81,7 +85,6 @@ class LibraryPageModule {
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {

@@ -17,10 +17,11 @@
  *    object.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { TaskEntryBackendDict, TaskEntry, TaskEntryObjectFactory } from
   'domain/improvements/TaskEntryObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Task entry', function() {
   let taskEntryObjectFactory: TaskEntryObjectFactory;

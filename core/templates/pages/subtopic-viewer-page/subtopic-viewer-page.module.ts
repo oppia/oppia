@@ -20,7 +20,6 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate',
@@ -28,22 +27,24 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { SubtopicViewerDomainConstants } from
+  'domain/subtopic_viewer/subtopic-viewer-domain.constants';
+
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
 import { SubtopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 
-import { SubtopicViewerDomainConstants } from
-  'domain/subtopic_viewer/subtopic-viewer-domain.constants';
 
 @NgModule({
   imports: [
@@ -73,8 +74,8 @@ class SubtopicViewerPageModule {
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import uiValidate from 'angular-ui-validate';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

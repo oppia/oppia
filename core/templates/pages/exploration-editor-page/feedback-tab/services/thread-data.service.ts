@@ -28,14 +28,14 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/suggestions.service.ts');
 
-import { FeedbackThread, FeedbackThreadBackendDict } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { SuggestionThread } from
-  'domain/suggestion/SuggestionThreadObjectFactory';
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
+import { FeedbackThread, FeedbackThreadBackendDict } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionBackendDict } from
   'domain/suggestion/SuggestionObjectFactory';
+import { SuggestionThread } from
+  'domain/suggestion/SuggestionThreadObjectFactory';
 
 type AnyThread = FeedbackThread | SuggestionThread;
 

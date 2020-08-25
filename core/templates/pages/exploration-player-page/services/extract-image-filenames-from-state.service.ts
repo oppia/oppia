@@ -16,17 +16,18 @@
  * @fileoverview Service to extract image filenames in a State.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { HtmlEscaperService } from 'services/html-escaper.service';
 import { State } from 'domain/state/StateObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 import {
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
   ItemSelectionInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs
 } from 'interactions/customization-args-defs';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 type CustomizationArgsWithChoices = (
   DragAndDropSortInputCustomizationArgs |

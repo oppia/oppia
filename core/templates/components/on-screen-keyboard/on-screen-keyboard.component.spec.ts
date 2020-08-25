@@ -17,9 +17,9 @@
  */
 
 import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 
 describe('OnScreenKeyboard', function() {

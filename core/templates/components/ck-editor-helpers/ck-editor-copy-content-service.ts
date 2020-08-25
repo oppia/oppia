@@ -17,11 +17,11 @@
  *               ck editor
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { HtmlEscaperService } from 'services/html-escaper.service';
 import { Subscription } from 'rxjs';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 interface CkEditorCopyEvent {
   rootElement?: HTMLElement;

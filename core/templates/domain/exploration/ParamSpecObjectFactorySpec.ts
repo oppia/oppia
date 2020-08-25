@@ -15,12 +15,13 @@
 /**
  * @fileoverview Unit tests for ParamSpecObjectFactory.
  */
-import { TestBed } from '@angular/core/testing';
 
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Param Spec Object Factory', () => {
   let psof, ptof;

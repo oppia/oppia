@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for Graph Input rules.
  */
 
+import { TestBed } from '@angular/core/testing';
+import { GraphAnswer } from 'interactions/answer-defs';
 import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
-import { TestBed } from '@angular/core/testing';
-import { GraphAnswer } from 'interactions/answer-defs';
 
 describe('Graph Input service', () => {
   let girs: GraphInputRulesService = null;

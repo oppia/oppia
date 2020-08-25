@@ -16,9 +16,9 @@
  * @fileoverview Unit test for the page title service.
  */
 
-import { PageTitleService } from 'services/page-title.service';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
+import { PageTitleService } from 'services/page-title.service';
 
 describe('Page title service', () => {
   let pts: PageTitleService;

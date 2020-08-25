@@ -16,13 +16,14 @@
  * @fileoverview Unit test for the Interaction attributes extractor service.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { InteractionAttributesExtractorService } from
-  'interactions/interaction-attributes-extractor.service';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
+import { InteractionAttributesExtractorService } from
+  'interactions/interaction-attributes-extractor.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 describe('Interaction attributes extractor service', () => {
   let iaes: InteractionAttributesExtractorService = null;

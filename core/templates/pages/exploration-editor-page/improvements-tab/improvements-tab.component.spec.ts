@@ -17,7 +17,6 @@
  * the improvements tab.
  */
 
-import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationTaskType } from
   'domain/improvements/ExplorationTaskObjectFactory';
@@ -29,9 +28,11 @@ import { NeedsGuidingResponsesTask } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
-import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
 import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
+import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+
+import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 

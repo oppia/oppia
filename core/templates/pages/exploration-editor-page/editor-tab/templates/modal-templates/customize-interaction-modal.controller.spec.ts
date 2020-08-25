@@ -16,35 +16,40 @@
  * @fileoverview Unit tests for CustomizeInteractionModalController.
  */
 
-import { Subscription } from 'rxjs';
 
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
+
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
-
-import { InteractionDetailsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+
 import { StateNextContentIdIndexService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
-import { EditorFirstTimeEventsService } from
-  'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { InteractionDetailsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
+import { EditorFirstTimeEventsService } from
+  'pages/exploration-editor-page/services/editor-first-time-events.service';
+
+
+import { Subscription } from 'rxjs';
 
 describe('Customize Interaction Modal Controller', function() {
   var $injector = null;

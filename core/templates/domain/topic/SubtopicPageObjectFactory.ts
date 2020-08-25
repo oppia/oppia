@@ -17,16 +17,17 @@
  * subtopic page domain objects.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
-
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import {
   SubtopicPageContentsBackendDict,
   SubtopicPageContents,
   SubtopicPageContentsObjectFactory
 } from 'domain/topic/SubtopicPageContentsObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
+
+
 
 interface SubtopicPageBackendDict {
   'id': string;

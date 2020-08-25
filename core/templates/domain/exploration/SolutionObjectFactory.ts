@@ -17,21 +17,21 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { SubtitledHtml, SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
+
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { ExplorationHtmlFormatterService } from
-  'services/exploration-html-formatter.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory';
-import { SubtitledHtml, SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import {
   FractionAnswer,
   InteractionAnswer,
@@ -39,7 +39,13 @@ import {
   NumberWithUnitsAnswer,
   PencilCodeEditorAnswer
 } from 'interactions/answer-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ExplorationHtmlFormatterService } from
+  'services/exploration-html-formatter.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+
+
+
 
 export interface ExplanationBackendDict {
   'content_id': string;

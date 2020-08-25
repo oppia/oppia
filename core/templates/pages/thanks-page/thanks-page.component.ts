@@ -16,11 +16,12 @@
  * @fileoverview Component for the 'thanks' page.
  */
 
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
+
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
 
 @Component({
   selector: 'thanks-page',

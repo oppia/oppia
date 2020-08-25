@@ -16,22 +16,24 @@
  * @fileoverview Unit tests for math equation input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { MathEquationInputValidationService } from
-// eslint-disable-next-line max-len
-  'interactions/MathEquationInput/directives/math-equation-input-validation.service';
+
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { AppConstants } from 'app.constants';
 import { MathEquationInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
-
-import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { MathEquationInputValidationService } from
+// eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 
 describe('MathEquationInputValidationService', () => {
   let validatorService: MathEquationInputValidationService;

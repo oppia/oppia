@@ -16,12 +16,13 @@
  * @fileoverview Service for getting the rules services of interactions.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AlgebraicExpressionInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ContinueRulesService } from
@@ -61,12 +62,11 @@ import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
 interface InteractionRulesService {
   [ruleName: string]: (

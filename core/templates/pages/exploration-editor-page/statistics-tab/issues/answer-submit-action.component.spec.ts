@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for answerSubmitAction component.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ExplorationHtmlFormatterService } from
-  'services/exploration-html-formatter.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { ExplorationHtmlFormatterService } from
+  'services/exploration-html-formatter.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +

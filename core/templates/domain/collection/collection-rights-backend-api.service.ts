@@ -16,18 +16,20 @@
  * @fileoverview Service to change the rights of collections in the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { CollectionRights, CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
 import { CollectionRightsBackendDict } from
   'domain/collection/CollectionRightsObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { CollectionEditorPageConstants } from
+  'pages/collection-editor-page/collection-editor-page.constants';
+
 
 @Injectable({
   providedIn: 'root'

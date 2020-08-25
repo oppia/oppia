@@ -16,11 +16,12 @@
  * @fileoverview Component for the error page.
  */
 
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({

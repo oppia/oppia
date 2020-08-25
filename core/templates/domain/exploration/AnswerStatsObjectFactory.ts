@@ -17,13 +17,13 @@
  * particular answer from some particular state.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { InteractionAnswer } from
   'interactions/answer-defs';
+import cloneDeep from 'lodash/cloneDeep';
 
 export interface AnswerStatsBackendDict {
   answer: InteractionAnswer;

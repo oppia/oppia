@@ -16,6 +16,17 @@
  * @fileoverview Unit tests for ContributionOpportunitiesBackendApiService.
  */
 
+import { ExplorationOpportunitySummaryObjectFactory } from
+  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+
+import { FeaturedTranslationLanguageObjectFactory} from
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+import { SkillOpportunityObjectFactory } from
+  'domain/opportunity/SkillOpportunityObjectFactory';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
@@ -23,14 +34,6 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { ExplorationOpportunitySummaryObjectFactory } from
-  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
-import { SkillOpportunityObjectFactory } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { FeaturedTranslationLanguageObjectFactory} from
-  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 
 describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:

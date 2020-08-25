@@ -21,13 +21,15 @@
 // not maintain the currently-active card -- it's more like a log of what the
 // learner has 'discovered' so far.
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { StateCard } from 'domain/state_card/StateCardObjectFactory';
+
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 
 import { LoggerService } from 'services/contextual/logger.service';
-import { StateCard } from 'domain/state_card/StateCardObjectFactory';
+
 
 @Injectable({
   providedIn: 'root'

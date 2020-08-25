@@ -16,16 +16,20 @@
  * @fileoverview Unit tests for storyViewerPage.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { StoryViewerBackendApiService } from
-  'domain/story_viewer/story-viewer-backend-api.service';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
-import { StoryPlaythroughObjectFactory } from
-  'domain/story_viewer/StoryPlaythroughObjectFactory';
+import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import { StoryViewerBackendApiService } from
+  'domain/story_viewer/story-viewer-backend-api.service';
+
+import { StoryPlaythroughObjectFactory } from
+  'domain/story_viewer/StoryPlaythroughObjectFactory';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+
+import { TestBed } from '@angular/core/testing';
 import { PageTitleService } from 'services/page-title.service';
 
 describe('Story Viewer Page component', function() {

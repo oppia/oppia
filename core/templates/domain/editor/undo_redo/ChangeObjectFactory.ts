@@ -21,21 +21,22 @@
 // TODO(bhenning): Consolidate the backend ExplorationChange and
 // CollectionChange domain objects.
 
-import cloneDeep from 'lodash/cloneDeep';
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
-import { MisconceptionBackendDict } from
-  'domain/skill/MisconceptionObjectFactory';
 import { RecordedVoiceOverBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { StateBackendDict } from
-  'domain/state/StateObjectFactory';
 import { SubtitledHtmlBackendDict } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { MisconceptionBackendDict } from
+  'domain/skill/MisconceptionObjectFactory';
 import { WorkedExampleBackendDict } from
   'domain/skill/WorkedExampleObjectFactory';
+import { StateBackendDict } from
+  'domain/state/StateObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
 
 interface CollectionTitleChange {
   'cmd': 'edit_collection_property';

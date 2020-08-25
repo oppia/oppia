@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { EditabilityService } from 'services/editability.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -26,10 +26,10 @@ import { StateNameService } from
   'components/state-editor/state-editor-properties-services/state-name.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { EditabilityService } from 'services/editability.service';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('State Name Editor component', function() {
   var ctrl = null;

@@ -16,9 +16,9 @@
  * @fileoverview Backend service for creating a new skills
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface RubricBackendDict {
   difficulty: string;

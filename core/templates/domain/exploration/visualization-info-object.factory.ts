@@ -16,11 +16,13 @@
  * @fileoverview Frontend domain object for visualization info.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { AnswerStats } from
   'domain/exploration/AnswerStatsObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+
 import { InteractionAnswer } from
   'interactions/answer-defs';
 

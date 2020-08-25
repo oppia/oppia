@@ -16,45 +16,46 @@
  * @fileoverview Unit tests for translationTab.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { EventEmitter } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { LoaderService } from 'services/loader.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { ExplorationImprovementsTaskRegistryService } from
-  'services/exploration-improvements-task-registry.service';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { StateSolutionService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solution.service';
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
-import { ContextService } from 'services/context.service';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
-import { ExternalSaveService } from 'services/external-save.service';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
 
 import $ from 'jquery';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { ContextService } from 'services/context.service';
+import { ExplorationImprovementsTaskRegistryService } from
+  'services/exploration-improvements-task-registry.service';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { ExternalSaveService } from 'services/external-save.service';
+import { LoaderService } from 'services/loader.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 describe('Translation tab component', function() {
   var ctrl = null;

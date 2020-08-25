@@ -16,21 +16,23 @@
  * @fileoverview Unit tests for the Exploration object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { LoggerService } from 'services/contextual/logger.service';
+
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { LoggerService } from 'services/contextual/logger.service';
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;

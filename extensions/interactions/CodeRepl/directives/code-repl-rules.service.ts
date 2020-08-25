@@ -19,11 +19,11 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { CodeReplAnswer } from 'interactions/answer-defs';
 import { CodeReplRuleInputs } from 'interactions/rule-input-defs';
+import { CodeNormalizerService } from 'services/code-normalizer.service';
 
 @Injectable({
   providedIn: 'root'

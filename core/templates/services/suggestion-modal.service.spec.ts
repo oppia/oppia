@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for SuggestionModalService.
  */
 import { TestBed } from '@angular/core/testing';
+
 import { SuggestionModalService } from './suggestion-modal.service';
 
 describe('Suggestion Modal Service', () => {

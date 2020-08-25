@@ -15,18 +15,18 @@
 /**
  * @fileoverview Rules service for the interaction.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { CodeNormalizerService } from 'services/code-normalizer.service';
+import { NormalizeWhitespacePunctuationAndCasePipe } from
+  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 /* eslint-disable max-len */
-import { NormalizeWhitespacePunctuationAndCasePipe } from
-  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 /* eslint-enable max-len */
 import { PencilCodeEditorAnswer } from 'interactions/answer-defs';
 import { PencilCodeEditorRuleInputs } from 'interactions/rule-input-defs';
+import { CodeNormalizerService } from 'services/code-normalizer.service';
 
 @Injectable({
   providedIn: 'root'

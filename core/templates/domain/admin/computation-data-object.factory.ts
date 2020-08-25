@@ -16,8 +16,8 @@
  * @fileoverview Frontend domain object factory for computation data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface ComputationDataBackendDict {
   'last_stopped_msec': number;

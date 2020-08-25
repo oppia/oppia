@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for PlatformParameterFilterObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import {
   PlatformParameterFilterBackendDict,
   PlatformParameterFilterObjectFactory,
   PlatformParameterFilterType,
   ServerMode,
 } from 'domain/platform_feature/platform-parameter-filter-object.factory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('PlatformParameterFilterObjectFactory', () => {
   let factory: PlatformParameterFilterObjectFactory;

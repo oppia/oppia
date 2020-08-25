@@ -17,14 +17,16 @@
  * collection node domain objects.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary-object.factory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+import cloneDeep from 'lodash/cloneDeep';
+
+
+
 
 export interface CollectionNodeBackendDict {
   'exploration_id': string;

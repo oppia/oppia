@@ -30,15 +30,15 @@ require(
   'interactions/interaction-attributes-extractor.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 
-import { Subscription } from 'rxjs';
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
 import logicProofConversion from
   'interactions/LogicProof/static/js/conversion.ts';
+import logicProofData from 'interactions/LogicProof/static/js/data.ts';
 import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
   'interactions/LogicProof/static/js/generatedDefaultData.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
+import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractiveLogicProof', [
   'InteractionAttributesExtractorService', 'PlayerPositionService',

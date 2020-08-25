@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for multipleIncorrectSubmissionsIssue.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 

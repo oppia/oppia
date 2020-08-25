@@ -16,16 +16,17 @@
  * @fileoverview Unit tests for the UserExplorationPermissionsService.
  */
 
+import { ExplorationPermissions, ExplorationPermissionsObjectFactory } from
+  'domain/exploration/exploration-permissions-object.factory';
+
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ContextService } from
-  'services/context.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { ExplorationPermissions, ExplorationPermissionsObjectFactory } from
-  'domain/exploration/exploration-permissions-object.factory';
+import { ContextService } from
+  'services/context.service';
 
 describe('User Exploration Permissions Service', () => {
   let ueps: UserExplorationPermissionsService = null;

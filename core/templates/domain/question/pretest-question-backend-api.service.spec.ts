@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for PretestQuestionBackendApiService.
  */
 
+import { PretestQuestionBackendApiService } from
+  'domain/question/pretest-question-backend-api.service';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { PretestQuestionBackendApiService } from
-  'domain/question/pretest-question-backend-api.service';
 
 describe('Pretest question backend API service', function() {
   let pretestQuestionBackendApiService:

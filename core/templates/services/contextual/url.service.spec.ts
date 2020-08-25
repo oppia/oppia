@@ -19,6 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { UrlService } from 'services/contextual/url.service';
+
 import { WindowRef } from './window-ref.service';
 
 describe('Url Service', () => {

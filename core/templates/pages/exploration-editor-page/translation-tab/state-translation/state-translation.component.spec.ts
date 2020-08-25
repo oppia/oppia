@@ -16,18 +16,31 @@
  * @fileoverview Unit tests for stateTranslation.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory';
+
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content-service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+
+
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -48,28 +61,26 @@ import { StateWrittenTranslationsService } from
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
+
+
 import { WrapTextWithEllipsisPipe } from
   'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
-import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory';
+
+
 import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
 import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
-import { EventEmitter } from '@angular/core';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
 import { ExternalSaveService } from 'services/external-save.service';
 
 

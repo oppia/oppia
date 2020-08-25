@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for ConceptCardBackendApiService.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
 
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
+
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 describe('Concept card backend API service', () => {
   let conceptCardBackendApiService: ConceptCardBackendApiService = null;

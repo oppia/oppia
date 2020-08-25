@@ -16,6 +16,11 @@
  * @fileoverview Component for the translation language select.
  */
 
+import { FeaturedTranslationLanguage } from
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+
 import {
   Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild
 } from '@angular/core';
@@ -24,9 +29,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { FeaturedTranslationLanguage } from
-  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
 @Component({
   selector: 'translation-language-selector',

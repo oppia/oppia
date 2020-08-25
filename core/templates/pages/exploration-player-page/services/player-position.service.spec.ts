@@ -16,17 +16,18 @@
  * @fileoverview Unit tests for the player position service.
  */
 
+import { StateCardObjectFactory } from
+  'domain/state_card/StateCardObjectFactory';
+
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { Subscription } from 'rxjs';
 
 import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
+import { Subscription } from 'rxjs';
 
 describe('Player position service', () => {
   let pts = null;

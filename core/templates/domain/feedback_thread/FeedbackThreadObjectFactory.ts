@@ -17,13 +17,14 @@
    thread domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface FeedbackThreadBackendDict {
   'status': string;

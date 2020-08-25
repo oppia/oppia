@@ -18,6 +18,11 @@
 
 import { TestBed } from '@angular/core/testing';
 
+import { NormalizeWhitespacePunctuationAndCasePipe } from
+  // eslint-disable-next-line max-len
+  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { AlgebraicExpressionInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
@@ -36,10 +41,6 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { ImageClickInputRulesService } from
   'interactions/ImageClickInput/directives/image-click-input-rules.service';
-import { InteractionRulesRegistryService } from
-  'services/interaction-rules-registry.service';
-import { InteractionSpecsConstants } from
-  'pages/interaction-specs.constants';
 import { InteractiveMapRulesService } from
   'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import { ItemSelectionInputRulesService } from
@@ -55,11 +56,6 @@ import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { NormalizeWhitespacePunctuationAndCasePipe } from
-  // eslint-disable-next-line max-len
-  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 import { NumericExpressionInputRulesService } from
@@ -73,6 +69,10 @@ import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
+import { InteractionSpecsConstants } from
+  'pages/interaction-specs.constants';
+import { InteractionRulesRegistryService } from
+  'services/interaction-rules-registry.service';
 
 describe('Interaction Rules Registry Service', () => {
   beforeEach(() => {

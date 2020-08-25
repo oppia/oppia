@@ -17,11 +17,7 @@
  * about the concept card of a skill from the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
-import cloneDeep from 'lodash/cloneDeep';
 
 import { ConceptCard, ConceptCardBackendDict, ConceptCardObjectFactory} from
   'domain/skill/ConceptCardObjectFactory';
@@ -29,6 +25,11 @@ import { SkillDomainConstants } from
   'domain/skill/skill-domain.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
 
 interface ConceptCardBackendDicts {
   'concept_card_dicts': ConceptCardBackendDict[];

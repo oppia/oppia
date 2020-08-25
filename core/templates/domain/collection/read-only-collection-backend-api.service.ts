@@ -17,17 +17,19 @@
  * about collections from the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
-
-import cloneDeep from 'lodash/cloneDeep';
-
-import { AppConstants } from 'app.constants';
 import { CollectionBackendDict, CollectionObjectFactory, Collection } from
   'domain/collection/CollectionObjectFactory';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { EventEmitter, Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { AppConstants } from 'app.constants';
+import cloneDeep from 'lodash/cloneDeep';
+
 
 interface CollectionCache {
   [collectionId: string]: Collection;

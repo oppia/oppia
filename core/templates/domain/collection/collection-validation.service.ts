@@ -19,11 +19,13 @@
  * in collection_domain.Collection and subsequent domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { Collection } from 'domain/collection/CollectionObjectFactory';
+
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
-import { Collection } from 'domain/collection/CollectionObjectFactory';
+
 
 @Injectable({
   providedIn: 'root'

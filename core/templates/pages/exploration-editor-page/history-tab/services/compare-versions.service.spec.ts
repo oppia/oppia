@@ -20,7 +20,6 @@
 // compare-versions.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -33,15 +32,18 @@ import { RecordedVoiceoversObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { ExplorationSnapshot, VersionTreeService } from
-  'pages/exploration-editor-page/history-tab/services/version-tree.service';
+
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+
+import { ExplorationSnapshot, VersionTreeService } from
+  'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 

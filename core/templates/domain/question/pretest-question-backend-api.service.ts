@@ -16,18 +16,19 @@
  * @fileoverview Service to receive questions as pretests for an exploration.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { QuestionDomainConstants } from
+  'domain/question/question-domain.constants';
+import { QuestionBackendDict } from
+  'domain/question/QuestionObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { QuestionBackendDict } from
-  'domain/question/QuestionObjectFactory';
-import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants';
 
 interface PretestQuestionsBackendResponse {
   'pretest_question_dicts': QuestionBackendDict[];

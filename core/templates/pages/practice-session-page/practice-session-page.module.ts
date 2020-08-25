@@ -20,6 +20,15 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import 'angular-ui-sortable';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
+
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeModule } from '@angular/upgrade/static';
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ui-tree.import';
@@ -30,26 +39,20 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
 ]);
 
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, StaticProvider } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 
 import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { PracticeSessionPageConstants } from
-  'pages/practice-session-page/practice-session-page.constants';
-import { QuestionPlayerConstants } from
-  'components/question-directives/question-player/question-player.constants';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { ServicesConstants } from 'services/services.constants';
-import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { QuestionPlayerConstants } from
+  'components/question-directives/question-player/question-player.constants';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
+import { PracticeSessionPageConstants } from
+  'pages/practice-session-page/practice-session-page.constants';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+import { ServicesConstants } from 'services/services.constants';
 
 @NgModule({
   imports: [
@@ -82,8 +85,6 @@ class PracticeSessionPageModule {
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -20,14 +20,15 @@
  * QuestionSummary just contains the question data.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import {
   QuestionSummaryBackendDict,
   QuestionSummary,
   QuestionSummaryObjectFactory
 } from 'domain/question/QuestionSummaryObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export interface QuestionSummaryForOneSkillBackendDict {
   'skill_id': string;

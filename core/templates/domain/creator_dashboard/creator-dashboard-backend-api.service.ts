@@ -17,9 +17,6 @@
  * backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 
 import {
   CollectionSummary,
@@ -32,11 +29,6 @@ import {
   CreatorDashboardStatsObjectFactory
 } from 'domain/creator_dashboard/creator-dashboard-stats-object.factory';
 import {
-  CreatorExplorationSummary,
-  CreatorExplorationSummaryBackendDict,
-  CreatorExplorationSummaryObjectFactory
-} from 'domain/summary/creator-exploration-summary-object.factory';
-import {
   FeedbackThread,
   FeedbackThreadObjectFactory,
   FeedbackThreadBackendDict
@@ -47,19 +39,28 @@ import {
   SuggestionObjectFactory
 } from 'domain/suggestion/SuggestionObjectFactory';
 import {
-  ProfileSummary,
-  SubscriberSummaryBackendDict,
-  ProfileSummaryObjectFactory
-} from 'domain/user/profile-summary-object.factory';
-import {
   SuggestionThread,
   SuggestionThreadObjectFactory
 } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import {
+  CreatorExplorationSummary,
+  CreatorExplorationSummaryBackendDict,
+  CreatorExplorationSummaryObjectFactory
+} from 'domain/summary/creator-exploration-summary-object.factory';
 import {
   TopicSummary,
   TopicSummaryBackendDict,
   TopicSummaryObjectFactory
 } from 'domain/topic/TopicSummaryObjectFactory';
+import {
+  ProfileSummary,
+  SubscriberSummaryBackendDict,
+  ProfileSummaryObjectFactory
+} from 'domain/user/profile-summary-object.factory';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { LoggerService } from 'services/contextual/logger.service';
 import { SuggestionsService } from
   'services/suggestions.service';

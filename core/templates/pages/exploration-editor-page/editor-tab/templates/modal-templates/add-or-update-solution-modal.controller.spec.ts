@@ -16,24 +16,27 @@
  * @fileoverview Unit tests for AddOrUpdateSolutionModalController.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ExplorationHtmlFormatterService } from
-  'services/exploration-html-formatter.service';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { CurrentInteractionService } from
-  'pages/exploration-player-page/services/current-interaction.service';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
+
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService }
   // eslint-disable-next-line max-len
   from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService }
   // eslint-disable-next-line max-len
   from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { StateSolutionService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solution.service';
+import { CurrentInteractionService } from
+  'pages/exploration-player-page/services/current-interaction.service';
+import { ExplorationHtmlFormatterService } from
+  'services/exploration-html-formatter.service';
+
 
 describe('Add Or Update Solution Modal Controller', function() {
   var $scope = null;

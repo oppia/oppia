@@ -16,15 +16,17 @@
  * @fileoverview A data service that stores the content ids
  * to audio translations.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { RecordedVoiceovers } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
 
-import { AlertsService } from 'services/alerts.service';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
-import { RecordedVoiceovers } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { AlertsService } from 'services/alerts.service';
+
 import { UtilsService } from 'services/utils.service';
 
 @Injectable({

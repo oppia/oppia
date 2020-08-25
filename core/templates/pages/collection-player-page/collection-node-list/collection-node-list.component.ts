@@ -16,11 +16,12 @@
  * @fileoverview Component for creating a list of collection nodes which link to
  * playing the exploration in each node.
  */
+import { CollectionNode } from
+  'domain/collection/collection-node-object.factory';
+
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { CollectionNode } from
-  'domain/collection/collection-node-object.factory';
 
 @Component({
   selector: 'collection-node-list',

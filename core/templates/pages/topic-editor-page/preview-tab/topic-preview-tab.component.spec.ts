@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for topic preview tab.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { StorySummaryObjectFactory } from
   'domain/story/StorySummaryObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Topic preview tab', function() {
   var ctrl = null;

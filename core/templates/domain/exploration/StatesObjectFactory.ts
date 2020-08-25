@@ -16,15 +16,16 @@
  * @fileoverview Factory for creating new frontend instances of State
  * domain objects given a list of backend state dictionaries.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
+import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 import {
   StateBackendDict,
   StateObjectFactory,
   State
 } from 'domain/state/StateObjectFactory';
-import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 

@@ -16,46 +16,48 @@
  * @fileoverview Unit tests for Audio Translation Bar directive.
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
+
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { StateRecordedVoiceoversService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { StateWrittenTranslationsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-written-translations.service';
-import { IdGenerationService } from 'services/id-generation.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateRecordedVoiceoversService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { StateSolutionService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solution.service';
+import { StateWrittenTranslationsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-written-translations.service';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
+import $ from 'jquery';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
+import { EditabilityService } from 'services/editability.service';
+import { IdGenerationService } from 'services/id-generation.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 import WaveSurfer from 'wavesurfer.js';
-import $ from 'jquery';
 
 require('pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');

@@ -17,8 +17,8 @@
  * create Story Object used in the topic editor.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 const constants = require('constants.ts');
 

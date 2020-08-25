@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for QuestionSummaryObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import {
   QuestionSummaryForOneSkillBackendDict,
   QuestionSummaryForOneSkillObjectFactory
 } from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Question summary for one skill object factory', () => {
   describe('QuestionSummaryForOneSkillObjectFactory', () => {

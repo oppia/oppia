@@ -16,16 +16,17 @@
  * @fileoverview Rules service for the interaction.
  */
 
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { unit } from 'mathjs';
-
-import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory';
-import { UtilsService } from 'services/utils.service';
 import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 import { NumberWithUnitsRuleInputs } from 'interactions/rule-input-defs';
+import { unit } from 'mathjs';
+
+import { UtilsService } from 'services/utils.service';
 
 // Rules service for number with units interaction.
 @Injectable({

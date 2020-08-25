@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for searchResults.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { EventEmitter } from '@angular/core';
 
 describe('Search Results component', function() {
   var ctrl = null;

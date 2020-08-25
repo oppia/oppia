@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for the LearnerActionObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Learner Action Object Factory', () => {
   var learnerActionObjectFactory: LearnerActionObjectFactory;

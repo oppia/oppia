@@ -16,15 +16,18 @@
  * @fileoverview Unit tests for voiceoverOpportunities.
  */
 
+import { ExplorationOpportunitySummaryObjectFactory } from
+  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ExplorationOpportunitySummaryObjectFactory } from
-  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
-import { EventEmitter } from '@angular/core';
+
+
 
 describe('Voiceover opportunities component', function() {
   var ctrl = null;

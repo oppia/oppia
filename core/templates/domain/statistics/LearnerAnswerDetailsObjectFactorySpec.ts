@@ -16,10 +16,10 @@
  * @fileoverview Tests for LearnerAnswerDetailsObjectFactory.
  */
 
-import { LearnerAnswerInfoObjectFactory } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerInfoObjectFactory } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
 
 describe('Learner answer details object factory', () => {
   it('should create a default learner answer details object', () => {

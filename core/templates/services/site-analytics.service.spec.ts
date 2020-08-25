@@ -17,8 +17,8 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 const constants = require('constants.ts');
 

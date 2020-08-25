@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for VisualizationInfoObjectFactory.
  */
 
-import { VisualizationInfoObjectFactory } from
-  'domain/exploration/visualization-info-object.factory';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
+import { VisualizationInfoObjectFactory } from
+  'domain/exploration/visualization-info-object.factory';
 
 describe('Visualization info object factory', () => {
   let viof: VisualizationInfoObjectFactory;

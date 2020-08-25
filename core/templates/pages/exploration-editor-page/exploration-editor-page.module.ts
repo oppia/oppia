@@ -36,11 +36,7 @@ angular.module('oppia', [
   'ui.sortable', 'ui.tree', uiValidate,
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -56,15 +52,23 @@ import { CollectionSummaryTileConstants } from
   'components/summary-tile/collection-summary-tile.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
+
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
+
 import { ServicesConstants } from 'services/services.constants';
 import { StateEditorConstants } from
   'components/state-editor/state-editor.constants';
+
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
+
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
+import { NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 import { ExplorationEditorPageConstants } from
   'pages/exploration-editor-page/exploration-editor-page.constants';
 

@@ -16,9 +16,10 @@
  * @fileoverview Directive for the SortedTiles visualization.
  */
 
+import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+
 import { sum } from 'd3-array';
 
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 
 require(
   'components/common-layout-directives/common-elements/' +

@@ -17,8 +17,6 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory.ts';
@@ -26,6 +24,9 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory.ts';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { Unit, NumberWithUnitsAnswer } from
   'interactions/answer-defs';
 

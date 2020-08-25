@@ -16,14 +16,16 @@
  * @fileoverview Unit tests for SchemaDefaultValueService.
  */
 
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
 
 import { LoggerService } from 'services/contextual/logger.service';
 import { SchemaDefaultValueService } from
   'services/schema-default-value.service';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Schema Default Value Service', () => {
   let sdvs, ls;

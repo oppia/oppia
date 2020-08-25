@@ -18,9 +18,9 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
+import { EventEmitter } from '@angular/core';
 import { UpgradedServices } from 'services/UpgradedServices';
 
-import { EventEmitter } from '@angular/core';
 
 // ^^^ This block is to be removed.
 

@@ -16,18 +16,21 @@
  * @fileoverview Unit tests for the ExplorationImprovementsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-
 import {
   ExplorationImprovementsConfig,
   ExplorationImprovementsConfigBackendDict,
 } from 'domain/improvements/exploration-improvements-config-object.factory';
+
 import {
   ExplorationTaskBackendDict,
   ExplorationTaskObjectFactory,
 } from 'domain/improvements/ExplorationTaskObjectFactory';
+
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+
 import {
   ExplorationImprovementsBackendApiService,
   ExplorationImprovementsHistoryResponse,

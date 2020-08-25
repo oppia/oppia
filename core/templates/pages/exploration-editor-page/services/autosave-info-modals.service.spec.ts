@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for AutosaveInfoModalsService.
  */
 
-import { LocalStorageService } from 'services/local-storage.service';
-import { TestBed } from '@angular/core/testing';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { TestBed } from '@angular/core/testing';
+import { LocalStorageService } from 'services/local-storage.service';
 
 describe('AutosaveInfoModalsService', () => {
   let AutosaveInfoModalsService = null;

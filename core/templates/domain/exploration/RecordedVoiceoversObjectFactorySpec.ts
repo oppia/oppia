@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for RecordedVoiceovers object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('RecordedVoiceovers object factory', () => {
   let rvof: RecordedVoiceoversObjectFactory = null;

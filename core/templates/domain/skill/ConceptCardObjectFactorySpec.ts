@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for ConceptCardObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
-import { ConceptCardObjectFactory } from
-  'domain/skill/ConceptCardObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { ConceptCardObjectFactory } from
+  'domain/skill/ConceptCardObjectFactory';
 import { WorkedExampleObjectFactory } from
   'domain/skill/WorkedExampleObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('Concept card object factory', () => {
   let conceptCardObjectFactory: ConceptCardObjectFactory;

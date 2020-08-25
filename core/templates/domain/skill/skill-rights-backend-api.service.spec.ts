@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for SkillRightsBackendApiService.
  */
 
+import { SkillRightsBackendApiService} from
+  'domain/skill/skill-rights-backend-api.service.ts';
+import { SkillRightsBackendDict, SkillRights, SkillRightsObjectFactory } from
+  'domain/skill/SkillRightsObjectFactory.ts';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
 
-import { SkillRightsBackendDict, SkillRights, SkillRightsObjectFactory } from
-  'domain/skill/SkillRightsObjectFactory.ts';
-import { SkillRightsBackendApiService} from
-  'domain/skill/skill-rights-backend-api.service.ts';
 
 describe('Skill rights backend API service', () => {
   let skillRightsBackendApiService:SkillRightsBackendApiService = null;

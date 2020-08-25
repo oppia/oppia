@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for the audio translation manager service.
  */
 
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
 
 import { AudioTranslationManagerService } from
   'pages/exploration-player-page/services/audio-translation-manager.service';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 
 describe('Audio translation manager service', () => {
   let atms: AudioTranslationManagerService, vof: VoiceoverObjectFactory;

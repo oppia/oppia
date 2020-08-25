@@ -18,8 +18,8 @@
 
 import { EventEmitter } from '@angular/core';
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { Subscription } from 'rxjs';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('I18nLanguageCodeService', () => {
   const i18nLanguageCodeService = new I18nLanguageCodeService();

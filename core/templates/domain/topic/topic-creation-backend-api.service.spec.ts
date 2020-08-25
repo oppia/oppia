@@ -16,17 +16,19 @@
  * @fileoverview Unit test for TopicCreationBackendApiService.
  */
 
+import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
+
+import { TopicCreationBackendApiService } from
+  'domain/topic/topic-creation-backend-api.service.ts';
+import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
+
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
-import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
-  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
-import { TopicCreationBackendApiService } from
-  'domain/topic/topic-creation-backend-api.service.ts';
 
 describe('Topic creation backend api service', () => {
   let csrfService: CsrfTokenService = null;

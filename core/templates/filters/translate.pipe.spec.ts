@@ -16,13 +16,15 @@
  * @fileoverview Unit tests for the translate pipe.
  */
 
+import { EventEmitter, ChangeDetectorRef, Component } from '@angular/core';
 import { async, TestBed, ComponentFixture, fakeAsync }
   from '@angular/core/testing';
-import { EventEmitter, ChangeDetectorRef, Component } from '@angular/core';
 
 import { TranslateService } from 'services/translate.service';
-import { TranslatePipe } from './translate.pipe';
+
 import { UtilsService } from 'services/utils.service';
+
+import { TranslatePipe } from './translate.pipe';
 
 
 class MockChangeDetectorRef {

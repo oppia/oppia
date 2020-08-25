@@ -16,14 +16,17 @@
  * @fileoverview Backend API service for playthrough.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { Playthrough } from
+  'domain/statistics/PlaythroughObjectFactory';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Playthrough } from
-  'domain/statistics/PlaythroughObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root'

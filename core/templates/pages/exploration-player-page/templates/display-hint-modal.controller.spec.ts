@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for DisplayHintModalController.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { StateCardObjectFactory } from
+  'domain/state_card/StateCardObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 import { Subscription } from 'rxjs';
 

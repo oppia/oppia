@@ -25,13 +25,17 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap'
 ]);
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
+
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { Component, NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
 @Component({
@@ -43,8 +47,7 @@ export class ServiceBootstrapComponent {}
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+
 
 @NgModule({
   imports: [
@@ -74,7 +77,6 @@ class ConsoleErrorPageModule {
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {

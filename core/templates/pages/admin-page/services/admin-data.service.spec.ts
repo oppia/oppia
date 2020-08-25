@@ -16,12 +16,7 @@
  * @fileoverview Tests for AdminDataService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AdminDataService } from
-  'pages/admin-page/services/admin-data.service';
 import { AdminPageData } from
   'domain/admin/admin-backend-api.service';
 import { ComputationDataObjectFactory } from
@@ -32,6 +27,12 @@ import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
+
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { AdminDataService } from
+  'pages/admin-page/services/admin-data.service';
 
 
 describe('Admin Data Service', () => {

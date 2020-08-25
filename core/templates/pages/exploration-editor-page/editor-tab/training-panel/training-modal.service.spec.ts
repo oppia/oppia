@@ -18,10 +18,10 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Subscription } from 'rxjs';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { Subscription } from 'rxjs';
 
 describe('Training Modal Service', function() {
   var $rootScope;

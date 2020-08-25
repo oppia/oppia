@@ -18,10 +18,10 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CodeReplRulesService } from
-  'interactions/CodeRepl/directives/code-repl-rules.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
+import { CodeReplRulesService } from
+  'interactions/CodeRepl/directives/code-repl-rules.service';
 
 describe('Code REPL rules service', () => {
   let crrs = null;

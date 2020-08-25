@@ -21,6 +21,7 @@
 // state-property.service.ts is upgraded to Angular 8.
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 

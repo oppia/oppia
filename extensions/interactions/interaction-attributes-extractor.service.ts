@@ -17,14 +17,15 @@
  * attrs for interactions.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { InteractionCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { InteractionCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 

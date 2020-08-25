@@ -16,15 +16,17 @@
  * @fileoverview Unit tests for ExplorationPermissionsBackendApiService.
  */
 
+import { ExplorationPermissionsBackendApiService } from
+  'domain/exploration/exploration-permissions-backend-api.service';
+
+import { ExplorationPermissionsObjectFactory } from
+  'domain/exploration/exploration-permissions-object.factory';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ContextService } from 'services/context.service';
-import { ExplorationPermissionsBackendApiService } from
-  'domain/exploration/exploration-permissions-backend-api.service';
-import { ExplorationPermissionsObjectFactory } from
-  'domain/exploration/exploration-permissions-object.factory';
 
 describe('Exploration permissions backend api service', () => {
   let epbas: ExplorationPermissionsBackendApiService;

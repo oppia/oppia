@@ -16,13 +16,13 @@
  * @fileoverview Controller for demonstration.
  */
 
+import logicProofData from 'interactions/LogicProof/static/js/data.ts';
 import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
 import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
 import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import defaultStrings from 'interactions/LogicProof/static/js/tools/strings.ts';
 import logicProofTeacher2
   from 'interactions/LogicProof/static/js/tools/teacher2.ts';
-import defaultStrings from 'interactions/LogicProof/static/js/tools/strings.ts';
 
 var logicDemo = angular.module('logicDemo', []);
 

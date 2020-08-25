@@ -16,10 +16,11 @@
  * @fileoverview unit test for RuleObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { RuleObjectFactory, RuleBackendDict, RuleInputs, Rule } from
   'domain/exploration/RuleObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('RuleObjectFactory', () => {
   let ruleObjectFactory: RuleObjectFactory = null;

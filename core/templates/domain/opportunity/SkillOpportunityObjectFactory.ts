@@ -17,8 +17,8 @@
  * skill opportunity domain object.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface SkillOpportunityBackendDict {
   'id': string;

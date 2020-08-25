@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for LanguageUtilService
  */
 
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+
 import { TestBed } from '@angular/core/testing';
 
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
 const CONSTANTS = require('constants.ts');
 

@@ -15,13 +15,13 @@
 /**
  * @fileoverview A data service that stores the current interaction id.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
+import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
 
 @Injectable({

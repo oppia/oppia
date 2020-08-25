@@ -26,8 +26,8 @@
  * https://github.com/python/cpython/blob/2.7/Lib/tokenize.py
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants';

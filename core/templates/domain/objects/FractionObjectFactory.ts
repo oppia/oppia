@@ -17,11 +17,13 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+
 import { FractionAnswer } from
   'interactions/answer-defs';
 

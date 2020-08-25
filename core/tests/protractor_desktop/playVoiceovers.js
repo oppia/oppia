@@ -16,18 +16,18 @@
  * @fileoverview End-to-end tests for the functionality of the voiceover player.
  */
 
+var CreatorDashboardPage = require(
+  '../protractor_utils/CreatorDashboardPage.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage = require(
+  '../protractor_utils/ExplorationPlayerPage.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var ExplorationEditorPage = require(
-  '../protractor_utils/ExplorationEditorPage.js');
-var CreatorDashboardPage = require(
-  '../protractor_utils/CreatorDashboardPage.js');
-var ExplorationPlayerPage = require(
-  '../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Voiceover player', function() {
   var creatorDashboardPage = null;

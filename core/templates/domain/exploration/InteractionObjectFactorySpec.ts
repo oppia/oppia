@@ -16,12 +16,10 @@
  * @fileoverview Unit tests for Interaction object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { InteractionObjectFactory, Interaction } from
   'domain/exploration/InteractionObjectFactory';
@@ -29,9 +27,13 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory.ts';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 

@@ -16,10 +16,11 @@
  * @fileoverview unit tests for the local save services.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 import { LocalStorageService } from 'services/local-storage.service';
 
 describe('LocalStorageService', () => {

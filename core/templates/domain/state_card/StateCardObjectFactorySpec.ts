@@ -16,20 +16,21 @@
  * @fileoverview Tests for StateCardObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { StateCardObjectFactory } from
+  'domain/state_card/StateCardObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 
 describe('State card object factory', () => {

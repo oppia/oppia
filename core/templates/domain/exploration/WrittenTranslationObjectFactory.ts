@@ -17,8 +17,8 @@
  * WrittenTranslation domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export const WRITTEN_TRANSLATION_TYPE_HTML = 'html';
 export const WRITTEN_TRANSLATION_TYPE_UNICODE = 'unicode';

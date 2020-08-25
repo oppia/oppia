@@ -17,8 +17,8 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ExplorationEditorPageConstants } from
   'pages/exploration-editor-page/exploration-editor-page.constants';

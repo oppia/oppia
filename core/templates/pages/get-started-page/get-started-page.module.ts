@@ -25,17 +25,19 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap'
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeModule } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
-import { AppConstants } from 'app.constants';
 
 
 @NgModule({
@@ -64,8 +66,6 @@ class GetStartedPageModule {
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

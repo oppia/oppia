@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for DebouncerService.
  */
 import { TestBed } from '@angular/core/testing';
-import { DebouncerService } from 'services/debouncer.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { DebouncerService } from 'services/debouncer.service';
 
 describe('Debouncer service', () => {
   let ds;

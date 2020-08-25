@@ -17,12 +17,13 @@
  */
 
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 describe('Topics and Skills Dashboard backend API service', () => {
   let topicsAndSkillsDashboardBackendApiService:

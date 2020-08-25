@@ -17,10 +17,11 @@
  * states based on statistics.
  */
 
+import { State } from 'domain/state/StateObjectFactory';
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { State } from 'domain/state/StateObjectFactory';
 
 @Injectable({
   providedIn: 'root'

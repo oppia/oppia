@@ -17,13 +17,15 @@
  * story contents domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { StoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
+  'domain/story/StoryNodeObjectFactory';
+
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
-import { StoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory';
+
 
 export interface StoryContentsBackendDict {
   'initial_node_id': string;

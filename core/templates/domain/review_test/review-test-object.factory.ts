@@ -16,8 +16,8 @@
  * @fileoverview Frontend domain object factory for review test.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface SkillDescriptions {
   [skillId: string]: string;

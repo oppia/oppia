@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the HighBounceRateTask domain object.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
@@ -24,6 +23,8 @@ import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { ExplorationStatsObjectFactory, ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
 
 describe('High bounce rate task', function() {
   let explorationStatsObjectFactory: ExplorationStatsObjectFactory;

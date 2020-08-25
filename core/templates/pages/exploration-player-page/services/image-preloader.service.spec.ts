@@ -20,14 +20,7 @@
 // image-preloader.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AudioFileObjectFactory } from
-  'domain/utilities/AudioFileObjectFactory';
-import { FileDownloadRequestObjectFactory } from
-  'domain/utilities/FileDownloadRequestObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImageFileObjectFactory } from
-  'domain/utilities/ImageFileObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
@@ -45,13 +38,21 @@ import { RecordedVoiceoversObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { AudioFileObjectFactory } from
+  'domain/utilities/AudioFileObjectFactory';
+import { FileDownloadRequestObjectFactory } from
+  'domain/utilities/FileDownloadRequestObjectFactory';
+import { ImageFileObjectFactory } from
+  'domain/utilities/ImageFileObjectFactory';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 

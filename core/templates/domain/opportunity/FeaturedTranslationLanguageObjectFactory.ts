@@ -17,8 +17,8 @@
  * featured translation language domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface FeaturedTranslationLanguageBackendDict {
   'language_code': string;

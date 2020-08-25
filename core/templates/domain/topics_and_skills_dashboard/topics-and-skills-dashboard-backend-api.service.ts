@@ -17,9 +17,6 @@
   from the backend and to merge skills from the dashboard.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
 
 import {
   AssignedSkill,
@@ -38,6 +35,8 @@ import {
 } from 'domain/skill/ShortSkillSummaryObjectFactory';
 import { SkillSummary, SkillSummaryBackendDict, SkillSummaryObjectFactory } from
   'domain/skill/skill-summary-object.factory';
+import { TopicSummary, TopicSummaryBackendDict, TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
 import { TopicsAndSkillsDashboardDomainConstants } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
@@ -45,10 +44,12 @@ import {
   TopicsAndSkillsDashboardFilter
 // eslint-disable-next-line max-len
 } from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
-import { TopicSummary, TopicSummaryBackendDict, TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { EventEmitter, Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface CategorizedSkillsBackendDict {
   [topicName: string]: {

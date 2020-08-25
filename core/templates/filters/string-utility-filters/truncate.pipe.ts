@@ -17,6 +17,7 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { ConvertToPlainTextPipe } from './convert-to-plain-text.pipe';
 
 // Pipe that truncates long descriptors.

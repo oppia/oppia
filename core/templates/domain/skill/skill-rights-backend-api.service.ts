@@ -16,18 +16,22 @@
  * @fileoverview Service to change the rights of skills in the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import { SkillRightsBackendDict, SkillRightsObjectFactory, SkillRights } from
+  'domain/skill/SkillRightsObjectFactory.ts';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { cloneDeep } from 'lodash';
 
-import { SkillRightsBackendDict, SkillRightsObjectFactory, SkillRights } from
-  'domain/skill/SkillRightsObjectFactory.ts';
+
 import { SkillEditorPageConstants } from
   'pages/skill-editor-page/skill-editor-page.constants.ts';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+
 
 export interface SkillRightsCache {
   [propName: string]: SkillRights;

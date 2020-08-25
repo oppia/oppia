@@ -16,9 +16,11 @@
  * @fileoverview Unit tests for Lost Change Object Factory.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 import { OutcomeObjectFactory } from './OutcomeObjectFactory';
 
 describe('Lost Change Object Factory', () => {

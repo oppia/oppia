@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for the IneffectiveFeedbackLoopTask domain object.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+
 
 describe('Ineffective feedback loop task', function() {
   let ineffectiveFeedbackLoopTaskObjectFactory:

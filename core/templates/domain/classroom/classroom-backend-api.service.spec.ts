@@ -16,9 +16,6 @@
  * @fileoverview Unit tests for ClassroomBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
@@ -26,6 +23,10 @@ import { ClassroomDataObjectFactory } from
   'domain/classroom/ClassroomDataObjectFactory';
 import { TopicSummaryBackendDict } from
   'domain/topic/TopicSummaryObjectFactory';
+
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 describe('Classroom backend API service', function() {
   let classroomBackendApiService:

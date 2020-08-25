@@ -15,15 +15,17 @@
 /**
  * @fileoverview A data service that stores the current state content.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-import { AlertsService } from 'services/alerts.service';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
+import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+
 
 @Injectable({
   providedIn: 'root'

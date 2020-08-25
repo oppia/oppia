@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
+import { CreatorDashboardBackendApiService } from
+  'domain/creator_dashboard/creator-dashboard-backend-api.service';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { CreatorDashboardBackendApiService } from
-  'domain/creator_dashboard/creator-dashboard-backend-api.service';
 
 describe('Creator Dashboard backend API service', () => {
   let creatorDashboardBackendApiService:

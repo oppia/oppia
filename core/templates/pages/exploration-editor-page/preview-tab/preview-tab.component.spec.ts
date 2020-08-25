@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for previewTab.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+
 import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';

@@ -17,11 +17,13 @@
  * QuestionsOpportunitiesSelectSkillAndDifficultyModalController.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { AlertsService } from 'services/alerts.service';
 import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
+
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { AlertsService } from 'services/alerts.service';
 
 describe(
   'Questions Opportunities Select Skill And Difficulty Modal Controller',

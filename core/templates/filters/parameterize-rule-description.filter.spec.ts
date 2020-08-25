@@ -20,6 +20,7 @@
 // parameterize-rule-description.filter.ts is upgraded to Angular 8.
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 

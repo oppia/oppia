@@ -15,13 +15,13 @@
 /**
  * @fileoverview A data service that stores the next content id index.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
+import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
 
 @Injectable({

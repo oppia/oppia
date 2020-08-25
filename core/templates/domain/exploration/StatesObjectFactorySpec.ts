@@ -16,16 +16,17 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
+import { TestBed } from '@angular/core/testing';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 const constants = require('constants.ts');
 

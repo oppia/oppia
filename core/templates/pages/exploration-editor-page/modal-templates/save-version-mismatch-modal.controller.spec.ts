@@ -18,9 +18,10 @@
 
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
-import { UtilsService } from 'services/utils.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { UtilsService } from 'services/utils.service';
 
 describe('Save Version Mismatch Modal Controller', () => {
   let $scope = null;

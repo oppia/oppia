@@ -16,17 +16,17 @@
  * @fileoverview Utility services for explorations which may be shared by both
  * the learner and editor views.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ExtensionTagAssemblerService } from
-  'services/extension-tag-assembler.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+import { ExtensionTagAssemblerService } from
+  'services/extension-tag-assembler.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 
 // A service that provides a number of utility functions useful to both the

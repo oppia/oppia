@@ -16,13 +16,16 @@
  * @fileoverview Component for the navbar breadcrumb of the topic viewer.
  */
 
+import { ReadOnlyTopic } from
+  'domain/topic_viewer/read-only-topic-object.factory';
+
+import { TopicViewerBackendApiService } from
+  'domain/topic_viewer/topic-viewer-backend-api.service';
+
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { ReadOnlyTopic } from
-  'domain/topic_viewer/read-only-topic-object.factory';
-import { TopicViewerBackendApiService } from
-  'domain/topic_viewer/topic-viewer-backend-api.service';
+
 import { UrlService } from 'services/contextual/url.service';
 
 @Component({

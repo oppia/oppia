@@ -16,13 +16,15 @@
  * @fileoverview Unit tests for reviewTestPage.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
-import { PageTitleService } from 'services/page-title.service';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
 import { ReviewTestEngineService } from
   'pages/review-test-page/review-test-engine.service';
+import { PageTitleService } from 'services/page-title.service';
 
 describe('Review test page component', function() {
   var ctrl = null;

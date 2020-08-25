@@ -16,17 +16,17 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { GraphAnswer } from 'interactions/answer-defs';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
-import { UtilsService } from 'services/utils.service';
-import { GraphAnswer } from 'interactions/answer-defs';
 import {
   GraphIsomorphicRuleInputs,
   GraphPropertyRuleInputs
 } from 'interactions/rule-input-defs';
+import { UtilsService } from 'services/utils.service';
 
 @Injectable({
   providedIn: 'root'

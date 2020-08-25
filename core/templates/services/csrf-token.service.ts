@@ -20,8 +20,8 @@
 // because Angular doesn't support global definitions and every library used
 // needs to be imported explicitly.
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import $ from 'jquery';
 
 @Injectable({

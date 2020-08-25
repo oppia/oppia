@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for EditProfilePictureModalController.
  */
 
-import $ from 'jquery';
 import Cropper from 'cropperjs';
+import $ from 'jquery';
 
 describe('EditProfilePictureModalController', function() {
   var $scope = null;

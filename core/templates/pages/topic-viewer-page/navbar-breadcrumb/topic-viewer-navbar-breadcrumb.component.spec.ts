@@ -16,16 +16,19 @@
  * @fileoverview Unit tests for classroom page component.
  */
 
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { UrlService } from 'services/contextual/url.service';
-import { TopicViewerBackendApiService } from
-  'domain/topic_viewer/topic-viewer-backend-api.service';
 import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
+import { TopicViewerBackendApiService } from
+  'domain/topic_viewer/topic-viewer-backend-api.service';
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
+import { UrlService } from 'services/contextual/url.service';
+
+
 
 describe('Topic viewer navbar breadcrumb component', () => {
   let component: TopicViewerNavbarBreadcrumbComponent;

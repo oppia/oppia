@@ -17,13 +17,14 @@
  *    task.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { TaskEntryBackendDict, TaskEntry } from
-  'domain/improvements/TaskEntryObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
+import { TaskEntryBackendDict, TaskEntry } from
+  'domain/improvements/TaskEntryObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 export class SuccessiveIncorrectAnswersTask extends TaskEntry<
     'successive_incorrect_answers'> {

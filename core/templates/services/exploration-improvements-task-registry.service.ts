@@ -17,9 +17,6 @@
  * improvements tasks for an exploration.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-import { group } from 'd3-array';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { States } from 'domain/exploration/StatesObjectFactory';
@@ -41,15 +38,19 @@ import { NeedsGuidingResponsesTask } from
 import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
+import { ExplorationStats } from
+  'domain/statistics/ExplorationStatsObjectFactory';
 import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
   MultipleIncorrectSubmissionsPlaythroughIssue,
   PlaythroughIssue
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
-import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
 import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { group } from 'd3-array';
 
 type HbrTask = HighBounceRateTask;
 type IflTask = IneffectiveFeedbackLoopTask;

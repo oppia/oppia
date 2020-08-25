@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for hint object factory.
  */
 
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+
 import { TestBed } from '@angular/core/testing';
 
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 
 describe('Hint object factory', () => {
   var hof: HintObjectFactory = null;

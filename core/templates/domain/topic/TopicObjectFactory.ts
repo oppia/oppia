@@ -17,10 +17,7 @@
  * topic domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
-import cloneDeep from 'lodash/cloneDeep';
 
 import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
@@ -35,6 +32,10 @@ import {
   SubtopicBackendDict,
   SubtopicObjectFactory
 } from 'domain/topic/SubtopicObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
 
 interface TopicBackendDict {
   'id': string;

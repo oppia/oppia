@@ -16,8 +16,6 @@
  * @fileoverview Component for the navbar breadcrumb of the subtopic viewer.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants.ts';
@@ -27,6 +25,9 @@ import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlService } from 'services/contextual/url.service';
 
 @Component({

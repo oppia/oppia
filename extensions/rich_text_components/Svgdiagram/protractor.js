@@ -20,8 +20,9 @@
 var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
-var request = require('request');
 var path = require('path');
+
+var request = require('request');
 
 const SVGTAGS = {
   rectangle: (

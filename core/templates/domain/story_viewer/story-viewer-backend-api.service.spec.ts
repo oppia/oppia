@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for StoryViewerBackendApiService.
  */
 
+import { StoryViewerBackendApiService } from
+  'domain/story_viewer/story-viewer-backend-api.service';
+import { StoryPlaythroughObjectFactory } from
+  'domain/story_viewer/StoryPlaythroughObjectFactory';
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { StoryPlaythroughObjectFactory } from
-  'domain/story_viewer/StoryPlaythroughObjectFactory';
-import { StoryViewerBackendApiService } from
-  'domain/story_viewer/story-viewer-backend-api.service';
 
 describe('Story viewer backend API service', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService = null;

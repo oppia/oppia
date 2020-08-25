@@ -16,11 +16,12 @@
  * @fileoverview Service for inspecting and managing suggestion objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { SuggestionBackendDict } from
   'domain/suggestion/SuggestionObjectFactory';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 
 @Injectable({providedIn: 'root'})
 export class SuggestionsService {

@@ -62,28 +62,9 @@
  */
 
 /* eslint-disable max-len */
-import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
-import { AdminDataService } from
-  'pages/admin-page/services/admin-data.service';
-import { AdminRouterService } from
-  'pages/admin-page/services/admin-router.service.ts';
-import { AdminTaskManagerService } from
-  'pages/admin-page/services/admin-task-manager.service';
-import { AlertsService } from 'services/alerts.service';
-import { AlgebraicExpressionInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
-import { AlgebraicExpressionInputValidationService } from
-  // eslint-disable-next-line max-len
-  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerClassificationService } from
-  'pages/exploration-player-page/services/answer-classification.service';
+
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
@@ -335,9 +316,11 @@ import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
 import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { KeyboardShortcutService } from
   'services/keyboard-shortcut.service';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
+
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
@@ -699,6 +682,25 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
+import { AlgebraicExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import { AlgebraicExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
+import { AdminDataService } from
+  'pages/admin-page/services/admin-data.service';
+import { AdminRouterService } from
+  'pages/admin-page/services/admin-router.service.ts';
+import { AdminTaskManagerService } from
+  'pages/admin-page/services/admin-task-manager.service';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service';
+import { AlertsService } from 'services/alerts.service';
 import { TranslateService } from 'services/translate.service';
 
 @Component({

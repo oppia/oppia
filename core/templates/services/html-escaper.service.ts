@@ -16,8 +16,8 @@
  * @fileoverview Service for HTML serialization and escaping.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { LoggerService } from 'services/contextual/logger.service';
 

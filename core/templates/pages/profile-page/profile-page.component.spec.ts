@@ -16,18 +16,19 @@
  * @fileoverview Unit tests for profile page component.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 
 // TODO(#7222): Remove the following block of unnecessary imports once
 // thread-data.service.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-import { ProfilePageBackendApiService } from
-  './profile-page-backend-api.service';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
+import { UpgradedServices } from 'services/UpgradedServices';
+
+import { ProfilePageBackendApiService } from
+  './profile-page-backend-api.service';
 
 require('pages/profile-page/profile-page.component.ts');
 

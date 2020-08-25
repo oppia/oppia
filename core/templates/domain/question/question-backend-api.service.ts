@@ -15,11 +15,7 @@
  * @fileoverview Service to receive questions for practice given a set of
  * skill_ids.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 
-import cloneDeep from 'lodash/cloneDeep';
 
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
@@ -29,6 +25,11 @@ import { QuestionSummaryBackendDict } from
   'domain/question/QuestionSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
 
 interface QuestionCountBackendResponse {
   'total_question_count': number;
