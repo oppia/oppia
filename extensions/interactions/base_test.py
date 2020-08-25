@@ -355,192 +355,179 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
         for interaction_id in all_interaction_ids:
-            # Ignoring the RatioExpressionInput for now as there's no creator
-            # for the interaction yet.Once added this needs to be removed.
+            # TODO(#10212):Ignoring the RatioExpressionInput for now as 
+            # there's no learner's flow for the interaction yet. 
+            # Once added this needs to be removed.
+
+            # Check that the interaction id is valid.
+            self.assertTrue(self._is_camel_cased(interaction_id))
+            hyphenated_interaction_id = (
+                utils.camelcase_to_hyphenated(interaction_id))
+            # Check that the interaction directory exists.
+            interaction_dir = os.path.join(
+                feconf.INTERACTIONS_DIR, interaction_id)
+            self.assertTrue(os.path.isdir(interaction_dir))
+            # The interaction directory should contain the following files:
+            #  Required:
+            #    * A python file called {InteractionName}.py.
+            #    * An __init__.py file used to import the Python file.
+            #    * A TypeScript file called {InteractionName}.ts.
+            #    * A directory name 'directives' containing TS and HTML
+            #       files for directives
+            #    * A directory named 'static' containing at least a .png
+            #       file.
+            #  Optional:
+            #    * A JS file called protractor.js.
+            interaction_dir_contents = (
+                self._listdir_omit_ignored(interaction_dir))
+            interaction_dir_optional_dirs_and_files_count = 0
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir, 'protractor.js')))
+                interaction_dir_optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir,
+                    '%s-prediction.service.ts' % hyphenated_interaction_id))) # pylint: disable=line-too-long
+                interaction_dir_optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir, '%s-prediction.service.spec.ts'
+                    % hyphenated_interaction_id)))
+                interaction_dir_optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+            self.assertEqual(
+                interaction_dir_optional_dirs_and_files_count + 5,
+                len(interaction_dir_contents)
+            )
+            py_file = os.path.join(
+                interaction_dir, '%s.py' % interaction_id)
+            ts_file = os.path.join(
+                interaction_dir, '%s.ts' % interaction_id)
+            self.assertTrue(os.path.isfile(py_file))
+            self.assertTrue(os.path.isfile(ts_file))
+            # Check that __init__.py file exists.
+            init_file = os.path.join(interaction_dir, '__init__.py')
+            self.assertTrue(os.path.isfile(init_file))
+            # Check that the directives subdirectory exists.
+            directives_dir = os.path.join(
+                interaction_dir, 'directives')
+            self.assertTrue(os.path.isdir(directives_dir))
+            # The directives directory should contain the following files:
+            #  Required:
+            #    * A TS file called
+            #    oppia-interactive-{InteractionName}.directive.ts.
+            #    * A TS file called
+            #      OppiaResponse{InteractionName}.directive.ts.
+            #    * A TS file called
+            #    oppia-short-response-{InteractionName}.directive.ts.
+            #    * A TS file called {InteractionName}-rules.service.ts.
+            #    * A TS file called {InteractionName}-validation.service.ts.
+            #    * A HTML file called
+            #      {InteractionName}-interaction.directive.html.
+            #    * A HTML file called
+            #      {InteractionName}-response.directive.html.
+            #    * A HTML file called
+            #      {InteractionName}-short-response.directive.html.
+            #  Optional:
+            #    * A TS file called
+            #      {InteractionName}-validation.service.specs.ts.
+            #    * A TS file called
+            #      {InteractionName}-rules.service.specs.ts.
+            hyphenated_interaction_id = (
+                utils.camelcase_to_hyphenated(interaction_id))
+            if interaction_id in INTERACTIONS_THAT_USE_COMPONENTS:
+                interaction_ts_file = os.path.join(
+                    directives_dir, 'oppia-interactive-%s.component.ts' % (
+                        hyphenated_interaction_id))
+                response_ts_file = os.path.join(
+                    directives_dir, 'oppia-response-%s.component.ts'
+                    % hyphenated_interaction_id)
+                short_response_ts_file = os.path.join(
+                    directives_dir, 'oppia-short-response-%s.component.ts' % ( # pylint: disable=line-too-long
+                        hyphenated_interaction_id))
+                rules_service_ts_file = os.path.join(
+                    directives_dir, '%s-rules.service.ts'
+                    % hyphenated_interaction_id)
+                validation_service_ts_file = os.path.join(
+                    directives_dir, '%s-validation.service.ts'
+                    % hyphenated_interaction_id)
+                interaction_html = os.path.join(
+                    directives_dir,
+                    '%s-interaction.component.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
+                response_html = os.path.join(
+                    directives_dir,
+                    '%s-response.component.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
+                short_response_html = os.path.join(
+                    directives_dir,
+                    '%s-short-response.component.html' %
+                    hyphenated_interaction_id)
+            else:
+                interaction_ts_file = os.path.join(
+                    directives_dir, 'oppia-interactive-%s.directive.ts' % (
+                        hyphenated_interaction_id))
+                response_ts_file = os.path.join(
+                    directives_dir, 'oppia-response-%s.directive.ts'
+                    % hyphenated_interaction_id)
+                short_response_ts_file = os.path.join(
+                    directives_dir, 'oppia-short-response-%s.directive.ts' % ( # pylint: disable=line-too-long
+                        hyphenated_interaction_id))
+                rules_service_ts_file = os.path.join(
+                    directives_dir, '%s-rules.service.ts'
+                    % hyphenated_interaction_id)
+                validation_service_ts_file = os.path.join(
+                    directives_dir, '%s-validation.service.ts'
+                    % hyphenated_interaction_id)
+                interaction_html = os.path.join(
+                    directives_dir,
+                    '%s-interaction.directive.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
+                response_html = os.path.join(
+                    directives_dir,
+                    '%s-response.directive.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
+                short_response_html = os.path.join(
+                    directives_dir,
+                    '%s-short-response.directive.html' %
+                    hyphenated_interaction_id)
             if interaction_id != u'RatioExpressionInput':
-                # Check that the interaction id is valid.
-                self.assertTrue(self._is_camel_cased(interaction_id))
-                hyphenated_interaction_id = (
-                    utils.camelcase_to_hyphenated(interaction_id))
-
-                # Check that the interaction directory exists.
-                interaction_dir = os.path.join(
-                    feconf.INTERACTIONS_DIR, interaction_id)
-                self.assertTrue(os.path.isdir(interaction_dir))
-
-                # The interaction directory should contain the following files:
-                #  Required:
-                #    * A python file called {InteractionName}.py.
-                #    * An __init__.py file used to import the Python file.
-                #    * A TypeScript file called {InteractionName}.ts.
-                #    * A directory name 'directives' containing TS and HTML
-                #       files for directives
-                #    * A directory named 'static' containing at least a .png
-                #       file.
-                #  Optional:
-                #    * A JS file called protractor.js.
-                interaction_dir_contents = (
-                    self._listdir_omit_ignored(interaction_dir))
-
-                interaction_dir_optional_dirs_and_files_count = 0
-
-                try:
-                    self.assertTrue(os.path.isfile(os.path.join(
-                        interaction_dir, 'protractor.js')))
-                    interaction_dir_optional_dirs_and_files_count += 1
-                except Exception:
-                    pass
-
-                try:
-                    self.assertTrue(os.path.isfile(os.path.join(
-                        interaction_dir,
-                        '%s-prediction.service.ts' % hyphenated_interaction_id))) # pylint: disable=line-too-long
-                    interaction_dir_optional_dirs_and_files_count += 1
-                except Exception:
-                    pass
-
-                try:
-                    self.assertTrue(os.path.isfile(os.path.join(
-                        interaction_dir, '%s-prediction.service.spec.ts'
-                        % hyphenated_interaction_id)))
-                    interaction_dir_optional_dirs_and_files_count += 1
-                except Exception:
-                    pass
-
-                self.assertEqual(
-                    interaction_dir_optional_dirs_and_files_count + 5,
-                    len(interaction_dir_contents)
-                )
-
-                py_file = os.path.join(
-                    interaction_dir, '%s.py' % interaction_id)
-                ts_file = os.path.join(
-                    interaction_dir, '%s.ts' % interaction_id)
-
-                self.assertTrue(os.path.isfile(py_file))
-                self.assertTrue(os.path.isfile(ts_file))
-
-                # Check that __init__.py file exists.
-                init_file = os.path.join(interaction_dir, '__init__.py')
-                self.assertTrue(os.path.isfile(init_file))
-
-                # Check that the directives subdirectory exists.
-                directives_dir = os.path.join(
-                    interaction_dir, 'directives')
-                self.assertTrue(os.path.isdir(directives_dir))
-
-                # The directives directory should contain the following files:
-                #  Required:
-                #    * A TS file called
-                #    oppia-interactive-{InteractionName}.directive.ts.
-                #    * A TS file called
-                #      OppiaResponse{InteractionName}.directive.ts.
-                #    * A TS file called
-                #    oppia-short-response-{InteractionName}.directive.ts.
-                #    * A TS file called {InteractionName}-rules.service.ts.
-                #    * A TS file called {InteractionName}-validation.service.ts.
-                #    * A HTML file called
-                #      {InteractionName}-interaction.directive.html.
-                #    * A HTML file called
-                #      {InteractionName}-response.directive.html.
-                #    * A HTML file called
-                #      {InteractionName}-short-response.directive.html.
-                #  Optional:
-                #    * A TS file called
-                #      {InteractionName}-validation.service.specs.ts.
-                #    * A TS file called
-                #      {InteractionName}-rules.service.specs.ts.
-
-                hyphenated_interaction_id = (
-                    utils.camelcase_to_hyphenated(interaction_id))
-                if interaction_id in INTERACTIONS_THAT_USE_COMPONENTS:
-                    interaction_ts_file = os.path.join(
-                        directives_dir, 'oppia-interactive-%s.component.ts' % (
-                            hyphenated_interaction_id))
-                    response_ts_file = os.path.join(
-                        directives_dir, 'oppia-response-%s.component.ts'
-                        % hyphenated_interaction_id)
-                    short_response_ts_file = os.path.join(
-                        directives_dir, 'oppia-short-response-%s.component.ts' % ( # pylint: disable=line-too-long
-                            hyphenated_interaction_id))
-                    rules_service_ts_file = os.path.join(
-                        directives_dir, '%s-rules.service.ts'
-                        % hyphenated_interaction_id)
-                    validation_service_ts_file = os.path.join(
-                        directives_dir, '%s-validation.service.ts'
-                        % hyphenated_interaction_id)
-                    interaction_html = os.path.join(
-                        directives_dir,
-                        '%s-interaction.component.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
-                    response_html = os.path.join(
-                        directives_dir,
-                        '%s-response.component.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
-                    short_response_html = os.path.join(
-                        directives_dir,
-                        '%s-short-response.component.html' %
-                        hyphenated_interaction_id)
-                else:
-                    interaction_ts_file = os.path.join(
-                        directives_dir, 'oppia-interactive-%s.directive.ts' % (
-                            hyphenated_interaction_id))
-                    response_ts_file = os.path.join(
-                        directives_dir, 'oppia-response-%s.directive.ts'
-                        % hyphenated_interaction_id)
-                    short_response_ts_file = os.path.join(
-                        directives_dir, 'oppia-short-response-%s.directive.ts' % ( # pylint: disable=line-too-long
-                            hyphenated_interaction_id))
-                    rules_service_ts_file = os.path.join(
-                        directives_dir, '%s-rules.service.ts'
-                        % hyphenated_interaction_id)
-                    validation_service_ts_file = os.path.join(
-                        directives_dir, '%s-validation.service.ts'
-                        % hyphenated_interaction_id)
-                    interaction_html = os.path.join(
-                        directives_dir,
-                        '%s-interaction.directive.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
-                    response_html = os.path.join(
-                        directives_dir,
-                        '%s-response.directive.html' % hyphenated_interaction_id) # pylint: disable=line-too-long
-                    short_response_html = os.path.join(
-                        directives_dir,
-                        '%s-short-response.directive.html' %
-                        hyphenated_interaction_id)
-
                 self.assertTrue(os.path.isfile(interaction_ts_file))
                 self.assertTrue(os.path.isfile(response_ts_file))
                 self.assertTrue(os.path.isfile(
                     short_response_ts_file))
-                self.assertTrue(os.path.isfile(rules_service_ts_file))
-                self.assertTrue(os.path.isfile(validation_service_ts_file))
                 self.assertTrue(os.path.isfile(interaction_html))
                 self.assertTrue(os.path.isfile(response_html))
-                self.assertTrue(os.path.isfile(short_response_html))
-
-                # Check that the PNG thumbnail image has the correct dimensions.
-                static_dir = os.path.join(interaction_dir, 'static')
-                self.assertTrue(os.path.isdir(static_dir))
-                png_file = os.path.join(
-                    interaction_dir, 'static', '%s.png' % interaction_id)
-                self.assertTrue(os.path.isfile(png_file))
-                with python_utils.open_file(png_file, 'rb', encoding=None) as f:
-                    img_data = f.read()
-                    width, height = struct.unpack('>LL', img_data[16:24])
-                    self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
-                    self.assertEqual(
-                        int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
-
+                self.assertTrue(os.path.isfile(short_response_html))   
+            self.assertTrue(os.path.isfile(rules_service_ts_file))
+            self.assertTrue(os.path.isfile(validation_service_ts_file))
+            # Check that the PNG thumbnail image has the correct dimensions.
+            static_dir = os.path.join(interaction_dir, 'static')
+            self.assertTrue(os.path.isdir(static_dir))
+            png_file = os.path.join(
+                interaction_dir, 'static', '%s.png' % interaction_id)
+            self.assertTrue(os.path.isfile(png_file))
+            with python_utils.open_file(png_file, 'rb', encoding=None) as f:
+                img_data = f.read()
+                width, height = struct.unpack('>LL', img_data[16:24])
+                self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
+                self.assertEqual(
+                    int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
+            if interaction_id != u'RatioExpressionInput':
                 interaction_ts_file_content = utils.get_file_contents(
                     interaction_ts_file)
                 response_ts_file_content = utils.get_file_contents(
                     response_ts_file)
                 short_response_ts_file_content = (
                     utils.get_file_contents(short_response_ts_file))
-                ts_file_content = utils.get_file_contents(ts_file)
-                rules_service_ts_file_content = utils.get_file_contents(
-                    rules_service_ts_file)
-                validation_service_ts_file_content = utils.get_file_contents(
-                    validation_service_ts_file)
-
+            ts_file_content = utils.get_file_contents(ts_file)
+            rules_service_ts_file_content = utils.get_file_contents(
+                rules_service_ts_file)
+            validation_service_ts_file_content = utils.get_file_contents(
+                validation_service_ts_file)
+            if interaction_id != u'RatioExpressionInput':
                 self.assertIn(
                     'oppiaInteractive%s' % interaction_id,
                     interaction_ts_file_content)
@@ -550,16 +537,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertIn(
                     'oppiaShortResponse%s' % interaction_id,
                     short_response_ts_file_content)
-                self.assertIn(
-                    '%sRulesService' % (
-                        interaction_id[0] + interaction_id[1:]),
-                    rules_service_ts_file_content)
-                self.assertIn(
-                    '%sValidationService' % interaction_id,
-                    validation_service_ts_file_content)
-
-                # Check that the html template includes js script for the
-                # interaction.
+            self.assertIn(
+                '%sRulesService' % (
+                    interaction_id[0] + interaction_id[1:]),
+                rules_service_ts_file_content)
+            self.assertIn(
+                '%sValidationService' % interaction_id,
+                validation_service_ts_file_content)
+            # Check that the html template includes js script for the
+            # interaction.
+            if interaction_id != u'RatioExpressionInput':
                 self.assertTrue(
                     'oppia-interactive-%s.component.ts' %
                     hyphenated_interaction_id in ts_file_content or (
@@ -575,128 +562,110 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     hyphenated_interaction_id in ts_file_content or (
                         'oppia-short-response-%s.directive.ts' %
                         hyphenated_interaction_id in ts_file_content))
-                self.assertIn(
-                    '%s-rules.service.ts' % hyphenated_interaction_id,
-                    ts_file_content)
-                self.assertIn(
-                    '%s-validation.service.ts' % hyphenated_interaction_id,
-                    ts_file_content)
-
-                self.assertNotIn(
-                    '<script>', interaction_ts_file_content)
-                self.assertNotIn(
-                    '</script>', interaction_ts_file_content)
-                self.assertNotIn('<script>', response_ts_file_content)
-                self.assertNotIn(
-                    '</script>', response_ts_file_content)
-                self.assertNotIn(
-                    '<script>', short_response_ts_file_content)
-                self.assertNotIn(
-                    '</script>', short_response_ts_file_content)
-                self.assertNotIn('<script>', rules_service_ts_file_content)
-                self.assertNotIn('</script>', rules_service_ts_file_content)
-                self.assertNotIn('<script>', validation_service_ts_file_content)
-                self.assertNotIn(
-                    '</script>', validation_service_ts_file_content)
-
-                interaction = interaction_registry.Registry.get_interaction_by_id(interaction_id) # pylint: disable=line-too-long
-
-                # Check that the specified interaction id is the same as the
-                # class name.
+            self.assertIn(
+                '%s-rules.service.ts' % hyphenated_interaction_id,
+                ts_file_content)
+            self.assertIn(
+                '%s-validation.service.ts' % hyphenated_interaction_id,
+                ts_file_content)
+            self.assertNotIn(
+                '<script>', interaction_ts_file_content)
+            self.assertNotIn(
+                '</script>', interaction_ts_file_content)
+            self.assertNotIn('<script>', response_ts_file_content)
+            self.assertNotIn(
+                '</script>', response_ts_file_content)
+            self.assertNotIn(
+                '<script>', short_response_ts_file_content)
+            self.assertNotIn(
+                '</script>', short_response_ts_file_content)
+            self.assertNotIn('<script>', rules_service_ts_file_content)
+            self.assertNotIn('</script>', rules_service_ts_file_content)
+            self.assertNotIn('<script>', validation_service_ts_file_content)
+            self.assertNotIn(
+                '</script>', validation_service_ts_file_content)
+            interaction = interaction_registry.Registry.get_interaction_by_id(interaction_id) # pylint: disable=line-too-long
+            # Check that the specified interaction id is the same as the
+            # class name.
+            self.assertTrue(
+                interaction_id, msg=interaction.__class__.__name__)
+            # Check that the configuration file contains the correct
+            # top-level keys, and that these keys have the correct types.
+            for item, item_type in _INTERACTION_CONFIG_SCHEMA:
+                self.assertTrue(isinstance(
+                    getattr(interaction, item), item_type))
+                if item_type == python_utils.BASESTRING:
+                    self.assertTrue(getattr(interaction, item))
+            self.assertIn(
+                interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
+            if interaction.is_linear or interaction.is_terminal:
+                self.assertIsNone(interaction.answer_type)
+            else:
+                # Check that the answer_type corresponds to a valid object
+                # class.
+                obj_services.Registry.get_object_class_by_type(
+                    interaction.answer_type)
+            self._validate_customization_arg_specs(
+                interaction.customization_arg_specs)
+            answer_visualization_specs = (
+                interaction.answer_visualization_specs)
+            self._validate_answer_visualization_specs(
+                answer_visualization_specs)
+            answer_visualizations = interaction.answer_visualizations
+            for ind, visualization in enumerate(answer_visualizations):
+                self.assertEqual(
+                    visualization.id, answer_visualization_specs[ind]['id'])
+                self.assertEqual(
+                    visualization.calculation_id,
+                    answer_visualization_specs[ind]['calculation_id'])
+                self.assertEqual(
+                    visualization.options,
+                    answer_visualization_specs[ind]['options'])
+                # Check that the derived visualization is valid.
+                visualization.validate()
+            # Check that supplemental interactions have instructions, and
+            # inline ones do not.
+            if interaction.display_mode == base.DISPLAY_MODE_INLINE:
+                self.assertIsNone(interaction.instructions)
+                self.assertIsNone(interaction.narrow_instructions)
+            else:
                 self.assertTrue(
-                    interaction_id, msg=interaction.__class__.__name__)
-
-                # Check that the configuration file contains the correct
-                # top-level keys, and that these keys have the correct types.
-                for item, item_type in _INTERACTION_CONFIG_SCHEMA:
-                    self.assertTrue(isinstance(
-                        getattr(interaction, item), item_type))
-                    if item_type == python_utils.BASESTRING:
-                        self.assertTrue(getattr(interaction, item))
-
-                self.assertIn(
-                    interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
-
-                if interaction.is_linear or interaction.is_terminal:
-                    self.assertIsNone(interaction.answer_type)
-                else:
-                    # Check that the answer_type corresponds to a valid object
-                    # class.
-                    obj_services.Registry.get_object_class_by_type(
-                        interaction.answer_type)
-
-                self._validate_customization_arg_specs(
-                    interaction.customization_arg_specs)
-
-                answer_visualization_specs = (
-                    interaction.answer_visualization_specs)
-                self._validate_answer_visualization_specs(
-                    answer_visualization_specs)
-
-                answer_visualizations = interaction.answer_visualizations
-                for ind, visualization in enumerate(answer_visualizations):
-                    self.assertEqual(
-                        visualization.id, answer_visualization_specs[ind]['id'])
-                    self.assertEqual(
-                        visualization.calculation_id,
-                        answer_visualization_specs[ind]['calculation_id'])
-                    self.assertEqual(
-                        visualization.options,
-                        answer_visualization_specs[ind]['options'])
-
-                    # Check that the derived visualization is valid.
-                    visualization.validate()
-
-                # Check that supplemental interactions have instructions, and
-                # inline ones do not.
-                if interaction.display_mode == base.DISPLAY_MODE_INLINE:
-                    self.assertIsNone(interaction.instructions)
-                    self.assertIsNone(interaction.narrow_instructions)
-                else:
-                    self.assertTrue(
-                        isinstance(
-                            interaction.instructions, python_utils.BASESTRING))
-                    self.assertIsNotNone(interaction.instructions)
-                    self.assertIsNotNone(interaction.narrow_instructions)
-
-                # Check that terminal interactions are not linear.
-                if interaction.is_terminal:
-                    self.assertFalse(interaction.is_linear)
-
-                # Check that only linear interactions have a
-                # default_outcome_heading property.
-                if interaction.is_linear:
-                    self.assertTrue(
-                        isinstance(
-                            interaction.default_outcome_heading,
-                            python_utils.BASESTRING)
-                        and interaction.default_outcome_heading)
-                else:
-                    self.assertIsNone(interaction.default_outcome_heading)
-
-                # Check that interactions that can have solution cannot be
-                # linear.
-                if interaction.can_have_solution:
-                    self.assertFalse(interaction.is_linear)
-
-                default_object_values = obj_services.get_default_object_values()
-
-                # Check that the rules for this interaction have object editor
-                # templates and default values.
-                for rule_name in list(interaction.rules_dict.keys()):
-                    param_list = interaction.get_rule_param_list(rule_name)
-
-                    for (_, param_obj_cls) in param_list:
-                        # TODO(sll): Get rid of these special cases.
-                        if param_obj_cls.__name__ in [
-                                'NonnegativeInt', 'ListOfCodeEvaluation',
-                                'ListOfCoordTwoDim', 'ListOfGraph',
-                                'SetOfNormalizedString']:
-                            continue
-
-                        # Check that the rule has a default value.
-                        self.assertIn(
-                            param_obj_cls.__name__, default_object_values)
+                    isinstance(
+                        interaction.instructions, python_utils.BASESTRING))
+                self.assertIsNotNone(interaction.instructions)
+                self.assertIsNotNone(interaction.narrow_instructions)
+            # Check that terminal interactions are not linear.
+            if interaction.is_terminal:
+                self.assertFalse(interaction.is_linear)
+            # Check that only linear interactions have a
+            # default_outcome_heading property.
+            if interaction.is_linear:
+                self.assertTrue(
+                    isinstance(
+                        interaction.default_outcome_heading,
+                        python_utils.BASESTRING)
+                    and interaction.default_outcome_heading)
+            else:
+                self.assertIsNone(interaction.default_outcome_heading)
+            # Check that interactions that can have solution cannot be
+            # linear.
+            if interaction.can_have_solution:
+                self.assertFalse(interaction.is_linear)
+            default_object_values = obj_services.get_default_object_values()
+            # Check that the rules for this interaction have object editor
+            # templates and default values.
+            for rule_name in list(interaction.rules_dict.keys()):
+                param_list = interaction.get_rule_param_list(rule_name)
+                for (_, param_obj_cls) in param_list:
+                    # TODO(sll): Get rid of these special cases.
+                    if param_obj_cls.__name__ in [
+                            'NonnegativeInt', 'ListOfCodeEvaluation',
+                            'ListOfCoordTwoDim', 'ListOfGraph',
+                            'SetOfNormalizedString']:
+                        continue
+                    # Check that the rule has a default value.
+                    self.assertIn(
+                        param_obj_cls.__name__, default_object_values)
 
     def test_trainable_interactions_have_more_than_just_a_classifier(self):
         """This ensures that trainable interactions cannot only have a soft
@@ -750,8 +719,9 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
         if list(missing_interaction_ids) != ['RatioExpressionInput']:
-            # Ignoring the RatioExpressionInput for now as there's no creator
-            # for the interaction yet.Once added this needs to be removed.
+            # TODO(#10212):Ignoring the RatioExpressionInput for now as 
+            # there's no learner's flow for the interaction yet. 
+            # Once added this needs to be removed.
             # Ignoring the lack of the MathExpressionInput since it is going
             # to be deprecated and explorations that use it will now be using
             # one of AlgebraicExpressionInput, NumericExpressionInput, or

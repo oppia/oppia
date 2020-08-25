@@ -50,7 +50,15 @@ export class RatioExpressionInputValidationService {
     };
     var minimumNumberOfTerms =
       customizationArgs.numberOfTerms.value;
-    if (!isInt(minimumNumberOfTerms)) {
+    if (minimumNumberOfTerms === undefined) {
+      return [
+        {
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'Number of terms cannot be empty.')
+        }
+      ];
+    } else if (!isInt(minimumNumberOfTerms)) {
       return [
         {
           type: AppConstants.WARNING_TYPES.ERROR,

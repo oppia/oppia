@@ -217,4 +217,15 @@ describe('RatioExpressionInputValidationService', () => {
       message: ('Number of terms must be integral.')
     }]);
   });
+
+  it('should catch undefined value for # terms', () => {
+    customizationArgs.numberOfTerms.value = null;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: ('Number of terms cannot be empty.')
+    }]);
+  });
 });

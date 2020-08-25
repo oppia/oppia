@@ -133,7 +133,7 @@ describe('Ratio Object Factory', () => {
     expect(new Ratio([3, 6, 9]).convertToSimplestForm()).toEqual([1, 2, 3]);
     expect(new Ratio([2, 3, 5]).convertToSimplestForm()).toEqual([2, 3, 5]);
     expect(new Ratio([2, 4, 5]).convertToSimplestForm()).toEqual([2, 4, 5]);
-    expect(new Ratio([2, 0, 4]).convertToSimplestForm()).toEqual([2, 0, 4]);
-    expect(new Ratio([0, 0, 4]).convertToSimplestForm()).toEqual([0, 0, 4]);
+    expect(new Ratio([2, 0, 4]).convertToSimplestForm()).toEqual([1, 0, 2]);
+    expect(new Ratio([0, 0, 4]).convertToSimplestForm()).toEqual([0, 0, 1]);
   });
 });

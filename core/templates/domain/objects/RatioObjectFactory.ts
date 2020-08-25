@@ -42,12 +42,14 @@ export class Ratio {
     var gcd = (x: number, y: number) => {
       return y === 0 ? x : gcd(y, x % y);
     };
-    if (this.numbers.some(element => element === 0)) {
-      return this.numbers;
-    } else {
-      var gcdResult = this.numbers.reduce(gcd);
-      return this.numbers.map(currentValue => currentValue / gcdResult);
-    }
+    var gcdResult = this.numbers.reduce(gcd);
+    return this.numbers.map(currentValue => {
+      if (currentValue === 0) {
+        return currentValue;
+      } else {
+        return currentValue / gcdResult;
+      }
+    });
   }
 }
 
