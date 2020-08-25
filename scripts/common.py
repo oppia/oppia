@@ -116,6 +116,9 @@ FECONF_PATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 REDIS_CONF_PATH = os.path.join('.', 'redis.conf')
+# Path for the dump file the redis server autogenerates. It contains data
+# used by the Redis server.
+REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
 
 
 def is_windows_os():
@@ -648,6 +651,12 @@ def start_redis_server():
             'The redis command line interface is not installed because your '
             'machine is on the Windows operating system. The redis server '
             'cannot start.')
+
+    # Check if a redis dump file currently exists. This file contains residual
+    # data from a previous run of the redis server. If it exists, removes the
+    # dump file so that the redis server starts with a clean slate.
+    if os.path.exists(REDIS_DUMP_PATH):
+        os.remove(REDIS_DUMP_PATH)
 
     # Redis-cli is only required in a development environment.
     python_utils.PRINT('Starting Redis development server.')
