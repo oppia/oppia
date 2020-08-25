@@ -66,7 +66,8 @@ describe('Topic editor state service', function() {
   var $scope = null;
   var $q = null;
 
-  var testSubscriptions: Subscription;
+  var testSubscriptions = null;
+  var subtopicPageLoadedSpy = null;
 
   const topicInitializedSpy = jasmine.createSpy('topicInitialized');
   const topicReinitializedSpy = jasmine.createSpy('topicReinitialized');
@@ -354,7 +355,11 @@ describe('Topic editor state service', function() {
   }));
 
   beforeEach(() => {
+    subtopicPageLoadedSpy = jasmine.createSpy('subtopicPageLoaded');
     testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      TopicEditorStateService.onSubtopicPageLoaded.subscribe(
+        subtopicPageLoadedSpy));
     testSubscriptions.add(TopicEditorStateService.onTopicInitialized.subscribe(
       topicInitializedSpy));
     testSubscriptions.add(
@@ -445,8 +450,6 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete new subtopic pages without changing already ' +
     'existing subtopic pages from the local cache', function() {
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
@@ -454,7 +457,7 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
     $rootScope.$apply();
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+    expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     expect(TopicEditorStateService.getCachedSubtopicPages().length).toBe(2);
     TopicEditorStateService.deleteSubtopicPage('validTopicId', 1);
 
@@ -470,8 +473,6 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete already existing subtopic pages without ' +
     'changing newly created subtopic pages from the local cache', function() {
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
@@ -479,7 +480,7 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
     $rootScope.$apply();
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+    expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     expect(TopicEditorStateService.getCachedSubtopicPages().length).toBe(2);
     TopicEditorStateService.deleteSubtopicPage('validTopicId', 0);
 
@@ -517,12 +518,9 @@ describe('Topic editor state service', function() {
 
   it('should fire a loaded event after loading a new subtopic page',
     function() {
-      spyOn($rootScope, '$broadcast').and.callThrough();
-
       TopicEditorStateService.loadSubtopicPage('validTopicId', 1);
       $rootScope.$apply();
-
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+      expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     }
   );
 
@@ -530,8 +528,6 @@ describe('Topic editor state service', function() {
     // Load initial topic.
     TopicEditorStateService.loadTopic(5);
     $rootScope.$apply();
-
-    spyOn($rootScope, '$broadcast').and.callThrough();
 
     // Load a second topic.
     TopicEditorStateService.loadTopic(1);
@@ -661,11 +657,8 @@ describe('Topic editor state service', function() {
     function() {
       TopicEditorStateService.loadTopic(5);
       $rootScope.$apply();
-
-      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(TopicEditorStateService.saveTopic(
         'Commit message')).toBe(false);
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
   );
 

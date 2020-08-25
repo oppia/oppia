@@ -44,7 +44,7 @@ export class NonExistentActivities {
 })
 export class NonExistentActivitiesObjectFactory {
   createFromBackendDict(
-      backendDict: NonExistentActivitiesBackendDict) {
+      backendDict: NonExistentActivitiesBackendDict): NonExistentActivities {
     return new NonExistentActivities(
       backendDict.incomplete_explorations,
       backendDict.incomplete_collections,
