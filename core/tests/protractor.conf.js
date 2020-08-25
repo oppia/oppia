@@ -252,6 +252,7 @@ exports.config = {
         // Actions.
         '--headless',
         '--no-sandbox',
+        '--disable-dev-shm-usage',
       ]
     },
     prefs: {
