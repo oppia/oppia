@@ -1732,8 +1732,9 @@ class GeneralFeedbackThreadModelValidator(
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [ENTITY_TYPE].[ENTITY_ID].[GENERATED_STRING].
-        regex_string = '%s\\.%s\\.[A-Za-z0-9=+/]{1,}$' % (
-            item.entity_type, item.entity_id)
+        regex_string = '%s\\.%s\\.[A-Za-z0-9-_]{1,%s}$' % (
+            item.entity_type[:feedback_models.THREAD_ID_PREFIX_MAX_LEN],
+            item.entity_id, feedback_models.THREAD_ID_SUFFIX_MAX_LEN)
         return regex_string
 
     @classmethod
