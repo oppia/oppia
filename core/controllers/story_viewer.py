@@ -92,6 +92,8 @@ class StoryProgressHandler(base.BaseHandler):
 
     @acl_decorators.can_access_story_viewer_page
     def post(self, story_id, node_id):
+        if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
+            raise self.PageNotFoundException
 
         try:
             story_fetchers.get_node_index_by_story_id_and_node_id(

@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -787,15 +788,16 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/skill/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'This looks good!',
-                'skill_id': self.SKILL_ID
-            }, csrf_token=csrf_token)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.put_json('%s/skill/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'This looks good!',
+                    'skill_id': self.SKILL_ID
+                }, csrf_token=csrf_token)
 
         suggestion_post_accept = self.get_json(
             '%s?suggestion_type=%s' % (
@@ -922,13 +924,14 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json(
-            '%s/skill/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX,
-                self.skill_id, suggestion_id), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
-                }, csrf_token=csrf_token, expected_status_int=400)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            response = self.put_json(
+                '%s/skill/%s/%s' % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    self.skill_id, suggestion_id), {
+                        'action': u'reject',
+                        'review_message': u'Rejected!'
+                    }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -948,15 +951,16 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json(
-            '%s/skill/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX,
-                'skill_id', suggestion_to_accept['suggestion_id']),
-            {
-                'action': u'reject',
-                'review_message': u'Rejected!'
-            },
-            csrf_token=csrf_token, expected_status_int=400)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            response = self.put_json(
+                '%s/skill/%s/%s' % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    'skill_id', suggestion_to_accept['suggestion_id']),
+                {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                },
+                csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -974,13 +978,14 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                 self.author_id))['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
-            '%s/skill/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']),
-            {'action': 'invalid_action'}, csrf_token=csrf_token,
-            expected_status_int=400)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            response = self.put_json(
+                '%s/skill/%s/%s' % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_to_accept['suggestion_id']),
+                {'action': 'invalid_action'}, csrf_token=csrf_token,
+                expected_status_int=400)
 
         self.assertEqual(
             response['error'], 'Invalid action.')
@@ -1000,13 +1005,14 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/skill/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_reject['target_id'],
-            suggestion_to_reject['suggestion_id']), {
-                'action': u'reject',
-                'review_message': u'Rejected!'
-            }, csrf_token=csrf_token)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.put_json('%s/skill/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_reject['target_id'],
+                suggestion_to_reject['suggestion_id']), {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_reject['suggestion_id'])
@@ -1028,15 +1034,16 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/skill/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted!',
-                'skill_id': self.skill_id
-            }, csrf_token=csrf_token)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.put_json('%s/skill/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted!',
+                    'skill_id': self.skill_id
+                }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])
@@ -1059,15 +1066,16 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/skill/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted!',
-                'skill_id': self.skill_id
-            }, csrf_token=csrf_token)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.put_json('%s/skill/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted!',
+                    'skill_id': self.skill_id
+                }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])
