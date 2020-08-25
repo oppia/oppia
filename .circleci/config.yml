@@ -19,7 +19,7 @@ workflows:
 
     jobs:
       - setup_and_typescript_tests
-      - e2e_non_prod_tests:
+      - e2e_non_prod_miscellaneous_tests:
           requires:
             - setup_and_typescript_tests
       - e2e_non_prod_new_structure_tests:
@@ -217,7 +217,7 @@ jobs:
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
   # All other e2e tests should be run in prod mode.
-  e2e_non_prod_tests:
+  e2e_non_prod_miscellaneous_tests:
     <<: *job_defaults
     steps:
       - checkout
