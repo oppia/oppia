@@ -1944,7 +1944,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             html_validation_service.
-            validate_math_content_in_math_rich_text(
+            validate_math_content_attribute_in_html(
                 html_string_with_filename_having_valid_format), [])
 
     def test_validate_svg_filenames_format_when_all_filenames_are_invalid(self):
@@ -1992,7 +1992,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             sorted(
                 html_validation_service.
-                validate_math_content_in_math_rich_text(
+                validate_math_content_attribute_in_html(
                     html_string_with_filename_having_invalid_format)), sorted(
                         expected_output))
 

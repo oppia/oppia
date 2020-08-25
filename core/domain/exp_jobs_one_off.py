@@ -311,7 +311,7 @@ class ExplorationRteMathContentValidationOneOffJob(
             html_string = ''.join(state.get_all_html_content_strings())
             error_list = (
                 html_validation_service.
-                validate_math_content_in_math_rich_text(html_string))
+                validate_math_content_attribute_in_html(html_string))
             if len(error_list) > 0:
                 invalid_tags_info_in_state = {
                     'state_name': state_name,
@@ -339,7 +339,7 @@ class ExplorationRteMathContentValidationOneOffJob(
             'no_of_invalid_tags': no_of_invalid_tags,
         }
         yield ('Overall result.', final_value_dict)
-        yield ('Detailed information on invalid tags. ', invalid_tags_info)
+        yield ('Detailed information on invalid tags.', invalid_tags_info)
 
 
 class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):

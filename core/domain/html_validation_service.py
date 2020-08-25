@@ -913,7 +913,7 @@ def validate_svg_filenames_in_math_rich_text(
     return error_list
 
 
-def validate_math_content_in_math_rich_text(html_string):
+def validate_math_content_attribute_in_html(html_string):
     """Validates the format of SVG filenames for each math rich-text components
     and returns a list of all invalid math tags in the given HTML.
 
