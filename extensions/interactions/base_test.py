@@ -355,8 +355,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
         for interaction_id in all_interaction_ids:
-            # TODO(#10212):Ignoring the RatioExpressionInput for now as 
-            # there's no learner's flow for the interaction yet. 
+            # TODO(#10212):Ignoring the RatioExpressionInput for now as
+            # there's no learner's flow for the interaction yet.
             # Once added this needs to be removed.
 
             # Check that the interaction id is valid.
@@ -500,7 +500,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     short_response_ts_file))
                 self.assertTrue(os.path.isfile(interaction_html))
                 self.assertTrue(os.path.isfile(response_html))
-                self.assertTrue(os.path.isfile(short_response_html))   
+                self.assertTrue(os.path.isfile(short_response_html))
             self.assertTrue(os.path.isfile(rules_service_ts_file))
             self.assertTrue(os.path.isfile(validation_service_ts_file))
             # Check that the PNG thumbnail image has the correct dimensions.
@@ -719,8 +719,8 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
         if list(missing_interaction_ids) != ['RatioExpressionInput']:
-            # TODO(#10212):Ignoring the RatioExpressionInput for now as 
-            # there's no learner's flow for the interaction yet. 
+            # TODO(#10212):Ignoring the RatioExpressionInput for now as
+            # there's no learner's flow for the interaction yet.
             # Once added this needs to be removed.
             # Ignoring the lack of the MathExpressionInput since it is going
             # to be deprecated and explorations that use it will now be using
