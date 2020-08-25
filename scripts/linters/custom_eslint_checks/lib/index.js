@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview ESLint plugin for Oppia codebase.
+ * @fileoverview ESLint plugin for Oppia codebase which indexes all custom
+ * eslint rules.
  */
 'use strict';
 
