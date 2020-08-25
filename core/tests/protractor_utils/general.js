@@ -16,15 +16,14 @@
  * @fileoverview Minor general functional components for end-to-end testing
  * with protractor.
  */
+var dragAndDropScript = require('html-dnd').code;
+
+var action = require('../protractor_utils/action.js');
 
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 
 var waitFor = require('./waitFor.js');
-
-var dragAndDropScript = require('html-dnd').code;
-
-var action = require('../protractor_utils/action.js');
 
 var dragAndDrop = async function(fromElement, toElement) {
   await browser.executeScript(dragAndDropScript, fromElement, toElement);

@@ -17,6 +17,8 @@
  * in Protractor tests.
  */
 
+var path = require('path');
+
 var dragAndDropScript = require('html-dnd').code;
 
 var action = require('../protractor_utils/action.js');
@@ -26,8 +28,6 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
-
-var path = require('path');
 
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
