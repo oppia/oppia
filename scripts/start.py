@@ -168,6 +168,9 @@ def main(args=None):
             common.GCLOUD_PATH
         ), shell=True))
 
+    while not common.is_port_open(8081):
+        time.sleep(1)
+
     background_processes.append(subprocess.Popen(
         'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 '
         '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '

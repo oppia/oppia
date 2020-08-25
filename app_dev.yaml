@@ -245,9 +245,9 @@ libraries:
 - name: webapp2
   version: "2.5.2"
 - name: grpcio
-  version: 1.0.0
+  version: "1.0.0"
 - name: setuptools
-  version: 36.6.0
+  version: "36.6.0"
 
 
 # This is an access connector that connects to the Google Cloud Redis instance

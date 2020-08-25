@@ -176,6 +176,8 @@ def main():
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
         ('grpcio', common.GRPCIO_VERSION, common.OPPIA_TOOLS_DIR),
+        ('setuptools', '36.6.0', common.OPPIA_TOOLS_DIR),
+
     ]
 
     for package, version, path in pip_dependencies:

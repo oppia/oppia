@@ -70,6 +70,8 @@ DIRS_TO_ADD_TO_SYS_PATH = [
         common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'),
     os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'grpcio-%s' % common.GRPCIO_VERSION),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
     common.CURR_DIR,
