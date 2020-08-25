@@ -493,10 +493,8 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
                 self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        self.save_new_valid_exploration(
-            self.published_exp_id, self.owner_id)
-        self.save_new_valid_exploration(
-            self.private_exp_id, self.owner_id)
+        self.save_new_valid_exploration(self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(self.private_exp_id, self.owner_id)
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
@@ -544,47 +542,47 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
     def test_guest_cannot_comment_on_feedback_threads_via_json_handler(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_comment_on_feedback_thread/exploration.%s.thread1'
-                % (self.private_exp_id), expected_status_int=401)
+                '/mock_comment_on_feedback_thread/%s'
+                % self.private_exp_thread_id, expected_status_int=401)
             self.get_json(
-                '/mock_comment_on_feedback_thread/exploration.%s.thread1'
-                % (self.published_exp_id), expected_status_int=401)
+                '/mock_comment_on_feedback_thread/%s'
+                % self.public_exp_thread_id, expected_status_int=401)
 
     def test_guest_is_redirected_when_using_html_handler(self):
         with self.swap(
             self.MockHandler, 'GET_HANDLER_ERROR_RETURN_TYPE',
             feconf.HANDLER_TYPE_HTML):
             response = self.mock_testapp.get(
-                '/mock_comment_on_feedback_thread/exploration.%s.thread1'
-                % (self.private_exp_id), expect_errors=True)
+                '/mock_comment_on_feedback_thread/%s'
+                % self.public_exp_thread_id, expect_errors=True)
             self.assertEqual(response.status_int, 302)
             response = self.mock_testapp.get(
-                '/mock_comment_on_feedback_thread/exploration.%s.thread1'
-                % (self.published_exp_id), expect_errors=True)
+                '/mock_comment_on_feedback_thread/%s'
+                % self.public_exp_thread_id, expect_errors=True)
             self.assertEqual(response.status_int, 302)
 
     def test_owner_can_comment_on_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_comment_on_feedback_thread/exploration.%s.thread1'
-                % (self.private_exp_id))
+                '/mock_comment_on_feedback_thread/%s'
+                % self.private_exp_thread_id)
         self.logout()
 
     def test_moderator_can_comment_on_feeback_for_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_comment_on_feedback_thread/exploration.%s.thread1'
-                % (self.published_exp_id))
+                '/mock_comment_on_feedback_thread/%s'
+                % self.public_exp_thread_id)
         self.logout()
 
     def test_admin_can_comment_on_feeback_for_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_comment_on_feedback_thread/exploration.%s.thread1'
-                % (self.private_exp_id))
+                '/mock_comment_on_feedback_thread/%s'
+                % self.private_exp_thread_id)
         self.logout()
 
 
@@ -694,6 +692,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.viewer_email, self.viewer_username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
@@ -702,10 +701,15 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
                 '/mock_view_feedback_thread/<thread_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        self.save_new_valid_exploration(
-            self.published_exp_id, self.owner_id)
-        self.save_new_valid_exploration(
-            self.private_exp_id, self.owner_id)
+        self.save_new_valid_exploration(self.published_exp_id, self.owner_id)
+        self.public_exp_thread_id = feedback_services.create_thread(
+            'exploration', self.published_exp_id, self.viewer_id,
+            'subject', 'feedback message')
+
+        self.save_new_valid_exploration(self.private_exp_id, self.owner_id)
+        self.private_exp_thread_id = feedback_services.create_thread(
+            'exploration', self.private_exp_id, self.viewer_id,
+            'subject', 'feedback message')
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
@@ -714,14 +718,14 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock_view_feedback_thread/exploration.%s.thread1'
                 % feconf.DISABLED_EXPLORATION_IDS[0],
-                expected_status_int=404)
+                expected_status_int=401)
 
     def test_viewer_cannot_view_feedback_for_private_exploration(self):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % self.private_exp_id, expected_status_int=401)
+                '/mock_view_feedback_thread/%s' % self.private_exp_thread_id,
+                expected_status_int=401)
             self.assertEqual(
                 response['error'], 'You do not have credentials to view '
                 'exploration feedback.')
@@ -730,31 +734,27 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
     def test_guest_can_view_feedback_threads_for_public_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % (self.published_exp_id))
+                '/mock_view_feedback_thread/%s' % self.public_exp_thread_id)
 
-    def test_owner_cannot_view_feedback_for_private_exploration(self):
+    def test_owner_can_view_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % (self.private_exp_id))
+                '/mock_view_feedback_thread/%s' % self.private_exp_thread_id)
         self.logout()
 
     def test_moderator_can_view_feeback_for_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % (self.published_exp_id))
+                '/mock_view_feedback_thread/%s' % self.public_exp_thread_id)
         self.logout()
 
     def test_admin_can_view_feeback_for_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_view_feedback_thread/exploration.%s.thread1'
-                % (self.private_exp_id))
+                '/mock_view_feedback_thread/%s' % self.private_exp_thread_id)
         self.logout()
 
 

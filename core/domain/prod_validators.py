@@ -1313,13 +1313,8 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
     """Class for validating GeneralFeedbackEmailReplyToIdModels."""
 
     @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return (
-            '^%s\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
-            '[A-Za-z0-9=+/]{1,}') % (
-                USER_ID_REGEX,
-                ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
-                base_models.ID_LENGTH)
+    def _get_model_id_regex(cls, item):
+        return '^%s\\.%s' % (item.user_id, item.thread_id)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

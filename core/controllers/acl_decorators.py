@@ -801,7 +801,7 @@ def can_view_feedback_thread(handler):
             UnauthorizedUserException. The user does not have credentials to
                 view an exploration feedback.
         """
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_services.get_thread(thread_id, strict=False)
 
         if thread is None:
             raise self.UnauthorizedUserException(
@@ -855,7 +855,7 @@ def can_comment_on_feedback_thread(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_services.get_thread(thread_id, strict=False)
 
         if thread is None:
             raise self.UnauthorizedUserException(

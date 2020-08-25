@@ -538,7 +538,6 @@ class FeedbackThreadIdRegenerateOneOffJobTest(test_utils.GenericTestBase):
                 old_feedback_thread.id))
 
         self.assertEqual(len(old_feedback_message_models), 1)
-
         self.assertEqual(self._run_one_off_job(), [('SUCCESS', 2)])
 
         threads = feedback_services.get_threads(
@@ -592,7 +591,6 @@ class FeedbackThreadIdRegenerateOneOffJobTest(test_utils.GenericTestBase):
 
         threads = feedback_services.get_threads(
             suggestion_models.TARGET_TYPE_EXPLORATION, self.exp_id)
-
         self.assertEqual(len(threads), 2)
 
         new_suggestion_thread = threads[0 if threads[0].has_suggestion else 1]
@@ -629,6 +627,7 @@ class FeedbackThreadIdRegenerateOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_email_reply_to_id_models[0].id, '.'.join(
                 [self.author_id, old_suggestion_thread.id]))
+
         self.assertEqual(self._run_one_off_job(), [('SUCCESS', 2)])
 
         threads = feedback_services.get_threads(

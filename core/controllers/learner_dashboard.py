@@ -175,7 +175,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
         if suggestion:
             suggestion_thread = feedback_services.get_thread(thread_id)
             exploration = exp_fetchers.get_exploration_by_id(
-                suggestion.entity_id)
+                suggestion.target_id)
             current_content_html = (
                 exploration.states[
                     suggestion.change.state_name].content.html)

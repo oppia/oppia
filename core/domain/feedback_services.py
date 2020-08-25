@@ -676,8 +676,10 @@ def get_thread(thread_id, strict=True):
     Returns:
         FeedbackThread. The resulting FeedbackThread domain object.
     """
+    thread_model = feedback_models.GeneralFeedbackThreadModel.get(
+        thread_id, strict)
     return _get_thread_from_model(
-        feedback_models.GeneralFeedbackThreadModel.get(thread_id, strict))
+        thread_model) if thread_model is not None else None
 
 
 def get_closed_threads(entity_type, entity_id, has_suggestion):

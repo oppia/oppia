@@ -101,20 +101,18 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
-        if (
-                suggestion_id.split('.')[0] !=
-                suggestion_models.TARGET_TYPE_EXPLORATION):
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.target_type != suggestion_models.TARGET_TYPE_EXPLORATION:
             raise self.InvalidInputException(
-                'This handler allows actions only'
-                ' on suggestions to explorations.')
+                'This handler allows actions only on suggestions to '
+                'explorations.')
 
-        if suggestion_id.split('.')[1] != target_id:
+        if suggestion.target_id != target_id:
             raise self.InvalidInputException(
                 'The exploration id provided does not match the exploration id '
                 'present as part of the suggestion_id')
 
         action = self.payload.get('action')
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.author_id == self.user_id:
             raise self.UnauthorizedUserException(

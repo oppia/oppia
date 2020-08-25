@@ -18,6 +18,7 @@ from __future__ import absolute_import # pylint: disable=import-only-modules
 from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 from core import jobs
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.platform import models
 
@@ -180,7 +181,8 @@ class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             # The id of the GeneralFeedbackMessageModel follows the following
             # pattern: <thread_id>.<message_id>.
             new_model = feedback_models.GeneralFeedbackMessageModel.create(
-                new_thread_id, feedback_message_model.message_id)
+                feedback_domain.FullyQualifiedMessageIdentifier(
+                    new_thread_id, feedback_message_model.message_id))
             new_model.thread_id = new_thread_id
             new_model.message_id = feedback_message_model.message_id
             new_model.author_id = feedback_message_model.author_id
@@ -212,14 +214,14 @@ class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 models_to_put.append(new_model)
 
         feedback_thread_user_models = (
-            email_models.GeneralFeedbackThreadUserModel.get_by_thread_id(
+            feedback_models.GeneralFeedbackThreadUserModel.get_by_thread_id(
                 old_thread_id))
         if feedback_thread_user_models:
             models_to_delete.extend(feedback_thread_user_models)
             for model in feedback_thread_user_models:
                 # The id of the GeneralFeedbackThreadUserModel follows the
                 # following pattern: <user_id>.<thread_id>.
-                new_model = email_models.GeneralFeedbackThreadUserModel(
+                new_model = feedback_models.GeneralFeedbackThreadUserModel(
                     id=('.'.join([model.user_id, new_thread_id])),
                     user_id=model.user_id,
                     thread_id=new_thread_id,

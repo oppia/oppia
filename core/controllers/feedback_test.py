@@ -43,8 +43,8 @@ EXPECTED_THREAD_KEYS = [
     'thread_id', 'subject', 'last_updated_msecs', 'message_count',
     'last_nonempty_message_text', 'last_nonempty_message_author']
 EXPECTED_MESSAGE_KEYS = [
-    'author_username', 'created_on_msecs', 'entity_type', 'message_id',
-    'entity_id', 'text', 'updated_status', 'updated_subject']
+    'id', 'author_username', 'created_on_msecs', 'message_id', 'text',
+    'updated_status', 'updated_subject']
 
 
 class MockFeedbackAnalyticsAggregator(
@@ -91,7 +91,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
     def test_invalid_thread_ids_return_400_response(self):
         self.get_json(
             '%s/invalid_thread_id' % feconf.FEEDBACK_THREAD_URL_PREFIX,
-            expected_status_int=400)
+            expected_status_int=401)
 
     def test_non_logged_in_users_can_view_threads_and_messages(self):
         # Non-logged-in users can see the thread list.
@@ -240,7 +240,6 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             set(EXPECTED_MESSAGE_KEYS))
         self.assertDictContainsSubset({
             'author_username': self.EDITOR_USERNAME,
-            'entity_id': self.EXP_ID,
             'message_id': 0,
             'updated_status': 'open',
             'updated_subject': u'New Thread ¡unicode!',
@@ -248,7 +247,6 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         }, response_dict['messages'][0])
         self.assertDictContainsSubset({
             'author_username': self.EDITOR_USERNAME,
-            'entity_id': self.EXP_ID,
             'message_id': 1,
             'updated_status': None,
             'updated_subject': None,
