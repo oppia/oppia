@@ -219,7 +219,7 @@ describe('RatioExpressionInputValidationService', () => {
   });
 
   it('should catch undefined value for # terms', () => {
-    customizationArgs.numberOfTerms.value = null;
+    customizationArgs.numberOfTerms.value = undefined;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
