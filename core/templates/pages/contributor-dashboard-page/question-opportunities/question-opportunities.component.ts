@@ -31,10 +31,10 @@ require(
   'question-editor.directive.ts');
 require(
   'pages/contributor-dashboard-page/login-required-message/' +
-  'login-required-message.directive.ts');
+  'login-required-message.component.ts');
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.directive.ts');
+  'opportunities-list.component.ts');
 require(
   'pages/contributor-dashboard-page/modal-templates/' +
   'question-suggestion-editor-modal.controller.ts');
@@ -49,10 +49,10 @@ require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('interactions/codemirrorRequires.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.directive.ts');
+  'opportunities-list.component.ts');
 require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities.service.ts');

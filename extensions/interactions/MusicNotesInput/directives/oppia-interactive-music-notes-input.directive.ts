@@ -104,7 +104,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         scope.SOUNDFONT_URL =
-        '/third_party/static/midi-js-a8a842/examples/soundfont/';
+        '/third_party/static/midi-js-c26ebb/examples/soundfont/';
 
         const {
           sequenceToGuess,
@@ -119,6 +119,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         scope.initialSequence = scope.interactionIsActive ?
           initialSequence :
           scope.getLastAnswer();
+
+        scope.directiveSubscriptions = new Subscription();
 
         scope.directiveSubscriptions.add(
           PlayerPositionService.onNewCardAvailable.subscribe(() => {
