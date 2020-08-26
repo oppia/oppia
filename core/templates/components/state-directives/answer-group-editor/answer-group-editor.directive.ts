@@ -304,7 +304,6 @@ angular.module('oppia').directive('answerGroupEditor', [
                   if (ctrl.isRuleEditorOpen()) {
                     ctrl.saveRules();
                   }
-                  $scope.$broadcast('updateAnswerGroupInteractionId');
                   ctrl.answerChoices = ctrl.getAnswerChoices();
                 }
               )
