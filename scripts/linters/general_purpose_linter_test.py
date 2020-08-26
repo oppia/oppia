@@ -348,7 +348,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
             'if you\'re having trouble declaring types.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
-    
+
     def test_invalid_use_of_broadcast_comment(self):
         with self.print_swap:
             general_purpose_linter.GeneralPurposeLinter(
