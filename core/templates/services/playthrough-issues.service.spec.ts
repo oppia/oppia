@@ -179,9 +179,9 @@ describe('Playthrough Issues Service', function() {
     var stateName = issue.issueCustomizationArgs.state_name.value;
 
     expect(PlaythroughIssuesService.renderIssueSuggestions(issue))
-      .toEqual(
-        ['Review the cards up to and including "' + stateName +
-      '" for errors, ' + 'ambiguities, or insufficient motivation.']);
+      .toEqual([
+        'Review the cards up to and including "' + stateName +
+        '" for errors, ' + 'ambiguities, or insufficient motivation.']);
   });
 
   it('should render issue suggestion when its type is CyclicStateTransitions',

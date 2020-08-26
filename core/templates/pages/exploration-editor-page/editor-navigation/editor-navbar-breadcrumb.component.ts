@@ -19,8 +19,7 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-property.service.ts');
+  'pages/exploration-editor-page/services/exploration-property.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/stateful/focus-manager.service.ts');

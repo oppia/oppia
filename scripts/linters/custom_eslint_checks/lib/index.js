@@ -13,9 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview ESLint plugin for Oppia codebase which indexes all custom
- * eslint rules.
+ * @fileoverview Indexes all custom eslint rules.
  */
+
 'use strict';
 
 var requireIndex = require('requireindex');

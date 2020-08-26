@@ -13,8 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview There should be a break after parenthesis
+ * @fileoverview Tests for the break-after-paren.js file
  */
+
 'use strict';
 
 var rule = require('../../../lib/rules/break-after-parens');
@@ -22,7 +23,6 @@ var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
 ruleTester.run('break-after-parens', rule, {
-
   valid: [
     'var a = (true);',
     `if (true ||

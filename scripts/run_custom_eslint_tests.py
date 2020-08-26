@@ -24,7 +24,6 @@ import subprocess
 import sys
 
 import python_utils
-
 from scripts import common
 
 

@@ -22,9 +22,11 @@ module.exports = {
   meta: {
     type: 'layout',
     docs: {
-      description: 'There should be a break after parenthesis',
+      description: (
+        'Lint check to ensure that there is a break after parenthesis in case' +
+        ' of multiline hanging indentation'),
       category: 'Stylistic Issues',
-      recommended: false
+      recommended: true
     },
     fixable: null,
     schema: [],
@@ -44,6 +46,7 @@ module.exports = {
         const separators = ['(', '{', '[', ' '];
         var parens = [];
         var excluded = false;
+        // Iterates over all tokens and store all parenthesis tokens in a list.
         tokens.forEach((token, i) => {
           if (token.value === '(' || token.value === ')') {
             parens.push(token);
@@ -52,7 +55,7 @@ module.exports = {
         parens.forEach((paren, i) => {
           const line = lines[paren.loc.start.line - 1].trim();
           const nextParen = parens[i + 1];
-          if (line.startsWith('it') || line.startsWith('describe') ||
+          if (line.startsWith('it(') || line.startsWith('describe(') ||
             line.startsWith('angular.module(\'oppia\').')) {
             return true;
           }
@@ -73,20 +76,23 @@ module.exports = {
               parensCount -= 1;
             }
           }
+          // Check if we have token next to corresponding token because there
+          // will be no token after last ')' token and it will raise errors.
           if (nextParen) {
+            // If the current and next token are not on same line check if the
+            // number of parenthesis is greater than 0 and raise a lint error.
             if (paren.loc.start.line !== nextParen.loc.start.line &&
               parensCount > 0) {
+              // Allow '[', '{', '(' at the end of line.
               if (separators.includes(line[line.length - 1])) {
                 parensCount = 0;
                 return true;
               }
-              if (paren.value === '(') {
-                context.report({
-                  node,
-                  loc: paren.loc,
-                  messageId: 'expectedAfter'
-                });
-              }
+              context.report({
+                node,
+                loc: paren.loc,
+                messageId: 'expectedAfter'
+              });
             }
           }
         });
