@@ -23,7 +23,7 @@ jobs:
           architecture: 'x64'
       - name: Install third party
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run --auto-servernum python -m scripts.install_third_party_libs
+        run: python -m scripts.install_third_party_libs
       - name: Run Accessibility E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_e2e_tests --suite="accessibility" --prod_env
