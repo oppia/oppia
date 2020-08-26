@@ -210,7 +210,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'require\(.*\.\..*\);'),
         'message': 'Please, don\'t use relative imports in require().',
         'excluded_files': (),
-        'excluded_dirs': ('core/tests/',)
+        'excluded_dirs': (
+            'core/tests/', 'scripts/linters/custom_eslint_checks/')
     },
     {
         'regexp': re.compile(r'innerHTML'),
