@@ -123,6 +123,28 @@ def get_currently_served_version(app_name):
     return listed_versions[:listed_versions.index(' ')]
 
 
+def get_latest_deployed_version(app_name, service_name):
+    """Retrieves the latest version being served on the specified App Engine
+    application and a specific service.
+
+    Args:
+        app_name: str. The name of the GCloud project.
+        service_name: str. The name of the service for which version is
+            to be fetched.
+
+    Returns:
+        str. The latest serving version.
+    """
+    listed_versions = json.loads(
+        subprocess.check_output([
+            common.GCLOUD_PATH, 'app', 'versions', 'list', '--format=json',
+            '--service=%s' % service_name, '--project=%s' % app_name]))
+    version_ids = [
+        listed_version.get('id') for listed_version in listed_versions]
+    version_ids.sort()
+    return version_ids[-1]
+
+
 def switch_version(app_name, version_to_switch_to):
     """Switches to the release version and migrates traffic to it.
 
@@ -133,6 +155,13 @@ def switch_version(app_name, version_to_switch_to):
     subprocess.check_output([
         common.GCLOUD_PATH, 'app', 'services', 'set-traffic',
         'default', '--splits', '%s=1' % version_to_switch_to,
+        '--project=%s' % app_name])
+
+    latest_admin_version = get_latest_deployed_version(
+        app_name, 'cloud-datastore-admin')
+    subprocess.check_output([
+        common.GCLOUD_PATH, 'app', 'services', 'set-traffic',
+        'cloud-datastore-admin', '--splits', '%s=1' % latest_admin_version,
         '--project=%s' % app_name])
 
 

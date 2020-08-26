@@ -308,7 +308,9 @@ def execute_branch_cut(target_version, hotfix_number):
     else:
         python_utils.PRINT(
             'Please cherrypick the required PRs and push the branch '
-            'to Github once this script is done.')
+            'to Github once this script is done.\n'
+            'Note: It is fine to push the branch only after creating the '
+            'branch protection rule and doing all the cherrypicks.')
 
     common.ask_user_to_confirm(
         'Ask Sean (or Ben, if Sean isn\'t available) to create '

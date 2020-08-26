@@ -76,6 +76,7 @@ BUCKET_NAME_SUFFIX = '-resources'
 
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
+APP_DEV_YAML_PATH = os.path.join('.', 'app_dev.yaml')
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 INDEX_YAML_PATH = os.path.join('.', 'index.yaml')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -98,7 +99,9 @@ def preprocess_release(app_name, deploy_data_path):
     in execute_deployment function. Currently it does the following:
 
     (1) Substitutes files from the per-app deployment data.
-    (2) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
+    (2) Changes GCS_RESOURCE_BUCKET in assets/constants.ts.
+    (3) Updates project id for vpc_access_connector in app_dev.yaml.
+    (4) Updates REDISHOST in feconf.py
 
     Args:
         app_name: str. Name of the app to deploy.
@@ -108,6 +111,8 @@ def preprocess_release(app_name, deploy_data_path):
         Exception. Could not find deploy data directory.
         Exception. Could not find source path.
         Exception. Could not find destination path.
+        Exception. Constants file has invalid GCS_RESOURCE_BUCKET.
+        Exception. The vpc_access_connector line is missing in app_dev.yaml.
     """
     if not os.path.exists(deploy_data_path):
         raise Exception(
@@ -145,17 +150,34 @@ def preprocess_release(app_name, deploy_data_path):
 
     with python_utils.open_file(
         os.path.join(common.CONSTANTS_FILE_PATH), 'r') as assets_file:
-        content = assets_file.read()
+        common_content = assets_file.read()
 
-    assert '"DEV_MODE": true' in content, 'Invalid DEV_MODE'
-    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content, (
+    with python_utils.open_file(
+        os.path.join(APP_DEV_YAML_PATH), 'r') as app_dev_file:
+        app_dev_content = app_dev_file.read()
+
+    assert '"DEV_MODE": true' in common_content, 'Invalid DEV_MODE'
+    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in common_content, (
         'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
             common.CONSTANTS_FILE_PATH))
+
+    assert 'vpc_access_connector:\n  name: projects/PROJECT_ID' in (
+        app_dev_content), 'Missing vpc_access_connector'
+
     bucket_name = app_name + BUCKET_NAME_SUFFIX
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
         r'"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
+
+    updated_app_dev_content = app_dev_content.replace(
+        'vpc_access_connector:\n  name: projects/PROJECT_ID',
+        'vpc_access_connector:\n  name: projects/%s' % app_name)
+    with python_utils.open_file(
+        os.path.join(APP_DEV_YAML_PATH), 'w') as app_dev_file:
+        app_dev_file.write(updated_app_dev_content)
+
+    update_configs.add_redishost()
 
 
 def check_errors_in_a_page(url_to_check, msg_to_confirm):
@@ -270,6 +292,16 @@ def flush_memcache(app_name):
         'src=ac&project=%s') % app_name
     common.open_new_tab_in_browser_if_possible(memcache_url)
     common.ask_user_to_confirm('Please flush the memcache.')
+
+    admin_misc_tab_url = None
+    if app_name == APP_NAME_OPPIASERVER:
+        admin_misc_tab_url = 'https://www.oppia.org/admin#/misc'
+    else:
+        admin_misc_tab_url = 'https://%s.appspot.com/admin#/misc' % app_name
+
+    if admin_misc_tab_url:
+        common.open_new_tab_in_browser_if_possible(admin_misc_tab_url)
+        common.ask_user_to_confirm('Please flush the cache on Oppia website.')
 
 
 def switch_version(app_name, current_release_version):
@@ -534,6 +566,7 @@ def execute_deployment():
                         'MAILGUN_API_KEY = None' in feconf_contents):
                     raise Exception(
                         'The mailgun API key must be added before deployment.')
+
         if not os.path.exists(THIRD_PARTY_DIR):
             raise Exception(
                 'Could not find third_party directory at %s. Please run '
@@ -582,7 +615,8 @@ def execute_deployment():
         common.run_cmd([
             'git', 'checkout', '--',
             update_configs.LOCAL_FECONF_PATH,
-            update_configs.LOCAL_CONSTANTS_PATH])
+            update_configs.LOCAL_CONSTANTS_PATH,
+            APP_DEV_YAML_PATH])
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

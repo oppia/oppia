@@ -1,0 +1,53 @@
+# This file is invalid since vpc_access_connector is missing.
+default_expiration: "10m"
+handlers:
+# PRODUCTION STATIC
+- url: /favicon.ico
+  static_files: assets/favicon.ico
+  upload: assets/favicon.ico
+  secure: always
+
+# DEVELOPMENT STATIC
+- url: /webpack_bundles
+  static_dir: webpack_bundles
+  secure: always
+  application_readable: true
+  expiration: "0"
+
+# DYNAMIC
+- url: /mapreduce(/.*)?
+  script: mapreduce.main.APP
+  login: admin
+  secure: always
+
+# STATIC PAGES.
+- url: /about
+  static_files: webpack_bundles/about-page.mainpage.html
+  upload: webpack_bundles/about-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+
+libraries:
+- name: jinja2
+  version: "2.6"
+- name: PIL
+  version: "1.1.7"
+# This is needed for sending requests to a mailgun HTTPS URL.
+- name: ssl
+  version: "2.7.11"
+- name: webapp2
+  version: "2.5.2"
+
+skip_files:
+# .pyc and .pyo files
+- ^(.*/)?.*\.py[co]$
+# Unix hidden files whose names begin with a dot
+- ^(.*/)?\..*$
+# Karma test files
+- ^(.*/)Spec.js$
