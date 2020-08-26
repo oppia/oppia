@@ -275,7 +275,9 @@ fdescribe('TextInputValidationService', () => {
   });
 
   it('should catch redundancy of equals rules with matching inputs', () => {
-    var answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
+    var answerGroups = [
+      agof.createNew(goodDefaultOutcome, null, null),
+      agof.createNew(goodDefaultOutcome, null, null)];
     answerGroups[0].updateRuleTypesToInputs(
       [rof.createFromBackendDict({
         rule_type: 'Equals',
@@ -305,9 +307,59 @@ fdescribe('TextInputValidationService', () => {
         inputs: {
           x: 'xyz'
         }
+      })]);
+    answerGroups[1].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: 'xya'
+        }
+      })]);
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 1 from answer group 2 will never be matched because it' +
+      ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
+    }]);
+  });
+
+  it('should catch redundancy of fuzzyEquals rules with matching input', () => {
+    var answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
+    answerGroups[0].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'FuzzyEquals',
+        inputs: {
+          x: 'xyz'
+        }
       }),
       rof.createFromBackendDict({
-        rule_type: 'Equals',
+        rule_type: 'FuzzyEquals',
+        inputs: {
+          x: 'xyz'
+        }
+      })]);
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
+    }]);
+
+    answerGroups[0].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'FuzzyEquals',
+        inputs: {
+          x: 'xyz'
+        }
+      }),
+      rof.createFromBackendDict({
+        rule_type: 'FuzzyEquals',
         inputs: {
           x: 'xya'
         }
