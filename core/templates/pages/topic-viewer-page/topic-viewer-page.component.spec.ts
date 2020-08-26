@@ -93,7 +93,7 @@ describe('Topic viewer page', function() {
     ctrl.$onInit();
 
     expect(ctrl.canonicalStorySummaries).toEqual([]);
-    expect(ctrl.activeTab).toBe('info');
+    expect(ctrl.activeTab).toBe('story');
     expect(ctrl.topicIsLoading).toBe(true);
     $scope.$apply();
 
