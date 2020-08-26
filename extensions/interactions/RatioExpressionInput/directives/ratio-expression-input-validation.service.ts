@@ -54,7 +54,7 @@ export class RatioExpressionInputValidationService {
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            'Number of terms cannot be empty.')
+            'Number of terms should be an integer value.')
         }
       ];
     } else if (!isInt(minimumNumberOfTerms)) {
@@ -62,7 +62,7 @@ export class RatioExpressionInputValidationService {
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            'Number of terms must be integral.')
+            'Number of terms cannot have decimal places.')
         }
       ];
     } else if (minimumNumberOfTerms < 0) {
