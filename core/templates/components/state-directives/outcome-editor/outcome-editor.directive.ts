@@ -31,6 +31,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -55,11 +56,13 @@ angular.module('oppia').directive('outcomeEditor', [
         'outcome-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'StateEditorService', 'StateInteractionIdService',
-        'ENABLE_PREREQUISITE_SKILLS', 'INTERACTION_SPECS',
+        '$scope', 'ExternalSaveService', 'StateEditorService',
+        'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
+        'INTERACTION_SPECS',
         function(
-            $scope, StateEditorService, StateInteractionIdService,
-            ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
+            $scope, ExternalSaveService, StateEditorService,
+            StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
+            INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.isInQuestionMode = function() {
@@ -169,7 +172,7 @@ angular.module('oppia').directive('outcomeEditor', [
             var feedbackContentId = ctrl.savedOutcome.feedback.getContentId();
             if (fromClickSaveFeedbackButton && contentHasChanged) {
               var contentId = ctrl.savedOutcome.feedback.getContentId();
-              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
+              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
             }
             ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);
           };
@@ -212,11 +215,14 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on('externalSave', function() {
-              onExternalSave();
-            });
             ctrl.directiveSubscriptions.add(
-              () => onExternalSave()
+              ExternalSaveService.onExternalSave.subscribe(
+                () => onExternalSave()
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                () => onExternalSave())
             );
             ctrl.editOutcomeForm = {};
             ctrl.canAddPrerequisiteSkill = (

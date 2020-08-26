@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { EditabilityService } from 'services/editability.service';
 import { StateEditorService } from
@@ -23,12 +24,14 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateNameService } from
   'components/state-editor/state-editor-properties-services/state-name.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('Sidebar state name controller', function() {
+describe('State Name Editor component', function() {
   var ctrl = null;
   var $httpBackend = null;
   var $rootScope = null;
@@ -38,6 +41,8 @@ describe('Sidebar state name controller', function() {
   var routerService = null;
   var stateEditorService = null;
   var stateNameService = null;
+
+  var mockExternalSaveEventEmitter = null;
 
   var mockExplorationData = {
     explorationId: 0,
@@ -67,7 +72,13 @@ describe('Sidebar state name controller', function() {
       TestBed.get(ExplorationImprovementsTaskRegistryService));
     $provide.value('ExplorationStatsService',
       TestBed.get(ExplorationStatsService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -198,6 +209,10 @@ describe('Sidebar state name controller', function() {
     ctrl.$onInit();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should not save state name when it is longer than 50 characters',
     function() {
       expect(ctrl.saveStateName(
@@ -274,5 +289,12 @@ describe('Sidebar state name controller', function() {
     ctrl.saveStateName('Third State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
     expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+  });
+
+  it('should save state name when ExternalSave event occurs', function() {
+    spyOn(ctrl, 'saveStateName');
+    ctrl.tmpStateName = 'SampleState';
+    mockExternalSaveEventEmitter.emit();
+    expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
   });
 });

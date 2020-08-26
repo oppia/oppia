@@ -16,25 +16,25 @@
  * @fileoverview Component for the state translation editor.
  */
 
-import { WRITTEN_TRANSLATION_TYPE_HTML } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-
 import { Subscription } from 'rxjs';
 
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
-    '$scope', '$uibModal', 'EditabilityService', 'ExplorationStatesService',
+    '$scope', '$uibModal', 'EditabilityService',
+    'ExternalSaveService', 'ExplorationStatesService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService', 'UrlInterpolationService',
     'WrittenTranslationObjectFactory',
     function(
-        $scope, $uibModal, EditabilityService, ExplorationStatesService,
+        $scope, $uibModal, EditabilityService,
+        ExternalSaveService, ExplorationStatesService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
         TranslationTabActiveContentIdService, UrlInterpolationService,
@@ -109,7 +109,8 @@ angular.module('oppia').component('stateTranslationEditor', {
           .displayed.getWrittenTranslation(contentId, languageCode));
         var newWrittenTranslation = writtenTranslation;
         if (oldWrittenTranslation === null || (
-          oldWrittenTranslation.getHtml() !== newWrittenTranslation.getHtml() ||
+          (oldWrittenTranslation.translation !==
+           newWrittenTranslation.translation) ||
           (oldWrittenTranslation.needsUpdate !== (
             newWrittenTranslation.needsUpdate)))
         ) {
@@ -130,7 +131,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           if (!$scope.activeWrittenTranslation) {
             $scope.activeWrittenTranslation = (
               WrittenTranslationObjectFactory
-                .createNew(WRITTEN_TRANSLATION_TYPE_HTML, ''));
+                .createNew($scope.dataFormat, ''));
           }
         }
       };
@@ -140,13 +141,14 @@ angular.module('oppia').component('stateTranslationEditor', {
           StateWrittenTranslationsService.displayed);
         if (displayedWrittenTranslations.hasWrittenTranslation(
           contentId, languageCode)) {
-          displayedWrittenTranslations.updateWrittenTranslationHtml(
+          displayedWrittenTranslations.updateWrittenTranslation(
             contentId, languageCode,
-            $scope.activeWrittenTranslation.getHtml());
+            $scope.activeWrittenTranslation.translation);
         } else {
           displayedWrittenTranslations.addWrittenTranslation(
             contentId, languageCode,
-            $scope.activeWrittenTranslation.getHtml());
+            $scope.dataFormat,
+            $scope.activeWrittenTranslation.translation);
         }
 
         saveTranslation();
@@ -157,13 +159,22 @@ angular.module('oppia').component('stateTranslationEditor', {
         initEditor();
       };
       ctrl.$onInit = function() {
+        $scope.dataFormat = (
+          TranslationTabActiveContentIdService.getActiveDataFormat());
         $scope.HTML_SCHEMA = {
           type: 'html'
         };
+        $scope.UNICODE_SCHEMA = {
+          type: 'unicode'
+        };
+
         ctrl.directiveSubscriptions.add(
           TranslationTabActiveContentIdService.onActiveContentIdChanged.
             subscribe(
-              () => initEditor()
+              (dataFormat) => {
+                $scope.dataFormat = dataFormat;
+                initEditor();
+              }
             )
         );
         ctrl.directiveSubscriptions.add(
@@ -172,11 +183,12 @@ angular.module('oppia').component('stateTranslationEditor', {
           )
         );
         initEditor();
-        $scope.$on('externalSave', function() {
-          if ($scope.translationEditorIsOpen) {
-            saveTranslation();
-          }
-        });
+        ctrl.directiveSubscriptions.add(
+          ExternalSaveService.onExternalSave.subscribe(()=> {
+            if ($scope.translationEditorIsOpen) {
+              saveTranslation();
+            }
+          }));
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

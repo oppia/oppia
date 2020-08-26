@@ -46,9 +46,17 @@ export namespace ImprovementsConstants {
   export const TASK_STATUS_OBSOLETE: string = constants.TASK_STATUS_OBSOLETE;
   export const TASK_STATUS_RESOLVED: string = constants.TASK_STATUS_RESOLVED;
 
-  export const HIGH_BOUNCE_RATE_THRESHOLD_HIGH: number = 0.25;
-  export const HIGH_BOUNCE_RATE_THRESHOLD_LOW: number = 0.20;
-  export const HIGH_BOUNCE_RATE_MIN_EXP_STARTS: number = 100;
+  export const EXPLORATION_HEALTH_TYPE_HEALTHY = 'healthy';
+  export const EXPLORATION_HEALTH_TYPE_WARNING = 'warning';
+  export const EXPLORATION_HEALTH_TYPE_CRITICAL = 'critical';
+  export const EXPLORATION_HEALTH_TYPES = [
+    EXPLORATION_HEALTH_TYPE_HEALTHY,
+    EXPLORATION_HEALTH_TYPE_WARNING,
+    EXPLORATION_HEALTH_TYPE_CRITICAL,
+  ] as const;
+
+  export const COMPLETION_BAR_ARC_RADIUS = 58;
+  export const COMPLETION_BAR_ARC_LENGTH = Math.PI * COMPLETION_BAR_ARC_RADIUS;
 
   export const EXPLORATION_IMPROVEMENTS_URL: string = (
     `/improvements/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);

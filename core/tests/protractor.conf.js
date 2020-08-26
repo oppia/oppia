@@ -57,6 +57,10 @@ var suites = {
       'protractor_desktop/embedding.js'
     ],
 
+    explorationImprovementsTab: [
+      'protractor_desktop/explorationImprovementsTab.js'
+    ],
+
     explorationFeedbackTab: [
       'protractor_desktop/explorationFeedbackTab.js'
     ],

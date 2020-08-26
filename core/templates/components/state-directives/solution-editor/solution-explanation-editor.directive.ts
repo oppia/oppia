@@ -22,6 +22,9 @@ require(
   'state-property.service.ts');
 require('services/context.service.ts');
 require('services/editability.service.ts');
+require('services/external-save.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('solutionExplanationEditor', [
   'UrlInterpolationService',
@@ -39,11 +42,12 @@ angular.module('oppia').directive('solutionExplanationEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'ContextService', 'EditabilityService',
-        'StateSolutionService',
+        'ExternalSaveService', 'StateSolutionService',
         function(
             $scope, ContextService, EditabilityService,
-            StateSolutionService) {
+            ExternalSaveService, StateSolutionService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.openExplanationEditor = function() {
             if (ctrl.isEditable) {
               ctrl.explanationEditorIsOpen = true;
@@ -58,7 +62,7 @@ angular.module('oppia').directive('solutionExplanationEditor', [
               var solutionContentId = StateSolutionService.displayed.explanation
                 .getContentId();
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                solutionContentId);
+                [solutionContentId]);
             }
             StateSolutionService.saveDisplayedValue();
             ctrl.onSaveSolution(StateSolutionService.displayed);
@@ -70,12 +74,14 @@ angular.module('oppia').directive('solutionExplanationEditor', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on('externalSave', function() {
-              if (ctrl.explanationEditorIsOpen &&
-                ctrl.editSolutionForm.$valid) {
-                ctrl.saveThisExplanation();
-              }
-            });
+            ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(() => {
+                if (ctrl.explanationEditorIsOpen &&
+                  ctrl.editSolutionForm.$valid) {
+                  ctrl.saveThisExplanation();
+                }
+              })
+            );
             ctrl.isEditable = EditabilityService.isEditable();
             ctrl.editSolutionForm = {};
             ctrl.explanationEditorIsOpen = false;
@@ -88,6 +94,9 @@ angular.module('oppia').directive('solutionExplanationEditor', [
                   ContextService.getEntityType() === 'question')
               }
             };
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
