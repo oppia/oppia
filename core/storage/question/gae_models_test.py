@@ -717,6 +717,7 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
         question_summary_model = question_models.QuestionSummaryModel(
             id='question',
             question_content='Question',
+            interaction_id='TextInput',
             question_model_created_on=datetime.datetime.utcnow(),
             question_model_last_updated=datetime.datetime.utcnow()
         )

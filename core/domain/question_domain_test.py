@@ -476,6 +476,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         self.observed_object = question_domain.QuestionSummary(
             question_id='question_1',
             question_content='<p>question content</p>',
+            interaction_id='TextInput',
             question_model_created_on=self.fake_date_created,
             question_model_last_updated=self.fake_date_updated,
         )
@@ -487,6 +488,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         expected_object_dict = {
             'id': 'question_1',
             'question_content': '<p>question content</p>',
+            'interaction_id': 'TextInput',
             'last_updated_msec': utils.get_time_in_millisecs(
                 self.fake_date_updated),
             'created_on_msec': utils.get_time_in_millisecs(
@@ -502,6 +504,13 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         self.observed_object.id = 1
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected id to be a string, received 1'):
+            self.observed_object.validate()
+
+    def test_validation_with_invalid_interaction_id(self):
+        self.observed_object.interaction_id = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected interaction id to be a string, received 1'):
             self.observed_object.validate()
 
     def test_validation_with_invalid_question_content(self):

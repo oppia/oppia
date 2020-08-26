@@ -631,8 +631,9 @@ def compute_summary_of_question(question):
         QuestionSummary. The computed summary for the given question.
     """
     question_content = question.question_state_data.content.html
+    interaction_id = question.question_state_data.interaction.id
     question_summary = question_domain.QuestionSummary(
-        question.id, question_content,
+        question.id, question_content, interaction_id,
         question.created_on, question.last_updated)
     return question_summary
 
@@ -649,7 +650,8 @@ def save_question_summary(question_summary):
         id=question_summary.id,
         question_model_last_updated=question_summary.last_updated,
         question_model_created_on=question_summary.created_on,
-        question_content=question_summary.question_content
+        question_content=question_summary.question_content,
+        interaction_id=question_summary.interaction_id
     )
 
     question_summary_model.put()
@@ -670,6 +672,7 @@ def get_question_summary_from_model(question_summary_model):
     return question_domain.QuestionSummary(
         question_summary_model.id,
         question_summary_model.question_content,
+        question_summary_model.interaction_id,
         question_summary_model.question_model_created_on,
         question_summary_model.question_model_last_updated
     )

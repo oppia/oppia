@@ -945,7 +945,7 @@ class QuestionSummary(python_utils.OBJECT):
     """Domain object for Question Summary."""
 
     def __init__(
-            self, question_id, question_content,
+            self, question_id, question_content, interaction_id,
             question_model_created_on=None, question_model_last_updated=None):
         """Constructs a Question Summary domain object.
 
@@ -953,6 +953,7 @@ class QuestionSummary(python_utils.OBJECT):
             question_id: str. The ID of the question.
             question_content: str. The static HTML of the question shown to
                 the learner.
+            interaction_id: str. The ID of the interaction.
             question_model_created_on: datetime.datetime. Date and time when
                 the question model is created.
             question_model_last_updated: datetime.datetime. Date and time
@@ -960,6 +961,7 @@ class QuestionSummary(python_utils.OBJECT):
         """
         self.id = question_id
         self.question_content = html_cleaner.clean(question_content)
+        self.interaction_id = interaction_id
         self.created_on = question_model_created_on
         self.last_updated = question_model_last_updated
 
@@ -972,6 +974,7 @@ class QuestionSummary(python_utils.OBJECT):
         return {
             'id': self.id,
             'question_content': self.question_content,
+            'interaction_id': self.interaction_id,
             'last_updated_msec': utils.get_time_in_millisecs(self.last_updated),
             'created_on_msec': utils.get_time_in_millisecs(self.created_on)
         }
@@ -991,6 +994,11 @@ class QuestionSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected question content to be a string, received %s' %
                 self.question_content)
+
+        if not isinstance(self.interaction_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected interaction id to be a string, received %s' %
+                self.interaction_id)
 
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
