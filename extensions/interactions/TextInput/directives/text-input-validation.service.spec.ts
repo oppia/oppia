@@ -31,7 +31,7 @@ import { SubtitledUnicode } from
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 
-describe('TextInputValidationService', () => {
+fdescribe('TextInputValidationService', () => {
   var validatorService, WARNING_TYPES;
   var INTERACTION_SPECS, customizationArgSpecs, rowsSpecs, minRows, maxRows;
 
@@ -271,6 +271,55 @@ describe('TextInputValidationService', () => {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because it' +
       ' is preceded by a \'StartsWith\' rule with a matching prefix.'
+    }]);
+  });
+
+  it('should catch redundancy of equals rules with matching inputs', () => {
+    var answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
+    answerGroups[0].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: 'xyz'
+        }
+      }),
+      rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: 'xyz'
+        }
+      })]);
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      ' is preceded by a \'Equals\' rule with a matching input.'
+    }]);
+
+    answerGroups[0].updateRuleTypesToInputs(
+      [rof.createFromBackendDict({
+        rule_type: 'FuzzyEquals',
+        inputs: {
+          x: 'xyz'
+        }
+      }),
+      rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: 'xya'
+        }
+      })]);
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
     }]);
   });
 });

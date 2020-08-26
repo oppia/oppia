@@ -25,12 +25,16 @@ import { AppConstants } from 'app.constants';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { TextInputCustomizationArgs } from
   'interactions/customization-args-defs';
+import { TextInputRulesService } from './text-input-rules.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { UtilsService } from 'services/utils.service';
 
 interface Warning {
   type: string,
@@ -96,12 +100,17 @@ export class TextInputValidationService {
       customizationArgs: TextInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList: Warning[] = [];
+    var textInputRulesService = (
+      new TextInputRulesService(
+        new NormalizeWhitespacePipe(new UtilsService())));
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 
     var seenStringsContains: string[] = [];
     var seenStringsStartsWith: string[] = [];
+    var seenStringsEquals: string[] = [];
+    var seenStringsFuzzyEquals: string[] = [];
 
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].getRulesAsList();
@@ -136,6 +145,42 @@ export class TextInputValidationService {
             });
           }
           seenStringsStartsWith.push(currentString);
+        } else if (rules[j].type === 'Equals') {
+          if (seenStringsEquals.some(
+            (seenString) => textInputRulesService.Equals(
+              currentString, {x: seenString}))) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+                ' will never be matched because it is preceded ' +
+                'by a \'Equals\' rule with a matching input.')
+            });
+          } else if (seenStringsFuzzyEquals.some(
+            (seenString) => textInputRulesService.FuzzyEquals(
+              currentString, {x: seenString}))) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+                ' will never be matched because it is preceded ' +
+                'by a \'FuzzyEquals\' rule with a matching input.')
+            });
+          }
+          seenStringsEquals.push(currentString);
+        } else if (rules[j].type === 'FuzzyEquals') {
+          if (seenStringsFuzzyEquals.some(
+            (seenString) => textInputRulesService.FuzzyEquals(
+              currentString, {x: seenString}))) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+                ' will never be matched because it is preceded ' +
+                'by a \'FuzzyEquals\' rule with a matching input.')
+            });
+          }
+          seenStringsFuzzyEquals.push(currentString);
         }
       }
     }
