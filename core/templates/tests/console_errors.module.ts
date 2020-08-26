@@ -32,6 +32,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
 @Component({
@@ -53,9 +55,11 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
+    OppiaAngularRootComponent,
     ServiceBootstrapComponent
   ],
   entryComponents: [
+    OppiaAngularRootComponent,
     ServiceBootstrapComponent
   ],
   providers: [
@@ -93,4 +97,12 @@ angular.module('oppia').directive(
   'serviceBootstrap',
   downgradeComponent({
     component: ServiceBootstrapComponent
+  }) as angular.IDirectiveFactory);
+
+angular.module('oppia').directive(
+  // This directive is the downgraded version of the Angular component to
+  // bootstrap the Angular 8.
+  'oppiaAngularRoot',
+  downgradeComponent({
+    component: OppiaAngularRootComponent
   }) as angular.IDirectiveFactory);
