@@ -407,6 +407,8 @@ class CommonTests(test_utils.GenericTestBase):
             pass
         def mock_get_remote_alias(unused_url):
             return 'remote'
+        def mock_ask_user_to_confirm(unused_msg):
+            pass
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
         chdir_swap = self.swap(os, 'chdir', mock_chdir)
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
@@ -422,8 +424,10 @@ class CommonTests(test_utils.GenericTestBase):
             mock_verify_current_branch_name)
         get_remote_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         with isdir_swap, chdir_swap, popen_swap, communicate_swap:
-            with check_call_swap, verify_local_repo_swap:
+            with check_call_swap, verify_local_repo_swap, ask_user_swap:
                 with verify_current_branch_name_swap, get_remote_alias_swap:
                     (
                         common
@@ -791,3 +795,112 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             if os.path.exists('readme_test_dir'):
                 shutil.rmtree('readme_test_dir')
+
+    def test_windows_os_throws_exception_when_starting_redis_server(self):
+        def mock_is_windows_os():
+            return True
+        windows_not_supported_exception = self.assertRaisesRegexp(
+            Exception,
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. The redis server '
+            'cannot start.')
+        swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
+        with swap_os_check, windows_not_supported_exception:
+            common.start_redis_server()
+
+    def test_windows_os_throws_exception_when_stopping_redis_server(self):
+        def mock_is_windows_os():
+            return True
+        windows_not_supported_exception = self.assertRaisesRegexp(
+            Exception,
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. There is no redis '
+            'server to shutdown.')
+        swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
+
+        with swap_os_check, windows_not_supported_exception:
+            common.stop_redis_server()
+
+    def test_start_and_stop_server_calls_are_called(self):
+        # Test that starting the server calls subprocess.call().
+        check_function_calls = {
+            'subprocess_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True
+        }
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            check_function_calls['subprocess_call_is_called'] = True
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+            return Ret()
+
+        def mock_wait_for_port_to_be_open(port): # pylint: disable=unused-argument
+            return
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        swap_wait_for_port_to_be_open = self.swap(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open)
+        with swap_call, swap_wait_for_port_to_be_open:
+            common.start_redis_server()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+        # Test that stopping the server calls subprocess.call().
+        check_function_calls = {
+            'subprocess_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True
+        }
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        with swap_call:
+            common.stop_redis_server()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_start_server_removes_redis_dump(self):
+        check_function_calls = {
+            'os_remove_is_called': False
+        }
+
+        def mock_os_remove_file(file_path): # pylint: disable=unused-argument
+            check_function_calls['os_remove_is_called'] = True
+
+        def mock_os_path_exists(file_path): # pylint: disable=unused-argument
+            return True
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+            return Ret()
+
+        def mock_wait_for_port_to_be_open(port): # pylint: disable=unused-argument
+            return
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        swap_wait_for_port_to_be_open = self.swap(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open)
+        swap_os_remove = self.swap(os, 'remove', mock_os_remove_file)
+        swap_os_path_exists = self.swap(os.path, 'exists', mock_os_path_exists)
+        with swap_call, swap_wait_for_port_to_be_open, swap_os_remove, (
+            swap_os_path_exists):
+            common.start_redis_server()
+
+        self.assertTrue(check_function_calls['os_remove_is_called'])

@@ -30,6 +30,7 @@ import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { InteractiveMapCustomizationArgs } from
   'interactions/customization-args-defs';
+import { InteractiveMapRuleInputs } from 'interactions/rule-input-defs';
 
 describe('InteractiveMapValidationService', () => {
   let validatorService: InteractiveMapValidationService;
@@ -70,24 +71,24 @@ describe('InteractiveMapValidationService', () => {
       },
       longitude: {
         value: 0
+      },
+      zoom: {
+        value: 0
       }
     };
-    goodAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
-        rule_type: 'Within',
-        inputs: {
-          d: 100
-        }
-      }), rof.createFromBackendDict({
-        rule_type: 'NotWithin',
-        inputs: {
-          d: 50
-        }
-      })],
-      goodDefaultOutcome,
-      null,
-      null
-    )];
+    const goodAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    goodAnswerGroup.updateRuleTypesToInputs([rof.createFromBackendDict({
+      rule_type: 'Within',
+      inputs: {
+        d: 100
+      }
+    }), rof.createFromBackendDict({
+      rule_type: 'NotWithin',
+      inputs: {
+        d: 50
+      }
+    })]);
+    goodAnswerGroups = [goodAnswerGroup];
   });
 
   it('should be able to perform basic validation', () => {
@@ -101,6 +102,11 @@ describe('InteractiveMapValidationService', () => {
     () => {
       expect(() => {
         validatorService.getAllWarnings(
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'InteractiveMapCustomizationArgs'." We are
+          // purposely assigning the wrong type of customization args in
+          // order to test validations.
+          // @ts-expect-error
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have properties: ' +
@@ -140,8 +146,10 @@ describe('InteractiveMapValidationService', () => {
 
   it('should expect all rule types to refer to positive distances',
     () => {
-      goodAnswerGroups[0].rules[0].inputs.d = -90;
-      goodAnswerGroups[0].rules[1].inputs.d = -180;
+      (<InteractiveMapRuleInputs>
+        goodAnswerGroups[0].ruleTypesToInputs.Within[0]).d = -90;
+      (<InteractiveMapRuleInputs>
+        goodAnswerGroups[0].ruleTypesToInputs.NotWithin[0]).d = -180;
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);

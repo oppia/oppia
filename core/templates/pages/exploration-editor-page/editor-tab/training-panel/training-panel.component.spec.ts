@@ -25,6 +25,8 @@ import { AngularNameService } from
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -67,7 +69,8 @@ describe('Training Panel Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_specs: [],
+        rule_input_translations: {},
+        rule_types_to_inputs: {},
         tagged_skill_misconception_id: ''
       }, {
         outcome: {
@@ -80,7 +83,8 @@ describe('Training Panel Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_specs: [],
+        rule_input_translations: {},
+        rule_types_to_inputs: {},
         tagged_skill_misconception_id: ''
       }],
       confirmed_unclassified_answers: null,
@@ -128,6 +132,8 @@ describe('Training Panel Component', function() {
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
   }));

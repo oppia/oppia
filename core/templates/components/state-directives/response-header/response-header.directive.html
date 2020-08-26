@@ -45,6 +45,18 @@
     margin-bottom: 7px;
   }
 
+  response-header .oppia-response-cross {
+    color: #C55F45;
+  }
+
+  response-header .oppia-response-tick {
+    color: #00645C;
+  }
+
+  response-header .oppia-num-rules {
+    bottom: 4px;
+  }
+
   /* This is to break the line only when screen is too narrow to have both divs
      in same line.*/
   @media screen and (min-width: 370px) {
@@ -56,15 +68,15 @@
 <div class="oppia-response-header-block">
   <div class="oppia-response-header">
     <span ng-if="$ctrl.showWarning()">⚠</span>
-    <i class="material-icons md-18 oppia-response-tick-cross" ng-if="!$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#x2718;</i>
-    <i class="material-icons md-18 oppia-response-tick-cross  protractor-test-correct-tick-mark" ng-if="$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#10004;</i>
-    <span ng-if="!$ctrl.isActive()" ng-attr-title="<[$ctrl.getSummary()]>">
+    <i class="material-icons md-18 oppia-response-tick-cross oppia-response-cross" ng-if="!$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#x2718;</i>
+    <i class="material-icons md-18 oppia-response-tick-cross  oppia-response-tick protractor-test-correct-tick-mark" ng-if="$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#10004;</i>
+    <span ng-attr-title="<[$ctrl.getSummary()]>">
       <[$ctrl.getShortSummary()]>
-      <span ng-if="$ctrl.getNumRules() > 1" class="badge badge-primary" style="position: relative; bottom: 4px;">
+      <span ng-if="$ctrl.getNumRules() > 1" class="badge badge-primary position-relative oppia-num-rules">
         +<[$ctrl.getNumRules() - 1]>
       </span>
     </span>
-    <span ng-if="$ctrl.isActive()">&nbsp;</span>
+    <span>&nbsp;</span>
   </div>
 
   <br class="break-in-mobile">

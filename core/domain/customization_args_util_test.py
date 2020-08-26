@@ -399,10 +399,10 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
         for line in lines:
             # Search for XCustomizationArgsBackendDict interfaces and extract X,
-            # where X is a interaction id.
-            # Group 1: The characters 'interface'.
-            # Group 2: The interaction id.
-            # Group 3: The characters 'CustomizationArgsBackendDict'.
+            # where X is an interaction id.
+            # Group 1: Matches the string 'interface'.
+            # Group 2: Matches an interaction id.
+            # Group 3: Matches the string 'CustomizationArgsBackendDict'.
             ca_backend_interface_match = (
                 re.search(
                     r'(interface )([a-zA-Z]+)(CustomizationArgsBackendDict)',
@@ -413,11 +413,11 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                     ca_backend_interface_match.group(2))
 
             # Search for XCustomizationArgs interfaces and extract X,
-            # where X is a interaction id.
-            # Group 1: The characters 'interface'.
-            # Group 2: The interaction id.
-            # Group 3: The characters 'CustomizationArgs'.
-            # Group 4: A space or an open bracket.
+            # where X is an interaction id.
+            # Group 1: Matches the string 'interface'.
+            # Group 2: Matches an interaction id.
+            # Group 3: Matches the string 'CustomizationArgs'.
+            # Group 4: Matches a space or an open bracket.
             ca_frontend_interface_match = (
                 re.search(
                     r'(interface )([a-zA-Z]+)(CustomizationArgs)( |{)',
@@ -457,12 +457,12 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             # Checks that the customization args interfaces are being used
             # to typecast the customization args. Matches patterns
             # <XCustomizationArgs> or <XCustomizationArgsBackendDict> where
-            # X is a interaction id.
-            # Group 1: The character '<'.
-            # Group 2: The interaction id.
-            # Group 3: The characters 'CustomizationArgs'.
-            # Group 4: The characters 'BackendDict' (optional).
-            # Group 5: The character '>'.
+            # X is an interaction id.
+            # Group 1: Matches the string '<'.
+            # Group 2: Matches an interaction id.
+            # Group 3: Matches the string 'CustomizationArgs'.
+            # Group 4: Matches the string 'BackendDict' (optional).
+            # Group 5: Matches the string '>'.
             used_match = (
                 re.search(
                     r'(<)([a-zA-Z]+)(CustomizationArgs)(BackendDict)?(>)',
@@ -475,3 +475,38 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             all_interaction_ids,
             interaction_ids_with_used_ca_frontend_interfaces)
+
+    def test_frontend_customization_args_dtslint_test_coverage(self):
+        """Test to ensure that customization-args-defs-test.ts covers testing
+        customization arguments types for each interaction. Uses regex to
+        confirm that there exists a test named
+        Test[interaction id]CustomizationArgsInterfacesMatch for each
+        interaction id.
+        """
+        filepath = os.path.join(
+            'typings', 'tests', 'customization-args-defs-test.ts')
+        with python_utils.open_file(filepath, 'r', newline='') as f:
+            lines = f.readlines()
+
+        all_interaction_ids = (
+            set(interaction_registry.Registry.get_all_interaction_ids()))
+        interaction_ids_with_ca_tests = set()
+
+        for line in lines:
+            # Matches patterns TestXCustomizationArgsInterfacesMatch where X is
+            # an interaction id.
+            # Group 1: Matches the string 'Test'.
+            # Group 2: Matches an interaction id.
+            # Group 3: Matches the string 'CustomizationArgsInterfacesMatch'.
+            test_exists_match = (
+                re.search(
+                    r'(Test)([a-zA-Z]+)(CustomizationArgsInterfacesMatch)',
+                    line
+                ))
+            if test_exists_match:
+                interaction_ids_with_ca_tests.add(
+                    test_exists_match.group(2))
+
+        self.assertEqual(
+            all_interaction_ids,
+            interaction_ids_with_ca_tests)

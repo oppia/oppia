@@ -70,7 +70,7 @@ export class SkillDifficulty {
   providedIn: 'root'
 })
 export class SkillDifficultyObjectFactory {
-  create(id: string, description: string, difficulty: number) {
+  create(id: string, description: string, difficulty: number): SkillDifficulty {
     return new SkillDifficulty(id, description, difficulty);
   }
 }

@@ -232,12 +232,14 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'Second'
               },
-              rule_specs: [{
-                inputs: {
-                  x: 0
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Equals: [
+                  {
+                    x: 0
+                  }
+                ]
+              },
               training_data: []
             },
             {
@@ -253,12 +255,14 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'First'
               },
-              rule_specs: [{
-                inputs: {
-                  x: 1
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Equals: [
+                  {
+                    x: 1
+                  }
+                ]
+              },
               training_data: []
             }],
             solution: null,
@@ -320,12 +324,14 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'Third'
               },
-              rule_specs: [{
-                inputs: {
-                  x: 0
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations: {},
+              rule_types_to_inputs: {
+                Equals: [
+                  {
+                    x: 0
+                  }
+                ]
+              },
               training_data: []
             }],
             solution: null,
@@ -536,7 +542,7 @@ describe('Translation status service', function() {
       expect(stateWiseStatusColor.Second).toBe(NO_ASSETS_AVAILABLE_COLOR);
       expect(stateWiseStatusColor.Third).toBe(NO_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', 'content');
+      swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'content');
       ess.saveWrittenTranslations('Second', swts.displayed);
 
       tss.refresh();
@@ -589,7 +595,7 @@ describe('Translation status service', function() {
         tss.getActiveStateComponentStatusColor('feedback'));
       expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', 'Content');
+      swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'Content');
 
       activeStateComponentStatus = (
         tss.getActiveStateComponentStatusColor('content'));
@@ -690,7 +696,8 @@ describe('Translation status service', function() {
       expect(activeStateContentIdStatusColor).toBe(
         ALL_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', '<p>Content</p>');
+      swts.displayed.addWrittenTranslation(
+        'content', 'hi', 'html', '<p>Content</p>');
 
       activeStateContentIdStatusColor = (
         tss.getActiveStateContentIdStatusColor('content'));

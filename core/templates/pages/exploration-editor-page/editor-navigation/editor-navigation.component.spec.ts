@@ -16,10 +16,14 @@
  * @fileoverview Unit tests for editorNavigation.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Editor Navigation Component', function() {
   var ctrl = null;
@@ -33,17 +37,35 @@ describe('Editor Navigation Component', function() {
   var explorationFeaturesService = null;
   var explorationImprovementsService = null;
   var explorationWarningsService = null;
+  var stateTutorialFirstTimeService = null;
   var threadDataService = null;
   var userService = null;
   var windowDimensionsService = null;
 
+  var mockOpenPostTutorialHelpPopover = new EventEmitter();
+
+  var testSubscriptions: Subscription;
+
+  const openEditorTutorialSpy = jasmine.createSpy('openEditorTutorial');
+  const openTranslationTutorialSpy = (
+    jasmine.createSpy('openTranslationTutorial'));
+
+  var explorationRightsService = null;
+  var editabilityService = null;
+  var explorationSaveService = null;
+  var changeListService = null;
   var explorationId = 'exp1';
   var userInfo = {
     isLoggedIn: () => true
   };
   var isImprovementsTabEnabledAsyncSpy = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
@@ -57,12 +79,18 @@ describe('Editor Navigation Component', function() {
       $uibModal = $injector.get('$uibModal');
       $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
       contextService = $injector.get('ContextService');
+      explorationRightsService = $injector.get('ExplorationRightsService');
+      changeListService = $injector.get('ChangeListService');
+      explorationSaveService = $injector.get('ExplorationSaveService');
+      editabilityService = $injector.get('EditabilityService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
       explorationImprovementsService = $injector.get(
         'ExplorationImprovementsService');
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userService = $injector.get('UserService');
       threadDataService = $injector.get('ThreadDataService');
+      stateTutorialFirstTimeService = (
+        $injector.get('StateTutorialFirstTimeService'));
 
       spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
         of(new Event('resize')));
@@ -75,27 +103,53 @@ describe('Editor Navigation Component', function() {
         explorationImprovementsService, 'isImprovementsTabEnabledAsync');
 
       isImprovementsTabEnabledAsyncSpy.and.returnValue(false);
+      var MockUserExplorationPermissionsService = {
+        getPermissionsAsync: () => {
+          var deferred = $q.defer();
+          deferred.resolve({
+            canPublish: true
+          });
+          return deferred.promise;
+        }
+      };
 
+      spyOnProperty(stateTutorialFirstTimeService,
+        'onOpenPostTutorialHelpPopover').and.returnValue(
+        mockOpenPostTutorialHelpPopover);
       $scope = $rootScope.$new();
       ctrl = $componentController('editorNavigation', {
         $scope: $scope,
-        WindowDimensionsService: windowDimensionsService
+        WindowDimensionsService: windowDimensionsService,
+        UserExplorationPermissionsService: MockUserExplorationPermissionsService
       });
       ctrl.$onInit();
       $scope.$apply();
     }));
 
+    beforeEach(() => {
+      testSubscriptions = new Subscription();
+      testSubscriptions.add(
+        stateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
+          openTranslationTutorialSpy));
+      testSubscriptions.add(
+        stateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
+          openEditorTutorialSpy));
+    });
+
     afterEach(function() {
+      testSubscriptions.unsubscribe();
       ctrl.$onDestroy();
     });
 
     it('should evaluate $scope properties after controller initialization',
       function() {
+        spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
         expect($scope.isPostTutorialHelpPopoverShown())
           .toBe(false);
         expect($scope.isScreenLarge()).toBe(true);
         expect($scope.isUserLoggedIn()).toBe(true);
         expect($scope.isImprovementsTabEnabled()).toBe(false);
+        expect($scope.showPublishButton()).toEqual(true);
       });
 
     it('should evaluate warnings from exploration warning service', function() {
@@ -108,7 +162,7 @@ describe('Editor Navigation Component', function() {
         warnings);
       spyOn(explorationWarningsService, 'countWarnings').and.returnValue(
         warnings.length);
-      // This approach was choosen because spyOn() doesn't work on properties
+      // This approach was chosen because spyOn() doesn't work on properties
       // that doesn't have a get access type.
       // eslint-disable-next-line max-len
       // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
@@ -125,41 +179,102 @@ describe('Editor Navigation Component', function() {
 
     it('should open editor tutorial after closing user help modal with mode' +
       'editor', function() {
-      spyOn($rootScope, '$broadcast');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('editor')
       });
       $scope.showUserHelpModal();
       $scope.$apply();
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'openEditorTutorial');
+      expect(openEditorTutorialSpy).toHaveBeenCalled();
     });
 
     it('should open editor tutorial after closing user help modal with mode' +
       'translation', function() {
-      spyOn($rootScope, '$broadcast');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('translation')
       });
       $scope.showUserHelpModal();
       $scope.$apply();
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'openTranslationTutorial');
+      expect(openTranslationTutorialSpy).toHaveBeenCalled();
     });
 
-    it('should not open any tutorial after dismissing user help modal',
-      function() {
-        spyOn($rootScope, '$broadcast');
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
-        $scope.showUserHelpModal();
-        $scope.$apply();
 
-        expect($rootScope.$broadcast).not.toHaveBeenCalled();
+    it('should return if exploration is private', function() {
+      spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
+      expect($scope.isPrivate()).toEqual(true);
+    });
+
+    it('should return if exploration is locked for editing', function() {
+      spyOn(changeListService,
+        'isExplorationLockedForEditing').and.returnValue(true);
+      expect($scope.isExplorationLockedForEditing()).toEqual(true);
+    });
+
+    it('should return if exploration is editable outside tutorial mode',
+      function() {
+        spyOn(
+          editabilityService,
+          'isEditableOutsideTutorialMode').and.returnValue(true);
+        spyOn(editabilityService, 'isTranslatable').and.returnValue(true);
+        expect($scope.isEditableOutsideTutorialMode()).toEqual(true);
       });
+
+    it('should call exploration save service to discard changes', function() {
+      var explorationSpy = spyOn(explorationSaveService, 'discardChanges');
+      $scope.discardChanges();
+      expect(explorationSpy).toHaveBeenCalled();
+    });
+
+    it('should call exploration save service to save changes', function() {
+      var deferred = $q.defer();
+      deferred.resolve();
+      var explorationSpy = spyOn(
+        explorationSaveService,
+        'saveChanges').and.returnValue(deferred.promise);
+      $scope.saveChanges();
+      $rootScope.$apply();
+      expect(explorationSpy).toHaveBeenCalled();
+    });
+
+    it('should show/hide the loading dots', function() {
+      $scope.showLoadingDots();
+      expect($scope.loadingDotsAreShown).toEqual(true);
+      $scope.hideLoadingDots();
+      expect($scope.loadingDotsAreShown).toEqual(false);
+    });
+
+    it('should return if exploration is saveable', function() {
+      spyOn(
+        explorationSaveService, 'isExplorationSaveable').and.returnValue(true);
+      expect($scope.isExplorationSaveable()).toEqual(true);
+    });
+
+    it('should toggle mobile nav options', function() {
+      $scope.mobileNavOptionsAreShown = false;
+      $scope.toggleMobileNavOptions();
+      expect($scope.mobileNavOptionsAreShown).toEqual(true);
+      $scope.toggleMobileNavOptions();
+      expect($scope.mobileNavOptionsAreShown).toEqual(false);
+    });
+
+    it('should return the number of changes', function() {
+      spyOn(changeListService,
+        'getChangeList').and.returnValue([]);
+      expect($scope.getChangeListLength()).toEqual(0);
+    });
+
+    it('should hide loading dots after publishing the exploration', function() {
+      $scope.loadingDotsAreShown = true;
+      var deferred = $q.defer();
+      deferred.resolve();
+      spyOn(
+        explorationSaveService,
+        'showPublishExplorationModal').and.returnValue(deferred.promise);
+      $scope.showPublishExplorationModal();
+      $rootScope.$apply();
+      expect($scope.loadingDotsAreShown).toEqual(false);
+    });
 
     it('should navigate to main tab', function() {
       $scope.selectMainTab();
@@ -221,7 +336,7 @@ describe('Editor Navigation Component', function() {
     it('should toggle post tutorial help popover when resizing page',
       function() {
         angular.element(window).triggerHandler('resize');
-        $rootScope.$broadcast('openPostTutorialHelpPopover');
+        mockOpenPostTutorialHelpPopover.emit();
 
         expect(ctrl.postTutorialHelpPopoverIsShown).toBe(true);
 
@@ -245,6 +360,8 @@ describe('Editor Navigation Component', function() {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userService = $injector.get('UserService');
       threadDataService = $injector.get('ThreadDataService');
+      stateTutorialFirstTimeService = (
+        $injector.get('StateTutorialFirstTimeService'));
 
       spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
         of(new Event('resize')));
@@ -252,6 +369,10 @@ describe('Editor Navigation Component', function() {
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
+
+      spyOnProperty(stateTutorialFirstTimeService,
+        'onOpenPostTutorialHelpPopover').and.returnValue(
+        mockOpenPostTutorialHelpPopover);
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
         explorationImprovementsService, 'isImprovementsTabEnabledAsync');
@@ -273,8 +394,7 @@ describe('Editor Navigation Component', function() {
 
     it('should hide post tutorial help popover when resizing page', function() {
       angular.element(window).triggerHandler('resize');
-      $rootScope.$broadcast('openPostTutorialHelpPopover');
-
+      mockOpenPostTutorialHelpPopover.emit();
       expect(ctrl.postTutorialHelpPopoverIsShown).toBe(false);
     });
   });

@@ -197,7 +197,6 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
         python_utils.PRINT('Starting CODEOWNERS file check')
         python_utils.PRINT('----------------------------------------')
 
-
     with linter_utils.redirect_stdout(stdout):
         failed = False
         summary_messages = []

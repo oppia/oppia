@@ -61,12 +61,12 @@ export class Topic {
   _abbreviatedName: string;
   _description: string;
   _languageCode: string;
-  _canonicalStoryReferences: Array<StoryReference>;
-  _additionalStoryReferences: Array<StoryReference>;
+  _canonicalStoryReferences: StoryReference[];
+  _additionalStoryReferences: StoryReference[];
   _uncategorizedSkillSummaries: ShortSkillSummary[];
   _nextSubtopicId: number;
   _version: number;
-  _subtopics: Array<Subtopic>;
+  _subtopics: Subtopic[];
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
   _urlFragment: string;
@@ -76,10 +76,10 @@ export class Topic {
   constructor(
       id: string, name: string, abbreviatedName: string, urlFragment: string,
       description: string, languageCode: string,
-      canonicalStoryReferences: Array<StoryReference>,
-      additionalStoryReferences: Array<StoryReference>,
-      uncategorizedSkillIds: Array<string>,
-      nextSubtopicId: number, version: number, subtopics: Array<Subtopic>,
+      canonicalStoryReferences: StoryReference[],
+      additionalStoryReferences: StoryReference[],
+      uncategorizedSkillIds: string[],
+      nextSubtopicId: number, version: number, subtopics: Subtopic[],
       thumbnailFilename: string,
       thumbnailBgColor: string,
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
@@ -178,7 +178,7 @@ export class Topic {
     return this._version;
   }
 
-  validate(): Array<string> {
+  validate(): string[] {
     let validUrlFragmentRegex = new RegExp(constants.VALID_URL_FRAGMENT_REGEX);
     let topicUrlFragmentCharLimit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
     let issues = [];
@@ -248,7 +248,7 @@ export class Topic {
     return issues;
   }
 
-  prepublishValidate(): Array<string> {
+  prepublishValidate(): string[] {
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
@@ -263,7 +263,7 @@ export class Topic {
     return issues;
   }
 
-  getSkillIds(): Array<string> {
+  getSkillIds(): string[] {
     let topicSkillIds = cloneDeep(
       this._uncategorizedSkillSummaries.map((
           skillSummary: ShortSkillSummary) => {
@@ -339,15 +339,15 @@ export class Topic {
     this._subtopics.length = 0;
   }
 
-  getSubtopics(): Array<Subtopic> {
+  getSubtopics(): Subtopic[] {
     return this._subtopics.slice();
   }
 
-  getCanonicalStoryReferences(): Array<StoryReference> {
+  getCanonicalStoryReferences(): StoryReference[] {
     return this._canonicalStoryReferences.slice();
   }
 
-  getCanonicalStoryIds(): Array<string> {
+  getCanonicalStoryIds(): string[] {
     return this._canonicalStoryReferences.map((reference: StoryReference) => {
       return reference.getStoryId();
     });
@@ -380,7 +380,8 @@ export class Topic {
     this._canonicalStoryReferences.splice(toIndex, 0, canonicalStoryToMove);
   }
 
-  rearrangeSkillInSubtopic(subtopicId, fromIndex, toIndex) {
+  rearrangeSkillInSubtopic(
+      subtopicId: number, fromIndex: number, toIndex: number): void {
     const subtopic = this.getSubtopicById(subtopicId);
     const skillToMove = cloneDeep(
       subtopic.getSkillSummaries()[fromIndex]);
@@ -388,7 +389,7 @@ export class Topic {
     subtopic._skillSummaries.splice(toIndex, 0, skillToMove);
   }
 
-  rearrangeSubtopic(fromIndex, toIndex) {
+  rearrangeSubtopic(fromIndex: number, toIndex: number): void {
     const subtopicToMove = cloneDeep(this._subtopics[fromIndex]);
     this._subtopics.splice(fromIndex, 1);
     this._subtopics.splice(toIndex, 0, subtopicToMove);
@@ -398,13 +399,13 @@ export class Topic {
     this._canonicalStoryReferences.length = 0;
   }
 
-  getAdditionalStoryIds(): Array<string> {
+  getAdditionalStoryIds(): string[] {
     return this._additionalStoryReferences.map((reference: StoryReference) => {
       return reference.getStoryId();
     });
   }
 
-  getAdditionalStoryReferences(): Array<StoryReference> {
+  getAdditionalStoryReferences(): StoryReference[] {
     return this._additionalStoryReferences.slice();
   }
 

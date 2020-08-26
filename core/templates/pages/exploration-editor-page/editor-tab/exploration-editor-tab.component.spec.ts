@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the component of the 'State Editor'.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
@@ -67,6 +68,8 @@ import { SolutionObjectFactory } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -82,11 +85,19 @@ describe('Exploration editor tab component', function() {
   var hintObjectFactory = null;
   var outcomeObjectFactory = null;
   var routerService = null;
+  var stateEditorRefreshService = null;
   var solutionObjectFactory = null;
   var stateEditorService = null;
   var subtitledHtmlObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  var mockRefreshStateEditorEventEmitter = null;
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(function() {
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
@@ -161,6 +172,12 @@ describe('Exploration editor tab component', function() {
     explorationStatesService = $injector.get('ExplorationStatesService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
     routerService = $injector.get('RouterService');
+    stateEditorRefreshService = $injector.get('StateEditorRefreshService');
+
+    mockRefreshStateEditorEventEmitter = new EventEmitter();
+    spyOnProperty(stateEditorRefreshService,
+      'onRefreshStateEditor').and.returnValue(
+      mockRefreshStateEditorEventEmitter);
 
     explorationStatesService.init({
       'First State': {
@@ -178,7 +195,8 @@ describe('Exploration editor tab component', function() {
             rows: {value: 1}
           },
           answer_groups: [{
-            rule_specs: [],
+            rule_input_translations: {},
+            rule_types_to_inputs: {},
             outcome: {
               dest: 'unused',
               feedback: {
@@ -262,7 +280,8 @@ describe('Exploration editor tab component', function() {
             rows: {value: 1}
           },
           answer_groups: [{
-            rule_specs: [],
+            rule_input_translations: {},
+            rule_types_to_inputs: {},
             outcome: {
               dest: 'unused',
               feedback: {
@@ -305,6 +324,10 @@ describe('Exploration editor tab component', function() {
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should evaluate controller properties after its initialization',
     function() {
@@ -403,7 +426,8 @@ describe('Exploration editor tab component', function() {
 
     expect(stateEditorService.interaction.answerGroups).toEqual([
       answerGroupObjectFactory.createFromBackendDict({
-        rule_specs: [],
+        rule_input_translations: {},
+        rule_types_to_inputs: {},
         outcome: {
           dest: 'unused',
           feedback: {
@@ -417,7 +441,8 @@ describe('Exploration editor tab component', function() {
       })]);
 
     var displayedValue = [answerGroupObjectFactory.createFromBackendDict({
-      rule_specs: [],
+      rule_input_translations: {},
+      rule_types_to_inputs: {},
       outcome: {
         dest: 'Second State',
         feedback: {
@@ -481,7 +506,7 @@ describe('Exploration editor tab component', function() {
 
     var displayedValue = {
       placeholder: {
-        value: 'Placeholder value'
+        value: new SubtitledUnicode('Placeholder value', 'ca_placeholder')
       },
       rows: {
         value: 2
@@ -566,7 +591,7 @@ describe('Exploration editor tab component', function() {
       .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate).toBe(
       false);
 
-    ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired('feedback_1');
+    ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
     $scope.$apply();
 
     expect(explorationStatesService.getState('First State')
@@ -591,7 +616,7 @@ describe('Exploration editor tab component', function() {
         .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
         .toBe(false);
 
-      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired('feedback_1');
+      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
       $scope.$apply();
 
       expect(explorationStatesService.getState('First State')
@@ -629,7 +654,7 @@ describe('Exploration editor tab component', function() {
     stateEditorService.updateStateResponsesInitialised();
     stateEditorService.updateStateEditorDirectiveInitialised();
 
-    $rootScope.$broadcast('refreshStateEditor');
+    mockRefreshStateEditorEventEmitter.emit();
 
     const stateEditorInitializedSpy = jasmine.createSpy(
       'stateEditorInitialized');

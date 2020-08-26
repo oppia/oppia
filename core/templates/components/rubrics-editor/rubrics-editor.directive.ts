@@ -92,6 +92,9 @@ angular.module('oppia').directive('rubricsEditor', [
           ctrl.cancelEditExplanation = function(difficulty, index) {
             ctrl.editableExplanations[difficulty][index] = (
               explanationsMemento[difficulty][index]);
+            if (!ctrl.editableExplanations[difficulty][index]) {
+              ctrl.deleteExplanation(difficulty, index);
+            }
             ctrl.explanationEditorIsOpen[difficulty][index] = false;
           };
 
@@ -151,6 +154,8 @@ angular.module('oppia').directive('rubricsEditor', [
               {id: 1, difficulty: 'Medium'},
               {id: 2, difficulty: 'Hard'}
             ];
+            ctrl.selectedRubricIndex = 1;
+            ctrl.rubric = ctrl.getRubrics()[1];
           };
 
           ctrl.onRubricSelectionChange = function() {

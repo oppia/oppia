@@ -50,6 +50,11 @@ require(
 require('services/context.service.ts');
 require('services/exploration-features.service.ts');
 
+require(
+  'pages/exploration-player-page/services/exploration-player-state.service.ts');
+
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('previewTab', {
   template: require('./preview-tab.component.html'),
   controller: [
@@ -57,6 +62,7 @@ angular.module('oppia').component('previewTab', {
     'EditableExplorationBackendApiService',
     'ExplorationDataService', 'ExplorationEngineService',
     'ExplorationFeaturesService', 'ExplorationInitStateNameService',
+    'ExplorationPlayerStateService',
     'LearnerParamsService', 'NumberAttemptsService',
     'ParamChangeObjectFactory', 'ParameterMetadataService',
     'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
@@ -66,11 +72,13 @@ angular.module('oppia').component('previewTab', {
         EditableExplorationBackendApiService,
         ExplorationDataService, ExplorationEngineService,
         ExplorationFeaturesService, ExplorationInitStateNameService,
+        ExplorationPlayerStateService,
         LearnerParamsService, NumberAttemptsService,
         ParamChangeObjectFactory, ParameterMetadataService,
         PlayerCorrectnessFeedbackEnabledService, RouterService,
         StateEditorService, UrlInterpolationService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.getManualParamChanges = function(initStateNameForPreview) {
         var deferred = $q.defer();
 
@@ -153,12 +161,17 @@ angular.module('oppia').component('previewTab', {
         // This allows the active state to be kept up-to-date whilst
         // navigating in preview mode, ensuring that the state does not
         // change when toggling between editor and preview.
-        $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
-          StateEditorService.setActiveStateName(stateName);
-        });
-        $scope.$on('playerStateChange', function() {
-          ctrl.allParams = LearnerParamsService.getAllParams();
-        });
+        ctrl.directiveSubscriptions.add(
+          ExplorationEngineService.onUpdateActiveStateIfInEditor.subscribe(
+            (stateName) => {
+              StateEditorService.setActiveStateName(stateName);
+            })
+        );
+        ctrl.directiveSubscriptions.add(
+          ExplorationPlayerStateService.onPlayerStateChange.subscribe(() => {
+            ctrl.allParams = LearnerParamsService.getAllParams();
+          })
+        );
         ctrl.isExplorationPopulated = false;
         ExplorationDataService.getData().then(function() {
           var initStateNameForPreview = StateEditorService
@@ -185,6 +198,9 @@ angular.module('oppia').component('previewTab', {
             });
         });
         ctrl.allParams = {};
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

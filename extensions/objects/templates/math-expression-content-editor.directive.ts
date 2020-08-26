@@ -20,15 +20,17 @@ require('mathjaxConfig.ts');
 require('directives/mathjax-bind.directive.ts');
 require('services/image-upload-helper.service.ts');
 require('services/alerts.service.ts');
+require('services/external-rte-save.service.ts');
 
+import { Subscription } from 'rxjs';
 
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
 angular.module('oppia').directive('mathExpressionContentEditor', [
-  'AlertsService', 'ImageUploadHelperService',
-  function(AlertsService, ImageUploadHelperService) {
+  'AlertsService', 'ExternalRteSaveService', 'ImageUploadHelperService',
+  function(AlertsService, ExternalRteSaveService, ImageUploadHelperService) {
     return {
       restrict: 'E',
       scope: {},
@@ -40,6 +42,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
+        ctrl.directiveSubscriptions = new Subscription();
         // TODO(#10197): Upgrade to MathJax 3, after proper investigation
         // and testing. MathJax 3 provides a faster and more cleaner way to
         // convert a LaTeX string to an SVG.
@@ -59,13 +62,19 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           // Naturally MathJax works asynchronously, but we can add processes
           // which we want to happen synchronously into the MathJax Hub Queue.
           MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
+          ctrl.numberOfElementsInQueue++;
           MathJax.Hub.Queue(function() {
             if (outputElement[0].getElementsByTagName('svg')[0] !== undefined) {
               ctrl.svgString = (
                 outputElement[0].getElementsByTagName('svg')[0].outerHTML);
             }
-            ctrl.value.mathExpressionSvgIsBeingProcessed = false;
-            $scope.$apply();
+            ctrl.numberOfElementsInQueue--;
+            // We need to ensure that all the typepsetting requests in the
+            // MathJax queue is finished before we save the final SVG.
+            if (ctrl.numberOfElementsInQueue === 0) {
+              ctrl.value.mathExpressionSvgIsBeingProcessed = false;
+              $scope.$apply();
+            }
           });
         };
         // This method cleans the SVG string and generates a filename before
@@ -107,20 +116,24 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           // Reset the component each time the value changes (e.g. if this is
           // part of an editable list).
           ctrl.svgString = '';
+          ctrl.numberOfElementsInQueue = 0;
+          ctrl.value.mathExpressionSvgIsBeingProcessed = true;
           $scope.$watch('$ctrl.value', function() {
             ctrl.localValue = {
               label: ctrl.value.raw_latex || '',
             };
           }, true);
-          $scope.$on('externalSave', function() {
-            processAndSaveSvg();
-            if (ctrl.active) {
-              ctrl.replaceValue(ctrl.localValue.label);
-              // The $scope.$apply() call is needed to propagate the replaced
-              // value.
-              $scope.$apply();
-            }
-          });
+          ctrl.directiveSubscriptions.add(
+            ExternalRteSaveService.onExternalRteSave.subscribe(() => {
+              processAndSaveSvg();
+              if (ctrl.active) {
+                ctrl.replaceValue(ctrl.localValue.label);
+                // The $scope.$apply() call is needed to propagate the replaced
+                // value.
+                $scope.$apply();
+              }
+            })
+          );
           ctrl.placeholderText = '\\frac{x}{y}';
           ctrl.alwaysEditable = ctrl.getAlwaysEditable();
 
@@ -149,6 +162,9 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
 
             ctrl.closeEditor();
           }
+        };
+        ctrl.$onDestroy = function() {
+          ctrl.directiveSubscriptions.unsubscribe();
         };
       }]
     };

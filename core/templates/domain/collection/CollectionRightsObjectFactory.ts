@@ -23,10 +23,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export interface CollectionRightsBackendDict {
-  'collection_id'?: number;
-  'can_edit'?: boolean;
-  'can_unpublish'?: boolean;
-  'is_private'?: boolean;
+  'collection_id': number;
+  'can_edit': boolean;
+  'can_unpublish': boolean;
+  'is_private': boolean;
   'owner_names': string[];
 }
 
@@ -135,7 +135,11 @@ export class CollectionRightsObjectFactory {
   // pass validation tests.
   createEmptyCollectionRights(): CollectionRights {
     return new CollectionRights({
-      owner_names: []
+      owner_names: [],
+      collection_id: null,
+      can_edit: null,
+      can_unpublish: null,
+      is_private: null
     });
   }
 }

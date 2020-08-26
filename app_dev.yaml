@@ -245,8 +245,21 @@ libraries:
 - name: webapp2
   version: "2.5.2"
 
+# This is an access connector that connects to the Google Cloud Redis instance
+# used for memory caching. Please replace PROJECT_ID with the correct project id
+# for oppia on the production server.
+vpc_access_connector:
+  name: projects/PROJECT_ID/locations/us-central1/connectors/oppia-redis-connector-1
+
 env_variables:
   PYTHONHTTPSVERIFY: 1
+# GAE_USE_SOCKETS_HTTPLIB is needed for the redis connector in the Python 2
+# runtime. More information can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/connecting-vpc#configuring
+# (The second note under 'Configuring your app to use a connector') which
+# redirects to these instructions to disable URL fetch:
+# https://cloud.google.com/appengine/docs/standard/python/sockets#making_httplib_use_sockets
+  GAE_USE_SOCKETS_HTTPLIB : "anyvalue"
 
 skip_files:
 # .pyc and .pyo files
@@ -259,12 +272,12 @@ skip_files:
 - ^core/(.*/)?.*\.ts$
 # Typescript output log file
 - ^(.*/)tsc_output_log.txt$
+# Python test files
+- ^(.*/)?.*_test\.py$
 # Other folders to ignore
-- tests/
-- scripts/
-- integrations/
-- integrations_dev/
+- core/tests/
 - node_modules/
+- scripts/
 # Some third_party static scripts are directly imported, namely: jquery,
 # jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
@@ -356,8 +369,8 @@ skip_files:
 - third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/sample/
 - third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/scss/
 - third_party/static/fontawesome-free-5.9.0-web/
-- third_party/static/guppy-175999/site/
-- third_party/static/guppy-175999/test/
+- third_party/static/guppy-7509f3/site/
+- third_party/static/guppy-7509f3/test/
 - third_party/static/MathJax-2.7.5/docs/
 - third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Pagella/
 - third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Termes/
@@ -408,5 +421,4 @@ skip_files:
 - third_party/static/MathJax-2.7.5/test/
 - third_party/static/MathJax-2.7.5/unpacked/
 - third_party/static/messageformat-2.0.5/
-- third_party/static/nginfinitescroll-1.0.0/
 - third_party/static/popperJs-1.15.0/

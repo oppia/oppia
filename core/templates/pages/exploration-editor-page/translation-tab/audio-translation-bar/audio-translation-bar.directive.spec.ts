@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for Audio Translation Bar directive.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
@@ -48,6 +49,8 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
 
@@ -57,7 +60,7 @@ import $ from 'jquery';
 require('pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
 
-describe('State Graph Visualization directive', function() {
+describe('Audio translation bar directive', function() {
   var ctrl = null;
   var $interval = null;
   var $q = null;
@@ -71,6 +74,7 @@ describe('State Graph Visualization directive', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var recordedVoiceoversObjectFactory = null;
+  var externalSaveService = null;
   var siteAnalyticsService = null;
   var stateEditorService = null;
   var stateRecordedVoiceoversService = null;
@@ -83,6 +87,12 @@ describe('State Graph Visualization directive', function() {
   var stateName = 'State1';
   var explorationId = 'exp1';
   var isTranslatableSpy = null;
+
+  var mockExternalSaveEventEmitter = null;
+
+  var mockActiveContentIdChangedEventEmitter = new EventEmitter();
+  var mockActiveLanguageChangedEventEmitter = new EventEmitter();
+  var mockShowTranslationTabBusyModalEventEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(function() {
@@ -104,7 +114,13 @@ describe('State Graph Visualization directive', function() {
       TestBed.get(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
     $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateEditorService', TestBed.get(StateEditorService));
     $provide.value(
       'StateCustomizationArgsService',
@@ -129,6 +145,7 @@ describe('State Graph Visualization directive', function() {
     contextService = $injector.get('ContextService');
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     explorationStatesService = $injector.get('ExplorationStatesService');
+    externalSaveService = $injector.get('ExternalSaveService');
     stateEditorService = $injector.get('StateEditorService');
     translationLanguageService = $injector.get('TranslationLanguageService');
     translationTabActiveContentIdService = $injector.get(
@@ -147,6 +164,18 @@ describe('State Graph Visualization directive', function() {
     // recordedvoiceovers and not all the exploration.
     spyOn(explorationStatesService, 'saveRecordedVoiceovers').and
       .callFake(function() {});
+
+    spyOnProperty(translationTabActiveContentIdService,
+      'onActiveContentIdChanged').and.returnValue(
+      mockActiveContentIdChangedEventEmitter);
+
+    spyOnProperty(translationLanguageService,
+      'onActiveLanguageChanged').and.returnValue(
+      mockActiveLanguageChangedEventEmitter);
+
+    spyOnProperty(stateEditorService,
+      'onShowTranslationTabBusyModal').and.returnValue(
+      mockShowTranslationTabBusyModalEventEmitter);
 
     stateRecordedVoiceoversService.init(stateName,
       recordedVoiceoversObjectFactory.createFromBackendDict({
@@ -203,6 +232,8 @@ describe('State Graph Visualization directive', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: false
     });
+    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+      $q.resolve());
     $scope.checkAndStartRecording();
 
     expect($scope.unsupportedBrowser).toBe(true);
@@ -217,6 +248,20 @@ describe('State Graph Visualization directive', function() {
       $q.resolve());
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
+    var waveSurferObjSpy = {
+      load: () => {},
+      on: () => {},
+      pause: () => {},
+      play: () => {},
+    };
+    // This throws "Argument of type '{ load: () => void; ... }'
+    // is not assignable to parameter of type 'WaveSurfer'."
+    // This is because the actual 'WaveSurfer.create` function returns a
+    // object with around 50 more properties than `waveSurferObjSpy`.
+    // We are suppressing this error because we have defined the properties
+    // we need for this test in 'waveSurferObjSpy' object.
+    // @ts-expect-error
+    spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
 
     $scope.checkAndStartRecording();
     $scope.$apply();
@@ -249,7 +294,7 @@ describe('State Graph Visualization directive', function() {
     $scope.checkAndStartRecording();
     $scope.$apply();
 
-    $rootScope.$broadcast('activeContentIdChanged');
+    mockActiveContentIdChangedEventEmitter.emit();
 
     expect(voiceoverRecordingService.stopRecord).toHaveBeenCalled();
     expect(voiceoverRecordingService.closeRecorder).toHaveBeenCalled();
@@ -272,10 +317,16 @@ describe('State Graph Visualization directive', function() {
     $scope.checkAndStartRecording();
     $scope.$apply();
 
-    $rootScope.$broadcast('activeLanguageChanged');
+    mockActiveLanguageChangedEventEmitter.emit();
 
     expect(voiceoverRecordingService.stopRecord).toHaveBeenCalled();
     expect(voiceoverRecordingService.closeRecorder).toHaveBeenCalled();
+  });
+
+  it('should open translation busy modal on event', () => {
+    spyOn($uibModal, 'open').and.callThrough();
+    mockShowTranslationTabBusyModalEventEmitter.emit();
+    expect($uibModal.open).toHaveBeenCalled();
   });
 
   it('should stop record when externalSave flag is broadcasted', function() {
@@ -293,7 +344,7 @@ describe('State Graph Visualization directive', function() {
     $scope.checkAndStartRecording();
     $scope.$apply();
 
-    $rootScope.$broadcast('externalSave');
+    mockExternalSaveEventEmitter.emit();
 
     expect(voiceoverRecordingService.stopRecord).toHaveBeenCalled();
     expect(voiceoverRecordingService.closeRecorder).toHaveBeenCalled();
@@ -398,6 +449,20 @@ describe('State Graph Visualization directive', function() {
     });
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
+    var waveSurferObjSpy = {
+      load: () => {},
+      on: () => {},
+      pause: () => {},
+      play: () => {},
+    };
+    // This throws "Argument of type '{ load: () => void; ... }'
+    // is not assignable to parameter of type 'WaveSurfer'."
+    // This is because the actual 'WaveSurfer.create` function returns a
+    // object with around 50 more properties than `waveSurferObjSpy`.
+    // We are suppressing this error because we have defined the properties
+    // we need for this test in 'waveSurferObjSpy' object.
+    // @ts-expect-error
+    spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
 
     document.body.dispatchEvent(keyEvent);
 
@@ -494,7 +559,7 @@ describe('State Graph Visualization directive', function() {
         result: $q.resolve()
       });
 
-      $rootScope.$broadcast('showTranslationTabBusyModal');
+      mockShowTranslationTabBusyModalEventEmitter.emit();
       $scope.$apply();
 
       expect($q.resolve).toHaveBeenCalled();
@@ -507,7 +572,7 @@ describe('State Graph Visualization directive', function() {
         result: $q.reject()
       });
 
-      $rootScope.$broadcast('showTranslationTabBusyModal');
+      mockShowTranslationTabBusyModalEventEmitter.emit();
       $scope.$apply();
 
       expect($q.reject).toHaveBeenCalled();

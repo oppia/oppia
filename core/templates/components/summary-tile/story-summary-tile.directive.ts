@@ -40,7 +40,15 @@ angular.module('oppia').directive('storySummaryTile', [
             AssetsBackendApiService, WindowDimensionsService,
             ENTITY_TYPE, STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
+          var circumference = (20 * 2 * Math.PI);
+          var gapLength = 5;
+
           ctrl.getStoryLink = function() {
+            // This component is being used in the topic editor as well and
+            // we want to disable the linking in this case.
+            if (!ctrl.classroomUrlFragment || !ctrl.topicUrlFragment) {
+              return '#';
+            }
             return UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_URL_TEMPLATE, {
                 classroom_url_fragment: ctrl.classroomUrlFragment,
@@ -71,8 +79,50 @@ angular.module('oppia').directive('storySummaryTile', [
             ctrl.chaptersDisplayed = ctrl.initialCount;
           };
 
+          ctrl.getStrokeDashArrayValues = function() {
+            if (ctrl.nodeCount === 1) {
+              return '';
+            }
+            var segmentLength = (
+              (circumference - (ctrl.nodeCount * gapLength)) / ctrl.nodeCount);
+            return segmentLength.toString() + ' ' + gapLength.toString();
+          };
+
+          ctrl.getCompletedStrokeDashArrayValues = function() {
+            var completedStrokeValues = '';
+            var remainingCircumference = circumference;
+            if (ctrl.completedStoriesCount === 0) {
+              return '0 ' + circumference.toString();
+            }
+            if (ctrl.completedStoriesCount === 1 && ctrl.nodeCount === 1) {
+              return '';
+            }
+            var segmentLength = (
+              (circumference - (ctrl.nodeCount * gapLength)) / ctrl.nodeCount);
+            for (var i = 1; i <= ctrl.completedStoriesCount - 1; i++) {
+              completedStrokeValues += (
+                segmentLength.toString() + ' ' + gapLength.toString() + ' ');
+              remainingCircumference -= (segmentLength + gapLength);
+            }
+            completedStrokeValues += (
+              segmentLength.toString() + ' ' +
+              (remainingCircumference - segmentLength).toString());
+            return completedStrokeValues;
+          };
+
           ctrl.$onInit = function() {
             ctrl.nodeCount = ctrl.storySummary.getNodeTitles().length;
+            ctrl.completedStoriesCount = 0;
+            for (var idx in ctrl.storySummary.getNodeTitles()) {
+              if (
+                ctrl.storySummary.isNodeCompleted(
+                  ctrl.storySummary.getNodeTitles()[idx])) {
+                ctrl.completedStoriesCount++;
+              }
+            }
+            ctrl.storyProgress = Math.floor(
+              (ctrl.completedStoriesCount / ctrl.nodeCount) * 100);
+
             ctrl.chaptersDisplayed = 3;
             if (WindowDimensionsService.getWidth() <= 800) {
               ctrl.chaptersDisplayed = 2;

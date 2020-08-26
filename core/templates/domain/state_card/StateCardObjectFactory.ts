@@ -52,7 +52,8 @@ export class StateCard {
   _completed: boolean;
   audioTranslationLanguageService: AudioTranslationLanguageService;
   constructor(
-      stateName, contentHtml, interactionHtml, interaction: Interaction,
+      stateName: string, contentHtml: string,
+      interactionHtml: string, interaction: Interaction,
       inputResponsePairs: InputResponsePair[],
       recordedVoiceovers: RecordedVoiceovers, contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService) {
@@ -222,7 +223,7 @@ export class StateCard {
 })
 export class StateCardObjectFactory {
   constructor(private audioTranslationLanguageService:
-                  AudioTranslationLanguageService ) {}
+                  AudioTranslationLanguageService) {}
 
   /**
    * @param {string} stateName - The state name for the current card.

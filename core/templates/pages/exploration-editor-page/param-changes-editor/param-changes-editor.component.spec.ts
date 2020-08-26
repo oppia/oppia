@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for paramChangesEditor.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
@@ -24,6 +25,8 @@ import { AngularNameService } from
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -53,9 +56,12 @@ describe('Param Changes Editor Component', function() {
   var explorationStatesService = null;
   var paramChangeObjectFactory = null;
   var paramSpecsObjectFactory = null;
+  var externalSaveService = null;
   var stateParamChangesService = null;
 
   var postSaveHookSpy = jasmine.createSpy('postSaveHook', () => {});
+
+  var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -78,9 +84,15 @@ describe('Param Changes Editor Component', function() {
       TestBed.get(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService',
       TestBed.get(StateInteractionIdService));
     $provide.value('StateSolutionService',
@@ -92,6 +104,7 @@ describe('Param Changes Editor Component', function() {
     explorationParamSpecsService = $injector.get(
       'ExplorationParamSpecsService');
     explorationStatesService = $injector.get('ExplorationStatesService');
+    externalSaveService = $injector.get('ExternalSaveService');
 
     explorationParamSpecsService.init(
       paramSpecsObjectFactory.createFromBackendDict({
@@ -108,7 +121,8 @@ describe('Param Changes Editor Component', function() {
     ctrl = $componentController('paramChangesEditor', {
       $scope: $scope,
       AlertsService: alertsService,
-      ParamChangeObjectFactory: paramChangeObjectFactory
+      ParamChangeObjectFactory: paramChangeObjectFactory,
+      ExternalSaveService: externalSaveService
     }, {
       paramChangesService: stateParamChangesService,
       postSaveHook: postSaveHookSpy,
@@ -117,7 +131,11 @@ describe('Param Changes Editor Component', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluate $scope properties after controller initialization',
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
+  it('should initialize $scope properties after controller is initialized',
     function() {
       expect($scope.isParamChangesEditorOpen).toBe(false);
       expect($scope.warningText).toBe('');
@@ -153,7 +171,7 @@ describe('Param Changes Editor Component', function() {
     $scope.addParamChange();
     $scope.openParamChangesEditor();
 
-    $rootScope.$broadcast('externalSave');
+    mockExternalSaveEventEmitter.emit();
 
     expect(saveParamChangesSpy).toHaveBeenCalled();
     expect(postSaveHookSpy).toHaveBeenCalled();
