@@ -1826,7 +1826,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         return user_data
 
 
-class UserContributionScoringModel(base_models.BaseModel):
+class UserContributionProficiencyModel(base_models.BaseModel):
     """Model for storing the scores of a user for various suggestions created by
     the user. Users having scores above a particular threshold for a category
     can review suggestions for that category.
@@ -1845,7 +1845,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserContributionScoringModel can be deleted since it only contains
+        """UserContributionProficiencyModel can be deleted since it only contains
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
@@ -1857,14 +1857,14 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """(Takeout) Exports the data from UserContributionScoringModel
+        """(Takeout) Exports the data from UserContributionProficiencyModel
         into dict format.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from UserContributionScoringModel.
+            dict. Dictionary of the data from UserContributionProficiencyModel.
         """
         user_data = dict()
         scoring_models = cls.query(cls.user_id == user_id).fetch()
@@ -1877,7 +1877,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
-        """Delete instances of UserContributionScoringModel for the user.
+        """Delete instances of UserContributionProficiencyModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -1887,7 +1887,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserContributionScoringModels exist for user.
+        """Check whether UserContributionProficiencyModels exist for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -1954,7 +1954,7 @@ class UserContributionScoringModel(base_models.BaseModel):
                 on.
 
         Returns:
-            str. The instance ID for UserContributionScoringModel.
+            str. The instance ID for UserContributionProficiencyModel.
         """
         return '.'.join([score_category, user_id])
 
@@ -1967,8 +1967,9 @@ class UserContributionScoringModel(base_models.BaseModel):
             score_category: str. The score category of the suggestion.
 
         Returns:
-            UserContributionScoringModel|None. A UserContributionScoringModel
-            corresponding to the user score identifier or None if none exist.
+            UserContributionProficiencyModel|None. A
+            UserContributionProficiencyModel corresponding to the user score
+            identifier or None if none exist.
         """
         instance_id = cls._get_instance_id(user_id, score_category)
         return cls.get_by_id(instance_id)
@@ -1976,7 +1977,7 @@ class UserContributionScoringModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, user_id, score_category, score, onboarding_email_sent=False):
-        """Creates a new UserContributionScoringModel entry.
+        """Creates a new UserContributionProficiencyModel entry.
 
         Args:
             user_id: str. The ID of the user.
@@ -1986,7 +1987,7 @@ class UserContributionScoringModel(base_models.BaseModel):
                 user as a reviewer has been sent.
 
         Returns:
-            UserContributionScoringModel. The user scoring model that was
+            UserContributionProficiencyModel. The user scoring model that was
             created.
 
         Raises:
@@ -1996,8 +1997,8 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         if cls.get_by_id(instance_id):
             raise Exception(
-                'There is already a UserContributionScoringModel entry with the'
-                ' given id: %s' % instance_id
+                'There is already a UserContributionProficiencyModel entry with'
+                ' the given id: %s' % instance_id
             )
 
         user_scoring_model = cls(

@@ -392,12 +392,12 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_playlist.collection_ids, [])
 
 
-class UserContributionScoringTests(test_utils.GenericTestBase):
+class UserContributionProficiencyTests(test_utils.GenericTestBase):
     """Testing domain object for user contribution scoring model."""
 
     def setUp(self):
-        super(UserContributionScoringTests, self).setUp()
-        self.user_scoring = user_domain.UserContributionScoring(
+        super(UserContributionProficiencyTests, self).setUp()
+        self.user_scoring = user_domain.UserContributionProficiency(
             'user_id0', 'category0', 0, False)
 
     def test_initialization(self):

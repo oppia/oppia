@@ -5141,9 +5141,9 @@ class UserSkillMasteryModelValidator(
             cls._validate_skill_mastery]
 
 
-class UserContributionScoringModelValidator(
+class UserContributionProficiencyModelValidator(
         base_model_validators.BaseUserModelValidator):
-    """Class for validating UserContributionScoringModels."""
+    """Class for validating UserContributionProficiencyModels."""
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -5161,7 +5161,7 @@ class UserContributionScoringModelValidator(
         """Validates that score is non-negative.
 
         Args:
-            item: ndb.Model. UserContributionScoringModel to validate.
+            item: ndb.Model. UserContributionProficiencyModel to validate.
         """
         if item.score < 0:
             cls._add_error(

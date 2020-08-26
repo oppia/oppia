@@ -508,7 +508,7 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
         to review.
     """
     score_categories = (
-        user_models.UserContributionScoringModel
+        user_models.UserContributionProficiencyModel
         .get_all_categories_where_user_can_review(user_id))
 
     if len(score_categories) == 0:
@@ -572,19 +572,19 @@ def get_submitted_suggestions(user_id, suggestion_type):
 
 
 def get_user_scoring_from_model(user_scoring_model):
-    """Converts the given UserContributionScoringModel to a
-    UserContributionScoring domain object.
+    """Converts the given UserContributionProficiencyModel to a
+    UserContributionProficiency domain object.
 
     Args:
-        user_scoring_model: UserContributionScoringModel.
-            UserContributionScoringModel to be
-            converted to UserContributionScoring domain object.
+        user_scoring_model: UserContributionProficiencyModel.
+            UserContributionProficiencyModel to be
+            converted to UserContributionProficiency domain object.
 
     Returns:
-        UserContributionScoring. The corresponding UserContributionScoring
+        UserContributionProficiency. The corresponding UserContributionProficiency
         domain object.
     """
-    return user_domain.UserContributionScoring(
+    return user_domain.UserContributionProficiency(
         user_scoring_model.user_id, user_scoring_model.score_category,
         user_scoring_model.score,
         user_scoring_model.onboarding_email_sent
@@ -595,10 +595,10 @@ def _update_user_scoring(user_scoring):
     """Updates the user_scoring.
 
     Args:
-        user_scoring: UserContributionScoring. The user scoring to be
+        user_scoring: UserContributionProficiency. The user scoring to be
             updated.
     """
-    user_scoring_model = user_models.UserContributionScoringModel.get(
+    user_scoring_model = user_models.UserContributionProficiencyModel.get(
         user_scoring.user_id, user_scoring.score_category
     )
 
@@ -613,7 +613,7 @@ def _update_user_scoring(user_scoring):
         user_scoring_model.put()
 
     else:
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             user_scoring.user_id, user_scoring.score_category,
             user_scoring.score, user_scoring.onboarding_email_sent)
 
@@ -630,7 +630,7 @@ def get_all_scores_of_user(user_id):
     """
     scores = {}
     for model in (
-            user_models.UserContributionScoringModel.get_all_scores_of_user(
+            user_models.UserContributionProficiencyModel.get_all_scores_of_user(
                 user_id)):
         scores[model.score_category] = model.score
 
@@ -666,7 +666,7 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
         category.
     """
     return [
-        model.user_id for model in user_models.UserContributionScoringModel
+        model.user_id for model in user_models.UserContributionProficiencyModel
         .get_all_users_with_score_above_minimum_for_category(score_category)
     ]
 
@@ -682,15 +682,15 @@ def _get_user_scoring(user_id, score_category):
         score_category: str. The category of the suggestion.
 
     Returns:
-        UserContributionScoring. The user scoring object.
+        UserContributionProficiency. The user scoring object.
     """
-    user_scoring_model = user_models.UserContributionScoringModel.get(
+    user_scoring_model = user_models.UserContributionProficiencyModel.get(
         user_id, score_category)
 
     if user_scoring_model is not None:
         return get_user_scoring_from_model(user_scoring_model)
 
-    return user_domain.UserContributionScoring(
+    return user_domain.UserContributionProficiency(
         user_id, score_category, 0, False)
 
 

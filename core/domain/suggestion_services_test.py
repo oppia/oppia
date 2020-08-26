@@ -311,7 +311,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Create a user scoring model to verify that the
         # score and onboarding_email_sent fields have changed after the
         # suggestion has been accepted.
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.author_id, suggestion.score_category, 0)
 
         # An email is sent to users the first time that they pass the score
@@ -338,7 +338,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id, suggestion_models.STATUS_ACCEPTED)
         # Assert that the email was sent and that the score increased by the
         # correct amount.
-        user_scoring_model = user_models.UserContributionScoringModel.get(
+        user_scoring_model = user_models.UserContributionProficiencyModel.get(
             self.author_id, suggestion.score_category
         )
         self.assertTrue(user_scoring_model.onboarding_email_sent)
@@ -353,7 +353,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Create the user scoring model to verify the score and
         # that the onboarding_email_sent field does not change after the
         # suggestion is accepted.
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.author_id, self.score_category, 0)
 
         # An email is sent to users the first time that they pass the score
@@ -373,7 +373,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
 
-        user_scoring_model = user_models.UserContributionScoringModel.get(
+        user_scoring_model = user_models.UserContributionProficiencyModel.get(
             self.author_id, self.score_category
         )
         # Assert that the users score was updated correctly.
@@ -394,7 +394,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
         # Verify that a user scoring model does not exist.
-        self.assertIsNone(user_models.UserContributionScoringModel.get(
+        self.assertIsNone(user_models.UserContributionProficiencyModel.get(
             self.author_id, self.score_category))
 
         with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
@@ -403,7 +403,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'review message')
 
         # Verify that a user scoring model now exists.
-        self.assertIsNotNone(user_models.UserContributionScoringModel.get(
+        self.assertIsNotNone(user_models.UserContributionProficiencyModel.get(
             self.author_id, self.score_category))
 
     def test_accept_suggestion_successfully(self):
@@ -1002,18 +1002,18 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         # User scoring models for user1.
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 15)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             'user1', 'category2', 15)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             'user1', 'category3', 5)
         # User scoring models for user2.
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             'user2', 'category1', 5)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             'user2', 'category2', 5)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             'user2', 'category3', 5)
 
         suggestion_models.GeneralSuggestionModel.create(
@@ -1366,24 +1366,24 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestions[0].status, suggestion_models.STATUS_REJECTED)
 
 
-class UserContributionScoringUnitTests(test_utils.GenericTestBase):
+class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(UserContributionScoringUnitTests, self).setUp()
+        super(UserContributionProficiencyUnitTests, self).setUp()
         self.signup('user1@example.com', 'user1')
         self.signup('user2@example.com', 'user2')
         self.user_1_id = self.get_user_id_from_email('user1@example.com')
         self.user_2_id = self.get_user_id_from_email('user2@example.com')
 
     def test_get_all_user_ids_who_are_allowed_to_review(self):
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.user_1_id, 'category1', 0)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.user_1_id, 'category2',
             feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.user_2_id, 'category1', 0)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.user_2_id, 'category2', 0)
 
         user_ids = (
@@ -1405,11 +1405,11 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             self.user_2_id, 'category1'))
 
     def test_get_all_scores_of_the_user_with_multiple_scores(self):
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.user_1_id, 'category1', 1)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.user_1_id, 'category2', 2)
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.user_1_id, 'category3', 3)
 
         expected_scores_dict = {}

@@ -872,7 +872,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         }
         self.save_new_default_exploration('exp1', self.owner_id)
 
-        user_models.UserContributionScoringModel.create(
+        user_models.UserContributionProficiencyModel.create(
             self.owner_id, 'category1', 15)
         model1 = feedback_models.GeneralFeedbackThreadModel.create(
             'exploration.exp1.thread_1')

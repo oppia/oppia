@@ -377,14 +377,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             can_review_voiceover_for_language_codes=['hi'],
             can_review_questions=True).put()
 
-        user_models.UserContributionScoringModel(
+        user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_ID_1),
             user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
             onboarding_email_sent=False
         ).put()
-        user_models.UserContributionScoringModel(
+        user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_ID_1),
             user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_2,
