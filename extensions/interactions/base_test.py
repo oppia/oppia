@@ -500,7 +500,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     '%s-short-response.directive.html' %
                     hyphenated_interaction_id)
 
-            # TODO(#10212): Remove this as soon as the leaners flow is added
+            # TODO(#10212): Remove this as soon as the learner's flow is added
             # for RatioExpressionInput.
             if interaction_id != u'RatioExpressionInput':
                 self.assertTrue(os.path.isfile(interaction_ts_file))
@@ -526,7 +526,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
-            # TODO(#10212): Remove this as soon as the leaners flow is added
+            # TODO(#10212): Remove this as soon as the learner's flow is added
             # for RatioExpressionInput.
             if interaction_id != u'RatioExpressionInput':
                 interaction_ts_file_content = utils.get_file_contents(
@@ -541,7 +541,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             validation_service_ts_file_content = utils.get_file_contents(
                 validation_service_ts_file)
 
-            # TODO(#10212): Remove this as soon as the leaners flow is added
+            # TODO(#10212): Remove this as soon as the learner's flow is added
             # for RatioExpressionInput.
             if interaction_id != u'RatioExpressionInput':
                 self.assertIn(
@@ -563,7 +563,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # Check that the html template includes js script for the
             # interaction.
-            # TODO(#10212): Remove this as soon as the leaners flow is added
+            # TODO(#10212): Remove this as soon as the learner's flow is added
             # for RatioExpressionInput.
             if interaction_id != u'RatioExpressionInput':
                 self.assertTrue(
@@ -754,7 +754,7 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
         if list(missing_interaction_ids) != ['RatioExpressionInput']:
-            # TODO(#10212): Remove this as soon as the leaners flow is added
+            # TODO(#10212): Remove this as soon as the learner's flow is added
             # for RatioExpressionInput.
             self.assertEqual(len(missing_interaction_ids), 0, msg=(
                 'Missing interaction IDs in demo exploration: %s' %
