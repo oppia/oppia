@@ -234,7 +234,7 @@ var ExplorationEditorPage = function() {
     await waitFor.invisibilityOf(loadingModal,
       'Loading modal taking too long to disappear');
     await waitFor.invisibilityOfInfoToast(
-      'Changes takes too long to be discarded.');
+      'Changes take too long to be discarded.');
     // Expect editor page to completely reload.
     await waitFor.pageToFullyLoad();
   };
