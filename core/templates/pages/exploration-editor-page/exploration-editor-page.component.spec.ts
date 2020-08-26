@@ -390,23 +390,18 @@ describe('Exploration editor page component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('editor')
       });
-      spyOn($rootScope, '$broadcast');
       ctrl.showUserHelpModal();
       $rootScope.$apply();
       expect($uibModal.open).toHaveBeenCalled();
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('openEditorTutorial');
     });
 
     it('should show the user help modal for editor tutorial', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('translation')
       });
-      spyOn($rootScope, '$broadcast');
       ctrl.showUserHelpModal();
       $rootScope.$apply();
       expect($uibModal.open).toHaveBeenCalled();
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'openTranslationTutorial');
     });
   });
 
