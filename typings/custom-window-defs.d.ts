@@ -24,6 +24,7 @@ interface Window {
     encodeURIComponent: (decodedURIComponent: string) => string;
     ga: Function;
     $: JQueryStatic;
+    Base64Binary: Base64Binary;
     jQuery: JQueryStatic;
     Zone: {
       root: {

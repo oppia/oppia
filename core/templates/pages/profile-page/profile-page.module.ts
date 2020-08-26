@@ -74,7 +74,7 @@ export class ProfilePageModule {
     ProfilePageModule.injector = injector;
   }
   // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+  ngDoBootstrap(): void {}
 }
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
