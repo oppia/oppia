@@ -415,7 +415,7 @@ describe('Core exploration functionality', function() {
     await action.click('Test Interaction Button', testInteractionButton);
     var okayBtn = element(
       by.css('.protractor-test-close-no-customization-modal'));
-    await action.click('Close \'No customization modal\' button', okayBtn)
+    await action.click('Close \'No customization modal\' button', okayBtn);
 
     // Continue input has customization options. Therefore, on re-clicking, a
     // modal opens up containing the customization arguments for this input.

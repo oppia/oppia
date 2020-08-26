@@ -363,13 +363,15 @@ var ExplorationEditorMainTab = function() {
       },
       setFeedback: async function(richTextInstructions) {
       // Begin editing feedback.
-        await action.click('openOutcomeFeedBackEditor', openOutcomeFeedBackEditor);
+        await action.click('openOutcomeFeedBackEditor',
+          openOutcomeFeedBackEditor);
 
         // Set feedback contents.
         await _setOutcomeFeedback(richTextInstructions);
 
         // Save feedback.
-        await action.click('saveOutcomeFeedbackButton', saveOutcomeFeedbackButton);
+        await action.click('saveOutcomeFeedbackButton',
+          saveOutcomeFeedbackButton);
       },
       // This saves the rule after the destination is selected.
       //  - destinationName: The name of the state to move to, or null to stay
@@ -391,7 +393,8 @@ var ExplorationEditorMainTab = function() {
           saveOutcomeDestButton);
       },
       markAsCorrect: async function() {
-        await action.click('Answer Correctness Toggle', answerCorrectnessToggle);
+        await action.click('Answer Correctness Toggle',
+          answerCorrectnessToggle);
       },
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: async function(stateNames) {
@@ -461,7 +464,6 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.expectTickMarkIsDisplayed = async function() {
-    // expect(await correctAnswerTickMark.isDisplayed()).toBe(true);
     await waitFor.visibilityOf(correctAnswerTickMark,
       'Correct answer tick mark not visible');
     expect(correctAnswerTickMark.isPresent()).toBeTruthy();
