@@ -20,8 +20,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.domain import topic_domain  # pylint: disable=invalid-import
 from core.platform import models
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -533,8 +533,8 @@ class TopicRightsModel(base_models.VersionedModel):
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
             user_id_attribute_names = (
-                topic_domain.TopicRightsChange.get_user_id_attribute_names(
-                    commit_cmd['cmd']))
+                feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS
+                .get_user_id_attribute_names(commit_cmd['cmd']))
             for user_id_attribute_name in user_id_attribute_names:
                 commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
         snapshot_metadata_model.commit_cmds_user_ids = list(

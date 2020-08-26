@@ -31,14 +31,15 @@ import feconf
 import python_utils
 import utils
 
-CMD_CREATE_NEW = 'create_new'
-CMD_CHANGE_ROLE = 'change_role'
-CMD_REMOVE_MANAGER_ROLE = 'remove_manager_role'
-CMD_PUBLISH_TOPIC = 'publish_topic'
-CMD_UNPUBLISH_TOPIC = 'unpublish_topic'
+CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
+CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
+CMD_REMOVE_MANAGER_ROLE = feconf.CMD_REMOVE_MANAGER_ROLE
+CMD_PUBLISH_TOPIC = feconf.CMD_PUBLISH_TOPIC
+CMD_UNPUBLISH_TOPIC = feconf.CMD_UNPUBLISH_TOPIC
 
-ROLE_MANAGER = 'manager'
-ROLE_NONE = 'none'
+ROLE_MANAGER = feconf.ROLE_MANAGER
+ROLE_NONE = feconf.ROLE_NONE
+
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 TOPIC_PROPERTY_NAME = 'name'
@@ -233,36 +234,7 @@ class TopicRightsChange(change_domain.BaseChange):
         - 'unpublish_story'.
     """
 
-    # The allowed list of roles which can be used in change_role command.
-    ALLOWED_ROLES = [ROLE_NONE, ROLE_MANAGER]
-
-    ALLOWED_COMMANDS = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': [],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': []
-    }, {
-        'name': CMD_CHANGE_ROLE,
-        'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': ['assignee_id'],
-        'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
-    }, {
-        'name': CMD_REMOVE_MANAGER_ROLE,
-        'required_attribute_names': ['removed_user_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': ['removed_user_id']
-    }, {
-        'name': CMD_PUBLISH_TOPIC,
-        'required_attribute_names': [],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': []
-    }, {
-        'name': CMD_UNPUBLISH_TOPIC,
-        'required_attribute_names': [],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': []
-    }]
+    ALLOWED_COMMANDS = feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS
 
 
 class StoryReference(python_utils.OBJECT):

@@ -17,76 +17,32 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import copy
-
 from constants import constants
 from core.domain import change_domain
 from core.domain import user_services
-from core.platform import models
+import feconf
 import python_utils
 import utils
-
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
 # backward-compatibility with previous exploration snapshots in the datastore.
 # Do not modify the definitions of CMD keys that already exist.
-CMD_CREATE_NEW = 'create_new'
-CMD_CHANGE_ROLE = 'change_role'
-CMD_CHANGE_EXPLORATION_STATUS = 'change_exploration_status'
-CMD_CHANGE_COLLECTION_STATUS = 'change_collection_status'
-CMD_CHANGE_PRIVATE_VIEWABILITY = 'change_private_viewability'
-CMD_RELEASE_OWNERSHIP = 'release_ownership'
-CMD_UPDATE_FIRST_PUBLISHED_MSEC = 'update_first_published_msec'
+CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
+CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
+CMD_CHANGE_EXPLORATION_STATUS = feconf.CMD_CHANGE_EXPLORATION_STATUS
+CMD_CHANGE_COLLECTION_STATUS = feconf.CMD_CHANGE_COLLECTION_STATUS
+CMD_CHANGE_PRIVATE_VIEWABILITY = feconf.CMD_CHANGE_PRIVATE_VIEWABILITY
+CMD_RELEASE_OWNERSHIP = feconf.CMD_RELEASE_OWNERSHIP
+CMD_UPDATE_FIRST_PUBLISHED_MSEC = feconf.CMD_UPDATE_FIRST_PUBLISHED_MSEC
 
 ACTIVITY_STATUS_PRIVATE = constants.ACTIVITY_STATUS_PRIVATE
 ACTIVITY_STATUS_PUBLIC = constants.ACTIVITY_STATUS_PUBLIC
 
-ROLE_OWNER = 'owner'
-ROLE_EDITOR = 'editor'
-ROLE_VOICE_ARTIST = 'voice artist'
-ROLE_VIEWER = 'viewer'
-ROLE_NONE = 'none'
-
-ROLE_ADMIN = 'admin'
-ROLE_MODERATOR = 'moderator'
-
-# The allowed list of roles which can be used in change_role command.
-ALLOWED_ROLES = [ROLE_OWNER, ROLE_EDITOR, ROLE_VOICE_ARTIST, ROLE_VIEWER]
-
-# The allowed list of status which can be used in change_exploration_status
-# and change_collection_status commands.
-ALLOWED_STATUS = [ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC]
-
-COMMON_ALLOWED_COMMANDS = [{
-    'name': CMD_CREATE_NEW,
-    'required_attribute_names': [],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': []
-}, {
-    'name': CMD_CHANGE_ROLE,
-    'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': ['assignee_id'],
-    'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
-}, {
-    'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
-    'required_attribute_names': [
-        'old_viewable_if_private', 'new_viewable_if_private'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': []
-}, {
-    'name': CMD_RELEASE_OWNERSHIP,
-    'required_attribute_names': [],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': []
-}, {
-    'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-    'required_attribute_names': [
-        'old_first_published_msec', 'new_first_published_msec'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': []
-}]
+ROLE_OWNER = feconf.ROLE_OWNER
+ROLE_EDITOR = feconf.ROLE_EDITOR
+ROLE_VOICE_ARTIST = feconf.ROLE_VOICE_ARTIST
+ROLE_VIEWER = feconf.ROLE_VIEWER
+ROLE_NONE = feconf.ROLE_NONE
 
 
 class ActivityRights(python_utils.OBJECT):
@@ -259,13 +215,31 @@ class ActivityRights(python_utils.OBJECT):
         return bool(self.status == ACTIVITY_STATUS_PRIVATE)
 
 
-class ActivityRightsChange(change_domain.BaseChange):
-    """Domain object class for an activity rights change.
+class ExplorationRightsChange(change_domain.BaseChange):
+    """Domain object class for an exploration rights change.
 
     The allowed commands, together with the attributes:
         - 'create_new'
         - 'change_role' (with assignee_id, old_role, new_role)
         - 'change_exploration_status' (with old_status, new_status)
+        - 'change_private_viewability' (with
+            old_viewable_if_private, new_viewable_if_private)
+        - 'release_ownership'
+        - 'update_first_published_msec' (with
+            old_first_published_msec, new_first_published_msec)
+    A role must be one of the ALLOWED_ROLES.
+    A status must be one of the ALLOWED_STATUS.
+    """
+
+    ALLOWED_COMMANDS = feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+
+
+class CollectionRightsChange(change_domain.BaseChange):
+    """Domain object class for an collection rights change.
+
+    The allowed commands, together with the attributes:
+        - 'create_new'
+        - 'change_role' (with assignee_id, old_role, new_role)
         - 'change_collection_status' (with old_status, new_status)
         - 'change_private_viewability' (with
             old_viewable_if_private, new_viewable_if_private)
@@ -276,32 +250,4 @@ class ActivityRightsChange(change_domain.BaseChange):
     A status must be one of the ALLOWED_STATUS.
     """
 
-    ALLOWED_COMMANDS = COMMON_ALLOWED_COMMANDS
-
-
-class ExplorationRightsChange(ActivityRightsChange):
-    """Domain object class for an exploration rights change."""
-
-    ALLOWED_COMMANDS = copy.deepcopy(COMMON_ALLOWED_COMMANDS)
-    ALLOWED_COMMANDS.append({
-        'name': CMD_CHANGE_EXPLORATION_STATUS,
-        'required_attribute_names': ['old_status', 'new_status'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {
-            'old_status': ALLOWED_STATUS, 'new_status': ALLOWED_STATUS}
-    })
-
-
-class CollectionRightsChange(ActivityRightsChange):
-    """Domain object class for an collection rights change."""
-
-    ALLOWED_COMMANDS = copy.deepcopy(COMMON_ALLOWED_COMMANDS)
-    ALLOWED_COMMANDS.append({
-        'name': CMD_CHANGE_COLLECTION_STATUS,
-        'required_attribute_names': ['old_status', 'new_status'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {
-            'old_status': ALLOWED_STATUS, 'new_status': ALLOWED_STATUS}
-    })
+    ALLOWED_COMMANDS = feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
