@@ -98,11 +98,3 @@ angular.module('oppia').directive(
   downgradeComponent({
     component: ServiceBootstrapComponent
   }) as angular.IDirectiveFactory);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
