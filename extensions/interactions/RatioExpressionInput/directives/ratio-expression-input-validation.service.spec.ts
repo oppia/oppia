@@ -209,7 +209,7 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('Number of terms must be integral.')
+      message: ('Number of terms cannot have decimal places.')
     }]);
   });
 
@@ -220,7 +220,7 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('Number of terms cannot be empty.')
+      message: ('Number of terms should be an integer value.')
     }]);
   });
 
