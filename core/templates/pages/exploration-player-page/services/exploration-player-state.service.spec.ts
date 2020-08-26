@@ -50,7 +50,7 @@ describe('Exploration Player State Service', () => {
         getExplorationVersionFromUrl: () => {
           return null;
         },
-        getStoryIdInPlayer: () => {
+        getStoryUrlFragmentFromLearnerUrl: () => {
           return '1';
         },
         getUrlParams: () => {

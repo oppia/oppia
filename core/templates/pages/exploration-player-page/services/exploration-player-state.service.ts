@@ -81,7 +81,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         });
     }
 
-    var storyId = UrlService.getStoryIdInPlayer();
+    var storyUrlFragment = UrlService.getStoryUrlFragmentFromLearnerUrl();
 
     var _playerStateChangeEventEmitter = new EventEmitter();
 
@@ -175,7 +175,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       $q.all([
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
-          explorationId, storyId),
+          explorationId, storyUrlFragment),
         ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
           explorationId),
       ]).then(function(combinedData) {
@@ -188,7 +188,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           initializeExplorationServices(explorationData, true, callback);
           initializePretestServices(pretestQuestionsData, callback);
         } else if (
-          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
           UrlService.getUrlParams().hasOwnProperty('node_id')) {
           setStoryChapterMode();
           initializeExplorationServices(explorationData, false, callback);
@@ -233,7 +233,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       },
       moveToExploration: function(callback) {
         if (
-          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
           UrlService.getUrlParams().hasOwnProperty('node_id')) {
           setStoryChapterMode();
         } else {
