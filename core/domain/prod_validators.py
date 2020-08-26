@@ -1954,9 +1954,10 @@ class UnsentFeedbackEmailModelValidator(
         """
         for reference in item.feedback_message_references:
             try:
-                split_thread_id = reference['thread_id'].split('.')
-                if split_thread_id[0] != reference['entity_type'] or (
-                        split_thread_id[1] != reference['entity_id']):
+                thread = feedback_models.GeneralFeedbackThreadModel.get(
+                    reference['thread_id'])
+                if thread.entity_type != reference['entity_type'] or (
+                        thread.entity_id != reference['entity_id']):
                     cls._add_error(
                         'feedback message %s' % (
                             base_model_validators.ERROR_CATEGORY_REFERENCE_CHECK

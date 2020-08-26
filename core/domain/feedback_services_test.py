@@ -703,32 +703,33 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 feedback_services.clear_feedback_message_references(
                     self.editor_id, 'thread_id'))
 
-            feedback_services.create_thread(
+            thread_id_0 = feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
-            threadlist = feedback_services.get_all_threads(
-                'exploration', self.exploration.id, False)
-            thread_id = threadlist[0].id
+            thread_id_1 = feedback_services.create_thread(
+                'exploration', self.exploration.id,
+                self.user_id_a, 'another subject', 'some more text')
 
-            messagelist = feedback_services.get_messages(thread_id)
+            messagelist = feedback_services.get_messages(thread_id_0)
+            self.assertEqual(len(messagelist), 1)
+            messagelist = feedback_services.get_messages(thread_id_1)
             self.assertEqual(len(messagelist), 1)
 
             model = feedback_models.UnsentFeedbackEmailModel.get(
                 self.editor_id)
+            references_thread_ids = [
+                ref['thread_id'] for ref in model.feedback_message_references]
             self.assertEqual(
-                len(model.feedback_message_references), 1)
-            self.assertEqual(
-                model.feedback_message_references[0]['thread_id'], thread_id)
+                set(references_thread_ids), set([thread_id_0, thread_id_1]))
 
             feedback_services.clear_feedback_message_references(
-                self.editor_id, 'new_thread_id')
+                self.editor_id, thread_id_0)
             model = feedback_models.UnsentFeedbackEmailModel.get(
                 self.editor_id)
             self.assertEqual(
                 len(model.feedback_message_references), 1)
             self.assertEqual(
-                model.feedback_message_references[0]['thread_id'],
-                thread_id)
+                model.feedback_message_references[0]['thread_id'], thread_id_1)
 
     def test_update_feedback_email_retries(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:

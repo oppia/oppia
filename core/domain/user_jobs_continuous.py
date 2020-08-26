@@ -268,19 +268,18 @@ class RecentUpdatesMRJobManager(
             last_message = (
                 feedback_models.GeneralFeedbackMessageModel
                 .get_most_recent_message(feedback_thread_id))
-            exploration_id = last_message.entity_id
+            feedback_thread = feedback_services.get_thread(feedback_thread_id)
 
             yield (
                 reducer_key, {
                     'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-                    'activity_id': exploration_id,
+                    'activity_id': feedback_thread.entity_id,
                     'activity_title': exp_models.ExplorationModel.get_by_id(
-                        exploration_id).title,
+                        feedback_thread.entity_id).title,
                     'author_id': last_message.author_id,
                     'last_updated_ms': utils.get_time_in_millisecs(
                         last_message.created_on),
-                    'subject': feedback_services.get_thread(
-                        last_message.thread_id).subject
+                    'subject': feedback_thread.subject
                 })
 
     @staticmethod
