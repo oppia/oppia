@@ -284,6 +284,11 @@ def url_retrieve(source_url, filename=None):
     """
     try:
         import urllib
+        # Change the User-Agent to prevent servers from blocking requests.
+        # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
+        urllib.URLopener.version = (
+            'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
+            'Gecko/20100101 Firefox/47.0')
         return urllib.urlretrieve(source_url, filename=filename)
     except ImportError:
         import urllib.request
