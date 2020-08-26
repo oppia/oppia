@@ -67,11 +67,11 @@ angular.module('oppia').component('historyTab', {
       // Changes the checkbox selection and provides an appropriate user
       // prompt.
       ctrl.changeSelectedVersions = function(snapshot, item) {
-        if (item === 1 && !ctrl.selectedVersionsArray.includes(
+        if (item === 1 && snapshot && !ctrl.selectedVersionsArray.includes(
           snapshot.versionNumber)) {
           ctrl.selectedVersionsArray[0] = snapshot.versionNumber;
         }
-        if (item === 2 && !ctrl.selectedVersionsArray.includes(
+        if (item === 2 && snapshot && !ctrl.selectedVersionsArray.includes(
           snapshot.versionNumber)) {
           ctrl.selectedVersionsArray[1] = snapshot.versionNumber;
         }
@@ -252,6 +252,17 @@ angular.module('oppia').component('historyTab', {
         return ctrl.EditabilityService.isEditable();
       };
 
+      ctrl.resetGraph = function() {
+        ctrl.firstVersion = null;
+        ctrl.secondVersion = null;
+        ctrl.hideHistoryGraph = true;
+        ctrl.selectedVersionsArray = [];
+      };
+
+      ctrl.toggleHistoryOptions = function(index) {
+        ctrl.highlightedIndex = !ctrl.highlightedIndex ? index : null;
+      };
+
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshVersionHistory.subscribe((data) => {
@@ -263,6 +274,7 @@ angular.module('oppia').component('historyTab', {
         );
 
         ctrl.EditabilityService = EditabilityService;
+        ctrl.highlightedIndex = null;
         ctrl.explorationId = ExplorationDataService.explorationId;
         ctrl.explorationAllSnapshotsUrl =
             '/createhandler/snapshots/' + ctrl.explorationId;

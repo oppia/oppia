@@ -151,7 +151,7 @@ describe('History tab component', function() {
 
     spyOn(csrfTokenService, 'getTokenAsync')
       .and.returnValue($q.resolve('sample-csrf-token'));
-    spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
+    spyOn(dateTimeFormatService, 'getLocaleDateTimeHourString')
       .and.returnValue('11/21/2014');
 
     $scope = $rootScope.$new();
@@ -238,10 +238,10 @@ describe('History tab component', function() {
     expect(ctrl.diffData).toEqual({});
 
     expect(ctrl.earlierVersionHeader).toBe(
-      'Revision #2 by committer_3 (Nov 21 15:15 PM):' +
+      'Revision #2 by committer_3 (11/21/2014):' +
         ' This is the commit message 2');
     expect(ctrl.laterVersionHeader).toBe(
-      'Revision #1 by committer_3 (Nov 21 15:15 PM):' +
+      'Revision #1 by committer_3 (11/21/2014):' +
         ' This is the commit message');
   });
 
@@ -339,5 +339,20 @@ describe('History tab component', function() {
     ctrl.username = 'committer_1';
     ctrl.filterByUsername();
     expect(ctrl.explorationVersionMetadata).toEqual([snapshots[2]]);
+  });
+
+  it('should reset the graph', function() {
+    ctrl.hideHistoryGraph = false;
+    ctrl.resetGraph();
+    expect(ctrl.hideHistoryGraph).toBe(true);
+  });
+
+  it('should toggle history options', function() {
+    ctrl.toggleHistoryOptions(10);
+    expect(ctrl.highlightedIndex).toBe(10);
+    ctrl.toggleHistoryOptions(10);
+    expect(ctrl.highlightedIndex).toBe(null);
+    ctrl.toggleHistoryOptions(5);
+    expect(ctrl.highlightedIndex).toBe(5);
   });
 });
