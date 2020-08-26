@@ -31,7 +31,7 @@ import { SubtitledUnicode } from
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 
-fdescribe('TextInputValidationService', () => {
+describe('TextInputValidationService', () => {
   var validatorService, WARNING_TYPES;
   var INTERACTION_SPECS, customizationArgSpecs, rowsSpecs, minRows, maxRows;
 
