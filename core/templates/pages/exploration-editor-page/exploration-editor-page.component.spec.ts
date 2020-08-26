@@ -505,8 +505,6 @@ describe('Exploration editor page component', function() {
 
       var successCallback = jasmine.createSpy('success');
       mockInitExplorationPageEmitter.emit(successCallback);
-      $rootScope.$broadcast('initExplorationPage', successCallback);
-
       // Need to flush and $apply twice to fire the callback. In practice, this
       // will occur seamlessly.
       flushMicrotasks();
