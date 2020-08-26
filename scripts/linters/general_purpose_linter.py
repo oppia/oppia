@@ -247,9 +247,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': re.compile(r'$broadcast'),
         'message': (
-            'Please do not use $broadcast/$on for propogration events. '
-            'Use EventEmitters and Subscriptions instead'
-        )
+            'Please do not use $broadcast/$on for propagating events. '
+            'Use EventEmitters and Subscriptions instead.'),
         'excluded_files': (),
         'excluded_dirs': ()
     }
