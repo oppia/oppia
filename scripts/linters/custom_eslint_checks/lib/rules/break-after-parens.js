@@ -40,7 +40,7 @@ module.exports = {
     const lines = sourceCode.lines;
 
     return {
-      Program: function checkParenSpaces(node) {
+      Program: function(node) {
         const tokens = sourceCode.tokensAndComments;
         var parensCount = 0;
         const separators = ['(', '{', '[', ' '];
