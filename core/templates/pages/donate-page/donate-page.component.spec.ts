@@ -55,21 +55,23 @@ describe('Donate page', () => {
     }).compileComponents();
   });
 
+  let component;
+
   beforeEach(() => {
-    this.fixture = TestBed.createComponent(DonatePageComponent);
-    this.component = this.fixture.componentInstance;
+    const donatePageComponent = TestBed.createComponent(DonatePageComponent);
+    component = donatePageComponent.componentInstance;
   });
 
   it('should successfully instantiate the component from beforeEach block',
     () => {
-      expect(this.component).toBeDefined();
+      expect(component).toBeDefined();
     });
 
   it('should set component properties when ngOnInit() is called', () => {
-    this.component.ngOnInit();
+    component.ngOnInit();
 
-    expect(this.component.windowIsNarrow).toBe(true);
-    expect(this.component.donateImgUrl).toBe(
+    expect(component.windowIsNarrow).toBe(true);
+    expect(component.donateImgUrl).toBe(
       '/assets/images/general/opp_donate_text.svg');
   });
 
@@ -77,12 +79,12 @@ describe('Donate page', () => {
     spyOn(siteAnalyticsServiceStub, 'registerGoToDonationSiteEvent')
       .and.callThrough();
 
-    this.component.onDonateThroughAmazon();
+    component.onDonateThroughAmazon();
     expect(siteAnalyticsServiceStub.registerGoToDonationSiteEvent)
       .toHaveBeenCalledWith('Amazon');
 
     setTimeout(() => {
-      expect(this.component.windowRef.nativeWindow.location.href).toBe(
+      expect(component.windowRef.nativeWindow.location.href).toBe(
         'https://smile.amazon.com/ch/81-1740068');
 
       done();
@@ -93,7 +95,7 @@ describe('Donate page', () => {
     spyOn(siteAnalyticsServiceStub, 'registerGoToDonationSiteEvent')
       .and.callThrough();
 
-    this.component.onDonateThroughPayPal();
+    component.onDonateThroughPayPal();
     expect(siteAnalyticsServiceStub.registerGoToDonationSiteEvent)
       .toHaveBeenCalledWith('PayPal');
   });

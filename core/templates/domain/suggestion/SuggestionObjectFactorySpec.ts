@@ -22,8 +22,10 @@ import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 
 describe('SuggestionObjectFactory', () => {
+  let suggestionObjectFactory: SuggestionObjectFactory;
+
   beforeEach(() => {
-    this.factory = TestBed.get(SuggestionObjectFactory);
+    suggestionObjectFactory = TestBed.get(SuggestionObjectFactory);
   });
 
   it('should create a new suggestion from a backend dict.', () => {
@@ -39,12 +41,17 @@ describe('SuggestionObjectFactory', () => {
         cmd: 'edit_state_property',
         property_name: 'content',
         state_name: 'state_1',
-        new_value: 'new suggestion content',
-        old_value: 'old suggestion content'
+        new_value: {
+          html: 'new suggestion content'
+        },
+        old_value: {
+          html: 'old suggestion content'
+        }
       },
       last_updated_msecs: 1000
     };
-    let suggestion = this.factory.createFromBackendDict(suggestionBackendDict);
+    let suggestion = suggestionObjectFactory.createFromBackendDict(
+      suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
     expect(suggestion.targetType).toEqual('exploration');
     expect(suggestion.targetId).toEqual('exp1');
@@ -52,8 +59,8 @@ describe('SuggestionObjectFactory', () => {
     expect(suggestion.status).toEqual('accepted');
     expect(suggestion.authorName).toEqual('author');
     expect(suggestion.stateName).toEqual('state_1');
-    expect(suggestion.newValue).toEqual('new suggestion content');
-    expect(suggestion.oldValue).toEqual('old suggestion content');
+    expect(suggestion.newValue.html).toEqual('new suggestion content');
+    expect(suggestion.oldValue.html).toEqual('old suggestion content');
     expect(suggestion.lastUpdatedMsecs).toEqual(1000);
     expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
   });
