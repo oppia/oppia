@@ -26,7 +26,7 @@ export class LoggerService {
 
   /**
    * Logs a message to console at the debug level.
-   * @param {string} msg - A message to log.
+   * @param msg - A message to log.
    */
   debug(msg: string): void {
     // eslint-disable-next-line no-console
@@ -35,7 +35,7 @@ export class LoggerService {
 
   /**
    * Logs a message to console at the info level.
-   * @param {string} msg - A message to log.
+   * @param msg - A message to log.
    */
   info(msg: string): void {
     // eslint-disable-next-line no-console
@@ -44,7 +44,7 @@ export class LoggerService {
 
   /**
    * Logs a message to console at the warning level.
-   * @param {string} msg - A message to log.
+   * @param msg - A message to log.
    */
   warn(msg: string): void {
     console.warn(msg);
@@ -52,7 +52,7 @@ export class LoggerService {
 
   /**
    * Logs a message to console at the error level.
-   * @param {string} msg - A message to log.
+   * @param msg - A message to log.
    */
   error(msg: string): void {
     console.error(msg);
@@ -60,7 +60,7 @@ export class LoggerService {
 
   /**
    * Logs a message to console.
-   * @param {string} msg - A message to log.
+   * @param msg - A message to log.
    */
   log(msg: string): void {
     // eslint-disable-next-line no-console

@@ -137,8 +137,8 @@ export class MessengerService {
 
   /**
    * Sends a message to the parent iframe.
-   * @param {string} messageTitle - The title of the message.
-   * @param {Object} messageData - The data of the message. It is of type
+   * @param messageTitle - The title of the message.
+   * @param messageData - The data of the message. It is of type
    *   Object since it can have different properties based on the messageTitle.
    */
   sendMessage(messageTitle: string, messageData: Object): void {
