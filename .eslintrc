@@ -278,7 +278,6 @@
     "@typescript-eslint/explicit-module-boundary-types": ["error"],
     "@typescript-eslint/prefer-as-const": ["error"],
     "@typescript-eslint/no-array-constructor": ["error"],
-    "@typescript-eslint/no-empty-function": ["error"],
     "@typescript-eslint/no-extra-semi": ["error"],
     "wrap-iife": [
       "error",
