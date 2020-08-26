@@ -252,7 +252,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_files': (
             'core/templates/pages/exploration-editor-page/translation-tab/'
             'audio-translation-bar/audio-translation-bar.directive.spec.ts',
-            'core/templates/pages/library-page/search-bar/search-bar.component.spec.ts'),
+            'core/templates/pages/library-page/search-bar/'
+            'search-bar.component.spec.ts'),
         'excluded_dirs': ()
     }
 ]
