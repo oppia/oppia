@@ -109,24 +109,6 @@ class BaseChange(python_utils.OBJECT):
         'user_id_attribute_names': []
     }]
 
-    @classmethod
-    def get_user_id_attribute_names(cls, cmd_name):
-        """Get the cmd attributes that contain user ID.
-
-        Args:
-            cmd_name: str. Name of the cmd.
-
-        Returns:
-            list(str). The list of the cmd attributes that contain user ID.
-        """
-        all_allowed_commands = (
-            cls.ALLOWED_COMMANDS + cls.COMMON_ALLOWED_COMMANDS
-        )
-
-        for cmd in all_allowed_commands:
-            if cmd['name'] == cmd_name:
-                return cmd['user_id_attribute_names']
-
     def __init__(self, change_dict):
         """Initializes a BaseChange object from a dict.
 

@@ -1118,7 +1118,7 @@ COMMON_RIGHTS_ALLOWED_COMMANDS = [{
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS)
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
-    'name': CMD_CHANGE_EXPLORATION_STATUS,
+    'name': CMD_CHANGE_COLLECTION_STATUS,
     'required_attribute_names': ['old_status', 'new_status'],
     'optional_attribute_names': [],
     'user_id_attribute_names': [],
@@ -1131,7 +1131,7 @@ COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
 EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS)
 EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
-    'name': CMD_CHANGE_COLLECTION_STATUS,
+    'name': CMD_CHANGE_EXPLORATION_STATUS,
     'required_attribute_names': ['old_status', 'new_status'],
     'optional_attribute_names': [],
     'user_id_attribute_names': [],
