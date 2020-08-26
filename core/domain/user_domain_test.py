@@ -397,42 +397,42 @@ class UserContributionProficiencyTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserContributionProficiencyTests, self).setUp()
-        self.user_scoring = user_domain.UserContributionProficiency(
+        self.user_proficiency = user_domain.UserContributionProficiency(
             'user_id0', 'category0', 0, False)
 
     def test_initialization(self):
         """Testing init method."""
-        self.assertEqual(self.user_scoring.user_id, 'user_id0')
+        self.assertEqual(self.user_proficiency.user_id, 'user_id0')
         self.assertEqual(
-            self.user_scoring.score_category, 'category0')
-        self.assertEqual(self.user_scoring.score, 0)
+            self.user_proficiency.score_category, 'category0')
+        self.assertEqual(self.user_proficiency.score, 0)
         self.assertEqual(
-            self.user_scoring.onboarding_email_sent, False)
+            self.user_proficiency.onboarding_email_sent, False)
 
     def test_increment_score(self):
-        self.assertEqual(self.user_scoring.score, 0)
+        self.assertEqual(self.user_proficiency.score, 0)
 
-        self.user_scoring.increment_score(4)
-        self.assertEqual(self.user_scoring.score, 4)
+        self.user_proficiency.increment_score(4)
+        self.assertEqual(self.user_proficiency.score, 4)
 
-        self.user_scoring.increment_score(-3)
-        self.assertEqual(self.user_scoring.score, 1)
+        self.user_proficiency.increment_score(-3)
+        self.assertEqual(self.user_proficiency.score, 1)
 
     def test_can_user_review_category(self):
-        self.assertEqual(self.user_scoring.score, 0)
-        self.assertFalse(self.user_scoring.can_user_review_category())
+        self.assertEqual(self.user_proficiency.score, 0)
+        self.assertFalse(self.user_proficiency.can_user_review_category())
 
-        self.user_scoring.increment_score(
+        self.user_proficiency.increment_score(
             feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
 
-        self.assertTrue(self.user_scoring.can_user_review_category())
+        self.assertTrue(self.user_proficiency.can_user_review_category())
 
     def test_mark_onboarding_email_as_sent(self):
-        self.assertFalse(self.user_scoring.onboarding_email_sent)
+        self.assertFalse(self.user_proficiency.onboarding_email_sent)
 
-        self.user_scoring.mark_onboarding_email_as_sent()
+        self.user_proficiency.mark_onboarding_email_as_sent()
 
-        self.assertTrue(self.user_scoring.onboarding_email_sent)
+        self.assertTrue(self.user_proficiency.onboarding_email_sent)
 
 
 class UserContributionRightsTests(test_utils.GenericTestBase):

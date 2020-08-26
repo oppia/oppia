@@ -1987,8 +1987,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
                 user as a reviewer has been sent.
 
         Returns:
-            UserContributionProficiencyModel. The user scoring model that was
-            created.
+            UserContributionProficiencyModel. The user proficiency model that
+            was created.
 
         Raises:
             Exception. There is already an entry with the given id.
@@ -2001,12 +2001,12 @@ class UserContributionProficiencyModel(base_models.BaseModel):
                 ' the given id: %s' % instance_id
             )
 
-        user_scoring_model = cls(
+        user_proficiency_model = cls(
             id=instance_id, user_id=user_id, score_category=score_category,
             score=score,
             onboarding_email_sent=onboarding_email_sent)
-        user_scoring_model.put()
-        return user_scoring_model
+        user_proficiency_model.put()
+        return user_proficiency_model
 
 
 class UserContributionRightsModel(base_models.BaseModel):

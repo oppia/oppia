@@ -308,7 +308,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'target_id', self.target_id)])[0]
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
-        # Create a user scoring model to verify that the
+        # Create a user proficiency model to verify that the
         # score and onboarding_email_sent fields have changed after the
         # suggestion has been accepted.
         user_models.UserContributionProficiencyModel.create(
@@ -338,19 +338,22 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id, suggestion_models.STATUS_ACCEPTED)
         # Assert that the email was sent and that the score increased by the
         # correct amount.
-        user_scoring_model = user_models.UserContributionProficiencyModel.get(
-            self.author_id, suggestion.score_category
+        user_proficiency_model = (
+            user_models.UserContributionProficiencyModel.get(
+                self.author_id, suggestion.score_category
+            )
         )
-        self.assertTrue(user_scoring_model.onboarding_email_sent)
+        self.assertTrue(user_proficiency_model.onboarding_email_sent)
         self.assertEqual(
-            user_scoring_model.score, feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+            user_proficiency_model.score,
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
 
     def test_accept_suggestion_does_not_send_email_if_users_score_is_too_low(
             self):
         self.mock_create_suggestion(self.target_id)
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
-        # Create the user scoring model to verify the score and
+        # Create the user proficiency model to verify the score and
         # that the onboarding_email_sent field does not change after the
         # suggestion is accepted.
         user_models.UserContributionProficiencyModel.create(
@@ -373,27 +376,29 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
 
-        user_scoring_model = user_models.UserContributionProficiencyModel.get(
-            self.author_id, self.score_category
+        user_proficiency_model = (
+            user_models.UserContributionProficiencyModel.get(
+                self.author_id, self.score_category
+            )
         )
         # Assert that the users score was updated correctly.
         self.assertEqual(
-            user_scoring_model.score,
+            user_proficiency_model.score,
             suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
         # Assert that their score is not high enough to review the category.
         self.assertLess(
-            user_scoring_model.score,
+            user_proficiency_model.score,
             feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
         # Assert that the onboarding new reviewer email was not sent.
-        self.assertFalse(user_scoring_model.onboarding_email_sent)
+        self.assertFalse(user_proficiency_model.onboarding_email_sent)
 
-    def test_accept_suggestion_creates_user_scoring_model_if_it_does_not_exist(
+    def test_accept_suggestion_creates_user_proficiency_model_if_it_is_None(
             self):
         self.mock_create_suggestion(self.target_id)
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
-        # Verify that a user scoring model does not exist.
+        # Verify that a user proficiency model does not exist.
         self.assertIsNone(user_models.UserContributionProficiencyModel.get(
             self.author_id, self.score_category))
 
@@ -402,7 +407,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
                 'review message')
 
-        # Verify that a user scoring model now exists.
+        # Verify that a user proficiency model now exists.
         self.assertIsNotNone(user_models.UserContributionProficiencyModel.get(
             self.author_id, self.score_category))
 
@@ -1001,14 +1006,14 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 .get_translation_suggestion_ids_with_exp_ids([])), 0)
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
-        # User scoring models for user1.
+        # user proficiency models for user1.
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 15)
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category2', 15)
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category3', 5)
-        # User scoring models for user2.
+        # user proficiency models for user2.
         user_models.UserContributionProficiencyModel.create(
             'user2', 'category1', 5)
         user_models.UserContributionProficiencyModel.create(
