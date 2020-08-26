@@ -613,7 +613,7 @@ textarea {
   bottom: 100px;
   color: white;
   left: 0;
-  opacity: 0.7;
+  opacity: 0.85;
   padding: 4px 8px;
   /* This allows clicks to 'pass through' the element. */
   pointer-events: none;

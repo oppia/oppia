@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for the component of the library page.
  */
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
 import { TestBed } from '@angular/core/testing';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { PageTitleService } from 'services/page-title.service';
 import { of } from 'rxjs';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import 'mousetrap';
 
 describe('Library controller', function() {
   var ctrl = null;
@@ -51,6 +52,11 @@ describe('Library controller', function() {
     i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
     pageTitleService = TestBed.get(PageTitleService);
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('KeyboardShortcutService',
+      TestBed.get(KeyboardShortcutService));
+  }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowDimensionsService', {
@@ -179,59 +185,6 @@ describe('Library controller', function() {
       ctrl.clearActiveGroup();
       expect(ctrl.activeGroupIndex).toBe(null);
     });
-
-    it('should focus on search input element when using shortcut /',
-      function() {
-        var focusSpy = jasmine.createSpy('focus', () => {});
-        spyOn(document, 'querySelector')
-          .withArgs('.protractor-test-search-input').and
-          .callFake(function() {
-            return {
-              focus: focusSpy
-            };
-          });
-        Mousetrap.trigger('/');
-
-        expect(focusSpy).toHaveBeenCalled();
-      });
-
-    it('should focus on category bar element when using shortcut c',
-      function() {
-        var focusSpy = jasmine.createSpy('focus', () => {});
-        spyOn(document, 'getElementById').withArgs('categoryBar').and
-        // This throws "Argument of type '() => { focus: Spy<() => void>; }'
-        // is not assignable to parameter of type
-        // '(elementId: string) => HTMLElement'. This is because getElementById
-        // method return more than just focus property.
-        // @ts-expect-error
-          .callFake(function(elementId) {
-            return {
-              focus: focusSpy
-            };
-          });
-        Mousetrap.trigger('c');
-
-        expect(focusSpy).toHaveBeenCalled();
-      });
-
-    it('should focus on skip to main content id element when using shortcut s',
-      function() {
-        var focusSpy = jasmine.createSpy('focus', () => {});
-        spyOn(document, 'getElementById').withArgs('skipToMainContentId').and
-        // This throws "Argument of type '() => { focus: Spy<() => void>; }'
-        // is not assignable to parameter of type
-        // '(elementId: string) => HTMLElement'. This is because getElementById
-        // method return more than just focus property.
-        // @ts-expect-error
-          .callFake(function() {
-            return {
-              focus: focusSpy
-            };
-          });
-        Mousetrap.trigger('s');
-
-        expect(focusSpy).toHaveBeenCalled();
-      });
 
     it('should change left most card index carousel after carousel is' +
       ' initialized', function() {
