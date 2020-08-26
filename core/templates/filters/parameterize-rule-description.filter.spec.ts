@@ -20,7 +20,6 @@
 // parameterize-rule-description.filter.ts is upgraded to Angular 8.
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -33,7 +32,6 @@ describe('Testing filters', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('RatioObjectFactory', new RatioObjectFactory());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
