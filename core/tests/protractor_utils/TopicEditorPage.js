@@ -179,12 +179,6 @@ var TopicEditorPage = function() {
     await element(by.css('option[label="' + skillDescription + '"]')).click();
 
     await action.click('Create question button', createQuestionButton);
-    await action.click(
-      'Confirm skill difficulty button', confirmSkillDifficultyButton);
-
-    await waitFor.invisibilityOf(
-      confirmSkillDifficultyButton,
-      'Confirm skill difficulty button takes too long to disappear');
   };
 
   this.moveToQuestionsTab = async function() {
