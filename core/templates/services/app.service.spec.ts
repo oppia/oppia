@@ -22,31 +22,29 @@ import { AppConstants } from 'app.constants';
 import { AppService } from 'services/app.service';
 
 describe('App Service', () => {
+  let appService: AppService;
+
   beforeEach(() => {
-    this.appService = TestBed.get(AppService);
+    appService = TestBed.get(AppService);
   });
 
   describe('querying the app for Machine Learning classifiers', () => {
-    beforeAll(() => {
-      this.initialValue = AppConstants.ENABLE_ML_CLASSIFIERS;
-    });
+    const initialValue = AppConstants.ENABLE_ML_CLASSIFIERS;
 
     afterAll(() => {
-      AppConstants.ENABLE_ML_CLASSIFIERS = this.initialValue;
+      AppConstants.ENABLE_ML_CLASSIFIERS = initialValue;
     });
 
     it('should return true if AppConstants.ENABLE_ML_CLASSIFIERS is true',
       () => {
         AppConstants.ENABLE_ML_CLASSIFIERS = true;
-        expect(this.appService.isMachineLearningClassificationEnabled())
-          .toBeTrue();
+        expect(appService.isMachineLearningClassificationEnabled()).toBeTrue();
       });
 
     it('should return false if AppConstants.ENABLE_ML_CLASSIFIERS is false',
       () => {
         AppConstants.ENABLE_ML_CLASSIFIERS = false;
-        expect(this.appService.isMachineLearningClassificationEnabled())
-          .toBeFalse();
+        expect(appService.isMachineLearningClassificationEnabled()).toBeFalse();
       });
   });
 });
