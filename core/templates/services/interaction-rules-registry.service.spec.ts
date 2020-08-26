@@ -304,9 +304,10 @@ describe('Interaction Rules Registry Service', () => {
 
   it('should return the correct rules service for RatioExpressionInput',
     () => {
-      expect(this.registry.getRulesServiceByInteractionId(
-        'RatioExpressionInput')).toBe(
-        this.ratioExpressionInputRulesService);
+      expect(
+        interactionRulesRegistryService
+          .getRulesServiceByInteractionId('RatioExpressionInput')
+      ).toBe(ratioExpressionInputRulesService);
     }
   );
 
