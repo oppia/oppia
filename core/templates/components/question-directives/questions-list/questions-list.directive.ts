@@ -231,11 +231,9 @@ angular.module('oppia').directive('questionsList', [
 
           ctrl.createQuestion = function() {
             ctrl.newQuestionSkillIds = [];
-            var currentMode = MODE_SELECT_SKILL;
             ctrl.skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
             if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
-              currentMode = MODE_SELECT_DIFFICULTY;
             } else {
               ctrl.newQuestionSkillIds = [ctrl.getSelectedSkillId()];
             }
@@ -324,7 +322,6 @@ angular.module('oppia').directive('questionsList', [
               return;
             }
             _reInitializeSelectedSkillIds();
-            var skillId = null;
             // For the case when, it is in the skill editor.
             if (ctrl.getAllSkillSummaries().length === 0) {
               EditableQuestionBackendApiService.editQuestionSkillLinks(
@@ -445,7 +442,6 @@ angular.module('oppia').directive('questionsList', [
             QuestionUndoRedoService.clearChanges();
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
-            var selectedSkillId = ctrl.selectedSkillId;
             ImageLocalStorageService.flushStoredImagesData();
             if (newQuestionIsBeingCreated) {
               ContextService.setImageSaveDestinationToLocalStorage();
