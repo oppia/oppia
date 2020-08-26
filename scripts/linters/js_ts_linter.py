@@ -224,8 +224,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         backend-api.service.ts.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         http_client_pattern = r':\n? *HttpClient'
 
@@ -256,16 +256,15 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         file_path))
                 error_messages.append(error_message)
 
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def _check_ts_ignore(self):
         """Checks if ts ignore is used.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Ts ignore'
         error_messages = []
@@ -330,16 +329,15 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     or (
                         previous_line_has_comment_with_ts_error and
                         previous_line_has_comment))
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def _check_ts_expect_error(self):
         """Checks if ts expect error is used in non spec file.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Ts expect error'
         error_messages = []
@@ -387,9 +385,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     or (
                         previous_line_has_comment_with_ts_error and
                         previous_line_has_comment))
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
@@ -397,8 +394,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         build.JS_FILEPATHS_NOT_TO_BUILD.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Extra JS files'
         error_messages = []
@@ -420,9 +417,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
                 'build.py. Otherwise, rename them to .ts\n')
             error_messages.append(err_msg)
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def _check_js_and_ts_component_name_and_count(self):
         """This function ensures that all JS/TS files have exactly
@@ -430,8 +426,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         matches the filename.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         # Select JS files which need to be checked.
         name = 'JS and TS component name and count'
@@ -460,17 +456,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         failed = True
                         error_messages.append(error_message)
                         break
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def _check_directive_scope(self):
         """This function checks that all directives have an explicit
         scope: {} and it should not be scope: true.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         # Select JS and TS files which need to be checked.
         name = 'Directive scope'
@@ -578,9 +573,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                                     ))
                                             error_messages.append(
                                                 error_message)
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -589,8 +583,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         imports, and constant imports, all in sorted order.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Sorted dependencies'
         files_to_check = self.all_filepaths
@@ -662,9 +656,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 'sorted order.'
                                 % (property_value, filepath))
                             error_messages.append(error_message)
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
@@ -672,8 +665,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         between the arguments of the controller function.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Controller dependency line break'
         files_to_check = self.all_filepaths
@@ -707,9 +700,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         'exactly match.' % (
                             filepath, stringfied_dependencies,
                             function_parameters))
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
@@ -719,8 +711,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         AngularJS) and in *.constants.ts (for Angular 8).
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Constants declaration'
         error_messages = []
@@ -875,9 +867,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         '%s --> Duplicate constant declaration found.'
                         % filepath)
                     error_messages.append(error_message)
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def _check_comments(self):
         """This function ensures that comments follow correct style. Below are
@@ -889,8 +880,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         in the comment.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Comments'
         error_messages = []
@@ -966,24 +957,23 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             'the end of the comment.' % (
                                 filepath, line_num + 1))
                         error_messages.append(error_message)
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(TaskResult). A list of TaskResult objects to be used for
-            linter status retrieval.
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
         """
 
         if not self.all_filepaths:
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log(
-                'There are no JavaScript or Typescript files to lint.')
-            return []
+            return [
+                concurrent_task_utils.TaskResult(
+                    'JS TS lint', False, [],
+                    ['There are no JavaScript or Typescript files to lint.'])]
 
         # Clear temp compiled typescipt files from the previous runs.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
@@ -1078,8 +1068,8 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         """Prints a list of lint errors in the given list of JavaScript files.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         eslint_path = os.path.join(
@@ -1133,14 +1123,14 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            list(TaskResult). A list of TaskResult objects to be used for
-            linter status retrieval.
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
         """
         if not self.all_filepaths:
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log(
-                'There are no JavaScript or Typescript files to lint.')
-            return []
+            return [
+                concurrent_task_utils.TaskResult(
+                    'JS TS lint', False, [],
+                    ['There are no JavaScript or Typescript files to lint.'])]
 
         return [self._lint_js_and_ts_files()]
 

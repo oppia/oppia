@@ -98,8 +98,8 @@ class PythonLintChecksManager(python_utils.OBJECT):
         names are in test files.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Function definition'
         error_messages = []
@@ -123,17 +123,16 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     error_messages.append(error_message)
                     failed = True
 
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def check_that_all_jobs_are_listed_in_the_job_registry_file(self):
         """This function is used to check that all the one-off and audit jobs
         are registered in jobs_registry.py file.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         def _get_jobs_class_names_in_filepath(filepath, base_class_name):
             """Returns a list of job class names in the given filepath which has
@@ -231,22 +230,22 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     ',\n'.join(sorted(non_registered_validation_jobs))))
             error_messages.append(error_message)
 
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(TaskResult). A list of TaskResult objects to be used for
-            linter status retrieval.
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
         """
         if not self.all_filepaths:
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log('There are no Python files to lint.')
-            return []
+            return [
+                concurrent_task_utils.TaskResult(
+                    'Python lint', False, [],
+                    ['There are no Python files to lint.'])]
 
         linter_stdout = []
 
@@ -311,8 +310,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         """Prints a list of lint errors in the given list of Python files.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
         config_pylint = '--rcfile=%s' % pylintrc_path
@@ -377,8 +376,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         Python files.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         files_to_lint = self.all_filepaths
         any_errors = False
@@ -390,9 +389,12 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             file_name for file_name in files_to_lint if not re.match(
                 r'^.*python_utils.*\.py$', file_name)]
         if not files_to_lint_for_python3_compatibility:
-            concurrent_task_utils.log(
-                'There are no Python files to lint for Python 3 compatibility.')
-            return []
+            return [
+                concurrent_task_utils.TaskResult(
+                    name, False, [],
+                    [
+                        'There are no Python files to lint for Python 3 '
+                        'compatibility.'])]
 
         _batch_size = 50
         current_batch_start_index = 0
@@ -435,8 +437,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         has imports placed in alphabetical order.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Import order'
         error_messages = []
@@ -458,23 +460,23 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 error_message = stdout.getvalue()
                 error_messages.append(error_message)
 
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(TaskResult). A list of TaskResult objects to be used for
-            linter status retrieval.
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
         """
         linter_stdout = []
         if not self.all_filepaths:
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log('There are no Python files to lint.')
-            return []
+            return [
+                concurrent_task_utils.TaskResult(
+                    'Python lint', False, [],
+                    ['There are no Python files to lint.'])]
 
         linter_stdout.append(self.lint_py_files())
 

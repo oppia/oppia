@@ -705,9 +705,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     self._check_for_mandatory_pattern_in_file(
                         pattern_list, filepath, failed))
                 error_messages.extend(mandatory_error_messages)
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
@@ -764,9 +763,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                             REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
                         error_messages.append(error_message)
                         total_error_count += 1
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def check_newline_at_eof(self):
         """This function is used to detect newline at the end of file."""
@@ -786,25 +784,26 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     'end of file.' % filepath)
                 error_messages.append(error_message)
                 failed = True
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(TaskResult). A list of TaskResult objects to be used for
-            linter status retrieval.
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
         """
         if not self.all_filepaths:
-            concurrent_task_utils.log('There are no files to be checked.')
-        linter_stdout = []
-        linter_stdout.append(self.check_mandatory_patterns())
-        linter_stdout.append(self.check_bad_patterns())
-        linter_stdout.append(self.check_newline_at_eof())
-        return linter_stdout
+            return [
+                concurrent_task_utils.TaskResult(
+                    'General purpose lint', False, [],
+                    ['There are no files to be checked.'])]
+        task_results = [
+            self.check_mandatory_patterns(), self.check_bad_patterns(),
+            self.check_newline_at_eof()]
+        return task_results
 
 
 def get_linters(files_to_lint, file_cache):

@@ -49,11 +49,11 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/workflows/']
 
 
-class CodeOwnerLintChecksManager(python_utils.OBJECT):
+class CodeownerLintChecksManager(python_utils.OBJECT):
     """Manages codeowner checks."""
 
     def __init__(self, file_cache):
-        """Constructs a PythonLintChecksManager object.
+        """Constructs a CodeownerLintChecksManager object.
 
         Args:
             file_cache: object(FileCache). Provides thread-safe access to cached
@@ -186,8 +186,8 @@ class CodeOwnerLintChecksManager(python_utils.OBJECT):
         bottom of the CODEOWNERS file.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'CODEOWNERS'
         # Checks whether every pattern in the CODEOWNERS file matches at
@@ -293,33 +293,32 @@ class CodeOwnerLintChecksManager(python_utils.OBJECT):
         self._check_for_important_patterns_at_bottom_of_codeowners(
             important_rules_in_critical_section)
 
-        full_error_messages = self.error_messages
         return concurrent_task_utils.TaskResult(
-            name, self.failed, self.error_messages, full_error_messages)
+            name, self.failed, self.error_messages, self.error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(TaskResult). A list of TaskResult objects to be used for
-            linter status retrieval.
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
         """
 
         return [self.check_codeowner_file()]
 
 
 def get_linters(file_cache):
-    """Creates CodeOwnerLintChecksManager object and returns it.
+    """Creates CodeownerLintChecksManager object and returns it.
 
     Args:
         file_cache: object(FileCache). Provides thread-safe access to cached
             file content.
 
     Returns:
-        tuple(CodeOwnerLintChecksManager, None). A 2-tuple of custom and
+        tuple(CodeownerLintChecksManager, None). A 2-tuple of custom and
         third_party linter objects.
     """
-    custom_linter = CodeOwnerLintChecksManager(file_cache)
+    custom_linter = CodeownerLintChecksManager(file_cache)
 
     return custom_linter, None

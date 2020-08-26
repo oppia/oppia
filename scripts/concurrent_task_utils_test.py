@@ -38,17 +38,17 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ConcurrentTaskUtilsTests, self).setUp()
         self.semaphore = threading.Semaphore(1)
-        self.linter_stdout = []
+        self.task_stdout = []
 
         def mock_print(*args):
             """Mock for python_utils.PRINT. Append the values to print to
-            linter_stdout list.
+            task_stdout list.
 
             Args:
                 *args: list(*). Variable length argument list of values to print
                     in the same line of output.
             """
-            self.linter_stdout.append(
+            self.task_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
@@ -74,16 +74,6 @@ class TaskResultTests(ConcurrentTaskUtilsTests):
         self.assertTrue(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
 
-    def test_task_report_with_failed_message(self):
-        output_object = concurrent_task_utils.TaskResult(
-            'Test', True, [], [])
-        self.assertEqual(
-            output_object.task_report, 'FAILED  Test check failed')
-        self.assertTrue(output_object.failed)
-        self.assertEqual(output_object.name, 'Test')
-        self.assertTrue(
-            isinstance(output_object.task_report, python_utils.UNICODE))
-
 
 class CreateTaskTests(ConcurrentTaskUtilsTests):
     """Tests for create_task method."""
@@ -105,7 +95,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             task.start()
             task.join()
-        expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
+        expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
         self.assertTrue(len(expected_output) == 1)
 
     def test_task_thread_with_exception(self):
@@ -118,7 +108,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             task.join()
         self.assertTrue(
             'test_function() takes exactly 1 argument '
-            '(0 given)' in self.linter_stdout)
+            '(0 given)' in self.task_stdout)
 
     def test_task_thread_with_verbose_mode_enabled(self):
         class HelperTests(python_utils.OBJECT):
@@ -138,8 +128,10 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             task.start()
             task.join()
-        expected_output = [s for s in self.linter_stdout if 'Report' in s]
-        self.assertTrue(len(expected_output) == 1)
+        self.assertRegexpMatches(
+            self.task_stdout[0],
+            r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  '
+            'name check failed')
 
     def test_task_thread_with_no_test_name(self):
         class HelperTests(python_utils.OBJECT):
@@ -159,7 +151,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             task.start()
             task.join()
-        expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
+        expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
         self.assertTrue(len(expected_output) == 1)
 
 
@@ -171,7 +163,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
             test_function('unused_arg'), False, self.semaphore, name='test')
         with self.print_swap:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
-        expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
+        expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
         self.assertTrue(len(expected_output) == 1)
 
     def test_execute_task_with_multiple_task(self):
@@ -182,7 +174,8 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
-        expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
+        self.assertEqual('', self.task_stdout)
+        expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
         self.assertTrue(len(expected_output) == 6)
 
     def test_execute_task_with_exception(self):
@@ -195,4 +188,4 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
         self.assertTrue(
             'test_function() takes exactly 1 argument '
-            '(0 given)' in self.linter_stdout)
+            '(0 given)' in self.task_stdout)

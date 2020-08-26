@@ -65,6 +65,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
             '19:16',
             'Unexpected whitespace before \":\"   declaration-colon-space-'
             'before'], lint_task_report.all_messages)
+        self.assertEqual('Stylelint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
     def test_perform_all_lint_checks_with_invalid_stylelint_path(self):
@@ -100,17 +101,18 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
     def test_perform_all_lint_checks_with_no_files(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [])
-        with self.print_swap:
-            third_party_linter.perform_all_lint_checks()
+        lint_task_report = third_party_linter.perform_all_lint_checks()
         self.assertEqual(
             'There are no HTML or CSS files to lint.',
-            self.linter_stdout[1])
+            lint_task_report[0].all_messages[0])
+        self.assertEqual('CSS lint', lint_task_report[0].name)
+        self.assertFalse(lint_task_report[0].failed)
 
     def test_perform_all_lint_checks_with_valid_file(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [VALID_CSS_FILEPATH])
-        lint_task_report = third_party_linter.lint_css_files()
-        self.assertFalse(lint_task_report.failed)
+        lint_task_report = third_party_linter.perform_all_lint_checks()
+        self.assertTrue(isinstance(lint_task_report, list))
 
     def test_get_linters(self):
         custom_linter, third_party_linter = css_linter.get_linters(

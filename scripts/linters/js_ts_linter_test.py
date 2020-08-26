@@ -450,22 +450,26 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.validate(lint_task_report, expected_messages, 0)
 
     def test_custom_linter_with_no_files(self):
-        with self.print_swap:
-            js_ts_linter.JsTsLintChecksManager(
-                [], [], FILE_CACHE).perform_all_lint_checks()
-        self.assert_same_list_elements(
-            ['There are no JavaScript or Typescript files to lint.'],
-            self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+        lint_task_report = js_ts_linter.JsTsLintChecksManager(
+            [], [], FILE_CACHE).perform_all_lint_checks()
+        self.assertEqual(
+            [
+                'There are no JavaScript or Typescript files to lint.',
+                'SUCCESS  JS TS lint check passed'],
+            lint_task_report[0].all_messages)
+        self.assertEqual('JS TS lint', lint_task_report[0].name)
+        self.assertFalse(lint_task_report[0].failed)
 
     def test_third_party_linter_with_no_files(self):
-        with self.print_swap:
-            js_ts_linter.ThirdPartyJsTsLintChecksManager(
-                []).perform_all_lint_checks()
-        self.assert_same_list_elements(
-            ['There are no JavaScript or Typescript files to lint.'],
-            self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+        lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+            []).perform_all_lint_checks()
+        self.assertEqual(
+            [
+                'There are no JavaScript or Typescript files to lint.',
+                'SUCCESS  JS TS lint check passed'],
+            lint_task_report[0].all_messages)
+        self.assertEqual('JS TS lint', lint_task_report[0].name)
+        self.assertFalse(lint_task_report[0].failed)
 
     def test_http_client_used_with_excluded_file(self):
         excluded_file = (

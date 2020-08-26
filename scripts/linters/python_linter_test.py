@@ -64,7 +64,8 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             [INVALID_IMPORT_FILEPATH]).check_import_order()
         self.assert_same_list_elements([
             'FAILED  Import order check failed'], lint_task_report.all_messages)
-        self.assert_failed_messages_count(lint_task_report.messages, 1)
+        self.assertEqual('Import order', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
 
     def test_sorted_import_order(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
@@ -72,6 +73,8 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual(
             ['SUCCESS  Import order check passed'],
             lint_task_report.all_messages)
+        self.assertEqual('Import order', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
 
     def test_all_jobs_are_listed_in_the_job_registry_file_with_duplicacy(self):
         lint_task_report = python_linter.PythonLintChecksManager(
@@ -84,7 +87,8 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Found one-off jobs not listed in jobs_registry file: '
             'CollectionsMigrationOneOffJob'], lint_task_report.messages)
-        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
+        self.assertEqual('Job registry', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
 
     def test_all_jobs_are_listed_in_the_job_registry_file_with_success(self):
         lint_task_report = python_linter.PythonLintChecksManager(
@@ -93,6 +97,8 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual(
             ['SUCCESS  Job registry check passed'],
             lint_task_report.all_messages)
+        self.assertEqual('Job registry', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
 
     def test_jobs_are_listed_in_job_registry_file_with_duplicate_prod_job(self):
         lint_task_report = python_linter.PythonLintChecksManager(
@@ -106,7 +112,8 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             'Found validation jobs not listed in jobs_registry file: '
             'PendingDeletionRequestModelAuditOneOffJobs'
             ], lint_task_report.messages)
-        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
+        self.assertEqual('Job registry', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
 
     def test_custom_linter_with_test_only_in_non_test_file(self):
         lint_task_report = python_linter.PythonLintChecksManager(
@@ -114,7 +121,8 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Line 35: Please do not use \'test_only\' in the non-test '
             'file.'], lint_task_report.messages)
-        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
+        self.assertEqual('Function definition', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
 
     def test_custom_linter_with_test_function_in_test_file(self):
         lint_task_report = python_linter.PythonLintChecksManager(
@@ -122,12 +130,16 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual(
             ['SUCCESS  Function definition check passed'],
             lint_task_report.all_messages)
+        self.assertEqual('Function definition', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
 
     def test_valid_file_with_pylint(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [VALID_PY_FILEPATH]).lint_py_files()
         self.assertEqual(
             ['SUCCESS  Pylint check passed'], lint_task_report.all_messages)
+        self.assertEqual('Pylint', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
 
     def test_invalid_file_with_pylint_error(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
@@ -135,17 +147,19 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['W: 27, 0: Period is not used at the end of the docstring.'],
             lint_task_report.messages)
-        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
+        self.assertEqual('Pylint', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
 
     def test_python_utils_file_with_no_files(self):
-        with self.print_swap:
-            python_linter.ThirdPartyPythonLintChecksManager(
-                [PYTHON_UTILS_FILEPATH]
-            ).lint_py_files_for_python3_compatibility()
+        lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
+            [PYTHON_UTILS_FILEPATH]
+        ).lint_py_files_for_python3_compatibility()
         self.assert_same_list_elements([
             'There are no Python files to lint for Python 3 '
-            'compatibility.'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+            'compatibility.'], lint_task_report[0].all_messages)
+        self.assertEqual(
+            'Pylint for Python 3 compatibility', lint_task_report[0].name)
+        self.assertFalse(lint_task_report[0].failed)
 
     def test_for_python_three_incompatibility(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
@@ -155,23 +169,27 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             ['W: 21, 0: import missing `from __future__ import '
              'absolute_import` (no-absolute-import)'],
             lint_task_report.all_messages)
-        self.assert_failed_messages_count(lint_task_report.all_messages, 2)
+        self.assertEqual(
+            'Pylint for Python 3 compatibility', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
 
     def test_custom_linter_with_no_files(self):
-        with self.print_swap:
-            python_linter.PythonLintChecksManager(
-                [], FILE_CACHE).perform_all_lint_checks()
+        lint_task_report = python_linter.PythonLintChecksManager(
+            [], FILE_CACHE).perform_all_lint_checks()
         self.assert_same_list_elements(
-            ['There are no Python files to lint.'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+            ['There are no Python files to lint.'],
+            lint_task_report[0].all_messages)
+        self.assertEqual('Python lint', lint_task_report[0].name)
+        self.assertFalse(lint_task_report[0].failed)
 
     def test_third_party_linter_with_no_files(self):
-        with self.print_swap:
-            python_linter.ThirdPartyPythonLintChecksManager(
-                []).perform_all_lint_checks()
+        lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
+            []).perform_all_lint_checks()
         self.assert_same_list_elements(
-            ['There are no Python files to lint.'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+            ['There are no Python files to lint.'],
+            lint_task_report[0].all_messages)
+        self.assertEqual('Python lint', lint_task_report[0].name)
+        self.assertFalse(lint_task_report[0].failed)
 
     def test_third_party_perform_all_lint_checks(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
@@ -190,7 +208,8 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['27:1: E302 expected 2 blank lines, found 1'],
             lint_task_report.messages)
-        self.assert_failed_messages_count(lint_task_report.all_messages, 1)
+        self.assertEqual('Pylint', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
 
     def test_get_linters_with_success(self):
         custom_linter, third_party_linter = python_linter.get_linters(

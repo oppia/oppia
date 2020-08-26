@@ -250,8 +250,8 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         """This function checks the indentation of lines in HTML files.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         html_files_to_lint = self.html_filepaths
         failed = False
@@ -270,23 +270,23 @@ class HTMLLintChecksManager(python_utils.OBJECT):
             if parser.failed:
                 error_messages.extend(parser.error_messages)
                 failed = True
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(TaskResult). A list of TaskResult objects to be used for
-            linter status retrieval.
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
         """
 
         if not self.all_filepaths:
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log('There are no HTML files to lint.')
-            return []
+            return [
+                concurrent_task_utils.TaskResult(
+                    'HTML lint', False, [],
+                    ['There are no HTML files to lint.'])]
 
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
@@ -347,8 +347,8 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         """This function is used to check HTML files for linting errors.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         htmllint_path = os.path.join(
@@ -356,7 +356,6 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
 
         failed = False
         name = 'HTMLLint'
-        error_summary = []
         error_messages = []
         full_error_messages = []
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
@@ -375,7 +374,6 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 [int(s) for s in linter_stdout.split() if s.isdigit()][-2])
             if error_count:
                 failed = True
-                error_summary.append(error_count)
                 full_error_messages.append(linter_stdout)
                 error_messages.append(
                     self._get_trimmed_error_output(linter_stdout))
@@ -388,13 +386,14 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            list(TaskResult). A list of TaskResult objects to be used for
-            linter status retrieval.
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
         """
         if not self.all_filepaths:
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log('There are no HTML files to lint.')
-            return []
+            return [
+                concurrent_task_utils.TaskResult(
+                    'HTML lint', False, [],
+                    ['There are no HTML files to lint.'])]
 
         return [self.lint_html_files()]
 

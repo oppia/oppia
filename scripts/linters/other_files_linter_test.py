@@ -79,6 +79,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             expected_error_messages = ['SUCCESS  App dev file check passed']
             self.assertEqual(
                 error_messages.all_messages, expected_error_messages)
+            self.assertEqual('App dev file', error_messages.name)
+            self.assertFalse(error_messages.failed)
 
     def test_check_invalid_pattern_in_app_dev_yaml(self):
         def mock_readlines(unused_self, unused_filepath):
@@ -94,6 +96,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertTrue(
             'Pattern on line 2 doesn\'t match any file or directory' in
             error_messages.all_messages[0])
+        self.assertEqual('App dev file', error_messages.name)
+        self.assertTrue(error_messages.failed)
 
     def test_check_valid_pattern(self):
         def mock_readlines(unused_self, unused_filepath):
@@ -119,6 +123,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'SUCCESS  Webpack config file check passed']
         self.assertEqual(
             error_messages.all_messages, expected_error_messages)
+        self.assertEqual('Webpack config file', error_messages.name)
+        self.assertFalse(error_messages.failed)
 
     def test_check_invalid_pattern_with_some_keys_missing(self):
         def mock_readlines(unused_self, unused_filepath):
@@ -142,6 +148,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'FAILED  Webpack config file check failed']
         self.assertEqual(
             error_messages.all_messages, expected_error_messages)
+        self.assertEqual('Webpack config file', error_messages.name)
+        self.assertTrue(error_messages.failed)
 
     def test_check_invalid_pattern_without_all_keys(self):
         def mock_readlines(unused_self, unused_filepath):
@@ -163,6 +171,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             ' failed']
         self.assertEqual(
             error_messages.all_messages, expected_error_messages)
+        self.assertEqual('Webpack config file', error_messages.name)
+        self.assertTrue(error_messages.failed)
 
     def test_check_third_party_libs_type_defs(self):
         expected_error_messages = [
@@ -172,6 +182,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
                 error_messages.all_messages, expected_error_messages)
+        self.assertEqual('Third party type defs', error_messages.name)
+        self.assertFalse(error_messages.failed)
 
     def test_check_third_party_libs_type_defs_verbose(self):
         self.verbose_mode_enabled = True
@@ -182,6 +194,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
                 error_messages.all_messages, expected_error_messages)
+            self.assertEqual('Third party type defs', error_messages.name)
+            self.assertFalse(error_messages.failed)
 
     def test_check_third_party_libs_type_defs_multiple(self):
         self.files_in_typings_dir.append('guppy-defs-0.2.d.ts')
@@ -194,6 +208,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assert_same_list_elements([
                 'There are multiple type definitions for Guppy in the '
                 'typings dir.'], error_messages.all_messages)
+            self.assertEqual('Third party type defs', error_messages.name)
+            self.assertTrue(error_messages.failed)
 
     def test_check_third_party_libs_type_defs_no_type_defs(self):
         self.files_in_typings_dir = [
@@ -211,6 +227,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assert_same_list_elements([
                 'There are no type definitions for Guppy in the '
                 'typings dir.'], error_messages.all_messages)
+            self.assertEqual('Third party type defs', error_messages.name)
+            self.assertTrue(error_messages.failed)
 
     def test_check_third_party_libs_type_defs_wrong_version(self):
         self.files_in_typings_dir = [
@@ -231,6 +249,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 'current version of Guppy is 0.1 and the type definitions '
                 'are for version 0.2. Please refer typings/README.md '
                 'for more details.'], error_messages.all_messages)
+            self.assertEqual('Third party type defs', error_messages.name)
+            self.assertTrue(error_messages.failed)
 
     def test_perform_all_lint_checks(self):
         lint_task_report = other_files_linter.CustomLintChecksManager(

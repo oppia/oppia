@@ -81,8 +81,8 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         """Prints a list of lint errors in the given list of CSS files.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         stylelint_path = os.path.join(
@@ -136,14 +136,14 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            list(TaskResult). A list of TaskResult objects to be used for
-            linter status retrieval.
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
         """
         if not self.all_filepaths:
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log(
-                'There are no HTML or CSS files to lint.')
-            return []
+            return [
+                concurrent_task_utils.TaskResult(
+                    'CSS lint', False, [],
+                    ['There are no HTML or CSS files to lint.'])]
 
         return [self.lint_css_files()]
 

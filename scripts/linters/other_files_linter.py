@@ -112,17 +112,16 @@ class CustomLintChecksManager(python_utils.OBJECT):
                 error_messages.append(error_message)
                 failed = True
 
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def check_third_party_libs_type_defs(self):
         """Checks the type definitions for third party libs
         are up to date.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Third party type defs'
 
@@ -188,17 +187,16 @@ class CustomLintChecksManager(python_utils.OBJECT):
                     error_messages.append(error_message)
                     failed = True
 
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def check_webpack_config_file(self):
         """Check to ensure that the instances of HtmlWebpackPlugin in
         webpack.common.config.ts contains all needed keys.
 
         Returns:
-            TaskResult. A TaskResult object to retrieve the status of a
-            lint check.
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
         """
         name = 'Webpack config file'
 
@@ -236,17 +234,16 @@ class CustomLintChecksManager(python_utils.OBJECT):
                 if key in keys:
                     keys.remove(key)
 
-        full_error_messages = error_messages
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
         Returns:
-            list(TaskResult). A list of TaskResult objects to be used for
-            linter status retrieval.
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
         """
         linter_stdout = []
 

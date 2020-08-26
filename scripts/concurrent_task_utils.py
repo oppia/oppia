@@ -47,21 +47,21 @@ def log(message, show_time=False):
 class TaskResult(python_utils.OBJECT):
     """Task result for concurrent_task_utils."""
 
-    def __init__(self, name, failed, error_messages, full_messages):
+    def __init__(self, name, failed, trimmed_messages, full_messages):
         """Constructs a TaskResult object.
 
         Args:
-            name: str. Name of the check running.
+            name: str. The name of the task.
             failed: bool. The boolean value representing whether the task
                 failed.
-            error_messages: list(str). List of error messages that are stripped
-                to keep main part of messages.
-            full_messages: list(str). List of full messages returned by the
+            trimmed_messages: list(str). List of error messages that are
+                trimmed to keep main part of messages.
+            full_messages: str|list(str). List of full messages returned by the
                 objects.
         """
         self.name = name
         self.failed = failed
-        self.messages = error_messages
+        self.messages = trimmed_messages
         self.full_messages = full_messages
 
     @property
@@ -70,7 +70,8 @@ class TaskResult(python_utils.OBJECT):
         check.
 
         Returns:
-            list(str). List of full messages corresponding to the given task.
+            str|list(str). List of full messages corresponding to the given
+            task.
         """
         if self.name:
             failed_message = (
@@ -80,15 +81,6 @@ class TaskResult(python_utils.OBJECT):
                         SUCCESS_MESSAGE_PREFIX, self.name, 'passed')))
             self.full_messages.append(failed_message)
         return self.full_messages
-
-    @property
-    def task_report(self):
-        """Returns all_messages as a string separated by newlines.
-
-        Returns:
-            str. All lint messages separated by newlines.
-        """
-        return '\n'.join(self.all_messages)
 
 
 class TaskThread(threading.Thread):
@@ -116,13 +108,13 @@ class TaskThread(threading.Thread):
                         log(
                             'Report from %s check\n'
                             '----------------------------------------\n'
-                            '%s' % (task_result.name, task_result.task_report),
-                            show_time=True)
+                            '%s' % (task_result.name, '\n'.join(
+                                task_result.all_messages)), show_time=True)
                     # The following section will print the output of backend
                     # tests.
                     else:
                         log(
-                            'LOG %s:\n%s\n'
+                            'LOG %s:\n%s'
                             '----------------------------------------' %
                             (self.name, task_result.all_messages),
                             show_time=True)
