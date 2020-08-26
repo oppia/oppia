@@ -47,8 +47,7 @@ export class RatioExpressionInputValidationService {
     var isInt = function(n) {
       return angular.isNumber(n) && n % 1 === 0;
     };
-    var minimumNumberOfTerms =
-      customizationArgs.numberOfTerms.value;
+    var minimumNumberOfTerms = customizationArgs.numberOfTerms.value;
     if (minimumNumberOfTerms === undefined) {
       return [
         {
@@ -86,8 +85,7 @@ export class RatioExpressionInputValidationService {
     let warningsList = [];
     let ratioRulesService = (
       new RatioExpressionInputRulesService(this.rof));
-    var minimumNumberOfTerms =
-      customizationArgs.numberOfTerms.value;
+    var minimumNumberOfTerms = customizationArgs.numberOfTerms.value;
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 

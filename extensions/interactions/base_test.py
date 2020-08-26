@@ -355,9 +355,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
         for interaction_id in all_interaction_ids:
-            # TODO(#10212): Ignoring the RatioExpressionInput for now as
-            # there's no learner's flow for the interaction yet.
-            # Once added this needs to be removed.
 
             # Check that the interaction id is valid.
             self.assertTrue(self._is_camel_cased(interaction_id))
@@ -503,6 +500,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     '%s-short-response.directive.html' %
                     hyphenated_interaction_id)
 
+            # TODO(#10212): Ignoring the RatioExpressionInput for now as
+            # there's no learner's flow for the interaction yet.
+            # Once added this needs to be removed.
             if interaction_id != u'RatioExpressionInput':
                 self.assertTrue(os.path.isfile(interaction_ts_file))
                 self.assertTrue(os.path.isfile(response_ts_file))
@@ -527,6 +527,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
+            # TODO(#10212): Ignoring the RatioExpressionInput for now as
+            # there's no learner's flow for the interaction yet.
+            # Once added this needs to be removed.
             if interaction_id != u'RatioExpressionInput':
                 interaction_ts_file_content = utils.get_file_contents(
                     interaction_ts_file)
@@ -540,6 +543,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             validation_service_ts_file_content = utils.get_file_contents(
                 validation_service_ts_file)
 
+            # TODO(#10212): Ignoring the RatioExpressionInput for now as
+            # there's no learner's flow for the interaction yet.
+            # Once added this needs to be removed.
             if interaction_id != u'RatioExpressionInput':
                 self.assertIn(
                     'oppiaInteractive%s' % interaction_id,
@@ -560,6 +566,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # Check that the html template includes js script for the
             # interaction.
+            # TODO(#10212): Ignoring the RatioExpressionInput for now as
+            # there's no learner's flow for the interaction yet.
+            # Once added this needs to be removed.
             if interaction_id != u'RatioExpressionInput':
                 self.assertTrue(
                     'oppia-interactive-%s.component.ts' %
