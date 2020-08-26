@@ -44,32 +44,18 @@ export class RatioExpressionInputValidationService {
 
   getCustomizationArgsWarnings(
       customizationArgs: RatioExpressionInputCustomizationArgs): Warning[] {
-    var isInt = function(n) {
-      return angular.isNumber(n) && n % 1 === 0;
+    var isPositiveInt = function(n) {
+      return angular.isNumber(n) && n % 1 === 0 && n > 0;
     };
     var minimumNumberOfTerms = customizationArgs.numberOfTerms.value;
-    if (minimumNumberOfTerms === undefined) {
+    if (minimumNumberOfTerms === undefined ||
+        !isPositiveInt(minimumNumberOfTerms)
+    ) {
       return [
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            'Number of terms should be an integer value.')
-        }
-      ];
-    } else if (!isInt(minimumNumberOfTerms)) {
-      return [
-        {
-          type: AppConstants.WARNING_TYPES.ERROR,
-          message: (
-            'Number of terms cannot have decimal places.')
-        }
-      ];
-    } else if (minimumNumberOfTerms < 0) {
-      return [
-        {
-          type: AppConstants.WARNING_TYPES.ERROR,
-          message: (
-            'Number of terms must be a positive integer.')
+            'The number of terms should be a positive integer.')
         }
       ];
     } else {

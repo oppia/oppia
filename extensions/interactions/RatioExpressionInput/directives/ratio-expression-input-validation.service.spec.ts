@@ -209,7 +209,7 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('Number of terms cannot have decimal places.')
+      message: ('The number of terms should be a positive integer.')
     }]);
   });
 
@@ -220,7 +220,7 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('Number of terms should be an integer value.')
+      message: ('The number of terms should be a positive integer.')
     }]);
   });
 
@@ -231,7 +231,7 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('Number of terms must be a positive integer.')
+      message: ('The number of terms should be a positive integer.')
     }]);
   });
 });
