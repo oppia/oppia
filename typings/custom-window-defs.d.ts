@@ -25,4 +25,9 @@ interface Window {
     ga: Function;
     $: JQueryStatic;
     jQuery: JQueryStatic;
+    Zone: {
+      root: {
+        run: (fn: () => void) => void;
+      }
+    };
 }

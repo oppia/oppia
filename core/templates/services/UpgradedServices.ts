@@ -1653,7 +1653,8 @@ export class UpgradedServices {
       upgradedServices['PlaythroughService'],
       upgradedServices['SiteAnalyticsService'],
       upgradedServices['StatsReportingBackendApiService'],
-      upgradedServices['StopwatchObjectFactory']);
+      upgradedServices['StopwatchObjectFactory'],
+      upgradedServices['WindowRef']);
 
     // Topological level: 7.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
