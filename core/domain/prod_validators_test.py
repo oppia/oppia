@@ -1400,7 +1400,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
             'cmd': 'change_collection_status',
-            'old_status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'old_status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, {
             'cmd': 'release_ownership',
             'invalid_attribute': 'invalid'
@@ -4018,7 +4018,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
             'cmd': 'change_exploration_status',
-            'old_status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'old_status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, {
             'cmd': 'release_ownership',
             'invalid_attribute': 'invalid'

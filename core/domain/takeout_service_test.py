@@ -24,7 +24,7 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.domain import takeout_domain
 from core.domain import takeout_service
 from core.domain import topic_domain
@@ -261,7 +261,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         # Setup for GeneralSuggestionModel.
         suggestion_models.GeneralSuggestionModel.create(
@@ -303,7 +303,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
