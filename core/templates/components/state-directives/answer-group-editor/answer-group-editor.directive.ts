@@ -294,6 +294,15 @@ angular.module('oppia').directive('answerGroupEditor', [
             // TODO(sll): Remove the need for this watcher, or make it less
             // ad hoc.
             ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(() => {
+                if (
+                  ctrl.isRuleEditorOpen() &&
+                  StateEditorService.checkCurrentRuleInputIsValid()) {
+                  ctrl.saveRules();
+                }
+              })
+            );
+            ctrl.directiveSubscriptions.add(
               StateEditorService.onUpdateAnswerChoices.subscribe(() => {
                 ctrl.answerChoices = ctrl.getAnswerChoices();
               })

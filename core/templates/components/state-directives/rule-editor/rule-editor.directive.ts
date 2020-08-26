@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { StateEditorService } from "components/state-editor/state-editor-properties-services/state-editor.service";
+
 /**
  * @fileoverview Directive for the rule editor.
  */
@@ -265,6 +267,12 @@ angular.module('oppia').directive('ruleEditor', [
               ctrl.onSelectNewRuleType(ctrl.rule.type);
             }
             computeRuleDescriptionFragments();
+
+            $scope.$watch(
+            '$ctrl.ruleEditForm.form.$invalid', function(newValue) {
+                StateEditorService.updateCurrentRuleInputIsValid(!newValue);
+              }
+            );
           };
         }
       ]
