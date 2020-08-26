@@ -24,6 +24,15 @@ jobs:
       - name: Install third party
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run --auto-servernum python -m scripts.install_third_party_libs
-      - name: Run Embedding E2E Test
+      - name: Run Accessibility E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_e2e_tests --suite="embedding" --prod_env
+        run: python -m scripts.run_e2e_tests --suite="accessibility" --prod_env
+      - name: Run Classroom Page E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPage" --prod_env
+      - name: Run Profile Menu E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
+      - name: Run Library E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
