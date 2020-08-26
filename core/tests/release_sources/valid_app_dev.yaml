@@ -1,3 +1,4 @@
+# This file is valid since vpc_access_connector is present.
 default_expiration: "10m"
 handlers:
 # PRODUCTION STATIC

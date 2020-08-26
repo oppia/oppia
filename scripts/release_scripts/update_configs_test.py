@@ -225,9 +225,17 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with python_utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
+    def test_invalid_redishost(self):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
+            return '192.123.23.11235'
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+        with getpass_swap, self.assertRaisesRegexp(
+            Exception, 'Invalid REDISHOST.'):
+            update_configs.add_redishost()
+
     def test_missing_redishost_line(self):
         def mock_getpass(prompt):  # pylint: disable=unused-argument
-            return 'test-host'
+            return '192.123.23.1'
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
         temp_feconf_path = tempfile.NamedTemporaryFile().name
@@ -250,7 +258,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
 
     def test_addition_of_redishost(self):
         def mock_getpass(prompt):  # pylint: disable=unused-argument
-            return 'test-host'
+            return '192.123.23.1'
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
         temp_feconf_path = tempfile.NamedTemporaryFile().name
@@ -265,7 +273,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
         expected_feconf_text = (
-            'REDISHOST = \'test-host\'\n'
+            'REDISHOST = \'192.123.23.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
             'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'

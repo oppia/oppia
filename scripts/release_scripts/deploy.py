@@ -100,6 +100,8 @@ def preprocess_release(app_name, deploy_data_path):
 
     (1) Substitutes files from the per-app deployment data.
     (2) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
+    (3) Updates project id for vpc_access_connector in app_dev.yaml.
+    (4) Updates REDISHOST in feconf.py
 
     Args:
         app_name: str. Name of the app to deploy.
@@ -109,6 +111,8 @@ def preprocess_release(app_name, deploy_data_path):
         Exception. Could not find deploy data directory.
         Exception. Could not find source path.
         Exception. Could not find destination path.
+        Exception. Constants file has invalid GCS_RESOURCE_BUCKET.
+        Exception. The vpc_access_connector line is missing in app_dev.yaml.
     """
     if not os.path.exists(deploy_data_path):
         raise Exception(
