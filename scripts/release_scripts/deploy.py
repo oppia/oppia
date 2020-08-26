@@ -99,7 +99,7 @@ def preprocess_release(app_name, deploy_data_path):
     in execute_deployment function. Currently it does the following:
 
     (1) Substitutes files from the per-app deployment data.
-    (2) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
+    (2) Changes GCS_RESOURCE_BUCKET in assets/constants.ts.
     (3) Updates project id for vpc_access_connector in app_dev.yaml.
     (4) Updates REDISHOST in feconf.py
 

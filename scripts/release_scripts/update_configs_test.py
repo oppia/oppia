@@ -157,12 +157,56 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             self.assertEqual(f.read(), expected_feconf_text)
 
     def test_invalid_mailgun_api_key(self):
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
+        check_prompts = {
+            'Enter mailgun api key from the release process doc.': False,
+            'You have entered an invalid mailgun api key: invalid, '
+            'please retry.': False
+        }
+        expected_check_prompts = {
+            'Enter mailgun api key from the release process doc.': True,
+            'You have entered an invalid mailgun api key: invalid, '
+            'please retry.': True
+        }
+        mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
+        def mock_getpass(prompt):
+            check_prompts[prompt] = True
+            if 'invalid' in prompt:
+                return mailgun_api_key
             return 'invalid'
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        with getpass_swap, self.assertRaisesRegexp(
-            Exception, 'Invalid mailgun api key.'):
+
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'MAILGUN_API_KEY = None\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+        expected_feconf_text = (
+            'MAILGUN_API_KEY = \'%s\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                mailgun_api_key))
+        with python_utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+        feconf_swap = self.swap(
+            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
+
+        with getpass_swap, feconf_swap:
             update_configs.add_mailgun_api_key()
+        self.assertEqual(check_prompts, expected_check_prompts)
+        with python_utils.open_file(temp_feconf_path, 'r') as f:
+            self.assertEqual(f.read(), expected_feconf_text)
 
     def test_missing_mailgun_api_key_line(self):
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
@@ -226,12 +270,54 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             self.assertEqual(f.read(), expected_feconf_text)
 
     def test_invalid_redishost(self):
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
+        check_prompts = {
+            'Enter REDISHOST from the release process doc.': False,
+            'You have entered an invalid IP Address: 192.123.23.11235, '
+            'please retry.': False
+        }
+        expected_check_prompts = {
+            'Enter REDISHOST from the release process doc.': True,
+            'You have entered an invalid IP Address: 192.123.23.11235, '
+            'please retry.': True
+        }
+        def mock_getpass(prompt):
+            check_prompts[prompt] = True
+            if 'invalid' in prompt:
+                return '192.123.23.1'
             return '192.123.23.11235'
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        with getpass_swap, self.assertRaisesRegexp(
-            Exception, 'Invalid REDISHOST.'):
+
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'REDISHOST = \'localhost\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+        expected_feconf_text = (
+            'REDISHOST = \'192.123.23.1\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+        with python_utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+        feconf_swap = self.swap(
+            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
+
+        with getpass_swap, feconf_swap:
             update_configs.add_redishost()
+        self.assertEqual(check_prompts, expected_check_prompts)
+        with python_utils.open_file(temp_feconf_path, 'r') as f:
+            self.assertEqual(f.read(), expected_feconf_text)
 
     def test_missing_redishost_line(self):
         def mock_getpass(prompt):  # pylint: disable=unused-argument

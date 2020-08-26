@@ -152,8 +152,12 @@ def add_mailgun_api_key():
         prompt=('Enter mailgun api key from the release process doc.'))
     mailgun_api_key = mailgun_api_key.strip()
 
-    if re.match('^key-[a-z0-9]{32}$', mailgun_api_key) is None:
-        raise Exception('Invalid mailgun api key.')
+    while re.match('^key-[a-z0-9]{32}$', mailgun_api_key) is None:
+        mailgun_api_key = getpass.getpass(
+            prompt=(
+                'You have entered an invalid mailgun api '
+                'key: %s, please retry.' % mailgun_api_key))
+        mailgun_api_key = mailgun_api_key.strip()
 
     feconf_lines = []
     with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
@@ -174,8 +178,12 @@ def add_redishost():
         prompt=('Enter REDISHOST from the release process doc.'))
     redishost = redishost.strip()
 
-    if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', redishost) is None:
-        raise Exception('Invalid REDISHOST.')
+    while re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', redishost) is None:
+        redishost = getpass.getpass(
+            prompt=(
+                'You have entered an invalid IP Address: %s, '
+                'please retry.' % redishost))
+        redishost = redishost.strip()
 
     feconf_lines = []
     with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
