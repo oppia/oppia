@@ -877,7 +877,8 @@ class UserSkillMasteryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.UserSkillMasteryModel]
 
 
-class UserContributionProficiencyModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+class UserContributionProficiencyModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
     """Job that audits and validates UserContributionProficiencyModel."""
 
     @classmethod

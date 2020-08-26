@@ -1970,7 +1970,8 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         )
 
     def test_create_model(self):
-        user_models.UserContributionProficiencyModel.create('user1', 'category1', 1)
+        user_models.UserContributionProficiencyModel.create(
+            'user1', 'category1', 1)
         score_models = (
             user_models.UserContributionProficiencyModel
             .get_all_scores_of_user('user1'))

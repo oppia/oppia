@@ -356,8 +356,8 @@ def accept_suggestion(
                 )
                 user_proficiency.mark_onboarding_email_as_sent()
 
-        # Need to update the corresponding user proficiency model after we updated
-        # the domain object.
+        # Need to update the corresponding user proficiency model after we
+        # updated the domain object.
         _update_user_proficiency(user_proficiency)
 
 
@@ -595,8 +595,8 @@ def _update_user_proficiency(user_proficiency):
     """Updates the user_proficiency.
 
     Args:
-        user_proficiency: UserContributionProficiency. The user proficiency to be
-            updated.
+        user_proficiency: UserContributionProficiency. The user proficiency to
+            be updated.
     """
     user_proficiency_model = user_models.UserContributionProficiencyModel.get(
         user_proficiency.user_id, user_proficiency.score_category

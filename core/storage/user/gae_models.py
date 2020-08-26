@@ -1845,8 +1845,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserContributionProficiencyModel can be deleted since it only contains
-        information relevant to the one user.
+        """UserContributionProficiencyModel can be deleted since it only
+        contains information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
 

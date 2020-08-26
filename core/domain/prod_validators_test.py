@@ -14946,7 +14946,8 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserContributionProficiencyModelValidatorTests(test_utils.AuditJobsTestBase):
+class UserContributionProficiencyModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(UserContributionProficiencyModelValidatorTests, self).setUp()
@@ -14955,8 +14956,10 @@ class UserContributionProficiencyModelValidatorTests(test_utils.AuditJobsTestBas
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         score_category = 'content.Art'
-        self.model_instance = user_models.UserContributionProficiencyModel.create(
-            self.user_id, score_category, 10
+        self.model_instance = (
+            user_models.UserContributionProficiencyModel.create(
+                self.user_id, score_category, 10
+            )
         )
         self.job_class = (
             prod_validation_jobs_one_off

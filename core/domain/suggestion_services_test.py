@@ -392,7 +392,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # Assert that the onboarding new reviewer email was not sent.
         self.assertFalse(user_proficiency_model.onboarding_email_sent)
 
-    def test_accept_suggestion_creates_user_proficiency_model_if_it_is_None(
+    def test_accept_suggestion_creates_user_proficiency_model_if_it_is_none(
             self):
         self.mock_create_suggestion(self.target_id)
         self.assert_suggestion_status(
@@ -1006,14 +1006,14 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 .get_translation_suggestion_ids_with_exp_ids([])), 0)
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
-        # user proficiency models for user1.
+        # User proficiency models for user1.
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 15)
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category2', 15)
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category3', 5)
-        # user proficiency models for user2.
+        # User proficiency models for user2.
         user_models.UserContributionProficiencyModel.create(
             'user2', 'category1', 5)
         user_models.UserContributionProficiencyModel.create(
