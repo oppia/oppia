@@ -601,6 +601,26 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertTrue(
             'Push aborted due to failing typescript checks.' in self.print_arr)
 
+    def test_strict_typescript_check_failiure(self):
+        self.does_diff_include_ts_files = True
+        def mock_run_script_and_get_returncode(script):
+            if script == pre_push_hook.STRICT_TYPESCRIPT_CHECKS_CMDS:
+                return 1
+            return 0
+
+        run_script_and_get_returncode_swap = self.swap(
+            pre_push_hook, 'run_script_and_get_returncode',
+            mock_run_script_and_get_returncode)
+        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
+            with self.collect_files_swap, self.uncommitted_files_swap:
+                with self.check_output_swap, self.start_linter_swap:
+                    with self.ts_swap, run_script_and_get_returncode_swap:
+                        with self.assertRaisesRegexp(SystemExit, '1'):
+                            pre_push_hook.main(args=[])
+        self.assertTrue(
+            'Push aborted due to failing typescript checks in '
+            'strict mode.' in self.print_arr)
+
     def test_frontend_test_failure(self):
         self.does_diff_include_js_or_ts_files = True
         def mock_run_script_and_get_returncode(unused_script):

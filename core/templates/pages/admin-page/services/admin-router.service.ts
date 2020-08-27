@@ -30,8 +30,9 @@ export class AdminRouterService {
     AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES);
 
   getTabNameByHash(tabHash: string): string | null {
-    for (var tabName in AdminPageConstants.ADMIN_TAB_URLS) {
-      if (AdminPageConstants.ADMIN_TAB_URLS[tabName] === tabHash) {
+    for (const [tabName, tabUrl] of Object.entries(
+      AdminPageConstants.ADMIN_TAB_URLS)) {
+      if (tabUrl === tabHash) {
         return tabName;
       }
     }
