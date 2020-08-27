@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -37,9 +36,6 @@ class TopicViewerPage(base.BaseHandler):
     def get(self, _):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         self.render_template('topic-viewer-page.mainpage.html')
 
 
@@ -53,9 +49,6 @@ class TopicPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
 
         topic = topic_fetchers.get_topic_by_name(topic_name)
         canonical_story_ids = topic.get_canonical_story_ids(
