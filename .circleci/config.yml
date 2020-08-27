@@ -117,6 +117,10 @@ jobs:
           name: Run typescript tests
           command: |
             python -m scripts.typescript_checks
+      - run:
+          name: Run typescript tests in strict mode
+          command: |
+            python -m scripts.typescript_checks --strict_checks
       - persist_to_workspace:
           root: /home/circleci/
           paths:
