@@ -32,7 +32,7 @@ import {
 export class RatioExpressionInputRulesService {
   constructor(private ratioObjectFactory: RatioObjectFactory) {}
   Equals(
-      answer: RatioInputAnswer, inputs: RatioInputEqualRuleInputs):boolean {
+      answer: RatioInputAnswer, inputs: RatioInputEqualRuleInputs): boolean {
     return this.ratioObjectFactory.arrayEquals(answer, inputs.x);
   }
 

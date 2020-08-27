@@ -79,6 +79,32 @@ export class RatioExpressionInputValidationService {
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
+    let rulesService = this;
+
+    // Checks whether currentInput is in simplest form or not.
+    let isInSimplestForm = function(
+        currentRuleType: string,
+        ratio: Ratio,
+        currentInput: number[]
+    ): boolean {
+      return currentRuleType === 'IsEquivalent' && (
+        !rulesService.rof.arrayEquals(
+          ratio.convertToSimplestForm(), currentInput));
+    };
+
+    // Checks whether currentInput has less number of terms than seenInput.
+    let hasLessNumberOfTerms = function(
+        currentRuleType: string,
+        seenRuleType: string,
+        currentInput: number,
+        seenInput: number[]
+    ): boolean {
+      return currentRuleType === 'HasNumberOfTermsEqualTo' &&
+      seenRuleType !== 'HasNumberOfTermsEqualTo' && (
+        ratioRulesService.HasNumberOfTermsEqualTo(
+          seenInput, {y: currentInput}));
+    };
+
     // The following validations ensure that there are no redundant rules
     // present in the answer groups. In particular, an Equals rule will make
     // all of the following rules with a matching input invalid. A
@@ -109,7 +135,7 @@ export class RatioExpressionInputValidationService {
               });
             }
           } else {
-            ratio = this.rof.fromList(<number[]> currentInput);
+            ratio = rulesService.rof.fromList(<number[]> currentInput);
             if (ratio.getNumberOfTerms() < minimumNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
@@ -120,10 +146,7 @@ export class RatioExpressionInputValidationService {
             }
           }
         }
-        if (currentRuleType === 'IsEquivalent' && (
-          !this.rof.arrayEquals(
-            ratio.convertToSimplestForm(), currentInput))
-        ) {
+        if (isInSimplestForm(currentRuleType, ratio, currentInput)) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (
@@ -158,10 +181,9 @@ export class RatioExpressionInputValidationService {
                 ' be matched because it is preceded by a \'IsEquivalent\'' +
                 ' rule with a matching input.')
             });
-          } else if (currentRuleType === 'HasNumberOfTermsEqualTo' &&
-          seenRuleType !== 'HasNumberOfTermsEqualTo' && (
-            ratioRulesService.HasNumberOfTermsEqualTo(
-              seenInput, {y: currentInput}))) {
+          } else if (hasLessNumberOfTerms(
+            currentRuleType, seenRuleType, currentInput, seenInput
+          )) {
             // This rule will make the following inputs with
             // HasNumberOfTermsEqualTo rule obsolete.
             warningsList.push({
