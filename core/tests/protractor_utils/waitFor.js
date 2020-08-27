@@ -177,7 +177,6 @@ exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
-exports.presenceOf = presenceOf;
 exports.visibilityOf = visibilityOf;
 exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;
