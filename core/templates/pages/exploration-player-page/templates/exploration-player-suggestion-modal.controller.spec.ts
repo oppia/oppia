@@ -118,7 +118,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
       $uibModalInstance);
   });
 
-  it('should close modal when submitting a suggestion', function() {
+  it('should submit a suggestion when closing the modal', function() {
     spyOn(ExplorationEngineService, 'getExplorationId').and.returnValue('exp1');
     spyOn(ExplorationEngineService, 'getExplorationVersion').and.returnValue(
       '1');

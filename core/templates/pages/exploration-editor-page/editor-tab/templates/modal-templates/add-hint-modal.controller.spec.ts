@@ -69,7 +69,7 @@ describe('Add Hint Modal Controller', function() {
       expect($scope.hintIndex).toBe(5);
     });
 
-  it('should close modal when saving hint', function() {
+  it('should save hint when closing the modal', function() {
     var contentId = 'cont_1';
     var hintExpected = hintObjectFactory.createNew(contentId, '');
 

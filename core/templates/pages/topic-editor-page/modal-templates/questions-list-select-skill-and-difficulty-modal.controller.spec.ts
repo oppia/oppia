@@ -124,19 +124,19 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
         expect($scope.currentMode).toBe('MODE_SELECT_DIFFICULTY');
       });
 
-    it('should close modal when skill and its difficulty are properly' +
-      ' selected', function() {
-      var summary = allSkillSummaries[1];
-      $scope.selectOrDeselectSkill(summary);
+    it('should select skill and its difficulty proerly when closing the modal',
+      function() {
+        var summary = allSkillSummaries[1];
+        $scope.selectOrDeselectSkill(summary);
 
-      $scope.startQuestionCreation();
+        $scope.startQuestionCreation();
 
-      expect($uibModalInstance.close).toHaveBeenCalledWith([
-        skillDifficultyObjectFactory.create(
-          allSkillSummaries[1].id, allSkillSummaries[1].description, 0.3)
-      ]);
+        expect($uibModalInstance.close).toHaveBeenCalledWith([
+          skillDifficultyObjectFactory.create(
+            allSkillSummaries[1].id, allSkillSummaries[1].description, 0.3)
+        ]);
 
-      // Remove summary to not affect other specs.
-      $scope.selectOrDeselectSkill(summary);
-    });
+        // Remove summary to not affect other specs.
+        $scope.selectOrDeselectSkill(summary);
+      });
   });

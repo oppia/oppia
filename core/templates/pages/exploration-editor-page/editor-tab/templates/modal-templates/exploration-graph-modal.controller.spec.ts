@@ -61,7 +61,7 @@ describe('Exploration Graph Modal Controller', function() {
       expect($scope.isEditable).toBe(isEditable);
     });
 
-  it('should close modal when deleting state', function() {
+  it('should delete state when closing the modal', function() {
     var stateName = 'State Name';
     $scope.deleteState(stateName);
 
@@ -71,7 +71,7 @@ describe('Exploration Graph Modal Controller', function() {
     });
   });
 
-  it('should close modal when selecting state', function() {
+  it('should select state when closing the modal', function() {
     var stateName = 'State Name';
     $scope.selectState(stateName);
 

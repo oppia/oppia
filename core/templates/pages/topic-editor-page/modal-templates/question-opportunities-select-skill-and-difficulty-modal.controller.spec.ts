@@ -114,8 +114,8 @@ describe(
         expect($scope.skillIdToRubricsObject[skillId].length).toBe(1);
       });
 
-      it('should close modal when creating a question and selecting its' +
-        ' difficulty', function() {
+      it('should create a question and select its difficulty when closing' +
+        ' the modal', function() {
         $scope.startQuestionCreation();
 
         expect($uibModalInstance.close).toHaveBeenCalledWith({

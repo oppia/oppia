@@ -130,7 +130,7 @@ describe('Add Or Update Solution Modal Controller', function() {
         expect($scope.shouldAdditionalSubmitButtonBeShown()).toBe(false);
       });
 
-    it('should close modal when saving solution', function() {
+    it('should save solution when closing the modal', function() {
       stateSolutionService.init('', answerEditorHtml);
       currentInteractionService.onSubmit('answer');
       $scope.saveSolution();
