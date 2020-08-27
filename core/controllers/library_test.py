@@ -92,7 +92,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
         self.set_admins([self.ADMIN_USERNAME])
@@ -119,7 +119,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'title': 'A new title!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
     def test_library_handler_for_created_explorations(self):
@@ -171,7 +171,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][1])
         self.assertDictContainsSubset({
             'id': 'A',
@@ -179,7 +179,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'title': 'Title A',
             'language_code': 'en',
             'objective': 'Objective A',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
         # Delete exploration A.
@@ -194,7 +194,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
     def test_library_handler_with_exceeding_query_limit_logs_error(self):
@@ -322,7 +322,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, activity_summary_dicts[0])
 
     def test_library_index_handler_updates_featured_activity_summary_dict(self):
@@ -368,7 +368,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, activity_summary_dicts[0])
 
 
@@ -442,7 +442,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
     def test_handler_for_top_rated_library_group_page(self):
@@ -481,7 +481,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
         # Load another public demo exploration.
@@ -503,7 +503,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'title': 'Project Euler Problem 1',
             'language_code': 'en',
             'objective': 'solve Problem 1 on the Project Euler site',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
         self.assertDictContainsSubset({
             'id': '0',
@@ -511,7 +511,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][1])
 
 
