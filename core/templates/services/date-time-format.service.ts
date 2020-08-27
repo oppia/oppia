@@ -45,7 +45,7 @@ export class DateTimeFormatService {
       return moment(date).format('MM/DD/YY');
     }
   }
-
+  // Returns date along with time.
   getLocaleDateTimeHourString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     return moment(date).format('MMM D HH:mm A');
