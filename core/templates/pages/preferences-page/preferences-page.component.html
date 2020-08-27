@@ -17,7 +17,8 @@
       <div class="form-group row">
         <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PICTURE"></label>
         <div class="col-lg-10 col-md-10 col-sm-10">
-          <div class="oppia-editable-section oppia-profile-picture-container" title="<['I18N_PREFERENCES_CHANGE_PICTURE' | translate]>">
+          <div class="oppia-editable-section oppia-profile-picture-container"
+               title="<['I18N_PREFERENCES_CHANGE_PICTURE' | translate]>">
             <div class="oppia-click-to-start-editing protractor-test-photo-clickable"
                  ng-click="$ctrl.showEditProfilePictureModal()"
                  aria-label="Edit profile picture button">
@@ -83,7 +84,9 @@
                             on-selection-change="$ctrl.onSubjectInterestsSelectionChange($ctrl.subjectInterests)">
           </select2-dropdown>
         </div>
-        <span class="form-text oppia-form-text" translate="I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK"></span>
+        <span class="form-text oppia-form-text"
+              translate="I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK">
+        </span>
       </div>
     </div>
 
@@ -131,13 +134,16 @@
                             on-selection-change="$ctrl.savePreferredLanguageCodes($ctrl.preferredLanguageCodes)">
           </select2-dropdown>
         </div>
-        <span class="form-text oppia-form-text" translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN">
+        <span class="form-text oppia-form-text"
+              translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN">
         </span>
       </div>
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE"></label>
+      <label class="col-lg-2 col-md-2 col-sm-2"
+             translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE">
+      </label>
       <div class="col-lg-10 col-md-10 col-sm-10">
         <!--
            If the ng-if is omitted, the select2-dropdown directive won't be
@@ -153,7 +159,9 @@
                             on-selection-change="$ctrl.savePreferredSiteLanguageCodes($ctrl.preferredSiteLanguageCode)">
           </select2-dropdown>
         </div>
-        <span class="form-text oppia-form-text" translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN"></span>
+        <span class="form-text oppia-form-text"
+              translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN">
+        </span>
       </div>
     </div>
 
@@ -174,7 +182,9 @@
                             on-selection-change="$ctrl.savePreferredAudioLanguageCode($ctrl.preferredAudioLanguageCode)">
           </select2-dropdown>
         </div>
-        <span class="form-text oppia-form-text" translate="I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN"></span>
+        <span class="form-text oppia-form-text"
+              translate="I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN">
+        </span>
       </div>
     </div>
 

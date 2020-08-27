@@ -1,5 +1,5 @@
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text oppia-long-text-card">
-  <div class="container oppia-button-text-container">
+  <div class="container ml-0">
     <h3>Reload a single exploration</h3>
     <div ng-repeat="exploration in $ctrl.DEMO_EXPLORATIONS"
          class="row oppia-reload-exploration-row protractor-test-reload-exploration-row">
@@ -56,7 +56,7 @@
 </md-card>
 
 <md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-  <div class="container oppia-button-text-container">
+  <div class="container ml-0">
     <h3>Reload a single collection</h3>
     <div ng-repeat="collection in $ctrl.DEMO_COLLECTIONS"
          class="row oppia-reload-collection-row protractor-test-reload-collection-row">
@@ -75,7 +75,7 @@
 </md-card>
 
 <md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-  <div class="container oppia-button-text-container">
+  <div class="container ml-0">
     <h3>Load dummy new structures data (only admins)</h3>
     <div class="row">
       <span class="col-lg-8 col-md-8 col-sm-8">
@@ -96,7 +96,7 @@
 </md-card>
 
 <md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-  <div class="container oppia-button-text-container">
+  <div class="container ml-0">
     <h3>Generate dummy skill with questions (only admins)</h3>
     <div class="row">
       <span class="col-lg-4 col-md-4 col-sm-4">
@@ -122,9 +122,6 @@
   }
   admin-dev-mode-activities-tab .oppia-long-text-card {
     max-width: 700px;
-  }
-  admin-dev-mode-activities-tab .oppia-button-text-container {
-    margin-left: 0;
   }
   admin-dev-mode-activities-tab .oppia-form-inline {
     margin-bottom: 5px;

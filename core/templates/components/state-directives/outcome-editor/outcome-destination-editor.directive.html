@@ -5,7 +5,7 @@
   </div>
   <div class="form-group oppia-form-group">
     <span>
-      <select class="form-control oppia-form-control" ng-model="$ctrl.outcome.dest" ng-options="choice.id as choice.text for choice in $ctrl.destChoices" ng-change="$ctrl.onDestSelectorChange()">
+      <select id="oppia-form-control" class="form-control" ng-model="$ctrl.outcome.dest" ng-options="choice.id as choice.text for choice in $ctrl.destChoices" ng-change="$ctrl.onDestSelectorChange()">
       </select>
     </span>
   </div>
@@ -38,7 +38,7 @@
   outcome-destination-editor .oppia-form-group {
     font-size: 1.1em;
   }
-  outcome-destination-editor .oppia-form-control {
+  outcome-destination-editor #oppia-form-control {
     width: 200px;
   }
   outcome-destination-editor .oppia-form-error-text {

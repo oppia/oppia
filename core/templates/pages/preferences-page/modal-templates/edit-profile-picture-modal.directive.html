@@ -11,7 +11,10 @@
         </image-uploader>
       </div>
 
-      <div class="oppia-form-error oppia-form-error-text" ng-if="invalidImageWarningIsShown" translate="I18N_PREFERENCES_PROFILE_PICTURE_ERROR"></div>
+      <div class="oppia-form-error oppia-form-error-text"
+           ng-if="invalidImageWarningIsShown"
+           translate="I18N_PREFERENCES_PROFILE_PICTURE_ERROR">
+      </div>
 
       <div ng-show="uploadedImage">
         <span translate="I18N_PREFERENCES_PROFILE_PICTURE_DRAG"></span>
@@ -26,9 +29,14 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="cancel()" translate="I18N_PREFERENCES_CANCEL_BUTTON"></button>
-    <button class="btn btn-success protractor-test-photo-upload-submit" ng-click="confirm()"
-            ng-disabled="!uploadedImage" translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD">
+    <button class="btn btn-secondary"
+            ng-click="cancel()"
+            translate="I18N_PREFERENCES_CANCEL_BUTTON">
+    </button>
+    <button class="btn btn-success protractor-test-photo-upload-submit"
+            ng-click="confirm()"
+            ng-disabled="!uploadedImage"
+            translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD">
     </button>
   </div>
 </div>
