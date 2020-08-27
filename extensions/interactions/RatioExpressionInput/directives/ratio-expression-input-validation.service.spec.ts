@@ -236,7 +236,7 @@ describe('RatioExpressionInputValidationService', () => {
   });
 
   it('should catch integral value 1 for # terms', () => {
-    customizationArgs.numberOfTerms.value = -1;
+    customizationArgs.numberOfTerms.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
