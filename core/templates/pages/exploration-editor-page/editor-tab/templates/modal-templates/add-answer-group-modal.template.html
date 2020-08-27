@@ -1,5 +1,6 @@
 <div class="modal-header protractor-test-add-response-modal-header">
   <h3>Add Response</h3>
+  <i class="fa fa-times" ng-click="cancel()"></i>
 </div>
 
 <div class="modal-body">
@@ -69,5 +70,30 @@
   }
   rule-editor {
     width: 100%;
+  }
+  .add-answer-group-modal .modal-header i {
+    display: none;
+  }
+  @media screen and (max-width: 768px) {
+    .add-answer-group-modal .modal-dialog ,
+    .add-answer-group-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+    }
+    .add-answer-group-modal .modal-content {
+      min-height: 100vh;
+    }
+    .add-answer-group-modal .modal-header {
+      background-color: #00609C;
+    }
+    .add-answer-group-modal .modal-header i {
+      color: #FFF;
+      display: block;
+      font-size: 20px;
+    }
+    .add-answer-group-modal .modal-header h3 {
+      color: #FFF;
+    }
   }
 </style>
