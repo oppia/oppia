@@ -66,6 +66,7 @@
 /core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
+/tsconfig-strict.json @nishantwrp @vojtechjelinek
 
 
 # Answer classification team.
