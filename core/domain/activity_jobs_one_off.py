@@ -31,6 +31,7 @@ from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 (
     collection_models, exp_models, question_models,
@@ -374,6 +375,7 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
             (str, str). Result info, first part is result message, second is
             additional info like IDs.
         """
+        new_user_ids = []
         for i, commit_cmd in enumerate(snapshot_model.commit_cmds):
             if (
                     commit_cmd['cmd'] == rights_domain.CMD_CHANGE_ROLE and
@@ -384,10 +386,13 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
                 user_settings_model = (
                     user_models.UserSettingsModel.get_by_gae_id(old_user_id))
                 if user_settings_model is None:
-                    return ('MIGRATION_FAILURE', old_user_id)
+                    return (
+                        'MIGRATION_FAILURE', (snapshot_model.id, old_user_id))
 
-                snapshot_model.commit_cmds[i]['assignee_id'] = (
-                    user_settings_model.id)
+                new_user_ids.append(user_settings_model.id)
+
+        for i in python_utils.RANGE(len(snapshot_model.commit_cmds)):
+            snapshot_model.commit_cmds[i]['assignee_id'] = new_user_ids[i]
 
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
