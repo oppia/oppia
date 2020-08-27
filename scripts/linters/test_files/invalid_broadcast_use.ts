@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid .ts file with broadcast, used by scripts/linters/
+ * @fileoverview Invalid .ts file with $broadcast, used by scripts/linters/
  * general_purpose_linter.py.
  */
 
