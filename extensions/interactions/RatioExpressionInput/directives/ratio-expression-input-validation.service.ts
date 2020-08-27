@@ -95,9 +95,10 @@ export class RatioExpressionInputValidationService {
         ratio: Ratio,
         currentInput: number[]
     ): boolean {
-      return currentRuleType === 'IsEquivalent' && (
+      return (currentRuleType === 'IsEquivalent' && (
         !rulesService.rof.arrayEquals(
-          ratio.convertToSimplestForm(), currentInput));
+          ratio.convertToSimplestForm(), currentInput))
+      );
     };
 
     // Checks whether currentInput has less number of terms than seenInput.
@@ -107,10 +108,11 @@ export class RatioExpressionInputValidationService {
         currentInput: number,
         seenInput: number[]
     ): boolean {
-      return currentRuleType === 'HasNumberOfTermsEqualTo' &&
+      return (currentRuleType === 'HasNumberOfTermsEqualTo' &&
       seenRuleType !== 'HasNumberOfTermsEqualTo' && (
         ratioRulesService.HasNumberOfTermsEqualTo(
-          seenInput, {y: currentInput}));
+          seenInput, {y: currentInput}))
+      );
     };
 
     // The following validations ensure that there are no redundant rules
@@ -139,7 +141,8 @@ export class RatioExpressionInputValidationService {
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   `Rule ${j + 1} from answer group ${i + 1} will never be` +
-                ' matched because it has fewer number of terms than required.')
+                  ' matched because it has fewer number of terms than required.'
+                )
               });
             }
           } else {
@@ -149,7 +152,8 @@ export class RatioExpressionInputValidationService {
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   `Rule ${j + 1} from answer group ${i + 1} will never be` +
-                ' matched because it has fewer number of terms than required.')
+                  ' matched because it has fewer number of terms than required.'
+                )
               });
             }
           }
