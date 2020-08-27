@@ -146,38 +146,29 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
 
 class StoryPageTests(BaseStoryViewerControllerTests):
     def test_any_user_can_access_story_viewer_page(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
 
     def test_accessibility_of_unpublished_story_viewer_page(self):
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
-                expected_status_int=404)
-            self.login(self.ADMIN_EMAIL)
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
-            self.logout()
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
+            expected_status_int=404)
+        self.login(self.ADMIN_EMAIL)
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
+        self.logout()
 
     def test_accessibility_of_story_viewer_in_unpublished_topic(self):
         topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
-                expected_status_int=404)
-            self.login(self.ADMIN_EMAIL)
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
-            self.logout()
-
-    def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
-                expected_status_int=404)
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
+            expected_status_int=404)
+        self.login(self.ADMIN_EMAIL)
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
+        self.logout()
 
 
 class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
@@ -189,11 +180,10 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             new_story_id, 'Title', 'Description', self.TOPIC_ID,
             new_story_url_fragment)
         story_services.save_new_story(self.admin_id, story)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/staging/topic/%s'
-                % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/topic/%s'
+            % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
+            expected_status_int=404)
 
     def test_can_not_access_story_viewer_page_with_unpublished_topic(self):
         new_story_id = 'new_story_id'
@@ -210,31 +200,23 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
         story_services.save_new_story(self.admin_id, story)
         topic_services.publish_story(
             'topic_id_1', new_story_id, self.admin_id)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/staging/topics/%s'
-                % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/topics/%s'
+            % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
+            expected_status_int=404)
 
     def test_get(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            json_response = self.get_json(
-                '%s/staging/topic/%s'
-                % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT))
-            expected_dict = {
-                'story_title': 'Title',
-                'story_description': 'Description',
-                'story_nodes': [self.node_2, self.node_1, self.node_3],
-                'topic_name': 'Topic'
-            }
-            self.assertDictContainsSubset(expected_dict, json_response)
-
-    def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_json(
-                '%s/staging/topic/%s'
-                % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT),
-                expected_status_int=404)
+        json_response = self.get_json(
+            '%s/staging/topic/%s'
+            % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT))
+        expected_dict = {
+            'story_id': self.STORY_ID,
+            'story_title': 'Title',
+            'story_description': 'Description',
+            'story_nodes': [self.node_2, self.node_1, self.node_3],
+            'topic_name': 'Topic'
+        }
+        self.assertDictContainsSubset(expected_dict, json_response)
 
 
 class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
