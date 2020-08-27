@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import subtopic_page_services
@@ -31,9 +30,6 @@ class SubtopicViewerPage(base.BaseHandler):
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, *args):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
 
         self.render_template('subtopic-viewer-page.mainpage.html')
 
@@ -55,8 +51,6 @@ class SubtopicPageDataHandler(base.BaseHandler):
             subtopic_id: str. The id of the subtopic, which is an integer in
                 string form.
         """
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
 
         subtopic_id = int(subtopic_id)
         topic = topic_fetchers.get_topic_by_name(topic_name)

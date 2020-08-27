@@ -754,30 +754,21 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     def test_get_topic_summary_dicts_with_new_structure_players_enabled(self):
         self.login(self.OWNER_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-            self.assertEqual(len(response['topic_summary_dicts']), 0)
-            self.save_new_topic(
-                'topic_id', self.owner_id, name='Name',
-                description='Description',
-                canonical_story_ids=['story_id_1', 'story_id_2'],
-                additional_story_ids=['story_id_3'],
-                uncategorized_skill_ids=['skill_id_1', 'skill_id_2'],
-                subtopics=[], next_subtopic_id=1)
-            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-            self.assertEqual(len(response['topic_summary_dicts']), 1)
-            self.assertTrue(isinstance(response['topic_summary_dicts'], list))
-            self.assertEqual(response['topic_summary_dicts'][0]['name'], 'Name')
-            self.assertEqual(
-                response['topic_summary_dicts'][0]['id'], 'topic_id')
-        self.logout()
-
-    def test_get_no_topic_summary_dicts_with_new_structure_players_disabled(
-            self):
-        self.login(self.OWNER_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-            self.assertEqual(response.get('topic_summary_dicts'), [])
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['topic_summary_dicts']), 0)
+        self.save_new_topic(
+            'topic_id', self.owner_id, name='Name',
+            description='Description',
+            canonical_story_ids=['story_id_1', 'story_id_2'],
+            additional_story_ids=['story_id_3'],
+            uncategorized_skill_ids=['skill_id_1', 'skill_id_2'],
+            subtopics=[], next_subtopic_id=1)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['topic_summary_dicts']), 1)
+        self.assertTrue(isinstance(response['topic_summary_dicts'], list))
+        self.assertEqual(response['topic_summary_dicts'][0]['name'], 'Name')
+        self.assertEqual(
+            response['topic_summary_dicts'][0]['id'], 'topic_id')
         self.logout()
 
     def test_can_update_display_preference(self):
