@@ -4,7 +4,7 @@
     <div class="oppia-question-player-card">
       <h3 class="oppia-question-player-header">Question <[$ctrl.currentQuestion]>/<[$ctrl.totalQuestions]></h3>
       <div class="oppia-question-player-progress">
-        <div class="current-progress"></div>
+        <div class="current-progress" ng-style="{width: $ctrl.currentProgress + '%'}"></div>
       </div>
     </div>
     <div class="oppia-question-player-body">
@@ -43,7 +43,7 @@
           <td> <[scorePerSkill.description]> </td>
           <td>
             <div class="oppia-skill-score-container">
-              <div class="score-bar"></div>
+              <div class="score-bar" ng-style="{width: $ctrl.getScorePercentage(scorePerSkill) + '%', background: $ctrl.getColorForScore(scorePerSkill)}"></div>
             </div>
           </td>
         </tr>
@@ -181,7 +181,6 @@
   .oppia-question-player-progress .current-progress {
     background: #0D48A1;
     height: 16px;
-    width: <[$ctrl.currentProgress]>%;
   }
 
   .oppia-question-player-container .question-player-results-header {
@@ -222,9 +221,7 @@
   }
 
   .oppia-skill-score-container .score-bar {
-    background: <[$ctrl.getColorForScore(scorePerSkill)]>;
     height: 8px;
-    width: <[$ctrl.getScorePercentage(scorePerSkill)]>%;
   }
 
   .oppia-question-player-container .question-player-results-footer {
