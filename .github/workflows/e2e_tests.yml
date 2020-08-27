@@ -26,13 +26,16 @@ jobs:
         run: python -m scripts.install_third_party_libs
       - name: Run Accessibility E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_e2e_tests --suite="accessibility" --prod_env
-      - name: Run Classroom Page E2E Test
+        run: python -m scripts.run_e2e_tests --suite="contributorDashboard"  --contributor_dashboard_enabled --prod_env
+      - name: Run Exploration Statistics Tab E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPage" --prod_env
-      - name: Run Profile Menu E2E Test
+        run: python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationStatisticsTab" --prod_env
+      - name: Run Exploration Translation Tab E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
-      - name: Run Library E2E Test
+        run: python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationTranslationTab" --prod_env
+      - name: Run Learner E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+        run: python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learner" --prod_env
+      - name: Run Learner Dashboard E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env
