@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
-from google.appengine.datastore import datastore_query
 from google.cloud import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -102,9 +101,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = ndb._datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
         else:
-            start_cursor = datastore_query.Cursor()
+            start_cursor = ndb._datastore_query.Cursor()
 
         results, cursor, more = cls.query(
             cls.incomplete_translation_language_codes == language_code).order(
@@ -141,7 +140,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = ndb._datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
         else:
             start_cursor = None
 
@@ -232,7 +231,7 @@ class SkillOpportunityModel(base_models.BaseModel):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = ndb._datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
         else:
             start_cursor = None
 

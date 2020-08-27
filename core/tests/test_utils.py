@@ -2645,7 +2645,7 @@ class AuditJobsTestBase(GenericTestBase):
         Yields:
             None. Empty yield statement.
         """
-        from google.appengine.ext import ndb
+        from google.cloud import ndb
 
         if not isinstance(mocked_datetime, datetime.datetime):
             raise utils.ValidationError(

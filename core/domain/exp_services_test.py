@@ -3467,7 +3467,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
         # This needs to be done in a toplevel wrapper because the datastore
         # puts to the event log are asynchronous.
-        @transaction_services.toplevel_wrapper
         def populate_datastore():
             """Populates the database according to the sequence."""
             exploration_1 = self.save_new_valid_exploration(

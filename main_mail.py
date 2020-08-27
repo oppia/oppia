@@ -35,19 +35,5 @@ URLS = [
         incoming_emails.IncomingReplyEmailHandler),
 ]
 
-from google.cloud import ndb
-
-client = ndb.Client()
-
-global_cache = ndb.RedisCache(
-    redis.StrictRedis(host=feconf.REDISHOST, port=feconf.REDISPORT))
-
-def ndb_wsgi_middleware(wsgi_app):
-    def middleware(environ, start_response):
-        with client.context(global_cache=global_cache):
-            return wsgi_app(environ, start_response)
-
-    return middleware
-
-app = ndb_wsgi_middleware(  # pylint: disable=invalid-name
+app = main.ndb_wsgi_middleware(  # pylint: disable=invalid-name
     webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))

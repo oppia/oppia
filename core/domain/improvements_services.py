@@ -28,7 +28,6 @@ from core.platform import models
 import feconf
 import python_utils
 
-from google.appengine.datastore import datastore_query
 
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
@@ -133,7 +132,7 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
     """
     start_cursor = (
         urlsafe_start_cursor and
-        datastore_query.Cursor(urlsafe=urlsafe_start_cursor))
+        ndb._datastore_query.Cursor(urlsafe=urlsafe_start_cursor))
     results, cursor, more = (
         improvements_models.TaskEntryModel.query(
             improvements_models.TaskEntryModel.entity_type == (

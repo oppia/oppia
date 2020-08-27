@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.platform import models
 
-from google.appengine.datastore import datastore_query
 from google.cloud import ndb
 
 (base_models, user_models,) = models.Registry.import_models([
@@ -261,7 +260,7 @@ class SkillSummaryModel(base_models.BaseModel):
                     this batch. If False, there are no further results
                     after this batch.
         """
-        cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        cursor = ndb._datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
         sort = -cls.skill_model_created_on
         if sort_by == (
                 constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[

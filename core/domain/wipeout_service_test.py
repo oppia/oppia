@@ -35,7 +35,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 (
     base_models, collection_models, exp_models,

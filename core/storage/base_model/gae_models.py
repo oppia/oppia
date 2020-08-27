@@ -24,7 +24,6 @@ from core.platform import models
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
 
 from google.cloud import ndb
 
@@ -362,7 +361,7 @@ class BaseModel(ndb.Model):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = ndb._datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
         else:
             start_cursor = None
 

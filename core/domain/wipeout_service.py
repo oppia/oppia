@@ -28,6 +28,7 @@ from core.platform import models
 import python_utils
 
 from google.cloud import ndb
+
 current_user_services = models.Registry.import_current_user_services()
 (
     base_models, feedback_models, improvements_models,
@@ -390,6 +391,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
         )
         save_pending_deletion_request(pending_deletion_request)
 
+    @ndb.transactional()
     def _pseudonymize_models(feedback_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
 
@@ -451,8 +453,8 @@ def _pseudonymize_feedback_models(pending_deletion_request):
                 0,
                 len(feedback_related_models),
                 MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
+
+            _pseudonymize_models(
                 feedback_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_user_id)
 
@@ -513,8 +515,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
             0,
             len(voiceover_application_models),
             MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-        transaction_services.run_in_transaction(
-            _pseudonymize_models,
+
+        _pseudonymize_models(
             voiceover_application_models[
                 i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION])
 

@@ -931,8 +931,8 @@ class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
         fake_urls.append(main.URLS[-1])
         with self.swap(main, 'URLS', fake_urls):
             transaction_services = models.Registry.import_transaction_services()
-            app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-                webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
+            app = webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG)
+
             self.testapp = webtest.TestApp(app)
 
             response = self.get_json(

@@ -26,6 +26,7 @@ import datetime
 import http.client
 import json
 import logging
+import main
 
 from export import acl_decorators
 
@@ -112,7 +113,8 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
             self.response.status_int = http.client.INTERNAL_SERVER_ERROR
 
 
-app = webapp2.WSGIApplication(  # pylint: disable=invalid-name
+app = main.ndb_wsgi_middleware(
+    webapp2.WSGIApplication(  # pylint: disable=invalid-name
     [
         ('/cloud_datastore_export', ExportToCloudDatastoreHandler),
-    ], debug=True)
+    ], debug=True))
