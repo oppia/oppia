@@ -29,7 +29,7 @@ import utils
 # One is extra (ie. (full: [*.js])) and three other test suites are
 # are being run by CircleCI.
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
-    'full', 'accessibility', 'adminPage', 'classroomPage',
+    'full', 'accessibility', 'adminMiscTab', 'adminPage', 'classroomPage',
     'classroomPageFileUploadFeatures', 'collections',
     'fileUploadExtensions', 'fileUploadFeatures', 'library', 'navigation',
     'playVoiceovers', 'preferences', 'profileFeatures', 'profileMenu',
