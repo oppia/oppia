@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
@@ -87,56 +86,48 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
         self.skill_id_2 = skill_services.get_new_skill_id()
 
     def test_get_concept_cards(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            json_response = self.get_json(
-                '%s/%s,%s' % (
-                    feconf.CONCEPT_CARD_DATA_URL_PREFIX,
-                    self.skill_id, self.skill_id_1)
-                )
-            self.assertEqual(2, len(json_response['concept_card_dicts']))
-            self.assertEqual(
-                '<p>Skill Explanation</p>',
-                json_response['concept_card_dicts'][0]['explanation']['html'])
-            self.assertEqual(
-                [skill_domain.WorkedExample(
-                    state_domain.SubtitledHtml(
-                        '2', '<p>Example Question 1</p>'),
-                    state_domain.SubtitledHtml(
-                        '3', '<p>Example Explanation 1</p>')
-                ).to_dict(), skill_domain.WorkedExample(
-                    state_domain.SubtitledHtml(
-                        '4', '<p>Example Question 2</p>'),
-                    state_domain.SubtitledHtml(
-                        '5', '<p>Example Explanation 2</p>')
-                ).to_dict()],
-                json_response['concept_card_dicts'][0]['worked_examples'])
+        json_response = self.get_json(
+            '%s/%s,%s' % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                self.skill_id, self.skill_id_1)
+            )
+        self.assertEqual(2, len(json_response['concept_card_dicts']))
+        self.assertEqual(
+            '<p>Skill Explanation</p>',
+            json_response['concept_card_dicts'][0]['explanation']['html'])
+        self.assertEqual(
+            [skill_domain.WorkedExample(
+                state_domain.SubtitledHtml(
+                    '2', '<p>Example Question 1</p>'),
+                state_domain.SubtitledHtml(
+                    '3', '<p>Example Explanation 1</p>')
+            ).to_dict(), skill_domain.WorkedExample(
+                state_domain.SubtitledHtml(
+                    '4', '<p>Example Question 2</p>'),
+                state_domain.SubtitledHtml(
+                    '5', '<p>Example Explanation 2</p>')
+            ).to_dict()],
+            json_response['concept_card_dicts'][0]['worked_examples'])
 
-            self.assertEqual(
-                '<p>Skill Explanation 1</p>',
-                json_response['concept_card_dicts'][1]['explanation']['html'])
-            self.assertEqual(
-                [skill_domain.WorkedExample(
-                    state_domain.SubtitledHtml(
-                        '2', '<p>Example Question 1</p>'),
-                    state_domain.SubtitledHtml(
-                        '3', '<p>Example Explanation 1</p>')
-                ).to_dict(), skill_domain.WorkedExample(
-                    state_domain.SubtitledHtml(
-                        '4', '<p>Example Question 2</p>'),
-                    state_domain.SubtitledHtml(
-                        '5', '<p>Example Explanation 2</p>')
-                ).to_dict()],
-                json_response['concept_card_dicts'][1]['worked_examples'])
-
-    def test_get_concept_cards_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_json(
-                '%s/%s' % (feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id),
-                expected_status_int=404)
+        self.assertEqual(
+            '<p>Skill Explanation 1</p>',
+            json_response['concept_card_dicts'][1]['explanation']['html'])
+        self.assertEqual(
+            [skill_domain.WorkedExample(
+                state_domain.SubtitledHtml(
+                    '2', '<p>Example Question 1</p>'),
+                state_domain.SubtitledHtml(
+                    '3', '<p>Example Explanation 1</p>')
+            ).to_dict(), skill_domain.WorkedExample(
+                state_domain.SubtitledHtml(
+                    '4', '<p>Example Question 2</p>'),
+                state_domain.SubtitledHtml(
+                    '5', '<p>Example Explanation 2</p>')
+            ).to_dict()],
+            json_response['concept_card_dicts'][1]['worked_examples'])
 
     def test_get_concept_cards_fails_when_skill_doesnt_exist(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/%s' % (
-                    feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id_2),
-                expected_status_int=404)
+        self.get_json(
+            '%s/%s' % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id_2),
+            expected_status_int=404)
