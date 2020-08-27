@@ -671,7 +671,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     # The html content for the question.
     question_content = ndb.TextProperty(indexed=False, required=True)
     # The ID of the interaction.
-    interaction_id = ndb.TextProperty(indexed=False, required=True)
+    interaction_id = ndb.StringProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy():
