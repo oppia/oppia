@@ -300,10 +300,12 @@ class TopicPageDataHandlerTests(
             'uncategorized_skill_ids': [self.skill_id_1],
             'subtopics': [subtopic_1.to_dict()],
             'degrees_of_mastery': {
-                self.skill_id_1: None
+                self.skill_id_1: None,
+                self.skill_id_2: None
             },
             'skill_descriptions': {
-                self.skill_id_1: 'Skill Description 1'
+                self.skill_id_1: 'Skill Description 1',
+                self.skill_id_2: None
             },
             'train_tab_should_be_displayed': True
         }
