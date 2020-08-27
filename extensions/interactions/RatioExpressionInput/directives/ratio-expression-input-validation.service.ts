@@ -51,13 +51,23 @@ export class RatioExpressionInputValidationService {
     if (minimumNumberOfTerms === undefined ||
         !isPositiveInt(minimumNumberOfTerms)
     ) {
-      return [
-        {
-          type: AppConstants.WARNING_TYPES.ERROR,
-          message: (
-            'The number of terms should be a positive integer.')
-        }
-      ];
+      if (minimumNumberOfTerms === 1) {
+        return [
+          {
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: (
+              'The number of terms in a ratio should be greater than 1.')
+          }
+        ];
+      } else {
+        return [
+          {
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: (
+              'The number of terms should be a positive integer.')
+          }
+        ];
+      }
     } else {
       return [];
     }

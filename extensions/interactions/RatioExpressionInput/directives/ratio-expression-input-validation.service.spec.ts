@@ -234,4 +234,15 @@ describe('RatioExpressionInputValidationService', () => {
       message: ('The number of terms should be a positive integer.')
     }]);
   });
+
+  it('should catch integral value 1 for # terms', () => {
+    customizationArgs.numberOfTerms.value = -1;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: ('The number of terms in a ratio should be greater than 1.')
+    }]);
+  });
 });
