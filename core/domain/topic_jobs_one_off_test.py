@@ -102,8 +102,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.albert_id, topic)
 
         # Delete the topic before migration occurs.
-        topic_services.delete_topic(
-            self.albert_id, self.TOPIC_ID)
+        topic_services.delete_topic(elf.albert_id, self.TOPIC_ID)
 
         # Ensure the topic is deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):

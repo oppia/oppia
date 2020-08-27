@@ -648,14 +648,14 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PRIVATE)
+            rights_domain.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
+            rights_domain.ACTIVITY_STATUS_PUBLIC)
 
         self.logout()
 

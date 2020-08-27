@@ -182,10 +182,10 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 
 class ActivityRightsChangeTests(test_utils.GenericTestBase):
 
-    def test_activity_rights_change_object_with_missing_cmd(self):
+    def test_exploration_rights_change_object_with_missing_cmd(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Missing cmd key in change dict'):
-            rights_domain.ActivityRightsChange({'invalid': 'data'})
+            rights_domain.ExplorationRightsChange({'invalid': 'data'})
 
     def test_activity_rights_change_object_with_invalid_cmd(self):
         with self.assertRaisesRegexp(
@@ -328,7 +328,7 @@ class ActivityRightsChangeTests(test_utils.GenericTestBase):
             exp_rights_change_object.new_status,
             rights_domain.ACTIVITY_STATUS_PUBLIC)
 
-    def test_exploration_rights_change_object_with_change_collection_status(
+    def test_collection_rights_change_object_with_change_collection_status(
             self):
         col_rights_change_object = rights_domain.CollectionRightsChange({
             'cmd': 'change_collection_status',
