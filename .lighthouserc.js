@@ -122,6 +122,7 @@
         {
           "matchingUrlPattern": "http://[^/]+/donate$",
           "assertions": {
+            // fdf
             "uses-webp-images": ["error", {"minScore": 0.8}]
           }
         },
