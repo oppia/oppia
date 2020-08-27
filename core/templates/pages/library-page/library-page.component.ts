@@ -70,7 +70,7 @@ angular.module('oppia').component('libraryPage', {
       var MAX_NUM_TILES_PER_ROW = 4;
       var isAnyCarouselCurrentlyScrolling = false;
 
-      ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
+      ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
 
       ctrl.setActiveGroup = function(groupIndex) {
         ctrl.activeGroupIndex = groupIndex;
@@ -206,12 +206,10 @@ angular.module('oppia').component('libraryPage', {
           return UrlInterpolationService.getStaticImageUrl(imagePath);
         };
 
-        var classroomPageIsShownPromise = (
-          ctrl.classroomBackendApiService.fetchClassroomPageIsShownStatusAsync()
-        );
-        classroomPageIsShownPromise.then(
-          function(classroomIsShown) {
-            ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
+        let service = ctrl.classroomBackendApiService;
+        service.fetchClassroomPromosAreEnabledStatusAsync().then(
+          function(classroomPromosAreEnabled) {
+            ctrl.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
           });
 
         ctrl.activeGroupIndex = null;
