@@ -38,8 +38,10 @@ describe('Exploration task object factory', () => {
     expTaskObjectFactory = TestBed.get(ExplorationTaskObjectFactory);
   });
 
+  let newTaskEntryBackendDict;
+
   beforeEach(() => {
-    this.newTaskEntryBackendDict = (
+    newTaskEntryBackendDict = (
       (taskType: string): TaskEntryBackendDict => ({
         entity_type: 'exploration',
         entity_id: 'eid',
@@ -58,28 +60,28 @@ describe('Exploration task object factory', () => {
   it('should return a high bounce rate task', () => {
     expect(
       expTaskObjectFactory.createFromBackendDict(
-        this.newTaskEntryBackendDict('high_bounce_rate'))
+        newTaskEntryBackendDict('high_bounce_rate'))
     ).toBeInstanceOf(HighBounceRateTask);
   });
 
   it('should return a ineffective feedback loop task', () => {
     expect(
       expTaskObjectFactory.createFromBackendDict(
-        this.newTaskEntryBackendDict('ineffective_feedback_loop'))
+        newTaskEntryBackendDict('ineffective_feedback_loop'))
     ).toBeInstanceOf(IneffectiveFeedbackLoopTask);
   });
 
   it('should return a needs guiding responses task', () => {
     expect(
       expTaskObjectFactory.createFromBackendDict(
-        this.newTaskEntryBackendDict('needs_guiding_responses'))
+        newTaskEntryBackendDict('needs_guiding_responses'))
     ).toBeInstanceOf(NeedsGuidingResponsesTask);
   });
 
   it('should return a successive incorrect answers task', () => {
     expect(
       expTaskObjectFactory.createFromBackendDict(
-        this.newTaskEntryBackendDict('successive_incorrect_answers'))
+        newTaskEntryBackendDict('successive_incorrect_answers'))
     ).toBeInstanceOf(SuccessiveIncorrectAnswersTask);
   });
 
@@ -106,7 +108,7 @@ describe('Exploration task object factory', () => {
   it('should throw an error if task type is unknown', () => {
     expect(
       () => expTaskObjectFactory.createFromBackendDict(
-        this.newTaskEntryBackendDict('unknown_task_type'))
+        newTaskEntryBackendDict('unknown_task_type'))
     ).toThrowError(new RegExp(
       'Unsupported task type "unknown_task_type" for backend dict: ' +
       '{.*"task_type":"unknown_task_type".*}'));
