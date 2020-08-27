@@ -133,7 +133,7 @@
     "d3-hexbin": "^0.2.2",
     "d3-scale": "^3.2.1",
     "default-passive-events": "^2.0.0",
-    "fabric": "4.1.0",
+    "fabric": "^4.1.0",
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
     "hammerjs": "^2.0.8",
