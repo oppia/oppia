@@ -355,7 +355,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 [INVALID_BROADCAST_USE_FILEPATH], FILE_CACHE, True
             ).perform_all_lint_checks()
         self.assert_same_list_elements([
-            'Line 22: Please do not use $broadcast/$on for propagating events. '
+            'Line 26: Please do not use $broadcast/$on for propagating events. '
             'Use EventEmitters and Subscriptions instead.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 

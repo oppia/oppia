@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Invalid .ts file with broadcast, used by scripts/linters/
+ * general_purpose_linter.py.
+ */
+
 angular.module('oppia').directive('sampleDirective', [
   function() {
     return {
@@ -23,4 +28,3 @@ angular.module('oppia').directive('sampleDirective', [
       ]
     };
   }]);
-
