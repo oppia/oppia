@@ -66,6 +66,7 @@
 /core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
+/tsconfig-strict.json @nishantwrp @vojtechjelinek
 
 
 # Answer classification team.
@@ -247,24 +248,23 @@
 
 
 # Global frontend services
-/core/templates/services/promo-bar.service*.ts @ankita240796
-/core/templates/services/html-escaper.service*.ts @ankita240796
-/core/templates/services/debouncer.service*.ts @ankita240796
-/core/templates/services/site-analytics.service*.ts @ankita240796
-/core/templates/services/date-time-format.service*.ts @ankita240796
-/core/templates/services/utils.service*.ts @ankita240796
-/core/templates/services/local-storage.service*.ts @ankita240796
-/core/templates/services/id-generation.service*.ts @ankita240796
 /core/templates/services/alerts.service*.ts @ankita240796
-/core/templates/services/page-title.service*.ts @ankita240796
+/core/templates/services/date-time-format.service*.ts @ankita240796
+/core/templates/services/debouncer.service*.ts @ankita240796
 /core/templates/services/extension-tag-assembler.service*.ts @ankita240796
+/core/templates/services/html-escaper.service*.ts @ankita240796
+/core/templates/services/id-generation.service*.ts @ankita240796
+/core/templates/services/keyboard-shortcut.service*.ts @jimbyo
+/core/templates/services/local-storage.service*.ts @ankita240796
 /core/templates/services/nested-directives*.ts @ankita240796
-/core/templates/services/keyboard-shortcut.service.ts @jimbyo
-/core/templates/services/keyboard-shortcut.service.spec.ts @jimbyo
+/core/templates/services/page-title.service*.ts @ankita240796
+/core/templates/services/promo-bar.service*.ts @ankita240796
+/core/templates/services/site-analytics.service*.ts @ankita240796
+/core/templates/services/utils.service*.ts @ankita240796
 /core/templates/services/stateful/background-mask.service*.ts @ankita240796
 /core/templates/services/stateful/focus-manager.service*.ts @ankita240796
-/core/templates/services/contextual/url.service*.ts @ankita240796
 /core/templates/services/contextual/device-info.service*.ts @ankita240796
+/core/templates/services/contextual/url.service*.ts @ankita240796
 /core/templates/services/contextual/window-dimensions.service*.ts @ankita240796
 /core/templates/services/contextual/window-ref.service*.ts @ankita240796
 
@@ -564,6 +564,7 @@
 
 # Typings.
 /typings @ankita240796 @nishantwrp
+/typings/tests/ @shavavo
 
 
 # User Data Takeout.

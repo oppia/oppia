@@ -8,7 +8,7 @@
   </h3>
 </div>
 
-<div class="modal-body">
+<div class="customize-interaction-body-container modal-body">
   <div ng-if="!StateInteractionIdService.displayed" ng-cloak>
     <uib-tabset>
       <uib-tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
@@ -75,5 +75,30 @@
   .interaction-editor-form .boolean-checkbox {
     float: left;
     margin-right: 4px;
+  }
+  .customize-interaction-body-container .oppia-interaction-tile img {
+    border: 1px solid #aaa;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+  }
+  .customize-interaction-body-container ul .active {
+    border-bottom: 2px solid #00609C;
+  }
+   .customize-interaction-modal .modal-dialog {
+     margin: 30px auto;
+     max-width: none;
+     width: 45vw;
+  }
+  @media screen and (max-width: 768px) {
+    .customize-interaction-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+    }
+    .customize-interaction-modal .modal-dialog {
+      margin: 0;
+      max-width: none;
+      width: 100vw;
+    }
   }
 </style>
