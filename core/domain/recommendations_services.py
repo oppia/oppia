@@ -319,9 +319,14 @@ def get_item_similarity(
     return similarity_score
 
 
-def set_recommendations(exp_id, new_recommendations):
+def set_exploration_recommendations(exp_id, new_recommendations):
     """Stores a list of exploration ids of recommended explorations to play
     after completing the exploration keyed by exp_id.
+
+    Args:
+        exp_id: str. The ID of the exploration for which to set
+            the recommendations.
+        new_recommendations: list(str). The new recommendations to set.
     """
 
     recommendations_models.ExplorationRecommendationsModel(
@@ -331,6 +336,14 @@ def set_recommendations(exp_id, new_recommendations):
 def get_exploration_recommendations(exp_id):
     """Gets a list of ids of at most 10 recommended explorations to play
     after completing the exploration keyed by exp_id.
+
+    Args:
+        exp_id: str. The ID of the exploration for which to get
+            the recommendations.
+
+    Returns:
+        list(str). List of recommended explorations IDs. Some of these IDs are
+        no longer valid/existing and need to be verified.
     """
 
     recommendations_model = (
@@ -340,3 +353,20 @@ def get_exploration_recommendations(exp_id):
         return []
     else:
         return recommendations_model.recommended_exploration_ids
+
+
+def delete_exploration_recommendations(exp_ids):
+    """Delete exploration recommendations.
+
+    Args:
+        exp_ids: list(str). List of exploration IDs for which to delete
+            the recommendations.
+    """
+
+    recommendation_models = (
+        recommendations_models.ExplorationRecommendationsModel.get_multi(
+            exp_ids))
+    existing_recommendation_models = [
+        model for model in recommendation_models if model is not None]
+    recommendations_models.ExplorationRecommendationsModel.delete_multi(
+        existing_recommendation_models)

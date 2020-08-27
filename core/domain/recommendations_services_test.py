@@ -312,7 +312,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_and_set_exploration_recommendations(self):
         recommended_exp_ids = ['exp_id_2', 'exp_id_3']
-        recommendations_services.set_recommendations(
+        recommendations_services.set_exploration_recommendations(
             'exp_id_1', recommended_exp_ids)
         saved_recommendation_ids = (
             recommendations_services.get_exploration_recommendations(
@@ -320,7 +320,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(recommended_exp_ids, saved_recommendation_ids)
 
         recommended_exp_ids = ['exp_id_3']
-        recommendations_services.set_recommendations(
+        recommendations_services.set_exploration_recommendations(
             'exp_id_1', recommended_exp_ids)
         saved_recommendation_ids = (
             recommendations_services.get_exploration_recommendations(

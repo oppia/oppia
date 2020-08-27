@@ -28,7 +28,7 @@ import utils
 
 from mapreduce import model as mapreduce_model
 
-job_models, = models.Registry.import_models([models.NAMES.job])
+(job_models,) = models.Registry.import_models([models.NAMES.job])
 
 
 def get_stuck_jobs(recency_msecs):
@@ -121,3 +121,39 @@ class JobCleanupManager(jobs.BaseMapReduceOneOffJobManager):
             logging.warning(
                 'Entities remaining count: %s entities (%s)' %
                 (sum(values), key))
+
+
+class JobModelsCleanupManager(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for cleaning up old entities of JobModel."""
+
+    TWELVE_WEEKS = datetime.timedelta(weeks=12)
+    STATUSES_TO_DELETE = [
+        job_models.STATUS_CODE_COMPLETED,
+        job_models.STATUS_CODE_FAILED,
+        job_models.STATUS_CODE_CANCELED
+    ]
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """The entity types this job will handle."""
+        return [job_models.JobModel]
+
+    @staticmethod
+    def map(model):
+        date_twelve_weeks_ago = (
+            datetime.datetime.utcnow() - JobModelsCleanupManager.TWELVE_WEEKS)
+        twelve_weeks_ago_in_millisecs = utils.get_time_in_millisecs(
+            date_twelve_weeks_ago)
+        if (
+                model.time_finished_msec < twelve_weeks_ago_in_millisecs and
+                model.status_code in JobModelsCleanupManager.STATUSES_TO_DELETE
+        ):
+            model.delete()
+            yield ('SUCCESS_DELETED', model.id)
+        else:
+            yield ('SUCCESS_KEPT', model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))

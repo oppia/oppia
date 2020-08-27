@@ -213,3 +213,12 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
                     jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
                 })
             logging.warning('Deletion jobs for auxiliary entities kicked off.')
+
+        if job_models.JobModel.do_unfinished_jobs_exist(
+                cron_services.JobModelsCleanupManager.__name__):
+            logging.warning(
+                'A previous JobModels cleanup job is still running.')
+        else:
+            cron_services.JobModelsCleanupManager.enqueue(
+                cron_services.JobModelsCleanupManager.create_new())
+            logging.warning('Deletion jobs for JobModels entities kicked off.')

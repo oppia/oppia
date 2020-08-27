@@ -92,5 +92,5 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             item['exp_id']
             for item in other_exploration_similarities[:MAX_RECOMMENDATIONS]]
 
-        recommendations_services.set_recommendations(
+        recommendations_services.set_exploration_recommendations(
             key, recommended_exploration_ids)
