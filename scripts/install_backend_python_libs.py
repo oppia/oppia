@@ -22,6 +22,7 @@ import collections
 import os
 import subprocess
 import sys
+import python_utils
 from pip._internal.utils.misc import get_installed_distributions
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
@@ -36,7 +37,7 @@ PRE_COMPILED_REQUIREMENTS_FILE_PATH = os.path.join('.', 'requirements.in')
 
 def _get_requirements_file_contents():
     requirements_contents = collections.defaultdict()
-    with open(REQUIREMENTS_FILE_PATH, 'r') as f:
+    with python_utils.open_file(REQUIREMENTS_FILE_PATH, 'r') as f:
         lines = f.readlines()
         for l in lines:
             if l.startswith('#'):
@@ -54,7 +55,7 @@ def _get_third_party_directory_contents():
         skip=[], paths=[THIRD_PARTY_DIR])
     directory_contents = collections.defaultdict()
     for d in installed_distributions:
-        library_and_version = str(d).split(' ')
+        library_and_version = python_utils.convert_to_bytes(d).split(' ')
         library = library_and_version[0].lower()
         version = library_and_version[1]
         directory_contents[library] = version
@@ -113,7 +114,7 @@ def get_mismatches():
     return mismatches
 
 def regenerate_requirements_file():
-    print("Regenerating 'requirements.txt' file...")
+    python_utils.PRINT("Regenerating 'requirements.txt' file...")
     subprocess.check_call([
         'pip-compile', PRE_COMPILED_REQUIREMENTS_FILE_PATH
     ])

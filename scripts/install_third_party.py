@@ -422,7 +422,6 @@ def main(args=None):
         python_utils.PRINT(
             'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing python third party packages.')
-
     # Install static frontend libraries to third_party/static
     download_manifest_files(MANIFEST_FILE_PATH)
 
