@@ -72,7 +72,6 @@ describe('ExplorationStatesService', function() {
   var ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
-  var StateSolicitAnswerDetailsService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(function($provide) {
@@ -137,7 +136,6 @@ describe('ExplorationStatesService', function() {
     ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
-    StateSolicitAnswerDetailsService = _StateSolicitAnswerDetailsService_;
   }));
 
   beforeEach(function() {

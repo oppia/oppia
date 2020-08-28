@@ -74,7 +74,6 @@ describe('Audio translation bar directive', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var recordedVoiceoversObjectFactory = null;
-  var externalSaveService = null;
   var siteAnalyticsService = null;
   var stateEditorService = null;
   var stateRecordedVoiceoversService = null;
@@ -145,7 +144,6 @@ describe('Audio translation bar directive', function() {
     contextService = $injector.get('ContextService');
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     explorationStatesService = $injector.get('ExplorationStatesService');
-    externalSaveService = $injector.get('ExternalSaveService');
     stateEditorService = $injector.get('StateEditorService');
     translationLanguageService = $injector.get('TranslationLanguageService');
     translationTabActiveContentIdService = $injector.get(

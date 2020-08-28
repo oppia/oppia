@@ -40,6 +40,7 @@ angular.module('oppia').directive('adminConfigTab', [
         var ctrl = this;
         ctrl.isNonemptyObject = function(object) {
           var hasAtLeastOneElement = false;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           for (var property in object) {
             hasAtLeastOneElement = true;
           }

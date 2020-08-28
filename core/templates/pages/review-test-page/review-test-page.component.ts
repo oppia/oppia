@@ -58,7 +58,7 @@ angular.module('oppia').component('reviewTestPage', {
           UrlService.getStoryUrlFragmentFromLearnerUrl());
         var classroomUrlFragment = (
           UrlService.getClassroomUrlFragmentFromLearnerUrl());
-        var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
+        UrlInterpolationService.interpolateUrl(
           REVIEW_TEST_DATA_URL, {
             topic_url_fragment: topicUrlFragment,
             classroom_url_fragment: classroomUrlFragment,
