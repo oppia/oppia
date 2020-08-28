@@ -18,6 +18,7 @@
  */
 'use strict';
 
+// TODO(#10479): Implement this rule using the nodes instead of tokens.
 module.exports = {
   meta: {
     type: 'layout',
@@ -55,12 +56,14 @@ module.exports = {
         parens.forEach((paren, i) => {
           const line = lines[paren.loc.start.line - 1].trim();
           const nextParen = parens[i + 1];
+          // TODO(#10479): Consider 'it' and 'describe' as a normal function
+          // call instead of an exception.
           if (line.startsWith('it(') || line.startsWith('describe(') ||
             line.startsWith('angular.module(\'oppia\').')) {
             return true;
           }
-          if (line.startsWith('if') || line.startsWith('} else if') ||
-            line.startsWith('while') || line.startsWith('for')) {
+          if (line.startsWith('if (') || line.startsWith('} else if (') ||
+            line.startsWith('while (') || line.startsWith('for (')) {
             excluded = true;
           }
           if (excluded && line.endsWith(') {')) {
