@@ -530,7 +530,8 @@ class DeployTests(test_utils.GenericTestBase):
             deploy, 'APP_DEV_YAML_PATH', INVALID_APP_DEV_YAML_PATH)
         with self.exists_swap, self.copyfile_swap, app_dev_swap:
             with self.listdir_swap, self.assertRaisesRegexp(
-                AssertionError, 'Missing vpc_access_connector'):
+                AssertionError,
+                'name: projects/PROJECT_ID string is missing in app_dev.yaml'):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
     def test_constants_and_app_dev_are_updated_correctly(self):

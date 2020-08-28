@@ -162,7 +162,8 @@ def preprocess_release(app_name, deploy_data_path):
             common.CONSTANTS_FILE_PATH))
 
     assert 'vpc_access_connector:\n  name: projects/PROJECT_ID' in (
-        app_dev_content), 'Missing vpc_access_connector'
+        app_dev_content), (
+            'name: projects/PROJECT_ID string is missing in app_dev.yaml')
 
     bucket_name = app_name + BUCKET_NAME_SUFFIX
     common.inplace_replace_file(
