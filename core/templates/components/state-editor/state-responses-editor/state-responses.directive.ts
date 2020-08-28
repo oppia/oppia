@@ -138,8 +138,6 @@ angular.module('oppia').directive('stateResponses', [
             if (StateEditorService.isInQuestionMode()) {
               return;
             }
-            var explorationId = ContextService.getExplorationId();
-            var currentStateName = $scope.stateName;
           };
 
           $scope.isInQuestionMode = function() {
