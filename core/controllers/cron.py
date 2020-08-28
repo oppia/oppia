@@ -26,6 +26,7 @@ from core.domain import activity_jobs_one_off
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
+from core.domain import recommendations_services
 from core.domain import user_jobs_one_off
 from core.domain import wipeout_jobs_one_off
 from core.platform import models
@@ -118,6 +119,7 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
+        recommendations_services.delete_all_exploration_recommendations()
         job_class = (
             recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob)
         job_class.enqueue(job_class.create_new())

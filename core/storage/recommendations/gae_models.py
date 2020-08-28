@@ -35,10 +35,9 @@ class ExplorationRecommendationsModel(
     Instances of this class are keyed by exploration id.
     """
 
-    # Ids of recommended explorations. Some of these exploration IDs might no
-    # longer be valid and always need to be checked that they exist.
+    # Ids of recommended explorations.
     recommended_exploration_ids = ndb.StringProperty(
-        repeated=True, indexed=False)
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():

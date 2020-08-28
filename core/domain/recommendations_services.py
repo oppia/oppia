@@ -342,8 +342,7 @@ def get_exploration_recommendations(exp_id):
             the recommendations.
 
     Returns:
-        list(str). List of recommended explorations IDs. Some of these IDs are
-        no longer valid/existing and need to be verified.
+        list(str). List of recommended explorations IDs.
     """
 
     recommendations_model = (
@@ -355,18 +354,37 @@ def get_exploration_recommendations(exp_id):
         return recommendations_model.recommended_exploration_ids
 
 
-def delete_exploration_recommendations(exp_ids):
-    """Delete exploration recommendations.
+def delete_explorations_from_recommendations(exp_ids):
+    """Delete explorations from recommendations. Both delete the recommendations
+    for explorations and delete the explorations from other explorations
+    recommendations.
 
     Args:
         exp_ids: list(str). List of exploration IDs for which to delete
             the recommendations.
     """
-
-    recommendation_models = (
-        recommendations_models.ExplorationRecommendationsModel.get_multi(
-            exp_ids))
+    recommendations_class = (
+        recommendations_models.ExplorationRecommendationsModel)
+    recommendation_models = recommendations_class.get_multi(exp_ids)
     existing_recommendation_models = [
         model for model in recommendation_models if model is not None]
-    recommendations_models.ExplorationRecommendationsModel.delete_multi(
-        existing_recommendation_models)
+    recommendations_class.delete_multi(existing_recommendation_models)
+
+    mentioned_recommendation_models = recommendations_class.query(
+        recommendations_class.recommended_exploration_ids.IN(exp_ids)
+    ).fetch()
+
+    for mentioned_recommendation_model in mentioned_recommendation_models:
+        for exp_id in exp_ids:
+            mentioned_recommendation_model.recommended_exploration_ids.remove(
+                exp_id)
+
+    recommendations_class.put_multi(mentioned_recommendation_models)
+
+
+def delete_all_exploration_recommendations():
+    """Delete explorations from recommendations. Both delete the recommendations
+    for explorations and delete the explorations from other explorations
+    recommendations.
+    """
+    recommendations_models.ExplorationRecommendationsModel.delete_all()
