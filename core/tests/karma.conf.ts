@@ -1,4 +1,5 @@
 var path = require('path');
+
 var argv = require('yargs').argv;
 
 var generatedJs = 'third_party/generated/js/third_party.js';
