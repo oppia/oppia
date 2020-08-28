@@ -185,7 +185,7 @@ export class Story {
   }
 
   prepublishValidate(): string[] {
-    let metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
+    const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Story should have a thumbnail.');

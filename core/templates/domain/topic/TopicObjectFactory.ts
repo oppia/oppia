@@ -273,7 +273,7 @@ export class Topic {
   }
 
   prepublishValidate(): string[] {
-    let metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
+    const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
@@ -291,6 +291,9 @@ export class Topic {
       issues.push(
         'Topic meta tag content should not be longer than ' +
         `${metaTagContentCharLimit} characters.`);
+    }
+    if (!this._subtopics.length) {
+      issues.push('Topic should have at least 1 subtopic.');
     }
     return issues;
   }

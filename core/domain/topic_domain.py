@@ -1045,6 +1045,11 @@ class Topic(python_utils.OBJECT):
                         'Subtopic with title %s does not have any skills '
                         'linked.' % subtopic.title)
 
+        if strict:
+            if len(self.subtopics) == 0:
+                raise utils.ValidationError(
+                    'Topic should have at least 1 subtopic.')
+
         if not self.are_subtopic_url_fragments_unique():
             raise utils.ValidationError(
                 'Subtopic url fragments are not unique across '

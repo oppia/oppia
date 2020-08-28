@@ -139,6 +139,12 @@ describe('Practice tab component', function() {
       expect(component.isStartButtonDisabled()).toBe(true);
     });
 
+  it('should have start button disabled when the disable boolean is set',
+    function() {
+      component.startButtonIsDisabled = true;
+      expect(component.isStartButtonDisabled()).toBe(true);
+    });
+
   it('should open a new practice session containing the selected subtopic' +
     ' when start button is clicked', function() {
     component.selectedSubtopicIndices[0] = true;

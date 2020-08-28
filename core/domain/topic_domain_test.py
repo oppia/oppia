@@ -491,6 +491,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_strict_validation_error(
             'Subtopic with title Title does not have any skills linked')
 
+        self.topic.subtopics = []
+        self._assert_strict_validation_error(
+            'Topic should have at least 1 subtopic.')
+
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
@@ -613,7 +617,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, validation_message):
             self.topic.validate()
 
-    def test_validation_fails_with_lenghty_url_fragment(self):
+    def test_validation_fails_with_lengthy_url_fragment(self):
         self.topic.url_fragment = 'a' * 25
         url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
         validation_message = (
