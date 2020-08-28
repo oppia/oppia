@@ -95,9 +95,10 @@ export class RatioExpressionInputValidationService {
         ratio: Ratio,
         currentInput: number[]
     ): boolean {
-      return (currentRuleType === 'IsEquivalent' && (
+      return (
+        currentRuleType === 'IsEquivalent' &&
         !rulesService.rof.arrayEquals(
-          ratio.convertToSimplestForm(), currentInput))
+          ratio.convertToSimplestForm(), currentInput)
       );
     };
 
@@ -108,10 +109,11 @@ export class RatioExpressionInputValidationService {
         currentInput: number,
         seenInput: number[]
     ): boolean {
-      return (currentRuleType === 'HasNumberOfTermsEqualTo' &&
-      seenRuleType !== 'HasNumberOfTermsEqualTo' && (
+      return (
+        currentRuleType === 'HasNumberOfTermsEqualTo' &&
+        seenRuleType !== 'HasNumberOfTermsEqualTo' &&
         ratioRulesService.HasNumberOfTermsEqualTo(
-          seenInput, {y: currentInput}))
+          seenInput, {y: currentInput})
       );
     };
 
