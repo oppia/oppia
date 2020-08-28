@@ -168,7 +168,7 @@ describe('History tab component', function() {
     ctrl.$onDestroy();
   });
 
-  it('should evaluate controller properties after its initialization',
+  it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.explorationId).toBe(explorationId);
       expect(ctrl.explorationAllSnapshotsUrl).toBe(
@@ -255,7 +255,7 @@ describe('History tab component', function() {
       '/createhandler/download/exp1?v=1', '&output_format=zip');
   });
 
-  it('should open revert exploration modal with $uibModal', function() {
+  it('should open revert exploration modal', function() {
     spyOn($uibModal, 'open').and.callThrough();
 
     ctrl.showRevertExplorationModal();

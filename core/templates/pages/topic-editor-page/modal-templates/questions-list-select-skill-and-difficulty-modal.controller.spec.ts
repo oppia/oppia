@@ -81,7 +81,8 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
       });
     }));
 
-    it('should evaluate initialized properties', function() {
+    it('should initialize $scope properties after controller' +
+      ' is initialized', function() {
       expect($scope.countOfSkillsToPrioritize).toBe(countOfSkillsToPrioritize);
       expect($scope.instructionMessage).toBe(
         'Select the skill(s) to link the question to:');
@@ -94,7 +95,7 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
       expect($scope.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
     });
 
-    it('should select and deselect a skill', function() {
+    it('should toggle skill selection when clicking on it', function() {
       expect($scope.linkedSkillsWithDifficulty.length).toBe(0);
       var summary = allSkillSummaries[0];
       $scope.selectOrDeselectSkill(summary);
@@ -107,28 +108,35 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
       expect($scope.linkedSkillsWithDifficulty.length).toBe(0);
     });
 
-    it('should change current mode when changing views', function() {
-      expect($scope.currentMode).toBe(currentMode);
+    it('should change view mode to select skill when changing view',
+      function() {
+        expect($scope.currentMode).toBe(currentMode);
 
-      $scope.goToSelectSkillView();
-      expect($scope.currentMode).toBe('MODE_SELECT_SKILL');
+        $scope.goToSelectSkillView();
+        expect($scope.currentMode).toBe('MODE_SELECT_SKILL');
+      });
 
-      $scope.goToNextStep();
-      expect($scope.currentMode).toBe('MODE_SELECT_DIFFICULTY');
-    });
+    it('should change view mode to select difficulty after selecting a skill',
+      function() {
+        expect($scope.currentMode).toBe(currentMode);
 
-    it('should close modal when starting to create question', function() {
-      var summary = allSkillSummaries[1];
-      $scope.selectOrDeselectSkill(summary);
+        $scope.goToNextStep();
+        expect($scope.currentMode).toBe('MODE_SELECT_DIFFICULTY');
+      });
 
-      $scope.startQuestionCreation();
+    it('should select skill and its difficulty proerly when closing the modal',
+      function() {
+        var summary = allSkillSummaries[1];
+        $scope.selectOrDeselectSkill(summary);
 
-      expect($uibModalInstance.close).toHaveBeenCalledWith([
-        skillDifficultyObjectFactory.create(
-          allSkillSummaries[1].id, allSkillSummaries[1].description, 0.3)
-      ]);
+        $scope.startQuestionCreation();
 
-      // Remove summary to not affect other specs.
-      $scope.selectOrDeselectSkill(summary);
-    });
+        expect($uibModalInstance.close).toHaveBeenCalledWith([
+          skillDifficultyObjectFactory.create(
+            allSkillSummaries[1].id, allSkillSummaries[1].description, 0.3)
+        ]);
+
+        // Remove summary to not affect other specs.
+        $scope.selectOrDeselectSkill(summary);
+      });
   });
