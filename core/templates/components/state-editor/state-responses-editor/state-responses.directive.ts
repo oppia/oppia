@@ -320,6 +320,7 @@ angular.module('oppia').directive('stateResponses', [
                 currentInteractionId: () => currentInteractionId,
                 stateName: () => stateName,
               },
+              windowClass: 'add-answer-group-modal',
               controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {
               // Create a new answer group.
