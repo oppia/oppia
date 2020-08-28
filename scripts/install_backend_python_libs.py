@@ -17,9 +17,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from scripts import common
 import collections
 import os
 import subprocess
+import sys
 from pip._internal.utils.misc import get_installed_distributions
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
@@ -30,7 +32,7 @@ REQUIREMENTS_FILE_PATH = os.path.join('.', 'requirements.txt')
 # modifying. It is the file that pip-tools will use to compile a deterministic
 # "requirements.txt" file so that all installations using "requirements.txt"
 # will be the same.
-PRE_COMPILED_REQUIREMENTS_FILE_NAME = 'requirements.in'
+PRE_COMPILED_REQUIREMENTS_FILE_PATH = os.path.join('.', 'requirements.in')
 
 def _get_requirements_file_contents():
     requirements_contents = collections.defaultdict()
@@ -113,11 +115,14 @@ def get_mismatches():
 def regenerate_requirements_file():
     print("Regenerating 'requirements.txt' file...")
     subprocess.check_call([
-        'pip-compile', PRE_COMPILED_REQUIREMENTS_FILE_NAME
+        'pip-compile', PRE_COMPILED_REQUIREMENTS_FILE_PATH
     ])
 
 def main():
-    print(validate_third_party_directory())
+    sys.path.insert(0, os.path.join(
+        TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION))
+    regenerate_requirements_file()
+    validate_third_party_directory()
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when install_third_party_libs.py is used as a script.
