@@ -122,8 +122,10 @@ class RegenerateQuestionSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             question_services.create_question_summary(question_model.id)
         except Exception as e:
-            yield (RegenerateQuestionSummaryOneOffJob._ERROR_KEY,
-                   'Failed to create question summary %s: %s' % (question_model.id, e))
+            yield (
+                RegenerateQuestionSummaryOneOffJob._ERROR_KEY,
+                'Failed to create question summary %s: %s' % (
+                    question_model.id, e))
             return
 
         yield (RegenerateQuestionSummaryOneOffJob._PROCESSED_KEY, 1)
@@ -138,4 +140,3 @@ class RegenerateQuestionSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
-

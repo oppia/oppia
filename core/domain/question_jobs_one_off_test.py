@@ -216,7 +216,8 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
 
         # Start migration job on sample question.
         job_id = (
-            question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.create_new())
+            question_jobs_one_off
+            .RegenerateQuestionSummaryOneOffJob.create_new())
         question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -224,8 +225,9 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             question_services.get_question_by_id(self.QUESTION_ID)
 
-        output = question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.get_output(
-            job_id)
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionSummaryOneOffJob.get_output(job_id))
 
         expected = [[u'question_deleted',
                      [u'Encountered 1 deleted questions.']]]
@@ -236,12 +238,14 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
 
         # Start migration job on sample question.
         job_id = (
-            question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.create_new())
+            question_jobs_one_off
+            .RegenerateQuestionSummaryOneOffJob.create_new())
         question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        output = question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.get_output(
-            job_id)
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionSummaryOneOffJob.get_output(job_id))
 
         expected = [[u'question_processed',
                      [u'Successfully processed 1 questions.']]]
@@ -258,12 +262,15 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
 
         with get_question_by_id_swap:
             job_id = (
-                question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.create_new())
-            question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.enqueue(job_id)
+                question_jobs_one_off
+                .RegenerateQuestionSummaryOneOffJob.create_new())
+            question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.enqueue(
+                job_id)
             self.process_and_flush_pending_tasks()
 
-        output = question_jobs_one_off.RegenerateQuestionSummaryOneOffJob.get_output(
-            job_id)
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionSummaryOneOffJob.get_output(job_id))
 
         for x in output:
             self.assertRegexpMatches(
