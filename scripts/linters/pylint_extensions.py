@@ -1767,7 +1767,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
     (missing-docstring) for missing file overviews.
     """
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
     name = 'space_between_imports_and_file-overview'
     priority = -1
     msgs = {
@@ -1783,45 +1783,37 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
         )
     }
 
-    def process_module(self, node):
-        """Process a module to ensure that there is a blank line below
+    def visit_module(self, node):
+        """Visit a module to ensure that there is a blank line below
         file overview docstring.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-        triple_quote_counter = 0
-        empty_line_counter = 0
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
-            # Single line comment, ignore it.
-            if line.startswith(b'#'):
-                continue
-            triple_quote_counter += line.count(multi_line_indicator)
-
-            if line.endswith(b'"""') and triple_quote_counter == 2:
-                closing_line_index_of_fileoverview = line_num
+        # Check if the given node has docstring.
+        if node.doc is None:
+            return
+        line_number = node.fromlineno
+        # Iterate till the start of docstring.
+        while True:
+            line = linecache.getline(node.root().file, line_number).strip()
+            if line.startswith((b'\'', b'"')):
                 break
+            else:
+                line_number += 1
 
-        if triple_quote_counter == 2:
-            empty_line_check_index = closing_line_index_of_fileoverview
-            if empty_line_check_index < file_length - 1:
-                while file_content[empty_line_check_index + 1] == b'\n':
-                    empty_line_counter += 1
-                    empty_line_check_index += 1
-
-            if empty_line_counter > 1:
-                self.add_message(
-                    'only-a-single-empty-line-should-be-provided',
-                    line=closing_line_index_of_fileoverview + 1)
-            elif empty_line_counter == 0:
-                self.add_message(
-                    'no-empty-line-provided-below-fileoverview',
-                    line=closing_line_index_of_fileoverview + 1)
+        doc_length = len(node.doc.split(b'\n'))
+        line_number += doc_length
+        first_line_after_doc = linecache.getline(
+            node.root().file, line_number).strip()
+        second_line_after_doc = linecache.getline(
+            node.root().file, line_number + 1).strip()
+        if first_line_after_doc != b'':
+            self.add_message(
+                'no-empty-line-provided-below-fileoverview', node=node)
+        elif second_line_after_doc == b'':
+            self.add_message(
+                'only-a-single-empty-line-should-be-provided', node=node)
 
 
 class SingleLinePragmaChecker(checkers.BaseChecker):

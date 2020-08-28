@@ -2580,13 +2580,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 """)
         node_no_empty_line_below_fileoverview.file = filename
         node_no_empty_line_below_fileoverview.path = filename
+        node_no_empty_line_below_fileoverview.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_no_empty_line_below_fileoverview)
 
         message = testutils.Message(
             msg_id='no-empty-line-provided-below-fileoverview',
-            line=2)
+            node=node_no_empty_line_below_fileoverview)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2609,12 +2610,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 """)
         node_extra_empty_lines_below_fileoverview.file = filename
         node_extra_empty_lines_below_fileoverview.path = filename
+        node_extra_empty_lines_below_fileoverview.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_extra_empty_lines_below_fileoverview)
 
         message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided', line=2)
+            msg_id='only-a-single-empty-line-should-be-provided',
+            node=node_extra_empty_lines_below_fileoverview)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2637,12 +2640,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 """)
         node_extra_empty_lines_below_fileoverview.file = filename
         node_extra_empty_lines_below_fileoverview.path = filename
+        node_extra_empty_lines_below_fileoverview.fromlineno = 3
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_extra_empty_lines_below_fileoverview)
 
         message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided', line=3)
+            msg_id='only-a-single-empty-line-should-be-provided',
+            node=node_extra_empty_lines_below_fileoverview)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2664,13 +2669,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 """)
         node_no_empty_line_below_fileoverview.file = filename
         node_no_empty_line_below_fileoverview.path = filename
+        node_no_empty_line_below_fileoverview.fromlineno = 3
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_no_empty_line_below_fileoverview)
 
         message = testutils.Message(
             msg_id='no-empty-line-provided-below-fileoverview',
-            line=3)
+            node=node_no_empty_line_below_fileoverview)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2692,8 +2698,9 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
+        node_with_no_error_message.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_with_no_error_message)
 
         with self.checker_test_object.assertNoMessages():
@@ -2702,7 +2709,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
     def test_file_with_no_file_overview(self):
         node_file_with_no_file_overview = astroid.scoped_nodes.Module(
             name='test',
-            doc='Custom test')
+            doc=None)
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
@@ -2715,7 +2722,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_file_with_no_file_overview.file = filename
         node_file_with_no_file_overview.path = filename
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_file_with_no_file_overview)
 
         with self.checker_test_object.assertNoMessages():
@@ -2734,13 +2741,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                     \"\"\" this file does something \"\"\"   """)
         node_file_overview_at_end_of_file.file = filename
         node_file_overview_at_end_of_file.path = filename
+        node_file_overview_at_end_of_file.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_module(
             node_file_overview_at_end_of_file)
 
         message = testutils.Message(
-            msg_id='no-empty-line-provided-below-fileoverview',
-            line=2)
+            msg_id='only-a-single-empty-line-should-be-provided',
+            node=node_file_overview_at_end_of_file)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
