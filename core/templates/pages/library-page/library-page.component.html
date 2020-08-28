@@ -38,7 +38,10 @@
       </div>
 
       <div class="oppia-exp-summary-tiles-container" ng-if="$ctrl.pageMode === $ctrl.LIBRARY_PAGE_MODES.INDEX">
-        <img ng-src="<[$ctrl.bannerImageFileUrl]>" align="center"width="100%" alt="">
+        <img ng-src="<[$ctrl.bannerImageFileUrl]>"
+             align="center"
+             width="100%"
+             alt="page banner">
         <div class="text-center w-100">
           <h1 class="oppia-library-h1 protractor-test-library-main-header" translate="I18N_LIBRARY_MAIN_HEADER"></h1>
           <h2 class="oppia-library-h2" translate="I18N_LIBRARY_SUB_HEADER"></h2>
@@ -61,7 +64,7 @@
             <source type="image/png"
                     ng-srcset="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.png')]>">
             <img ng-src="<[$ctrl.getStaticImageUrl('/assets/images/landing/math/fractions/matthew_paper.png')]>"
-                 alt="">
+                 alt="math classroom illustration">
           </picture>
         </div>
 
