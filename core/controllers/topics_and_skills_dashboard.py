@@ -83,10 +83,8 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                     )
             else:
                 logging.error(
-                    'Found topic without any rights model\n' +
-                    'INFO:\n' +
-                    'topic_id: %s\n' +
-                    'topic_name: %s\n' % (
+                    '\033[91m Found topic without any rights model for '
+                    'topic \'%s\' with id %s \033[0m' % (
                         topic_summary['id'], topic_summary['name']))
 
         all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
@@ -269,10 +267,6 @@ class NewTopicHandler(base.BaseHandler):
         except:
             raise self.InvalidInputException(
                 'Invalid topic name, received %s.' % name)
-        new_topic_id = topic_services.get_new_topic_id()
-        topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, url_fragment, description)
-        topic_services.save_new_topic(self.user_id, topic)
 
         try:
             file_format = image_validation_services.validate_image_and_filename(
@@ -291,7 +285,7 @@ class NewTopicHandler(base.BaseHandler):
             filename_prefix, image_is_compressible)
 
         topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, abbreviated_name, description)
+            new_topic_id, name, url_fragment, description)
         topic_services.save_new_topic(self.user_id, topic)
 
         topic_services.update_topic_and_subtopic_pages(
@@ -306,6 +300,15 @@ class NewTopicHandler(base.BaseHandler):
                 'old_value': None,
                 'new_value': thumbnail_bg_color
             }), ], 'Add topic thumbnail.')
+
+        topic_summary = topic_services.get_topic_summary_by_id(
+            new_topic_id)
+        logging.info(
+            '\033[92mCreated topic: %s\033[0m' % topic_summary.to_dict())
+
+        topic_rights = topic_fetchers.get_topic_rights(new_topic_id)
+        logging.info(
+            '\033[92mCreated topic rights: %s\033[0m' % topic_rights.to_dict())
 
         self.render_json({
             'topicId': new_topic_id
