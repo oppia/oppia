@@ -46,7 +46,6 @@ angular.module('oppia').directive('topicEditorStoriesList', [
             EditableTopicBackendApiService, UrlService, UndoRedoService,
             UrlInterpolationService, TopicUpdateService) {
           var ctrl = this;
-          var topicId = UrlService.getTopicIdFromUrl();
           var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
           $scope.openStoryEditor = function(storyId) {
             if (UndoRedoService.getChangeCount() > 0) {
