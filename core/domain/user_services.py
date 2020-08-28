@@ -396,6 +396,21 @@ def is_user_id_correct(user_id):
         len(user_id) == user_models.USER_ID_LENGTH))
 
 
+def is_pseudonymous_id(user_id):
+    """Check that the ID is a pseudonymous one.
+
+    Args:
+        user_id: str. The ID to be checked.
+
+    Returns:
+        bool. True when the ID is a pseudonymous one.
+    """
+    return all((
+        user_id.islower(),
+        user_id.startswith('pid_'),
+        len(user_id) == user_models.USER_ID_LENGTH))
+
+
 def is_username_taken(username):
     """"Returns whether the given username has already been taken.
 
@@ -996,6 +1011,11 @@ def _get_user_auth_details_from_model(user_auth_details_model):
     )
 
 
+def _get_pseudonymous_username(pseudonymous_id):
+    return 'PseudonymousUser%s%s' % (
+        pseudonymous_id[-6].upper(), pseudonymous_id[-5:])
+
+
 def get_username(user_id):
     """Gets username corresponding to the given user_id.
 
@@ -1005,6 +1025,9 @@ def get_username(user_id):
     Returns:
         str. Username corresponding to the given user_id.
     """
+    if is_pseudonymous_id(user_id):
+        return _get_pseudonymous_username(user_id)
+
     if user_id in feconf.SYSTEM_USERS:
         return feconf.SYSTEM_USERS[user_id]
 
@@ -1028,6 +1051,8 @@ def get_usernames(user_ids):
     for index, user_id in enumerate(user_ids):
         if user_id in feconf.SYSTEM_USERS:
             usernames[index] = feconf.SYSTEM_USERS[user_id]
+        elif is_pseudonymous_id(user_id):
+            usernames[index] = _get_pseudonymous_username(user_id)
         else:
             non_system_user_indices.append(index)
             non_system_user_ids.append(user_id)

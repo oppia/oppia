@@ -76,12 +76,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_services.is_user_id_correct(feconf.SUGGESTION_BOT_USER_ID))
         self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
-        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
-        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
         self.assertFalse(
             user_services.is_user_id_correct('uid_' + 'a' * 31 + 'A'))
         self.assertFalse(user_services.is_user_id_correct('uid_' + 'a' * 31))
         self.assertFalse(user_services.is_user_id_correct('a' * 36))
+
+    def test_is_pseudonymous_id(self):
+        self.assertTrue(user_services.is_pseudonymous_id('pid_' + 'a' * 32))
+        self.assertFalse(user_services.is_pseudonymous_id('uid_' + 'a' * 32))
+        self.assertFalse(
+            user_services.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
+        self.assertFalse(user_services.is_pseudonymous_id('uid_' + 'a' * 31))
+        self.assertFalse(user_services.is_pseudonymous_id('a' * 36))
 
     def test_set_and_get_username(self):
         gae_id = 'someUser'
@@ -104,25 +110,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             feconf.MIGRATION_BOT_USERNAME,
             user_services.get_username(feconf.MIGRATION_BOT_USER_ID))
 
-    def test_get_usernames(self):
-        gae_ids = ['test1', 'test2']
-        usernames = ['name1', 'name2']
-        user_emails = ['test1@email.com', 'test2@email.com']
+    def test_get_username_for_pseudonymous_id(self):
+        self.assertEqual(
+            'PseudonymousUserAaaaaa',
+            user_services.get_username('pid_' + 'a' * 32))
+        self.assertEqual(
+            'PseudonymousUserBbbbbb',
+            user_services.get_username('pid_' + 'b' * 32))
 
-        user_ids = []
-        for gae_id, email, name in python_utils.ZIP(
-                gae_ids, user_emails, usernames):
-            user_id = user_services.create_new_user(gae_id, email).user_id
-            user_services.set_username(user_id, name)
-            user_ids.append(user_id)
+    def test_get_usernames_for_pseudonymous_ids(self):
 
         # Handle usernames that exists.
-        self.assertEqual(usernames, user_services.get_usernames(user_ids))
-
-        # Return None for usernames that don't exists.
         self.assertEqual(
-            [None, 'name1'],
-            user_services.get_usernames(['fakeUser', user_ids[0]]))
+            ['PseudonymousUserAaaaaa', 'PseudonymousUserBbbbbb'],
+            user_services.get_usernames(['pid_' + 'a' * 32, 'pid_' + 'b' * 32]))
 
     def test_get_usernames_empty_list(self):
         # Return empty list when no user id passed.
