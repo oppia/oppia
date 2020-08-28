@@ -106,7 +106,8 @@ describe(
         $scope.$apply();
       }));
 
-      it('should evaluate initialized properties', function() {
+      it('should initialize $scope properties after controller is' +
+        ' initialized', function() {
         expect($scope.skill).toEqual(skillObjectFactory.createFromBackendDict(
           skill));
         expect($scope.linkedSkillsWithDifficulty).toEqual(
@@ -115,7 +116,8 @@ describe(
         expect($scope.skillIdToRubricsObject[skillId].length).toBe(1);
       });
 
-      it('should close modal on creating a question', function() {
+      it('should create a question and select its difficulty when closing' +
+        ' the modal', function() {
         $scope.startQuestionCreation();
 
         expect($uibModalInstance.close).toHaveBeenCalledWith({
@@ -149,7 +151,7 @@ describe(
           });
       }));
 
-      it('should add a warning message', function() {
+      it('should shows a warning error', function() {
         var addWarningSpy = spyOn(alertsService, 'addWarning');
         $scope.$apply();
 

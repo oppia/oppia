@@ -333,7 +333,7 @@ describe('Exploration editor tab component', function() {
     ctrl.$onDestroy();
   });
 
-  it('should evaluate controller properties after its initialization',
+  it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.interactionIsShown).toBe(false);
     });
@@ -371,7 +371,7 @@ describe('Exploration editor tab component', function() {
       'Fourth State', null);
   });
 
-  it('should refresh warnings from exploration warnings', function() {
+  it('should refresh warnings', function() {
     spyOn(explorationWarningsService, 'updateWarnings');
 
     ctrl.refreshWarnings();
@@ -379,7 +379,7 @@ describe('Exploration editor tab component', function() {
     expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
   });
 
-  it('should save state content successfully', function() {
+  it('should save state content', function() {
     stateEditorService.setActiveStateName('First State');
     expect(explorationStatesService.getState('First State').content).toEqual(
       subtitledHtmlObjectFactory.createFromBackendDict({
@@ -398,7 +398,7 @@ describe('Exploration editor tab component', function() {
     expect(ctrl.interactionIsShown).toBe(true);
   });
 
-  it('should save state interaction id successfully', function() {
+  it('should save state interaction id', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -411,7 +411,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
   });
 
-  it('should save state next content id index successfully', function() {
+  it('should save state next content id index', function() {
     stateEditorService.setActiveStateName('First State');
     expect(
       explorationStatesService.getState('First State').nextContentIdIndex
@@ -423,7 +423,7 @@ describe('Exploration editor tab component', function() {
     ).toBe(2);
   });
 
-  it('should save interaction answer groups successfully', function() {
+  it('should save interaction answer groups', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -465,7 +465,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.answerGroups).toEqual(displayedValue);
   });
 
-  it('should save interaction default outcome successfully', function() {
+  it('should save interaction default outcome', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -498,7 +498,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction customization args successfully', function() {
+  it('should save interaction customization args', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -522,7 +522,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction solution successfully', function() {
+  it('should save interaction solution', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -551,7 +551,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction hints successfully', function() {
+  it('should save interaction hints', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -570,7 +570,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save solicit answer details successfully', function() {
+  it('should save solicit answer details', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setSolicitAnswerDetails(
       explorationStatesService.getState('First State').solicitAnswerDetails);
