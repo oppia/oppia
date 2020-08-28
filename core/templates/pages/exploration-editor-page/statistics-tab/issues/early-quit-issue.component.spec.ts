@@ -68,7 +68,7 @@ describe('Early Quit Issue Component', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluate controller properties after its initialization',
+  it('should initialize controller properties after its initialization',
     function() {
       expect($scope.currentIssueIdentifier).toBe(2);
       expect($scope.issueStatement).toBe(

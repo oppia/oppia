@@ -75,12 +75,13 @@ describe('State Diff Modal Controller', function() {
       });
     }));
 
-    it('should evaluate scope variables values correctly', function() {
-      expect($scope.headers).toBe(headers);
-      expect($scope.newStateName).toBe(newStateName);
-      expect($scope.oldStateName).toBe(oldStateName);
-      expect($scope.yamlStrs).toEqual({});
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.headers).toBe(headers);
+        expect($scope.newStateName).toBe(newStateName);
+        expect($scope.oldStateName).toBe(oldStateName);
+        expect($scope.yamlStrs).toEqual({});
+      });
 
     it('should evaluate yaml strings object', function() {
       $httpBackend.flush();
@@ -113,18 +114,20 @@ describe('State Diff Modal Controller', function() {
       });
     }));
 
-    it('should evaluate scope variables values correctly', function() {
-      expect($scope.headers).toBe(headers);
-      expect($scope.newStateName).toBe(newStateName);
-      expect($scope.oldStateName).toBe(oldStateName);
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.headers).toBe(headers);
+        expect($scope.newStateName).toBe(newStateName);
+        expect($scope.oldStateName).toBe(oldStateName);
+      });
 
-    it('should evaluate yaml strings object', function() {
-      $flushPendingTasks();
-      $verifyNoPendingTasks('$timeout');
+    it('should evaluate yaml strings object when timeout tasks are flushed',
+      function() {
+        $flushPendingTasks();
+        $verifyNoPendingTasks('$timeout');
 
-      expect($scope.yamlStrs.leftPane).toBe('');
-      expect($scope.yamlStrs.rightPane).toBe('');
-    });
+        expect($scope.yamlStrs.leftPane).toBe('');
+        expect($scope.yamlStrs.rightPane).toBe('');
+      });
   });
 });

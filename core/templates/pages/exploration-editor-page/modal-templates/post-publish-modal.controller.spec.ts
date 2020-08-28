@@ -52,12 +52,13 @@ describe('Post Publish Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
-    expect($scope.congratsImgUrl).toBe('/assets/images/general/congrats.svg');
-    expect($scope.explorationId).toBe(explorationId);
-    expect($scope.explorationLinkCopied).toBe(false);
-    expect($scope.explorationLink).toBe('https://www.oppia.org/explore/exp1');
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.congratsImgUrl).toBe('/assets/images/general/congrats.svg');
+      expect($scope.explorationId).toBe(explorationId);
+      expect($scope.explorationLinkCopied).toBe(false);
+      expect($scope.explorationLink).toBe('https://www.oppia.org/explore/exp1');
+    });
 
   it('should add range from a click event', function() {
     var removeAllRanges = jasmine.createSpy('removeAllRanges');

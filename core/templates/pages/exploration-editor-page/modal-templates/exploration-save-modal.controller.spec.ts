@@ -44,7 +44,7 @@ describe('Exploration Save Modal Controller', function() {
     });
   }));
 
-  it('should evaluate controller properties after it is initialized',
+  it('should initialize $scope properties after controller is initialized',
     function() {
       expect($scope.showDiff).toBe(false);
       expect($scope.diffData).toBe(diffData);
@@ -53,7 +53,8 @@ describe('Exploration Save Modal Controller', function() {
       expect($scope.laterVersionHeader).toBe('New changes');
     });
 
-  it('should click on toggle diff button', function() {
+  it('should toggle exploration diff visibility when clicking on toggle diff' +
+    ' button', function() {
     var divMock = $(document.createElement('div'));
     var jQuerySpy = spyOn(window, '$');
 

@@ -77,9 +77,10 @@ describe('Playthrough Issues Component', function() {
     $scope.$apply();
   }));
 
-  it('should close modal with the correct value', function() {
-    expect($scope.issues).toEqual(issues);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.issues).toEqual(issues);
+    });
 
   it('should check if issue is on init display based on its index on array',
     function() {
@@ -88,7 +89,7 @@ describe('Playthrough Issues Component', function() {
       expect($scope.isIssueOnInitDisplay(issues[2])).toBe(false);
     });
 
-  it('should create issue nav id', function() {
+  it('should create issue nav id based on an issue', function() {
     expect($scope.createIssueNavId(issues[0])).toBe(1);
     expect($scope.createIssueNavId(issues[1])).toBe(2);
     expect($scope.createIssueNavId(issues[2])).toBe(3);

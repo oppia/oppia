@@ -44,7 +44,7 @@ describe('Help Modal Controller', function() {
     });
   }));
 
-  it('should begin editor tutorial', function() {
+  it('should begin editor tutorial when closing the modal', function() {
     $scope.beginEditorTutorial();
 
     expect(SiteAnalyticsService.registerOpenTutorialFromHelpCenterEvent)
@@ -52,7 +52,7 @@ describe('Help Modal Controller', function() {
     expect($uibModalInstance.close).toHaveBeenCalledWith('editor');
   });
 
-  it('should begin translation tutorial', function() {
+  it('should begin translation tutorial when closing the modal', function() {
     $scope.beginTranslationTutorial();
 
     expect(SiteAnalyticsService.registerOpenTutorialFromHelpCenterEvent)
@@ -60,7 +60,7 @@ describe('Help Modal Controller', function() {
     expect($uibModalInstance.close).toHaveBeenCalledWith('translation');
   });
 
-  it('should go to help center', function() {
+  it('should dismiss modal when changing to help center', function() {
     $scope.goToHelpCenter();
 
     expect(SiteAnalyticsService.registerVisitHelpCenterEvent)

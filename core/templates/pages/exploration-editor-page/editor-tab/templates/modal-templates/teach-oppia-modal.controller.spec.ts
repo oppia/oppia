@@ -211,7 +211,8 @@ describe('Teach Oppia Modal Controller', function() {
       $httpBackend.flush();
     }));
 
-    it('should init the variables', function() {
+    it('should initialize unresolved answer properties after controller is' +
+      ' initialized', function() {
       var unresolvedAnswers = $scope.unresolvedAnswers[0];
 
       expect(unresolvedAnswers.answer).toBe('Answer Text');
@@ -326,7 +327,7 @@ describe('Teach Oppia Modal Controller', function() {
       $httpBackend.flush();
     }));
 
-    it('should evaluate controller properties after initialization',
+    it('should initialize controller properties after its initialization',
       function() {
         expect($logSpy.calls.allArgs()).toContain(
           ['Error occurred while fetching unresolved answers ' +

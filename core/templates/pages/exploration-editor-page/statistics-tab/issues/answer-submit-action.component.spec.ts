@@ -76,12 +76,13 @@ describe('Answer Submit Action directive', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluate controller properties after initialization', function() {
-    expect(ctrl.currentStateName).toBe('State name');
-    expect(ctrl.destStateName).toBe('Introduction');
-    expect(ctrl.actionIndex).toBe(2);
-    expect(ctrl.timeSpentInStateSecs).toBe(2000);
-  });
+  it('should initialize controller properties after its initialization',
+    function() {
+      expect(ctrl.currentStateName).toBe('State name');
+      expect(ctrl.destStateName).toBe('Introduction');
+      expect(ctrl.actionIndex).toBe(2);
+      expect(ctrl.timeSpentInStateSecs).toBe(2000);
+    });
 
   it('should get short answer html', function() {
     expect(ctrl.getShortAnswerHtml()).toBe(

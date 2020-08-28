@@ -128,26 +128,28 @@ describe('Customize Interaction Modal Controller', function() {
       });
     }));
 
-    it('should evaluate scope variable values correctly', function() {
-      expect($scope.customizationModalReopened).toBe(true);
-      // Image Click Input has 2 arg specs.
-      expect($scope.customizationArgSpecs.length).toBe(2);
-      expect(stateCustomizationArgsService.displayed).toEqual({
-        imageAndRegions: {
-          value: {
-            imagePath: '',
-            labeledRegions: []
-          }
-        },
-        highlightRegionsOnHover: {value: false}
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.customizationModalReopened).toBe(true);
+        // Image Click Input has 2 arg specs.
+        expect($scope.customizationArgSpecs.length).toBe(2);
+        expect(stateCustomizationArgsService.displayed).toEqual({
+          imageAndRegions: {
+            value: {
+              imagePath: '',
+              labeledRegions: []
+            }
+          },
+          highlightRegionsOnHover: {value: false}
+        });
+
+        expect(schemaBasedFormsSpy).toHaveBeenCalled();
+        expect($scope.form).toEqual({});
+        expect($scope.hasCustomizationArgs).toBe(true);
       });
 
-      expect(schemaBasedFormsSpy).toHaveBeenCalled();
-      expect($scope.form).toEqual({});
-      expect($scope.hasCustomizationArgs).toBe(true);
-    });
-
-    it('should get interaction thumbnail image url', function() {
+    it('should get complete interaction thumbnail icon path corresponding to' +
+      ' a given relative path', function() {
       var interactionId = 'i1';
       expect($scope.getInteractionThumbnailImageUrl(interactionId)).toBe(
         '/extensions/interactions/i1/static/i1.png');
@@ -174,8 +176,8 @@ describe('Customize Interaction Modal Controller', function() {
       stateCustomizationArgsService.displayed = {};
     });
 
-    it('should set state customization args when changing interaction id that' +
-      ' is not in cache', function() {
+    it('should update state customization args when changing interaction id' +
+      ' that is not in cache', function() {
       $scope.onChangeInteractionId('LogicProof');
 
       expect($scope.customizationArgSpecs.length).toBe(1);
@@ -206,7 +208,7 @@ describe('Customize Interaction Modal Controller', function() {
       interactionDetailsCacheService.removeDetails('LogicProof');
     });
 
-    it('should save interaction if there is no customization args left',
+    it('should save interaction when there are no customization args left',
       function() {
         spyOn(
           editorFirstTimeEventsService, 'registerFirstSaveInteractionEvent')
@@ -231,8 +233,8 @@ describe('Customize Interaction Modal Controller', function() {
         interactionDetailsCacheService.removeDetails('NumberWithUnits');
       });
 
-    it('should set state customization args when changing interaction id that' +
-      ' is in cache', function() {
+    it('should update state customization args when changing interaction id' +
+      ' that is in cache', function() {
       // Save logicProof on cache.
       stateInteractionIdService.displayed = 'LogicProof';
       $scope.returnToInteractionSelector();
@@ -251,7 +253,7 @@ describe('Customize Interaction Modal Controller', function() {
     });
 
     it('should have save interaction button enabled and return warning' +
-      ' message', function() {
+      ' message when image is not provided', function() {
       $scope.form.schemaForm = {
         $valid: true
       };

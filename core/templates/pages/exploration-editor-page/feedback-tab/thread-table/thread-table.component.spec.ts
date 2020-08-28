@@ -49,12 +49,13 @@ describe('Thread table directive', function() {
       'Not Actionable');
   });
 
-  it('should get locale abbreviated date time string', function() {
-    // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-    var NOW_MILLIS = 1416563100000;
-    spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-      .withArgs(NOW_MILLIS).and.returnValue('11/21/2014');
-    expect($scope.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
-      '11/21/2014');
-  });
+  it('should get formatted date string from the timestamp in milliseconds',
+    function() {
+      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+      var NOW_MILLIS = 1416563100000;
+      spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
+        .withArgs(NOW_MILLIS).and.returnValue('11/21/2014');
+      expect($scope.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
+        '11/21/2014');
+    });
 });

@@ -94,41 +94,43 @@ describe('Add Or Update Solution Modal Controller', function() {
       });
     }));
 
-    it('should evaluate scope variable values correctly', function() {
-      stateSolutionService.init('', answerEditorHtml);
-      expect($scope.correctAnswerEditorHtml).toBe(null);
-      expect($scope.data).toEqual({
-        answerIsExclusive: true,
-        correctAnswer: null,
-        explanationHtml: 'Explanation html',
-        explanationContentId: 'cont_1'
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        stateSolutionService.init('', answerEditorHtml);
+        expect($scope.correctAnswerEditorHtml).toBe(null);
+        expect($scope.data).toEqual({
+          answerIsExclusive: true,
+          correctAnswer: null,
+          explanationHtml: 'Explanation html',
+          explanationContentId: 'cont_1'
+        });
+        expect($scope.answerIsValid).toBe(false);
       });
-      expect($scope.answerIsValid).toBe(false);
-    });
 
-    it('should set data answer when current interaction is submited',
+    it('should update correct answer when submitting current interaction',
       function() {
         var answer = {};
         currentInteractionService.onSubmit(answer);
         expect($scope.data.correctAnswer).toEqual(answer);
       });
 
-    it('should submit answer when click on submit button', function() {
+    it('should submit answer when clicking on submit button', function() {
       spyOn(currentInteractionService, 'submitAnswer');
       $scope.onSubmitFromSubmitButton();
 
       expect(currentInteractionService.submitAnswer).toHaveBeenCalled();
     });
 
-    it('should check if additional submit button should be shown', function() {
-      stateInteractionIdService.init('', 'TextInput');
-      expect($scope.shouldAdditionalSubmitButtonBeShown()).toBe(true);
-      stateInteractionIdService.displayed = 'Continue';
-      stateInteractionIdService.saveDisplayedValue();
-      expect($scope.shouldAdditionalSubmitButtonBeShown()).toBe(false);
-    });
+    it('should check if additional submit button should be shown',
+      function() {
+        stateInteractionIdService.init('', 'TextInput');
+        expect($scope.shouldAdditionalSubmitButtonBeShown()).toBe(true);
+        stateInteractionIdService.displayed = 'Continue';
+        stateInteractionIdService.saveDisplayedValue();
+        expect($scope.shouldAdditionalSubmitButtonBeShown()).toBe(false);
+      });
 
-    it('should save solution', function() {
+    it('should save solution when closing the modal', function() {
       stateSolutionService.init('', answerEditorHtml);
       currentInteractionService.onSubmit('answer');
       $scope.saveSolution();

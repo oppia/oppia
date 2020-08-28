@@ -54,13 +54,14 @@ describe('Exploration Graph Modal Controller', function() {
     });
   }));
 
-  it('should evaluate scope variable values correctly', function() {
-    expect($scope.currentStateName).toBe(stateName);
-    expect($scope.graphData).toEqual(graphData);
-    expect($scope.isEditable).toBe(isEditable);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.currentStateName).toBe(stateName);
+      expect($scope.graphData).toEqual(graphData);
+      expect($scope.isEditable).toBe(isEditable);
+    });
 
-  it('should delete state', function() {
+  it('should delete state when closing the modal', function() {
     var stateName = 'State Name';
     $scope.deleteState(stateName);
 
@@ -70,7 +71,7 @@ describe('Exploration Graph Modal Controller', function() {
     });
   });
 
-  it('should select state', function() {
+  it('should select state when closing the modal', function() {
     var stateName = 'State Name';
     $scope.selectState(stateName);
 
