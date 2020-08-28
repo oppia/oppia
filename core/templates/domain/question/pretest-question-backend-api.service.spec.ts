@@ -97,10 +97,10 @@ describe('Pretest question backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       pretestQuestionBackendApiService.fetchPretestQuestions(
-        'expId', 'storyId').then(successHandler, failHandler);
+        'expId', 'story-fragment').then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
-        '/pretest_handler/expId?story_id=storyId');
+        '/pretest_handler/expId?story_url_fragment=story-fragment');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -118,10 +118,10 @@ describe('Pretest question backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       pretestQuestionBackendApiService.fetchPretestQuestions(
-        'expId', 'storyId').then(successHandler, failHandler);
+        'expId', 'story-fragment').then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
-        '/pretest_handler/expId?story_id=storyId');
+        '/pretest_handler/expId?story_url_fragment=story-fragment');
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading data.', {
         status: ERROR_STATUS_CODE, statusText: 'Invalid Request'

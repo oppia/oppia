@@ -28,7 +28,7 @@ const SVGTAGS = {
   rectangle: (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
-    '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
+    '"><desc>Created with Fabric.js 3.6.6</desc><defs></defs><rect x="0" y="' +
     '0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matri' +
     'x(1 0 0 1 50 50)"><rect style="stroke: rgb(0,0,0); stroke-width: 3; str' +
     'oke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke' +
@@ -38,7 +38,7 @@ const SVGTAGS = {
   circle: (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
-    '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
+    '"><desc>Created with Fabric.js 3.6.6</desc><defs></defs><rect x="0" y="' +
     '0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matri' +
     'x(1 0 0 1 50 50)"><circle style="stroke: rgb(0,0,0); stroke-width: 3; s' +
     'troke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stro' +
@@ -48,7 +48,7 @@ const SVGTAGS = {
   line: (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
-    '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
+    '"><desc>Created with Fabric.js 3.6.6</desc><defs></defs><rect x="0" y="' +
     '0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matri' +
     'x(1 0 0 1 75 75)"><line style="stroke: rgb(0,0,0); stroke-width: 3; str' +
     'oke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke' +
@@ -58,7 +58,7 @@ const SVGTAGS = {
   text: (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
-    '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
+    '"><desc>Created with Fabric.js 3.6.6</desc><defs></defs><rect x="0" y="' +
     '0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matri' +
     'x(1 0 0 1 50 50)" style=""><text font-family="helvetica" font-size="18"' +
     ' font-style="normal" font-weight="normal" style="stroke: none; stroke-w' +
@@ -70,7 +70,7 @@ const SVGTAGS = {
   rectangle_bezier_piechart_svgupload: (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="368" viewBox="0 0 494 368' +
-    '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
+    '"><desc>Created with Fabric.js 3.6.6</desc><defs></defs><rect x="0" y="' +
     '0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matri' +
     'x(1 0 0 1 50 50)"><rect style="stroke: rgb(0,0,0); stroke-width: 3; str' +
     'oke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke' +

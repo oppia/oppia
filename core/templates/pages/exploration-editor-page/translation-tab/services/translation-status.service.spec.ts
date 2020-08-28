@@ -544,7 +544,7 @@ describe('Translation status service', function() {
       expect(stateWiseStatusColor.Second).toBe(NO_ASSETS_AVAILABLE_COLOR);
       expect(stateWiseStatusColor.Third).toBe(NO_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', 'content');
+      swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'content');
       ess.saveWrittenTranslations('Second', swts.displayed);
 
       tss.refresh();
@@ -597,7 +597,7 @@ describe('Translation status service', function() {
         tss.getActiveStateComponentStatusColor('feedback'));
       expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', 'Content');
+      swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'Content');
 
       activeStateComponentStatus = (
         tss.getActiveStateComponentStatusColor('content'));
@@ -698,7 +698,8 @@ describe('Translation status service', function() {
       expect(activeStateContentIdStatusColor).toBe(
         ALL_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', '<p>Content</p>');
+      swts.displayed.addWrittenTranslation(
+        'content', 'hi', 'html', '<p>Content</p>');
 
       activeStateContentIdStatusColor = (
         tss.getActiveStateContentIdStatusColor('content'));

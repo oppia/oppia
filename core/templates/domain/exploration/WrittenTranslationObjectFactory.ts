@@ -23,8 +23,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export const WRITTEN_TRANSLATION_TYPE_HTML = 'html';
 export const WRITTEN_TRANSLATION_TYPE_UNICODE = 'unicode';
 
-type WrittenTranslationDataFormat = typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
-  typeof WRITTEN_TRANSLATION_TYPE_HTML;
+export type WrittenTranslationDataFormat = (
+  typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
+  typeof WRITTEN_TRANSLATION_TYPE_HTML);
 
 export interface TranslationBackendDict {
   'data_format': WrittenTranslationDataFormat;
@@ -47,16 +48,31 @@ export class WrittenTranslation {
     this.needsUpdate = !this.needsUpdate;
   }
 
+  isHtml(): boolean {
+    return this.dataFormat === WRITTEN_TRANSLATION_TYPE_HTML;
+  }
+
+  isUnicode(): boolean {
+    return this.dataFormat === WRITTEN_TRANSLATION_TYPE_UNICODE;
+  }
+
+  getUnicode(): string {
+    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_UNICODE) {
+      throw new Error('This translation is not of data format unicode');
+    }
+    return this.translation;
+  }
+
   getHtml(): string {
     if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
-      throw new Error('This translation is not of type html');
+      throw new Error('This translation is not of data format html');
     }
     return this.translation;
   }
 
   setHtml(html: string): void {
     if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
-      throw new Error('This translation is not of type html');
+      throw new Error('This translation is not of data format html');
     }
     this.translation = html;
   }

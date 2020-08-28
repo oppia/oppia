@@ -163,13 +163,14 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomPageIsShownStatusAsync().then(
+      let service = classroomBackendApiService;
+      service.fetchClassroomPromosAreEnabledStatusAsync().then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/classroom_page_status_handler');
+        '/classroom_promos_status_handler');
       expect(req.request.method).toEqual('GET');
-      req.flush({classroom_page_is_shown: false});
+      req.flush({classroom_promos_are_enabled: false});
 
       flushMicrotasks();
 
@@ -183,11 +184,12 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomPageIsShownStatusAsync().then(
+      let service = classroomBackendApiService;
+      service.fetchClassroomPromosAreEnabledStatusAsync().then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/classroom_page_status_handler');
+        '/classroom_promos_status_handler');
       expect(req.request.method).toEqual('GET');
       req.flush('Invalid request', {
         status: 400,

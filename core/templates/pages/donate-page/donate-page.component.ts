@@ -28,7 +28,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service.ts';
 
-require('base-components/base-content.directive.ts');
 
 @Component({
   selector: 'donate-page',

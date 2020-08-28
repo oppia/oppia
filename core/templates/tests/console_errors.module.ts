@@ -30,23 +30,18 @@ import { ObjectsDomainConstants } from
 
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-// This component is needed to force-bootstrap Angular at the beginning of the
-// app.
-@Component({
-  selector: 'service-bootstrap',
-  template: ''
-})
-export class ServiceBootstrapComponent {}
-
 import { AppConstants } from 'app.constants';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+
 
 
 @NgModule({
@@ -56,10 +51,10 @@ import { InteractionsExtensionsConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    ServiceBootstrapComponent
+    OppiaAngularRootComponent
   ],
   entryComponents: [
-    ServiceBootstrapComponent
+    OppiaAngularRootComponent
   ],
   providers: [
     AppConstants,
@@ -92,7 +87,7 @@ angular.module('oppia').requires.push(downgradedModule);
 angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
-  'serviceBootstrap',
+  'oppiaAngularRoot',
   downgradeComponent({
-    component: ServiceBootstrapComponent
+    component: OppiaAngularRootComponent
   }) as angular.IDirectiveFactory);

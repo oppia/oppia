@@ -25,9 +25,12 @@ import { TestBed } from '@angular/core/testing';
 
 
 describe('FeedbackThreadObjectFactory', () => {
+  let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
+  let threadMessageObjectFactory: ThreadMessageObjectFactory;
+
   beforeEach(() => {
-    this.feedbackThreadObjectFactory = TestBed.get(FeedbackThreadObjectFactory);
-    this.threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
+    feedbackThreadObjectFactory = TestBed.get(FeedbackThreadObjectFactory);
+    threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
   });
 
   describe('.createFromBackendDict', () => {
@@ -46,7 +49,7 @@ describe('FeedbackThreadObjectFactory', () => {
       };
 
       let feedbackThread =
-        this.feedbackThreadObjectFactory.createFromBackendDict(
+        feedbackThreadObjectFactory.createFromBackendDict(
           feedbackThreadBackendDict);
       expect(feedbackThread.status).toEqual('accepted');
       expect(feedbackThread.subject).toEqual('sample subject');
@@ -68,7 +71,7 @@ describe('FeedbackThreadObjectFactory', () => {
     describe('.setMessages', () => {
       it('should update message-related fields', () => {
         let feedbackThread =
-          this.feedbackThreadObjectFactory.createFromBackendDict({
+          feedbackThreadObjectFactory.createFromBackendDict({
             last_updated_msecs: 1000,
             original_author_username: 'author',
             status: 'accepted',
@@ -84,7 +87,7 @@ describe('FeedbackThreadObjectFactory', () => {
         expect(feedbackThread.getMessages()).toEqual([]);
 
         let messages = [
-          this.threadMessageObjectFactory.createFromBackendDict({
+          threadMessageObjectFactory.createFromBackendDict({
             author_username: 'author1',
             text: 'message1',
             updated_subject: null,
@@ -94,7 +97,7 @@ describe('FeedbackThreadObjectFactory', () => {
             message_id: 1,
             updated_status: null
           }),
-          this.threadMessageObjectFactory.createFromBackendDict({
+          threadMessageObjectFactory.createFromBackendDict({
             author_username: 'author2',
             text: 'message2',
             updated_subject: null,

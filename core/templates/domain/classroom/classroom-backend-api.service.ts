@@ -32,8 +32,8 @@ import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface ClassroomStatusBackendDict {
-  'classroom_page_is_shown': boolean;
+interface ClassroomPromosStatusBackendDict {
+  'classroom_promos_are_enabled': boolean;
 }
 
 interface ClassroomDataBackendDict {
@@ -80,15 +80,16 @@ export class ClassroomBackendApiService {
     });
   }
 
-  _fetchClassroomPageIsShownStatus(
+  _fetchClassroomPromosAreEnabledStatus(
       successCallback: (value: boolean) => void,
       errorCallback: (reason: string) => void): void {
-    const classroomStatusHandlerUrl = '/classroom_page_status_handler';
+    const classroomPromosAreEnabledStatusHandlerUrl = (
+      '/classroom_promos_status_handler');
 
-    this.http.get<ClassroomStatusBackendDict>(
-      classroomStatusHandlerUrl).toPromise().then(data => {
+    this.http.get<ClassroomPromosStatusBackendDict>(
+      classroomPromosAreEnabledStatusHandlerUrl).toPromise().then(data => {
       if (successCallback) {
-        successCallback(data.classroom_page_is_shown);
+        successCallback(data.classroom_promos_are_enabled);
       }
     }, errorResponse => {
       if (errorCallback) {
@@ -105,9 +106,9 @@ export class ClassroomBackendApiService {
     });
   }
 
-  async fetchClassroomPageIsShownStatusAsync(): Promise<boolean> {
+  async fetchClassroomPromosAreEnabledStatusAsync(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._fetchClassroomPageIsShownStatus(resolve, reject);
+      this._fetchClassroomPromosAreEnabledStatus(resolve, reject);
     });
   }
 

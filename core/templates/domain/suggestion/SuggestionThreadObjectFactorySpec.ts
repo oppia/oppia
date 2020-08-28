@@ -25,14 +25,20 @@ import { TestBed } from '@angular/core/testing';
 
 
 describe('SuggestionThreadObjectFactory', () => {
-  beforeEach(() => {
-    this.suggestionThreadObjectFactory =
-      TestBed.get(SuggestionThreadObjectFactory);
-    this.threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
-  });
+  let suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
+  let threadMessageObjectFactory: ThreadMessageObjectFactory;
 
   beforeEach(() => {
-    this.suggestionThreadBackendDict = {
+    suggestionThreadObjectFactory =
+      TestBed.get(SuggestionThreadObjectFactory);
+    threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
+  });
+
+  let suggestionThreadBackendDict;
+  let suggestionBackendDict;
+
+  beforeEach(() => {
+    suggestionThreadBackendDict = {
       last_updated_msecs: 1000,
       original_author_username: 'author',
       status: 'accepted',
@@ -44,7 +50,7 @@ describe('SuggestionThreadObjectFactory', () => {
       last_nonempty_message_author: 'author',
       last_nonempty_message_text: 'tenth message',
     };
-    this.suggestionBackendDict = {
+    suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
       suggestion_type: '',
       target_type: 'exploration',
@@ -64,12 +70,12 @@ describe('SuggestionThreadObjectFactory', () => {
   });
 
   it('should create a new suggestion thread from a backend dict.', () => {
-    this.suggestionBackendDict.suggestion_type =
+    suggestionBackendDict.suggestion_type =
       'edit_exploration_state_content';
 
     let suggestionThread =
-      this.suggestionThreadObjectFactory.createFromBackendDicts(
-        this.suggestionThreadBackendDict, this.suggestionBackendDict);
+      suggestionThreadObjectFactory.createFromBackendDicts(
+        suggestionThreadBackendDict, suggestionBackendDict);
 
     expect(suggestionThread.lastUpdatedMsecs).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
@@ -109,8 +115,8 @@ describe('SuggestionThreadObjectFactory', () => {
 
   it('should create a new suggestion thread.', () => {
     let suggestionThread =
-      this.suggestionThreadObjectFactory.createFromBackendDicts(
-        this.suggestionThreadBackendDict, this.suggestionBackendDict);
+      suggestionThreadObjectFactory.createFromBackendDicts(
+        suggestionThreadBackendDict, suggestionBackendDict);
 
     expect(suggestionThread.lastUpdatedMsecs).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
@@ -132,19 +138,31 @@ describe('SuggestionThreadObjectFactory', () => {
   describe('.setMessages', () => {
     it('should handle message getter and setter.', () => {
       let suggestionThread =
-        this.suggestionThreadObjectFactory.createFromBackendDicts(
-          this.suggestionThreadBackendDict, this.suggestionBackendDict);
+        suggestionThreadObjectFactory.createFromBackendDicts(
+          suggestionThreadBackendDict, suggestionBackendDict);
 
       expect(suggestionThread.getMessages()).toEqual([]);
 
       let messages = [
-        this.threadMessageObjectFactory.createFromBackendDict({
+        threadMessageObjectFactory.createFromBackendDict({
           author_username: 'author1',
-          text: 'message1'
+          text: 'message1',
+          created_on_msecs: 1000000,
+          entity_type: 'exploration',
+          entity_id: 'exp_id',
+          message_id: 0,
+          updated_status: 'status',
+          updated_subject: 'subject',
         }),
-        this.threadMessageObjectFactory.createFromBackendDict({
+        threadMessageObjectFactory.createFromBackendDict({
           author_username: 'author2',
-          text: 'message2'
+          text: 'message2',
+          created_on_msecs: 1000000,
+          entity_type: 'exploration',
+          entity_id: 'exp_id',
+          message_id: 0,
+          updated_status: 'status',
+          updated_subject: 'subject',
         })
       ];
 

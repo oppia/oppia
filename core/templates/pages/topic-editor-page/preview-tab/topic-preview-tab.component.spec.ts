@@ -58,7 +58,7 @@ describe('Topic preview tab', function() {
   }));
 
   it('should initialize the variables', function() {
-    expect(ctrl.activeTab).toEqual('info');
+    expect(ctrl.activeTab).toEqual('story');
   });
 
   it('should return the static image url', function() {
@@ -70,13 +70,9 @@ describe('Topic preview tab', function() {
   it('should change the preview tab', function() {
     ctrl.changePreviewTab('story');
     expect(ctrl.activeTab).toEqual('story');
-    ctrl.changePreviewTab('info');
-    expect(ctrl.activeTab).toEqual('info');
     ctrl.changePreviewTab('subtopic');
     expect(ctrl.activeTab).toEqual('subtopic');
     ctrl.changePreviewTab('practice');
     expect(ctrl.activeTab).toEqual('practice');
-    ctrl.changePreviewTab('info');
-    expect(ctrl.activeTab).toEqual('info');
   });
 });

@@ -21,7 +21,7 @@ import {
   TranslationBackendDict,
   WrittenTranslation,
   WrittenTranslationObjectFactory,
-  WRITTEN_TRANSLATION_TYPE_HTML
+  WrittenTranslationDataFormat
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 import { Injectable } from '@angular/core';
@@ -105,23 +105,23 @@ export class WrittenTranslations {
     delete this.translationsMapping[contentId];
   }
 
-  addWrittenTranslation(
-      contentId: string, languageCode: string, html: string): void {
+  addWrittenTranslation(contentId: string, languageCode: string,
+      dataFormat: WrittenTranslationDataFormat, translation: string): void {
     var writtenTranslations = this.translationsMapping[contentId];
     if (writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
     writtenTranslations[languageCode] = this._writtenTranslationObjectFactory
-      .createNew(WRITTEN_TRANSLATION_TYPE_HTML, html);
+      .createNew(dataFormat, translation);
   }
 
-  updateWrittenTranslationHtml(
-      contentId: string, languageCode: string, html: string): void {
+  updateWrittenTranslation(
+      contentId: string, languageCode: string, translation: string): void {
     var writtenTranslations = this.translationsMapping[contentId];
     if (!writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Unable to find the given language code.');
     }
-    writtenTranslations[languageCode].translation = html;
+    writtenTranslations[languageCode].translation = translation;
     // Marking translation updated.
     writtenTranslations[languageCode].needsUpdate = false;
   }

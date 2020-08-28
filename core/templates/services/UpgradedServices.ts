@@ -30,6 +30,26 @@ import { AnswerClassificationResultObjectFactory } from
 
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
+import { PredictionResultObjectFactory } from
+  'domain/classifier/PredictionResultObjectFactory';
+import { ClassroomBackendApiService } from
+  'domain/classroom/classroom-backend-api.service';
+import { ClassroomDataObjectFactory } from
+  'domain/classroom/ClassroomDataObjectFactory';
+import { CollectionNodeObjectFactory } from
+  'domain/collection/collection-node-object.factory';
+import { CollectionRightsBackendApiService } from
+  'domain/collection/collection-rights-backend-api.service';
+import { CollectionSummaryObjectFactory } from
+  'domain/collection/collection-summary-object.factory';
+import { CollectionValidationService } from
+  'domain/collection/collection-validation.service';
+import { CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
+import { CollectionPlaythroughObjectFactory } from
+  'domain/collection/CollectionPlaythroughObjectFactory';
+import { CollectionRightsObjectFactory } from
+  'domain/collection/CollectionRightsObjectFactory';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { AnswerGroupObjectFactory } from
@@ -114,10 +134,6 @@ import { BrowserCheckerService } from
 
 
 
-import { ClassroomBackendApiService } from
-  'domain/classroom/classroom-backend-api.service';
-import { ClassroomDataObjectFactory } from
-  'domain/classroom/ClassroomDataObjectFactory';
 import { ClientContextObjectFactory } from
   'domain/platform_feature/client-context-object.factory';
 
@@ -132,20 +148,6 @@ import { CollectionCreationBackendService } from
 import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
 
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
-import { CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
-import { CollectionPlaythroughObjectFactory } from
-  'domain/collection/CollectionPlaythroughObjectFactory';
-import { CollectionRightsBackendApiService } from
-  'domain/collection/collection-rights-backend-api.service';
-import { CollectionRightsObjectFactory } from
-  'domain/collection/CollectionRightsObjectFactory';
-import { CollectionSummaryObjectFactory } from
-  'domain/collection/collection-summary-object.factory';
-import { CollectionValidationService } from
-  'domain/collection/collection-validation.service';
 
 
 import { ConceptCardBackendApiService } from
@@ -350,7 +352,6 @@ import { ItemSelectionInputRulesService } from
 import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
@@ -499,8 +500,6 @@ import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 
-import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
 
@@ -923,7 +922,6 @@ export class UpgradedServices {
     upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
     upgradedServices['JobStatusSummaryObjectFactory'] =
       new JobStatusSummaryObjectFactory();
-    upgradedServices['KeyboardShortcutService'] = new KeyboardShortcutService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =

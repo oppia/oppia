@@ -41,20 +41,20 @@ import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -510,7 +510,7 @@ describe('Exploration editor tab component', function() {
 
     var displayedValue = {
       placeholder: {
-        value: 'Placeholder value'
+        value: new SubtitledUnicode('Placeholder value', 'ca_placeholder')
       },
       rows: {
         value: 2
@@ -595,7 +595,7 @@ describe('Exploration editor tab component', function() {
       .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate).toBe(
       false);
 
-    ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired('feedback_1');
+    ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
     $scope.$apply();
 
     expect(explorationStatesService.getState('First State')
@@ -620,7 +620,7 @@ describe('Exploration editor tab component', function() {
         .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
         .toBe(false);
 
-      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired('feedback_1');
+      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
       $scope.$apply();
 
       expect(explorationStatesService.getState('First State')

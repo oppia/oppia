@@ -23,13 +23,15 @@ import { TestBed } from '@angular/core/testing';
 
 
 describe('ThreadMessageObjectFactory', () => {
+  let threadMessageObjectFactory: ThreadMessageObjectFactory;
+
   beforeEach(() => {
-    this.factory = TestBed.get(ThreadMessageObjectFactory);
+    threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
   });
 
   describe('.createFromBackendDict', () => {
     it('should create a new thread message from a backend dict.', () => {
-      let threadMessage = this.factory.createFromBackendDict({
+      let threadMessage = threadMessageObjectFactory.createFromBackendDict({
         author_username: 'author',
         created_on_msecs: 1000,
         entity_type: 'exploration',
@@ -55,7 +57,7 @@ describe('ThreadMessageObjectFactory', () => {
 
   describe('.hasSubjectUpdate', () => {
     it('should be true when updatedSubject is non-null', () => {
-      let threadMessage = this.factory.createFromBackendDict({
+      let threadMessage = threadMessageObjectFactory.createFromBackendDict({
         updated_subject: 'a new descriptive subject!',
         author_username: 'author',
         created_on_msecs: 1000,
@@ -70,7 +72,7 @@ describe('ThreadMessageObjectFactory', () => {
     });
 
     it('should be false when updatedSubject is null', () => {
-      let threadMessage = this.factory.createFromBackendDict({
+      let threadMessage = threadMessageObjectFactory.createFromBackendDict({
         updated_subject: null,
         author_username: 'author',
         created_on_msecs: 1000,
@@ -87,7 +89,7 @@ describe('ThreadMessageObjectFactory', () => {
 
   describe('.hasStatusUpdate', () => {
     it('should be true when updatedStatus is non-null', () => {
-      let threadMessage = this.factory.createFromBackendDict({
+      let threadMessage = threadMessageObjectFactory.createFromBackendDict({
         updated_status: 'open',
         author_username: 'author',
         created_on_msecs: 1000,
@@ -102,7 +104,7 @@ describe('ThreadMessageObjectFactory', () => {
     });
 
     it('should be false when updatedStatus is null', () => {
-      let threadMessage = this.factory.createFromBackendDict({
+      let threadMessage = threadMessageObjectFactory.createFromBackendDict({
         updated_status: null,
         author_username: 'author',
         created_on_msecs: 1000,
@@ -119,7 +121,7 @@ describe('ThreadMessageObjectFactory', () => {
 
   describe('.hasText', () => {
     it('should be true when text is nonempty string', () => {
-      let threadMessage = this.factory.createFromBackendDict({
+      let threadMessage = threadMessageObjectFactory.createFromBackendDict({
         text: 'nonempty!',
         author_username: 'author',
         created_on_msecs: 1000,
@@ -134,7 +136,7 @@ describe('ThreadMessageObjectFactory', () => {
     });
 
     it('should be false when text is empty string', () => {
-      let threadMessage = this.factory.createFromBackendDict({
+      let threadMessage = threadMessageObjectFactory.createFromBackendDict({
         text: '',
         author_username: 'author',
         created_on_msecs: 1000,

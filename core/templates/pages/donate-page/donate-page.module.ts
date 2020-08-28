@@ -31,11 +31,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
+
 import { AppConstants } from 'app.constants';
 
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
@@ -51,10 +53,12 @@ import { DonatePageComponent } from './donate-page.component';
     SharedComponentsModule
   ],
   declarations: [
-    DonatePageComponent
+    DonatePageComponent,
+    OppiaAngularRootComponent
   ],
   entryComponents: [
-    DonatePageComponent
+    DonatePageComponent,
+    OppiaAngularRootComponent
   ],
   providers: [
     AppConstants,
@@ -72,6 +76,7 @@ class DonatePageModule {
   ngDoBootstrap() {}
 }
 
+import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
@@ -80,3 +85,11 @@ const bootstrapFn = (extraProviders: StaticProvider[]) => {
 const downgradedModule = downgradeModule(bootstrapFn);
 
 angular.module('oppia').requires.push(downgradedModule);
+
+angular.module('oppia').directive(
+  // This directive is the downgraded version of the Angular component to
+  // bootstrap the Angular 8.
+  'oppiaAngularRoot',
+  downgradeComponent({
+    component: OppiaAngularRootComponent
+  }) as angular.IDirectiveFactory);
