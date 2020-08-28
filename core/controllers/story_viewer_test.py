@@ -22,6 +22,7 @@ from core.domain import question_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import summary_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -129,11 +130,15 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story.story_contents.initial_node_id = 'node_2'
         story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.TOPIC_ID, 'user', name='Topic',
             description='A new topic', canonical_story_ids=[story.id],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0)
+            subtopics=[subtopic_1], next_subtopic_id=2)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)

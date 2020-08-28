@@ -48,7 +48,8 @@
     </div>
     <div ng-if="$ctrl.activeTab === 'practice'">
       <practice-tab [subtopics-list]="$ctrl.subtopics"
-                    [topic-name]="$ctrl.topicName">
+                    [topic-name]="$ctrl.topicName"
+                    [start-button-is-disabled]="true">
       </practice-tab>
     </div>
   </div>

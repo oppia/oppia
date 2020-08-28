@@ -260,6 +260,9 @@ export class Topic {
           ' does not have any skill IDs linked.');
       }
     }
+    if (!this._subtopics.length) {
+      issues.push('Topic should have at least 1 subtopic.');
+    }
     return issues;
   }
 

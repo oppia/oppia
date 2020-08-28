@@ -353,6 +353,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             topic_id, 'topic', 'abbrev', 'description')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
         topic_services.save_new_topic(owner_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
 

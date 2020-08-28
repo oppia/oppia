@@ -68,6 +68,13 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         public_topic.thumbnail_filename = 'Topic.svg'
         public_topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        public_topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        public_topic.next_subtopic_id = 2
         topic_services.save_new_topic(admin_id, public_topic)
         topic_services.publish_topic(topic_id_2, admin_id)
 

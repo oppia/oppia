@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -91,12 +92,16 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             self.story_id_2, 'Private Story Title', 'Description',
             self.topic_id, self.story_url_fragment_2)
         story_services.save_new_story(self.admin_id, self.story_2)
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.topic_id, 'user', name='Topic',
             description='A new topic',
             canonical_story_ids=[self.story_id_1, self.story_id_3],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0)
+            subtopics=[subtopic_1], next_subtopic_id=2)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id_1, self.admin_id)

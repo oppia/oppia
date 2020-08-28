@@ -2186,11 +2186,15 @@ class StoryViewerTests(test_utils.GenericTestBase):
         self.save_new_story(
             self.story_id, self.admin_id, self.topic_id,
             url_fragment=self.story_url_fragment)
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+            subtopics=[subtopic_1], next_subtopic_id=2)
 
     def test_cannot_access_non_existent_story(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2463,11 +2467,15 @@ class TopicViewerTests(test_utils.GenericTestBase):
         ))
 
         self.topic_id = topic_services.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+            subtopics=[subtopic_1], next_subtopic_id=2)
 
     def test_cannot_access_non_existent_topic(self):
         with self.swap(self, 'testapp', self.mock_testapp):
