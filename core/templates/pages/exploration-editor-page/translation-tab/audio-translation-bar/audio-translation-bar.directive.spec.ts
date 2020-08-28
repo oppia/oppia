@@ -49,6 +49,8 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
 
@@ -117,6 +119,8 @@ describe('Audio translation bar directive', function() {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
+    $provide.value('StateEditorRefreshService',
+      TestBed.get(StateEditorRefreshService));
     $provide.value('StateEditorService', TestBed.get(StateEditorService));
     $provide.value(
       'StateCustomizationArgsService',
@@ -555,7 +559,7 @@ describe('Audio translation bar directive', function() {
         result: $q.resolve()
       });
 
-      $rootScope.$broadcast('showTranslationTabBusyModal');
+      mockShowTranslationTabBusyModalEventEmitter.emit();
       $scope.$apply();
 
       expect($q.resolve).toHaveBeenCalled();
@@ -568,7 +572,7 @@ describe('Audio translation bar directive', function() {
         result: $q.reject()
       });
 
-      $rootScope.$broadcast('showTranslationTabBusyModal');
+      mockShowTranslationTabBusyModalEventEmitter.emit();
       $scope.$apply();
 
       expect($q.reject).toHaveBeenCalled();
@@ -777,7 +781,7 @@ describe('Audio translation bar directive', function() {
     });
 
     it('should trigger drop event in translation tab element and open add' +
-      ' audio translation modal with $uibModal', function() {
+      ' audio translation modal', function() {
       translationTabDivMock.triggerHandler('dragover');
 
       spyOn($uibModal, 'open').and.callThrough();

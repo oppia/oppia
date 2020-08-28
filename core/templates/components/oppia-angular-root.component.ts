@@ -552,6 +552,8 @@ import { StateContentService } from
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -958,6 +960,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateClassifierMappingService: StateClassifierMappingService;
   static stateContentService: StateContentService;
   static stateCustomizationArgsService: StateCustomizationArgsService;
+  static stateEditorRefreshService: StateEditorRefreshService;
   static stateEditorService: StateEditorService;
   static keyboardShortcutService: KeyboardShortcutService;
   static stateGraphLayoutService: StateGraphLayoutService;
@@ -1286,6 +1289,7 @@ private stateCardObjectFactory: StateCardObjectFactory,
 private stateClassifierMappingService: StateClassifierMappingService,
 private stateContentService: StateContentService,
 private stateCustomizationArgsService: StateCustomizationArgsService,
+private stateEditorRefreshService: StateEditorRefreshService,
 private stateEditorService: StateEditorService,
 private keyboardShortcutService: KeyboardShortcutService,
 private stateGraphLayoutService: StateGraphLayoutService,
@@ -1363,7 +1367,7 @@ private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
 private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
   ) {}
 
-  public ngAfterViewInit() {
+  public ngAfterViewInit(): void {
     OppiaAngularRootComponent.adminBackendApiService = this.adminBackendApiService;
     OppiaAngularRootComponent.adminDataService = this.adminDataService;
     OppiaAngularRootComponent.adminRouterService = this.adminRouterService;
@@ -1615,6 +1619,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateClassifierMappingService = this.stateClassifierMappingService;
     OppiaAngularRootComponent.stateContentService = this.stateContentService;
     OppiaAngularRootComponent.stateCustomizationArgsService = this.stateCustomizationArgsService;
+    OppiaAngularRootComponent.stateEditorRefreshService = this.stateEditorRefreshService;
     OppiaAngularRootComponent.stateEditorService = this.stateEditorService;
     OppiaAngularRootComponent.keyboardShortcutService = this.keyboardShortcutService;
     OppiaAngularRootComponent.stateGraphLayoutService = this.stateGraphLayoutService;

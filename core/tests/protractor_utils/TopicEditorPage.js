@@ -122,6 +122,8 @@ var TopicEditorPage = function() {
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
+  var saveRearrangedSkillsButton = element(
+    by.css('.protractor-save-rearrange-skills'));
 
   this.get = async function(topicId) {
     await browser.get(EDITOR_URL_PREFIX + topicId);
@@ -165,6 +167,7 @@ var TopicEditorPage = function() {
   };
 
   this.saveQuestion = async function() {
+    await general.scrollToTop();
     await saveQuestionButton.click();
     await waitFor.invisibilityOf(
       saveQuestionButton, 'Question modal takes too long to disappear');
@@ -178,12 +181,6 @@ var TopicEditorPage = function() {
     await element(by.css('option[label="' + skillDescription + '"]')).click();
 
     await action.click('Create question button', createQuestionButton);
-    await action.click(
-      'Confirm skill difficulty button', confirmSkillDifficultyButton);
-
-    await waitFor.invisibilityOf(
-      confirmSkillDifficultyButton,
-      'Confirm skill difficulty button takes too long to disappear');
   };
 
   this.moveToQuestionsTab = async function() {
@@ -291,6 +288,11 @@ var TopicEditorPage = function() {
     expect(uncategorizedSkillIndex).not.toEqual(-1);
     var toMove = await uncategorizedSkills.get(uncategorizedSkillIndex);
     await dragAndDrop(toMove, target);
+  };
+
+  this.saveRearrangedSkills = async function() {
+    await action.click(
+      'Save rearranged skills modal', saveRearrangedSkillsButton);
   };
 
   this.navigateToReassignModal = async function() {

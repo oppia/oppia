@@ -28,6 +28,7 @@ describe('Router Service', () => {
   var ExplorationImprovementsService = null;
   var ExplorationInitStateNameService = null;
   var ExternalSaveService = null;
+  var StateEditorRefreshService = null;
   var $rootScope = null;
   var $location = null;
   var $timeout = null, $interval = null;
@@ -38,6 +39,7 @@ describe('Router Service', () => {
   var refreshTranslationTabSpy = null;
   var externalSaveSpy = null;
   var refreshVersionHistorySpy = null;
+  var refreshStateEditorSpy = null;
 
   beforeEach(angular.mock.module('oppia', $provide => {
     var ugs = new UpgradedServices();
@@ -53,6 +55,7 @@ describe('Router Service', () => {
     ExplorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
     ExternalSaveService = $injector.get('ExternalSaveService');
+    StateEditorRefreshService = $injector.get('StateEditorRefreshService');
     $rootScope = $injector.get('$rootScope');
     $location = $injector.get('$location');
     $timeout = $injector.get('$timeout');
@@ -171,6 +174,7 @@ describe('Router Service', () => {
     refreshStatisticsTabSpy = jasmine.createSpy('refreshStatisticsTab');
     refreshSettingsTabSpy = jasmine.createSpy('refreshSettingsTab');
     refreshTranslationTabSpy = jasmine.createSpy('refreshTranslationTab');
+    refreshStateEditorSpy = jasmine.createSpy('RefreshStateEditor');
     externalSaveSpy = jasmine.createSpy('externalSpy');
     refreshVersionHistorySpy = jasmine.createSpy('refreshVersionHistory');
     testSubscriptions = new Subscription();
@@ -188,6 +192,9 @@ describe('Router Service', () => {
     testSubscriptions.add(
       RouterService.onRefreshVersionHistory.subscribe(
         refreshVersionHistorySpy));
+    testSubscriptions.add(
+      StateEditorRefreshService.onRefreshStateEditor.subscribe(
+        refreshStateEditorSpy));
   });
 
   afterEach(() => {
@@ -195,7 +202,6 @@ describe('Router Service', () => {
   });
 
   it('should navigate to main tab when tab is already on main', done => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
 
     var jQuerySpy = spyOn(window, '$');
@@ -221,8 +227,6 @@ describe('Router Service', () => {
         expect(RouterService.getActiveTabName()).toBe('main');
 
         $interval.flush(300);
-
-        expect(broadcastSpy).toHaveBeenCalled();
 
         expect(applyAsyncSpy).toHaveBeenCalled();
         done();
@@ -232,7 +236,6 @@ describe('Router Service', () => {
   });
 
   it('should not navigate to main tab when already there', done => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
 
     var jQuerySpy = spyOn(window, '$');
@@ -258,8 +261,6 @@ describe('Router Service', () => {
         expect(RouterService.getActiveTabName()).toBe('main');
 
         $interval.flush(300);
-
-        expect(broadcastSpy).toHaveBeenCalled();
 
         expect(applyAsyncSpy).toHaveBeenCalled();
 
@@ -275,8 +276,6 @@ describe('Router Service', () => {
   });
 
   it('should navigate to main tab when current location is not main', () => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
-
     // Go to stats tab.
     RouterService.navigateToStatsTab();
     $timeout.flush();
@@ -301,13 +300,11 @@ describe('Router Service', () => {
 
     $interval.flush(300);
 
-    expect(broadcastSpy).toHaveBeenCalledWith('refreshStateEditor');
+    expect(refreshStateEditorSpy).toHaveBeenCalled();
     expect(centerGraphSpy).toHaveBeenCalled();
   });
 
   it('should navigate to translation tab', () => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
-
     RouterService.navigateToTranslationTab();
     $rootScope.$apply();
 
@@ -322,8 +319,6 @@ describe('Router Service', () => {
   });
 
   it('should navigate to preview tab', () => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
-
     expect(RouterService.getActiveTabName()).toBe('main');
     RouterService.navigateToPreviewTab();
     $timeout.flush(200);
@@ -345,8 +340,6 @@ describe('Router Service', () => {
   });
 
   it('should navigate to stats tab ', () => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
-
     RouterService.navigateToStatsTab();
     $rootScope.$apply();
 
@@ -359,7 +352,6 @@ describe('Router Service', () => {
   });
 
   it('should navigate to improvements tab ', fakeAsync(() => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
       .and.returnValue(Promise.resolve(true));
 
@@ -498,8 +490,6 @@ describe('Router Service', () => {
   });
 
   it('should navigate to feedback tab ', () => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
-
     RouterService.navigateToFeedbackTab();
     $rootScope.$apply();
 
@@ -512,7 +502,6 @@ describe('Router Service', () => {
   });
 
   it('should handle when location redirects to an invalid path', () => {
-    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     var locationPathSpy = spyOn($location, 'path');
     locationPathSpy.and.returnValue('/invalid');
 
@@ -531,7 +520,7 @@ describe('Router Service', () => {
 
     $interval.flush(300);
 
-    expect(broadcastSpy).toHaveBeenCalledWith('refreshStateEditor');
+    expect(refreshStateEditorSpy).toHaveBeenCalled();
     expect(centerGraphSpy).toHaveBeenCalled();
   });
 

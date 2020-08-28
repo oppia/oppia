@@ -134,12 +134,11 @@ export class ConceptCardObjectFactory {
       private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
   _generateWorkedExamplesFromBackendDict(
-      workedExampleDicts): WorkedExample[] {
-    return workedExampleDicts.map(
-      (workedExampleDict: WorkedExampleBackendDict) => {
-        return this.workedExampleObjectFactory.createFromBackendDict(
-          workedExampleDict);
-      });
+      workedExampleDicts: WorkedExampleBackendDict[]): WorkedExample[] {
+    return workedExampleDicts.map(workedExampleDict=> {
+      return this.workedExampleObjectFactory.createFromBackendDict(
+        workedExampleDict);
+    });
   }
 
   // Create an interstitial concept card that would be displayed in the
@@ -152,8 +151,7 @@ export class ConceptCardObjectFactory {
     };
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createDefault(
-        'Loading review material',
-        AppConstants.COMPONENT_NAME_EXPLANATION), [],
+        'Loading review material', AppConstants.COMPONENT_NAME_EXPLANATION), [],
       this.recordedVoiceoversObjectFactory.createFromBackendDict(
         recordedVoiceoversDict)
     );

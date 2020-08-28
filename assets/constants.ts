@@ -87,6 +87,12 @@ export = {
 
   "TASK_TARGET_TYPE_STATE": "state",
 
+  // Regex to validate the format of Math rich-text component SVGs. If this is
+  // changed in the future, the existing filenames on the server should be
+  // handled as well.
+  // eslint-disable-next-line max-len
+  "MATH_SVG_FILENAME_REGEX": "mathImg_[a-z0-9_]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
+
   // The SVG tag-specific attribute whitelist is based on the list of tags and
   // and attributes specified in this project:
   // https://github.com/cure53/DOMPurify
@@ -5215,13 +5221,6 @@ export = {
 
   "ENABLE_PREREQUISITE_SKILLS": false,
 
-  // For the full new structures viewer features, both
-  // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has
-  // to be true. Only ENABLE_NEW_STRUCTURE_PLAYERS can be true if just the
-  // players need to be accessed, but without story progress updation.
-  // This is split up so as to access the viewers in production without
-  // exposing the POST and PUT endpoints just yet.
-  "ENABLE_NEW_STRUCTURE_PLAYERS": true,
   "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": true,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,

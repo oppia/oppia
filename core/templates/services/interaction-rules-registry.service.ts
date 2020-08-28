@@ -65,6 +65,13 @@ import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+
+interface InteractionRulesService {
+  [ruleName: string]: (
+    answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
+}
 
 @Injectable({providedIn: 'root'})
 export class InteractionRulesRegistryService {
@@ -120,7 +127,8 @@ export class InteractionRulesRegistryService {
     }));
   }
 
-  getRulesServiceByInteractionId(interactionId: string): object {
+  getRulesServiceByInteractionId(
+      interactionId: string): InteractionRulesService {
     if (!interactionId) {
       throw new Error('Interaction ID must not be empty');
     }
@@ -128,7 +136,9 @@ export class InteractionRulesRegistryService {
     if (!this.rulesServiceRegistry.has(rulesServiceName)) {
       throw new Error('Unknown interaction ID: ' + interactionId);
     }
-    return this.rulesServiceRegistry.get(rulesServiceName);
+    return (
+      <InteractionRulesService> this.rulesServiceRegistry.get(
+        rulesServiceName));
   }
 }
 
