@@ -440,7 +440,7 @@ def _get_task_output(lint_messages, failed, task):
     """
     if task.task_results:
         for task_result in task.task_results:
-            lint_messages += task_result.messages
+            lint_messages += task_result.trimmed_messages
             if task_result.failed:
                 failed = True
     return failed

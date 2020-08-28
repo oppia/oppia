@@ -59,18 +59,18 @@ class TaskResultTests(ConcurrentTaskUtilsTests):
     def test_all_messages_with_success_message(self):
         output_object = concurrent_task_utils.TaskResult(
             'Test', False, [], [])
-        self.assertEqual(output_object.messages, [])
+        self.assertEqual(output_object.trimmed_messages, [])
         self.assertEqual(
-            output_object.all_messages, ['SUCCESS  Test check passed'])
+            output_object.get_report(), ['SUCCESS  Test check passed'])
         self.assertFalse(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
 
     def test_all_messages_with_failed_message(self):
         output_object = concurrent_task_utils.TaskResult(
             'Test', True, [], [])
-        self.assertEqual(output_object.messages, [])
+        self.assertEqual(output_object.trimmed_messages, [])
         self.assertEqual(
-            output_object.all_messages, ['FAILED  Test check failed'])
+            output_object.get_report(), ['FAILED  Test check failed'])
         self.assertTrue(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
 
@@ -133,10 +133,11 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  '
             'name check failed')
 
-    def test_task_thread_with_no_test_name(self):
+    def test_task_thread_with_task_report_disabled(self):
         class HelperTests(python_utils.OBJECT):
             def test_show(self):
-                return concurrent_task_utils.TaskResult(None, None, None, [])
+                return concurrent_task_utils.TaskResult(
+                    None, None, None, ['msg'], report_enabled=False)
             def test_perform_all_check(self):
                 return [self.test_show()]
 
@@ -174,7 +175,6 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
-        self.assertEqual('', self.task_stdout)
         expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
         self.assertTrue(len(expected_output) == 6)
 

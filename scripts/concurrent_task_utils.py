@@ -47,7 +47,9 @@ def log(message, show_time=False):
 class TaskResult(python_utils.OBJECT):
     """Task result for concurrent_task_utils."""
 
-    def __init__(self, name, failed, trimmed_messages, full_messages):
+    def __init__(
+            self, name, failed, trimmed_messages, full_messages,
+            report_enabled=True):
         """Constructs a TaskResult object.
 
         Args:
@@ -56,30 +58,31 @@ class TaskResult(python_utils.OBJECT):
                 failed.
             trimmed_messages: list(str). List of error messages that are
                 trimmed to keep main part of messages.
-            full_messages: str|list(str). List of full messages returned by the
+            full_messages: list(str). List of full messages returned by the
                 objects.
+            report_enabled: bool. Decide whether task result will print or not.
         """
         self.name = name
         self.failed = failed
-        self.messages = trimmed_messages
+        self.trimmed_messages = trimmed_messages
         self.full_messages = full_messages
+        self.report_enabled = report_enabled
 
-    @property
-    def all_messages(self):
+    def get_report(self):
         """Returns a list of message with pass or fail status for the current
         check.
 
         Returns:
-            str|list(str). List of full messages corresponding to the given
+            list(str). List of full messages corresponding to the given
             task.
         """
-        if self.name:
-            failed_message = (
+        if self.report_enabled:
+            status_message = (
                 '%s %s check %s' % (
                     (FAILED_MESSAGE_PREFIX, self.name, 'failed')
                     if self.failed else (
                         SUCCESS_MESSAGE_PREFIX, self.name, 'passed')))
-            self.full_messages.append(failed_message)
+            self.full_messages.append(status_message)
         return self.full_messages
 
 
@@ -89,7 +92,7 @@ class TaskThread(threading.Thread):
     def __init__(self, func, verbose, semaphore, name):
         super(TaskThread, self).__init__()
         self.func = func
-        self.task_results = None
+        self.task_results = []
         self.exception = None
         self.stacktrace = None
         self.verbose = verbose
@@ -104,19 +107,19 @@ class TaskThread(threading.Thread):
                 for task_result in self.task_results:
                     # The following section will print the output of the lint
                     # checks.
-                    if task_result.name:
+                    if task_result.report_enabled:
                         log(
                             'Report from %s check\n'
                             '----------------------------------------\n'
                             '%s' % (task_result.name, '\n'.join(
-                                task_result.all_messages)), show_time=True)
+                                task_result.get_report())), show_time=True)
                     # The following section will print the output of backend
                     # tests.
                     else:
                         log(
                             'LOG %s:\n%s'
                             '----------------------------------------' %
-                            (self.name, task_result.all_messages),
+                            (self.name, task_result.get_report()[0]),
                             show_time=True)
             log(
                 'FINISHED %s: %.1f secs' % (

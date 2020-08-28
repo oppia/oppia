@@ -182,7 +182,8 @@ class TestingTaskSpec(python_utils.OBJECT):
 
         result = run_shell_cmd(exc_list)
 
-        return [concurrent_task_utils.TaskResult(None, None, None, result)]
+        return [concurrent_task_utils.TaskResult(
+            None, None, None, [result], report_enabled=False)]
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
@@ -387,7 +388,7 @@ def main(args=None):
             try:
                 tests_run_regex_match = re.search(
                     r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
-                    task.task_results[0].all_messages)
+                    task.task_results[0].get_report()[0])
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
                 python_utils.PRINT(
@@ -396,7 +397,7 @@ def main(args=None):
             except Exception:
                 python_utils.PRINT(
                     'An unexpected error occurred. '
-                    'Task output:\n%s' % task.task_results[0].all_messages)
+                    'Task output:\n%s' % task.task_results[0].get_report()[0])
 
         total_count += test_count
 
