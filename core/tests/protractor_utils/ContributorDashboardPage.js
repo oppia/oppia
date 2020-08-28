@@ -132,8 +132,11 @@ var ContributorDashboardPage = function() {
   };
 
   var _getOpportunityElements = async function() {
-    var opportunityCount = await opportunityListItems.count();
+    await waitFor.visibilityOf(
+      element(opportunityHeadingCss),
+      'Opportunity Heading takes too long to appear.');
 
+    var opportunityCount = await opportunityListItems.count();
     var opportunityElements = [];
     for (var i = 0; i < opportunityCount; i++) {
       var opportunityElement = await opportunityListItems.get(i);
@@ -173,6 +176,7 @@ var ContributorDashboardPage = function() {
 
   this.expectOpportunityWithPropertiesToExist = async function(
       expectedHeading, expectedSubheading, expectedLabel, expectedPercentage) {
+    await this.waitForOpportunitiesToLoad();
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
       expectedHeading, expectedSubheading);
     expect(opportunity).not.toBe(null);
@@ -198,6 +202,7 @@ var ContributorDashboardPage = function() {
 
   this.clickOpportunityActionButton = async function(
       opportunityHeading, opportunitySubheading) {
+    await this.waitForOpportunitiesToLoad();
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
       opportunityHeading, opportunitySubheading);
     expect(opportunity).not.toBe(null);
