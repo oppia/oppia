@@ -58,8 +58,11 @@ require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/id-generation.service.ts');
 require('services/user.service.ts');
+require('services/external-save.service.ts');
 
 import WaveSurfer from 'wavesurfer.js';
+
+import { Subscription } from 'rxjs';
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -135,7 +138,8 @@ angular.module('oppia').directive('audioTranslationBar', [
       controller: [
         '$filter', '$interval', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
-        'ContextService', 'EditabilityService', 'ExplorationStatesService',
+        'ContextService', 'EditabilityService',
+        'ExternalSaveService', 'ExplorationStatesService',
         'IdGenerationService', 'SiteAnalyticsService',
         'StateEditorService', 'StateRecordedVoiceoversService',
         'TranslationLanguageService', 'TranslationStatusService',
@@ -144,13 +148,15 @@ angular.module('oppia').directive('audioTranslationBar', [
         function(
             $filter, $interval, $rootScope, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
-            ContextService, EditabilityService, ExplorationStatesService,
+            ContextService, EditabilityService,
+            ExternalSaveService, ExplorationStatesService,
             IdGenerationService, SiteAnalyticsService,
             StateEditorService, StateRecordedVoiceoversService,
             TranslationLanguageService, TranslationStatusService,
             TranslationTabActiveContentIdService, VoiceoverRecordingService,
             RECORDING_TIME_LIMIT) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var saveRecordedVoiceoversChanges = function() {
             StateRecordedVoiceoversService.saveDisplayedValue();
             var stateName = StateEditorService.getActiveStateName();
@@ -534,26 +540,37 @@ angular.module('oppia').directive('audioTranslationBar', [
             $scope.$on('$destroy', function() {
               document.body.onkeyup = null;
             });
-            $scope.$on('externalSave', function() {
-              if ($scope.voiceoverRecorder.status().isRecording) {
-                $scope.voiceoverRecorder.stopRecord();
-                $scope.voiceoverRecorder.closeRecorder();
-              }
-              AudioPlayerService.stop();
-              AudioPlayerService.clear();
-              $scope.audioBlob = null;
-            });
 
-            $scope.$on('activeContentIdChanged', function() {
-              $scope.initAudioBar();
-            });
-            $scope.$on('activeLanguageChanged', function() {
-              $scope.initAudioBar();
-            });
+            ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(() => {
+                if ($scope.voiceoverRecorder.status().isRecording) {
+                  $scope.voiceoverRecorder.stopRecord();
+                  $scope.voiceoverRecorder.closeRecorder();
+                }
+                AudioPlayerService.stop();
+                AudioPlayerService.clear();
+                $scope.audioBlob = null;
+              })
+            );
 
-            $scope.$on('showTranslationTabBusyModal', function() {
-              $scope.openTranslationTabBusyModal();
-            });
+            ctrl.directiveSubscriptions.add(
+              TranslationTabActiveContentIdService.onActiveContentIdChanged.
+                subscribe(
+                  () => $scope.initAudioBar()
+                )
+            );
+
+            ctrl.directiveSubscriptions.add(
+              TranslationLanguageService.onActiveLanguageChanged.subscribe(
+                () => $scope.initAudioBar()
+              )
+            );
+
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onShowTranslationTabBusyModal.subscribe(
+                () => $scope.openTranslationTabBusyModal()
+              )
+            );
             $scope.track = {
               progress: function(progressPercentage) {
                 if (angular.isDefined(progressPercentage)) {
@@ -563,6 +580,9 @@ angular.module('oppia').directive('audioTranslationBar', [
               }
             };
             $scope.initAudioBar();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }]
     };

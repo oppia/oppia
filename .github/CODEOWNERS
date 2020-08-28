@@ -44,8 +44,7 @@
 
 
 # Android team
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/domain/android_validation_constants*.py @seanlip
+/core/domain/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
@@ -67,6 +66,7 @@
 /core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
+/tsconfig-strict.json @nishantwrp @vojtechjelinek
 
 
 # Answer classification team.
@@ -143,8 +143,8 @@
 
 
 # Dev workflow team.
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/.circleci/ @vinitamurthi @U8NWXD @kevintab95
+# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
+/.circleci/ @BenHenning @U8NWXD @kevintab95
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -154,8 +154,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/.travis.yml @vinitamurthi @U8NWXD @kevintab95
+/.travis.yml @BenHenning @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -250,24 +249,23 @@
 
 
 # Global frontend services
-/core/templates/services/promo-bar.service*.ts @ankita240796
-/core/templates/services/html-escaper.service*.ts @ankita240796
-/core/templates/services/debouncer.service*.ts @ankita240796
-/core/templates/services/site-analytics.service*.ts @ankita240796
-/core/templates/services/date-time-format.service*.ts @ankita240796
-/core/templates/services/utils.service*.ts @ankita240796
-/core/templates/services/local-storage.service*.ts @ankita240796
-/core/templates/services/id-generation.service*.ts @ankita240796
 /core/templates/services/alerts.service*.ts @ankita240796
-/core/templates/services/page-title.service*.ts @ankita240796
+/core/templates/services/date-time-format.service*.ts @ankita240796
+/core/templates/services/debouncer.service*.ts @ankita240796
 /core/templates/services/extension-tag-assembler.service*.ts @ankita240796
+/core/templates/services/html-escaper.service*.ts @ankita240796
+/core/templates/services/id-generation.service*.ts @ankita240796
+/core/templates/services/keyboard-shortcut.service*.ts @jimbyo
+/core/templates/services/local-storage.service*.ts @ankita240796
 /core/templates/services/nested-directives*.ts @ankita240796
-/core/templates/services/keyboard-shortcut.service.ts @jimbyo
-/core/templates/services/keyboard-shortcut.service.spec.ts @jimbyo
+/core/templates/services/page-title.service*.ts @ankita240796
+/core/templates/services/promo-bar.service*.ts @ankita240796
+/core/templates/services/site-analytics.service*.ts @ankita240796
+/core/templates/services/utils.service*.ts @ankita240796
 /core/templates/services/stateful/background-mask.service*.ts @ankita240796
 /core/templates/services/stateful/focus-manager.service*.ts @ankita240796
-/core/templates/services/contextual/url.service*.ts @ankita240796
 /core/templates/services/contextual/device-info.service*.ts @ankita240796
+/core/templates/services/contextual/url.service*.ts @ankita240796
 /core/templates/services/contextual/window-dimensions.service*.ts @ankita240796
 /core/templates/services/contextual/window-ref.service*.ts @ankita240796
 
@@ -455,6 +453,7 @@
 /core/templates/services/interaction-rules-registry.service*.ts @bansalnitish
 /core/templates/services/interaction-specs.service*.ts @bansalnitish
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
+/redis.conf @seanlip
 /release_constants.py @ankita240796 @nithusha21 @DubeySandeep
 
 
@@ -554,21 +553,19 @@
 /core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
+/core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
 /puppeteer-login-script.js @jimbyo
 /scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
-/webpack.common.config.ts @jameesjohn @vojtechjelinek
-/webpack.common.macros.ts @jameesjohn @vojtechjelinek
-/webpack.dev.config.ts @jameesjohn @vojtechjelinek
-/webpack.prod.config.ts @jameesjohn @vojtechjelinek
-/webpack.terser.config.ts @nishantwrp @vojtechjelinek
+/webpack.*.ts @nishantwrp @vojtechjelinek
 
 
 # Typings.
 /typings @ankita240796 @nishantwrp
+/typings/tests/ @shavavo
 
 
 # User Data Takeout.
@@ -587,16 +584,13 @@
 
 
 # Dynamic Feature Gating project
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/domain/platform_feature_services*.py @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/domain/platform_parameter*.py @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/platform_feature*.py @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/storage/config/ @vinitamurthi
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/core/templates/domain/platform_feature/ @vinitamurthi
+# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
+/core/controllers/platform_feature*.py @BenHenning 
+/core/domain/platform_feature_services*.py @BenHenning 
+/core/domain/platform_parameter*.py @BenHenning 
+/core/platform_feature*.py @BenHenning 
+/core/storage/config/ @BenHenning 
+/core/templates/domain/platform_feature/ @BenHenning 
 
 
 # Frontend unit tests
@@ -613,6 +607,7 @@
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
+/core/templates/karma.module.ts @nishantwrp @vojtechjelinek
 /core/tests/protractor_utils/ @U8NWXD @kevintab95
 /core/tests/protractor_desktop/ @U8NWXD @kevintab95
 /core/tests/protractor/ @U8NWXD @kevintab95
@@ -649,5 +644,5 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
-# TODO(BenHenning): Reclaim ownership after 2020-08-16.
-/.github/workflows/ @vinitamurthi
+# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
+/.github/workflows/ @BenHenning

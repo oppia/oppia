@@ -20,6 +20,8 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
+require('services/guppy-initialization.service.ts');
+
 angular.module('oppia').component('customOskLettersEditor', {
   bindings: {
     value: '='
@@ -28,11 +30,11 @@ angular.module('oppia').component('customOskLettersEditor', {
   controller: [
     '$scope', '$window', 'MAX_CUSTOM_LETTERS_FOR_OSK',
     'CUSTOM_LETTERS_GREEK_TAB', 'CUSTOM_LETTERS_LATIN_TAB',
-    'GREEK_LETTER_NAMES_TO_SYMBOLS',
+    'GREEK_LETTER_NAMES_TO_SYMBOLS', 'GuppyInitializationService',
     function(
         $scope, $window, MAX_CUSTOM_LETTERS_FOR_OSK,
         CUSTOM_LETTERS_GREEK_TAB, CUSTOM_LETTERS_LATIN_TAB,
-        GREEK_LETTER_NAMES_TO_SYMBOLS) {
+        GREEK_LETTER_NAMES_TO_SYMBOLS, GuppyInitializationService) {
       const ctrl = this;
       ctrl.latinLowerCase = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
       ctrl.latinUpperCase = ctrl.latinLowerCase.map((x) => x.toUpperCase());
@@ -60,6 +62,7 @@ angular.module('oppia').component('customOskLettersEditor', {
         } else {
           ctrl.value.splice(index, 1);
         }
+        GuppyInitializationService.customOskLetters = ctrl.value;
       };
 
       ctrl.getRemainingLettersCount = function() {

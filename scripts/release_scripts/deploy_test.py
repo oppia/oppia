@@ -43,6 +43,9 @@ INVALID_CONSTANTS_WITH_WRONG_DEV_MODE = os.path.join(
 INVALID_CONSTANTS_WITH_WRONG_BUCKET_NAME = os.path.join(
     RELEASE_TEST_DIR, 'invalid_constants_with_wrong_bucket_name.txt')
 VALID_CONSTANTS = os.path.join(RELEASE_TEST_DIR, 'valid_constants.txt')
+INVALID_APP_DEV_YAML_PATH = os.path.join(
+    RELEASE_TEST_DIR, 'invalid_app_dev.yaml')
+VALID_APP_DEV_YAML_PATH = os.path.join(RELEASE_TEST_DIR, 'valid_app_dev.yaml')
 
 
 class MockCD(python_utils.OBJECT):
@@ -522,26 +525,61 @@ class DeployTests(test_utils.GenericTestBase):
                     common.CONSTANTS_FILE_PATH)):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
-    def test_constants_are_updated_correctly(self):
+    def test_missing_vpc_access_connector(self):
+        app_dev_swap = self.swap(
+            deploy, 'APP_DEV_YAML_PATH', INVALID_APP_DEV_YAML_PATH)
+        with self.exists_swap, self.copyfile_swap, app_dev_swap:
+            with self.listdir_swap, self.assertRaisesRegexp(
+                AssertionError, 'Missing vpc_access_connector'):
+                deploy.preprocess_release('oppiaserver', 'deploy_dir')
+
+    def test_constants_and_app_dev_are_updated_correctly(self):
+        check_function_calls = {
+            'add_redishost_gets_called': False
+        }
+        expected_check_function_calls = {
+            'add_redishost_gets_called': True
+        }
+        def mock_add_redishost():
+            check_function_calls['add_redishost_gets_called'] = True
+
         constants_swap = self.swap(
             common, 'CONSTANTS_FILE_PATH', VALID_CONSTANTS)
+        app_dev_swap = self.swap(
+            deploy, 'APP_DEV_YAML_PATH', VALID_APP_DEV_YAML_PATH)
+        redishost_swap = self.swap(
+            update_configs, 'add_redishost', mock_add_redishost)
         files_swap = self.swap(deploy, 'FILES_AT_ROOT', [])
         images_dir_swap = self.swap(deploy, 'IMAGE_DIRS', [])
+
         with python_utils.open_file(VALID_CONSTANTS, 'r') as f:
-            original_content = f.read()
-        expected_content = original_content.replace(
+            original_common_content = f.read()
+        expected_common_content = original_common_content.replace(
             '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
             '"GCS_RESOURCE_BUCKET_NAME": "oppiaserver%s",' % (
                 deploy.BUCKET_NAME_SUFFIX))
+
+        with python_utils.open_file(VALID_APP_DEV_YAML_PATH, 'r') as f:
+            original_app_dev_content = f.read()
+        expected_app_dev_content = original_app_dev_content.replace(
+            'vpc_access_connector:\n  name: projects/PROJECT_ID',
+            'vpc_access_connector:\n  name: projects/oppiaserver')
+
         try:
             with self.exists_swap, constants_swap, files_swap, images_dir_swap:
-                with self.listdir_swap:
+                with self.listdir_swap, app_dev_swap, redishost_swap:
                     deploy.preprocess_release('oppiaserver', 'deploy_dir')
             with python_utils.open_file(VALID_CONSTANTS, 'r') as f:
-                self.assertEqual(f.read(), expected_content)
+                self.assertEqual(f.read(), expected_common_content)
+            with python_utils.open_file(VALID_APP_DEV_YAML_PATH, 'r') as f:
+                self.assertEqual(f.read(), expected_app_dev_content)
+            self.assertEqual(
+                check_function_calls, expected_check_function_calls)
         finally:
             with python_utils.open_file(VALID_CONSTANTS, 'w') as f:
-                f.write(original_content)
+                f.write(original_common_content)
+            with python_utils.open_file(VALID_APP_DEV_YAML_PATH, 'w') as f:
+                f.write(original_app_dev_content)
 
     def test_indexes_not_serving(self):
         check_function_calls = {
@@ -582,7 +620,9 @@ class DeployTests(test_utils.GenericTestBase):
             deploy.build_scripts(False)
         self.assertEqual(
             cmd_tokens,
-            ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
+            [
+                'python', '-m', 'scripts.build', '--prod_env',
+                '--source_maps', '--deploy_mode'])
 
     def test_build_with_maintenance_mode(self):
         process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
@@ -596,7 +636,8 @@ class DeployTests(test_utils.GenericTestBase):
             cmd_tokens,
             [
                 'python', '-m', 'scripts.build',
-                '--prod_env', '--deploy_mode', '--maintenance_mode'
+                '--prod_env', '--source_maps', '--deploy_mode',
+                '--maintenance_mode'
             ]
         )
 
@@ -612,7 +653,9 @@ class DeployTests(test_utils.GenericTestBase):
             deploy.build_scripts(False)
         self.assertEqual(
             cmd_tokens,
-            ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
+            [
+                'python', '-m', 'scripts.build', '--prod_env',
+                '--source_maps', '--deploy_mode'])
 
     def test_deploy_application(self):
         check_function_calls = {
@@ -639,7 +682,7 @@ class DeployTests(test_utils.GenericTestBase):
                     deploy.CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
                 ))
 
-    def test_flush_memcache(self):
+    def test_flush_memcache_with_oppiaserver(self):
         check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': False,
             'ask_user_to_confirm_is_called': False
@@ -648,9 +691,20 @@ class DeployTests(test_utils.GenericTestBase):
             'open_new_tab_in_browser_if_possible_is_called': True,
             'ask_user_to_confirm_is_called': True
         }
-        def mock_open_tab(unused_url):
+        check_url_list = {
+            'https://console.cloud.google.com/appengine/'
+            'memcache?src=ac&project=oppiaserver': False,
+            'https://www.oppia.org/admin#/misc': False
+        }
+        expected_check_url_list = {
+            'https://console.cloud.google.com/appengine/'
+            'memcache?src=ac&project=oppiaserver': True,
+            'https://www.oppia.org/admin#/misc': True
+        }
+        def mock_open_tab(url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_is_called'] = True
+            check_url_list[url] = True
         def mock_ask_user_to_confirm(unused_msg):
             check_function_calls['ask_user_to_confirm_is_called'] = True
 
@@ -661,6 +715,42 @@ class DeployTests(test_utils.GenericTestBase):
         with open_tab_swap, ask_user_swap:
             deploy.flush_memcache('oppiaserver')
         self.assertEqual(check_function_calls, expected_check_function_calls)
+        self.assertEqual(check_url_list, expected_check_url_list)
+
+    def test_flush_memcache_with_oppiatestserver(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'ask_user_to_confirm_is_called': False
+        }
+        expected_check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'ask_user_to_confirm_is_called': True
+        }
+        check_url_list = {
+            'https://console.cloud.google.com/appengine/'
+            'memcache?src=ac&project=oppiatestserver': False,
+            'https://oppiatestserver.appspot.com/admin#/misc': False
+        }
+        expected_check_url_list = {
+            'https://console.cloud.google.com/appengine/'
+            'memcache?src=ac&project=oppiatestserver': True,
+            'https://oppiatestserver.appspot.com/admin#/misc': True
+        }
+        def mock_open_tab(url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+            check_url_list[url] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_is_called'] = True
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with open_tab_swap, ask_user_swap:
+            deploy.flush_memcache('oppiatestserver')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+        self.assertEqual(check_url_list, expected_check_url_list)
 
     def test_version_switch_with_release_branch(self):
         check_function_calls = {

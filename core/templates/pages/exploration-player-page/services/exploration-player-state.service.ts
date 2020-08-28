@@ -17,9 +17,10 @@
  *  like engine service.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { EventEmitter } from '@angular/core';
 
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
@@ -67,6 +68,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     StatsReportingService = (
       OppiaAngularRootComponent.statsReportingService);
     var _totalQuestionsReceivedEventEmitter = new EventEmitter();
+    var _oppiaFeedbackAvailableEventEmitter = new EventEmitter();
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -83,7 +85,9 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         });
     }
 
-    var storyId = UrlService.getStoryIdInPlayer();
+    var storyUrlFragment = UrlService.getStoryUrlFragmentFromLearnerUrl();
+
+    var _playerStateChangeEventEmitter = new EventEmitter();
 
     var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
@@ -135,15 +139,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       currentEngineService = ExplorationEngineService;
     };
 
-    var doesMathExpressionInputInteractionExist = function(states) {
-      for (var state in states) {
-        if (states[state].interaction.id === 'MathExpressionInput') {
-          return true;
-        }
-      }
-      return false;
-    };
-
     var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
       $q.all([
@@ -154,11 +149,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
         var featuresData = combinedData[1];
-        if (doesMathExpressionInputInteractionExist(explorationData.states)) {
-          Guppy.init({
-            symbols: ['/third_party/static/guppy-175999/sym/symbols.json',
-              oppiaSymbolsUrl]});
-        }
         ExplorationFeaturesService.init(explorationData, featuresData);
         ExplorationEngineService.init(
           explorationData, null, null, null, callback);
@@ -189,27 +179,20 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       $q.all([
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
-          explorationId, storyId),
+          explorationId, storyUrlFragment),
         ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
           explorationId),
       ]).then(function(combinedData) {
         var explorationData = combinedData[0];
         var pretestQuestionsData = combinedData[1];
         var featuresData = combinedData[2];
-        if (
-          doesMathExpressionInputInteractionExist(
-            explorationData.exploration.states)) {
-          Guppy.init({
-            symbols: ['/third_party/static/guppy-175999/sym/symbols.json',
-              oppiaSymbolsUrl]});
-        }
         ExplorationFeaturesService.init(explorationData, featuresData);
         if (pretestQuestionsData.length > 0) {
           setPretestMode();
           initializeExplorationServices(explorationData, true, callback);
           initializePretestServices(pretestQuestionsData, callback);
         } else if (
-          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
           UrlService.getUrlParams().hasOwnProperty('node_id')) {
           setStoryChapterMode();
           initializeExplorationServices(explorationData, false, callback);
@@ -254,7 +237,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       },
       moveToExploration: function(callback) {
         if (
-          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
           UrlService.getUrlParams().hasOwnProperty('node_id')) {
           setStoryChapterMode();
         } else {
@@ -270,6 +253,12 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       },
       get onTotalQuestionsReceived() {
         return _totalQuestionsReceivedEventEmitter;
+      },
+      get onPlayerStateChange() {
+        return _playerStateChangeEventEmitter;
+      },
+      get onOppiaFeedbackAvailable() {
+        return _oppiaFeedbackAvailableEventEmitter;
       }
     };
   }]);

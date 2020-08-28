@@ -98,6 +98,11 @@ describe('Player position service', () => {
     expect(pps.getDisplayedCardIndex()).toBe(5);
   });
 
+  it('should get onNewCardOpened EventEmitter', () => {
+    let mockNewCardOpenedEventEmitter = new EventEmitter();
+    expect(pps.onNewCardOpened).toEqual(mockNewCardOpenedEventEmitter);
+  });
+
   it('should emit the index of the question change', () => {
     pps.changeCurrentQuestion(3);
     expect(onQuestionChangeSpy).toHaveBeenCalledWith(3);
@@ -106,5 +111,10 @@ describe('Player position service', () => {
   it('should fetch EventEmitter for changing active card', () => {
     let mockActiveCardChangedEvent = new EventEmitter();
     expect(pps.onActiveCardChanged).toEqual(mockActiveCardChangedEvent);
+  });
+
+  it('should fetch EventEmitter when help card is available', () => {
+    let mockHelpCardAvailableEvent = new EventEmitter();
+    expect(pps.onHelpCardAvailable).toEqual(mockHelpCardAvailableEvent);
   });
 });

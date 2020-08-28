@@ -38,14 +38,12 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
         self.manifest_file = python_utils.string_io(
             buffer_value='{\"dependencies\":{\"frontend\":{\"guppy\":'
             '{\"version\": \"0.1\"},\"skulpt-dist\":{\"version\": \"0.2\"}'
-            ',\"mathExpressions\":{\"version\": \"0.3\"},\"midiJs\":'
-            '{\"version\": \"0.4\"}}}}')
+            ',\"midiJs\":{\"version\": \"0.4\"}}}}')
         self.package_file = python_utils.string_io(
             buffer_value='{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [
             'guppy-defs-0.1.d.ts',
             'skulpt-defs-0.2.d.ts',
-            'math-expressions-defs-0.3.d.ts',
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
@@ -63,7 +61,6 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
             python_utils, 'open_file', mock_open_file)
         self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
-
 
     def test_check_third_party_libs_type_defs(self):
         expected_summary_messages = [

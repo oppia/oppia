@@ -21,10 +21,16 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { Subscription } from 'rxjs';
+
 describe('Training Modal Service', function() {
   var $rootScope;
   var TrainingModalService = null;
   var AlertsService = null;
+  var ExternalSaveService = null;
+
+  var testSubscriptions = null;
+  var externalSaveSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -39,9 +45,19 @@ describe('Training Modal Service', function() {
     TrainingModalService = $injector.get(
       'TrainingModalService');
     AlertsService = $injector.get('AlertsService');
-
-    spyOn($rootScope, '$broadcast').and.callThrough();
+    ExternalSaveService = $injector.get('ExternalSaveService');
   }));
+
+  beforeEach(() => {
+    externalSaveSpy = jasmine.createSpy('externalSave');
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(ExternalSaveService.onExternalSave.subscribe(
+      externalSaveSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
 
   it('should open $uibModal', function() {
     var clearWarningsSpy = spyOn(AlertsService, 'clearWarnings')
@@ -49,6 +65,6 @@ describe('Training Modal Service', function() {
     TrainingModalService.openTrainUnresolvedAnswerModal();
 
     expect(clearWarningsSpy).toHaveBeenCalled();
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('externalSave');
+    expect(externalSaveSpy).toHaveBeenCalled();
   });
 });

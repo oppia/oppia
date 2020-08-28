@@ -25,6 +25,7 @@ import { UrlInterpolationService } from
 import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants.ts';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'practice-tab',
@@ -33,6 +34,7 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class PracticeTabComponent implements OnInit {
   @Input() topicName: string;
+  @Input() startButtonIsDisabled: boolean = false;
   @Input() subtopicsList: Subtopic[];
   selectedSubtopics: Subtopic[] = [];
   availableSubtopics: Subtopic[] = [];
@@ -40,7 +42,8 @@ export class PracticeTabComponent implements OnInit {
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -55,6 +58,9 @@ export class PracticeTabComponent implements OnInit {
   }
 
   isStartButtonDisabled(): boolean {
+    if (this.startButtonIsDisabled) {
+      return true;
+    }
     for (var idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
         return false;
@@ -79,7 +85,7 @@ export class PracticeTabComponent implements OnInit {
           this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
         comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
       });
-    window.location.href = practiceSessionsUrl;
+    this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
   }
 }
 

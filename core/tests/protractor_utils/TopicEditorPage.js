@@ -122,6 +122,8 @@ var TopicEditorPage = function() {
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
+  var saveRearrangedSkillsButton = element(
+    by.css('.protractor-save-rearrange-skills'));
 
   this.get = async function(topicId) {
     await browser.get(EDITOR_URL_PREFIX + topicId);
@@ -170,24 +172,20 @@ var TopicEditorPage = function() {
       saveQuestionButton, 'Question modal takes too long to disappear');
   };
 
-  this.createQuestionForSkillWithIndex = async function(index) {
+  this.createQuestionForSkillWithName = async function(skillDescription) {
+    await action.click('Select skill dropdown', selectSkillDropdown);
     await waitFor.elementToBeClickable(
-      createQuestionButton,
-      'Create Question button takes too long to be clickable');
-    await createQuestionButton.click();
-    await waitFor.visibilityOf(
-      skillSelectorModal,
-      'Select skill modal takes too long to appear');
-    var skillItem = await skillItems.get(index);
-    await skillItem.click();
-    await waitFor.elementToBeClickable(
-      confirmSkillButton,
-      'Confirm Skill button takes too long to be clickable');
-    await confirmSkillButton.click();
-    await confirmSkillDifficultyButton.click();
+      selectSkillDropdown, 'Skill select dropdown takes too long to appear.');
+    await selectSkillDropdown.click();
+    await element(by.css('option[label="' + skillDescription + '"]')).click();
+
+    await action.click('Create question button', createQuestionButton);
+    await action.click(
+      'Confirm skill difficulty button', confirmSkillDifficultyButton);
+
     await waitFor.invisibilityOf(
-      skillSelectorModal,
-      'Select skill modal takes too long to disappear');
+      confirmSkillDifficultyButton,
+      'Confirm skill difficulty button takes too long to disappear');
   };
 
   this.moveToQuestionsTab = async function() {
@@ -295,6 +293,11 @@ var TopicEditorPage = function() {
     expect(uncategorizedSkillIndex).not.toEqual(-1);
     var toMove = await uncategorizedSkills.get(uncategorizedSkillIndex);
     await dragAndDrop(toMove, target);
+  };
+
+  this.saveRearrangedSkills = async function() {
+    await action.click(
+      'Save rearranged skills modal', saveRearrangedSkillsButton);
   };
 
   this.navigateToReassignModal = async function() {

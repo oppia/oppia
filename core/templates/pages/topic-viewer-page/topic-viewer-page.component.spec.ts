@@ -93,14 +93,14 @@ describe('Topic viewer page', function() {
     ctrl.$onInit();
 
     expect(ctrl.canonicalStorySummaries).toEqual([]);
-    expect(ctrl.activeTab).toBe('info');
+    expect(ctrl.activeTab).toBe('story');
     expect(ctrl.topicIsLoading).toBe(true);
     $scope.$apply();
 
     expect(ctrl.topicId).toBe('1');
     expect(ctrl.topicName).toBe('Topic Name');
     expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-      topicName + ' - Oppia');
+      `Learn ${topicName} | Topic Description | Oppia`);
     expect(ctrl.topicDescription).toBe('Topic Description');
     expect(ctrl.canonicalStorySummaries.length).toBe(1);
     expect(ctrl.chapterCount).toBe(2);
@@ -144,7 +144,7 @@ describe('Topic viewer page', function() {
     expect(ctrl.activeTab).toBe('practice');
   });
 
-  it('should switch to info tab if practice tab is hidden', function() {
+  it('should switch to stories tab if practice tab is hidden', function() {
     spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       topicName);
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
@@ -183,7 +183,7 @@ describe('Topic viewer page', function() {
     $scope.$apply();
 
     expect(ctrl.trainTabShouldBeDisplayed).toBe(false);
-    expect(ctrl.activeTab).toBe('info');
+    expect(ctrl.activeTab).toBe('story');
   });
 
   it('should use reject handler when fetching subtopic data fails',
