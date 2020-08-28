@@ -216,21 +216,22 @@ describe('State Graph Visualization directive', function() {
         $flushPendingTasks();
       });
 
-      it('should evaluate $scope properties', function() {
-        expect($scope.graphLoaded).toBe(true);
-        expect($scope.GRAPH_WIDTH).toBe(630);
-        expect($scope.GRAPH_HEIGHT).toBe(280);
-        expect($scope.VIEWPORT_WIDTH).toBe(10000);
-        expect($scope.VIEWPORT_HEIGHT).toBe(10000);
-        expect($scope.VIEWPORT_X).toBe(-1260);
-        expect($scope.VIEWPORT_Y).toBe(-1000);
+      it('should initialize $scope properties after controller is initialized',
+        function() {
+          expect($scope.graphLoaded).toBe(true);
+          expect($scope.GRAPH_WIDTH).toBe(630);
+          expect($scope.GRAPH_HEIGHT).toBe(280);
+          expect($scope.VIEWPORT_WIDTH).toBe(10000);
+          expect($scope.VIEWPORT_HEIGHT).toBe(10000);
+          expect($scope.VIEWPORT_X).toBe(-1260);
+          expect($scope.VIEWPORT_Y).toBe(-1000);
 
-        expect($scope.getGraphHeightInPixels()).toBe(300);
+          expect($scope.getGraphHeightInPixels()).toBe(300);
 
-        expect($scope.augmentedLinks[0].style).toBe(
-          'background-color: red; ');
-        expect($scope.nodeList.length).toBe(2);
-      });
+          expect($scope.augmentedLinks[0].style).toBe(
+            'background-color: red; ');
+          expect($scope.nodeList.length).toBe(2);
+        });
 
       it('should get highlight transform css value based on provided values',
         function() {

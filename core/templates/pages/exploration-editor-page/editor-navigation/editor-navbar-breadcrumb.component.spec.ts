@@ -62,7 +62,7 @@ describe('Editor Navbar Breadcrumb directive', function() {
     ctrl.$onDestroy();
   });
 
-  it('should evaluate scope properties after controller initialization',
+  it('should initialize $scope properties after controller is initialized',
     function() {
       expect($scope.navbarTitle).toBe(null);
     });

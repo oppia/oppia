@@ -142,7 +142,7 @@ describe('Editor Navigation Component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should evaluate $scope properties after controller initialization',
+    it('should initialize $scope properties after controller is initialized',
       function() {
         spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
         expect($scope.isPostTutorialHelpPopoverShown())
@@ -153,7 +153,7 @@ describe('Editor Navigation Component', function() {
         expect($scope.showPublishButton()).toEqual(true);
       });
 
-    it('should evaluate warnings from exploration warning service', function() {
+    it('should get warnings whenever has one', function() {
       var warnings = [{
         type: 'ERROR'
       }, {
@@ -199,7 +199,6 @@ describe('Editor Navigation Component', function() {
 
       expect(openTranslationTutorialSpy).toHaveBeenCalled();
     });
-
 
     it('should return if exploration is private', function() {
       spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
@@ -278,19 +277,19 @@ describe('Editor Navigation Component', function() {
       expect($scope.loadingDotsAreShown).toEqual(false);
     });
 
-    it('should navigate to main tab', function() {
+    it('should navigate to main tab when clicking on tab', function() {
       $scope.selectMainTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('main');
     });
 
-    it('should navigate to translation tab', function() {
+    it('should navigate to translation tab when clicking on tab', function() {
       $scope.selectTranslationTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('translation');
     });
 
-    it('should navigate to preview tab', function() {
+    it('should navigate to preview tab when clicking on tab', function() {
       $scope.selectPreviewTab();
       $rootScope.$apply();
       $flushPendingTasks();
@@ -298,19 +297,19 @@ describe('Editor Navigation Component', function() {
       expect($scope.getActiveTabName()).toBe('preview');
     });
 
-    it('should navigate to settings tab', function() {
+    it('should navigate to settings tab when clicking on tab', function() {
       $scope.selectSettingsTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('settings');
     });
 
-    it('should navigate to stats tab', function() {
+    it('should navigate to stats tab when clicking on tab', function() {
       $scope.selectStatsTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('stats');
     });
 
-    it('should navigate to improvements tab', function() {
+    it('should navigate to improvements tab when clicking on tab', function() {
       spyOn(explorationFeaturesService, 'isInitialized').and.returnValue(true);
       isImprovementsTabEnabledAsyncSpy.and.returnValue(true);
       $scope.selectImprovementsTab();
@@ -318,19 +317,19 @@ describe('Editor Navigation Component', function() {
       expect($scope.getActiveTabName()).toBe('improvements');
     });
 
-    it('should navigate to history tab', function() {
+    it('should navigate to history tab when clicking on tab', function() {
       $scope.selectHistoryTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('history');
     });
 
-    it('should navigate to feedback tab', function() {
+    it('should navigate to feedback tab when clicking on tab', function() {
       $scope.selectFeedbackTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('feedback');
     });
 
-    it('should get open thread count from thread data service', function() {
+    it('should get open thread count', function() {
       spyOn(threadDataService, 'getOpenThreadsCount').and.returnValue(5);
       expect($scope.getOpenThreadsCount()).toBe(5);
     });
