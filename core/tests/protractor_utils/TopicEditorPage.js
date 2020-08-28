@@ -122,6 +122,8 @@ var TopicEditorPage = function() {
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
+  var saveRearrangedSkillsButton = element(
+    by.css('.protractor-save-rearrange-skills'));
 
   this.get = async function(topicId) {
     await browser.get(EDITOR_URL_PREFIX + topicId);
@@ -296,6 +298,11 @@ var TopicEditorPage = function() {
     expect(uncategorizedSkillIndex).not.toEqual(-1);
     var toMove = await uncategorizedSkills.get(uncategorizedSkillIndex);
     await dragAndDrop(toMove, target);
+  };
+
+  this.saveRearrangedSkills = async function() {
+    await action.click(
+      'Save rearranged skills modal', saveRearrangedSkillsButton);
   };
 
   this.navigateToReassignModal = async function() {
