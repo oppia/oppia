@@ -147,7 +147,6 @@ describe('Topics and skills dashboard functionality', function() {
         'Skill to be merged', 'Concept card explanation', false);
     await skillEditorPage.moveToQuestionsTab();
     await skillEditorPage.clickCreateQuestionButton();
-    await skillEditorPage.confirmSkillDifficulty();
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Question 1'));
     await explorationEditorMainTab.setInteraction(

@@ -149,7 +149,6 @@ describe('Skill Editor functionality', function() {
   it('should create a question for the skill', async function() {
     await skillEditorPage.moveToQuestionsTab();
     await skillEditorPage.clickCreateQuestionButton();
-    await skillEditorPage.confirmSkillDifficulty();
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Question 1'));
     await explorationEditorMainTab.setInteraction(
