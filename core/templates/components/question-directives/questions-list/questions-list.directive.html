@@ -1,5 +1,63 @@
 <div class="question-editor-container">
-  <md-card class="question-data-container">
+  <div ng-if="$ctrl.editorIsOpen" class="question-editor-parent">
+    <md-card class="oppia-page-card oppia-mobile-collapsible-card">
+      <div class="difficulty-card-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleDifficultyCard()">
+        <h3>Difficulty</h3>
+        <i class="fa fa-caret-down"
+           ng-if="!$ctrl.difficultyCardIsShown"
+           aria-hidden="true">
+        </i>
+        <i class="fa fa-caret-up"
+           ng-if="$ctrl.difficultyCardIsShown"
+           aria-hidden="true">
+        </i>
+      </div>
+      <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.difficultyCardIsShown">
+        <div class="list-group">
+          <h4>Select Difficulty</h4>
+          <div ng-repeat="skillWithDifficulty in $ctrl.linkedSkillsWithDifficulty track by $index" ng-click="$ctrl.changeLinkedSkillDifficulty()">
+            <label class="list-group-item-heading"><[skillWithDifficulty.getDescription()]></label>
+            <question-difficulty-selector skill-id-to-rubrics-object="$ctrl.skillIdToRubricsObject"
+                                          skill-with-difficulty="skillWithDifficulty">
+            </question-difficulty-selector>
+          </div>
+        </div>
+      </div>
+    </md-card>
+    <div ng-if="!$ctrl.newQuestionIsBeingCreated" class="linked-skills-container">
+      <h4> <strong> Linked Skills </strong> </h4>
+      <md-card class="question-skill-id" ng-repeat="skill in $ctrl.associatedSkillSummaries">
+        <div class="skill-description-card">
+          <span ng-click="$ctrl.removeSkill(skill.getId())" aria-hidden="true">
+            <i class="material-icons oppia-cross-icon md-18">&#xE14C;</i>
+          </span>
+          <a ng-href="<[$ctrl.getSkillEditorUrl(skill.getId())]>" target="_blank" rel="noopener">
+            <[skill.getDescription()]>
+          </a>
+        </div>
+      </md-card>
+      <button class="btn btn-success btn-sm" ng-click="$ctrl.addSkill()">Link Another Skill</button>
+    </div>
+    <question-editor question-id="$ctrl.questionId"
+                     misconceptions-by-skill="$ctrl.misconceptionsBySkill"
+                     question-state-data="$ctrl.questionStateData"
+                     question="$ctrl.question"
+                     can-edit-question="$ctrl.canEditQuestion"
+                     question-changed="$ctrl.questionChanged">
+    </question-editor>
+    <div class="alert alert-danger" ng-if="$ctrl.question.getStateData().interaction.id && $ctrl.question.getValidationErrorMessage()">
+      <[$ctrl.question.getValidationErrorMessage()]>
+    </div>
+    <md-card class="misconception-parent-card" ng-if="$ctrl.question.getStateData().interaction.id && !$ctrl.question.getValidationErrorMessage() && $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill).length">
+      <div>
+        <h3>Misconceptions:</h3>
+        <div ng-repeat="misconceptionName in $ctrl.question.getUnaddressedMisconceptionNames($ctrl.misconceptionsBySkill)" class="misconception-list-item">
+          <[misconceptionName]>
+        </div>
+      </div>
+    </md-card>
+  </div>
+  <md-card class="question-data-container" ng-if="!$ctrl.editorIsOpen">
     <div class="question-list-container">
       <div class="list-header">
         <h3>Question List</h3>
@@ -9,8 +67,8 @@
           There are no questions in this skill.
         </span>
       </div>
-      <div  ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill() track by $index" class="question-list-item protractor-test-question-list-item" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
-        <div ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDifficulty())">
+      <div ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill() track by $index" class="question-list-item protractor-test-question-list-item" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
+        <div ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
           <div class="question-data">
             <angular-html-bind class="question-text" html-data="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()"></angular-html-bind>
             <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription())"
@@ -29,25 +87,64 @@
       </div>
     </div>
   </md-card>
-  <div class="create-question-container">
+  <md-card class="question-data-container question-editor-open-container" ng-if="$ctrl.editorIsOpen">
+    <div class="save-question-container">
+      <div>
+        <div class="list-header">
+          <h3>New Question</h3>
+        </div>
+        <div class="checklist-item">
+          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.linkedSkillsWithDifficulty.length}"><span>1</span></div>
+          <div class="checklist-item-text">Difficulty</div>
+        </div>
+        <div class="checklist-item-separator"></div>
+        <div class="checklist-item">
+          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().content.getHtml().length}">2</div>
+          <div class="checklist-item-text">Problem</div>
+        </div>
+        <div class="checklist-item-separator"></div>
+        <div class="checklist-item">
+          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.id}">3</div>
+          <div class="checklist-item-text">Interaction</div>
+        </div>
+        <div class="checklist-item-separator"></div>
+        <div class="checklist-item">
+          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.answerGroups.length}">4</div>
+          <div class="checklist-item-text">Answers and Responses</div>
+        </div>
+        <div class="checklist-item-separator"></div>
+        <div class="checklist-item">
+          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.hints.length}">5</div>
+          <div class="checklist-item-text">Hints</div>
+        </div>
+        <div class="checklist-item-separator"></div>
+        <div class="checklist-item">
+          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.solution}">6</div>
+          <div class="checklist-item-text">Solution</div>
+        </div>
+      </div>
+      <div class="save-question-button-container">
+        <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
+        <button title="To Save please add: interaction, hint, solution and address all misconceptions"
+                class="btn btn-success add-question-btn protractor-test-save-question-button"
+                ng-click="$ctrl.saveQuestion()"
+                ng-disabled="!$ctrl.isQuestionValid()">
+          Save
+        </button>
+      </div>
+    </div>
+  </md-card>
+  <div class="create-question-container" ng-if="!$ctrl.editorIsOpen">
     <md-card class="oppia-page-card">
       <div>
         <div class="list-header create-question-header">
           <h3>Create a new question</h3>
         </div>
         <button class="btn add-question-btn protractor-test-create-question-button"
+                ng-disabled="$ctrl.selectSkillModalIsShown() && !$ctrl.getSelectedSkillId()"
                 ng-click="$ctrl.createQuestion()">
           + ADD QUESTION
         </button>
-        <div class="list-group" ng-if="$ctrl.showDifficultyChoices">
-          <div class="list-group-item"  ng-repeat="skillWithDifficulty in $ctrl.linkedSkillsWithDifficulty track by $index">
-            <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty.getDescription()]></label>
-            <question-difficulty-selector skill-id-to-rubrics-object="$ctrl.skillIdToRubricsObject"
-                                          skill-with-difficulty="skillWithDifficulty">
-            </question-difficulty-selector>
-            <button class="btn btn-success protractor-test-confirm-skill-difficulty-button" ng-click="$ctrl.initiateQuestionCreation($ctrl.linkedSkillsWithDifficulty)">Save Difficulty</button>
-          </div>
-        </div>
       </div>
     </md-card>
   </div>
@@ -57,24 +154,26 @@
     margin-top: 2%;
   }
   questions-list .question-data-container {
-    margin-right: 1%;
+    margin: 0;
     max-height: 70vh;
     min-height: 70vh;
     overflow-y: scroll;
-    width: 28%;
+    padding: 20px 15px;
+    width: 60%;
   }
   questions-list .question-editor-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 60px;
+    justify-content: space-between;
+    margin: 60px auto 0;
+    width: 70%;
   }
-  questions-list .question-list-container {
+  questions-list .question-list-container,
+  questions-list .save-question-container {
     padding: 0 20px 20px;
   }
   questions-list .create-question-container {
-    padding: 10px 12px;
-    width: 40%;
+    width: 35%;
   }
   questions-list .list-header {
     border-bottom: 2px solid #000;
@@ -92,8 +191,9 @@
     flex-wrap: wrap;
     justify-content: space-between;
   }
-  questions-list  .create-question-header {
+  questions-list .create-question-header {
     border-bottom: none;
+    margin: 0;
   }
   questions-list .question-text {
     width: 90%;
@@ -106,5 +206,129 @@
     color: #FFFFFF;
     font-weight: bold;
     text-align: left;
+  }
+  questions-list .question-editor-parent {
+    width: 60%;
+  }
+  questions-list .question-editor-open-container {
+    width: 35%;
+  }
+  questions-list .checklist-item {
+    display: flex;
+  }
+  questions-list .checklist-item-number {
+    align-items: center;
+    background-color: #FFF;
+    border: 1.5px solid #419889;
+    border-radius: 50%;
+    color: #419889;
+    display: flex;
+    font-size: 12px;
+    height: 22px;
+    justify-content: center;
+    text-align: center;
+    width: 22px;
+  }
+  questions-list .checklist-item-number-active {
+    background-color: #419889;
+    color: #FFF;
+  }
+  questions-list .checklist-item-separator {
+    background-color: #419889;
+    height: 20px;
+    margin: 2px 10px;
+    width: 2px;
+  }
+  questions-list .new-question-header {
+    border-bottom: 2px solid #000;
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 0;
+  }
+  questions-list .question-skill-id {
+    background-color: #efefef;
+    margin-left: 0;
+  }
+  questions-list .question-skill-id:hover {
+    background-color: #e0e0e0;
+  }
+  questions-list .skill-description-card {
+    height: 2.5em;
+    padding-left: 10px;
+    padding-top: 10px;
+  }
+  questions-list .checklist-item-text {
+    margin-left: 5px;
+  }
+  questions-list .btn-success[disabled] {
+    background-color: #008098;
+  }
+  questions-list .save-question-button-container {
+    border-top: 1px solid #000;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding-top: 20px;
+  }
+  questions-list .oppia-cross-icon {
+    color: #FF0000;
+  }
+  questions-list .misconception-parent-card {
+    padding: 20px;
+  }
+  questions-list .misconception-list-item {
+    border: 1px solid #999999;
+    border-radius: 4px;
+    margin: 10px;
+    padding: 15px;
+  }
+  questions-list .linked-skills-container {
+    margin-top: 40px;
+  }
+  questions-list .difficulty-card-header {
+    display: flex;
+    justify-content: space-between;
+  }
+  questions-list .difficulty-card-header i {
+    display: none;
+  }
+  @media screen and (max-width: 768px) {
+    questions-list .question-editor-container {
+      margin-top: 30px;
+      width: 100%;
+    }
+    questions-list .question-data-container {
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: 30px;
+      order: 10;
+      padding: 0;
+      width: 100%;
+    }
+    questions-list .create-question-container {
+      width: 100%;
+    }
+    questions-list .question-editor-parent {
+      width: 100%;
+    }
+
+    questions-list .create-question-header h3 {
+      margin: 0;
+    }
+    questions-list .create-question-container md-card {
+      padding: 25px;
+    }
+    questions-list .create-question-header {
+      padding-bottom: 25px;
+    }
+    questions-tab .questions {
+      margin-bottom: 70px;
+    }
+    questions-list .difficulty-card-header i {
+      display: block;
+    }
+    questions-list .difficulty-card-header h3 {
+      margin: 0;
+    }
   }
 </style>
